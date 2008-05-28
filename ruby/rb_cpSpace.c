@@ -247,6 +247,8 @@ rb_cpSpaceShapePointQuery(int argc, VALUE *argv, VALUE self)
 	rb_scan_args(argc, argv, "10&", &point, &block);
 	
 	cpSpaceShapePointQuery(SPACE(self), *VGET(point), pointQueryHelper, (void *)block);
+	
+	return Qnil;
 }
 
 static VALUE
@@ -256,6 +258,8 @@ rb_cpSpaceStaticShapePointQuery(int argc, VALUE *argv, VALUE self)
 	rb_scan_args(argc, argv, "10&", &point, &block);
 	
 	cpSpaceStaticShapePointQuery(SPACE(self), *VGET(point), pointQueryHelper, (void *)block);
+	
+	return Qnil;
 }
 
 static VALUE
