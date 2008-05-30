@@ -43,7 +43,7 @@ cpfclamp(cpFloat f, cpFloat min, cpFloat max){
 }
 
 #ifndef INFINITY
-	#ifdef _WIN32
+	#ifdef _MSC_VER
 		union MSVC_EVIL_FLOAT_HACK
 		{
 			unsigned __int8 Bytes[4];
