@@ -43,18 +43,34 @@ typedef struct cpShapeClass {
 	// Called to by cpShapeDestroy().
 	void (*destroy)(struct cpShape *shape);
 	
-	// called by cpShapeQueryPoint
+	// called by cpShapeQueryPointQuery().
 	int (*pointQuery)(struct cpShape *shape, cpVect p);
 } cpShapeClass;
 
 // Basic shape struct that the others inherit from.
 typedef struct cpShape{
+	// The "class" of a shape as defined above 
 	const cpShapeClass *klass;
 	
-	// Unique id used as the hash value.
-	unsigned int id;
+	// cpBody that the shape is attached to.
+	cpBody *body;
+
 	// Cached BBox for the shape.
 	cpBB bb;
+	
+	// *** Surface properties.
+	
+	// Coefficient of restitution. (elasticity)
+	cpFloat e;
+	// Coefficient of friction.
+	cpFloat u;
+	// Surface velocity used when solving for friction.
+	cpVect surface_v;
+
+	// *** User Definable Fields
+
+	// User defined data pointer for the shape.
+	void *data;
 	
 	// User defined collision type for the shape.
 	unsigned int collision_type;
@@ -63,18 +79,10 @@ typedef struct cpShape{
 	// User defined layer bitmask for the shape.
 	unsigned int layers;
 	
-	// User defined data pointer for the shape.
-	void *data;
+	// *** Internally Used Fields
 	
-	// cpBody that the shape is attached to.
-	cpBody *body;
-	
-	// Coefficient of restitution. (elasticity)
-	cpFloat e;
-	// Coefficient of friction.
-	cpFloat u;
-	// Surface velocity used when solving for friction.
-	cpVect surface_v;
+	// Unique id used as the hash value.
+	unsigned int id;
 } cpShape;
 
 // Low level shape initialization func.
@@ -129,5 +137,5 @@ typedef struct cpSegmentShape{
 
 // Basic allocation functions for cpSegmentShape.
 cpSegmentShape* cpSegmentShapeAlloc(void);
-cpSegmentShape* cpSegmentShapeInit(cpSegmentShape *seg, cpBody *body, cpVect a, cpVect b, cpFloat r);
-cpShape* cpSegmentShapeNew(cpBody *body, cpVect a, cpVect b, cpFloat r);
+cpSegmentShape* cpSegmentShapeInit(cpSegmentShape *seg, cpBody *body, cpVect a, cpVect b, cpFloat radius);
+cpShape* cpSegmentShapeNew(cpBody *body, cpVect a, cpVect b, cpFloat radius);

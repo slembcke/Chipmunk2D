@@ -119,6 +119,6 @@ void demo5_init(void)
 	}
 	
 	// Give the last domino a little tip.
-	body->w = -1;
-	body->v = cpv(-body->w*20, 0);
+//	body->w = -1;
+//	body->v = cpv(-body->w*20, 0);
 }
