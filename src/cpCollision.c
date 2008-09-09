@@ -284,6 +284,24 @@ seg2poly(cpShape *shape1, cpShape *shape2, cpContact **arr)
 		else
 			findPointsBehindSeg(arr, &max, &num, seg, poly, minNeg, -1.0f);
 	}
+	
+	// If no other collision points are found, try colliding endpoints.
+	if(num == 0){
+		cpVect poly_a = poly->tVerts[mini];
+		cpVect poly_b = poly->tVerts[(mini + 1)%poly->numVerts];
+		
+		if(circle2circleQuery(seg->ta, poly_a, seg->r, 0.0f, arr))
+			return 1;
+			
+		if(circle2circleQuery(seg->tb, poly_a, seg->r, 0.0f, arr))
+			return 1;
+			
+		if(circle2circleQuery(seg->ta, poly_b, seg->r, 0.0f, arr))
+			return 1;
+			
+		if(circle2circleQuery(seg->tb, poly_b, seg->r, 0.0f, arr))
+			return 1;
+	}
 
 	return num;
 }
