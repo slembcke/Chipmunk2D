@@ -66,6 +66,19 @@ rb_cpSpaceSetIterations(VALUE self, VALUE val)
 }
 
 static VALUE
+rb_cpSpaceGetElasticIterations(VALUE self)
+{
+	return INT2NUM(SPACE(self)->elasticIterations);
+}
+
+static VALUE
+rb_cpSpaceSetElasticIterations(VALUE self, VALUE val)
+{
+	SPACE(self)->elasticIterations = NUM2INT(val);
+	return val;
+}
+
+static VALUE
 rb_cpSpaceGetDamping(VALUE self)
 {
 	return rb_float_new(SPACE(self)->damping);
@@ -282,6 +295,9 @@ Init_cpSpace(void)
 	
 	rb_define_method(c_cpSpace, "iterations", rb_cpSpaceGetIterations, 0);
 	rb_define_method(c_cpSpace, "iterations=", rb_cpSpaceSetIterations, 1);
+	
+	rb_define_method(c_cpSpace, "elastic_iterations", rb_cpSpaceGetElasticIterations, 0);
+	rb_define_method(c_cpSpace, "elastic_iterations=", rb_cpSpaceSetElasticIterations, 1);
 	
 	rb_define_method(c_cpSpace, "damping", rb_cpSpaceGetDamping, 0);
 	rb_define_method(c_cpSpace, "damping=", rb_cpSpaceSetDamping, 1);
