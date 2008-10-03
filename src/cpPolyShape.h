@@ -74,3 +74,19 @@ cpPolyShapeContainsVert(cpPolyShape *poly, cpVect v)
 	
 	return 1;
 }
+
+// Same as cpPolyShapeContainsVert() but ignores faces pointing away from the normal.
+static inline int
+cpPolyShapeContainsVertPartial(cpPolyShape *poly, cpVect v, cpVect n)
+{
+	cpPolyShapeAxis *axes = poly->tAxes;
+	
+	int i;
+	for(i=0; i<poly->numVerts; i++){
+		if(cpvdot(axes[i].n, n) < 0.0f) continue;
+		cpFloat dist = cpvdot(axes[i].n, v) - axes[i].d;
+		if(dist > 0.0) return 0;
+	}
+	
+	return 1;
+}

@@ -170,13 +170,13 @@ findVerts(cpContact **arr, cpPolyShape *poly1, cpPolyShape *poly2, cpVect n, cpF
 	
 	for(int i=0; i<poly1->numVerts; i++){
 		cpVect v = poly1->tVerts[i];
-		if(cpPolyShapeContainsVert(poly2, v))
+		if(cpPolyShapeContainsVertPartial(poly2, v, cpvneg(n)))
 			cpContactInit(addContactPoint(arr, &max, &num), v, n, dist, CP_HASH_PAIR(poly1, i));
 	}
 	
 	for(int i=0; i<poly2->numVerts; i++){
 		cpVect v = poly2->tVerts[i];
-		if(cpPolyShapeContainsVert(poly1, v))
+		if(cpPolyShapeContainsVertPartial(poly1, v, n))
 			cpContactInit(addContactPoint(arr, &max, &num), v, n, dist, CP_HASH_PAIR(poly2, i));
 	}
 	
