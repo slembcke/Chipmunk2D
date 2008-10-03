@@ -2,6 +2,6 @@ require 'mkmf'
 
 system 'cp ../src/* ./'
 
-$CFLAGS.gsub!('-O2', '-O3')
+$CFLAGS.gsub!('-fast-math')
 $CFLAGS += ' -std=gnu99'
 create_makefile('chipmunk')
