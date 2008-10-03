@@ -116,7 +116,6 @@
 		D3C4FD4C0AE6E1EA00339F3A /* rb_cpBB.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpBB.c; path = ../ruby/rb_cpBB.c; sourceTree = "<group>"; };
 		D3C4FD510AE6E20D00339F3A /* rb_cpVect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpVect.c; path = ../ruby/rb_cpVect.c; sourceTree = "<group>"; };
 		D3C4FD570AE6E33000339F3A /* rb_cpShape.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpShape.c; path = ../ruby/rb_cpShape.c; sourceTree = "<group>"; };
-		D3CB64560CF58482006D09D8 /* cpSpatialIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpSpatialIndex.h; sourceTree = "<group>"; };
 		D3CCDF460AE35D920080442F /* Demo1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Demo1.c; sourceTree = "<group>"; };
 		D3CCE0390AE364C10080442F /* Demo2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Demo2.c; sourceTree = "<group>"; };
 		D3CCE2780AE4103C0080442F /* Demo3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Demo3.c; sourceTree = "<group>"; };
@@ -175,7 +174,6 @@
 		D37E24570AAAA48800BB4C50 /* Collision */ = {
 			isa = PBXGroup;
 			children = (
-				D3CB64560CF58482006D09D8 /* cpSpatialIndex.h */,
 				D3E5F2DE0AAA562B004E361B /* cpSpaceHash.h */,
 				D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */,
 				D3E5F0C10AA75CA9004E361B /* cpArbiter.h */,

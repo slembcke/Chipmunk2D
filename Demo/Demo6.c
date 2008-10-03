@@ -25,8 +25,6 @@
 #include <stdio.h>
 #include <math.h>
 
-#include <OpenGL/gl.h>
-
 #include "chipmunk.h"
 
 extern cpSpace *space;
