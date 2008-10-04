@@ -46,7 +46,7 @@ rb_cpSpaceInitialize(VALUE self)
 	rb_iv_set(self, "static_shapes", rb_ary_new());
 	rb_iv_set(self, "active_shapes", rb_ary_new());
 	rb_iv_set(self, "bodies", rb_ary_new());
-	rb_iv_set(self, "joints", rb_ary_new());
+	rb_iv_set(self, "constraints", rb_ary_new());
 	rb_iv_set(self, "blocks", rb_hash_new());
 
 	return self;
@@ -191,11 +191,11 @@ rb_cpSpaceAddBody(VALUE self, VALUE body)
 }
 
 static VALUE
-rb_cpSpaceAddJoint(VALUE self, VALUE joint)
+rb_cpSpaceAddConstraint(VALUE self, VALUE constraint)
 {
-	cpSpaceAddJoint(SPACE(self), JOINT(joint));
-	rb_ary_push(rb_iv_get(self, "joints"), joint);
-	return joint;
+	cpSpaceAddConstraint(SPACE(self), CONSTRAINT(constraint));
+	rb_ary_push(rb_iv_get(self, "constraints"), constraint);
+	return constraint;
 }
 
 static VALUE
@@ -220,10 +220,10 @@ rb_cpSpaceRemoveBody(VALUE self, VALUE body)
 }
 
 static VALUE
-rb_cpSpaceRemoveJoint(VALUE self, VALUE joint)
+rb_cpSpaceRemoveConstraint(VALUE self, VALUE constraint)
 {
-	cpSpaceRemoveJoint(SPACE(self), JOINT(joint));
-	return rb_ary_delete(rb_iv_get(self, "joints"), joint);
+	cpSpaceRemoveConstraint(SPACE(self), CONSTRAINT(constraint));
+	return rb_ary_delete(rb_iv_get(self, "constraints"), constraint);
 }
 
 static VALUE
@@ -312,12 +312,12 @@ Init_cpSpace(void)
 	rb_define_method(c_cpSpace, "add_shape", rb_cpSpaceAddShape, 1);
 	rb_define_method(c_cpSpace, "add_static_shape", rb_cpSpaceAddStaticShape, 1);
 	rb_define_method(c_cpSpace, "add_body", rb_cpSpaceAddBody, 1);
-	rb_define_method(c_cpSpace, "add_joint", rb_cpSpaceAddJoint, 1);
+	rb_define_method(c_cpSpace, "add_constraint", rb_cpSpaceAddConstraint, 1);
 	
 	rb_define_method(c_cpSpace, "remove_shape", rb_cpSpaceRemoveShape, 1);
 	rb_define_method(c_cpSpace, "remove_static_shape", rb_cpSpaceRemoveStaticShape, 1);
 	rb_define_method(c_cpSpace, "remove_body", rb_cpSpaceRemoveBody, 1);
-	rb_define_method(c_cpSpace, "remove_joint", rb_cpSpaceRemoveJoint, 1);
+	rb_define_method(c_cpSpace, "remove_constraint", rb_cpSpaceRemoveConstraint, 1);
 	
 	rb_define_method(c_cpSpace, "resize_static_hash", rb_cpSpaceResizeStaticHash, 2);
 	rb_define_method(c_cpSpace, "resize_active_hash", rb_cpSpaceResizeActiveHash, 2);

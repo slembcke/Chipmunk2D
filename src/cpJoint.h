@@ -21,38 +21,28 @@
 
 // TODO: Comment me!
 	
-extern cpFloat cp_joint_bias_coef;
+extern cpFloat cp_constraint_bias_coef;
 
-typedef enum cpJointType {
-	CP_PIN_JOINT,
-	CP_PIVOT_JOINT,
-	CP_SLIDE_JOINT,
-	CP_GROOVE_JOINT,
-	CP_CUSTOM_JOINT, // For user definable joint types.
-} cpJointType;
+struct cpConstraintClass;
+struct cpConstraint;
 
-struct cpJoint;
-struct cpJointClass;
+typedef struct cpConstraintClass {
+	void (*preStep)(struct cpConstraint *constraint, cpFloat dt_inv);
+	void (*applyImpulse)(struct cpConstraint *constraint);
+} cpConstraintClass;
 
-typedef struct cpJointClass {
-	cpJointType type;
-	
-	void (*preStep)(struct cpJoint *joint, cpFloat dt_inv);
-	void (*applyImpulse)(struct cpJoint *joint);
-} cpJointClass;
-
-typedef struct cpJoint {
-	const cpJointClass *klass;
+typedef struct cpConstraint {
+	const cpConstraintClass *klass;
 	
 	cpBody *a, *b;
-} cpJoint;
+} cpConstraint;
 
-void cpJointDestroy(cpJoint *joint);
-void cpJointFree(cpJoint *joint);
+void cpConstraintDestroy(cpConstraint *constraint);
+void cpConstraintFree(cpConstraint *constraint);
 
 
 typedef struct cpPinJoint {
-	cpJoint joint;
+	cpConstraint constraint;
 	cpVect anchr1, anchr2;
 	cpFloat dist;
 	
@@ -66,11 +56,11 @@ typedef struct cpPinJoint {
 
 cpPinJoint *cpPinJointAlloc(void);
 cpPinJoint *cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
-cpJoint *cpPinJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
+cpConstraint *cpPinJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
 
 
 typedef struct cpSlideJoint {
-	cpJoint joint;
+	cpConstraint constraint;
 	cpVect anchr1, anchr2;
 	cpFloat min, max;
 	
@@ -84,11 +74,11 @@ typedef struct cpSlideJoint {
 
 cpSlideJoint *cpSlideJointAlloc(void);
 cpSlideJoint *cpSlideJointInit(cpSlideJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max);
-cpJoint *cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max);
+cpConstraint *cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max);
 
 
 typedef struct cpPivotJoint {
-	cpJoint joint;
+	cpConstraint constraint;
 	cpVect anchr1, anchr2;
 	
 	cpVect r1, r2;
@@ -100,11 +90,11 @@ typedef struct cpPivotJoint {
 
 cpPivotJoint *cpPivotJointAlloc(void);
 cpPivotJoint *cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect pivot);
-cpJoint *cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot);
+cpConstraint *cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot);
 
 
 typedef struct cpGrooveJoint {
-	cpJoint joint;
+	cpConstraint constraint;
 	cpVect grv_n, grv_a, grv_b;
 	cpVect  anchr2;
 	
@@ -119,4 +109,4 @@ typedef struct cpGrooveJoint {
 
 cpGrooveJoint *cpGrooveJointAlloc(void);
 cpGrooveJoint *cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);
-cpJoint *cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);
+cpConstraint *cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);

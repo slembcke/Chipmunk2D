@@ -26,23 +26,23 @@
 
 // TODO: Comment me!
 
-cpFloat cp_joint_bias_coef = 0.1f;
+cpFloat cp_constraint_bias_coef = 0.1f;
 
-void cpJointDestroy(cpJoint *joint){}
+void cpConstraintDestroy(cpConstraint *constraint){}
 
 void
-cpJointFree(cpJoint *joint)
+cpConstraintFree(cpConstraint *constraint)
 {
-	if(joint) cpJointDestroy(joint);
-	free(joint);
+	if(constraint) cpConstraintDestroy(constraint);
+	free(constraint);
 }
 
 static void
-cpJointInit(cpJoint *joint, const cpJointClass *klass, cpBody *a, cpBody *b)
+cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b)
 {
-	joint->klass = klass;
-	joint->a = a;
-	joint->b = b;
+	constraint->klass = klass;
+	constraint->a = a;
+	constraint->b = b;
 }
 
 
@@ -80,7 +80,7 @@ apply_bias_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
 
 
 static void
-pinJointPreStep(cpJoint *joint, cpFloat dt_inv)
+pinJointPreStep(cpConstraint *joint, cpFloat dt_inv)
 {
 	cpBody *a = joint->a;
 	cpBody *b = joint->b;
@@ -97,7 +97,7 @@ pinJointPreStep(cpJoint *joint, cpFloat dt_inv)
 	jnt->nMass = 1.0f/scalar_k(a, b, jnt->r1, jnt->r2, jnt->n);
 	
 	// calculate bias velocity
-	jnt->bias = -cp_joint_bias_coef*dt_inv*(dist - jnt->dist);
+	jnt->bias = -cp_constraint_bias_coef*dt_inv*(dist - jnt->dist);
 	jnt->jBias = 0.0f;
 	
 	// apply accumulated impulse
@@ -106,7 +106,7 @@ pinJointPreStep(cpJoint *joint, cpFloat dt_inv)
 }
 
 static void
-pinJointApplyImpulse(cpJoint *joint)
+pinJointApplyImpulse(cpConstraint *joint)
 {
 	cpBody *a = joint->a;
 	cpBody *b = joint->b;
@@ -139,8 +139,7 @@ pinJointApplyImpulse(cpJoint *joint)
 	apply_impulses(a, b, jnt->r1, jnt->r2, j);
 }
 
-static const cpJointClass pinJointClass = {
-	CP_PIN_JOINT,
+static const cpConstraintClass pinJointClass = {
 	pinJointPreStep,
 	pinJointApplyImpulse,
 };
@@ -154,7 +153,7 @@ cpPinJointAlloc(void)
 cpPinJoint *
 cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
 {
-	cpJointInit((cpJoint *)joint, &pinJointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &pinJointClass, a, b);
 	
 	joint->anchr1 = anchr1;
 	joint->anchr2 = anchr2;
@@ -168,17 +167,17 @@ cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect an
 	return joint;
 }
 
-cpJoint *
+cpConstraint *
 cpPinJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
 {
-	return (cpJoint *)cpPinJointInit(cpPinJointAlloc(), a, b, anchr1, anchr2);
+	return (cpConstraint *)cpPinJointInit(cpPinJointAlloc(), a, b, anchr1, anchr2);
 }
 
 
 
 
 static void
-slideJointPreStep(cpJoint *joint, cpFloat dt_inv)
+slideJointPreStep(cpConstraint *joint, cpFloat dt_inv)
 {
 	cpBody *a = joint->a;
 	cpBody *b = joint->b;
@@ -202,7 +201,7 @@ slideJointPreStep(cpJoint *joint, cpFloat dt_inv)
 	jnt->nMass = 1.0f/scalar_k(a, b, jnt->r1, jnt->r2, jnt->n);
 	
 	// calculate bias velocity
-	jnt->bias = -cp_joint_bias_coef*dt_inv*(pdist);
+	jnt->bias = -cp_constraint_bias_coef*dt_inv*(pdist);
 	jnt->jBias = 0.0f;
 	
 	// apply accumulated impulse
@@ -216,7 +215,7 @@ slideJointPreStep(cpJoint *joint, cpFloat dt_inv)
 }
 
 static void
-slideJointApplyImpulse(cpJoint *joint)
+slideJointApplyImpulse(cpConstraint *joint)
 {
 	cpSlideJoint *jnt = (cpSlideJoint *)joint;
 	if(!jnt->bias) return;  // early exit
@@ -255,8 +254,7 @@ slideJointApplyImpulse(cpJoint *joint)
 	apply_impulses(a, b, jnt->r1, jnt->r2, j);
 }
 
-static const cpJointClass slideJointClass = {
-	CP_SLIDE_JOINT,
+static const cpConstraintClass slideJointClass = {
 	slideJointPreStep,
 	slideJointApplyImpulse,
 };
@@ -270,7 +268,7 @@ cpSlideJointAlloc(void)
 cpSlideJoint *
 cpSlideJointInit(cpSlideJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max)
 {
-	cpJointInit((cpJoint *)joint, &slideJointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &slideJointClass, a, b);
 	
 	joint->anchr1 = anchr1;
 	joint->anchr2 = anchr2;
@@ -282,17 +280,17 @@ cpSlideJointInit(cpSlideJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVec
 	return joint;
 }
 
-cpJoint *
+cpConstraint *
 cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max)
 {
-	return (cpJoint *)cpSlideJointInit(cpSlideJointAlloc(), a, b, anchr1, anchr2, min, max);
+	return (cpConstraint *)cpSlideJointInit(cpSlideJointAlloc(), a, b, anchr1, anchr2, min, max);
 }
 
 
 
 
 static void
-pivotJointPreStep(cpJoint *joint, cpFloat dt_inv)
+pivotJointPreStep(cpConstraint *joint, cpFloat dt_inv)
 {
 	cpBody *a = joint->a;
 	cpBody *b = joint->b;
@@ -328,7 +326,7 @@ pivotJointPreStep(cpJoint *joint, cpFloat dt_inv)
 	
 	// calculate bias velocity
 	cpVect delta = cpvsub(cpvadd(b->p, jnt->r2), cpvadd(a->p, jnt->r1));
-	jnt->bias = cpvmult(delta, -cp_joint_bias_coef*dt_inv);
+	jnt->bias = cpvmult(delta, -cp_constraint_bias_coef*dt_inv);
 	jnt->jBias = cpvzero;
 	
 	// apply accumulated impulse
@@ -336,7 +334,7 @@ pivotJointPreStep(cpJoint *joint, cpFloat dt_inv)
 }
 
 static void
-pivotJointApplyImpulse(cpJoint *joint)
+pivotJointApplyImpulse(cpConstraint *joint)
 {
 	cpBody *a = joint->a;
 	cpBody *b = joint->b;
@@ -367,8 +365,7 @@ pivotJointApplyImpulse(cpJoint *joint)
 	apply_impulses(a, b, jnt->r1, jnt->r2, j);
 }
 
-static const cpJointClass pivotJointClass = {
-	CP_PIVOT_JOINT,
+static const cpConstraintClass pivotJointClass = {
 	pivotJointPreStep,
 	pivotJointApplyImpulse,
 };
@@ -382,7 +379,7 @@ cpPivotJointAlloc(void)
 cpPivotJoint *
 cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect pivot)
 {
-	cpJointInit((cpJoint *)joint, &pivotJointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &pivotJointClass, a, b);
 	
 	joint->anchr1 = cpvunrotate(cpvsub(pivot, a->p), a->rot);
 	joint->anchr2 = cpvunrotate(cpvsub(pivot, b->p), b->rot);
@@ -392,17 +389,17 @@ cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect pivot)
 	return joint;
 }
 
-cpJoint *
+cpConstraint *
 cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot)
 {
-	return (cpJoint *)cpPivotJointInit(cpPivotJointAlloc(), a, b, pivot);
+	return (cpConstraint *)cpPivotJointInit(cpPivotJointAlloc(), a, b, pivot);
 }
 
 
 
 
 static void
-grooveJointPreStep(cpJoint *joint, cpFloat dt_inv)
+grooveJointPreStep(cpConstraint *joint, cpFloat dt_inv)
 {
 	cpBody *a = joint->a;
 	cpBody *b = joint->b;
@@ -464,7 +461,7 @@ grooveJointPreStep(cpJoint *joint, cpFloat dt_inv)
 	
 	// calculate bias velocity
 	cpVect delta = cpvsub(cpvadd(b->p, jnt->r2), cpvadd(a->p, jnt->r1));
-	jnt->bias = cpvmult(delta, -cp_joint_bias_coef*dt_inv);
+	jnt->bias = cpvmult(delta, -cp_constraint_bias_coef*dt_inv);
 	jnt->jBias = cpvzero;
 	
 	// apply accumulated impulse
@@ -484,7 +481,7 @@ grooveConstrain(cpGrooveJoint *jnt, cpVect j){
 }
 
 static void
-grooveJointApplyImpulse(cpJoint *joint)
+grooveJointApplyImpulse(cpConstraint *joint)
 {
 	cpBody *a = joint->a;
 	cpBody *b = joint->b;
@@ -518,8 +515,7 @@ grooveJointApplyImpulse(cpJoint *joint)
 	apply_impulses(a, b, jnt->r1, jnt->r2, j);
 }
 
-static const cpJointClass grooveJointClass = {
-	CP_GROOVE_JOINT,
+static const cpConstraintClass grooveJointClass = {
 	grooveJointPreStep,
 	grooveJointApplyImpulse,
 };
@@ -533,7 +529,7 @@ cpGrooveJointAlloc(void)
 cpGrooveJoint *
 cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2)
 {
-	cpJointInit((cpJoint *)joint, &grooveJointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &grooveJointClass, a, b);
 	
 	joint->grv_a = groove_a;
 	joint->grv_b = groove_b;
@@ -545,9 +541,9 @@ cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpVect groove_a, c
 	return joint;
 }
 
-cpJoint *
+cpConstraint *
 cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2)
 {
-	return (cpJoint *)cpGrooveJointInit(cpGrooveJointAlloc(), a, b, groove_a, groove_b, anchr2);
+	return (cpConstraint *)cpGrooveJointInit(cpGrooveJointAlloc(), a, b, groove_a, groove_b, anchr2);
 }
 

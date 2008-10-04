@@ -63,7 +63,7 @@ typedef struct cpBody{
 	
 	// *** Internally Used Fields
 	
-	// Velocity bias values used when solving penetrations and correcting joints.
+	// Velocity bias values used when solving penetrations and correcting constraints.
 	cpVect v_bias;
 	cpFloat w_bias;
 	
@@ -113,7 +113,7 @@ cpBodyApplyImpulse(cpBody *body, cpVect j, cpVect r)
 	body->w += body->i_inv*cpvcross(r, j);
 }
 
-// Not intended for external use. Used by cpArbiter.c and cpJoint.c.
+// Not intended for external use. Used by cpArbiter.c and cpConstraint.c.
 static inline void
 cpBodyApplyBiasImpulse(cpBody *body, cpVect j, cpVect r)
 {

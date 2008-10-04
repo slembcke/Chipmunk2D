@@ -104,6 +104,6 @@ Init_chipmunk(void)
 	Init_cpBB();
 	Init_cpBody();
 	Init_cpShape();
-	Init_cpJoint();
+	Init_cpConstraint();
 	Init_cpSpace();
 }

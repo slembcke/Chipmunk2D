@@ -24,22 +24,22 @@
 #include "ruby.h"
 #include "rb_chipmunk.h"
 
-VALUE m_cpJoint;
+VALUE m_cpConstraint;
 
 static VALUE
-rb_cpPinJointAlloc(VALUE klass)
+rb_cpPinConstraintAlloc(VALUE klass)
 {
-	cpPinJoint *joint = cpPinJointAlloc();
-	VALUE self = Data_Wrap_Struct(klass, NULL, cpJointFree, joint);
+	cpPinConstraint *constraint = cpPinConstraintAlloc();
+	VALUE self = Data_Wrap_Struct(klass, NULL, cpConstraintFree, constraint);
 	
 	return self;
 }
 
 static VALUE
-rb_cpPinJointInit(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2)
+rb_cpPinConstraintInit(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2)
 {
-	cpPinJoint *joint = (cpPinJoint *)JOINT(self);
-	cpPinJointInit(joint, BODY(a), BODY(b), *VGET(anchr1), *VGET(anchr2));
+	cpPinConstraint *constraint = (cpPinConstraint *)CONSTRAINT(self);
+	cpPinConstraintInit(constraint, BODY(a), BODY(b), *VGET(anchr1), *VGET(anchr2));
 	rb_iv_set(self, "body_a", a);
 	rb_iv_set(self, "body_b", b);
 	
@@ -48,19 +48,19 @@ rb_cpPinJointInit(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2)
 
 
 static VALUE
-rb_cpSlideJointAlloc(VALUE klass)
+rb_cpSlideConstraintAlloc(VALUE klass)
 {
-	cpSlideJoint *joint = cpSlideJointAlloc();
-	VALUE self = Data_Wrap_Struct(klass, NULL, cpJointFree, joint);
+	cpSlideConstraint *constraint = cpSlideConstraintAlloc();
+	VALUE self = Data_Wrap_Struct(klass, NULL, cpConstraintFree, constraint);
 	
 	return self;
 }
 
 static VALUE
-rb_cpSlideJointInit(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2, VALUE min, VALUE max)
+rb_cpSlideConstraintInit(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2, VALUE min, VALUE max)
 {
-	cpSlideJoint *joint = (cpSlideJoint *)JOINT(self);
-	cpSlideJointInit(joint, BODY(a), BODY(b), *VGET(anchr1), *VGET(anchr2), NUM2DBL(min), NUM2DBL(max));
+	cpSlideConstraint *constraint = (cpSlideConstraint *)CONSTRAINT(self);
+	cpSlideConstraintInit(constraint, BODY(a), BODY(b), *VGET(anchr1), *VGET(anchr2), NUM2DBL(min), NUM2DBL(max));
 	rb_iv_set(self, "body_a", a);
 	rb_iv_set(self, "body_b", b);
 	
@@ -69,19 +69,19 @@ rb_cpSlideJointInit(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2, VA
 
 
 static VALUE
-rb_cpPivotJointAlloc(VALUE klass)
+rb_cpPivotConstraintAlloc(VALUE klass)
 {
-	cpPivotJoint *joint = cpPivotJointAlloc();
-	VALUE self = Data_Wrap_Struct(klass, NULL, cpJointFree, joint);
+	cpPivotConstraint *constraint = cpPivotConstraintAlloc();
+	VALUE self = Data_Wrap_Struct(klass, NULL, cpConstraintFree, constraint);
 	
 	return self;
 }
 
 static VALUE
-rb_cpPivotJointInit(VALUE self, VALUE a, VALUE b, VALUE pivot)
+rb_cpPivotConstraintInit(VALUE self, VALUE a, VALUE b, VALUE pivot)
 {
-	cpPivotJoint *joint = (cpPivotJoint *)JOINT(self);
-	cpPivotJointInit(joint, BODY(a), BODY(b), *VGET(pivot));
+	cpPivotConstraint *constraint = (cpPivotConstraint *)CONSTRAINT(self);
+	cpPivotConstraintInit(constraint, BODY(a), BODY(b), *VGET(pivot));
 	rb_iv_set(self, "body_a", a);
 	rb_iv_set(self, "body_b", b);
 	
@@ -90,19 +90,19 @@ rb_cpPivotJointInit(VALUE self, VALUE a, VALUE b, VALUE pivot)
 
 
 static VALUE
-rb_cpGrooveJointAlloc(VALUE klass)
+rb_cpGrooveConstraintAlloc(VALUE klass)
 {
-	cpGrooveJoint *joint = cpGrooveJointAlloc();
-	VALUE self = Data_Wrap_Struct(klass, NULL, cpJointFree, joint);
+	cpGrooveConstraint *constraint = cpGrooveConstraintAlloc();
+	VALUE self = Data_Wrap_Struct(klass, NULL, cpConstraintFree, constraint);
 	
 	return self;
 }
 
 static VALUE
-rb_cpGrooveJointInit(VALUE self, VALUE a, VALUE b, VALUE grv_a, VALUE grv_b, VALUE anchr2)
+rb_cpGrooveConstraintInit(VALUE self, VALUE a, VALUE b, VALUE grv_a, VALUE grv_b, VALUE anchr2)
 {
-	cpGrooveJoint *joint = (cpGrooveJoint *)JOINT(self);
-	cpGrooveJointInit(joint, BODY(a), BODY(b), *VGET(grv_a), *VGET(grv_b), *VGET(anchr2));
+	cpGrooveConstraint *constraint = (cpGrooveConstraint *)CONSTRAINT(self);
+	cpGrooveConstraintInit(constraint, BODY(a), BODY(b), *VGET(grv_a), *VGET(grv_b), *VGET(anchr2));
 	rb_iv_set(self, "body_a", a);
 	rb_iv_set(self, "body_b", b);
 	
@@ -110,27 +110,27 @@ rb_cpGrooveJointInit(VALUE self, VALUE a, VALUE b, VALUE grv_a, VALUE grv_b, VAL
 }
 
 void
-Init_cpJoint(void)
+Init_cpConstraint(void)
 {
-	m_cpJoint = rb_define_module_under(m_Chipmunk, "Joint");	
+	m_cpConstraint = rb_define_module_under(m_Chipmunk, "Constraint");	
 	
-	VALUE c_cpPinJoint = rb_define_class_under(m_cpJoint, "Pin", rb_cObject);
-	rb_include_module(c_cpPinJoint, m_cpJoint);
-	rb_define_alloc_func(c_cpPinJoint, rb_cpPinJointAlloc);
-	rb_define_method(c_cpPinJoint, "initialize", rb_cpPinJointInit, 4);
+	VALUE c_cpPinConstraint = rb_define_class_under(m_cpConstraint, "Pin", rb_cObject);
+	rb_include_module(c_cpPinConstraint, m_cpConstraint);
+	rb_define_alloc_func(c_cpPinConstraint, rb_cpPinConstraintAlloc);
+	rb_define_method(c_cpPinConstraint, "initialize", rb_cpPinConstraintInit, 4);
 	
-	VALUE c_cpSlideJoint = rb_define_class_under(m_cpJoint, "Slide", rb_cObject);
-	rb_include_module(c_cpSlideJoint, m_cpJoint);
-	rb_define_alloc_func(c_cpSlideJoint, rb_cpSlideJointAlloc);
-	rb_define_method(c_cpSlideJoint, "initialize", rb_cpSlideJointInit, 6);
+	VALUE c_cpSlideConstraint = rb_define_class_under(m_cpConstraint, "Slide", rb_cObject);
+	rb_include_module(c_cpSlideConstraint, m_cpConstraint);
+	rb_define_alloc_func(c_cpSlideConstraint, rb_cpSlideConstraintAlloc);
+	rb_define_method(c_cpSlideConstraint, "initialize", rb_cpSlideConstraintInit, 6);
 	
-	VALUE c_cpPivotJoint = rb_define_class_under(m_cpJoint, "Pivot", rb_cObject);
-	rb_include_module(c_cpPivotJoint, m_cpJoint);
-	rb_define_alloc_func(c_cpPivotJoint, rb_cpPivotJointAlloc);
-	rb_define_method(c_cpPivotJoint, "initialize", rb_cpPivotJointInit, 3);
+	VALUE c_cpPivotConstraint = rb_define_class_under(m_cpConstraint, "Pivot", rb_cObject);
+	rb_include_module(c_cpPivotConstraint, m_cpConstraint);
+	rb_define_alloc_func(c_cpPivotConstraint, rb_cpPivotConstraintAlloc);
+	rb_define_method(c_cpPivotConstraint, "initialize", rb_cpPivotConstraintInit, 3);
 	
-	VALUE c_cpGrooveJoint = rb_define_class_under(m_cpJoint, "Groove", rb_cObject);
-	rb_include_module(c_cpGrooveJoint, m_cpJoint);
-	rb_define_alloc_func(c_cpGrooveJoint, rb_cpGrooveJointAlloc);
-	rb_define_method(c_cpGrooveJoint, "initialize", rb_cpGrooveJointInit, 5);
+	VALUE c_cpGrooveConstraint = rb_define_class_under(m_cpConstraint, "Groove", rb_cObject);
+	rb_include_module(c_cpGrooveConstraint, m_cpConstraint);
+	rb_define_alloc_func(c_cpGrooveConstraint, rb_cpGrooveConstraintAlloc);
+	rb_define_method(c_cpGrooveConstraint, "initialize", rb_cpGrooveConstraintInit, 5);
 }
