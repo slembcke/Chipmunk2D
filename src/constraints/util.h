@@ -18,51 +18,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
-// Used for resizing hash tables.
-// Values approximately double.
 
-static int primes[] = {
-	5,          //2^2  + 1
-	11,         //2^3  + 3
-	17,         //2^4  + 1
-	37,         //2^5  + 5
-	67,         //2^6  + 3
-	131,        //2^7  + 3
-	257,        //2^8  + 1
-	521,        //2^9  + 9
-	1031,       //2^10 + 7
-	2053,       //2^11 + 5
-	4099,       //2^12 + 3
-	8209,       //2^13 + 17
-	16411,      //2^14 + 27
-	32771,      //2^15 + 3
-	65537,      //2^16 + 1
-	131101,     //2^17 + 29
-	262147,     //2^18 + 3
-	524309,     //2^19 + 21
-	1048583,    //2^20 + 7
-	2097169,    //2^21 + 17
-	4194319,    //2^22 + 15
-	8388617,    //2^23 + 9
-	16777259,   //2^24 + 43
-	33554467,   //2^25 + 35
-	67108879,   //2^26 + 15
-	134217757,  //2^27 + 29
-	268435459,  //2^28 + 3
-	536870923,  //2^29 + 11
-	1073741827, //2^30 + 3
-	0,
-};
-
-static inline int
-next_prime(int n)
+static inline void
+cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b)
 {
-	int i = 0;
-	while(n > primes[i]){
-		i++;
-		assert(primes[i]); // realistically this should never happen
-	}
+	constraint->klass = klass;
+	constraint->a = a;
+	constraint->b = b;
+}
+
+static inline cpVect
+relative_velocity(cpVect r1, cpVect v1, cpFloat w1, cpVect r2, cpVect v2, cpFloat w2){
+	cpVect v1_sum = cpvadd(v1, cpvmult(cpvperp(r1), w1));
+	cpVect v2_sum = cpvadd(v2, cpvmult(cpvperp(r2), w2));
 	
-	return primes[i];
+	return cpvsub(v2_sum, v1_sum);
+}
+
+static inline cpFloat
+k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n)
+{
+	cpFloat mass_sum = a->m_inv + b->m_inv;
+	cpFloat r1cn = cpvcross(r1, n);
+	cpFloat r2cn = cpvcross(r2, n);
+
+	return mass_sum + a->i_inv*r1cn*r1cn + b->i_inv*r2cn*r2cn;
+}
+
+static inline void
+apply_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
+{
+	cpBodyApplyImpulse(a, cpvneg(j), r1);
+	cpBodyApplyImpulse(b, j, r2);
+}
+
+static inline void
+apply_bias_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
+{
+	cpBodyApplyBiasImpulse(a, cpvneg(j), r1);
+	cpBodyApplyBiasImpulse(b, j, r2);
 }
