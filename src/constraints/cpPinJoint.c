@@ -46,7 +46,6 @@ pinJointPreStep(cpConstraint *joint, cpFloat dt_inv)
 	
 	// calculate bias velocity
 	jnt->bias = -cp_constraint_bias_coef*dt_inv*(dist - jnt->dist);
-	jnt->jBias = 0.0f;
 	
 	// apply accumulated impulse
 	cpVect j = cpvmult(jnt->n, jnt->jnAcc);
@@ -64,22 +63,12 @@ pinJointApplyImpulse(cpConstraint *joint)
 	cpVect r1 = jnt->r1;
 	cpVect r2 = jnt->r2;
 
-	//calculate bias impulse
-	cpVect vbr = relative_velocity(r1, a->v_bias, a->w_bias, r2, b->v_bias, b->w_bias);
-	cpFloat vbn = cpvdot(vbr, n);
-	
-	cpFloat jbn = (jnt->bias - vbn)*jnt->nMass;
-	jnt->jBias += jbn;
-	
-	cpVect jb = cpvmult(n, jbn);
-	apply_bias_impulses(a, b, jnt->r1, jnt->r2, jb);
-	
 	// compute relative velocity
 	cpVect vr = relative_velocity(r1, a->v, a->w, r2, b->v, b->w);
 	cpFloat vrn = cpvdot(vr, n);
 	
 	// compute normal impulse
-	cpFloat jn = -vrn*jnt->nMass;
+	cpFloat jn = (jnt->bias - vrn)*jnt->nMass;
 	jnt->jnAcc =+ jn;
 	
 	// apply impulse

@@ -50,7 +50,6 @@ slideJointPreStep(cpConstraint *joint, cpFloat dt_inv)
 	
 	// calculate bias velocity
 	jnt->bias = -cp_constraint_bias_coef*dt_inv*(pdist);
-	jnt->jBias = 0.0f;
 	
 	// apply accumulated impulse
 	if(!jnt->bias) //{
@@ -74,25 +73,13 @@ slideJointApplyImpulse(cpConstraint *joint)
 	cpVect n = jnt->n;
 	cpVect r1 = jnt->r1;
 	cpVect r2 = jnt->r2;
-	
-	//calculate bias impulse
-	cpVect vbr = relative_velocity(r1, a->v_bias, a->w_bias, r2, b->v_bias, b->w_bias);
-	cpFloat vbn = cpvdot(vbr, n);
-	
-	cpFloat jbn = (jnt->bias - vbn)*jnt->nMass;
-	cpFloat jbnOld = jnt->jBias;
-	jnt->jBias = cpfmin(jbnOld + jbn, 0.0f);
-	jbn = jnt->jBias - jbnOld;
-	
-	cpVect jb = cpvmult(n, jbn);
-	apply_bias_impulses(a, b, jnt->r1, jnt->r2, jb);
-	
+		
 	// compute relative velocity
 	cpVect vr = relative_velocity(r1, a->v, a->w, r2, b->v, b->w);
 	cpFloat vrn = cpvdot(vr, n);
 	
 	// compute normal impulse
-	cpFloat jn = -vrn*jnt->nMass;
+	cpFloat jn = (jnt->bias - vrn)*jnt->nMass;
 	cpFloat jnOld = jnt->jnAcc;
 	jnt->jnAcc = cpfmin(jnOld + jn, 0.0f);
 	jn = jnt->jnAcc - jnOld;

@@ -26,7 +26,7 @@ typedef struct cpPivotJoint {
 	cpVect r1, r2;
 	cpVect k1, k2;
 	
-	cpVect jAcc, jBias;
+	cpVect jAcc;
 	cpVect bias;
 } cpPivotJoint;
 

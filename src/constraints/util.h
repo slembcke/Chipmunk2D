@@ -19,13 +19,7 @@
  * SOFTWARE.
  */
 
-static inline void
-cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b)
-{
-	constraint->klass = klass;
-	constraint->a = a;
-	constraint->b = b;
-}
+void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b);
 
 static inline cpVect
 relative_velocity(cpVect r1, cpVect v1, cpFloat w1, cpVect r2, cpVect v2, cpFloat w2){

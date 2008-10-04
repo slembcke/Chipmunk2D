@@ -62,7 +62,6 @@ pivotJointPreStep(cpConstraint *joint, cpFloat dt_inv)
 	// calculate bias velocity
 	cpVect delta = cpvsub(cpvadd(b->p, jnt->r2), cpvadd(a->p, jnt->r1));
 	jnt->bias = cpvmult(delta, -cp_constraint_bias_coef*dt_inv);
-	jnt->jBias = cpvzero;
 	
 	// apply accumulated impulse
 	apply_impulses(a, b, jnt->r1, jnt->r2, jnt->jAcc);
@@ -79,21 +78,12 @@ pivotJointApplyImpulse(cpConstraint *joint)
 	cpVect r2 = jnt->r2;
 	cpVect k1 = jnt->k1;
 	cpVect k2 = jnt->k2;
-	
-	//calculate bias impulse
-	cpVect vbr = relative_velocity(r1, a->v_bias, a->w_bias, r2, b->v_bias, b->w_bias);
-	vbr = cpvsub(jnt->bias, vbr);
-	
-	cpVect jb = cpv(cpvdot(vbr, k1), cpvdot(vbr, k2));
-	jnt->jBias = cpvadd(jnt->jBias, jb);
-	
-	apply_bias_impulses(a, b, jnt->r1, jnt->r2, jb);
-	
+		
 	// compute relative velocity
 	cpVect vr = relative_velocity(r1, a->v, a->w, r2, b->v, b->w);
 	
 	// compute normal impulse
-	cpVect j = cpv(-cpvdot(vr, k1), -cpvdot(vr, k2));
+	cpVect j = cpvadd(jnt->bias, cpv(-cpvdot(vr, k1), -cpvdot(vr, k2)));
 	jnt->jAcc = cpvadd(jnt->jAcc, j);
 	
 	// apply impulse

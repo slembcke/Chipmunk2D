@@ -37,3 +37,12 @@ cpConstraintFree(cpConstraint *constraint)
 	if(constraint) cpConstraintDestroy(constraint);
 	free(constraint);
 }
+
+// defined in util.h
+void
+cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b)
+{
+	constraint->klass = klass;
+	constraint->a = a;
+	constraint->b = b;
+}
