@@ -60,7 +60,8 @@ make_box(cpFloat x, cpFloat y)
 		cpv( 15,-7),
 	};
 	
-	cpBody *body = cpBodyNew(10.0, cpMomentForPoly(1.0, num, verts, cpv(0,0)));
+	cpFloat mass = 100.0;
+	cpBody *body = cpBodyNew(mass, cpMomentForPoly(mass, num, verts, cpv(0,0)));
 	//	cpBody *body1 = cpBodyNew(1.0/0.0, 1.0/0.0);
 	body->p = cpv(x, y);
 	cpSpaceAddBody(space, body);
