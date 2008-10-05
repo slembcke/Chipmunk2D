@@ -119,6 +119,8 @@ cpSpace *space;
 cpBody *staticBody;
 
 cpVect mousePoint;
+cpBody *mouseBody = NULL;
+cpConstraint *mouseJoint = NULL;
 
 void demo_destroy(void)
 {
@@ -304,24 +306,43 @@ static void
 mouse(int x, int y)
 {
 	mousePoint = mouseToSpace(x, y);
+	mouseBody->v = cpvmult(cpvsub(mouseBody->p, mousePoint), 1.0f/60.0f);
+	mouseBody->p = mousePoint;
 	//	printf("(%d, %d) - %s\n", x, y, cpvstr(mousePoint));
 }
 
 static void
-removeShapeBody(cpShape *shape, void *data)
+findBody(cpShape *shape, void *data)
 {
-	cpSpaceRemoveBody(space, shape->body);
-	cpBodyFree(shape->body);
-
-	cpSpaceRemoveShape(space, shape);
-	cpShapeFree(shape);
+	cpBody **body_ptr = (cpBody **)data;
+	*body_ptr = shape->body;
+//	cpSpaceRemoveBody(space, shape->body);
+//	cpBodyFree(shape->body);
+//
+//	cpSpaceRemoveShape(space, shape);
+//	cpShapeFree(shape);
 }
 
 static void
 click(int button, int state, int x, int y)
 {
-	if(button == GLUT_LEFT_BUTTON && state == GLUT_UP)
-		cpSpaceShapePointQuery(space, mouseToSpace(x, y), removeShapeBody, NULL);
+	if(button == GLUT_LEFT_BUTTON){
+		if(state == GLUT_DOWN){
+			cpVect point = mouseToSpace(x, y);
+		
+			cpBody *body = NULL;
+			cpSpaceShapePointQuery(space, point, findBody, &body);
+			if(!body) return;
+			
+			mouseJoint = cpPivotJointNew(mouseBody, body, cpvzero, cpBodyWorld2Local(body, point));
+			mouseJoint->maxForce = 10000.0f;
+			cpSpaceAddConstraint(space, mouseJoint);
+		} else {
+			cpSpaceRemoveConstraint(space, mouseJoint);
+			cpConstraintFree(mouseJoint);
+			mouseJoint = NULL;
+		}
+	}
 }
 
 static void
@@ -376,6 +397,7 @@ glutStuff(int argc, const char *argv[])
 //	glutIdleFunc(idle);
 	glutTimerFunc(SLEEP_TICKS, timercall, 0);
 //	glutMouseFunc(buttons);
+	glutMotionFunc(mouse);
 	glutPassiveMotionFunc(mouse);
 	glutMouseFunc(click);
 	
@@ -412,6 +434,7 @@ main(int argc, const char **argv)
 //	time_trial(6, 25000);
 //	exit(0);
 	
+	mouseBody = cpBodyNew(INFINITY, INFINITY);
 	init_funcs[demo_index]();
 	
 	glutStuff(argc, argv);

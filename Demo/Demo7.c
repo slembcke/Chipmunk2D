@@ -60,7 +60,7 @@ make_box(cpFloat x, cpFloat y)
 		cpv( 15,-7),
 	};
 	
-	cpFloat mass = 100.0;
+	cpFloat mass = 1.0;
 	cpBody *body = cpBodyNew(mass, cpMomentForPoly(mass, num, verts, cpv(0,0)));
 	//	cpBody *body1 = cpBodyNew(1.0/0.0, 1.0/0.0);
 	body->p = cpv(x, y);
@@ -238,8 +238,8 @@ void demo7_init(void)
 	cpFloat radius = 15;
 	cpFloat wheel_mass = 0.3;
 	cpVect offset = cpv(radius + 30, -40);
-	cpFloat stiffness = 200.0f;
-	cpFloat damping = 5.0f;
+	cpFloat stiffness = 300.0f;
+	cpFloat damping = 0.5f;
 	
 	wheel1 = cpBodyNew(wheel_mass, cpMomentForCircle(wheel_mass, 0.0, radius, cpvzero));
 	wheel1->p = cpvadd(chassis->p, offset);
