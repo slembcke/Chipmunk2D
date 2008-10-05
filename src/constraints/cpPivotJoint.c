@@ -59,7 +59,7 @@ pivotJointApplyImpulse(cpConstraint *joint)
 	cpVect r2 = jnt->r2;
 		
 	// compute relative velocity
-	cpVect vr = relative_velocity(r1, a->v, a->w, r2, b->v, b->w);
+	cpVect vr = relative_velocity(a, b, r1, r2);
 	
 	// compute normal impulse
 	cpVect j = cpvsub(jnt->bias, mult_k(vr, jnt->k1, jnt->k2));

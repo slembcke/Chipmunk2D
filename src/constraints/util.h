@@ -24,11 +24,16 @@ void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, 
 #define J_MAX(constraint, dt) (((cpConstraint *)constraint)->maxForce*(dt))
 
 static inline cpVect
-relative_velocity(cpVect r1, cpVect v1, cpFloat w1, cpVect r2, cpVect v2, cpFloat w2){
-	cpVect v1_sum = cpvadd(v1, cpvmult(cpvperp(r1), w1));
-	cpVect v2_sum = cpvadd(v2, cpvmult(cpvperp(r2), w2));
+relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2){
+	cpVect v1_sum = cpvadd(a->v, cpvmult(cpvperp(r1), a->w));
+	cpVect v2_sum = cpvadd(b->v, cpvmult(cpvperp(r2), b->w));
 	
 	return cpvsub(v2_sum, v1_sum);
+}
+
+static inline cpFloat
+normal_relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n){
+	return cpvdot(relative_velocity(a, b, r1, r2), n);
 }
 
 static inline void

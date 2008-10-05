@@ -39,11 +39,11 @@ void demo7_update(int ticks)
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
-		cpBodyResetForces(chassis);
-		cpBodyResetForces(wheel1);
-		cpBodyResetForces(wheel2);
-		cpDampedSpring(chassis, wheel1, cpv(40, 15), cpvzero, 50.0f, 150.0f, 10.0f, dt);
-		cpDampedSpring(chassis, wheel2, cpv(-40, 15), cpvzero, 50.0f, 150.0f, 10.0f, dt);
+//		cpBodyResetForces(chassis);
+//		cpBodyResetForces(wheel1);
+//		cpBodyResetForces(wheel2);
+//		cpApplyDampedSpring(chassis, wheel1, cpv(40, 15), cpvzero, 50.0f, 150.0f, 10.0f, dt);
+//		cpApplyDampedSpring(chassis, wheel2, cpv(-40, 15), cpvzero, 50.0f, 150.0f, 10.0f, dt);
 		
 		cpSpaceStep(space, dt);
 	}
@@ -60,7 +60,7 @@ make_box(cpFloat x, cpFloat y)
 		cpv( 15,-7),
 	};
 	
-	cpBody *body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpv(0,0)));
+	cpBody *body = cpBodyNew(10.0, cpMomentForPoly(1.0, num, verts, cpv(0,0)));
 	//	cpBody *body1 = cpBodyNew(1.0/0.0, 1.0/0.0);
 	body->p = cpv(x, y);
 	cpSpaceAddBody(space, body);
@@ -77,7 +77,7 @@ void demo7_init(void)
 	
 	cpResetShapeIdCounter();
 	space = cpSpaceNew();
-	space->iterations = 10;
+	space->iterations = 20;
 	cpSpaceResizeActiveHash(space, 50.0, 999);
 	cpSpaceResizeStaticHash(space, 50.0, 999);
 	space->gravity = cpv(0, -300);
@@ -96,17 +96,17 @@ void demo7_init(void)
 	shape->e = 1.0; shape->u = 1.0;
 	cpSpaceAddStaticShape(space, shape);
 	
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,70), cpv(0,-240), 0.0f);
-	shape->e = 1.0; shape->u = 1.0;
-	cpSpaceAddStaticShape(space, shape);
-	
-	shape = cpSegmentShapeNew(staticBody, cpv(0,-240), cpv(320,-200), 0.0f);
-	shape->e = 1.0; shape->u = 1.0;
-	cpSpaceAddStaticShape(space, shape);
-	
-	shape = cpSegmentShapeNew(staticBody, cpv(200,-240), cpv(320,-100), 0.0f);
-	shape->e = 1.0; shape->u = 1.0;
-	cpSpaceAddStaticShape(space, shape);
+//	shape = cpSegmentShapeNew(staticBody, cpv(-320,70), cpv(0,-240), 0.0f);
+//	shape->e = 1.0; shape->u = 1.0;
+//	cpSpaceAddStaticShape(space, shape);
+//	
+//	shape = cpSegmentShapeNew(staticBody, cpv(0,-240), cpv(320,-200), 0.0f);
+//	shape->e = 1.0; shape->u = 1.0;
+//	cpSpaceAddStaticShape(space, shape);
+//	
+//	shape = cpSegmentShapeNew(staticBody, cpv(200,-240), cpv(320,-100), 0.0f);
+//	shape->e = 1.0; shape->u = 1.0;
+//	cpSpaceAddStaticShape(space, shape);
 	
 	//	shape = cpShapeNew(CP_SEGMENT_SHAPE, cpSegmentNew(cpv(-320,240), cpv(320,240)), space->staticBody);
 //	shape->e = 1.0; shape->u = 1.0;
@@ -114,73 +114,73 @@ void demo7_init(void)
 	
 	cpBody *body1, *body2, *body3, *body4, *body5, *body6, *body7;
 		
-//	body1 = make_box(-100, 100);
-//	body2 = make_box(body1->p.x + 40, 100);
-//	body3 = make_box(body2->p.x + 40, 100);
-//	body4 = make_box(body3->p.x + 40, 100);
-//	body5 = make_box(body4->p.x + 40, 100);
-//	body6 = make_box(body5->p.x + 40, 100);
-//	body7 = make_box(body6->p.x + 40, 100);
+	body1 = make_box(-100, 100);
+	body2 = make_box(body1->p.x + 40, 100);
+	body3 = make_box(body2->p.x + 40, 100);
+	body4 = make_box(body3->p.x + 40, 100);
+	body5 = make_box(body4->p.x + 40, 100);
+	body6 = make_box(body5->p.x + 40, 100);
+	body7 = make_box(body6->p.x + 40, 100);
+	
+	constraint = cpPivotJointNew(staticBody, body1, cpv(-120,100), cpv(-20,0));
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpPivotJointNew(body1, body2, cpv(20,0), cpv(-20,0));
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpPivotJointNew(body2, body3, cpv(20,0), cpv(-20,0));
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpPivotJointNew(body3, body4, cpv(20,0), cpv(-20,0));
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpPivotJointNew(body4, body5, cpv(20,0), cpv(-20,0));
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpPivotJointNew(body5, body6, cpv(20,0), cpv(-20,0));
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpPivotJointNew(body6, body7, cpv(20,0), cpv(-20,0));
+	cpSpaceAddConstraint(space, constraint);
+	
+//	constraint = cpPivotJointNew(body7, staticBody, cpv(20,0), cpv(body7->p.x + 20, 100));
+//	cpSpaceAddConstraint(space, constraint);
+	
+	
+//	body1 = make_box(-100, 50);
+//	body2 = make_box(body1->p.x + 40, 50);
+//	body3 = make_box(body2->p.x + 40, 50);
+//	body4 = make_box(body3->p.x + 40, 50);
+//	body5 = make_box(body4->p.x + 40, 50);
+//	body6 = make_box(body5->p.x + 40, 50);
+//	body7 = make_box(body6->p.x + 40, 50);
 //	
-//	constraint = cpPivotJointNew(staticBody, body1, cpv(-120,100), cpv(-20,0));
+//	cpFloat max = 12.0f;
+//	cpFloat min = 10.0f;
+//	
+//	constraint = cpSlideJointNew(staticBody, body1, cpv(body1->p.x - 15 - 10, 50), cpv(-15, 0), min, max);
 //	cpSpaceAddConstraint(space, constraint);
 //	
-//	constraint = cpPivotJointNew(body1, body2, cpv(20,0), cpv(-20,0));
+//	constraint = cpSlideJointNew(body1, body2, cpv(15, 0), cpv(-15, 0), min, max);
 //	cpSpaceAddConstraint(space, constraint);
 //	
-//	constraint = cpPivotJointNew(body2, body3, cpv(20,0), cpv(-20,0));
+//	constraint = cpSlideJointNew(body2, body3, cpv(15, 0), cpv(-15, 0), min, max);
 //	cpSpaceAddConstraint(space, constraint);
 //	
-//	constraint = cpPivotJointNew(body3, body4, cpv(20,0), cpv(-20,0));
+//	constraint = cpSlideJointNew(body3, body4, cpv(15, 0), cpv(-15, 0), min, max);
 //	cpSpaceAddConstraint(space, constraint);
 //	
-//	constraint = cpPivotJointNew(body4, body5, cpv(20,0), cpv(-20,0));
+//	constraint = cpSlideJointNew(body4, body5, cpv(15, 0), cpv(-15, 0), min, max);
 //	cpSpaceAddConstraint(space, constraint);
 //	
-//	constraint = cpPivotJointNew(body5, body6, cpv(20,0), cpv(-20,0));
+//	constraint = cpSlideJointNew(body5, body6, cpv(15, 0), cpv(-15, 0), min, max);
 //	cpSpaceAddConstraint(space, constraint);
 //	
-//	constraint = cpPivotJointNew(body6, body7, cpv(20,0), cpv(-20,0));
+//	constraint = cpSlideJointNew(body6, body7, cpv(15, 0), cpv(-15, 0), min, max);
 //	cpSpaceAddConstraint(space, constraint);
 //	
-////	constraint = cpPivotJointNew(body7, staticBody, cpv(20,0), cpv(body7->p.x + 20, 100));
-////	cpSpaceAddConstraint(space, constraint);
-	
-	
-	body1 = make_box(-100, 50);
-	body2 = make_box(body1->p.x + 40, 50);
-	body3 = make_box(body2->p.x + 40, 50);
-	body4 = make_box(body3->p.x + 40, 50);
-	body5 = make_box(body4->p.x + 40, 50);
-	body6 = make_box(body5->p.x + 40, 50);
-	body7 = make_box(body6->p.x + 40, 50);
-	
-	cpFloat max = 25.0f;
-	cpFloat min = 10.0f;
-	
-	constraint = cpSlideJointNew(staticBody, body1, cpv(body1->p.x - 15 - 10, 50), cpv(-15, 0), min, max);
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpSlideJointNew(body1, body2, cpv(15, 0), cpv(-15, 0), min, max);
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpSlideJointNew(body2, body3, cpv(15, 0), cpv(-15, 0), min, max);
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpSlideJointNew(body3, body4, cpv(15, 0), cpv(-15, 0), min, max);
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpSlideJointNew(body4, body5, cpv(15, 0), cpv(-15, 0), min, max);
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpSlideJointNew(body5, body6, cpv(15, 0), cpv(-15, 0), min, max);
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpSlideJointNew(body6, body7, cpv(15, 0), cpv(-15, 0), min, max);
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpSlideJointNew(body7, staticBody, cpv(15, 0), cpv(body7->p.x + 15 + 10, 50), min, max);
-	cpSpaceAddConstraint(space, constraint);
+//	constraint = cpSlideJointNew(body7, staticBody, cpv(15, 0), cpv(body7->p.x + 15 + 10, 50), min, max);
+//	cpSpaceAddConstraint(space, constraint);
 	
 //	body1 = make_box(-100, 150);
 //	body2 = make_box(body1->p.x + 40, 150);
@@ -227,7 +227,7 @@ void demo7_init(void)
 	};
 	
 	chassis = cpBodyNew(10.0, cpMomentForPoly(10.0, num, verts, cpv(0,0)));
-	chassis->p = cpv(-200, 100);
+	chassis->p = cpv(-200, 150);
 //	body->v = cpv(200, 0);
 	cpSpaceAddBody(space, chassis);
 	shape = cpPolyShapeNew(chassis, num, verts, cpv(0,0));
@@ -236,7 +236,10 @@ void demo7_init(void)
 	
 	cpFloat radius = 15;
 	cpFloat wheel_mass = 0.3;
-	cpVect offset = cpv(radius + 30, -25);
+	cpVect offset = cpv(radius + 30, -40);
+	cpFloat stiffness = 200.0f;
+	cpFloat damping = 5.0f;
+	
 	wheel1 = cpBodyNew(wheel_mass, cpMomentForCircle(wheel_mass, 0.0, radius, cpvzero));
 	wheel1->p = cpvadd(chassis->p, offset);
 	wheel1->v = chassis->v;
@@ -246,8 +249,11 @@ void demo7_init(void)
 	cpSpaceAddShape(space, shape);
 	
 	constraint = cpPinJointNew(chassis, wheel1, cpvzero, cpvzero);
-	constraint->maxForce = 18000.0;
 	cpSpaceAddConstraint(space, constraint);
+
+	constraint = cpDampedSpringNew(chassis, wheel1, cpv(offset.x, offset.y), cpvzero, 0.0f, stiffness, damping);
+	cpSpaceAddConstraint(space, constraint);
+
 	
 	
 	wheel2 = cpBodyNew(wheel_mass, cpMomentForCircle(wheel_mass, 0.0, radius, cpvzero));
@@ -259,6 +265,8 @@ void demo7_init(void)
 	cpSpaceAddShape(space, shape);
 	
 	constraint = cpPinJointNew(chassis, wheel2, cpvzero, cpvzero);
-	constraint->maxForce = 18000.0;
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpDampedSpringNew(chassis, wheel2, cpv(-offset.x, offset.y), cpvzero, 0.0f, stiffness, damping);
 	cpSpaceAddConstraint(space, constraint);
 }

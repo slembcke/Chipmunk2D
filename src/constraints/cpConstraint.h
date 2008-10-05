@@ -46,3 +46,4 @@ void cpConstraintFree(cpConstraint *constraint);
 #include "cpSlideJoint.h"
 #include "cpPivotJoint.h"
 #include "cpGrooveJoint.h"
+#include "cpDampedSpring.h"

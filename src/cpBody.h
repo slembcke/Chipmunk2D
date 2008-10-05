@@ -127,6 +127,6 @@ void cpBodyResetForces(cpBody *body);
 void cpBodyApplyForce(cpBody *body, cpVect f, cpVect r);
 
 // Apply a damped spring force between two bodies.
-void cpDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat rlen, cpFloat k, cpFloat dmp, cpFloat dt);
+void cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat rlen, cpFloat k, cpFloat dmp, cpFloat dt);
 
 //int cpBodyMarkLowEnergy(cpBody *body, cpFloat dvsq, int max);

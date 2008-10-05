@@ -78,7 +78,7 @@ slideJointApplyImpulse(cpConstraint *joint)
 	cpVect r2 = jnt->r2;
 		
 	// compute relative velocity
-	cpVect vr = relative_velocity(r1, a->v, a->w, r2, b->v, b->w);
+	cpVect vr = relative_velocity(a, b, r1, r2);
 	cpFloat vrn = cpvdot(vr, n);
 	
 	// compute normal impulse
@@ -88,8 +88,7 @@ slideJointApplyImpulse(cpConstraint *joint)
 	jn = jnt->jnAcc - jnOld;
 	
 	// apply impulse
-	cpVect j = cpvmult(n, jn);
-	apply_impulses(a, b, jnt->r1, jnt->r2, j);
+	apply_impulses(a, b, jnt->r1, jnt->r2, cpvmult(n, jn));
 }
 
 static const cpConstraintClass slideJointClass = {
