@@ -18,35 +18,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+ 
+struct cpSpace;
 
-// TODO: Comment me!
+typedef struct cpBreakableJoint {
+	cpConstraint constraint;
 	
-extern cpFloat cp_constraint_bias_coef;
-
-struct cpConstraintClass;
-struct cpConstraint;
-
-typedef struct cpConstraintClass {
-	void (*preStep)(struct cpConstraint *constraint, cpFloat dt, cpFloat dt_inv);
-	void (*applyImpulse)(struct cpConstraint *constraint);
-	cpFloat (*getImpulse)(struct cpConstraint *constraint);
-} cpConstraintClass;
-
-typedef struct cpConstraint {
-	const cpConstraintClass *klass;
+	cpConstraint *child;
+	struct cpSpace *space;
 	
-	cpBody *a, *b;
-	cpFloat maxForce;
-	cpFloat biasCoef;
-} cpConstraint;
+	cpFloat last_dt_inv;
+} cpBreakableJoint;
 
-void cpConstraintDestroy(cpConstraint *constraint);
-void cpConstraintFree(cpConstraint *constraint);
-
-// Built in Joint types
-#include "cpPinJoint.h"
-#include "cpSlideJoint.h"
-#include "cpPivotJoint.h"
-#include "cpGrooveJoint.h"
-#include "cpDampedSpring.h"
-#include "cpBreakableConstraint.h"
+cpBreakableJoint *cpBreakableJointAlloc(void);
+cpBreakableJoint *cpBreakableJointInit(cpBreakableJoint *constraint, cpConstraint *child, struct cpSpace *space);
+cpConstraint *cpBreakableJointNew(cpConstraint *child, struct cpSpace *space);

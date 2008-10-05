@@ -103,9 +103,16 @@ DampedSpringApplyImpulse(cpConstraint *constraint)
 	apply_impulses(a, b, spring->r1, spring->r2, cpvmult(spring->n, j));
 }
 
+static cpFloat
+cpDampedSpringGetImpulse(cpConstraint *constraint)
+{
+	return 0.0f;
+}
+
 static const cpConstraintClass DampedSpringClass = {
 	DampedSpringPreStep,
 	DampedSpringApplyImpulse,
+	cpDampedSpringGetImpulse,
 };
 
 cpDampedSpring *

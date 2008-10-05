@@ -97,91 +97,128 @@ void demo7_init(void)
 	shape->e = 1.0; shape->u = 1.0;
 	cpSpaceAddStaticShape(space, shape);
 	
-//	shape = cpSegmentShapeNew(staticBody, cpv(-320,70), cpv(0,-240), 0.0f);
-//	shape->e = 1.0; shape->u = 1.0;
-//	cpSpaceAddStaticShape(space, shape);
-//	
-//	shape = cpSegmentShapeNew(staticBody, cpv(0,-240), cpv(320,-200), 0.0f);
-//	shape->e = 1.0; shape->u = 1.0;
-//	cpSpaceAddStaticShape(space, shape);
-//	
-//	shape = cpSegmentShapeNew(staticBody, cpv(200,-240), cpv(320,-100), 0.0f);
-//	shape->e = 1.0; shape->u = 1.0;
-//	cpSpaceAddStaticShape(space, shape);
+	shape = cpSegmentShapeNew(staticBody, cpv(-320,70), cpv(0,-240), 0.0f);
+	shape->e = 1.0; shape->u = 1.0;
+	cpSpaceAddStaticShape(space, shape);
 	
-	//	shape = cpShapeNew(CP_SEGMENT_SHAPE, cpSegmentNew(cpv(-320,240), cpv(320,240)), space->staticBody);
-//	shape->e = 1.0; shape->u = 1.0;
-//	cpSpaceAddStaticShape(space, shape);
+	shape = cpSegmentShapeNew(staticBody, cpv(0,-240), cpv(320,-200), 0.0f);
+	shape->e = 1.0; shape->u = 1.0;
+	cpSpaceAddStaticShape(space, shape);
+	
+	shape = cpSegmentShapeNew(staticBody, cpv(200,-240), cpv(320,-100), 0.0f);
+	shape->e = 1.0; shape->u = 1.0;
+	cpSpaceAddStaticShape(space, shape);
 	
 	cpBody *body1, *body2, *body3, *body4, *body5, *body6, *body7;
 		
-	body1 = make_box(-100, 100);
-	body2 = make_box(body1->p.x + 40, 100);
-	body3 = make_box(body2->p.x + 40, 100);
-	body4 = make_box(body3->p.x + 40, 100);
-	body5 = make_box(body4->p.x + 40, 100);
-	body6 = make_box(body5->p.x + 40, 100);
-	body7 = make_box(body6->p.x + 40, 100);
-	
-	constraint = cpPivotJointNew(staticBody, body1, cpv(-120,100), cpv(-20,0));
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpPivotJointNew(body1, body2, cpv(20,0), cpv(-20,0));
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpPivotJointNew(body2, body3, cpv(20,0), cpv(-20,0));
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpPivotJointNew(body3, body4, cpv(20,0), cpv(-20,0));
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpPivotJointNew(body4, body5, cpv(20,0), cpv(-20,0));
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpPivotJointNew(body5, body6, cpv(20,0), cpv(-20,0));
-	cpSpaceAddConstraint(space, constraint);
-	
-	constraint = cpPivotJointNew(body6, body7, cpv(20,0), cpv(-20,0));
-	cpSpaceAddConstraint(space, constraint);
-	
+	cpFloat jointMax = 300000.0f;
+
+//	body1 = make_box(-100, 100);
+//	body2 = make_box(body1->p.x + 40, 100);
+//	body3 = make_box(body2->p.x + 40, 100);
+//	body4 = make_box(body3->p.x + 40, 100);
+//	body5 = make_box(body4->p.x + 40, 100);
+//	body6 = make_box(body5->p.x + 40, 100);
+//	body7 = make_box(body6->p.x + 40, 100);
+//	
+//	constraint = cpPivotJointNew(staticBody, body1, cpv(-120,100), cpv(-20,0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
+//	cpSpaceAddConstraint(space, constraint);
+//	
+//	constraint = cpPivotJointNew(body1, body2, cpv(20,0), cpv(-20,0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
+//	cpSpaceAddConstraint(space, constraint);
+//	
+//	constraint = cpPivotJointNew(body2, body3, cpv(20,0), cpv(-20,0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
+//	cpSpaceAddConstraint(space, constraint);
+//	
+//	constraint = cpPivotJointNew(body3, body4, cpv(20,0), cpv(-20,0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
+//	cpSpaceAddConstraint(space, constraint);
+//	
+//	constraint = cpPivotJointNew(body4, body5, cpv(20,0), cpv(-20,0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
+//	cpSpaceAddConstraint(space, constraint);
+//	
+//	constraint = cpPivotJointNew(body5, body6, cpv(20,0), cpv(-20,0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
+//	cpSpaceAddConstraint(space, constraint);
+//	
+//	constraint = cpPivotJointNew(body6, body7, cpv(20,0), cpv(-20,0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
+//	cpSpaceAddConstraint(space, constraint);
+//	
 //	constraint = cpPivotJointNew(body7, staticBody, cpv(20,0), cpv(body7->p.x + 20, 100));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
 //	cpSpaceAddConstraint(space, constraint);
 	
 	
-//	body1 = make_box(-100, 50);
-//	body2 = make_box(body1->p.x + 40, 50);
-//	body3 = make_box(body2->p.x + 40, 50);
-//	body4 = make_box(body3->p.x + 40, 50);
-//	body5 = make_box(body4->p.x + 40, 50);
-//	body6 = make_box(body5->p.x + 40, 50);
-//	body7 = make_box(body6->p.x + 40, 50);
-//	
-//	cpFloat max = 12.0f;
-//	cpFloat min = 10.0f;
-//	
-//	constraint = cpSlideJointNew(staticBody, body1, cpv(body1->p.x - 15 - 10, 50), cpv(-15, 0), min, max);
-//	cpSpaceAddConstraint(space, constraint);
-//	
-//	constraint = cpSlideJointNew(body1, body2, cpv(15, 0), cpv(-15, 0), min, max);
-//	cpSpaceAddConstraint(space, constraint);
-//	
-//	constraint = cpSlideJointNew(body2, body3, cpv(15, 0), cpv(-15, 0), min, max);
-//	cpSpaceAddConstraint(space, constraint);
-//	
-//	constraint = cpSlideJointNew(body3, body4, cpv(15, 0), cpv(-15, 0), min, max);
-//	cpSpaceAddConstraint(space, constraint);
-//	
-//	constraint = cpSlideJointNew(body4, body5, cpv(15, 0), cpv(-15, 0), min, max);
-//	cpSpaceAddConstraint(space, constraint);
-//	
-//	constraint = cpSlideJointNew(body5, body6, cpv(15, 0), cpv(-15, 0), min, max);
-//	cpSpaceAddConstraint(space, constraint);
-//	
-//	constraint = cpSlideJointNew(body6, body7, cpv(15, 0), cpv(-15, 0), min, max);
-//	cpSpaceAddConstraint(space, constraint);
-//	
-//	constraint = cpSlideJointNew(body7, staticBody, cpv(15, 0), cpv(body7->p.x + 15 + 10, 50), min, max);
-//	cpSpaceAddConstraint(space, constraint);
+	body1 = make_box(-100, 50);
+	body2 = make_box(body1->p.x + 40, 50);
+	body3 = make_box(body2->p.x + 40, 50);
+	body4 = make_box(body3->p.x + 40, 50);
+	body5 = make_box(body4->p.x + 40, 50);
+	body6 = make_box(body5->p.x + 40, 50);
+	body7 = make_box(body6->p.x + 40, 50);
+	
+	cpFloat max = 12.0f;
+	cpFloat min = 10.0f;
+	
+	constraint = cpSlideJointNew(staticBody, body1, cpv(body1->p.x - 15 - 10, 50), cpv(-15, 0), min, max);
+	constraint->maxForce = jointMax;
+	constraint = cpBreakableJointNew(constraint, space);
+	constraint->maxForce = jointMax;
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpSlideJointNew(body1, body2, cpv(15, 0), cpv(-15, 0), min, max);
+	constraint->maxForce = jointMax;
+	constraint = cpBreakableJointNew(constraint, space);
+	constraint->maxForce = jointMax;
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpSlideJointNew(body2, body3, cpv(15, 0), cpv(-15, 0), min, max);
+	constraint->maxForce = jointMax;
+	constraint = cpBreakableJointNew(constraint, space);
+	constraint->maxForce = jointMax;
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpSlideJointNew(body3, body4, cpv(15, 0), cpv(-15, 0), min, max);
+	constraint->maxForce = jointMax;
+	constraint = cpBreakableJointNew(constraint, space);
+	constraint->maxForce = jointMax;
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpSlideJointNew(body4, body5, cpv(15, 0), cpv(-15, 0), min, max);
+	constraint = cpBreakableJointNew(constraint, space);
+	constraint->maxForce = jointMax;
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpSlideJointNew(body5, body6, cpv(15, 0), cpv(-15, 0), min, max);
+	constraint->maxForce = jointMax;
+	constraint = cpBreakableJointNew(constraint, space);
+	constraint->maxForce = jointMax;
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpSlideJointNew(body6, body7, cpv(15, 0), cpv(-15, 0), min, max);
+	constraint->maxForce = jointMax;
+	constraint = cpBreakableJointNew(constraint, space);
+	constraint->maxForce = jointMax;
+	cpSpaceAddConstraint(space, constraint);
+	
+	constraint = cpSlideJointNew(body7, staticBody, cpv(15, 0), cpv(body7->p.x + 15 + 10, 50), min, max);
+	constraint->maxForce = jointMax;
+	constraint = cpBreakableJointNew(constraint, space);
+	constraint->maxForce = jointMax;
+	cpSpaceAddConstraint(space, constraint);
 	
 //	body1 = make_box(-100, 150);
 //	body2 = make_box(body1->p.x + 40, 150);
@@ -192,32 +229,48 @@ void demo7_init(void)
 //	body7 = make_box(body6->p.x + 40, 150);
 //	
 //	constraint = cpPinJointNew(staticBody, body1, cpv(body1->p.x - 15 - 10, 150), cpv(-15, 0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
 //	cpSpaceAddConstraint(space, constraint);
 //	
 //	constraint = cpPinJointNew(body1, body2, cpv(15, 0), cpv(-15, 0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
 //	cpSpaceAddConstraint(space, constraint);
 //	
 //	constraint = cpPinJointNew(body2, body3, cpv(15, 0), cpv(-15, 0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
 //	cpSpaceAddConstraint(space, constraint);
 //	
 //	constraint = cpPinJointNew(body3, body4, cpv(15, 0), cpv(-15, 0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
 //	cpSpaceAddConstraint(space, constraint);
 //	
 //	constraint = cpPinJointNew(body4, body5, cpv(15, 0), cpv(-15, 0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
 //	cpSpaceAddConstraint(space, constraint);
 //	
 //	constraint = cpPinJointNew(body5, body6, cpv(15, 0), cpv(-15, 0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
 //	cpSpaceAddConstraint(space, constraint);
 //	
 //	constraint = cpPinJointNew(body6, body7, cpv(15, 0), cpv(-15, 0));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
 //	cpSpaceAddConstraint(space, constraint);
 //	
-////	constraint = cpPinJointNew(body7, staticBody, cpv(15, 0), cpv(body7->p.x + 15 + 10, 150));
-////	cpSpaceAddConstraint(space, constraint);
+//	constraint = cpPinJointNew(body7, staticBody, cpv(15, 0), cpv(body7->p.x + 15 + 10, 150));
+//	constraint = cpBreakableJointNew(constraint, space);
+//	constraint->maxForce = jointMax;
+//	cpSpaceAddConstraint(space, constraint);
 	
-	body1 = make_box(190, 200);
-	constraint = cpGrooveJointNew(staticBody, body1, cpv(0, 195), cpv(250, 200), cpv(-15, 0));
-	cpSpaceAddConstraint(space, constraint);
+//	body1 = make_box(190, 200);
+//	constraint = cpGrooveJointNew(staticBody, body1, cpv(0, 195), cpv(250, 200), cpv(-15, 0));
+//	cpSpaceAddConstraint(space, constraint);
 	
 	int num = 4;
 	cpVect verts[] = {
@@ -236,10 +289,10 @@ void demo7_init(void)
 	cpSpaceAddShape(space, shape);
 	
 	cpFloat radius = 15;
-	cpFloat wheel_mass = 0.3;
+	cpFloat wheel_mass = 2;
 	cpVect offset = cpv(radius + 30, -40);
-	cpFloat stiffness = 300.0f;
-	cpFloat damping = 0.5f;
+	cpFloat stiffness = 600.0f;
+	cpFloat damping = 1.0f;
 	
 	wheel1 = cpBodyNew(wheel_mass, cpMomentForCircle(wheel_mass, 0.0, radius, cpvzero));
 	wheel1->p = cpvadd(chassis->p, offset);

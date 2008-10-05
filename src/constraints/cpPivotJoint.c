@@ -71,9 +71,16 @@ pivotJointApplyImpulse(cpConstraint *joint)
 	apply_impulses(a, b, jnt->r1, jnt->r2, j);
 }
 
+static cpFloat
+cpPivotJointGetImpulse(cpConstraint *joint)
+{
+	return cpvlength(((cpPivotJoint *)joint)->jAcc);
+}
+
 static const cpConstraintClass pivotJointClass = {
 	pivotJointPreStep,
 	pivotJointApplyImpulse,
+	cpPivotJointGetImpulse,
 };
 
 cpPivotJoint *

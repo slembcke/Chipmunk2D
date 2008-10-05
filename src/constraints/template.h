@@ -19,34 +19,10 @@
  * SOFTWARE.
  */
 
-// TODO: Comment me!
-	
-extern cpFloat cp_constraint_bias_coef;
+typedef struct NAME {
+	cpConstraint constraint;
+} NAME;
 
-struct cpConstraintClass;
-struct cpConstraint;
-
-typedef struct cpConstraintClass {
-	void (*preStep)(struct cpConstraint *constraint, cpFloat dt, cpFloat dt_inv);
-	void (*applyImpulse)(struct cpConstraint *constraint);
-	cpFloat (*getImpulse)(struct cpConstraint *constraint);
-} cpConstraintClass;
-
-typedef struct cpConstraint {
-	const cpConstraintClass *klass;
-	
-	cpBody *a, *b;
-	cpFloat maxForce;
-	cpFloat biasCoef;
-} cpConstraint;
-
-void cpConstraintDestroy(cpConstraint *constraint);
-void cpConstraintFree(cpConstraint *constraint);
-
-// Built in Joint types
-#include "cpPinJoint.h"
-#include "cpSlideJoint.h"
-#include "cpPivotJoint.h"
-#include "cpGrooveJoint.h"
-#include "cpDampedSpring.h"
-#include "cpBreakableConstraint.h"
+NAME *NAMEAlloc(void);
+NAME *NAMEInit(NAME *constraint, cpBody *a, cpBody *b);
+cpConstraint *NAMENew(cpBody *a, cpBody *b);

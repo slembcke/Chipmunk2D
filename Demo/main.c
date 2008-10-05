@@ -270,7 +270,7 @@ display(void)
 	
 	cpVect newPoint = cpvadd(mousePoint_last, cpvmult(cpvsub(mousePoint, mousePoint_last), 0.5f));
 	mouseBody->p = newPoint;
-	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0);
+//	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0);
 	mousePoint_last = newPoint;
 	update_funcs[demo_index](ticks);
 }
@@ -337,7 +337,7 @@ click(int button, int state, int x, int y)
 			if(!body) return;
 			
 			mouseJoint = cpPivotJointNew(mouseBody, body, cpvzero, cpBodyWorld2Local(body, point));
-			mouseJoint->maxForce = 5000.0f;
+			mouseJoint->maxForce = 50000.0f;
 			mouseJoint->biasCoef = 0.3f;
 			cpSpaceAddConstraint(space, mouseJoint);
 		} else {

@@ -91,18 +91,24 @@ grooveJointApplyImpulse(cpConstraint *joint)
 	cpVect vr = relative_velocity(a, b, r1, r2);
 
 	cpVect j = cpvsub(jnt->bias, mult_k(vr, jnt->k1, jnt->k2));
-	j = grooveConstrain(jnt, j);
-//	cpVect jOld = jnt->jAcc;
-//	jnt->jAcc = grooveConstrain(jnt, cpvadd(jOld, j));
-//	j = cpvsub(jnt->jAcc, jOld);
+	cpVect jOld = jnt->jAcc;
+	jnt->jAcc = grooveConstrain(jnt, cpvadd(jOld, j));
+	j = cpvsub(jnt->jAcc, jOld);
 	
 	// apply impulse
 	apply_impulses(a, b, jnt->r1, jnt->r2, j);
 }
 
+static cpFloat
+cpGrooveJointApplyImpulse(cpConstraint *joint)
+{
+	return cpvlength(((cpGrooveJoint *)joint)->jAcc);
+}
+
 static const cpConstraintClass grooveJointClass = {
 	grooveJointPreStep,
 	grooveJointApplyImpulse,
+	cpGrooveJointApplyImpulse,
 };
 
 cpGrooveJoint *

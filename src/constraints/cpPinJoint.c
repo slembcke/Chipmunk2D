@@ -23,6 +23,7 @@
 //#include <math.h>
 
 #include <stdlib.h>
+#include <math.h>
 
 #include "chipmunk.h"
 #include "util.h"
@@ -77,9 +78,16 @@ pinJointApplyImpulse(cpConstraint *joint)
 	apply_impulses(a, b, jnt->r1, jnt->r2, cpvmult(n, jn));
 }
 
+static cpFloat
+cpPinJointGetImpulse(cpConstraint *joint)
+{
+	return fabs(((cpPinJoint *)joint)->jnAcc);
+}
+
 static const cpConstraintClass pinJointClass = {
 	pinJointPreStep,
 	pinJointApplyImpulse,
+	cpPinJointGetImpulse,
 };
 
 cpPinJoint *
