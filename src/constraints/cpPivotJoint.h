@@ -27,9 +27,10 @@ typedef struct cpPivotJoint {
 	cpVect k1, k2;
 	
 	cpVect jAcc;
+	cpFloat jMaxLen;
 	cpVect bias;
 } cpPivotJoint;
 
 cpPivotJoint *cpPivotJointAlloc(void);
-cpPivotJoint *cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect pivot);
-cpConstraint *cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot);
+cpPivotJoint *cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
+cpConstraint *cpPivotJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);

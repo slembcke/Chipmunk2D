@@ -30,6 +30,7 @@ typedef struct cpGrooveJoint {
 	cpVect k1, k2;
 	
 	cpVect jAcc;
+	cpFloat jMaxLen;
 	cpVect bias;
 } cpGrooveJoint;
 

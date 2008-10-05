@@ -25,7 +25,7 @@
 #include "util.h"
 
 static void
-grooveJointPreStep(cpConstraint *joint, cpFloat dt_inv)
+grooveJointPreStep(cpConstraint *joint, cpFloat dt, cpFloat dt_inv)
 {
 	cpBody *a = joint->a;
 	cpBody *b = joint->b;
@@ -55,35 +55,12 @@ grooveJointPreStep(cpConstraint *joint, cpFloat dt_inv)
 		jnt->clamp = 0.0f;
 		jnt->r1 = cpvsub(cpvadd(cpvmult(cpvperp(n), -td), cpvmult(n, d)), a->p);
 	}
-		
-	// calculate mass matrix
-	// If I wasn't lazy and wrote a proper matrix class, this wouldn't be so gross...
-	cpFloat k11, k12, k21, k22;
-	cpFloat m_sum = a->m_inv + b->m_inv;
 	
-	// start with I*m_sum
-	k11 = m_sum; k12 = 0.0f;
-	k21 = 0.0f;  k22 = m_sum;
+	// Calculate mass tensor
+	k_tensor(a, b, jnt->r1, jnt->r2, &jnt->k1, &jnt->k2);	
 	
-	// add the influence from r1
-	cpFloat r1xsq =  jnt->r1.x * jnt->r1.x * a->i_inv;
-	cpFloat r1ysq =  jnt->r1.y * jnt->r1.y * a->i_inv;
-	cpFloat r1nxy = -jnt->r1.x * jnt->r1.y * a->i_inv;
-	k11 += r1ysq; k12 += r1nxy;
-	k21 += r1nxy; k22 += r1xsq;
-	
-	// add the influnce from r2
-	cpFloat r2xsq =  jnt->r2.x * jnt->r2.x * b->i_inv;
-	cpFloat r2ysq =  jnt->r2.y * jnt->r2.y * b->i_inv;
-	cpFloat r2nxy = -jnt->r2.x * jnt->r2.y * b->i_inv;
-	k11 += r2ysq; k12 += r2nxy;
-	k21 += r2nxy; k22 += r2xsq;
-	
-	// invert
-	cpFloat det_inv = 1.0f/(k11*k22 - k12*k21);
-	jnt->k1 = cpv( k22*det_inv, -k12*det_inv);
-	jnt->k2 = cpv(-k21*det_inv,  k11*det_inv);
-	
+	// compute max impulse
+	jnt->jMaxLen = J_MAX(jnt, dt);
 	
 	// calculate bias velocity
 	cpVect delta = cpvsub(cpvadd(b->p, jnt->r2), cpvadd(a->p, jnt->r1));
@@ -96,13 +73,8 @@ grooveJointPreStep(cpConstraint *joint, cpFloat dt_inv)
 static inline cpVect
 grooveConstrain(cpGrooveJoint *jnt, cpVect j){
 	cpVect n = jnt->grv_tn;
-	cpVect jn = cpvmult(n, cpvdot(j, n));
-
-	cpVect t = cpvperp(n);
-	cpFloat coef = (jnt->clamp*cpvcross(j, n) > 0.0f) ? 1.0f : 0.0f;
-	cpVect jt = cpvmult(t, cpvdot(j, t)*coef);	
-	
-	return cpvadd(jn, jt);
+	cpVect jClamp = (jnt->clamp*cpvcross(j, n) > 0.0f) ? j : cpvmult(n, cpvdot(j, n));
+	return clamp_vect(jClamp, jnt->jMaxLen);
 }
 
 static void
@@ -114,13 +86,11 @@ grooveJointApplyImpulse(cpConstraint *joint)
 	cpGrooveJoint *jnt = (cpGrooveJoint *)joint;
 	cpVect r1 = jnt->r1;
 	cpVect r2 = jnt->r2;
-	cpVect k1 = jnt->k1;
-	cpVect k2 = jnt->k2;
 	
 	// compute impulse
 	cpVect vr = relative_velocity(r1, a->v, a->w, r2, b->v, b->w);
 
-	cpVect j = cpvadd(jnt->bias, cpv(-cpvdot(vr, k1), -cpvdot(vr, k2)));
+	cpVect j = cpvsub(jnt->bias, mult_k(vr, jnt->k1, jnt->k2));
 	cpVect jOld = jnt->jAcc;
 	jnt->jAcc = grooveConstrain(jnt, cpvadd(jOld, j));
 	j = cpvsub(jnt->jAcc, jOld);

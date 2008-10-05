@@ -45,4 +45,6 @@ cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBod
 	constraint->klass = klass;
 	constraint->a = a;
 	constraint->b = b;
+	
+	constraint->maxForce = INFINITY;
 }

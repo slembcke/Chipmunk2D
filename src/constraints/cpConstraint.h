@@ -27,7 +27,7 @@ struct cpConstraintClass;
 struct cpConstraint;
 
 typedef struct cpConstraintClass {
-	void (*preStep)(struct cpConstraint *constraint, cpFloat dt_inv);
+	void (*preStep)(struct cpConstraint *constraint, cpFloat dt, cpFloat dt_inv);
 	void (*applyImpulse)(struct cpConstraint *constraint);
 } cpConstraintClass;
 
@@ -35,6 +35,7 @@ typedef struct cpConstraint {
 	const cpConstraintClass *klass;
 	
 	cpBody *a, *b;
+	cpFloat maxForce;
 } cpConstraint;
 
 void cpConstraintDestroy(cpConstraint *constraint);

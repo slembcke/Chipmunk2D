@@ -25,7 +25,7 @@
 #include "util.h"
 
 static void
-slideJointPreStep(cpConstraint *joint, cpFloat dt_inv)
+slideJointPreStep(cpConstraint *joint, cpFloat dt, cpFloat dt_inv)
 {
 	cpBody *a = joint->a;
 	cpBody *b = joint->b;
@@ -51,6 +51,9 @@ slideJointPreStep(cpConstraint *joint, cpFloat dt_inv)
 	// calculate bias velocity
 	jnt->bias = -cp_constraint_bias_coef*dt_inv*(pdist);
 	
+	// compute max impulse
+	jnt->jnMax = J_MAX(jnt, dt);
+
 	// apply accumulated impulse
 	if(!jnt->bias) //{
 		// if bias is 0, then the joint is not at a limit.
@@ -81,7 +84,7 @@ slideJointApplyImpulse(cpConstraint *joint)
 	// compute normal impulse
 	cpFloat jn = (jnt->bias - vrn)*jnt->nMass;
 	cpFloat jnOld = jnt->jnAcc;
-	jnt->jnAcc = cpfmin(jnOld + jn, 0.0f);
+	jnt->jnAcc = cpfclamp(jnOld + jn, -jnt->jnMax, 0.0f);
 	jn = jnt->jnAcc - jnOld;
 	
 	// apply impulse

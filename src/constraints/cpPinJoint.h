@@ -28,7 +28,7 @@ typedef struct cpPinJoint {
 	cpVect n;
 	cpFloat nMass;
 	
-	cpFloat jnAcc;
+	cpFloat jnAcc, jnMax;
 	cpFloat bias;
 } cpPinJoint;
 

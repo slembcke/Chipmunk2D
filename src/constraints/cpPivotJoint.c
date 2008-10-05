@@ -25,7 +25,7 @@
 #include "util.h"
 
 static void
-pivotJointPreStep(cpConstraint *joint, cpFloat dt_inv)
+pivotJointPreStep(cpConstraint *joint, cpFloat dt, cpFloat dt_inv)
 {
 	cpBody *a = joint->a;
 	cpBody *b = joint->b;
@@ -34,30 +34,11 @@ pivotJointPreStep(cpConstraint *joint, cpFloat dt_inv)
 	jnt->r1 = cpvrotate(jnt->anchr1, a->rot);
 	jnt->r2 = cpvrotate(jnt->anchr2, b->rot);
 	
-	// calculate mass matrix
-	// If I wasn't lazy, this wouldn't be so gross...
-	cpFloat k11, k12, k21, k22;
+	// Calculate mass tensor
+	k_tensor(a, b, jnt->r1, jnt->r2, &jnt->k1, &jnt->k2);
 	
-	cpFloat m_sum = a->m_inv + b->m_inv;
-	k11 = m_sum; k12 = 0.0f;
-	k21 = 0.0f;  k22 = m_sum;
-	
-	cpFloat r1xsq =  jnt->r1.x * jnt->r1.x * a->i_inv;
-	cpFloat r1ysq =  jnt->r1.y * jnt->r1.y * a->i_inv;
-	cpFloat r1nxy = -jnt->r1.x * jnt->r1.y * a->i_inv;
-	k11 += r1ysq; k12 += r1nxy;
-	k21 += r1nxy; k22 += r1xsq;
-	
-	cpFloat r2xsq =  jnt->r2.x * jnt->r2.x * b->i_inv;
-	cpFloat r2ysq =  jnt->r2.y * jnt->r2.y * b->i_inv;
-	cpFloat r2nxy = -jnt->r2.x * jnt->r2.y * b->i_inv;
-	k11 += r2ysq; k12 += r2nxy;
-	k21 += r2nxy; k22 += r2xsq;
-	
-	cpFloat det_inv = 1.0f/(k11*k22 - k12*k21);
-	jnt->k1 = cpv( k22*det_inv, -k12*det_inv);
-	jnt->k2 = cpv(-k21*det_inv,  k11*det_inv);
-	
+	// compute max impulse
+	jnt->jMaxLen = J_MAX(jnt, dt);
 	
 	// calculate bias velocity
 	cpVect delta = cpvsub(cpvadd(b->p, jnt->r2), cpvadd(a->p, jnt->r1));
@@ -76,15 +57,15 @@ pivotJointApplyImpulse(cpConstraint *joint)
 	cpPivotJoint *jnt = (cpPivotJoint *)joint;
 	cpVect r1 = jnt->r1;
 	cpVect r2 = jnt->r2;
-	cpVect k1 = jnt->k1;
-	cpVect k2 = jnt->k2;
 		
 	// compute relative velocity
 	cpVect vr = relative_velocity(r1, a->v, a->w, r2, b->v, b->w);
 	
 	// compute normal impulse
-	cpVect j = cpvadd(jnt->bias, cpv(-cpvdot(vr, k1), -cpvdot(vr, k2)));
-	jnt->jAcc = cpvadd(jnt->jAcc, j);
+	cpVect j = cpvsub(jnt->bias, mult_k(vr, jnt->k1, jnt->k2));
+	cpVect jOld = jnt->jAcc;
+	jnt->jAcc = clamp_vect(cpvadd(jnt->jAcc, j), jnt->jMaxLen);
+	j = cpvsub(jnt->jAcc, jOld);
 	
 	// apply impulse
 	apply_impulses(a, b, jnt->r1, jnt->r2, j);
@@ -102,12 +83,14 @@ cpPivotJointAlloc(void)
 }
 
 cpPivotJoint *
-cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect pivot)
+cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
 {
 	cpConstraintInit((cpConstraint *)joint, &pivotJointClass, a, b);
 	
-	joint->anchr1 = cpvunrotate(cpvsub(pivot, a->p), a->rot);
-	joint->anchr2 = cpvunrotate(cpvsub(pivot, b->p), b->rot);
+//	joint->anchr1 = cpvunrotate(cpvsub(pivot, a->p), a->rot);
+//	joint->anchr2 = cpvunrotate(cpvsub(pivot, b->p), b->rot);
+	joint->anchr1 = anchr1;
+	joint->anchr2 = anchr2;
 	
 	joint->jAcc = cpvzero;
 	
@@ -115,7 +98,7 @@ cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect pivot)
 }
 
 cpConstraint *
-cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot)
+cpPivotJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
 {
-	return (cpConstraint *)cpPivotJointInit(cpPivotJointAlloc(), a, b, pivot);
+	return (cpConstraint *)cpPivotJointInit(cpPivotJointAlloc(), a, b, anchr1, anchr2);
 }

@@ -112,7 +112,7 @@ demo_destroy_func destroy_funcs[] = {
 	demo_destroy,
 };
 
-int demo_index = 0;
+int demo_index = 6;
 
 int ticks = 0;
 cpSpace *space;

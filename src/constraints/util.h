@@ -21,22 +21,14 @@
 
 void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b);
 
+#define J_MAX(constraint, dt) (((cpConstraint *)constraint)->maxForce*(dt))
+
 static inline cpVect
 relative_velocity(cpVect r1, cpVect v1, cpFloat w1, cpVect r2, cpVect v2, cpFloat w2){
 	cpVect v1_sum = cpvadd(v1, cpvmult(cpvperp(r1), w1));
 	cpVect v2_sum = cpvadd(v2, cpvmult(cpvperp(r2), w2));
 	
 	return cpvsub(v2_sum, v1_sum);
-}
-
-static inline cpFloat
-k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n)
-{
-	cpFloat mass_sum = a->m_inv + b->m_inv;
-	cpFloat r1cn = cpvcross(r1, n);
-	cpFloat r2cn = cpvcross(r2, n);
-
-	return mass_sum + a->i_inv*r1cn*r1cn + b->i_inv*r2cn*r2cn;
 }
 
 static inline void
@@ -51,4 +43,60 @@ apply_bias_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
 {
 	cpBodyApplyBiasImpulse(a, cpvneg(j), r1);
 	cpBodyApplyBiasImpulse(b, j, r2);
+}
+
+static inline cpVect
+clamp_vect(cpVect v, cpFloat len)
+{
+	return (cpvdot(v,v) > len*len) ? cpvmult(cpvnormalize(v), len) : v;
+}
+
+static inline cpFloat
+k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n)
+{
+	cpFloat mass_sum = a->m_inv + b->m_inv;
+	cpFloat r1cn = cpvcross(r1, n);
+	cpFloat r2cn = cpvcross(r2, n);
+
+	return mass_sum + a->i_inv*r1cn*r1cn + b->i_inv*r2cn*r2cn;
+}
+
+static inline void
+k_tensor(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect *k1, cpVect *k2)
+{
+		// calculate mass matrix
+	// If I wasn't lazy and wrote a proper matrix class, this wouldn't be so gross...
+	cpFloat k11, k12, k21, k22;
+	cpFloat m_sum = a->m_inv + b->m_inv;
+	
+	// start with I*m_sum
+	k11 = m_sum; k12 = 0.0f;
+	k21 = 0.0f;  k22 = m_sum;
+	
+	// add the influence from r1
+	cpFloat a_i_inv = a->i_inv;
+	cpFloat r1xsq =  r1.x * r1.x * a_i_inv;
+	cpFloat r1ysq =  r1.y * r1.y * a_i_inv;
+	cpFloat r1nxy = -r1.x * r1.y * a_i_inv;
+	k11 += r1ysq; k12 += r1nxy;
+	k21 += r1nxy; k22 += r1xsq;
+	
+	// add the influnce from r2
+	cpFloat b_i_inv = b->i_inv;
+	cpFloat r2xsq =  r2.x * r2.x * b_i_inv;
+	cpFloat r2ysq =  r2.y * r2.y * b_i_inv;
+	cpFloat r2nxy = -r2.x * r2.y * b_i_inv;
+	k11 += r2ysq; k12 += r2nxy;
+	k21 += r2nxy; k22 += r2xsq;
+	
+	// invert
+	cpFloat det_inv = 1.0f/(k11*k22 - k12*k21);
+	*k1 = cpv( k22*det_inv, -k12*det_inv);
+	*k2 = cpv(-k21*det_inv,  k11*det_inv);
+}
+
+static inline cpVect
+mult_k(cpVect vr, cpVect k1, cpVect k2)
+{
+	return cpv(cpvdot(vr, k1), cpvdot(vr, k2));
 }

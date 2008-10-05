@@ -486,7 +486,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// Prestep the constraints.
 	for(int i=0; i<constraints->num; i++){
 		cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
-		constraint->klass->preStep(constraint, dt_inv);
+		constraint->klass->preStep(constraint, dt, dt_inv);
 	}
 
 	for(int i=0; i<space->elasticIterations; i++){

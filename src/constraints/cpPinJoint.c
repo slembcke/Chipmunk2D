@@ -28,7 +28,7 @@
 #include "util.h"
 
 static void
-pinJointPreStep(cpConstraint *joint, cpFloat dt_inv)
+pinJointPreStep(cpConstraint *joint, cpFloat dt, cpFloat dt_inv)
 {
 	cpBody *a = joint->a;
 	cpBody *b = joint->b;
@@ -46,6 +46,9 @@ pinJointPreStep(cpConstraint *joint, cpFloat dt_inv)
 	
 	// calculate bias velocity
 	jnt->bias = -cp_constraint_bias_coef*dt_inv*(dist - jnt->dist);
+	
+	// compute max impulse
+	jnt->jnMax = J_MAX(jnt, dt);
 	
 	// apply accumulated impulse
 	cpVect j = cpvmult(jnt->n, jnt->jnAcc);
@@ -69,7 +72,9 @@ pinJointApplyImpulse(cpConstraint *joint)
 	
 	// compute normal impulse
 	cpFloat jn = (jnt->bias - vrn)*jnt->nMass;
-	jnt->jnAcc =+ jn;
+	cpFloat jnOld = jnt->jnAcc;
+	jnt->jnAcc = cpfclamp(jnOld + jn, -jnt->jnMax, jnt->jnMax);
+	jn = jnt->jnAcc - jnOld;
 	
 	// apply impulse
 	cpVect j = cpvmult(n, jn);
