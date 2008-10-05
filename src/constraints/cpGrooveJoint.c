@@ -64,7 +64,7 @@ grooveJointPreStep(cpConstraint *joint, cpFloat dt, cpFloat dt_inv)
 	
 	// calculate bias velocity
 	cpVect delta = cpvsub(cpvadd(b->p, jnt->r2), cpvadd(a->p, jnt->r1));
-	jnt->bias = cpvmult(delta, -cp_constraint_bias_coef*dt_inv);
+	jnt->bias = cpvmult(delta, -jnt->constraint.biasCoef*dt_inv);
 	
 	// apply accumulated impulse
 	apply_impulses(a, b, jnt->r1, jnt->r2, jnt->jAcc);

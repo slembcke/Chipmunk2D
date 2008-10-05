@@ -119,6 +119,7 @@ cpSpace *space;
 cpBody *staticBody;
 
 cpVect mousePoint;
+cpVect mousePoint_last;
 cpBody *mouseBody = NULL;
 cpConstraint *mouseJoint = NULL;
 
@@ -267,6 +268,10 @@ display(void)
 	glutSwapBuffers();
 	ticks++;
 	
+	cpVect newPoint = cpvadd(mousePoint_last, cpvmult(cpvsub(mousePoint, mousePoint_last), 0.5f));
+	mouseBody->p = newPoint;
+	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0);
+	mousePoint_last = newPoint;
 	update_funcs[demo_index](ticks);
 }
 
@@ -306,9 +311,6 @@ static void
 mouse(int x, int y)
 {
 	mousePoint = mouseToSpace(x, y);
-	mouseBody->v = cpvmult(cpvsub(mouseBody->p, mousePoint), 1.0f/60.0f);
-	mouseBody->p = mousePoint;
-	//	printf("(%d, %d) - %s\n", x, y, cpvstr(mousePoint));
 }
 
 static void
@@ -335,7 +337,8 @@ click(int button, int state, int x, int y)
 			if(!body) return;
 			
 			mouseJoint = cpPivotJointNew(mouseBody, body, cpvzero, cpBodyWorld2Local(body, point));
-			mouseJoint->maxForce = 10000.0f;
+			mouseJoint->maxForce = 5000.0f;
+			mouseJoint->biasCoef = 0.3f;
 			cpSpaceAddConstraint(space, mouseJoint);
 		} else {
 			cpSpaceRemoveConstraint(space, mouseJoint);

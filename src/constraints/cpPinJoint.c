@@ -45,7 +45,7 @@ pinJointPreStep(cpConstraint *joint, cpFloat dt, cpFloat dt_inv)
 	jnt->nMass = 1.0f/k_scalar(a, b, jnt->r1, jnt->r2, jnt->n);
 	
 	// calculate bias velocity
-	jnt->bias = -cp_constraint_bias_coef*dt_inv*(dist - jnt->dist);
+	jnt->bias = -jnt->constraint.biasCoef*dt_inv*(dist - jnt->dist);
 	
 	// compute max impulse
 	jnt->jnMax = J_MAX(jnt, dt);
