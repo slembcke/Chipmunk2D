@@ -205,18 +205,18 @@ drawObject(void *ptr, void *unused)
 	}
 }
 
-static void
-drawBB(void *ptr, void *unused)
-{
-	cpShape *shape = (cpShape *)ptr;
-
-	glBegin(GL_LINE_LOOP); {
-		glVertex2f(shape->bb.l, shape->bb.b);
-		glVertex2f(shape->bb.l, shape->bb.t);
-		glVertex2f(shape->bb.r, shape->bb.t);
-		glVertex2f(shape->bb.r, shape->bb.b);
-	} glEnd();
-}
+//static void
+//drawBB(void *ptr, void *unused)
+//{
+//	cpShape *shape = (cpShape *)ptr;
+//
+//	glBegin(GL_LINE_LOOP); {
+//		glVertex2f(shape->bb.l, shape->bb.b);
+//		glVertex2f(shape->bb.l, shape->bb.t);
+//		glVertex2f(shape->bb.r, shape->bb.t);
+//		glVertex2f(shape->bb.r, shape->bb.b);
+//	} glEnd();
+//}
 
 static void
 drawCollisions(void *ptr, void *data)
@@ -319,11 +319,6 @@ findBody(cpShape *shape, void *data)
 {
 	cpBody **body_ptr = (cpBody **)data;
 	*body_ptr = shape->body;
-//	cpSpaceRemoveBody(space, shape->body);
-//	cpBodyFree(shape->body);
-//
-//	cpSpaceRemoveShape(space, shape);
-//	cpShapeFree(shape);
 }
 
 static void
@@ -357,11 +352,11 @@ timercall(int value)
 	glutPostRedisplay();
 }
 
-static void
-idle(void)
-{
-	glutPostRedisplay();
-}
+//static void
+//idle(void)
+//{
+//	glutPostRedisplay();
+//}
 
 static void
 initGL(void)
