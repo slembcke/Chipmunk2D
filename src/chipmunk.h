@@ -72,7 +72,7 @@ cpfclamp(cpFloat f, cpFloat min, cpFloat max){
 #include "cpArbiter.h"
 #include "cpCollision.h"
 	
-#include "cpJoint.h"
+#include "constraints/cpConstraint.h"
 
 #include "cpSpace.h"
 

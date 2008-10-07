@@ -43,8 +43,8 @@ int some_value = 42;
 static int
 collFunc(cpShape *a, cpShape *b, cpContact *contacts, int numContacts, cpFloat normal_coef, void *data)
 {
-	int *some_ptr = (int *)data;
-
+//	int *some_ptr = (int *)data;
+//
 // Do various things with the contact information. 
 // Make particle effects, estimate the impact damage from the relative velocities, etc.
 //	for(int i=0; i<numContacts; i++)

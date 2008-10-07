@@ -65,8 +65,8 @@ typedef struct cpSpace{
 	// Persistant contact set.
 	cpHashSet *contactSet;
 	
-	// List of joints in the system.
-	cpArray *joints;
+	// List of constraints in the system.
+	cpArray *constraints;
 	
 	// Set of collisionpair functions.
 	cpHashSet *collFuncSet;
@@ -82,7 +82,7 @@ cpSpace* cpSpaceNew(void);
 void cpSpaceDestroy(cpSpace *space);
 void cpSpaceFree(cpSpace *space);
 
-// Convenience function. Frees all referenced entities. (bodies, shapes and joints)
+// Convenience function. Frees all referenced entities. (bodies, shapes and constraints)
 void cpSpaceFreeChildren(cpSpace *space);
 
 // Collision pair function management functions.
@@ -95,12 +95,12 @@ void cpSpaceSetDefaultCollisionPairFunc(cpSpace *space, cpCollFunc func, void *d
 void cpSpaceAddShape(cpSpace *space, cpShape *shape);
 void cpSpaceAddStaticShape(cpSpace *space, cpShape *shape);
 void cpSpaceAddBody(cpSpace *space, cpBody *body);
-void cpSpaceAddJoint(cpSpace *space, cpJoint *joint);
+void cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint);
 
 void cpSpaceRemoveShape(cpSpace *space, cpShape *shape);
 void cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape);
 void cpSpaceRemoveBody(cpSpace *space, cpBody *body);
-void cpSpaceRemoveJoint(cpSpace *space, cpJoint *joint);
+void cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint);
 
 // Point query callback function
 typedef void (*cpSpacePointQueryFunc)(cpShape *shape, void *data);

@@ -28,7 +28,7 @@ extern VALUE m_cpShape;
 extern VALUE c_cpCircleShape;
 extern VALUE c_cpSegmentShape;
 extern VALUE c_cpPolyShape;
-extern VALUE m_cpJoint;
+extern VALUE m_cpConstraint;
 extern VALUE c_cpSpace;
 
 extern ID id_parent;
@@ -65,7 +65,7 @@ GETTER_TEMPLATE(VGET , c_cpVect , Vec2 , cpVect )
 GETTER_TEMPLATE(BBGET, c_cpBB   , BB   , cpBB   )
 GETTER_TEMPLATE(BODY , c_cpBody , Body , cpBody )
 GETTER_TEMPLATE(SHAPE, m_cpShape, Shape, cpShape)
-GETTER_TEMPLATE(JOINT, m_cpJoint, Joint, cpJoint)
+GETTER_TEMPLATE(CONSTRAINT, m_cpConstraint, Constraint, cpConstraint)
 GETTER_TEMPLATE(SPACE, c_cpSpace, Space, cpSpace)
 
 void Init_chipmunk(void);
@@ -73,5 +73,5 @@ void Init_cpVect();
 void Init_cpBB();
 void Init_cpBody();
 void Init_cpShape();
-void Init_cpJoint();
+void Init_cpConstraint();
 void Init_cpSpace();

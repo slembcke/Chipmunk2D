@@ -109,7 +109,7 @@ static void        freeWrap(void *ptr, void *unused){          free(            
 static void   shapeFreeWrap(void *ptr, void *unused){   cpShapeFree((cpShape *)  ptr);}
 static void arbiterFreeWrap(void *ptr, void *unused){ cpArbiterFree((cpArbiter *)ptr);}
 static void    bodyFreeWrap(void *ptr, void *unused){    cpBodyFree((cpBody *)   ptr);}
-static void   jointFreeWrap(void *ptr, void *unused){   cpJointFree((cpJoint *)  ptr);}
+static void   constraintFreeWrap(void *ptr, void *unused){   cpConstraintFree((cpConstraint *)  ptr);}
 
 cpSpace*
 cpSpaceAlloc(void)
@@ -141,7 +141,7 @@ cpSpaceInit(cpSpace *space)
 	space->arbiters = cpArrayNew(0);
 	space->contactSet = cpHashSetNew(0, contactSetEql, contactSetTrans);
 	
-	space->joints = cpArrayNew(0);
+	space->constraints = cpArrayNew(0);
 	
 	cpCollPairFunc pairFunc = {0, 0, alwaysCollide, NULL};
 	space->defaultPairFunc = pairFunc;
@@ -165,7 +165,7 @@ cpSpaceDestroy(cpSpace *space)
 	
 	cpArrayFree(space->bodies);
 	
-	cpArrayFree(space->joints);
+	cpArrayFree(space->constraints);
 	
 	if(space->contactSet)
 		cpHashSetEach(space->contactSet, &arbiterFreeWrap, NULL);
@@ -190,7 +190,7 @@ cpSpaceFreeChildren(cpSpace *space)
 	cpSpaceHashEach(space->staticShapes, &shapeFreeWrap, NULL);
 	cpSpaceHashEach(space->activeShapes, &shapeFreeWrap, NULL);
 	cpArrayEach(space->bodies, &bodyFreeWrap, NULL);
-	cpArrayEach(space->joints, &jointFreeWrap, NULL);
+	cpArrayEach(space->constraints, &constraintFreeWrap, NULL);
 }
 
 void
@@ -242,9 +242,9 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 }
 
 void
-cpSpaceAddJoint(cpSpace *space, cpJoint *joint)
+cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
-	cpArrayPush(space->joints, joint);
+	cpArrayPush(space->constraints, constraint);
 }
 
 void
@@ -266,9 +266,9 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 }
 
 void
-cpSpaceRemoveJoint(cpSpace *space, cpJoint *joint)
+cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 {
-	cpArrayDeleteObj(space->joints, joint);
+	cpArrayDeleteObj(space->constraints, constraint);
 }
 
 void
@@ -460,7 +460,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 
 	cpArray *bodies = space->bodies;
 	cpArray *arbiters = space->arbiters;
-	cpArray *joints = space->joints;
+	cpArray *constraints = space->constraints;
 	
 	// Empty the arbiter list.
 	cpHashSetReject(space->contactSet, &contactSetReject, space);
@@ -483,19 +483,19 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	for(int i=0; i<arbiters->num; i++)
 		cpArbiterPreStep((cpArbiter *)arbiters->arr[i], dt_inv);
 
-	// Prestep the joints.
-	for(int i=0; i<joints->num; i++){
-		cpJoint *joint = (cpJoint *)joints->arr[i];
-		joint->klass->preStep(joint, dt_inv);
+	// Prestep the constraints.
+	for(int i=0; i<constraints->num; i++){
+		cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
+		constraint->klass->preStep(constraint, dt, dt_inv);
 	}
 
 	for(int i=0; i<space->elasticIterations; i++){
 		for(int j=0; j<arbiters->num; j++)
 			cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j], 1.0f);
 			
-		for(int j=0; j<joints->num; j++){
-			cpJoint *joint = (cpJoint *)joints->arr[j];
-			joint->klass->applyImpulse(joint);
+		for(int j=0; j<constraints->num; j++){
+			cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
+			constraint->klass->applyImpulse(constraint);
 		}
 	}
 
@@ -514,9 +514,9 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		for(int j=0; j<arbiters->num; j++)
 			cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j], 0.0f);
 			
-		for(int j=0; j<joints->num; j++){
-			cpJoint *joint = (cpJoint *)joints->arr[j];
-			joint->klass->applyImpulse(joint);
+		for(int j=0; j<constraints->num; j++){
+			cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
+			constraint->klass->applyImpulse(constraint);
 		}
 	}
 

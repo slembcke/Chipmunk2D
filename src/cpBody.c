@@ -132,7 +132,7 @@ cpBodyApplyForce(cpBody *body, cpVect f, cpVect r)
 }
 
 void
-cpDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat rlen, cpFloat k, cpFloat dmp, cpFloat dt)
+cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat rlen, cpFloat k, cpFloat dmp, cpFloat dt)
 {
 	// Calculate the world space anchor coordinates.
 	cpVect r1 = cpvrotate(anchr1, a->rot);

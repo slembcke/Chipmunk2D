@@ -32,7 +32,7 @@ extern cpBody *staticBody;
 
 void demo2_update(int ticks)
 {
-	int steps = 1;
+	int steps = 3;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
