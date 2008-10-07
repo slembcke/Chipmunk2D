@@ -24,12 +24,12 @@ struct cpSpace;
 typedef struct cpBreakableJoint {
 	cpConstraint constraint;
 	
-	cpConstraint *child;
+	cpConstraint *delegate;
 	struct cpSpace *space;
 	
 	cpFloat last_dt_inv;
 } cpBreakableJoint;
 
 cpBreakableJoint *cpBreakableJointAlloc(void);
-cpBreakableJoint *cpBreakableJointInit(cpBreakableJoint *constraint, cpConstraint *child, struct cpSpace *space);
-cpConstraint *cpBreakableJointNew(cpConstraint *child, struct cpSpace *space);
+cpBreakableJoint *cpBreakableJointInit(cpBreakableJoint *constraint, cpConstraint *delegate, struct cpSpace *space);
+cpConstraint *cpBreakableJointNew(cpConstraint *delegate, struct cpSpace *space);

@@ -28,40 +28,11 @@
 #include "chipmunk.h"
 #include "util.h"
 
-//void
-//cpDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat rlen, cpFloat k, cpFloat dmp, cpFloat dt)
-//{
-//	// Calculate the world space anchor coordinates.
-//	cpVect r1 = cpvrotate(anchr1, a->rot);
-//	cpVect r2 = cpvrotate(anchr2, b->rot);
-//	
-//	cpVect delta = cpvsub(cpvadd(b->p, r2), cpvadd(a->p, r1));
-//	cpFloat dist = cpvlength(delta);
-//	cpVect n = dist ? cpvmult(delta, 1.0f/dist) : cpvzero;
-//	
-//	cpFloat f_spring = (dist - rlen)*k;
-//
-//	// Calculate the world relative velocities of the anchor points.
-//	cpVect v1 = cpvadd(a->v, cpvmult(cpvperp(r1), a->w));
-//	cpVect v2 = cpvadd(b->v, cpvmult(cpvperp(r2), b->w));
-//	
-//	// Calculate the damping force.
-//	// This really should be in the impulse solver and can produce problems when using large damping values.
-//	cpFloat vrn = cpvdot(cpvsub(v2, v1), n);
-//	cpFloat f_damp = vrn*cpfmin(dmp, 1.0f/(dt*(a->m_inv + b->m_inv)));
-//	
-//	// Apply!
-//	cpVect f = cpvmult(n, f_spring + f_damp);
-//	cpBodyApplyForce(a, f, r1);
-//	cpBodyApplyForce(b, cpvneg(f), r2);
-//}
-
 static void
-DampedSpringPreStep(cpConstraint *constraint, cpFloat dt, cpFloat dt_inv)
+preStep(cpDampedSpring *spring, cpFloat dt, cpFloat dt_inv)
 {
-	cpBody *a = constraint->a;
-	cpBody *b = constraint->b;
-	cpDampedSpring *spring = (cpDampedSpring *)constraint;
+	cpBody *a = spring->constraint.a;
+	cpBody *b = spring->constraint.b;
 	
 	spring->r1 = cpvrotate(spring->anchr1, a->rot);
 	spring->r2 = cpvrotate(spring->anchr2, b->rot);
@@ -82,12 +53,11 @@ DampedSpringPreStep(cpConstraint *constraint, cpFloat dt, cpFloat dt_inv)
 }
 
 static void
-DampedSpringApplyImpulse(cpConstraint *constraint)
+applyImpulse(cpDampedSpring *spring)
 {
-	cpBody *a = constraint->a;
-	cpBody *b = constraint->b;
+	cpBody *a = spring->constraint.a;
+	cpBody *b = spring->constraint.b;
 	
-	cpDampedSpring *spring = (cpDampedSpring *)constraint;
 	cpVect n = spring->n;
 	cpVect r1 = spring->r1;
 	cpVect r2 = spring->r2;
@@ -95,24 +65,24 @@ DampedSpringApplyImpulse(cpConstraint *constraint)
 	// compute relative velocity
 	cpFloat vrn = normal_relative_velocity(a, b, r1, r2, n) - spring->target_vrn;
 	
-	// compute normal impulse
+	// compute velocity loss from drag
+	// not 100% certain this is derived correctly, though it makes sense
 	cpFloat v_damp = -vrn*(1.0f - exp(-spring->damping*spring->dt/spring->nMass));
-	cpFloat j = v_damp*spring->nMass;
 	spring->target_vrn = vrn + v_damp;
 	
-	apply_impulses(a, b, spring->r1, spring->r2, cpvmult(spring->n, j));
+	apply_impulses(a, b, spring->r1, spring->r2, cpvmult(spring->n, v_damp*spring->nMass));
 }
 
 static cpFloat
-cpDampedSpringGetImpulse(cpConstraint *constraint)
+getImpulse(cpConstraint *constraint)
 {
 	return 0.0f;
 }
 
-static const cpConstraintClass DampedSpringClass = {
-	DampedSpringPreStep,
-	DampedSpringApplyImpulse,
-	cpDampedSpringGetImpulse,
+static const cpConstraintClass constraintClass = {
+	(cpConstraintPreStepFunction)preStep,
+	(cpConstraintApplyImpulseFunction)applyImpulse,
+	(cpConstraintGetImpulseFunction)getImpulse,
 };
 
 cpDampedSpring *
@@ -124,7 +94,7 @@ cpDampedSpringAlloc(void)
 cpDampedSpring *
 cpDampedSpringInit(cpDampedSpring *spring, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping)
 {
-	cpConstraintInit((cpConstraint *)spring, &DampedSpringClass, a, b);
+	cpConstraintInit((cpConstraint *)spring, &constraintClass, a, b);
 	
 	spring->anchr1 = anchr1;
 	spring->anchr2 = anchr2;

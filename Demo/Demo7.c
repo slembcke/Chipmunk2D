@@ -78,7 +78,7 @@ void demo7_init(void)
 	
 	cpResetShapeIdCounter();
 	space = cpSpaceNew();
-	space->iterations = 20;
+	space->iterations = 30;
 	cpSpaceResizeActiveHash(space, 50.0, 999);
 	cpSpaceResizeStaticHash(space, 50.0, 999);
 	space->gravity = cpv(0, -300);

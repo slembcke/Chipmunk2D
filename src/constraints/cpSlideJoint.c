@@ -26,82 +26,80 @@
 #include "util.h"
 
 static void
-slideJointPreStep(cpConstraint *joint, cpFloat dt, cpFloat dt_inv)
+preStep(cpSlideJoint *joint, cpFloat dt, cpFloat dt_inv)
 {
-	cpBody *a = joint->a;
-	cpBody *b = joint->b;
-	cpSlideJoint *jnt = (cpSlideJoint *)joint;
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
 	
-	jnt->r1 = cpvrotate(jnt->anchr1, a->rot);
-	jnt->r2 = cpvrotate(jnt->anchr2, b->rot);
+	joint->r1 = cpvrotate(joint->anchr1, a->rot);
+	joint->r2 = cpvrotate(joint->anchr2, b->rot);
 	
-	cpVect delta = cpvsub(cpvadd(b->p, jnt->r2), cpvadd(a->p, jnt->r1));
+	cpVect delta = cpvsub(cpvadd(b->p, joint->r2), cpvadd(a->p, joint->r1));
 	cpFloat dist = cpvlength(delta);
 	cpFloat pdist = 0.0;
-	if(dist > jnt->max) {
-		pdist = dist - jnt->max;
-	} else if(dist < jnt->min) {
-		pdist = jnt->min - dist;
+	if(dist > joint->max) {
+		pdist = dist - joint->max;
+	} else if(dist < joint->min) {
+		pdist = joint->min - dist;
 		dist = -dist;
 	}
-	jnt->n = cpvmult(delta, 1.0f/(dist ? dist : INFINITY));
+	joint->n = cpvmult(delta, 1.0f/(dist ? dist : INFINITY));
 	
 	// calculate mass normal
-	jnt->nMass = 1.0f/k_scalar(a, b, jnt->r1, jnt->r2, jnt->n);
+	joint->nMass = 1.0f/k_scalar(a, b, joint->r1, joint->r2, joint->n);
 	
 	// calculate bias velocity
-	jnt->bias = -jnt->constraint.biasCoef*dt_inv*(pdist);
+	joint->bias = -joint->constraint.biasCoef*dt_inv*(pdist);
 	
 	// compute max impulse
-	jnt->jnMax = J_MAX(jnt, dt);
+	joint->jnMax = J_MAX(joint, dt);
 
 	// apply accumulated impulse
-	if(!jnt->bias) //{
+	if(!joint->bias) //{
 		// if bias is 0, then the joint is not at a limit.
-		jnt->jnAcc = 0.0f;
+		joint->jnAcc = 0.0f;
 //	} else {
-		cpVect j = cpvmult(jnt->n, jnt->jnAcc);
-		apply_impulses(a, b, jnt->r1, jnt->r2, j);
+		cpVect j = cpvmult(joint->n, joint->jnAcc);
+		apply_impulses(a, b, joint->r1, joint->r2, j);
 //	}
 }
 
 static void
-slideJointApplyImpulse(cpConstraint *joint)
+applyImpulse(cpSlideJoint *joint)
 {
-	cpSlideJoint *jnt = (cpSlideJoint *)joint;
-	if(!jnt->bias) return;  // early exit
+	if(!joint->bias) return;  // early exit
 
-	cpBody *a = joint->a;
-	cpBody *b = joint->b;
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
 	
-	cpVect n = jnt->n;
-	cpVect r1 = jnt->r1;
-	cpVect r2 = jnt->r2;
+	cpVect n = joint->n;
+	cpVect r1 = joint->r1;
+	cpVect r2 = joint->r2;
 		
 	// compute relative velocity
 	cpVect vr = relative_velocity(a, b, r1, r2);
 	cpFloat vrn = cpvdot(vr, n);
 	
 	// compute normal impulse
-	cpFloat jn = (jnt->bias - vrn)*jnt->nMass;
-	cpFloat jnOld = jnt->jnAcc;
-	jnt->jnAcc = cpfclamp(jnOld + jn, -jnt->jnMax, 0.0f);
-	jn = jnt->jnAcc - jnOld;
+	cpFloat jn = (joint->bias - vrn)*joint->nMass;
+	cpFloat jnOld = joint->jnAcc;
+	joint->jnAcc = cpfclamp(jnOld + jn, -joint->jnMax, 0.0f);
+	jn = joint->jnAcc - jnOld;
 	
 	// apply impulse
-	apply_impulses(a, b, jnt->r1, jnt->r2, cpvmult(n, jn));
+	apply_impulses(a, b, joint->r1, joint->r2, cpvmult(n, jn));
 }
 
 static cpFloat
-cpSlideJointGetImpulse(cpConstraint *joint)
+getImpulse(cpConstraint *joint)
 {
 	return fabs(((cpSlideJoint *)joint)->jnAcc);
 }
 
-static const cpConstraintClass slideJointClass = {
-	slideJointPreStep,
-	slideJointApplyImpulse,
-	cpSlideJointGetImpulse,
+static const cpConstraintClass jointClass = {
+	(cpConstraintPreStepFunction)preStep,
+	(cpConstraintApplyImpulseFunction)applyImpulse,
+	(cpConstraintGetImpulseFunction)getImpulse,
 };
 
 cpSlideJoint *
@@ -113,7 +111,7 @@ cpSlideJointAlloc(void)
 cpSlideJoint *
 cpSlideJointInit(cpSlideJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max)
 {
-	cpConstraintInit((cpConstraint *)joint, &slideJointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &jointClass, a, b);
 	
 	joint->anchr1 = anchr1;
 	joint->anchr2 = anchr2;

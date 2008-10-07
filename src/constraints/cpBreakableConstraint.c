@@ -28,40 +28,39 @@
 #include "util.h"
 
 static void
-cpBreakableJointPreStep(cpConstraint *constraint, cpFloat dt, cpFloat dt_inv)
+preStep(cpBreakableJoint *breakable, cpFloat dt, cpFloat dt_inv)
 {
-	cpBreakableJoint *breakable = (cpBreakableJoint *)constraint;
-	cpConstraint *child = breakable->child;
+	cpConstraint *delegate = breakable->delegate;
 
-	if(child->klass->getImpulse(child)*breakable->last_dt_inv >= constraint->maxForce){
-		cpSpaceRemoveConstraint(breakable->space, constraint);
-		cpConstraintFree(constraint);
+	if(delegate->klass->getImpulse(delegate)*breakable->last_dt_inv >= breakable->constraint.maxForce){
+		cpSpaceRemoveConstraint(breakable->space, (cpConstraint *)breakable);
+//		cpConstraintFree(constraint);
 		
 		return;
 	}
 	
-	child->klass->preStep(child, dt, dt_inv);
+	delegate->klass->preStep(delegate, dt, dt_inv);
 	breakable->last_dt_inv = dt_inv;
 }
 
 static void
-cpBreakableJointApplyImpulse(cpConstraint *constraint)
+applyImpulse(cpBreakableJoint *breakable)
 {
-	cpConstraint *child = ((cpBreakableJoint *)constraint)->child;
-	child->klass->applyImpulse(child);
+	cpConstraint *delegate = breakable->delegate;
+	delegate->klass->applyImpulse(delegate);
 }
 
 static cpFloat
-cpBreakableJointGetImpulse(cpConstraint *constraint)
+getImpulse(cpBreakableJoint *breakable)
 {
-	cpConstraint *child = ((cpBreakableJoint *)constraint)->child;
-	return child->klass->getImpulse(child);
+	cpConstraint *delegate = breakable->delegate;
+	return delegate->klass->getImpulse(delegate);
 }
 
-static const cpConstraintClass cpBreakableJointClass = {
-	cpBreakableJointPreStep,
-	cpBreakableJointApplyImpulse,
-	cpBreakableJointGetImpulse,
+static const cpConstraintClass constraintClass = {
+	(cpConstraintPreStepFunction)preStep,
+	(cpConstraintApplyImpulseFunction)applyImpulse,
+	(cpConstraintGetImpulseFunction)getImpulse,
 };
 
 cpBreakableJoint *
@@ -71,18 +70,18 @@ cpBreakableJointAlloc(void)
 }
 
 cpBreakableJoint *
-cpBreakableJointInit(cpBreakableJoint *breakable, cpConstraint *child, struct cpSpace *space)
+cpBreakableJointInit(cpBreakableJoint *breakable, cpConstraint *delegate, struct cpSpace *space)
 {
-	cpConstraintInit((cpConstraint *)breakable, &cpBreakableJointClass, NULL, NULL);
+	cpConstraintInit((cpConstraint *)breakable, &constraintClass, NULL, NULL);
 	
-	breakable->child = child;
+	breakable->delegate = delegate;
 	breakable->space = space;
 	
 	return breakable;
 }
 
 cpConstraint *
-cpBreakableJointNew(cpConstraint *child, struct cpSpace *space)
+cpBreakableJointNew(cpConstraint *delegate, struct cpSpace *space)
 {
-	return (cpConstraint *)cpBreakableJointInit(cpBreakableJointAlloc(), child, space);
+	return (cpConstraint *)cpBreakableJointInit(cpBreakableJointAlloc(), delegate, space);
 }

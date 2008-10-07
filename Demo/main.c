@@ -285,6 +285,7 @@ keyboard(unsigned char key, int x, int y)
 		
 		demo_index = new_index;
 		ticks = 0;
+		mouseJoint = NULL;
 		init_funcs[demo_index]();
 	}
 }

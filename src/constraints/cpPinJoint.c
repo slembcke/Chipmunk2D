@@ -29,65 +29,62 @@
 #include "util.h"
 
 static void
-pinJointPreStep(cpConstraint *joint, cpFloat dt, cpFloat dt_inv)
+preStep(cpPinJoint *joint, cpFloat dt, cpFloat dt_inv)
 {
-	cpBody *a = joint->a;
-	cpBody *b = joint->b;
-	cpPinJoint *jnt = (cpPinJoint *)joint;
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
 	
-	jnt->r1 = cpvrotate(jnt->anchr1, a->rot);
-	jnt->r2 = cpvrotate(jnt->anchr2, b->rot);
+	joint->r1 = cpvrotate(joint->anchr1, a->rot);
+	joint->r2 = cpvrotate(joint->anchr2, b->rot);
 	
-	cpVect delta = cpvsub(cpvadd(b->p, jnt->r2), cpvadd(a->p, jnt->r1));
+	cpVect delta = cpvsub(cpvadd(b->p, joint->r2), cpvadd(a->p, joint->r1));
 	cpFloat dist = cpvlength(delta);
-	jnt->n = cpvmult(delta, 1.0f/(dist ? dist : INFINITY));
+	joint->n = cpvmult(delta, 1.0f/(dist ? dist : INFINITY));
 	
 	// calculate mass normal
-	jnt->nMass = 1.0f/k_scalar(a, b, jnt->r1, jnt->r2, jnt->n);
+	joint->nMass = 1.0f/k_scalar(a, b, joint->r1, joint->r2, joint->n);
 	
 	// calculate bias velocity
-	jnt->bias = -jnt->constraint.biasCoef*dt_inv*(dist - jnt->dist);
+	joint->bias = -joint->constraint.biasCoef*dt_inv*(dist - joint->dist);
 	
 	// compute max impulse
-	jnt->jnMax = J_MAX(jnt, dt);
+	joint->jnMax = J_MAX(joint, dt);
 	
 	// apply accumulated impulse
-	cpVect j = cpvmult(jnt->n, jnt->jnAcc);
-	apply_impulses(a, b, jnt->r1, jnt->r2, j);
+	cpVect j = cpvmult(joint->n, joint->jnAcc);
+	apply_impulses(a, b, joint->r1, joint->r2, j);
 }
 
 static void
-pinJointApplyImpulse(cpConstraint *joint)
+applyImpulse(cpPinJoint *joint)
 {
-	cpBody *a = joint->a;
-	cpBody *b = joint->b;
-	
-	cpPinJoint *jnt = (cpPinJoint *)joint;
-	cpVect n = jnt->n;
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
+	cpVect n = joint->n;
 
 	// compute relative velocity
-	cpFloat vrn = normal_relative_velocity(a, b, jnt->r1, jnt->r2, n);
+	cpFloat vrn = normal_relative_velocity(a, b, joint->r1, joint->r2, n);
 	
 	// compute normal impulse
-	cpFloat jn = (jnt->bias - vrn)*jnt->nMass;
-	cpFloat jnOld = jnt->jnAcc;
-	jnt->jnAcc = cpfclamp(jnOld + jn, -jnt->jnMax, jnt->jnMax);
-	jn = jnt->jnAcc - jnOld;
+	cpFloat jn = (joint->bias - vrn)*joint->nMass;
+	cpFloat jnOld = joint->jnAcc;
+	joint->jnAcc = cpfclamp(jnOld + jn, -joint->jnMax, joint->jnMax);
+	jn = joint->jnAcc - jnOld;
 	
 	// apply impulse
-	apply_impulses(a, b, jnt->r1, jnt->r2, cpvmult(n, jn));
+	apply_impulses(a, b, joint->r1, joint->r2, cpvmult(n, jn));
 }
 
 static cpFloat
-cpPinJointGetImpulse(cpConstraint *joint)
+getImpulse(cpPinJoint *joint)
 {
-	return fabs(((cpPinJoint *)joint)->jnAcc);
+	return fabs(joint->jnAcc);
 }
 
-static const cpConstraintClass pinJointClass = {
-	pinJointPreStep,
-	pinJointApplyImpulse,
-	cpPinJointGetImpulse,
+static const cpConstraintClass jointClass = {
+	(cpConstraintPreStepFunction)preStep,
+	(cpConstraintApplyImpulseFunction)applyImpulse,
+	(cpConstraintGetImpulseFunction)getImpulse,
 };
 
 cpPinJoint *
@@ -99,7 +96,7 @@ cpPinJointAlloc(void)
 cpPinJoint *
 cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
 {
-	cpConstraintInit((cpConstraint *)joint, &pinJointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &jointClass, a, b);
 	
 	joint->anchr1 = anchr1;
 	joint->anchr2 = anchr2;
