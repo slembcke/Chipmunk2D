@@ -97,15 +97,21 @@ display(void)
 }
 
 static void
-runDemo(int index)
+setDemo(chipmunkDemo *demo)
 {
 	if(currDemo)
 		currDemo->destroyFunc();
 		
-	currDemo = demos[index];
+	currDemo = demo;
 	ticks = 0;
 	mouseJoint = NULL;
 	space = currDemo->initFunc();
+}
+
+static void
+runDemo(int index)
+{
+	setDemo(demos[index]);
 	
 	static char title[1024];
 	sprintf(title, "Demo: %s (press a - %c to switch demos)", currDemo->name, 'a' + demoCount - 1);
@@ -120,6 +126,8 @@ keyboard(unsigned char key, int x, int y)
 	
 	if(0 <= new_index && new_index < demoCount){
 		runDemo(new_index);
+	} else if(key == '\r'){
+		setDemo(currDemo);
 	}
 }
 
