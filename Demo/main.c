@@ -151,8 +151,8 @@ glColor_from_pointer(void *ptr)
 	val = (val+0xfd7046c5) + (val<<3);
 	val = (val^0xb55a4f09) ^ (val>>16);
 	
-	GLfloat v = (GLfloat)val/(GLfloat)LONG_MAX;
-	v = v*0.5 + 0.5;
+	GLfloat v = (GLfloat)val/(GLfloat)ULONG_MAX;
+	v = 0.95f - v*0.15f;
 	
 	glColor3f(v, v, v);
 
@@ -203,7 +203,7 @@ drawCircleShape(cpBody *body, cpCircleShape *circle)
 		glRotatef(body->a*180.0/M_PI, 0.0f, 0.0f, 1.0f);
 		glScalef(circle->r, circle->r, 1.0f);
 		
-		glColor_from_pointer(body);
+		glColor_from_pointer(circle);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, circleVAR_count - 1);
 		
 		glColor3f(LINE_COLOR);
@@ -238,7 +238,7 @@ drawPolyShape(cpBody *body, cpPolyShape *poly)
 		VAR[2*i + 1] = v.y;
 	}
 
-	glColor_from_pointer(body);
+	glColor_from_pointer(poly);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, count);
 	
 	glColor3f(LINE_COLOR);
@@ -328,9 +328,9 @@ display(void)
 	glutSwapBuffers();
 	ticks++;
 	
-	cpVect newPoint = cpvadd(mousePoint_last, cpvmult(cpvsub(mousePoint, mousePoint_last), 0.5f));
+	cpVect newPoint = cpvadd(mousePoint_last, cpvmult(cpvsub(mousePoint, mousePoint_last), 0.25f));
 	mouseBody->p = newPoint;
-//	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0);
+	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0);
 	mousePoint_last = newPoint;
 	update_funcs[demo_index](ticks);
 }
@@ -394,7 +394,7 @@ click(int button, int state, int x, int y)
 			
 			mouseJoint = cpPivotJointNew(mouseBody, body, cpvzero, cpBodyWorld2Local(body, point));
 			mouseJoint->maxForce = 50000.0f;
-			mouseJoint->biasCoef = 0.3f;
+			mouseJoint->biasCoef = 0.15f;
 			cpSpaceAddConstraint(space, mouseJoint);
 		} else {
 			cpSpaceRemoveConstraint(space, mouseJoint);
@@ -431,7 +431,7 @@ initGL(void)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
 	glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
-	glLineWidth(2.5f);
+	glLineWidth(1.5f);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
