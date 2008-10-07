@@ -24,11 +24,14 @@
 #include <math.h>
 
 #include "chipmunk.h"
+#include "drawSpace.h"
+#include "ChipmunkDemo.h"
 
-extern cpSpace *space;
-extern cpBody *staticBody;
+cpSpace *space;
+cpBody *staticBody;
 
-void demo1_update(int ticks)
+static void
+updateFunc(int ticks)
 {
 	int steps = 2;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
@@ -54,7 +57,8 @@ collFunc(cpShape *a, cpShape *b, cpContact *contacts, int numContacts, cpFloat n
 	return 1;
 }
 
-void demo1_init(void)
+static cpSpace *
+initFunc(void)
 {
 	// Initialize a static body with infinite mass and moment of inertia
 	// to attach the static geometry to.
@@ -121,4 +125,23 @@ void demo1_init(void)
 	
 	// Add a collision callback between objects of the default type and the box.
 	cpSpaceAddCollisionPairFunc(space, 1, 0, &collFunc, &some_value);
+	
+	return space;
 }
+
+static void
+destroyFunc(void)
+{
+	cpSpaceFreeChildren(space);
+	cpSpaceFree(space);
+	
+	cpBodyFree(staticBody);
+}
+
+const chipmunkDemo Demo1 = {
+	"Tumble",
+	NULL,
+	initFunc,
+	updateFunc,
+	destroyFunc,
+};

@@ -19,5 +19,10 @@
  * SOFTWARE.
  */
 
-void
-drawSpace(cpSpace *space)
+typedef struct drawSpaceOptions {
+	int drawBBs;
+	int drawShapes;
+	int drawCollisions;
+} drawSpaceOptions;
+
+void drawSpace(cpSpace *space, drawSpaceOptions *options);

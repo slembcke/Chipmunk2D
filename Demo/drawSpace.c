@@ -40,6 +40,7 @@
 #endif
 
 #include "chipmunk.h"
+#include "drawSpace.h"
 
 /*
 	IMPORTANT - READ ME!
@@ -185,18 +186,18 @@ drawObject(void *ptr, void *unused)
 	}
 }
 
-//static void
-//drawBB(void *ptr, void *unused)
-//{
-//	cpShape *shape = (cpShape *)ptr;
-//
-//	glBegin(GL_LINE_LOOP); {
-//		glVertex2f(shape->bb.l, shape->bb.b);
-//		glVertex2f(shape->bb.l, shape->bb.t);
-//		glVertex2f(shape->bb.r, shape->bb.t);
-//		glVertex2f(shape->bb.r, shape->bb.b);
-//	} glEnd();
-//}
+static void
+drawBB(void *ptr, void *unused)
+{
+	cpShape *shape = (cpShape *)ptr;
+
+	glBegin(GL_LINE_LOOP); {
+		glVertex2f(shape->bb.l, shape->bb.b);
+		glVertex2f(shape->bb.l, shape->bb.t);
+		glVertex2f(shape->bb.r, shape->bb.t);
+		glVertex2f(shape->bb.r, shape->bb.b);
+	} glEnd();
+}
 
 static void
 drawCollisions(void *ptr, void *data)
@@ -215,14 +216,18 @@ drawCollisions(void *ptr, void *data)
 //}
 
 void
-drawSpace(cpSpace *space)
+drawSpace(cpSpace *space, drawSpaceOptions *options)
 {
-//	glColor3f(0.6, 1.0, 0.6);
-//	cpSpaceHashEach(space->activeShapes, &drawBB, NULL);
-//	cpSpaceHashEach(space->staticShapes, &drawBB, NULL);
-	
-	cpSpaceHashEach(space->activeShapes, &drawObject, NULL);
-	cpSpaceHashEach(space->staticShapes, &drawObject, NULL);
+	if(options->drawBBs){
+		glColor3f(0.6, 1.0, 0.6);
+		cpSpaceHashEach(space->activeShapes, &drawBB, NULL);
+		cpSpaceHashEach(space->staticShapes, &drawBB, NULL);
+	}
+
+	if(options->drawShapes){
+		cpSpaceHashEach(space->activeShapes, &drawObject, NULL);
+		cpSpaceHashEach(space->staticShapes, &drawObject, NULL);
+	}
 	
 //	glColor3f(1.0, 0.0, 0.0);
 //	cpSpaceShapePointQuery(space, mousePoint, pickingFunc, NULL);
@@ -238,7 +243,9 @@ drawSpace(cpSpace *space)
 			glVertex2f(body->p.x, body->p.y);
 		}
 		
-		glColor3f(COLLISION_COLOR);
-		cpArrayEach(space->arbiters, &drawCollisions, NULL);
+		if(options->drawCollisions){
+			glColor3f(COLLISION_COLOR);
+			cpArrayEach(space->arbiters, &drawCollisions, NULL);
+		}
 	} glEnd();
 }

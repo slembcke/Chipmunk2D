@@ -52,92 +52,39 @@
 #endif
 
 #include "chipmunk.h"
+#include "drawSpace.h"
+#include "ChipmunkDemo.h"
 
 #define SLEEP_TICKS 16
 
-extern void demo1_init(void);
-extern void demo1_update(int);
+extern chipmunkDemo Demo1;
 
-extern void demo2_init(void);
-extern void demo2_update(int);
-
-extern void demo3_init(void);
-extern void demo3_update(int);
-
-extern void demo4_init(void);
-extern void demo4_update(int);
-
-extern void demo5_init(void);
-extern void demo5_update(int);
-
-extern void demo6_init(void);
-extern void demo6_update(int);
-
-extern void demo7_init(void);
-extern void demo7_update(int);
-
-
-typedef void (*demo_init_func)(void);
-typedef void (*demo_update_func)(int);
-typedef void (*demo_destroy_func)(void);
-
-demo_init_func init_funcs[] = {
-	demo1_init,
-	demo2_init,
-	demo3_init,
-	demo4_init,
-	demo5_init,
-	demo6_init,
-	demo7_init,
+static chipmunkDemo *demos[] = {
+	&Demo1,
 };
+static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
+static chipmunkDemo *currDemo = NULL;
 
-demo_update_func update_funcs[] = {
-	demo1_update,
-	demo2_update,
-	demo3_update,
-	demo4_update,
-	demo5_update,
-	demo6_update,
-	demo7_update,
-};
-
-void demo_destroy(void);
-
-demo_destroy_func destroy_funcs[] = {
-	demo_destroy,
-	demo_destroy,
-	demo_destroy,
-	demo_destroy,
-	demo_destroy,
-	demo_destroy,
-	demo_destroy,
-};
-
-int demo_index = 6;
-
-int ticks = 0;
-cpSpace *space;
-cpBody *staticBody;
+static int ticks = 0;
+static cpSpace *space;
 
 cpVect mousePoint;
 cpVect mousePoint_last;
 cpBody *mouseBody = NULL;
 cpConstraint *mouseJoint = NULL;
 
-void demo_destroy(void)
-{
-	cpSpaceFreeChildren(space);
-	cpSpaceFree(space);
-	
-	cpBodyFree(staticBody);
-}
+drawSpaceOptions options = {
+	0,
+	1,
+	0,
+};
 
 static void
 display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	
-	drawSpace(space);
+	drawSpace(space, &options);
 	
 	glutSwapBuffers();
 	ticks++;
@@ -146,21 +93,33 @@ display(void)
 	mouseBody->p = newPoint;
 	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0);
 	mousePoint_last = newPoint;
-	update_funcs[demo_index](ticks);
+	currDemo->updateFunc(ticks);
+}
+
+static void
+runDemo(int index)
+{
+	if(currDemo)
+		currDemo->destroyFunc();
+		
+	currDemo = demos[index];
+	ticks = 0;
+	mouseJoint = NULL;
+	space = currDemo->initFunc();
+	
+	static char title[1024];
+	sprintf(title, "Demo: %s (press a - %c to switch demos)", currDemo->name, 'a' + demoCount - 1);
+	
+	glutSetWindowTitle(title);
 }
 
 static void
 keyboard(unsigned char key, int x, int y)
 {
-	int new_index = key - '1';
+	int new_index = key - 'a';
 	
-	if(0 <= new_index && new_index < 7){
-		destroy_funcs[demo_index]();
-		
-		demo_index = new_index;
-		ticks = 0;
-		mouseJoint = NULL;
-		init_funcs[demo_index]();
+	if(0 <= new_index && new_index < demoCount){
+		runDemo(new_index);
 	}
 }
 
@@ -263,7 +222,7 @@ glutStuff(int argc, const char *argv[])
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	
 	glutInitWindowSize(640, 480);
-	glutCreateWindow("Press 1-7 to switch demos");
+	glutCreateWindow("REPLACE ME!");
 	
 	initGL();
 	
@@ -310,7 +269,7 @@ main(int argc, const char **argv)
 //	exit(0);
 	
 	mouseBody = cpBodyNew(INFINITY, INFINITY);
-	init_funcs[demo_index]();
+	runDemo(0);
 	
 	glutStuff(argc, argv);
 	return 0;
