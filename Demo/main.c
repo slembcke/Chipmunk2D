@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <limits.h>
 //#include <sys/time.h>
 
 #ifdef __APPLE__
@@ -53,6 +54,11 @@
 #include "chipmunk.h"
 
 #define SLEEP_TICKS 16
+
+#define CLEAR_COLOR 1.0f, 1.0f, 1.0f
+#define LINE_COLOR 0.0f, 0.0f, 0.0f
+#define COLLISION_COLOR 1.0f, 0.0f, 0.0f
+#define BODY_COLOR 0.0f, 0.0f, 1.0f
 
 extern void demo1_init(void);
 extern void demo1_update(int);
@@ -133,37 +139,85 @@ void demo_destroy(void)
 
 
 static void
-drawCircle(cpFloat x, cpFloat y, cpFloat r, cpFloat a)
+glColor_from_pointer(void *ptr)
 {
-	const int segs = 15;
-	const cpFloat coef = 2.0*M_PI/(cpFloat)segs;
+	unsigned long val = (long)ptr;
 	
-	glBegin(GL_LINE_STRIP); {
-		for(int n = 0; n <= segs; n++){
-			cpFloat rads = n*coef;
-			glVertex2f(r*cos(rads + a) + x, r*sin(rads + a) + y);
-		}
-		glVertex2f(x,y);
-	} glEnd();
+	// hash the pointer up nicely
+	val = (val+0x7ed55d16) + (val<<12);
+	val = (val^0xc761c23c) ^ (val>>19);
+	val = (val+0x165667b1) + (val<<5);
+	val = (val+0xd3a2646c) ^ (val<<9);
+	val = (val+0xfd7046c5) + (val<<3);
+	val = (val^0xb55a4f09) ^ (val>>16);
+	
+	GLfloat v = (GLfloat)val/(GLfloat)LONG_MAX;
+	v = v*0.5 + 0.5;
+	
+	glColor3f(v, v, v);
+
+//	GLubyte r = (val>>0) & 0xFF;
+//	GLubyte g = (val>>8) & 0xFF;
+//	GLubyte b = (val>>16) & 0xFF;
+//	
+//	GLubyte max = r>g ? (r>b ? r : b) : (g>b ? g : b);
+//	
+//	const int mult = 127;
+//	const int add = 127;
+//	r = (r*mult)/max + add;
+//	g = (g*mult)/max + add;
+//	b = (b*mult)/max + add;
+//	
+//	glColor3ub(r, g, b);
+}
+
+GLfloat circleVAR[] = {
+	 1.0000f,  0.0000f,
+	 0.9135f,  0.4067f,
+	 0.6691f,  0.7431f,
+	 0.3090f,  0.9511f,
+	-0.1045f,  0.9945f,
+	-0.5000f,  0.8660f,
+	-0.8090f,  0.5878f,
+	-0.9781f,  0.2079f,
+	-0.9781f, -0.2079f,
+	-0.8090f, -0.5878f,
+	-0.5000f, -0.8660f,
+	-0.1045f, -0.9945f,
+	 0.3090f, -0.9511f,
+	 0.6691f, -0.7431f,
+	 0.9135f, -0.4067f,
+	 1.0000f,  0.0000f,
+	 0.0f, 0.0f, // For an extra line to see the rotation.
+};
+int circleVAR_count = sizeof(circleVAR)/sizeof(GLfloat)/2;
+
+static void
+drawCircleShape(cpBody *body, cpCircleShape *circle)
+{
+	glVertexPointer(2, GL_FLOAT, 0, circleVAR);
+
+	glPushMatrix(); {
+		cpVect center = cpvadd(body->p, cpvrotate(circle->c, body->rot));
+		glTranslatef(center.x, center.y, 0.0f);
+		glRotatef(body->a*180.0/M_PI, 0.0f, 0.0f, 1.0f);
+		glScalef(circle->r, circle->r, 1.0f);
+		
+		glColor_from_pointer(body);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, circleVAR_count - 1);
+		
+		glColor3f(LINE_COLOR);
+		glDrawArrays(GL_LINE_STRIP, 0, circleVAR_count);
+	} glPopMatrix();
 }
 
 static void
-drawCircleShape(cpShape *shape)
+drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 {
-	cpBody *body = shape->body;
-	cpCircleShape *circle = (cpCircleShape *)shape;
-	cpVect c = cpvadd(body->p, cpvrotate(circle->c, body->rot));
-	drawCircle(c.x, c.y, circle->r, body->a);
-}
-
-static void
-drawSegmentShape(cpShape *shape)
-{
-	cpBody *body = shape->body;
-	cpSegmentShape *seg = (cpSegmentShape *)shape;
 	cpVect a = cpvadd(body->p, cpvrotate(seg->a, body->rot));
 	cpVect b = cpvadd(body->p, cpvrotate(seg->b, body->rot));
 	
+	glColor3f(LINE_COLOR);
 	glBegin(GL_LINES); {
 		glVertex2f(a.x, a.y);
 		glVertex2f(b.x, b.y);
@@ -171,34 +225,41 @@ drawSegmentShape(cpShape *shape)
 }
 
 static void
-drawPolyShape(cpShape *shape)
+drawPolyShape(cpBody *body, cpPolyShape *poly)
 {
-	cpBody *body = shape->body;
-	cpPolyShape *poly = (cpPolyShape *)shape;
-	
-	int num = poly->numVerts;
+	int count = count=poly->numVerts;
+	GLfloat VAR[count*2];
+	glVertexPointer(2, GL_FLOAT, 0, VAR);
+
 	cpVect *verts = poly->verts;
-	
-	glBegin(GL_LINE_LOOP);
-	for(int i=0; i<num; i++){
+	for(int i=0; i<count; i++){
 		cpVect v = cpvadd(body->p, cpvrotate(verts[i], body->rot));
-		glVertex2f(v.x, v.y);
-	} glEnd();
+		VAR[2*i    ] = v.x;
+		VAR[2*i + 1] = v.y;
+	}
+
+	glColor_from_pointer(body);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, count);
+	
+	glColor3f(LINE_COLOR);
+	glDrawArrays(GL_LINE_LOOP, 0, count);
 }
 
 static void
 drawObject(void *ptr, void *unused)
 {
 	cpShape *shape = (cpShape *)ptr;
+	cpBody *body = shape->body;
+	
 	switch(shape->klass->type){
 		case CP_CIRCLE_SHAPE:
-			drawCircleShape(shape);
+			drawCircleShape(body, (cpCircleShape *)shape);
 			break;
 		case CP_SEGMENT_SHAPE:
-			drawSegmentShape(shape);
+			drawSegmentShape(body, (cpSegmentShape *)shape);
 			break;
 		case CP_POLY_SHAPE:
-			drawPolyShape(shape);
+			drawPolyShape(body, (cpPolyShape *)shape);
 			break;
 		default:
 			printf("Bad enumeration in drawObject().\n");
@@ -228,11 +289,11 @@ drawCollisions(void *ptr, void *data)
 	}
 }
 
-static void 
-pickingFunc(cpShape *shape, void *data)
-{
-	drawObject(shape, NULL);
-}
+//static void 
+//pickingFunc(cpShape *shape, void *data)
+//{
+//	drawObject(shape, NULL);
+//}
 
 static void
 display(void)
@@ -243,25 +304,24 @@ display(void)
 //	cpSpaceHashEach(space->activeShapes, &drawBB, NULL);
 //	cpSpaceHashEach(space->staticShapes, &drawBB, NULL);
 	
-	glColor3f(0.0, 0.0, 0.0);
 	cpSpaceHashEach(space->activeShapes, &drawObject, NULL);
 	cpSpaceHashEach(space->staticShapes, &drawObject, NULL);
 	
-	glColor3f(1.0, 0.0, 0.0);
-	cpSpaceShapePointQuery(space, mousePoint, pickingFunc, NULL);
-	cpSpaceStaticShapePointQuery(space, mousePoint, pickingFunc, NULL);
+//	glColor3f(1.0, 0.0, 0.0);
+//	cpSpaceShapePointQuery(space, mousePoint, pickingFunc, NULL);
+//	cpSpaceStaticShapePointQuery(space, mousePoint, pickingFunc, NULL);
 	
 	cpArray *bodies = space->bodies;
 	int num = bodies->num;
 	
 	glBegin(GL_POINTS); {
-		glColor3f(0.0, 0.0, 1.0);
+		glColor3f(BODY_COLOR);
 		for(int i=0; i<num; i++){
 			cpBody *body = (cpBody *)bodies->arr[i];
 			glVertex2f(body->p.x, body->p.y);
 		}
 		
-		glColor3f(1.0, 0.0, 0.0);
+		glColor3f(COLLISION_COLOR);
 		cpArrayEach(space->arbiters, &drawCollisions, NULL);
 	} glEnd();
 	
@@ -361,7 +421,7 @@ timercall(int value)
 static void
 initGL(void)
 {
-	glClearColor(1.0, 1.0, 1.0, 0.0);
+	glClearColor(CLEAR_COLOR, 0.0);
 
 	glPointSize(3.0);
 	
@@ -377,6 +437,8 @@ initGL(void)
 	glLoadIdentity();
 	glOrtho(-320.0, 320.0, -240.0, 240.0, -1.0, 1.0);
 	glTranslatef(0.5, 0.5, 0.0);
+	
+	glEnableClientState(GL_VERTEX_ARRAY);
 }
 
 static void
