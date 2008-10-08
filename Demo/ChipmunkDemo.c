@@ -63,6 +63,7 @@ extern chipmunkDemo Plink;
 extern chipmunkDemo Tumble;
 extern chipmunkDemo PyramidTopple;
 extern chipmunkDemo Bounce;
+extern chipmunkDemo Planet;
 
 static chipmunkDemo *demos[] = {
 	&LogoSmash,
@@ -71,6 +72,7 @@ static chipmunkDemo *demos[] = {
 	&Tumble,
 	&PyramidTopple,
 	&Bounce,
+	&Planet,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
@@ -255,7 +257,7 @@ main(int argc, const char **argv)
 	cpInitChipmunk();
 		
 	mouseBody = cpBodyNew(INFINITY, INFINITY);
-	runDemo(demos[0]);
+	runDemo(demos['g' - 'a']);
 	
 	glutStuff(argc, argv);
 	return 0;
