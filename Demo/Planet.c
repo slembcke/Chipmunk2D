@@ -48,7 +48,7 @@ static void
 planetGravityVelocityFunc(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
 	cpVect p = body->p;
-	cpVect g = cpvmult(p, -30000.0f/cpvdot(p, p));
+	cpVect g = cpvmult(p, -50000.0f/cpvdot(p, p));
 	
 	cpBodyUpdateVelocity(body, g, damping, dt);
 }
@@ -68,7 +68,7 @@ static void
 add_box()
 {
 	const cpFloat size = 10.0f;
-	const cpFloat mass = 5.0f;
+	const cpFloat mass = 1.0f;
 	
 	cpVect verts[] = {
 		cpv(-size,-size),
@@ -94,18 +94,18 @@ static cpSpace *
 init(void)
 {
 	staticBody = cpBodyNew(INFINITY, INFINITY);
-	staticBody->w = 0.5f;
+	staticBody->w = 0.2f;
 	
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
-	space->iterations = 10;
+	space->iterations = 20;
 	space->elasticIterations = 0;
 	
-	for(int i=0; i<100; i++)
+	for(int i=0; i<30; i++)
 		add_box();
 	
-	cpShape *shape = cpCircleShapeNew(staticBody, 50.0f, cpvzero);
+	cpShape *shape = cpCircleShapeNew(staticBody, 70.0f, cpvzero);
 	shape->e = 1.0; shape->u = 1.0;
 	cpSpaceAddStaticShape(space, shape);
 	
