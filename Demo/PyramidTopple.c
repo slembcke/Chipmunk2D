@@ -24,13 +24,14 @@
 #include <math.h>
 
 #include "chipmunk.h"
+#include "drawSpace.h"
+#include "ChipmunkDemo.h"
 
-#define SLEEP_TICKS 16
+cpSpace *space;
+cpBody *staticBody;
 
-extern cpSpace *space;
-extern cpBody *staticBody;
-
-void demo5_update(int ticks)
+static void
+update(int ticks)
 {
 	int steps = 2;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
@@ -39,7 +40,8 @@ void demo5_update(int ticks)
 		cpSpaceStep(space, dt);
 }
 
-void demo5_init(void)
+static cpSpace *
+init(void)
 {
 	staticBody = cpBodyNew(INFINITY, INFINITY);
 	
@@ -118,7 +120,24 @@ void demo5_init(void)
 		cpSpaceAddShape(space, shape);		
 	}
 	
-	// Give the last domino a little tip.
+	// Give the last domino a little tap.
 //	body->w = -1;
 //	body->v = cpv(-body->w*20, 0);
+	return space;
 }
+
+static void
+destroy(void)
+{
+	cpBodyFree(staticBody);
+	cpSpaceFreeChildren(space);
+	cpSpaceFree(space);
+}
+
+const chipmunkDemo PyramidTopple = {
+	"Pyramid Topple",
+	NULL,
+	init,
+	update,
+	destroy,
+};

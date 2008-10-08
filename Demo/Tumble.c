@@ -24,77 +24,111 @@
 #include <math.h>
 
 #include "chipmunk.h"
-
-#define SLEEP_TICKS 16
+#include "drawSpace.h"
+#include "ChipmunkDemo.h"
 
 extern cpSpace *space;
 extern cpBody *staticBody;
 
-void demo2_update(int ticks)
+static void
+update(int ticks)
 {
 	int steps = 3;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
+		
+		// Manually update the position of the static shape so that
+		// the box rotates.
+		cpBodyUpdatePosition(staticBody, dt);
+		
+		// Because the box was added as a static shape and we moved it
+		// we need to manually rehash the static spatial hash.
+		cpSpaceRehashStatic(space);
 	}
 }
 
-void demo2_init(void)
+static cpSpace *
+init(void)
 {
 	staticBody = cpBodyNew(INFINITY, INFINITY);
 	
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
-	space->iterations = 20;
-	cpSpaceResizeStaticHash(space, 40.0, 1000);
-	cpSpaceResizeActiveHash(space, 40.0, 1000);
-	space->gravity = cpv(0, -100);
+	cpSpaceResizeActiveHash(space, 30.0, 999);
+	cpSpaceResizeStaticHash(space, 200.0, 99);
+	space->gravity = cpv(0, -600);
 	
 	cpBody *body;
 	cpShape *shape;
 	
+	// Vertexes for the bricks
 	int num = 4;
 	cpVect verts[] = {
-		cpv(-15,-15),
-		cpv(-15, 15),
-		cpv( 15, 15),
-		cpv( 15,-15),
+		cpv(-30,-15),
+		cpv(-30, 15),
+		cpv( 30, 15),
+		cpv( 30,-15),
 	};
 	
-	// Create segments around the edge of the screen.
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);
+	// Set up the static box.
+	cpVect a = cpv(-200, -200);
+	cpVect b = cpv(-200,  200);
+	cpVect c = cpv( 200,  200);
+	cpVect d = cpv( 200, -200);
+	
+	shape = cpSegmentShapeNew(staticBody, a, b, 0.0f);
 	shape->e = 1.0; shape->u = 1.0;
 	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f);
+	shape = cpSegmentShapeNew(staticBody, b, c, 0.0f);
 	shape->e = 1.0; shape->u = 1.0;
 	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
+	shape = cpSegmentShapeNew(staticBody, c, d, 0.0f);
+	shape->e = 1.0; shape->u = 1.0;
+	cpSpaceAddStaticShape(space, shape);
+
+	shape = cpSegmentShapeNew(staticBody, d, a, 0.0f);
 	shape->e = 1.0; shape->u = 1.0;
 	cpSpaceAddStaticShape(space, shape);
 	
-	// Add lots of boxes.
-	for(int i=0; i<14; i++){
-		for(int j=0; j<=i; j++){
+	// Give the box a little spin.
+	// Because staticBody is never added to the space, we will need to
+	// update it ourselves. (see above).
+	// NOTE: Normally you would want to add the segments as normal and not static shapes.
+	// I'm just doing it to demonstrate the cpSpaceRehashStatic() function.
+	staticBody->w = 0.4;
+	
+	// Add the bricks.
+	for(int i=0; i<3; i++){
+		for(int j=0; j<7; j++){
 			body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
-			body->p = cpv(j*32 - i*16, 300 - i*32);
+			body->p = cpv(i*60 - 150, j*30 - 150);
 			cpSpaceAddBody(space, body);
 			shape = cpPolyShapeNew(body, num, verts, cpvzero);
-			shape->e = 0.0; shape->u = 0.8;
+			shape->e = 0.0; shape->u = 0.7;
 			cpSpaceAddShape(space, shape);
 		}
 	}
 	
-	// Add a ball to make things more interesting
-	cpFloat radius = 15.0;
-	body = cpBodyNew(10.0, cpMomentForCircle(10.0, 0.0, radius, cpvzero));
-	body->p = cpv(0, -240 + radius);
-//	body->v = cpv(10, 0);
-	cpSpaceAddBody(space, body);
-	shape = cpCircleShapeNew(body, radius, cpvzero);
-	shape->e = 0.0; shape->u = 0.9;
-	cpSpaceAddShape(space, shape);
+	return space;
 }
+
+static void
+destroy(void)
+{
+	cpBodyFree(staticBody);
+	cpSpaceFreeChildren(space);
+	cpSpaceFree(space);
+}
+
+const chipmunkDemo Tumble = {
+	"Tumble",
+	NULL,
+	init,
+	update,
+	destroy,
+};

@@ -24,8 +24,8 @@
 #include <math.h>
 
 #include "chipmunk.h"
-
-#define SLEEP_TICKS 16
+#include "drawSpace.h"
+#include "ChipmunkDemo.h"
 
 extern cpSpace *space;
 extern cpBody *staticBody;
@@ -40,7 +40,8 @@ eachBody(cpBody *body, void *unused)
 	}
 }
 
-void demo3_update(int ticks)
+static void
+update(int ticks)
 {
 	int steps = 1;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
@@ -53,7 +54,8 @@ void demo3_update(int ticks)
 
 #define NUM_VERTS 5
 
-void demo3_init(void)
+static cpSpace *
+init(void)
 {
 	staticBody = cpBodyNew(INFINITY, INFINITY);
 	
@@ -105,4 +107,22 @@ void demo3_init(void)
 		shape->e = 0.0; shape->u = 0.4;
 		cpSpaceAddShape(space, shape);
 	}
+	
+	return space;
 }
+
+static void
+destroy(void)
+{
+	cpBodyFree(staticBody);
+	cpSpaceFreeChildren(space);
+	cpSpaceFree(space);
+}
+
+const chipmunkDemo Plink = {
+	"Plink",
+	NULL,
+	init,
+	update,
+	destroy,
+};

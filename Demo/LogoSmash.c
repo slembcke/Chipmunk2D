@@ -76,7 +76,7 @@ get_pixel(int x, int y)
 cpSpace *space;
 
 static void
-updateFunc(int ticks)
+update(int ticks)
 {
 	int steps = 1;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
@@ -100,7 +100,7 @@ make_ball(cpFloat x, cpFloat y)
 }
 
 static cpSpace *
-initFunc(void)
+init(void)
 {
 	space = cpSpaceNew();
 	cpSpaceResizeActiveHash(space, 2.0, 10000);
@@ -137,7 +137,7 @@ initFunc(void)
 }
 
 static void
-destroyFunc(void)
+destroy(void)
 {
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
@@ -147,10 +147,10 @@ drawSpaceOptions draw_options = {
 	0, 0, 0.0f, 3.0f, 0.0f,
 };
 
-const chipmunkDemo Demo1 = {
+const chipmunkDemo LogoSmash = {
 	"Logo Smash",
 	&draw_options,
-	initFunc,
-	updateFunc,
-	destroyFunc,
+	init,
+	update,
+	destroy,
 };

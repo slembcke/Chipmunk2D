@@ -57,10 +57,18 @@
 
 #define SLEEP_TICKS 16
 
-extern chipmunkDemo Demo1;
+extern chipmunkDemo LogoSmash;
+extern chipmunkDemo PyramidStack;
+extern chipmunkDemo Plink;
+extern chipmunkDemo Tumble;
+extern chipmunkDemo PyramidTopple;
 
 static chipmunkDemo *demos[] = {
-	&Demo1,
+	&LogoSmash,
+	&PyramidStack,
+	&Plink,
+	&Tumble,
+	&PyramidTopple,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
@@ -74,11 +82,11 @@ cpBody *mouseBody = NULL;
 cpConstraint *mouseJoint = NULL;
 
 drawSpaceOptions options = {
+	0,
 	1,
-	1,
-	2.0f,
 	0.0f,
-	1.0f,
+	0.0f,
+	1.5f,
 };
 
 static void
