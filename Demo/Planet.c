@@ -107,7 +107,7 @@ init(void)
 	
 	cpShape *shape = cpCircleShapeNew(staticBody, 50.0f, cpvzero);
 	shape->e = 1.0; shape->u = 1.0;
-	cpSpaceAddShape(space, shape);
+	cpSpaceAddStaticShape(space, shape);
 	
 	return space;
 }
