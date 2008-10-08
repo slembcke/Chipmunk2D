@@ -76,6 +76,7 @@ static chipmunkDemo *demos[] = {
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
+static const int firstDemoIndex = 'a' - 'a';
 
 static int ticks = 0;
 static cpSpace *space;
@@ -110,6 +111,15 @@ display(void)
 	currDemo->updateFunc(ticks);
 }
 
+static char *
+demoTitle(chipmunkDemo *demo)
+{
+	static char title[1024];
+	sprintf(title, "Demo: %s (a thru %c switch demos)", currDemo->name, 'a' + demoCount - 1);
+	
+	return title;
+}
+
 static void
 runDemo(chipmunkDemo *demo)
 {
@@ -120,11 +130,8 @@ runDemo(chipmunkDemo *demo)
 	ticks = 0;
 	mouseJoint = NULL;
 	space = currDemo->initFunc();
-	
-	static char title[1024];
-	sprintf(title, "Demo: %s (press a - %c to switch demos)", currDemo->name, 'a' + demoCount - 1);
-	
-	glutSetWindowTitle(title);
+		
+	glutSetWindowTitle(demoTitle(currDemo));
 }
 
 static void
@@ -235,15 +242,17 @@ glutStuff(int argc, const char *argv[])
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	
 	glutInitWindowSize(640, 480);
-	glutCreateWindow("REPLACE ME!");
+	glutCreateWindow(demoTitle(demos[firstDemoIndex]));
 	
 	initGL();
 	
 	glutDisplayFunc(display);
-	glutKeyboardFunc(keyboard);
 //	glutIdleFunc(idle);
 	glutTimerFunc(SLEEP_TICKS, timercall, 0);
-//	glutMouseFunc(buttons);
+
+	glutIgnoreKeyRepeat(1);
+	glutKeyboardFunc(keyboard);
+
 	glutMotionFunc(mouse);
 	glutPassiveMotionFunc(mouse);
 	glutMouseFunc(click);
@@ -257,7 +266,7 @@ main(int argc, const char **argv)
 	cpInitChipmunk();
 		
 	mouseBody = cpBodyNew(INFINITY, INFINITY);
-	runDemo(demos['g' - 'a']);
+	runDemo(demos[firstDemoIndex]);
 	
 	glutStuff(argc, argv);
 	return 0;

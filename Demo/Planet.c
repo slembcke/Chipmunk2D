@@ -38,6 +38,9 @@ update(int ticks)
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
+		
+		// Update the static body spin so that it looks like it's rotating.
+		cpBodyUpdatePosition(staticBody, dt);
 	}
 }
 
@@ -91,6 +94,7 @@ static cpSpace *
 init(void)
 {
 	staticBody = cpBodyNew(INFINITY, INFINITY);
+	staticBody->w = 0.5f;
 	
 	cpResetShapeIdCounter();
 	
