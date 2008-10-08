@@ -62,6 +62,7 @@ extern chipmunkDemo PyramidStack;
 extern chipmunkDemo Plink;
 extern chipmunkDemo Tumble;
 extern chipmunkDemo PyramidTopple;
+extern chipmunkDemo Bounce;
 
 static chipmunkDemo *demos[] = {
 	&LogoSmash,
@@ -69,6 +70,7 @@ static chipmunkDemo *demos[] = {
 	&Plink,
 	&Tumble,
 	&PyramidTopple,
+	&Bounce,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;

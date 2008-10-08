@@ -62,6 +62,7 @@
 		D3BAFA040E9C52810039DD5C /* Plink.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFA030E9C52810039DD5C /* Plink.c */; };
 		D3BAFA360E9C53E50039DD5C /* Tumble.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFA350E9C53E50039DD5C /* Tumble.c */; };
 		D3BAFA510E9C549C0039DD5C /* PyramidTopple.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFA500E9C549C0039DD5C /* PyramidTopple.c */; };
+		D3BAFA870E9C5A230039DD5C /* Bounce.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFA860E9C5A230039DD5C /* Bounce.c */; };
 		D3BC99C10AB381EE0025A2C0 /* ChipmunkDemo.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */; };
 		D3E4A95E0E9963DD00EE08BA /* cpBreakableConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E4A95B0E9963DD00EE08BA /* cpBreakableConstraint.h */; };
 		D3E4A95F0E9963DD00EE08BA /* cpBreakableConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E4A95C0E9963DD00EE08BA /* cpBreakableConstraint.c */; };
@@ -134,6 +135,7 @@
 		D3BAFA030E9C52810039DD5C /* Plink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Plink.c; sourceTree = "<group>"; };
 		D3BAFA350E9C53E50039DD5C /* Tumble.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tumble.c; sourceTree = "<group>"; };
 		D3BAFA500E9C549C0039DD5C /* PyramidTopple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = PyramidTopple.c; sourceTree = "<group>"; };
+		D3BAFA860E9C5A230039DD5C /* Bounce.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Bounce.c; sourceTree = "<group>"; };
 		D3BC99AB0AB381AF0025A2C0 /* cpPolyShape.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpPolyShape.c; sourceTree = "<group>"; };
 		D3BC99AC0AB381AF0025A2C0 /* cpPolyShape.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cpPolyShape.h; sourceTree = "<group>"; };
 		D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = ChipmunkDemo.c; sourceTree = "<group>"; };
@@ -274,6 +276,7 @@
 				D3BAFA030E9C52810039DD5C /* Plink.c */,
 				D3BAFA350E9C53E50039DD5C /* Tumble.c */,
 				D3BAFA500E9C549C0039DD5C /* PyramidTopple.c */,
+				D3BAFA860E9C5A230039DD5C /* Bounce.c */,
 			);
 			name = Demo;
 			path = ../Demo;
@@ -511,6 +514,7 @@
 				D3BAFA040E9C52810039DD5C /* Plink.c in Sources */,
 				D3BAFA360E9C53E50039DD5C /* Tumble.c in Sources */,
 				D3BAFA510E9C549C0039DD5C /* PyramidTopple.c in Sources */,
+				D3BAFA870E9C5A230039DD5C /* Bounce.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <limits.h>
-//#include <sys/time.h>
+#include <string.h>
 
 #ifdef __APPLE__
 	#include "OpenGL/gl.h"
@@ -131,17 +131,67 @@ drawCircleShape(cpBody *body, cpCircleShape *circle)
 	} glPopMatrix();
 }
 
+static const GLfloat pillVAR[] = {
+	 0.0000,  1.0000,
+	 0.5000,  0.8660,
+	 0.8660,  0.5000,
+	 1.0000,  0.0000,
+	 0.8660, -0.5000,
+	 0.5000, -0.8660,
+
+	 0.0000, -1.0000,
+	-0.5000, -0.8660,
+	-0.8660, -0.5000,
+	-1.0000, -0.0000,
+	-0.8660,  0.5000,
+	-0.5000,  0.8660,
+};
+static const int pillVAR_count = sizeof(pillVAR)/sizeof(GLfloat)/2;
+
 static void
 drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 {
 	cpVect a = cpvadd(body->p, cpvrotate(seg->a, body->rot));
 	cpVect b = cpvadd(body->p, cpvrotate(seg->b, body->rot));
 	
-	glColor3f(LINE_COLOR);
-	glBegin(GL_LINES); {
-		glVertex2f(a.x, a.y);
-		glVertex2f(b.x, b.y);
-	} glEnd();
+	if(seg->r){
+		cpVect delta = cpvsub(b, a);
+		cpFloat len = cpvlength(delta)/seg->r;
+		
+		GLfloat VAR[24];
+		memcpy(VAR, pillVAR, sizeof(pillVAR));
+		
+		for(int i=0; i<12; i+=2)
+			VAR[i] += len;
+			
+		glVertexPointer(2, GL_FLOAT, 0, VAR);
+		glPushMatrix(); {
+			GLfloat x = a.x;
+			GLfloat y = a.y;
+			GLfloat cos = delta.x/len;
+			GLfloat sin = delta.y/len;
+
+			const GLfloat matrix[] = {
+				 cos,  sin, 0.0f, 0.0f,
+				-sin,  cos, 0.0f, 0.0f,
+				0.0f, 0.0f, 1.0f, 1.0f,
+					 x,    y, 0.0f, 1.0f,
+			};
+			
+			glMultMatrixf(matrix);
+				
+			glColor_from_pointer(seg);
+			glDrawArrays(GL_TRIANGLE_FAN, 0, pillVAR_count);
+			
+			glColor3f(LINE_COLOR);
+			glDrawArrays(GL_LINE_LOOP, 0, pillVAR_count);
+		} glPopMatrix();
+	} else {
+		glBegin(GL_LINES); {
+			glVertex2f(a.x, a.y);
+			glVertex2f(b.x, b.y);
+		} glEnd();
+	}
 }
 
 static void

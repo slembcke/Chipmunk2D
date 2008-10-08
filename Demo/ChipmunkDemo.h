@@ -34,3 +34,9 @@ typedef struct chipmunkDemo {
 	demoUpdateFunc updateFunc;
 	demoDestroyFunc destroyFunc;
 } chipmunkDemo;
+
+static inline cpFloat
+frand(void)
+{
+	return (cpFloat)rand()/(cpFloat)RAND_MAX;
+}

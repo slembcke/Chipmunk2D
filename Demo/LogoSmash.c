@@ -114,8 +114,8 @@ init(void)
 		for(int x=0; x<image_width; x++){
 			if(!get_pixel(x, y)) continue;
 			
-			cpFloat x_jitter = 0.05*((cpFloat)rand()/(cpFloat)RAND_MAX);
-			cpFloat y_jitter = 0.05*((cpFloat)rand()/(cpFloat)RAND_MAX);
+			cpFloat x_jitter = 0.05*frand();
+			cpFloat y_jitter = 0.05*frand();
 			
 			shape = make_ball(2*(x - image_width/2 + x_jitter), 2*(image_height/2 - y + y_jitter));
 			cpSpaceAddBody(space, shape->body);
