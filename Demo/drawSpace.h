@@ -22,7 +22,9 @@
 typedef struct drawSpaceOptions {
 	int drawBBs;
 	int drawShapes;
-	int drawCollisions;
+	float collisionPointSize;
+	float bodyPointSize;
+	float lineThickness;
 } drawSpaceOptions;
 
 void drawSpace(cpSpace *space, drawSpaceOptions *options);

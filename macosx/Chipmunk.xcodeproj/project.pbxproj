@@ -23,8 +23,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		D310E2540B69D4E7007E0B0C /* Demo7.c in Sources */ = {isa = PBXBuildFile; fileRef = D310E2530B69D4E7007E0B0C /* Demo7.c */; };
-		D349636D0B56C25300CAD239 /* Demo6.c in Sources */ = {isa = PBXBuildFile; fileRef = D349636C0B56C25300CAD239 /* Demo6.c */; };
 		D34963C10B56CBA900CAD239 /* chipmunk.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0C40AA75CC3004E361B /* chipmunk.h */; };
 		D34963C20B56CBA900CAD239 /* cpVect.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0270AA32F16004E361B /* cpVect.h */; };
 		D34963C30B56CBA900CAD239 /* cpBB.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F2D90AAA5622004E361B /* cpBB.h */; };
@@ -51,10 +49,6 @@
 		D34963D80B56CBBF00CAD239 /* cpCollision.c in Sources */ = {isa = PBXBuildFile; fileRef = D37E231F0AAA728A00BB4C50 /* cpCollision.c */; };
 		D34963D90B56CBBF00CAD239 /* cpSpace.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E5F2CF0AAA5589004E361B /* cpSpace.c */; };
 		D37697200B50C53900BB33CC /* Demo1.c in Sources */ = {isa = PBXBuildFile; fileRef = D3CCDF460AE35D920080442F /* Demo1.c */; };
-		D376975E0B50C81500BB33CC /* Demo2.c in Sources */ = {isa = PBXBuildFile; fileRef = D3CCE0390AE364C10080442F /* Demo2.c */; };
-		D376978E0B50C91100BB33CC /* Demo3.c in Sources */ = {isa = PBXBuildFile; fileRef = D3CCE2780AE4103C0080442F /* Demo3.c */; };
-		D37697AE0B50CA3F00BB33CC /* Demo4.c in Sources */ = {isa = PBXBuildFile; fileRef = D368EA320AE5997E00C25E02 /* Demo4.c */; };
-		D37697C00B50CC7A00BB33CC /* Demo5.c in Sources */ = {isa = PBXBuildFile; fileRef = D37697BF0B50CC7A00BB33CC /* Demo5.c */; };
 		D3800E120E9815FC00A3D7FA /* cpConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D3800E0F0E9815FC00A3D7FA /* cpConstraint.h */; };
 		D3800E130E9815FC00A3D7FA /* cpConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800E100E9815FC00A3D7FA /* cpConstraint.c */; };
 		D3800E1E0E98176F00A3D7FA /* cpPinJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800E1B0E98176F00A3D7FA /* cpPinJoint.c */; };
@@ -110,12 +104,8 @@
 		D3057A240B6F4FBE00856BA5 /* rb_cpJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpJoint.c; path = ../ruby/rb_cpJoint.c; sourceTree = "<group>"; };
 		D30CE25D0B52535500427129 /* cpHashSet.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpHashSet.c; sourceTree = "<group>"; };
 		D30CE25E0B52535500427129 /* cpHashSet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cpHashSet.h; sourceTree = "<group>"; };
-		D310E2530B69D4E7007E0B0C /* Demo7.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Demo7.c; sourceTree = "<group>"; };
-		D349636C0B56C25300CAD239 /* Demo6.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = Demo6.c; sourceTree = "<group>"; };
 		D34963BB0B56CAA300CAD239 /* libChipmunk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libChipmunk.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D353B6480B059C5F0038D274 /* prime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prime.h; sourceTree = "<group>"; };
-		D368EA320AE5997E00C25E02 /* Demo4.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = Demo4.c; sourceTree = "<group>"; };
-		D37697BF0B50CC7A00BB33CC /* Demo5.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = Demo5.c; sourceTree = "<group>"; };
 		D37E22FC0AAA63B800BB4C50 /* cpShape.h */ = {isa = PBXFileReference; fileEncoding = 4; languageSpecificationIdentifier = c; lastKnownFileType = sourcecode.c.h; path = cpShape.h; sourceTree = "<group>"; };
 		D37E22FD0AAA63B800BB4C50 /* cpShape.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpShape.c; sourceTree = "<group>"; };
 		D37E231E0AAA728A00BB4C50 /* cpCollision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpCollision.h; sourceTree = "<group>"; };
@@ -150,8 +140,6 @@
 		D3C4FD510AE6E20D00339F3A /* rb_cpVect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpVect.c; path = ../ruby/rb_cpVect.c; sourceTree = "<group>"; };
 		D3C4FD570AE6E33000339F3A /* rb_cpShape.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpShape.c; path = ../ruby/rb_cpShape.c; sourceTree = "<group>"; };
 		D3CCDF460AE35D920080442F /* Demo1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Demo1.c; sourceTree = "<group>"; };
-		D3CCE0390AE364C10080442F /* Demo2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Demo2.c; sourceTree = "<group>"; };
-		D3CCE2780AE4103C0080442F /* Demo3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Demo3.c; sourceTree = "<group>"; };
 		D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemo.h; sourceTree = "<group>"; };
 		D3E4A95B0E9963DD00EE08BA /* cpBreakableConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpBreakableConstraint.h; sourceTree = "<group>"; };
 		D3E4A95C0E9963DD00EE08BA /* cpBreakableConstraint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpBreakableConstraint.c; sourceTree = "<group>"; };
@@ -274,12 +262,6 @@
 				D3FBA1B80E9B1F6300950BCC /* drawSpace.h */,
 				D3FBA1A60E9B1E0400950BCC /* drawSpace.c */,
 				D3CCDF460AE35D920080442F /* Demo1.c */,
-				D3CCE0390AE364C10080442F /* Demo2.c */,
-				D3CCE2780AE4103C0080442F /* Demo3.c */,
-				D368EA320AE5997E00C25E02 /* Demo4.c */,
-				D37697BF0B50CC7A00BB33CC /* Demo5.c */,
-				D349636C0B56C25300CAD239 /* Demo6.c */,
-				D310E2530B69D4E7007E0B0C /* Demo7.c */,
 			);
 			name = Demo;
 			path = ../Demo;
@@ -512,12 +494,6 @@
 			files = (
 				D3BC99C10AB381EE0025A2C0 /* ChipmunkDemo.c in Sources */,
 				D37697200B50C53900BB33CC /* Demo1.c in Sources */,
-				D376975E0B50C81500BB33CC /* Demo2.c in Sources */,
-				D376978E0B50C91100BB33CC /* Demo3.c in Sources */,
-				D37697AE0B50CA3F00BB33CC /* Demo4.c in Sources */,
-				D37697C00B50CC7A00BB33CC /* Demo5.c in Sources */,
-				D349636D0B56C25300CAD239 /* Demo6.c in Sources */,
-				D310E2540B69D4E7007E0B0C /* Demo7.c in Sources */,
 				D3FBA1A70E9B1E0400950BCC /* drawSpace.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

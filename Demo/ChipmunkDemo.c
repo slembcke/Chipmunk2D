@@ -74,9 +74,11 @@ cpBody *mouseBody = NULL;
 cpConstraint *mouseJoint = NULL;
 
 drawSpaceOptions options = {
-	0,
 	1,
-	0,
+	1,
+	2.0f,
+	0.0f,
+	1.0f,
 };
 
 static void
@@ -84,7 +86,7 @@ display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	
-	drawSpace(space, &options);
+	drawSpace(space, currDemo->drawOptions ? currDemo->drawOptions : &options);
 	
 	glutSwapBuffers();
 	ticks++;
@@ -187,26 +189,23 @@ timercall(int value)
 	glutPostRedisplay();
 }
 
-//static void
-//idle(void)
-//{
-//	glutPostRedisplay();
-//}
+static void
+idle(void)
+{
+	glutPostRedisplay();
+}
 
 static void
 initGL(void)
 {
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0);
 
-	glPointSize(3.0);
-	
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_POINT_SMOOTH);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
 	glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
-	glLineWidth(1.5f);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -240,36 +239,11 @@ glutStuff(int argc, const char *argv[])
 	glutMainLoop();
 }
 
-//void time_trial(int index, int count)
-//{
-//	demo_index = index;
-//	init_funcs[demo_index]();
-//	
-//	struct timeval start_time, end_time;
-//	gettimeofday(&start_time, NULL);
-//	
-//	for(int i=0; i<count; i++)
-//		update_funcs[demo_index](i);
-//	
-//	gettimeofday(&end_time, NULL);
-//	long millisecs = (end_time.tv_sec - start_time.tv_sec)*1000;
-//	millisecs += (end_time.tv_usec - start_time.tv_usec)/1000;
-//	
-//	printf("Time(%d) = %ldms\n", index + 1, millisecs);
-//}
-
 int
 main(int argc, const char **argv)
 {
 	cpInitChipmunk();
-	
-//	time_trial(1, 5000);
-//	time_trial(2, 5000);
-//	time_trial(3, 5000);
-//	time_trial(4, 1000);
-//	time_trial(6, 25000);
-//	exit(0);
-	
+		
 	mouseBody = cpBodyNew(INFINITY, INFINITY);
 	runDemo(demos[0]);
 	

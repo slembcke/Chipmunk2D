@@ -209,43 +209,41 @@ drawCollisions(void *ptr, void *data)
 	}
 }
 
-//static void 
-//pickingFunc(cpShape *shape, void *data)
-//{
-//	drawObject(shape, NULL);
-//}
-
 void
 drawSpace(cpSpace *space, drawSpaceOptions *options)
 {
+	glLineWidth(1.0f);
 	if(options->drawBBs){
 		glColor3f(0.6, 1.0, 0.6);
 		cpSpaceHashEach(space->activeShapes, &drawBB, NULL);
 		cpSpaceHashEach(space->staticShapes, &drawBB, NULL);
 	}
 
+	glLineWidth(options->lineThickness);
 	if(options->drawShapes){
 		cpSpaceHashEach(space->activeShapes, &drawObject, NULL);
 		cpSpaceHashEach(space->staticShapes, &drawObject, NULL);
 	}
 	
-//	glColor3f(1.0, 0.0, 0.0);
-//	cpSpaceShapePointQuery(space, mousePoint, pickingFunc, NULL);
-//	cpSpaceStaticShapePointQuery(space, mousePoint, pickingFunc, NULL);
-	
 	cpArray *bodies = space->bodies;
 	int num = bodies->num;
 	
-	glBegin(GL_POINTS); {
-		glColor3f(BODY_COLOR);
-		for(int i=0; i<num; i++){
-			cpBody *body = (cpBody *)bodies->arr[i];
-			glVertex2f(body->p.x, body->p.y);
-		}
-		
-		if(options->drawCollisions){
+	if(options->bodyPointSize){
+		glPointSize(options->bodyPointSize);
+		glBegin(GL_POINTS); {
+			glColor3f(LINE_COLOR);
+			for(int i=0; i<num; i++){
+				cpBody *body = (cpBody *)bodies->arr[i];
+				glVertex2f(body->p.x, body->p.y);
+			}
+		} glEnd();
+	}
+
+	if(options->collisionPointSize){
+		glPointSize(options->collisionPointSize);
+		glBegin(GL_POINTS); {
 			glColor3f(COLLISION_COLOR);
 			cpArrayEach(space->arbiters, &drawCollisions, NULL);
-		}
-	} glEnd();
+		} glEnd();
+	}
 }
