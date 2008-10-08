@@ -225,12 +225,15 @@ cpSpaceSetDefaultCollisionPairFunc(cpSpace *space, cpCollFunc func, void *data)
 void
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
+	assert(shape->body);
 	cpSpaceHashInsert(space->activeShapes, shape, shape->id, shape->bb);
 }
 
 void
 cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
+	assert(shape->body);
+
 	cpShapeCacheBB(shape);
 	cpSpaceHashInsert(space->staticShapes, shape, shape->id, shape->bb);
 }

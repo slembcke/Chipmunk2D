@@ -71,24 +71,24 @@ glColor_from_pointer(void *ptr)
 	val = (val+0xfd7046c5) + (val<<3);
 	val = (val^0xb55a4f09) ^ (val>>16);
 	
-	GLfloat v = (GLfloat)val/(GLfloat)ULONG_MAX;
-	v = 0.95f - v*0.15f;
-	
-	glColor3f(v, v, v);
+//	GLfloat v = (GLfloat)val/(GLfloat)ULONG_MAX;
+//	v = 0.95f - v*0.15f;
+//	
+//	glColor3f(v, v, v);
 
-//	GLubyte r = (val>>0) & 0xFF;
-//	GLubyte g = (val>>8) & 0xFF;
-//	GLubyte b = (val>>16) & 0xFF;
-//	
-//	GLubyte max = r>g ? (r>b ? r : b) : (g>b ? g : b);
-//	
-//	const int mult = 127;
-//	const int add = 127;
-//	r = (r*mult)/max + add;
-//	g = (g*mult)/max + add;
-//	b = (b*mult)/max + add;
-//	
-//	glColor3ub(r, g, b);
+	GLubyte r = (val>>0) & 0xFF;
+	GLubyte g = (val>>8) & 0xFF;
+	GLubyte b = (val>>16) & 0xFF;
+	
+	GLubyte max = r>g ? (r>b ? r : b) : (g>b ? g : b);
+	
+	const int mult = 127;
+	const int add = 63;
+	r = (r*mult)/max + add;
+	g = (g*mult)/max + add;
+	b = (b*mult)/max + add;
+	
+	glColor3ub(r, g, b);
 }
 
 static const GLfloat circleVAR[] = {

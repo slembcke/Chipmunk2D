@@ -21,6 +21,7 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <assert.h>
 
 #include "chipmunk.h"
 #include "util.h"
@@ -38,7 +39,9 @@ cpConstraintFree(cpConstraint *constraint)
 	free(constraint);
 }
 
-// defined in util.h
+
+// *** defined in util.h
+
 void
 cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b)
 {
@@ -48,4 +51,10 @@ cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBod
 	
 	constraint->maxForce = INFINITY;
 	constraint->biasCoef = cp_constraint_bias_coef;
+}
+
+void
+CHECK_CLASS(cpConstraint *constraint, const cpConstraintClass *klass)
+{
+	assert(constraint->klass == klass);
 }

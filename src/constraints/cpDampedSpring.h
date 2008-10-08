@@ -37,3 +37,6 @@ typedef struct cpDampedSpring {
 cpDampedSpring *cpDampedSpringAlloc(void);
 cpDampedSpring *cpDampedSpringInit(cpDampedSpring *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping);
 cpConstraint *cpDampedSpringNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping);
+
+void cpDampedSpringGetProperties(cpConstraint *constraint, cpFloat *restLength, cpFloat *stiffness, cpFloat *damping);
+void cpDampedSpringSetProperties(cpConstraint *constraint, cpFloat restLength, cpFloat stiffness, cpFloat damping);

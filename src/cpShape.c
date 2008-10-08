@@ -43,7 +43,6 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 	shape->id = SHAPE_ID_COUNTER;
 	SHAPE_ID_COUNTER++;
 	
-	assert(body != NULL);
 	shape->body = body;
 	
 	shape->e = 0.0f;
