@@ -45,6 +45,15 @@ cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset)
 }
 
 cpFloat
+cpMomentForSegment(cpFloat m, cpVect a, cpVect b)
+{
+	cpFloat length = cpvlength(cpvsub(b, a));
+	cpVect offset = cpvmult(cpvadd(a, b), 1.0f/2.0f);
+	
+	return m*length*length/12.0f + m*cpvdot(offset, offset);
+}
+
+cpFloat
 cpMomentForPoly(cpFloat m, const int numVerts, cpVect *verts, cpVect offset)
 {
 	cpVect *tVerts = (cpVect *)calloc(numVerts, sizeof(cpVect));

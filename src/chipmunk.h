@@ -82,6 +82,7 @@ cpfclamp(cpFloat f, cpFloat min, cpFloat max){
 void cpInitChipmunk(void);
 
 cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset);
+cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b);
 cpFloat cpMomentForPoly(cpFloat m, int numVerts, cpVect *verts, cpVect offset);
 
 #ifdef __cplusplus
