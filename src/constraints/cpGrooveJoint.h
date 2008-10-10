@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+extern const cpConstraintClass cpGrooveJointClass;
+
 typedef struct cpGrooveJoint {
 	cpConstraint constraint;
 	cpVect grv_n, grv_a, grv_b;

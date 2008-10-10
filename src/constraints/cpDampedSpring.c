@@ -79,7 +79,7 @@ getImpulse(cpConstraint *constraint)
 	return 0.0f;
 }
 
-static const cpConstraintClass constraintClass = {
+const cpConstraintClass cpDampedSpringClass = {
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
@@ -94,7 +94,7 @@ cpDampedSpringAlloc(void)
 cpDampedSpring *
 cpDampedSpringInit(cpDampedSpring *spring, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping)
 {
-	cpConstraintInit((cpConstraint *)spring, &constraintClass, a, b);
+	cpConstraintInit((cpConstraint *)spring, &cpDampedSpringClass, a, b);
 	
 	spring->anchr1 = anchr1;
 	spring->anchr2 = anchr2;
@@ -115,7 +115,7 @@ cpDampedSpringNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat re
 void
 cpDampedSpringGetProperties(cpConstraint *constraint, cpFloat *restLength, cpFloat *stiffness, cpFloat *damping)
 {
-	CHECK_CLASS(constraint, &constraintClass);
+	CHECK_CLASS(constraint, &cpDampedSpringClass);
 	cpDampedSpring *spring = (cpDampedSpring *)constraint;
 
 	if(restLength) (*restLength) = spring->restLength;
@@ -126,7 +126,7 @@ cpDampedSpringGetProperties(cpConstraint *constraint, cpFloat *restLength, cpFlo
 void
 cpDampedSpringSetProperties(cpConstraint *constraint, cpFloat restLength, cpFloat stiffness, cpFloat damping)
 {
-	CHECK_CLASS(constraint, &constraintClass);
+	CHECK_CLASS(constraint, &cpDampedSpringClass);
 	cpDampedSpring *spring = (cpDampedSpring *)constraint;
 	
 	spring->restLength = restLength;

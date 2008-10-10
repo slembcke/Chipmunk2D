@@ -75,7 +75,7 @@ getImpulse(cpConstraint *joint)
 	return cpvlength(((cpPivotJoint *)joint)->jAcc);
 }
 
-static const cpConstraintClass jointClass = {
+const cpConstraintClass cpPivotJointClass = {
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
@@ -90,7 +90,7 @@ cpPivotJointAlloc(void)
 cpPivotJoint *
 cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
 {
-	cpConstraintInit((cpConstraint *)joint, &jointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &cpPivotJointClass, a, b);
 	
 //	joint->anchr1 = cpvunrotate(cpvsub(pivot, a->p), a->rot);
 //	joint->anchr2 = cpvunrotate(cpvsub(pivot, b->p), b->rot);

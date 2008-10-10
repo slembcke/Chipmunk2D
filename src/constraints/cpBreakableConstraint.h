@@ -18,8 +18,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
+
+// required forward declaration
 struct cpSpace;
+
+extern const cpConstraintClass cpBreakableJointClass;
 
 typedef struct cpBreakableJoint {
 	cpConstraint constraint;

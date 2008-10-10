@@ -103,7 +103,7 @@ getImpulse(cpGrooveJoint *joint)
 	return cpvlength(joint->jAcc);
 }
 
-static const cpConstraintClass jointClass = {
+const cpConstraintClass cpGrooveJointClass = {
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
@@ -118,7 +118,7 @@ cpGrooveJointAlloc(void)
 cpGrooveJoint *
 cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2)
 {
-	cpConstraintInit((cpConstraint *)joint, &jointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &cpGrooveJointClass, a, b);
 	
 	joint->grv_a = groove_a;
 	joint->grv_b = groove_b;

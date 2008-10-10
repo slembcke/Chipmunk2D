@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+extern const cpConstraintClass cpSlideJointClass;
+
 typedef struct cpSlideJoint {
 	cpConstraint constraint;
 	cpVect anchr1, anchr2;

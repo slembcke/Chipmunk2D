@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+extern const cpConstraintClass cpPivotJointClass;
+
 typedef struct cpPivotJoint {
 	cpConstraint constraint;
 	cpVect anchr1, anchr2;

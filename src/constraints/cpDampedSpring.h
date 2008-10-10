@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+extern const cpConstraintClass cpDampedSpringClass;
+
 typedef struct cpDampedSpring {
 	cpConstraint constraint;
 	cpVect anchr1, anchr2;

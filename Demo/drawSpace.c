@@ -140,6 +140,18 @@ drawCircleShape(cpBody *body, cpCircleShape *circle)
 	} glPopMatrix();
 }
 
+static void
+drawCircle(float x, float y, float r)
+{
+	glVertexPointer(2, GL_FLOAT, 0, circleVAR);
+	glPushMatrix(); {
+		glTranslatef(x, y, 0.0f);
+		glScalef(r, r, 1.0f);
+		
+		glDrawArrays(GL_LINE_STRIP, 0, circleVAR_count - 2);
+	} glPopMatrix();
+}
+
 static const GLfloat pillVAR[] = {
 	 0.0000,  1.0000,
 	 0.2588,  0.9659,
@@ -259,6 +271,92 @@ drawObject(void *ptr, void *unused)
 	}
 }
 
+static const GLfloat springVAR[] = {
+	0.00f, 0.0f,
+	0.20f, 0.0f,
+	0.25f, 3.0f,
+	0.30f,-6.0f,
+	0.35f, 6.0f,
+	0.40f,-6.0f,
+	0.45f, 6.0f,
+	0.50f,-6.0f,
+	0.55f, 6.0f,
+	0.60f,-6.0f,
+	0.65f, 6.0f,
+	0.70f,-3.0f,
+	0.75f, 6.0f,
+	0.80f, 0.0f,
+	1.00f, 0.0f,
+};
+static const int springVAR_count = sizeof(springVAR)/sizeof(GLfloat)/2;
+
+static void
+drawSpring(cpDampedSpring *spring, cpBody *body_a, cpBody *body_b)
+{
+	cpVect a = cpvadd(body_a->p, cpvrotate(spring->anchr1, body_a->rot));
+	cpVect b = cpvadd(body_b->p, cpvrotate(spring->anchr2, body_b->rot));
+
+	glPointSize(5.0f);
+	glBegin(GL_POINTS); {
+		glVertex2f(a.x, a.y);
+		glVertex2f(b.x, b.y);
+	} glEnd();
+
+	cpVect delta = cpvsub(b, a);
+
+	glVertexPointer(2, GL_FLOAT, 0, springVAR);
+	glPushMatrix(); {
+		GLfloat x = a.x;
+		GLfloat y = a.y;
+		GLfloat cos = delta.x;
+		GLfloat sin = delta.y;
+		GLfloat s = 1.0f/cpvlength(delta);
+
+		const GLfloat matrix[] = {
+			 cos,  sin, 0.0f, 0.0f,
+			-sin*s,  cos*s, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 1.0f,
+				 x,    y, 0.0f, 1.0f,
+		};
+		
+		glMultMatrixf(matrix);
+		glDrawArrays(GL_LINE_STRIP, 0, springVAR_count);
+	} glPopMatrix();
+}
+
+static void
+drawConstraint(cpConstraint *constraint)
+{
+	cpBody *body_a = constraint->a;
+	cpBody *body_b = constraint->b;
+
+	const cpConstraintClass *klass = constraint->klass;
+	if(klass == &cpPinJointClass){
+		printf("Cannot draw constraint\n");
+	} else if(klass == &cpSlideJointClass){
+		printf("Cannot draw constraint\n");
+	} else if(klass == &cpPivotJointClass){
+		cpPivotJoint *joint = (cpPivotJoint *)constraint;
+	
+		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
+		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
+
+		glPointSize(10.0f);
+		glBegin(GL_POINTS); {
+			glVertex2f(a.x, a.y);
+			glVertex2f(b.x, b.y);
+		} glEnd();
+	} else if(klass == &cpGrooveJointClass){
+		printf("Cannot draw constraint\n");
+	} else if(klass == &cpDampedSpringClass){
+		drawSpring((cpDampedSpring *)constraint, body_a, body_b);
+	} else if(klass == &cpBreakableJointClass){
+		printf("Cannot draw constraint\n");
+	} else {
+		printf("Cannot draw constraint\n");
+	}
+}
+
 static void
 drawBB(void *ptr, void *unused)
 {
@@ -298,14 +396,20 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 		cpSpaceHashEach(space->staticShapes, &drawObject, NULL);
 	}
 	
-	cpArray *bodies = space->bodies;
-	int num = bodies->num;
+	cpArray *constraints = space->constraints;
+
+	glColor3f(0.5f, 1.0f, 0.5f);
+	for(int i=0, count = constraints->num; i<count; i++){
+		drawConstraint(constraints->arr[i]);
+	}
 	
 	if(options->bodyPointSize){
+		cpArray *bodies = space->bodies;
+
 		glPointSize(options->bodyPointSize);
 		glBegin(GL_POINTS); {
 			glColor3f(LINE_COLOR);
-			for(int i=0; i<num; i++){
+			for(int i=0, count = bodies->num; i<count; i++){
 				cpBody *body = (cpBody *)bodies->arr[i];
 				glVertex2f(body->p.x, body->p.y);
 			}
