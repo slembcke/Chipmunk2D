@@ -140,18 +140,6 @@ drawCircleShape(cpBody *body, cpCircleShape *circle)
 	} glPopMatrix();
 }
 
-static void
-drawCircle(float x, float y, float r)
-{
-	glVertexPointer(2, GL_FLOAT, 0, circleVAR);
-	glPushMatrix(); {
-		glTranslatef(x, y, 0.0f);
-		glScalef(r, r, 1.0f);
-		
-		glDrawArrays(GL_LINE_STRIP, 0, circleVAR_count - 2);
-	} glPopMatrix();
-}
-
 static const GLfloat pillVAR[] = {
 	 0.0000,  1.0000,
 	 0.2588,  0.9659,

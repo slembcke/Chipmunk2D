@@ -19,39 +19,20 @@
  * SOFTWARE.
  */
 
-// TODO: Comment me!
+extern const cpConstraintClass cpDampedRotarySpringClass;
+
+typedef struct cpDampedRotarySpring {
+	cpConstraint constraint;
+	cpFloat restAngle;
+	cpFloat stiffness;
+	cpFloat damping;
 	
-extern cpFloat cp_constraint_bias_coef;
-
-struct cpConstraintClass;
-struct cpConstraint;
-
-typedef void (*cpConstraintPreStepFunction)(struct cpConstraint *constraint, cpFloat dt, cpFloat dt_inv);
-typedef void (*cpConstraintApplyImpulseFunction)(struct cpConstraint *constraint);
-typedef cpFloat (*cpConstraintGetImpulseFunction)(struct cpConstraint *constraint);
-
-typedef struct cpConstraintClass {
-	cpConstraintPreStepFunction preStep;
-	cpConstraintApplyImpulseFunction applyImpulse;
-	cpConstraintGetImpulseFunction getImpulse;
-} cpConstraintClass;
-
-typedef struct cpConstraint {
-	const cpConstraintClass *klass;
+	cpFloat dt;
+	cpFloat target_wrn;
 	
-	cpBody *a, *b;
-	cpFloat maxForce;
-	cpFloat biasCoef;
-} cpConstraint;
+	cpFloat iSum;
+} cpDampedRotarySpring;
 
-void cpConstraintDestroy(cpConstraint *constraint);
-void cpConstraintFree(cpConstraint *constraint);
-
-// Built in Joint types
-#include "cpPinJoint.h"
-#include "cpSlideJoint.h"
-#include "cpPivotJoint.h"
-#include "cpGrooveJoint.h"
-#include "cpDampedSpring.h"
-#include "cpDampedRotarySpring.h"
-#include "cpBreakableJoint.h"
+cpDampedRotarySpring *cpDampedRotarySpringAlloc(void);
+cpDampedRotarySpring *cpDampedRotarySpringInit(cpDampedRotarySpring *joint, cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping);
+cpConstraint *cpDampedRotarySpringNew(cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping);

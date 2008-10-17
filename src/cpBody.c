@@ -89,7 +89,7 @@ cpBodySetMoment(cpBody *body, cpFloat i)
 void
 cpBodySetAngle(cpBody *body, cpFloat a)
 {
-	body->a = fmod(a, (cpFloat)M_PI*2.0f);
+	body->a = a;//fmod(a, (cpFloat)M_PI*2.0f);
 	body->rot = cpvforangle(a);
 }
 

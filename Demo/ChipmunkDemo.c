@@ -57,6 +57,7 @@
 
 #define SLEEP_TICKS 16
 
+extern chipmunkDemo Test;
 extern chipmunkDemo LogoSmash;
 extern chipmunkDemo PyramidStack;
 extern chipmunkDemo Plink;
@@ -68,6 +69,7 @@ extern chipmunkDemo Springies;
 extern chipmunkDemo Pump;
 
 static chipmunkDemo *demos[] = {
+//	&Test,
 	&LogoSmash,
 	&PyramidStack,
 	&Plink,

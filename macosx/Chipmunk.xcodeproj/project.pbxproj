@@ -49,6 +49,8 @@
 		D34963D70B56CBBF00CAD239 /* cpShape.c in Sources */ = {isa = PBXBuildFile; fileRef = D37E22FD0AAA63B800BB4C50 /* cpShape.c */; };
 		D34963D80B56CBBF00CAD239 /* cpCollision.c in Sources */ = {isa = PBXBuildFile; fileRef = D37E231F0AAA728A00BB4C50 /* cpCollision.c */; };
 		D34963D90B56CBBF00CAD239 /* cpSpace.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E5F2CF0AAA5589004E361B /* cpSpace.c */; };
+		D36B19510EA13B6D0028A362 /* cpDampedRotarySpring.c in Sources */ = {isa = PBXBuildFile; fileRef = D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */; };
+		D36B196F0EA13BA20028A362 /* Test.c in Sources */ = {isa = PBXBuildFile; fileRef = D36B196E0EA13BA20028A362 /* Test.c */; };
 		D37697200B50C53900BB33CC /* LogoSmash.c in Sources */ = {isa = PBXBuildFile; fileRef = D3CCDF460AE35D920080442F /* LogoSmash.c */; };
 		D3800E120E9815FC00A3D7FA /* cpConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D3800E0F0E9815FC00A3D7FA /* cpConstraint.h */; };
 		D3800E130E9815FC00A3D7FA /* cpConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800E100E9815FC00A3D7FA /* cpConstraint.c */; };
@@ -67,8 +69,8 @@
 		D3BAFA870E9C5A230039DD5C /* Bounce.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFA860E9C5A230039DD5C /* Bounce.c */; };
 		D3BAFB8B0E9C7C150039DD5C /* Planet.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFB8A0E9C7C150039DD5C /* Planet.c */; };
 		D3BC99C10AB381EE0025A2C0 /* ChipmunkDemo.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */; };
-		D3E4A95E0E9963DD00EE08BA /* cpBreakableConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E4A95B0E9963DD00EE08BA /* cpBreakableConstraint.h */; };
-		D3E4A95F0E9963DD00EE08BA /* cpBreakableConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E4A95C0E9963DD00EE08BA /* cpBreakableConstraint.c */; };
+		D3E4A95E0E9963DD00EE08BA /* cpBreakableJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E4A95B0E9963DD00EE08BA /* cpBreakableJoint.h */; };
+		D3E4A95F0E9963DD00EE08BA /* cpBreakableJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E4A95C0E9963DD00EE08BA /* cpBreakableJoint.c */; };
 		D3E4A9C80E99683200EE08BA /* cpSlideJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA60E98260200A3D7FA /* cpSlideJoint.c */; };
 		D3E4A9CA0E99683200EE08BA /* cpPivotJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA40E98260200A3D7FA /* cpPivotJoint.c */; };
 		D3E4A9CC0E99683200EE08BA /* cpGrooveJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */; };
@@ -115,6 +117,9 @@
 		D31402940E9DD07E00EF79DB /* Springies.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Springies.c; sourceTree = "<group>"; };
 		D34963BB0B56CAA300CAD239 /* libChipmunk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libChipmunk.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D353B6480B059C5F0038D274 /* prime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prime.h; sourceTree = "<group>"; };
+		D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpDampedRotarySpring.c; sourceTree = "<group>"; };
+		D36B192E0EA1364E0028A362 /* cpDampedRotarySpring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpDampedRotarySpring.h; sourceTree = "<group>"; };
+		D36B196E0EA13BA20028A362 /* Test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Test.c; sourceTree = "<group>"; };
 		D37E22FC0AAA63B800BB4C50 /* cpShape.h */ = {isa = PBXFileReference; fileEncoding = 4; languageSpecificationIdentifier = c; lastKnownFileType = sourcecode.c.h; path = cpShape.h; sourceTree = "<group>"; };
 		D37E22FD0AAA63B800BB4C50 /* cpShape.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpShape.c; sourceTree = "<group>"; };
 		D37E231E0AAA728A00BB4C50 /* cpCollision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpCollision.h; sourceTree = "<group>"; };
@@ -157,8 +162,8 @@
 		D3C4FD570AE6E33000339F3A /* rb_cpShape.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpShape.c; path = ../ruby/rb_cpShape.c; sourceTree = "<group>"; };
 		D3CCDF460AE35D920080442F /* LogoSmash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LogoSmash.c; sourceTree = "<group>"; };
 		D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemo.h; sourceTree = "<group>"; };
-		D3E4A95B0E9963DD00EE08BA /* cpBreakableConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpBreakableConstraint.h; sourceTree = "<group>"; };
-		D3E4A95C0E9963DD00EE08BA /* cpBreakableConstraint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpBreakableConstraint.c; sourceTree = "<group>"; };
+		D3E4A95B0E9963DD00EE08BA /* cpBreakableJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpBreakableJoint.h; sourceTree = "<group>"; };
+		D3E4A95C0E9963DD00EE08BA /* cpBreakableJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpBreakableJoint.c; sourceTree = "<group>"; };
 		D3E5F0260AA32F15004E361B /* cpVect.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpVect.c; sourceTree = "<group>"; };
 		D3E5F0270AA32F16004E361B /* cpVect.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cpVect.h; sourceTree = "<group>"; };
 		D3E5F0490AA32FDE004E361B /* ChipmunkDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChipmunkDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -245,8 +250,10 @@
 				D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */,
 				D38011600E984FA400A3D7FA /* cpDampedSpring.h */,
 				D380115F0E984FA400A3D7FA /* cpDampedSpring.c */,
-				D3E4A95B0E9963DD00EE08BA /* cpBreakableConstraint.h */,
-				D3E4A95C0E9963DD00EE08BA /* cpBreakableConstraint.c */,
+				D36B192E0EA1364E0028A362 /* cpDampedRotarySpring.h */,
+				D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */,
+				D3E4A95B0E9963DD00EE08BA /* cpBreakableJoint.h */,
+				D3E4A95C0E9963DD00EE08BA /* cpBreakableJoint.c */,
 			);
 			name = constraints;
 			path = ../src/constraints;
@@ -286,6 +293,7 @@
 				D3BAFB8A0E9C7C150039DD5C /* Planet.c */,
 				D31402940E9DD07E00EF79DB /* Springies.c */,
 				D393275B0EA02C710026F6A2 /* Pump.c */,
+				D36B196E0EA13BA20028A362 /* Test.c */,
 			);
 			name = Demo;
 			path = ../Demo;
@@ -371,7 +379,7 @@
 				D3800E120E9815FC00A3D7FA /* cpConstraint.h in Headers */,
 				D3800E1F0E98176F00A3D7FA /* cpPinJoint.h in Headers */,
 				D38011630E984FA400A3D7FA /* cpDampedSpring.h in Headers */,
-				D3E4A95E0E9963DD00EE08BA /* cpBreakableConstraint.h in Headers */,
+				D3E4A95E0E9963DD00EE08BA /* cpBreakableJoint.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -488,7 +496,7 @@
 				D3E4A9CA0E99683200EE08BA /* cpPivotJoint.c in Sources */,
 				D3E4A9CC0E99683200EE08BA /* cpGrooveJoint.c in Sources */,
 				D38011620E984FA400A3D7FA /* cpDampedSpring.c in Sources */,
-				D3E4A95F0E9963DD00EE08BA /* cpBreakableConstraint.c in Sources */,
+				D3E4A95F0E9963DD00EE08BA /* cpBreakableJoint.c in Sources */,
 				D34963CE0B56CBBF00CAD239 /* chipmunk.c in Sources */,
 				D34963CF0B56CBBF00CAD239 /* cpVect.c in Sources */,
 				D34963D00B56CBBF00CAD239 /* cpBB.c in Sources */,
@@ -501,6 +509,7 @@
 				D34963D70B56CBBF00CAD239 /* cpShape.c in Sources */,
 				D34963D80B56CBBF00CAD239 /* cpCollision.c in Sources */,
 				D34963D90B56CBBF00CAD239 /* cpSpace.c in Sources */,
+				D36B19510EA13B6D0028A362 /* cpDampedRotarySpring.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -527,6 +536,7 @@
 				D3BAFB8B0E9C7C150039DD5C /* Planet.c in Sources */,
 				D31402950E9DD07E00EF79DB /* Springies.c in Sources */,
 				D393275C0EA02C710026F6A2 /* Pump.c in Sources */,
+				D36B196F0EA13BA20028A362 /* Test.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
