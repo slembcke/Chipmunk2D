@@ -26,12 +26,12 @@ typedef struct cpRotaryLockJoint {
 	
 	cpFloat iSum;
 	
-	cpFloat offset;
+	cpFloat offset, ratio;
 	
 	cpFloat bias;
 	cpFloat jAcc, jMax;
 } cpRotaryLockJoint;
 
 cpRotaryLockJoint *cpRotaryLockJointAlloc(void);
-cpRotaryLockJoint *cpRotaryLockJointInit(cpRotaryLockJoint *joint, cpBody *a, cpBody *b, cpFloat offset);
-cpConstraint *cpRotaryLockJointNew(cpBody *a, cpBody *b, cpFloat offset);
+cpRotaryLockJoint *cpRotaryLockJointInit(cpRotaryLockJoint *joint, cpBody *a, cpBody *b, cpFloat offset, cpFloat ratio);
+cpConstraint *cpRotaryLockJointNew(cpBody *a, cpBody *b, cpFloat offset, cpFloat ratio);
