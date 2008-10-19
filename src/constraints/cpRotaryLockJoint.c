@@ -35,7 +35,7 @@ preStep(cpRotaryLockJoint *joint, cpFloat dt, cpFloat dt_inv)
 	joint->iSum = 1.0f/(a->i_inv + joint->ratio*b->i_inv);
 	
 	// calculate bias velocity
-	joint->bias = -joint->constraint.biasCoef*dt_inv*(b->a - joint->ratio*a->a - joint->offset);
+	joint->bias = -joint->constraint.biasCoef*dt_inv*(b->a - joint->ratio*a->a - joint->phase);
 	
 	// compute max impulse
 	joint->jMax = J_MAX(joint, dt);
@@ -84,18 +84,18 @@ cpRotaryLockJointAlloc(void)
 }
 
 cpRotaryLockJoint *
-cpRotaryLockJointInit(cpRotaryLockJoint *joint, cpBody *a, cpBody *b, cpFloat offset, cpFloat ratio)
+cpRotaryLockJointInit(cpRotaryLockJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio)
 {
 	cpConstraintInit((cpConstraint *)joint, &cpRotaryLockJointClass, a, b);
 	
-	joint->offset = offset;
+	joint->phase = phase;
 	joint->ratio = ratio;
 	
 	return joint;
 }
 
 cpConstraint *
-cpRotaryLockJointNew(cpBody *a, cpBody *b, cpFloat offset, cpFloat ratio)
+cpRotaryLockJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio)
 {
-	return (cpConstraint *)cpRotaryLockJointInit(cpRotaryLockJointAlloc(), a, b, offset, ratio);
+	return (cpConstraint *)cpRotaryLockJointInit(cpRotaryLockJointAlloc(), a, b, phase, ratio);
 }
