@@ -69,7 +69,7 @@ extern chipmunkDemo Springies;
 extern chipmunkDemo Pump;
 
 static chipmunkDemo *demos[] = {
-//	&Test,
+	&Test,
 	&LogoSmash,
 	&PyramidStack,
 	&Plink,

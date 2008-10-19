@@ -52,6 +52,8 @@
 		D36B19510EA13B6D0028A362 /* cpDampedRotarySpring.c in Sources */ = {isa = PBXBuildFile; fileRef = D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */; };
 		D36B196F0EA13BA20028A362 /* Test.c in Sources */ = {isa = PBXBuildFile; fileRef = D36B196E0EA13BA20028A362 /* Test.c */; };
 		D37697200B50C53900BB33CC /* LogoSmash.c in Sources */ = {isa = PBXBuildFile; fileRef = D3CCDF460AE35D920080442F /* LogoSmash.c */; };
+		D37BB76E0EAADA6300C70958 /* cpRotaryLimitJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D37BB76C0EAADA6300C70958 /* cpRotaryLimitJoint.c */; };
+		D37BB76F0EAADA6300C70958 /* cpRotaryLimitJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D37BB76D0EAADA6300C70958 /* cpRotaryLimitJoint.h */; };
 		D3800E120E9815FC00A3D7FA /* cpConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D3800E0F0E9815FC00A3D7FA /* cpConstraint.h */; };
 		D3800E130E9815FC00A3D7FA /* cpConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800E100E9815FC00A3D7FA /* cpConstraint.c */; };
 		D3800E1E0E98176F00A3D7FA /* cpPinJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800E1B0E98176F00A3D7FA /* cpPinJoint.c */; };
@@ -120,6 +122,8 @@
 		D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpDampedRotarySpring.c; sourceTree = "<group>"; };
 		D36B192E0EA1364E0028A362 /* cpDampedRotarySpring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpDampedRotarySpring.h; sourceTree = "<group>"; };
 		D36B196E0EA13BA20028A362 /* Test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Test.c; sourceTree = "<group>"; };
+		D37BB76C0EAADA6300C70958 /* cpRotaryLimitJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpRotaryLimitJoint.c; sourceTree = "<group>"; };
+		D37BB76D0EAADA6300C70958 /* cpRotaryLimitJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpRotaryLimitJoint.h; sourceTree = "<group>"; };
 		D37E22FC0AAA63B800BB4C50 /* cpShape.h */ = {isa = PBXFileReference; fileEncoding = 4; languageSpecificationIdentifier = c; lastKnownFileType = sourcecode.c.h; path = cpShape.h; sourceTree = "<group>"; };
 		D37E22FD0AAA63B800BB4C50 /* cpShape.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpShape.c; sourceTree = "<group>"; };
 		D37E231E0AAA728A00BB4C50 /* cpCollision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpCollision.h; sourceTree = "<group>"; };
@@ -254,6 +258,8 @@
 				D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */,
 				D3E4A95B0E9963DD00EE08BA /* cpBreakableJoint.h */,
 				D3E4A95C0E9963DD00EE08BA /* cpBreakableJoint.c */,
+				D37BB76D0EAADA6300C70958 /* cpRotaryLimitJoint.h */,
+				D37BB76C0EAADA6300C70958 /* cpRotaryLimitJoint.c */,
 			);
 			name = constraints;
 			path = ../src/constraints;
@@ -380,6 +386,7 @@
 				D3800E1F0E98176F00A3D7FA /* cpPinJoint.h in Headers */,
 				D38011630E984FA400A3D7FA /* cpDampedSpring.h in Headers */,
 				D3E4A95E0E9963DD00EE08BA /* cpBreakableJoint.h in Headers */,
+				D37BB76F0EAADA6300C70958 /* cpRotaryLimitJoint.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -510,6 +517,7 @@
 				D34963D80B56CBBF00CAD239 /* cpCollision.c in Sources */,
 				D34963D90B56CBBF00CAD239 /* cpSpace.c in Sources */,
 				D36B19510EA13B6D0028A362 /* cpDampedRotarySpring.c in Sources */,
+				D37BB76E0EAADA6300C70958 /* cpRotaryLimitJoint.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

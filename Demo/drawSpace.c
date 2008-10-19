@@ -364,14 +364,14 @@ drawConstraint(cpConstraint *constraint)
 			glVertex2f(b.x, b.y);
 		} glEnd();
 	} else if(klass == &cpGrooveJointClass){
-		printf("Cannot draw constraint\n");
+//		printf("Cannot draw constraint\n");
 	} else if(klass == &cpDampedSpringClass){
 		drawSpring((cpDampedSpring *)constraint, body_a, body_b);
 	} else if(klass == &cpBreakableJointClass){
 		cpBreakableJoint *breakable = (cpBreakableJoint *)constraint;
 		drawConstraint(breakable->delegate);
 	} else {
-		printf("Cannot draw constraint\n");
+//		printf("Cannot draw constraint\n");
 	}
 }
 
