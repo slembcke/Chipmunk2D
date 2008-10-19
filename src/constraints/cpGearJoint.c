@@ -26,33 +26,33 @@
 #include "util.h"
 
 static void
-preStep(cpRotaryLockJoint *joint, cpFloat dt, cpFloat dt_inv)
+preStep(cpGearJoint *joint, cpFloat dt, cpFloat dt_inv)
 {
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
 	// calculate moment of inertia coefficient.
-	joint->iSum = 1.0f/(a->i_inv + joint->ratio*b->i_inv);
+	joint->iSum = 1.0f/(a->i_inv*fabs(joint->ratio) + b->i_inv);
 	
 	// calculate bias velocity
-	joint->bias = -joint->constraint.biasCoef*dt_inv*(b->a - joint->ratio*a->a - joint->phase);
+	joint->bias = -joint->constraint.biasCoef*dt_inv*(b->a*joint->ratio - a->a - joint->phase);
 	
 	// compute max impulse
 	joint->jMax = J_MAX(joint, dt);
 
 	// apply joint torque
 	a->w -= joint->jAcc*a->i_inv;
-	b->w += joint->jAcc*b->i_inv;
+	b->w += joint->jAcc*b->i_inv*joint->ratio;
 }
 
 static void
-applyImpulse(cpRotaryLockJoint *joint)
+applyImpulse(cpGearJoint *joint)
 {
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
 	// compute relative rotational velocity
-	cpFloat wr = b->w - a->w*joint->ratio;
+	cpFloat wr = b->w*joint->ratio - a->w;
 	
 	// compute normal impulse	
 	cpFloat j = (joint->bias - wr)*joint->iSum;
@@ -62,40 +62,42 @@ applyImpulse(cpRotaryLockJoint *joint)
 	
 	// apply impulse
 	a->w -= j*a->i_inv;
-	b->w += j*b->i_inv;
+	b->w += j*b->i_inv*joint->ratio;
 }
 
 static cpFloat
-getImpulse(cpRotaryLockJoint *joint)
+getImpulse(cpGearJoint *joint)
 {
 	return fabs(joint->jAcc);
 }
 
-const cpConstraintClass cpRotaryLockJointClass = {
+const cpConstraintClass cpGearJointClass = {
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
 
-cpRotaryLockJoint *
-cpRotaryLockJointAlloc(void)
+cpGearJoint *
+cpGearJointAlloc(void)
 {
-	return (cpRotaryLockJoint *)malloc(sizeof(cpRotaryLockJoint));
+	return (cpGearJoint *)malloc(sizeof(cpGearJoint));
 }
 
-cpRotaryLockJoint *
-cpRotaryLockJointInit(cpRotaryLockJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio)
+cpGearJoint *
+cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio)
 {
-	cpConstraintInit((cpConstraint *)joint, &cpRotaryLockJointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &cpGearJointClass, a, b);
 	
 	joint->phase = phase;
 	joint->ratio = ratio;
+	
+	joint->jAcc = 0.0f;
 	
 	return joint;
 }
 
 cpConstraint *
-cpRotaryLockJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio)
+cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio)
 {
-	return (cpConstraint *)cpRotaryLockJointInit(cpRotaryLockJointAlloc(), a, b, phase, ratio);
+	return (cpConstraint *)cpGearJointInit(cpGearJointAlloc(), a, b, phase, ratio);
 }

@@ -19,9 +19,9 @@
  * SOFTWARE.
  */
 
-extern const cpConstraintClass cpRotaryLockJointClass;
+extern const cpConstraintClass cpGearJointClass;
 
-typedef struct cpRotaryLockJoint {
+typedef struct cpGearJoint {
 	cpConstraint constraint;
 	
 	cpFloat iSum;
@@ -30,8 +30,8 @@ typedef struct cpRotaryLockJoint {
 	
 	cpFloat bias;
 	cpFloat jAcc, jMax;
-} cpRotaryLockJoint;
+} cpGearJoint;
 
-cpRotaryLockJoint *cpRotaryLockJointAlloc(void);
-cpRotaryLockJoint *cpRotaryLockJointInit(cpRotaryLockJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
-cpConstraint *cpRotaryLockJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
+cpGearJoint *cpGearJointAlloc(void);
+cpGearJoint *cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
+cpConstraint *cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);

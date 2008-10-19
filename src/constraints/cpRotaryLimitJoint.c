@@ -109,6 +109,8 @@ cpRotaryLimitJointInit(cpRotaryLimitJoint *joint, cpBody *a, cpBody *b, cpFloat 
 	joint->min = min;
 	joint->max  = max;
 	
+	joint->jAcc = 0.0f;
+	
 	return joint;
 }
 

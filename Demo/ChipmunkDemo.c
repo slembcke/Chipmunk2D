@@ -69,7 +69,7 @@ extern chipmunkDemo Springies;
 extern chipmunkDemo Pump;
 
 static chipmunkDemo *demos[] = {
-	&Test,
+//	&Test,
 	&LogoSmash,
 	&PyramidStack,
 	&Plink,
@@ -82,7 +82,7 @@ static chipmunkDemo *demos[] = {
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
-static const int firstDemoIndex = 'a' - 'a';
+static const int firstDemoIndex = 'i' - 'a';
 
 static int ticks = 0;
 static cpSpace *space;

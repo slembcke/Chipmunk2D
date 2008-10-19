@@ -87,6 +87,8 @@ cpSimpleMotorInit(cpSimpleMotor *joint, cpBody *a, cpBody *b, cpFloat rate)
 	
 	joint->rate = rate;
 	
+	joint->jAcc = 0.0f;
+	
 	return joint;
 }
 

@@ -30,14 +30,25 @@
 extern cpSpace *space;
 extern cpBody *staticBody;
 
+static cpBody *balls[4];
+static int numBalls = 4;
+
 static void
 update(int ticks)
 {
-	int steps = 2;
+	int steps = 1;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
+		
+		for(int i=0; i<numBalls; i++){
+			cpBody *ball = balls[i];
+			if(ball->p.x > 320.0){
+				ball->v = cpvzero;
+				ball->p = cpv(-224.0, 200.0f);
+			}
+		}
 	}
 }
 
@@ -53,22 +64,6 @@ add_ball(cpVect p)
 	cpSpaceAddShape(space, shape);
 	
 	return body;
-}
-
-static void
-make_gear(cpBody *body, cpFloat radius, int teeth)
-{
-	cpFloat circ = 2.0*radius*M_PI;
-	cpFloat tooth_radius = circ/4.0/(cpFloat)teeth;
-	
-	for(int i=0; i<teeth; i++){
-		cpFloat angle = (cpFloat)i*2.0*M_PI/(cpFloat)teeth;
-		cpVect offset = cpvmult(cpvforangle(angle), radius);
-		
-		cpShape *tooth = cpCircleShapeNew(body, tooth_radius*0.95, offset);
-		tooth->u = 0.5; tooth->layers = 2;
-		cpSpaceAddShape(space, tooth);
-	}
 }
 
 static cpSpace *
@@ -126,28 +121,59 @@ init(void)
 	cpSpaceAddShape(space, shape);
 	
 	// add balls to hopper
-	add_ball(cpv(-224,80));
-	add_ball(cpv(-224,80+64));
-	add_ball(cpv(-224,80+64*2));
+	for(int i=0; i<numBalls; i++)
+		balls[i] = add_ball(cpv(-224,80 + 64*i));
 	
-	// add gears
+	// add small gear
 	cpBody *smallGear = cpBodyNew(10.0f, cpMomentForCircle(10.0f, 80, 0, cpvzero));
 	smallGear->p = cpv(-160,-160);
+	cpBodySetAngle(smallGear, -M_PI_2);
 	cpSpaceAddBody(space, smallGear);
+
+	shape = cpCircleShapeNew(smallGear, 80.0f, cpvzero);
+	shape->layers = 0;
+	cpSpaceAddShape(space, shape);
 	
-	make_gear(smallGear, 80, 10);
 	cpSpaceAddConstraint(space, cpPivotJointNew(staticBody, smallGear, cpv(-160,-160), cpvzero));
 
-	cpBody *bigGear = cpBodyNew(10.0f, cpMomentForCircle(10.0f, 80, 0, cpvzero));
+	// add big gear
+	cpBody *bigGear = cpBodyNew(40.0f, cpMomentForCircle(40.0f, 160, 0, cpvzero));
 	bigGear->p = cpv(80,-160);
+	cpBodySetAngle(bigGear, M_PI_2);
 	cpSpaceAddBody(space, bigGear);
 	
-	make_gear(bigGear, 160, 20);
+	shape = cpCircleShapeNew(bigGear, 160.0f, cpvzero);
+	shape->layers = 0;
+	cpSpaceAddShape(space, shape);
+	
 	cpSpaceAddConstraint(space, cpPivotJointNew(staticBody, bigGear, cpv(80,-160), cpvzero));
 
 	// connect the plunger to the small gear.
-	cpSpaceAddConstraint(space, cpPinJointNew(smallGear, plunger, cpv(0,-80), cpv(0,0)));
+	cpSpaceAddConstraint(space, cpPinJointNew(smallGear, plunger, cpv(80,0), cpv(0,0)));
+	// connect the gears.
+	cpSpaceAddConstraint(space, cpGearJointNew(smallGear, bigGear, -M_PI_2, -2.0f));
 	
+	
+	// feeder mechanism
+	cpFloat bottom = -300.0f;
+	cpFloat top = 32.0f;
+	cpBody *feeder = cpBodyNew(1.0f, cpMomentForSegment(1.0f, cpv(-224.0f, bottom), cpv(-224.0f, top)));
+	feeder->p = cpv(-224, (bottom + top)/2.0);
+	cpSpaceAddBody(space, feeder);
+	
+	cpFloat len = top - bottom;
+	shape = cpSegmentShapeNew(feeder, cpv(0.0f, len/2.0f), cpv(0.0f, -len/2.0f), 20.0f);
+	cpSpaceAddShape(space, shape);
+	
+	cpSpaceAddConstraint(space, cpPivotJointNew(staticBody, feeder, cpv(-224.0f, bottom), cpv(0.0f, -len/2.0)));
+	cpVect anchr = cpBodyWorld2Local(feeder, cpv(-224.0f, -160.0f));
+	cpSpaceAddConstraint(space, cpPinJointNew(feeder, smallGear, anchr, cpv(0.0f, 80.0f)));
+
+	// motorize the second gear
+	cpConstraint *constraint = cpSimpleMotorNew(staticBody, bigGear, 3.0f);
+	constraint->maxForce = 1000000.0f;
+	cpSpaceAddConstraint(space, constraint);
+
 	return space;
 }
 
