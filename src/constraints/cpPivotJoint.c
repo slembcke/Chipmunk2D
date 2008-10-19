@@ -60,7 +60,7 @@ applyImpulse(cpPivotJoint *joint)
 	cpVect vr = relative_velocity(a, b, r1, r2);
 	
 	// compute normal impulse
-	cpVect j = cpvsub(joint->bias, mult_k(vr, joint->k1, joint->k2));
+	cpVect j = mult_k(cpvsub(joint->bias, vr), joint->k1, joint->k2);
 	cpVect jOld = joint->jAcc;
 	joint->jAcc = clamp_vect(cpvadd(joint->jAcc, j), joint->jMaxLen);
 	j = cpvsub(joint->jAcc, jOld);

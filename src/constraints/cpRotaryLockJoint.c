@@ -26,31 +26,19 @@
 #include "util.h"
 
 static void
-preStep(cpRotaryLimitJoint *joint, cpFloat dt, cpFloat dt_inv)
+preStep(cpRotaryLockJoint *joint, cpFloat dt, cpFloat dt_inv)
 {
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
-	
-	cpFloat dist = b->a - a->a;
-	cpFloat pdist = 0.0;
-	if(dist > joint->max) {
-		pdist = joint->max - dist;
-	} else if(dist < joint->min) {
-		pdist = joint->min - dist;
-	}
 	
 	// calculate moment of inertia coefficient.
 	joint->iSum = 1.0f/(a->i_inv + b->i_inv);
 	
 	// calculate bias velocity
-	joint->bias = -joint->constraint.biasCoef*dt_inv*(pdist);
+	joint->bias = -joint->constraint.biasCoef*dt_inv*(b->a - a->a - joint->offset);
 	
 	// compute max impulse
 	joint->jMax = J_MAX(joint, dt);
-
-	// If the bias is 0, the joint is not at a limit. Reset the impulse.
-	if(!joint->bias)
-		joint->jAcc = 0.0f;
 
 	// apply joint torque
 	a->w -= joint->jAcc*a->i_inv;
@@ -58,10 +46,8 @@ preStep(cpRotaryLimitJoint *joint, cpFloat dt, cpFloat dt_inv)
 }
 
 static void
-applyImpulse(cpRotaryLimitJoint *joint)
+applyImpulse(cpRotaryLockJoint *joint)
 {
-	if(!joint->bias) return; // early exit
-
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
@@ -69,13 +55,9 @@ applyImpulse(cpRotaryLimitJoint *joint)
 	cpFloat wr = b->w - a->w;
 	
 	// compute normal impulse	
-	cpFloat j = -(joint->bias + wr)*joint->iSum;
+	cpFloat j = (joint->bias - wr)*joint->iSum;
 	cpFloat jOld = joint->jAcc;
-	if(joint->bias < 0.0f){
-		joint->jAcc = cpfclamp(jOld + j, 0.0f, joint->jMax);
-	} else {
-		joint->jAcc = cpfclamp(jOld + j, -joint->jMax, 0.0f);
-	}
+	joint->jAcc = cpfclamp(jOld + j, -joint->jMax, joint->jMax);
 	j = joint->jAcc - jOld;
 	
 	// apply impulse
@@ -84,36 +66,35 @@ applyImpulse(cpRotaryLimitJoint *joint)
 }
 
 static cpFloat
-getImpulse(cpRotaryLimitJoint *joint)
+getImpulse(cpRotaryLockJoint *joint)
 {
 	return fabs(joint->jAcc);
 }
 
-const cpConstraintClass cpRotaryLimitJointClass = {
+const cpConstraintClass cpRotaryLockJointClass = {
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
 
-cpRotaryLimitJoint *
-cpRotaryLimitJointAlloc(void)
+cpRotaryLockJoint *
+cpRotaryLockJointAlloc(void)
 {
-	return (cpRotaryLimitJoint *)malloc(sizeof(cpRotaryLimitJoint));
+	return (cpRotaryLockJoint *)malloc(sizeof(cpRotaryLockJoint));
 }
 
-cpRotaryLimitJoint *
-cpRotaryLimitJointInit(cpRotaryLimitJoint *joint, cpBody *a, cpBody *b, cpFloat min, cpFloat max)
+cpRotaryLockJoint *
+cpRotaryLockJointInit(cpRotaryLockJoint *joint, cpBody *a, cpBody *b, cpFloat offset)
 {
-	cpConstraintInit((cpConstraint *)joint, &cpRotaryLimitJointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &cpRotaryLockJointClass, a, b);
 	
-	joint->min = min;
-	joint->max  = max;
+	joint->offset = offset;
 	
 	return joint;
 }
 
 cpConstraint *
-cpRotaryLimitJointNew(cpBody *a, cpBody *b, cpFloat min, cpFloat max)
+cpRotaryLockJointNew(cpBody *a, cpBody *b, cpFloat offset)
 {
-	return (cpConstraint *)cpRotaryLimitJointInit(cpRotaryLimitJointAlloc(), a, b, min, max);
+	return (cpConstraint *)cpRotaryLockJointInit(cpRotaryLockJointAlloc(), a, b, offset);
 }
