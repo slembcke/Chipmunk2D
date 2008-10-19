@@ -56,5 +56,5 @@ void cpConstraintFree(cpConstraint *constraint);
 #include "cpDampedRotarySpring.h"
 #include "cpBreakableJoint.h"
 #include "cpRotaryLimitJoint.h"
-#include "cpRotaryLockJoint.h"
+#include "cpGearJoint.h"
 #include "cpSimpleMotor.h"

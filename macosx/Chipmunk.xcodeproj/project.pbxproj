@@ -54,6 +54,10 @@
 		D37697200B50C53900BB33CC /* LogoSmash.c in Sources */ = {isa = PBXBuildFile; fileRef = D3CCDF460AE35D920080442F /* LogoSmash.c */; };
 		D37BB76E0EAADA6300C70958 /* cpRotaryLimitJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D37BB76C0EAADA6300C70958 /* cpRotaryLimitJoint.c */; };
 		D37BB76F0EAADA6300C70958 /* cpRotaryLimitJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D37BB76D0EAADA6300C70958 /* cpRotaryLimitJoint.h */; };
+		D37BB8B30EAB01E400C70958 /* cpGearJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D37BB8B10EAB01E400C70958 /* cpGearJoint.c */; };
+		D37BB8B40EAB01E400C70958 /* cpGearJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D37BB8B20EAB01E400C70958 /* cpGearJoint.h */; };
+		D37BB8F10EAB06B600C70958 /* cpSimpleMotor.h in Headers */ = {isa = PBXBuildFile; fileRef = D37BB8EF0EAB06B600C70958 /* cpSimpleMotor.h */; };
+		D37BB8F20EAB06B600C70958 /* cpSimpleMotor.c in Sources */ = {isa = PBXBuildFile; fileRef = D37BB8F00EAB06B600C70958 /* cpSimpleMotor.c */; };
 		D3800E120E9815FC00A3D7FA /* cpConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D3800E0F0E9815FC00A3D7FA /* cpConstraint.h */; };
 		D3800E130E9815FC00A3D7FA /* cpConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800E100E9815FC00A3D7FA /* cpConstraint.c */; };
 		D3800E1E0E98176F00A3D7FA /* cpPinJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800E1B0E98176F00A3D7FA /* cpPinJoint.c */; };
@@ -124,6 +128,10 @@
 		D36B196E0EA13BA20028A362 /* Test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Test.c; sourceTree = "<group>"; };
 		D37BB76C0EAADA6300C70958 /* cpRotaryLimitJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpRotaryLimitJoint.c; sourceTree = "<group>"; };
 		D37BB76D0EAADA6300C70958 /* cpRotaryLimitJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpRotaryLimitJoint.h; sourceTree = "<group>"; };
+		D37BB8B10EAB01E400C70958 /* cpGearJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpGearJoint.c; sourceTree = "<group>"; };
+		D37BB8B20EAB01E400C70958 /* cpGearJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpGearJoint.h; sourceTree = "<group>"; };
+		D37BB8EF0EAB06B600C70958 /* cpSimpleMotor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpSimpleMotor.h; sourceTree = "<group>"; };
+		D37BB8F00EAB06B600C70958 /* cpSimpleMotor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpSimpleMotor.c; sourceTree = "<group>"; };
 		D37E22FC0AAA63B800BB4C50 /* cpShape.h */ = {isa = PBXFileReference; fileEncoding = 4; languageSpecificationIdentifier = c; lastKnownFileType = sourcecode.c.h; path = cpShape.h; sourceTree = "<group>"; };
 		D37E22FD0AAA63B800BB4C50 /* cpShape.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpShape.c; sourceTree = "<group>"; };
 		D37E231E0AAA728A00BB4C50 /* cpCollision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpCollision.h; sourceTree = "<group>"; };
@@ -260,6 +268,10 @@
 				D3E4A95C0E9963DD00EE08BA /* cpBreakableJoint.c */,
 				D37BB76D0EAADA6300C70958 /* cpRotaryLimitJoint.h */,
 				D37BB76C0EAADA6300C70958 /* cpRotaryLimitJoint.c */,
+				D37BB8B20EAB01E400C70958 /* cpGearJoint.h */,
+				D37BB8B10EAB01E400C70958 /* cpGearJoint.c */,
+				D37BB8EF0EAB06B600C70958 /* cpSimpleMotor.h */,
+				D37BB8F00EAB06B600C70958 /* cpSimpleMotor.c */,
 			);
 			name = constraints;
 			path = ../src/constraints;
@@ -387,6 +399,8 @@
 				D38011630E984FA400A3D7FA /* cpDampedSpring.h in Headers */,
 				D3E4A95E0E9963DD00EE08BA /* cpBreakableJoint.h in Headers */,
 				D37BB76F0EAADA6300C70958 /* cpRotaryLimitJoint.h in Headers */,
+				D37BB8B40EAB01E400C70958 /* cpGearJoint.h in Headers */,
+				D37BB8F10EAB06B600C70958 /* cpSimpleMotor.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -518,6 +532,8 @@
 				D34963D90B56CBBF00CAD239 /* cpSpace.c in Sources */,
 				D36B19510EA13B6D0028A362 /* cpDampedRotarySpring.c in Sources */,
 				D37BB76E0EAADA6300C70958 /* cpRotaryLimitJoint.c in Sources */,
+				D37BB8B30EAB01E400C70958 /* cpGearJoint.c in Sources */,
+				D37BB8F20EAB06B600C70958 /* cpSimpleMotor.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
