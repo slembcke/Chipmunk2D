@@ -45,7 +45,20 @@ GL glut
 #be linked to all the libraries you specified above. 
 #You can build more than one executable per project
 SET(CurrentExe "../chipmunk_demos")
-ADD_EXECUTABLE(${CurrentExe}  Demo1.c  Demo2.c  Demo3.c  Demo4.c  Demo5.c  Demo6.c  Demo7.c  main.c)
+SET(demo_source_files
+    ChipmunkDemo.c
+    LogoSmash.c
+    PyramidStack.c
+    Plink.c
+    Tumble.c
+    PyramidTopple.c
+    Bounce.c
+    Planet.c
+    Springies.c
+    Pump.c
+    drawSpace.c
+    )
+ADD_EXECUTABLE(${CurrentExe} ${demo_source_files})
 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries} chipmunk_static)
 
@@ -58,6 +71,7 @@ TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries} chipmunk_static)
 #ADD_TEST(Testname ExecutableToRun arg1 arg2 arg3)
 	
 #Once you're done modifying this template, you should rename it to "CMakeLists.txt"
-SET (CMAKE_BUILD_TYPE Release)
+#SET (CMAKE_BUILD_TYPE Release)
+#SET (CMAKE_BUILD_TYPE Debug)
 
 

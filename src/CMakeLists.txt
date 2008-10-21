@@ -1,4 +1,4 @@
-#INCLUDE_DIRECTORIES(${CHIPMUNK_SOURCE_DIR}/include)
+INCLUDE_DIRECTORIES(${CHIPMUNK_SOURCE_DIR}/src)
 
 SET(chipmunk_includes
 	chipmunk.h
@@ -8,7 +8,6 @@ SET(chipmunk_includes
 	cpBody.h
 	cpCollision.h
 	cpHashSet.h
-	cpJoint.h
 	cpPolyShape.h
 	cpShape.h
 	cpSpace.h
@@ -16,8 +15,24 @@ SET(chipmunk_includes
 	cpVect.h
 )
 
+set(chipmunk_constraint_source_files
+    cpBreakableJoint.c
+    cpConstraint.c
+    cpDampedRotarySpring.c
+    cpDampedSpring.c
+    cpGearJoint.c
+    cpGrooveJoint.c
+    cpPinJoint.c
+    cpPivotJoint.c
+    cpRotaryLimitJoint.c
+    cpSimpleMotor.c
+    cpSlideJoint.c
+    )
+FOREACH(f ${chipmunk_constraint_source_files})
+    LIST(APPEND chipmunk_source_files constraints/${f})
+ENDFOREACH(f)
 
-ADD_LIBRARY(chipmunk SHARED 
+list(APPEND chipmunk_source_files
 	chipmunk.c
 	cpArbiter.c
 	cpArray.c
@@ -25,28 +40,19 @@ ADD_LIBRARY(chipmunk SHARED
 	cpBody.c
 	cpCollision.c
 	cpHashSet.c
-	cpJoint.c
 	cpPolyShape.c
 	cpShape.c
 	cpSpace.c
 	cpSpaceHash.c
 	cpVect.c
+    )
+
+ADD_LIBRARY(chipmunk SHARED 
+    ${chipmunk_source_files}
 )
 
 ADD_LIBRARY(chipmunk_static STATIC 
-	chipmunk.c
-	cpArbiter.c
-	cpArray.c
-	cpBB.c
-	cpBody.c
-	cpCollision.c
-	cpHashSet.c
-	cpJoint.c
-	cpPolyShape.c
-	cpShape.c
-	cpSpace.c
-	cpSpaceHash.c
-	cpVect.c
+    ${chipmunk_source_files}
 )
 
 INSTALL(FILES ${chipmunk_includes} DESTINATION include/chipmunk)

@@ -121,7 +121,7 @@ static char *
 demoTitle(chipmunkDemo *demo)
 {
 	static char title[1024];
-	sprintf(title, "Demo: %s (a thru %c switch demos)", currDemo->name, 'a' + demoCount - 1);
+	sprintf(title, "Demo: %s (a thru %c switch demos)", demo->name, 'a' + demoCount - 1);
 	
 	return title;
 }
@@ -136,7 +136,7 @@ runDemo(chipmunkDemo *demo)
 	ticks = 0;
 	mouseJoint = NULL;
 	space = currDemo->initFunc();
-		
+
 	glutSetWindowTitle(demoTitle(currDemo));
 }
 
@@ -262,8 +262,6 @@ glutStuff(int argc, const char *argv[])
 	glutMotionFunc(mouse);
 	glutPassiveMotionFunc(mouse);
 	glutMouseFunc(click);
-	
-	glutMainLoop();
 }
 
 int
@@ -272,8 +270,11 @@ main(int argc, const char **argv)
 	cpInitChipmunk();
 		
 	mouseBody = cpBodyNew(INFINITY, INFINITY);
-	runDemo(demos[firstDemoIndex]);
 	
 	glutStuff(argc, argv);
+	
+	runDemo(demos[firstDemoIndex]);
+	glutMainLoop();
+
 	return 0;
 }

@@ -1,7 +1,9 @@
 PROJECT(CHIPMUNK)
 
 SET(CMAKE_C_FLAGS_RELEASE "-O3 -ffast-math -std=gnu99")
+SET(CMAKE_C_FLAGS_DEBUG "-Wall -std=gnu99")
 
 SUBDIRS(src Demo)
 
 SET (CMAKE_BUILD_TYPE Release)
+#SET (CMAKE_BUILD_TYPE Debug)
