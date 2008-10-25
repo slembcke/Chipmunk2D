@@ -57,7 +57,7 @@
 
 #define SLEEP_TICKS 16
 
-extern chipmunkDemo Test;
+//extern chipmunkDemo Test;
 extern chipmunkDemo LogoSmash;
 extern chipmunkDemo PyramidStack;
 extern chipmunkDemo Plink;
@@ -67,6 +67,7 @@ extern chipmunkDemo Bounce;
 extern chipmunkDemo Planet;
 extern chipmunkDemo Springies;
 extern chipmunkDemo Pump;
+extern chipmunkDemo WalkBot;
 
 static chipmunkDemo *demos[] = {
 //	&Test,
@@ -79,10 +80,11 @@ static chipmunkDemo *demos[] = {
 	&Planet,
 	&Springies,
 	&Pump,
+	&WalkBot,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
-static const int firstDemoIndex = 'i' - 'a';
+static const int firstDemoIndex = 'a' - 'a';
 
 static int ticks = 0;
 static cpSpace *space;

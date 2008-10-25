@@ -82,6 +82,7 @@
 		D3E4A9CC0E99683200EE08BA /* cpGrooveJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */; };
 		D3E5F0550AA3303F004E361B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0530AA3303F004E361B /* GLUT.framework */; };
 		D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0540AA3303F004E361B /* OpenGL.framework */; };
+		D3F165330EB3C4960053F15F /* WalkBot.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F165320EB3C4960053F15F /* WalkBot.c */; };
 		D3FBA1A70E9B1E0400950BCC /* drawSpace.c in Sources */ = {isa = PBXBuildFile; fileRef = D3FBA1A60E9B1E0400950BCC /* drawSpace.c */; };
 /* End PBXBuildFile section */
 
@@ -195,6 +196,7 @@
 		D3E5F2DD0AAA562B004E361B /* cpArray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpArray.c; sourceTree = "<group>"; };
 		D3E5F2DE0AAA562B004E361B /* cpSpaceHash.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cpSpaceHash.h; sourceTree = "<group>"; };
 		D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpSpaceHash.c; sourceTree = "<group>"; };
+		D3F165320EB3C4960053F15F /* WalkBot.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = WalkBot.c; sourceTree = "<group>"; };
 		D3FBA1A60E9B1E0400950BCC /* drawSpace.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = drawSpace.c; sourceTree = "<group>"; };
 		D3FBA1B80E9B1F6300950BCC /* drawSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = drawSpace.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -311,6 +313,7 @@
 				D3BAFB8A0E9C7C150039DD5C /* Planet.c */,
 				D31402940E9DD07E00EF79DB /* Springies.c */,
 				D393275B0EA02C710026F6A2 /* Pump.c */,
+				D3F165320EB3C4960053F15F /* WalkBot.c */,
 				D36B196E0EA13BA20028A362 /* Test.c */,
 			);
 			name = Demo;
@@ -561,6 +564,7 @@
 				D31402950E9DD07E00EF79DB /* Springies.c in Sources */,
 				D393275C0EA02C710026F6A2 /* Pump.c in Sources */,
 				D36B196F0EA13BA20028A362 /* Test.c in Sources */,
+				D3F165330EB3C4960053F15F /* WalkBot.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
