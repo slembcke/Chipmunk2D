@@ -51,6 +51,7 @@ cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBod
 	
 	constraint->maxForce = INFINITY;
 	constraint->biasCoef = cp_constraint_bias_coef;
+	constraint->maxBias = INFINITY;
 }
 
 void

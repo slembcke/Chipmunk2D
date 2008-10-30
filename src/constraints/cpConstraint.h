@@ -42,6 +42,7 @@ typedef struct cpConstraint {
 	cpBody *a, *b;
 	cpFloat maxForce;
 	cpFloat biasCoef;
+	cpFloat maxBias;
 } cpConstraint;
 
 void cpConstraintDestroy(cpConstraint *constraint);

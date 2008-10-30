@@ -29,43 +29,19 @@
 
 cpSpace *space;
 cpBody *staticBody;
+cpBody *someBody;
 
 static void
 update(int ticks)
 {
-	int steps = 3;
+	int steps = 1;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
 	}
-}
-
-static void
-add_leg(cpBody *chassis, cpBody *crank, cpFloat crankOffset)
-{
-	cpFloat legMass = 2.0f;
-	cpFloat legHLength = 80.0f/2.0f;
-	cpVect leg_a = cpv(0.0f, legHLength);
-	cpVect leg_b = cpv(0.0f, -legHLength);
-	cpFloat legMoment = cpMomentForSegment(legMass, leg_a, leg_b);
 	
-	cpBody *body = cpBodyNew(legMass, legMoment);
-	body->p = cpvadd(crank->p, cpv(0.0f, -legHLength + crankOffset));
-	cpSpaceAddBody(space, body);
-	
-	cpShape *shape = cpSegmentShapeNew(body, leg_a, leg_b, 5.0f);
-	shape->group = 1;
-	cpSpaceAddShape(space, shape);
-	
-	cpSpaceAddConstraint(space, cpPivotJointNew(crank, body, cpv(0.0f, crankOffset), cpv(0.0f, legHLength)));
-	cpSpaceAddConstraint(space, cpGrooveJointNew(body, chassis, cpv(0.0f, legHLength), cpv(0.0f, -legHLength), cpv(crank->p.x, 0.0f)));
-	
-	// add a foot
-	shape = cpCircleShapeNew(body, 10.0f, cpv(0.0f, -legHLength));
-	shape->e = 0.0f; shape->u = 1.0f;
-	shape->group = 1;
-	cpSpaceAddShape(space, shape);
+	printf("v = %s\n", cpvstr(someBody->v));
 }
 
 static cpSpace *
@@ -76,83 +52,18 @@ init(void)
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
-	space->gravity = cpv(0.0, -600.0);
-	space->iterations = 50;
+	space->iterations = 20;
 	
 	cpBody *body;
 	cpShape *shape;
-
-	// add screen border
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);
-	shape->e = 1.0; shape->u = 1.0;
-	cpSpaceAddStaticShape(space, shape);
-
-	shape = cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f);
-	shape->e = 1.0; shape->u = 1.0;
-	cpSpaceAddStaticShape(space, shape);
-
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
-	shape->e = 1.0; shape->u = 1.0;
-	cpSpaceAddStaticShape(space, shape);
-
-	// Make the chassis
-	cpFloat chassisHW = 120.0f/2.0;
-	cpFloat chassisHH = 20.0f/2.0;
-	cpFloat chassisMass = 5.0;
-
-	int num = 4;
-	cpVect verts[] = {
-		cpv(-chassisHW,-chassisHH),
-		cpv(-chassisHW, chassisHH),
-		cpv( chassisHW, chassisHH),
-		cpv( chassisHW,-chassisHH),
-	};
 	
-	cpBody *chassis = body = cpBodyNew(chassisMass, cpMomentForPoly(chassisMass, num, verts, cpvzero));
-	cpSpaceAddBody(space, body);
-	shape = cpPolyShapeNew(body, num, verts, cpvzero);
-	shape->e = 0.0f; shape->u = 1.0f;
-	shape->group = 1;
-	cpSpaceAddShape(space, shape);
-	
-	// Add crankshafts
-	cpFloat crankMass = 1.0f;
-	cpFloat crankRadius = 20.0f;
-	cpFloat crankMoment = cpMomentForCircle(crankMass, crankRadius, 0.0f, cpvzero);
-	cpFloat crankSpeed = (2.0f*M_PI)/3.0f;
-	cpFloat crankXOffset = chassisHW - crankRadius;
-	cpFloat crankYOffset = crankRadius + 30.0f;
-	
-	cpBody *crank1 = body = cpBodyNew(crankMass, crankMoment);
-	body->p = cpvadd(chassis->p, cpv(crankXOffset, crankYOffset));
+	body = cpBodyNew(1.0, 1.0);
+	someBody = body;
 	cpSpaceAddBody(space, body);
 	
-	shape = cpCircleShapeNew(body, crankRadius, cpvzero);
-	shape->e = 0.0f; shape->u = 1.0f;
-	shape->group = 1;
-	cpSpaceAddShape(space, shape);
-	
-	cpSpaceAddConstraint(space, cpPivotJointNew(chassis, crank1, cpv(crankXOffset, crankYOffset), cpvzero));
-	
-	cpBody *crank2 = body = cpBodyNew(crankMass, crankMoment);
-	body->p = cpvadd(chassis->p, cpv(-crankXOffset, crankYOffset));
-	cpSpaceAddBody(space, body);
-	
-	shape = cpCircleShapeNew(body, crankRadius, cpvzero);
-	shape->e = 0.0f; shape->u = 1.0f;
-	shape->group = 1;
-	cpSpaceAddShape(space, shape);
-	
-	cpSpaceAddConstraint(space, cpPivotJointNew(chassis, crank2, cpv(-crankXOffset, crankYOffset), cpvzero));
-	
-	cpSpaceAddConstraint(space, cpSimpleMotorNew(chassis, crank1, crankSpeed));
-	cpSpaceAddConstraint(space, cpGearJointNew(crank1, crank2, 0.0f, 1.0f));
-	
-	// add legs
-	add_leg(chassis, crank1, crankRadius);
-	add_leg(chassis, crank1, -crankRadius);
-	add_leg(chassis, crank2, crankRadius);
-	add_leg(chassis, crank2, -crankRadius);
+	cpConstraint *constraint = cpPivotJointNew(staticBody, body, cpvzero, cpv(100,0));
+	constraint->maxBias = 10.0f;
+	cpSpaceAddConstraint(space, constraint);
 	
 	return space;
 }
