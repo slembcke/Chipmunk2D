@@ -98,6 +98,13 @@ cpVect mousePoint_last;
 cpBody *mouseBody = NULL;
 cpConstraint *mouseJoint = NULL;
 
+int key_up = 0;
+int key_down = 0;
+int key_left = 0;
+int key_right = 0;
+
+cpVect arrowDirection = {};
+
 drawSpaceOptions options = {
 	0,
 	1,
@@ -221,6 +228,41 @@ timercall(int value)
 }
 
 static void
+set_arrowDirection()
+{
+	int x = 0, y = 0;
+	
+	if(key_up) y += 1;
+	if(key_down) y -= 1;
+	if(key_right) x += 1;
+	if(key_left) x -= 1;
+	
+	arrowDirection = cpv(x, y);
+}
+
+static void
+arrowKeyDownFunc(int key, int x, int y)
+{
+	if(key == GLUT_KEY_UP) key_up = 1;
+	else if(key == GLUT_KEY_DOWN) key_down = 1;
+	else if(key == GLUT_KEY_LEFT) key_left = 1;
+	else if(key == GLUT_KEY_RIGHT) key_right = 1;
+
+	set_arrowDirection();
+}
+
+static void
+arrowKeyUpFunc(int key, int x, int y)
+{
+	if(key == GLUT_KEY_UP) key_up = 0;
+	else if(key == GLUT_KEY_DOWN) key_down = 0;
+	else if(key == GLUT_KEY_LEFT) key_left = 0;
+	else if(key == GLUT_KEY_RIGHT) key_right = 0;
+
+	set_arrowDirection();
+}
+
+static void
 idle(void)
 {
 	glutPostRedisplay();
@@ -264,6 +306,9 @@ glutStuff(int argc, const char *argv[])
 
 	glutIgnoreKeyRepeat(1);
 	glutKeyboardFunc(keyboard);
+	
+	glutSpecialFunc(arrowKeyDownFunc);
+	glutSpecialUpFunc(arrowKeyUpFunc);
 
 	glutMotionFunc(mouse);
 	glutPassiveMotionFunc(mouse);

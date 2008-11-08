@@ -36,10 +36,15 @@
 cpSpace *space;
 cpBody *staticBody;
 
+cpConstraint *motor;
+
 static void
 update(int ticks)
 {
-	int steps = 1;
+	cpFloat coef = (2.0f + arrowDirection.y)/3.0f;
+	((cpSimpleMotor *)motor)->rate = arrowDirection.x*10.0f*coef;
+	
+	int steps = 3;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
@@ -66,14 +71,14 @@ make_leg(cpFloat side, cpFloat offset, cpBody *chassis, cpBody *crank, cpVect an
 	cpSpaceAddConstraint(space, cpPivotJointNew(chassis, upper_leg, cpv(offset, 0.0f), cpvzero));
 	
 	// lower leg
-	a = cpvzero, b = cpv(0.0f, -side);
+	a = cpvzero, b = cpv(0.0f, -1.0f*side);
 	cpBody *lower_leg = cpBodyNew(leg_mass, cpMomentForSegment(leg_mass, a, b));
 	lower_leg->p = cpv(offset, -side);
 	cpSpaceAddBody(space, lower_leg);
 	shape = cpSegmentShapeNew(lower_leg, a, b, seg_radius);
 	shape->group = 1;
 	cpSpaceAddShape(space, shape);
-	shape = cpCircleShapeNew(lower_leg, seg_radius*2.0f, cpv(0.0f, -side));
+	shape = cpCircleShapeNew(lower_leg, seg_radius*2.0f, b);
 	shape->group = 1;
 	shape->e = 0.0f; shape->u = 1.0f;
 	cpSpaceAddShape(space, shape);
@@ -142,16 +147,16 @@ init(void)
 	cpSpaceAddConstraint(space, cpPivotJointNew(chassis, crank, cpvzero, cpvzero));
 	
 	cpFloat side = 30.0f;
-	int num_legs = 3;
+	
+	int num_legs = 2;
 	for(int i=0; i<num_legs; i++){
-		cpVect crank_offset = cpvmult(cpvforangle((cpFloat)i/(cpFloat)num_legs*2.0f*M_PI), crank_radius);
-		make_leg(side,  offset, chassis, crank, crank_offset);
-		make_leg(side, -offset, chassis, crank, crank_offset);
+		make_leg(side,  offset, chassis, crank, cpvmult(cpvforangle((cpFloat)(2*i+0)/(cpFloat)num_legs*M_PI), crank_radius));
+		make_leg(side, -offset, chassis, crank, cpvmult(cpvforangle((cpFloat)(2*i+1)/(cpFloat)num_legs*M_PI), crank_radius));
 	}
 	
-//	cpConstraint *motor = cpSimpleMotorNew(chassis, crank, 12.0f);
-//	motor->maxForce = 100000.0f;
-//	cpSpaceAddConstraint(space, motor);
+	motor = cpSimpleMotorNew(chassis, crank, 6.0f);
+	motor->maxForce = 100000.0f;
+	cpSpaceAddConstraint(space, motor);
 
 	return space;
 }

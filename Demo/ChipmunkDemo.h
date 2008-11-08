@@ -41,3 +41,4 @@ frand(void)
 	return (cpFloat)rand()/(cpFloat)RAND_MAX;
 }
 
+extern cpVect arrowDirection;
