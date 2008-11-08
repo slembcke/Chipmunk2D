@@ -18,6 +18,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+/*
+ * The previous WalkBot demo I designed was fairly disappointing, so I implemented
+ * the mechanism that Theo Jansen uses in his kinetic sculptures. Brilliant.
+ * Read more here: http://en.wikipedia.org/wiki/Theo_Jansen
+ */
  
 #include <stdlib.h>
 #include <stdio.h>
@@ -161,8 +167,8 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo Test = {
-	"Test",
+const chipmunkDemo TheoJansen = {
+	"Theo Jansen Machine",
 	NULL,
 	init,
 	update,
