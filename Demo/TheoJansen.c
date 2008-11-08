@@ -47,7 +47,7 @@ update(int ticks)
 	}
 }
 
-cpFloat seg_radius = 3.0f;
+static cpFloat seg_radius = 3.0f;
 
 static void
 make_leg(cpFloat side, cpFloat offset, cpBody *chassis, cpBody *crank, cpVect anchor)
@@ -120,7 +120,7 @@ init(void)
 	shape->e = 1.0; shape->u = 1.0;
 	cpSpaceAddStaticShape(space, shape);
 	
-	cpFloat offset = 25.0f;
+	cpFloat offset = 30.0f;
 
 	// make chassis
 	cpFloat chassis_mass = 2.0f;
@@ -133,7 +133,7 @@ init(void)
 	
 	// make crank
 	cpFloat crank_mass = 1.0f;
-	cpFloat crank_radius = 10.0f;
+	cpFloat crank_radius = 13.0f;
 	cpBody *crank = cpBodyNew(crank_mass, cpMomentForCircle(crank_mass, crank_radius, 0.0f, cpvzero));
 	cpSpaceAddBody(space, crank);
 	shape = cpCircleShapeNew(crank, crank_radius, cpvzero);
@@ -141,21 +141,17 @@ init(void)
 	cpSpaceAddShape(space, shape);
 	cpSpaceAddConstraint(space, cpPivotJointNew(chassis, crank, cpvzero, cpvzero));
 	
-	cpFloat side = 25.0f;
-	make_leg(side,  offset, chassis, crank, cpvmult(cpvforangle(0.0f/5.0f*2.0f*M_PI), crank_radius));
-	make_leg(side, -offset, chassis, crank, cpvmult(cpvforangle(0.0f/5.0f*2.0f*M_PI), crank_radius));
-	make_leg(side,  offset, chassis, crank, cpvmult(cpvforangle(1.0f/5.0f*2.0f*M_PI), crank_radius));
-	make_leg(side, -offset, chassis, crank, cpvmult(cpvforangle(1.0f/5.0f*2.0f*M_PI), crank_radius));
-	make_leg(side,  offset, chassis, crank, cpvmult(cpvforangle(2.0f/5.0f*2.0f*M_PI), crank_radius));
-	make_leg(side, -offset, chassis, crank, cpvmult(cpvforangle(2.0f/5.0f*2.0f*M_PI), crank_radius));
-	make_leg(side,  offset, chassis, crank, cpvmult(cpvforangle(3.0f/5.0f*2.0f*M_PI), crank_radius));
-	make_leg(side, -offset, chassis, crank, cpvmult(cpvforangle(3.0f/5.0f*2.0f*M_PI), crank_radius));
-	make_leg(side,  offset, chassis, crank, cpvmult(cpvforangle(4.0f/5.0f*2.0f*M_PI), crank_radius));
-	make_leg(side, -offset, chassis, crank, cpvmult(cpvforangle(4.0f/5.0f*2.0f*M_PI), crank_radius));
+	cpFloat side = 30.0f;
+	int num_legs = 3;
+	for(int i=0; i<num_legs; i++){
+		cpVect crank_offset = cpvmult(cpvforangle((cpFloat)i/(cpFloat)num_legs*2.0f*M_PI), crank_radius);
+		make_leg(side,  offset, chassis, crank, crank_offset);
+		make_leg(side, -offset, chassis, crank, crank_offset);
+	}
 	
-	cpConstraint *motor = cpSimpleMotorNew(chassis, crank, 12.0f);
-	motor->maxForce = 100000.0f;
-	cpSpaceAddConstraint(space, motor);
+//	cpConstraint *motor = cpSimpleMotorNew(chassis, crank, 12.0f);
+//	motor->maxForce = 100000.0f;
+//	cpSpaceAddConstraint(space, motor);
 
 	return space;
 }

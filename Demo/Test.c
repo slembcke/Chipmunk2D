@@ -41,7 +41,7 @@ update(int ticks)
 	}
 }
 
-cpFloat seg_radius = 3.0f;
+static cpFloat seg_radius = 3.0f;
 
 static void
 make_leg(cpFloat side, cpFloat offset, cpBody *chassis, cpBody *crank, cpVect anchor)
