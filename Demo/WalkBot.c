@@ -29,10 +29,15 @@
 
 cpSpace *space;
 cpBody *staticBody;
+cpConstraint *motor;
 
 static void
 update(int ticks)
 {
+	cpFloat coef = (2.0f + arrowDirection.y)/3.0f;
+	cpFloat rate = arrowDirection.x*3.0f*coef;
+	((cpSimpleMotor *)motor)->rate = -rate; // FIXME nasty casting
+
 	int steps = 3;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
 	
@@ -147,7 +152,8 @@ init(void)
 	
 	cpSpaceAddConstraint(space, cpPivotJointNew(chassis, crank2, cpv(-crankXOffset, crankYOffset), cpvzero));
 	
-	cpSpaceAddConstraint(space, cpSimpleMotorNew(chassis, crank1, crankSpeed));
+	motor = cpSimpleMotorNew(chassis, crank1, crankSpeed);
+	cpSpaceAddConstraint(space, motor);
 	cpSpaceAddConstraint(space, cpGearJointNew(crank1, crank2, 0.0f, 1.0f));
 	
 	// add legs

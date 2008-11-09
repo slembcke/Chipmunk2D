@@ -29,6 +29,7 @@
 
 extern cpSpace *space;
 extern cpBody *staticBody;
+cpConstraint *motor;
 
 static cpBody *balls[4];
 static int numBalls = 4;
@@ -36,6 +37,11 @@ static int numBalls = 4;
 static void
 update(int ticks)
 {
+	cpFloat coef = (2.0f + arrowDirection.y)/3.0f;
+	cpFloat rate = arrowDirection.x*30.0f*coef;
+	((cpSimpleMotor *)motor)->rate = rate; // FIXME nasty casting
+	motor->maxForce = (rate) ? 1000000.0f : 0.0f;
+
 	int steps = 1;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
 	
@@ -170,9 +176,8 @@ init(void)
 	cpSpaceAddConstraint(space, cpPinJointNew(feeder, smallGear, anchr, cpv(0.0f, 80.0f)));
 
 	// motorize the second gear
-	cpConstraint *constraint = cpSimpleMotorNew(staticBody, bigGear, 3.0f);
-	constraint->maxForce = 1000000.0f;
-	cpSpaceAddConstraint(space, constraint);
+	motor = cpSimpleMotorNew(staticBody, bigGear, 3.0f);
+	cpSpaceAddConstraint(space, motor);
 
 	return space;
 }
