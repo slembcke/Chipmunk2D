@@ -33,6 +33,7 @@
  
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include <limits.h>
 //#include <sys/time.h>
@@ -114,12 +115,42 @@ drawSpaceOptions options = {
 };
 
 static void
+drawInstructions()
+{
+	int x = -300;
+	int y =  220;
+	
+	char *str = (
+		"Controls:\n"
+		"A - * Switch demos.\n"
+		"Use the mouse to grab objects.\n"
+		"Arrow Keys control some demos.\n"
+		"\\ enables anti-aliasing."
+	);
+	
+	glColor3f(0.0f, 0.0f, 0.0f);
+	glRasterPos2i(x, y);
+	
+	for(int i=0, len=strlen(str); i<len; i++){
+		if(str[i] == '\n'){
+			y -= 16;
+			glRasterPos2i(x, y);
+		} else if(str[i] == '*'){
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, 'A' + demoCount - 1);
+		} else {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, str[i]);
+		}
+	}
+}
+
+static void
 display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	drawSpace(space, currDemo->drawOptions ? currDemo->drawOptions : &options);
-	
+	drawInstructions();
+		
 	glutSwapBuffers();
 	ticks++;
 	
@@ -134,7 +165,7 @@ static char *
 demoTitle(chipmunkDemo *demo)
 {
 	static char title[1024];
-	sprintf(title, "Demo: %s (a thru %c switch demos)", demo->name, 'a' + demoCount - 1);
+	sprintf(title, "Demo: %s", demo->name);
 	
 	return title;
 }
@@ -162,6 +193,13 @@ keyboard(unsigned char key, int x, int y)
 		runDemo(demos[index]);
 	} else if(key == '\r'){
 		runDemo(currDemo);
+	} else if(key == '\\'){
+		glEnable(GL_LINE_SMOOTH);
+		glEnable(GL_POINT_SMOOTH);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
+		glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
 	}
 }
 
@@ -272,13 +310,6 @@ static void
 initGL(void)
 {
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0);
-
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POINT_SMOOTH);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-	glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
