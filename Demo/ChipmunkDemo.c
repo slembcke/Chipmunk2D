@@ -122,9 +122,9 @@ drawInstructions()
 	
 	char *str = (
 		"Controls:\n"
-		"A - * Switch demos.\n"
+		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
-		"Arrow Keys control some demos.\n"
+		"Arrow keys control some demos.\n"
 		"\\ enables anti-aliasing."
 	);
 	
