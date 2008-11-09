@@ -42,7 +42,9 @@ static void
 update(int ticks)
 {
 	cpFloat coef = (2.0f + arrowDirection.y)/3.0f;
-	((cpSimpleMotor *)motor)->rate = arrowDirection.x*10.0f*coef;
+	cpFloat rate = arrowDirection.x*10.0f*coef;
+	((cpSimpleMotor *)motor)->rate = rate;
+	motor->maxForce = (rate) ? 100000.0f : 0.0f;
 	
 	int steps = 3;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
@@ -155,7 +157,6 @@ init(void)
 	}
 	
 	motor = cpSimpleMotorNew(chassis, crank, 6.0f);
-	motor->maxForce = 100000.0f;
 	cpSpaceAddConstraint(space, motor);
 
 	return space;
