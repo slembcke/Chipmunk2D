@@ -21,7 +21,7 @@
 
 #include <stdlib.h>
 
-#include "chipmunk.h"
+#include "../chipmunk.h"
 #include "util.h"
 
 static void

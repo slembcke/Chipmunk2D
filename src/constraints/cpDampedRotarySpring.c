@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "chipmunk.h"
+#include "../chipmunk.h"
 #include "util.h"
 
 static void

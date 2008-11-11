@@ -23,7 +23,7 @@
 #include <math.h>
 #include <assert.h>
 
-#include "chipmunk.h"
+#include "../chipmunk.h"
 #include "util.h"
 
 // TODO: Comment me!
