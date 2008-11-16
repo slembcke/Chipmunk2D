@@ -36,3 +36,6 @@ typedef struct cpPivotJoint {
 cpPivotJoint *cpPivotJointAlloc(void);
 cpPivotJoint *cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
 cpConstraint *cpPivotJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
+
+cpConstraintAccessor(cpPivotJoint, cpVect, anchr1);
+cpConstraintAccessor(cpPivotJoint, cpVect, anchr2);

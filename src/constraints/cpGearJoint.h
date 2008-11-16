@@ -23,11 +23,10 @@ extern const cpConstraintClass cpGearJointClass;
 
 typedef struct cpGearJoint {
 	cpConstraint constraint;
-	
-	cpFloat iSum;
-	
 	cpFloat phase, ratio;
 	
+	cpFloat iSum;
+		
 	cpFloat bias;
 	cpFloat jAcc, jMax;
 } cpGearJoint;
@@ -35,3 +34,6 @@ typedef struct cpGearJoint {
 cpGearJoint *cpGearJointAlloc(void);
 cpGearJoint *cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
 cpConstraint *cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
+
+cpConstraintAccessor(cpGearJoint, cpFloat, phase);
+cpConstraintAccessor(cpGearJoint, cpFloat, ratio);

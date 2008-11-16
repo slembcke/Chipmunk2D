@@ -23,11 +23,10 @@ extern const cpConstraintClass cpRotaryLimitJointClass;
 
 typedef struct cpRotaryLimitJoint {
 	cpConstraint constraint;
-	
-	cpFloat iSum;
-	
 	cpFloat min, max;
 	
+	cpFloat iSum;
+		
 	cpFloat bias;
 	cpFloat jAcc, jMax;
 } cpRotaryLimitJoint;
@@ -35,3 +34,6 @@ typedef struct cpRotaryLimitJoint {
 cpRotaryLimitJoint *cpRotaryLimitJointAlloc(void);
 cpRotaryLimitJoint *cpRotaryLimitJointInit(cpRotaryLimitJoint *joint, cpBody *a, cpBody *b, cpFloat min, cpFloat max);
 cpConstraint *cpRotaryLimitJointNew(cpBody *a, cpBody *b, cpFloat min, cpFloat max);
+
+cpConstraintAccessor(cpRotaryLimitJoint, cpFloat, min);
+cpConstraintAccessor(cpRotaryLimitJoint, cpFloat, max);

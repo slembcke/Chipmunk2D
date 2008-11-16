@@ -40,5 +40,8 @@ cpDampedSpring *cpDampedSpringAlloc(void);
 cpDampedSpring *cpDampedSpringInit(cpDampedSpring *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping);
 cpConstraint *cpDampedSpringNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping);
 
-void cpDampedSpringGetProperties(cpConstraint *constraint, cpFloat *restLength, cpFloat *stiffness, cpFloat *damping);
-void cpDampedSpringSetProperties(cpConstraint *constraint, cpFloat restLength, cpFloat stiffness, cpFloat damping);
+cpConstraintAccessor(cpDampedSpring, cpVect, anchr1);
+cpConstraintAccessor(cpDampedSpring, cpVect, anchr2);
+cpConstraintAccessor(cpDampedSpring, cpFloat, restLength);
+cpConstraintAccessor(cpDampedSpring, cpFloat, stiffness);
+cpConstraintAccessor(cpDampedSpring, cpFloat, damping);

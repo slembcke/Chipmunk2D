@@ -48,6 +48,11 @@ typedef struct cpConstraint {
 void cpConstraintDestroy(cpConstraint *constraint);
 void cpConstraintFree(cpConstraint *constraint);
 
+
+#define cpConstraintAccessor(s, t, m) \
+static inline t s##_get_##m(cpConstraint *constraint){return ((s *)constraint)->m;} \
+static inline void s##_set_##m(cpConstraint *constraint, t value){((s *)constraint)->m = value;}
+
 // Built in Joint types
 #include "cpPinJoint.h"
 #include "cpSlideJoint.h"

@@ -120,7 +120,7 @@ cpSpaceAlloc(void)
 #define DEFAULT_DIM_SIZE 100.0f
 #define DEFAULT_COUNT 1000
 #define DEFAULT_ITERATIONS 10
-#define DEFAULT_ELASTIC_ITERATIONS 0
+#define DEFAULT_ELASTIC_ITERATIONS 10
 
 cpSpace*
 cpSpaceInit(cpSpace *space)

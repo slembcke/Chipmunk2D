@@ -39,3 +39,6 @@ typedef struct cpGrooveJoint {
 cpGrooveJoint *cpGrooveJointAlloc(void);
 cpGrooveJoint *cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);
 cpConstraint *cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);
+
+// TODO setters for the groove.
+cpConstraintAccessor(cpGrooveJoint, cpVect, anchr2);

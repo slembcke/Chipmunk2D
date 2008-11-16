@@ -39,7 +39,7 @@ update(int ticks)
 {
 	cpFloat coef = (2.0f + arrowDirection.y)/3.0f;
 	cpFloat rate = arrowDirection.x*30.0f*coef;
-	((cpSimpleMotor *)motor)->rate = rate; // FIXME nasty casting
+	cpSimpleMotor_set_rate(motor, rate);
 	motor->maxForce = (rate) ? 1000000.0f : 0.0f;
 
 	int steps = 1;

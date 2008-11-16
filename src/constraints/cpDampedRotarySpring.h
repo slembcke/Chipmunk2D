@@ -36,3 +36,7 @@ typedef struct cpDampedRotarySpring {
 cpDampedRotarySpring *cpDampedRotarySpringAlloc(void);
 cpDampedRotarySpring *cpDampedRotarySpringInit(cpDampedRotarySpring *joint, cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping);
 cpConstraint *cpDampedRotarySpringNew(cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping);
+
+cpConstraintAccessor(cpDampedRotarySpring, cpFloat, restAngle);
+cpConstraintAccessor(cpDampedRotarySpring, cpFloat, stiffness);
+cpConstraintAccessor(cpDampedRotarySpring, cpFloat, damping);

@@ -37,3 +37,8 @@ typedef struct cpSlideJoint {
 cpSlideJoint *cpSlideJointAlloc(void);
 cpSlideJoint *cpSlideJointInit(cpSlideJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max);
 cpConstraint *cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max);
+
+cpConstraintAccessor(cpSlideJoint, cpVect, anchr1);
+cpConstraintAccessor(cpSlideJoint, cpVect, anchr2);
+cpConstraintAccessor(cpSlideJoint, cpFloat, min);
+cpConstraintAccessor(cpSlideJoint, cpFloat, max);

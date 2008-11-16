@@ -37,3 +37,7 @@ typedef struct cpPinJoint {
 cpPinJoint *cpPinJointAlloc(void);
 cpPinJoint *cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
 cpConstraint *cpPinJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
+
+cpConstraintAccessor(cpPinJoint, cpVect, anchr1);
+cpConstraintAccessor(cpPinJoint, cpVect, anchr2);
+cpConstraintAccessor(cpPinJoint, cpFloat, dist);

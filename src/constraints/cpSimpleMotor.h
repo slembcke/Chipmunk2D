@@ -23,14 +23,15 @@ extern const cpConstraintClass cpSimpleMotorClass;
 
 typedef struct cpSimpleMotor {
 	cpConstraint constraint;
-	
-	cpFloat iSum;
-	
 	cpFloat rate;
 	
+	cpFloat iSum;
+		
 	cpFloat jAcc, jMax;
 } cpSimpleMotor;
 
 cpSimpleMotor *cpSimpleMotorAlloc(void);
 cpSimpleMotor *cpSimpleMotorInit(cpSimpleMotor *joint, cpBody *a, cpBody *b, cpFloat rate);
 cpConstraint *cpSimpleMotorNew(cpBody *a, cpBody *b, cpFloat rate);
+
+cpConstraintAccessor(cpSimpleMotor, cpFloat, rate);

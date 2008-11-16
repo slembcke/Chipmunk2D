@@ -36,7 +36,7 @@ update(int ticks)
 {
 	cpFloat coef = (2.0f + arrowDirection.y)/3.0f;
 	cpFloat rate = arrowDirection.x*3.0f*coef;
-	((cpSimpleMotor *)motor)->rate = -rate; // FIXME nasty casting
+	cpSimpleMotor_set_rate(motor, -rate);
 
 	int steps = 3;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
