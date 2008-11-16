@@ -39,6 +39,12 @@ cpConstraintFree(cpConstraint *constraint)
 	free(constraint);
 }
 
+void
+cpConstraintCheckCast(cpConstraint *constraint, const cpConstraintClass *klass)
+{
+	assert(constraint->klass == klass); // Bad cpConstraint type in cast
+}
+
 
 // *** defined in util.h
 
@@ -52,10 +58,4 @@ cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBod
 	constraint->maxForce = INFINITY;
 	constraint->biasCoef = cp_constraint_bias_coef;
 	constraint->maxBias = INFINITY;
-}
-
-void
-CHECK_CLASS(cpConstraint *constraint, const cpConstraintClass *klass)
-{
-	assert(constraint->klass == klass);
 }

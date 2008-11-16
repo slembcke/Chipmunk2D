@@ -111,26 +111,3 @@ cpDampedSpringNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat re
 {
 	return (cpConstraint *)cpDampedSpringInit(cpDampedSpringAlloc(), a, b, anchr1, anchr2, restLength, stiffness, damping);
 }
-
-void
-cpDampedSpringGetProperties(cpConstraint *constraint, cpFloat *restLength, cpFloat *stiffness, cpFloat *damping)
-{
-	CHECK_CLASS(constraint, &cpDampedSpringClass);
-	cpDampedSpring *spring = (cpDampedSpring *)constraint;
-
-	if(restLength) (*restLength) = spring->restLength;
-	if(stiffness)  (*stiffness)  = spring->stiffness;
-	if(damping)    (*damping)    = spring->damping;
-}
-
-void
-cpDampedSpringSetProperties(cpConstraint *constraint, cpFloat restLength, cpFloat stiffness, cpFloat damping)
-{
-	CHECK_CLASS(constraint, &cpDampedSpringClass);
-	cpDampedSpring *spring = (cpDampedSpring *)constraint;
-	
-	spring->restLength = restLength;
-	spring->stiffness  = stiffness;
-	spring->damping    = damping;
-}
-

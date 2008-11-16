@@ -49,9 +49,19 @@ void cpConstraintDestroy(cpConstraint *constraint);
 void cpConstraintFree(cpConstraint *constraint);
 
 
+void cpConstraintCheckCast(cpConstraint *constraint, const cpConstraintClass *klass);
+
 #define cpConstraintAccessor(s, t, m) \
-static inline t s##_get_##m(cpConstraint *constraint){return ((s *)constraint)->m;} \
-static inline void s##_set_##m(cpConstraint *constraint, t value){((s *)constraint)->m = value;}
+static inline t \
+s##_get_##m(cpConstraint *constraint){ \
+	cpConstraintCheckCast(constraint, &s##Class); \
+	return ((s *)constraint)->m; \
+} \
+static inline void \
+s##_set_##m(cpConstraint *constraint, t value){ \
+	cpConstraintCheckCast(constraint, &s##Class); \
+	((s *)constraint)->m = value; \
+}
 
 // Built in Joint types
 #include "cpPinJoint.h"
