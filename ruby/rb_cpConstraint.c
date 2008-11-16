@@ -208,6 +208,23 @@ MAKE_FLT_ACCESSORS(cpSlideJoint, min);
 MAKE_FLT_ACCESSORS(cpSlideJoint, max);
 
 
+ALLOC_TEMPLATE(cpGrooveJoint, cpGrooveJointAlloc())
+
+static VALUE
+rb_cpGrooveJoint_init(VALUE self, VALUE a, VALUE b, VALUE grv_a, VALUE grv_b, VALUE anchr2)
+{
+	cpGrooveJoint *joint = (cpGrooveJoint *)CONSTRAINT(self);
+	cpGrooveJointInit(joint, BODY(a), BODY(b), *VGET(grv_a), *VGET(grv_b), *VGET(anchr2));
+	rb_iv_set(self, "@body_a", a);
+	rb_iv_set(self, "@body_b", b);
+	
+	return self;
+}
+
+MAKE_VEC_ACCESSORS(cpGrooveJoint, anchr2)
+// TODO more accessors
+
+
 #define STRINGIFY(v) #v
 #define ACCESSOR_METHODS(s, m, name) \
 rb_define_method(c_##s, STRINGIFY(name), rb_##s##_get_##m, 0); \
@@ -273,4 +290,10 @@ Init_cpConstraint(void)
 	ACCESSOR_METHODS(cpSlideJoint, anchr2, anchr2)
 	ACCESSOR_METHODS(cpSlideJoint, min, min)
 	ACCESSOR_METHODS(cpSlideJoint, max, max)
+	
+	VALUE c_cpGrooveJoint = make_class("GrooveJoint", rb_cpGrooveJoint_alloc, rb_cpGrooveJoint_init, 5);
+	ACCESSOR_METHODS(cpGrooveJoint, anchr2, anchr2)
+// TODO groove joint accessors
+	
+	// TODO breakable joint
 }
