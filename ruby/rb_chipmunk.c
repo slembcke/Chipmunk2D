@@ -75,19 +75,14 @@ rb_momentForPoly(VALUE self, VALUE m, VALUE arr, VALUE offset)
 	return rb_float_new(inertia);
 }
 
-static VALUE
-rb_dampedSpring(VALUE self, VALUE a, VALUE b, VALUE r1, VALUE r2, VALUE len, VALUE k, VALUE dmp, VALUE dt)
-{
-	cpDampedSpring(BODY(a), BODY(b), *VGET(r1), *VGET(r2), NUM2DBL(len), NUM2DBL(k), NUM2DBL(dmp), NUM2DBL(dt));
-	return Qnil;
-}
-
 void
 Init_chipmunk(void)
 {
 	id_parent = rb_intern("parent");
 	
 	cpInitChipmunk();
+	
+	rb_eval_string("Float::INFINITY = 1.0/0.0");
 	
 	m_Chipmunk = rb_define_module("CP");
 	rb_define_module_function(m_Chipmunk, "bias_coef", rb_get_cp_bias_coef, 0);
@@ -97,8 +92,7 @@ Init_chipmunk(void)
 	
 	rb_define_module_function(m_Chipmunk, "moment_for_circle", rb_momentForCircle, 4);
 	rb_define_module_function(m_Chipmunk, "moment_for_poly", rb_momentForPoly, 3);
-	
-	rb_define_module_function(m_Chipmunk, "damped_spring", rb_dampedSpring, 8);
+	// TODO add seg moment function
 	
 	Init_cpVect();
 	Init_cpBB();

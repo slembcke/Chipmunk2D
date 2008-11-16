@@ -50,23 +50,25 @@ VWRAP(VALUE parent, cpVect *v)
 	return vec_obj;	
 }
 
-#define GETTER_TEMPLATE(func_name, klass, klass_name, type)\
+#define GETTER_TEMPLATE(func_name, klass, type)\
 static inline type *\
 func_name(VALUE self)\
 {\
-	if(!rb_obj_is_kind_of(self, klass))\
-		rb_raise(rb_eTypeError, "wrong argument type %s (expected CP::klass_name)", rb_obj_classname(self));\
+	if(!rb_obj_is_kind_of(self, klass)){\
+		VALUE klass_name = rb_funcall(klass, rb_intern("to_s"), 0);\
+		rb_raise(rb_eTypeError, "wrong argument type %s (expected %s)", rb_obj_classname(self), StringValuePtr(klass_name));\
+	}\
 	type *ptr;\
 	Data_Get_Struct(self, type, ptr);\
 	return ptr;\
 }\
 
-GETTER_TEMPLATE(VGET , c_cpVect , Vec2 , cpVect )
-GETTER_TEMPLATE(BBGET, c_cpBB   , BB   , cpBB   )
-GETTER_TEMPLATE(BODY , c_cpBody , Body , cpBody )
-GETTER_TEMPLATE(SHAPE, m_cpShape, Shape, cpShape)
-GETTER_TEMPLATE(CONSTRAINT, m_cpConstraint, Constraint, cpConstraint)
-GETTER_TEMPLATE(SPACE, c_cpSpace, Space, cpSpace)
+GETTER_TEMPLATE(VGET , c_cpVect , cpVect )
+GETTER_TEMPLATE(BBGET, c_cpBB   , cpBB   )
+GETTER_TEMPLATE(BODY , c_cpBody , cpBody )
+GETTER_TEMPLATE(SHAPE, m_cpShape, cpShape)
+GETTER_TEMPLATE(CONSTRAINT, m_cpConstraint, cpConstraint)
+GETTER_TEMPLATE(SPACE, c_cpSpace, cpSpace)
 
 void Init_chipmunk(void);
 void Init_cpVect();

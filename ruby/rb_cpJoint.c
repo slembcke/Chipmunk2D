@@ -26,111 +26,251 @@
 
 VALUE m_cpConstraint;
 
+#define CONSTRAINT_GETSET_FUNCS(member) \
+static VALUE rb_cpConstraint_get_##member(VALUE self) \
+{return rb_float_new(CONSTRAINT(self)->member);} \
+static VALUE rb_cpConstraint_set_##member(VALUE self, VALUE value) \
+{CONSTRAINT(self)->member = NUM2DBL(value); return value;}
+
+CONSTRAINT_GETSET_FUNCS(maxForce)
+CONSTRAINT_GETSET_FUNCS(biasCoef)
+CONSTRAINT_GETSET_FUNCS(maxBias)
+
+
+#define MAKE_FLT_GETTER(func) \
+static VALUE rb_##func(VALUE self) \
+{return rb_float_new(func(CONSTRAINT(self)));}
+
+#define MAKE_FLT_SETTER(func) \
+static VALUE rb_##func(VALUE self, VALUE value) \
+{func(CONSTRAINT(self), NUM2DBL(value)); return value;} \
+
+#define MAKE_FLT_ACCESSORS(s, m) \
+MAKE_FLT_GETTER(s##_get_##m) \
+MAKE_FLT_SETTER(s##_set_##m)
+
+#define MAKE_VEC_GETTER(func) \
+static VALUE rb_##func(VALUE self) \
+{return VNEW(cpPinJoint_get_anchr1(CONSTRAINT(self)));}
+
+#define MAKE_VEC_SETTER(func) \
+static VALUE rb_##func(VALUE self, VALUE value) \
+{func(CONSTRAINT(self), *VGET(value)); return value;} \
+
+#define MAKE_VEC_ACCESSORS(s, m) \
+MAKE_VEC_GETTER(s##_get_##m) \
+MAKE_VEC_SETTER(s##_set_##m)
+
+
+#define ALLOC_TEMPLATE(s, alloc) \
+static VALUE rb_##s##_alloc(VALUE klass) \
+{return Data_Wrap_Struct(klass, NULL, cpConstraintFree, alloc);}
+
+ALLOC_TEMPLATE(cpPinJoint, cpPinJointAlloc())
+
 static VALUE
-rb_cpPinConstraintAlloc(VALUE klass)
+rb_cpPinJoint_init(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2)
 {
-	cpPinConstraint *constraint = cpPinConstraintAlloc();
-	VALUE self = Data_Wrap_Struct(klass, NULL, cpConstraintFree, constraint);
+	cpPinJoint *joint = (cpPinJoint *)CONSTRAINT(self);
+	cpPinJointInit(joint, BODY(a), BODY(b), *VGET(anchr1), *VGET(anchr2));
+	rb_iv_set(self, "@body_a", a);
+	rb_iv_set(self, "@body_b", b);
 	
 	return self;
 }
 
+MAKE_FLT_ACCESSORS(cpPinJoint, dist)
+MAKE_VEC_ACCESSORS(cpPinJoint, anchr1)
+MAKE_VEC_ACCESSORS(cpPinJoint, anchr2)
+
+
+ALLOC_TEMPLATE(cpDampedRotarySpring, cpDampedRotarySpringAlloc())
+
 static VALUE
-rb_cpPinConstraintInit(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2)
+rb_cpDampedRotarySpring_init(VALUE self, VALUE a, VALUE b, VALUE restAngle, VALUE stiffness, VALUE damping)
 {
-	cpPinConstraint *constraint = (cpPinConstraint *)CONSTRAINT(self);
-	cpPinConstraintInit(constraint, BODY(a), BODY(b), *VGET(anchr1), *VGET(anchr2));
-	rb_iv_set(self, "body_a", a);
-	rb_iv_set(self, "body_b", b);
+	cpDampedRotarySpring *spring = (cpDampedRotarySpring *)CONSTRAINT(self);
+	cpDampedRotarySpringInit(spring, BODY(a), BODY(b), NUM2DBL(restAngle), NUM2DBL(stiffness), NUM2DBL(damping));
+	rb_iv_set(self, "@body_a", a);
+	rb_iv_set(self, "@body_b", b);
 	
 	return self;
 }
 
+MAKE_FLT_ACCESSORS(cpDampedRotarySpring, restAngle);
+MAKE_FLT_ACCESSORS(cpDampedRotarySpring, stiffness);
+MAKE_FLT_ACCESSORS(cpDampedRotarySpring, damping);
+
+
+ALLOC_TEMPLATE(cpDampedSpring, cpDampedSpringAlloc())
 
 static VALUE
-rb_cpSlideConstraintAlloc(VALUE klass)
+rb_cpDampedSpring_init(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2, VALUE restLength, VALUE stiffness, VALUE damping)
 {
-	cpSlideConstraint *constraint = cpSlideConstraintAlloc();
-	VALUE self = Data_Wrap_Struct(klass, NULL, cpConstraintFree, constraint);
+	cpDampedSpring *spring = (cpDampedSpring *)CONSTRAINT(self);
+	cpDampedSpringInit(spring, BODY(a), BODY(b), *VGET(anchr1), *VGET(anchr2), NUM2DBL(restLength), NUM2DBL(stiffness), NUM2DBL(damping));
+	rb_iv_set(self, "@body_a", a);
+	rb_iv_set(self, "@body_b", b);
 	
 	return self;
 }
 
+MAKE_VEC_ACCESSORS(cpDampedSpring, anchr1)
+MAKE_VEC_ACCESSORS(cpDampedSpring, anchr2)
+MAKE_FLT_ACCESSORS(cpDampedSpring, restLength);
+MAKE_FLT_ACCESSORS(cpDampedSpring, stiffness);
+MAKE_FLT_ACCESSORS(cpDampedSpring, damping);
+
+
+ALLOC_TEMPLATE(cpGearJoint, cpGearJointAlloc())
+
 static VALUE
-rb_cpSlideConstraintInit(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2, VALUE min, VALUE max)
+rb_cpGearJoint_init(VALUE self, VALUE a, VALUE b, VALUE phase, VALUE ratio)
 {
-	cpSlideConstraint *constraint = (cpSlideConstraint *)CONSTRAINT(self);
-	cpSlideConstraintInit(constraint, BODY(a), BODY(b), *VGET(anchr1), *VGET(anchr2), NUM2DBL(min), NUM2DBL(max));
-	rb_iv_set(self, "body_a", a);
-	rb_iv_set(self, "body_b", b);
+	cpGearJoint *joint = (cpGearJoint *)CONSTRAINT(self);
+	cpGearJointInit(joint, BODY(a), BODY(b), NUM2DBL(phase), NUM2DBL(ratio));
+	rb_iv_set(self, "@body_a", a);
+	rb_iv_set(self, "@body_b", b);
 	
 	return self;
 }
 
+MAKE_FLT_ACCESSORS(cpGearJoint, phase);
+MAKE_FLT_ACCESSORS(cpGearJoint, ratio);
+
+
+ALLOC_TEMPLATE(cpPivotJoint, cpPivotJointAlloc())
 
 static VALUE
-rb_cpPivotConstraintAlloc(VALUE klass)
+rb_cpPivotJoint_init(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2)
 {
-	cpPivotConstraint *constraint = cpPivotConstraintAlloc();
-	VALUE self = Data_Wrap_Struct(klass, NULL, cpConstraintFree, constraint);
+	cpPivotJoint *joint = (cpPivotJoint *)CONSTRAINT(self);
+	cpPivotJointInit(joint, BODY(a), BODY(b), *VGET(anchr1), *VGET(anchr2));
+	rb_iv_set(self, "@body_a", a);
+	rb_iv_set(self, "@body_b", b);
 	
 	return self;
 }
 
+MAKE_VEC_ACCESSORS(cpPivotJoint, anchr1);
+MAKE_VEC_ACCESSORS(cpPivotJoint, anchr2);
+
+
+ALLOC_TEMPLATE(cpRotaryLimitJoint, cpRotaryLimitJointAlloc())
+
 static VALUE
-rb_cpPivotConstraintInit(VALUE self, VALUE a, VALUE b, VALUE pivot)
+rb_cpRotaryLimitJoint_init(VALUE self, VALUE a, VALUE b, VALUE min, VALUE max)
 {
-	cpPivotConstraint *constraint = (cpPivotConstraint *)CONSTRAINT(self);
-	cpPivotConstraintInit(constraint, BODY(a), BODY(b), *VGET(pivot));
-	rb_iv_set(self, "body_a", a);
-	rb_iv_set(self, "body_b", b);
+	cpRotaryLimitJoint *joint = (cpRotaryLimitJoint *)CONSTRAINT(self);
+	cpRotaryLimitJointInit(joint, BODY(a), BODY(b), NUM2DBL(min), NUM2DBL(max));
+	rb_iv_set(self, "@body_a", a);
+	rb_iv_set(self, "@body_b", b);
 	
 	return self;
 }
 
+MAKE_FLT_ACCESSORS(cpRotaryLimitJoint, min);
+MAKE_FLT_ACCESSORS(cpRotaryLimitJoint, max);
+
+
+ALLOC_TEMPLATE(cpSimpleMotor, cpSimpleMotorAlloc())
 
 static VALUE
-rb_cpGrooveConstraintAlloc(VALUE klass)
+rb_cpSimpleMotor_init(VALUE self, VALUE a, VALUE b, VALUE rate)
 {
-	cpGrooveConstraint *constraint = cpGrooveConstraintAlloc();
-	VALUE self = Data_Wrap_Struct(klass, NULL, cpConstraintFree, constraint);
+	cpSimpleMotor *motor = (cpSimpleMotor *)CONSTRAINT(self);
+	cpSimpleMotorInit(motor, BODY(a), BODY(b), NUM2DBL(rate));
+	rb_iv_set(self, "@body_a", a);
+	rb_iv_set(self, "@body_b", b);
 	
 	return self;
 }
 
+MAKE_FLT_ACCESSORS(cpSimpleMotor, rate);
+
+
+ALLOC_TEMPLATE(cpSlideJoint, cpSlideJointAlloc())
+
 static VALUE
-rb_cpGrooveConstraintInit(VALUE self, VALUE a, VALUE b, VALUE grv_a, VALUE grv_b, VALUE anchr2)
+rb_cpSlideJoint_init(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2, VALUE min, VALUE max)
 {
-	cpGrooveConstraint *constraint = (cpGrooveConstraint *)CONSTRAINT(self);
-	cpGrooveConstraintInit(constraint, BODY(a), BODY(b), *VGET(grv_a), *VGET(grv_b), *VGET(anchr2));
-	rb_iv_set(self, "body_a", a);
-	rb_iv_set(self, "body_b", b);
+	cpSlideJoint *joint = (cpSlideJoint *)CONSTRAINT(self);
+	cpSlideJointInit(joint, BODY(a), BODY(b), *VGET(anchr1), *VGET(anchr2), NUM2DBL(min), NUM2DBL(max));
+	rb_iv_set(self, "@body_a", a);
+	rb_iv_set(self, "@body_b", b);
 	
 	return self;
+}
+
+MAKE_VEC_ACCESSORS(cpSlideJoint, anchr1)
+MAKE_VEC_ACCESSORS(cpSlideJoint, anchr2)
+MAKE_FLT_ACCESSORS(cpSlideJoint, min);
+MAKE_FLT_ACCESSORS(cpSlideJoint, max);
+
+
+#define STRINGIFY(v) #v
+#define ACCESSOR_METHODS(s, m, name) \
+rb_define_method(c_##s, STRINGIFY(name), rb_##s##_get_##m, 0); \
+rb_define_method(c_##s, STRINGIFY(name=), rb_##s##_set_##m, 1);
+
+static VALUE
+make_class(char *name, void *alloc_func, void *init_func, int init_params)
+{
+	VALUE klass = rb_define_class_under(m_cpConstraint, name, rb_cObject);
+	rb_include_module(klass, m_cpConstraint);
+	rb_define_alloc_func(klass, alloc_func);
+	rb_define_method(klass, "initialize", init_func, init_params);
+	
+	return klass;
 }
 
 void
 Init_cpConstraint(void)
 {
-	m_cpConstraint = rb_define_module_under(m_Chipmunk, "Constraint");	
+	m_cpConstraint = rb_define_module_under(m_Chipmunk, "Constraint");
+	rb_define_attr(m_cpConstraint, "body_a", 1, 0);
+	rb_define_method(m_cpConstraint, "maxForce", rb_cpConstraint_get_maxForce, 0);
+	rb_define_method(m_cpConstraint, "maxForce=", rb_cpConstraint_set_maxForce, 1);
+	rb_define_method(m_cpConstraint, "biasCoef", rb_cpConstraint_get_biasCoef, 0);
+	rb_define_method(m_cpConstraint, "biasCoef=", rb_cpConstraint_set_biasCoef, 1);
+	rb_define_method(m_cpConstraint, "maxBias", rb_cpConstraint_get_maxBias, 0);
+	rb_define_method(m_cpConstraint, "maxBias=", rb_cpConstraint_set_maxBias, 1);
 	
-	VALUE c_cpPinConstraint = rb_define_class_under(m_cpConstraint, "Pin", rb_cObject);
-	rb_include_module(c_cpPinConstraint, m_cpConstraint);
-	rb_define_alloc_func(c_cpPinConstraint, rb_cpPinConstraintAlloc);
-	rb_define_method(c_cpPinConstraint, "initialize", rb_cpPinConstraintInit, 4);
+	VALUE c_cpPinJoint = make_class("PinJoint", rb_cpPinJoint_alloc, rb_cpPinJoint_init, 4);
+	ACCESSOR_METHODS(cpPinJoint, anchr1, anchr1)
+	ACCESSOR_METHODS(cpPinJoint, anchr2, anchr2)
+	ACCESSOR_METHODS(cpPinJoint, dist, dist)
 	
-	VALUE c_cpSlideConstraint = rb_define_class_under(m_cpConstraint, "Slide", rb_cObject);
-	rb_include_module(c_cpSlideConstraint, m_cpConstraint);
-	rb_define_alloc_func(c_cpSlideConstraint, rb_cpSlideConstraintAlloc);
-	rb_define_method(c_cpSlideConstraint, "initialize", rb_cpSlideConstraintInit, 6);
+	VALUE c_cpDampedRotarySpring = make_class("DampedRotarySpring", rb_cpDampedRotarySpring_alloc, rb_cpDampedRotarySpring_init, 5);
+	ACCESSOR_METHODS(cpDampedRotarySpring, restAngle, rest_angle)
+	ACCESSOR_METHODS(cpDampedRotarySpring, stiffness, stiffness)
+	ACCESSOR_METHODS(cpDampedRotarySpring, damping, damping)
 	
-	VALUE c_cpPivotConstraint = rb_define_class_under(m_cpConstraint, "Pivot", rb_cObject);
-	rb_include_module(c_cpPivotConstraint, m_cpConstraint);
-	rb_define_alloc_func(c_cpPivotConstraint, rb_cpPivotConstraintAlloc);
-	rb_define_method(c_cpPivotConstraint, "initialize", rb_cpPivotConstraintInit, 3);
+	VALUE c_cpDampedSpring = make_class("DampedSpring", rb_cpDampedSpring_alloc, rb_cpDampedSpring_init, 7);
+	ACCESSOR_METHODS(cpDampedSpring, anchr1, anchr1)
+	ACCESSOR_METHODS(cpDampedSpring, anchr2, anchr2)
+	ACCESSOR_METHODS(cpDampedSpring, restLength, rest_length)
+	ACCESSOR_METHODS(cpDampedSpring, stiffness, stiffness)
+	ACCESSOR_METHODS(cpDampedSpring, damping, damping)
 	
-	VALUE c_cpGrooveConstraint = rb_define_class_under(m_cpConstraint, "Groove", rb_cObject);
-	rb_include_module(c_cpGrooveConstraint, m_cpConstraint);
-	rb_define_alloc_func(c_cpGrooveConstraint, rb_cpGrooveConstraintAlloc);
-	rb_define_method(c_cpGrooveConstraint, "initialize", rb_cpGrooveConstraintInit, 5);
+	VALUE c_cpGearJoint = make_class("GearJoint", rb_cpGearJoint_alloc, rb_cpGearJoint_init, 4);
+	ACCESSOR_METHODS(cpGearJoint, phase, phase)
+	ACCESSOR_METHODS(cpGearJoint, ratio, ratio)
+	
+	VALUE c_cpPivotJoint = make_class("PivotJoint", rb_cpPivotJoint_alloc, rb_cpPivotJoint_init, 4);
+	ACCESSOR_METHODS(cpPivotJoint, anchr1, anchr1)
+	ACCESSOR_METHODS(cpPivotJoint, anchr2, anchr2)
+	
+	VALUE c_cpRotaryLimitJoint = make_class("RotaryLimitJoint", rb_cpRotaryLimitJoint_alloc, rb_cpRotaryLimitJoint_init, 4);
+	ACCESSOR_METHODS(cpRotaryLimitJoint, min, min)
+	ACCESSOR_METHODS(cpRotaryLimitJoint, max, max)
+	
+	VALUE c_cpSimpleMotor = make_class("SimpleMotor", rb_cpSimpleMotor_alloc, rb_cpSimpleMotor_init, 3);
+	ACCESSOR_METHODS(cpSimpleMotor, rate, rate);
+	
+	VALUE c_cpSlideJoint = make_class("SlideJoint", rb_cpSlideJoint_alloc, rb_cpSlideJoint_init, 6);
+	ACCESSOR_METHODS(cpSlideJoint, anchr1, anchr1)
+	ACCESSOR_METHODS(cpSlideJoint, anchr2, anchr2)
+	ACCESSOR_METHODS(cpSlideJoint, min, min)
+	ACCESSOR_METHODS(cpSlideJoint, max, max)
 }

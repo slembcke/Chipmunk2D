@@ -1,3 +1,7 @@
+************************
+NOTE: THIS READ ME IS TERRIBLE OUT OF DATE! I'LL UPDATE IT WHEN I GET CLOSER TO THE NEXT RELEASE
+************************
+
 BUILDING:
 
   OS X: There is an included XCode project file for building the

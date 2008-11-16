@@ -227,6 +227,25 @@ Init_cpBody(void)
 	rb_define_method(c_cpBody, "w=", rb_cpBodySetAVel, 1);
 	rb_define_method(c_cpBody, "t=", rb_cpBodySetTorque, 1);
 	
+	rb_define_method(c_cpBody, "mass" , rb_cpBodyGetMass, 0);
+	rb_define_method(c_cpBody, "moment" , rb_cpBodyGetMoment, 0);	
+	rb_define_method(c_cpBody, "pos" , rb_cpBodyGetPos, 0);
+	rb_define_method(c_cpBody, "vel" , rb_cpBodyGetVel, 0);
+	rb_define_method(c_cpBody, "force" , rb_cpBodyGetForce, 0);
+	rb_define_method(c_cpBody, "angle" , rb_cpBodyGetAngle, 0);
+	rb_define_method(c_cpBody, "ang_vel" , rb_cpBodyGetAVel, 0);
+	rb_define_method(c_cpBody, "torque" , rb_cpBodyGetTorque, 0);
+	rb_define_method(c_cpBody, "rot", rb_cpBodyGetRot, 0);
+	
+	rb_define_method(c_cpBody, "mass=", rb_cpBodySetMass, 1);
+	rb_define_method(c_cpBody, "moment=", rb_cpBodySetMoment, 1);
+	rb_define_method(c_cpBody, "pos=", rb_cpBodySetPos, 1);
+	rb_define_method(c_cpBody, "vel=", rb_cpBodySetVel, 1);
+	rb_define_method(c_cpBody, "force=", rb_cpBodySetForce, 1);
+	rb_define_method(c_cpBody, "angl=", rb_cpBodySetAngle, 1);
+	rb_define_method(c_cpBody, "ang_vel=", rb_cpBodySetAVel, 1);
+	rb_define_method(c_cpBody, "torque=", rb_cpBodySetTorque, 1);
+	
 	rb_define_method(c_cpBody, "local2world", rb_cpBodyLocal2World, 1);
 	rb_define_method(c_cpBody, "world2local", rb_cpBodyWorld2Local, 1);
 
@@ -236,4 +255,6 @@ Init_cpBody(void)
 	
 	rb_define_method(c_cpBody, "update_velocity", rb_cpBodyUpdateVelocity, 3);
 	rb_define_method(c_cpBody, "update_position", rb_cpBodyUpdatePosition, 1);
+	
+	// TODO integration functions?
 }
