@@ -246,12 +246,12 @@ Init_cpConstraint(void)
 {
 	m_cpConstraint = rb_define_module_under(m_Chipmunk, "Constraint");
 	rb_define_attr(m_cpConstraint, "body_a", 1, 0);
-	rb_define_method(m_cpConstraint, "maxForce", rb_cpConstraint_get_maxForce, 0);
-	rb_define_method(m_cpConstraint, "maxForce=", rb_cpConstraint_set_maxForce, 1);
-	rb_define_method(m_cpConstraint, "biasCoef", rb_cpConstraint_get_biasCoef, 0);
-	rb_define_method(m_cpConstraint, "biasCoef=", rb_cpConstraint_set_biasCoef, 1);
-	rb_define_method(m_cpConstraint, "maxBias", rb_cpConstraint_get_maxBias, 0);
-	rb_define_method(m_cpConstraint, "maxBias=", rb_cpConstraint_set_maxBias, 1);
+	rb_define_method(m_cpConstraint, "max_force", rb_cpConstraint_get_maxForce, 0);
+	rb_define_method(m_cpConstraint, "max_force=", rb_cpConstraint_set_maxForce, 1);
+	rb_define_method(m_cpConstraint, "bias_coef", rb_cpConstraint_get_biasCoef, 0);
+	rb_define_method(m_cpConstraint, "bias_coef=", rb_cpConstraint_set_biasCoef, 1);
+	rb_define_method(m_cpConstraint, "max_bias", rb_cpConstraint_get_maxBias, 0);
+	rb_define_method(m_cpConstraint, "max_bias=", rb_cpConstraint_set_maxBias, 1);
 	
 	VALUE c_cpPinJoint = make_class("PinJoint", rb_cpPinJoint_alloc, rb_cpPinJoint_init, 4);
 	ACCESSOR_METHODS(cpPinJoint, anchr1, anchr1)
