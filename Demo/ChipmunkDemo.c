@@ -70,6 +70,7 @@ extern chipmunkDemo Springies;
 extern chipmunkDemo Pump;
 extern chipmunkDemo WalkBot;
 extern chipmunkDemo TheoJansen;
+extern chipmunkDemo MagnetsElectric;
 
 //extern chipmunkDemo Test;
 
@@ -86,6 +87,7 @@ static chipmunkDemo *demos[] = {
 	&Pump,
 	&WalkBot,
 	&TheoJansen,
+	&MagnetsElectric,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
