@@ -56,6 +56,9 @@ SET(demo_source_files
     Planet.c
     Springies.c
     Pump.c
+    WalkBot.c
+    TheoJansen.c
+    MagnetsElectric.c
     drawSpace.c
     )
 ADD_EXECUTABLE(${CurrentExe} ${demo_source_files})
