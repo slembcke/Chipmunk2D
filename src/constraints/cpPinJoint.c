@@ -19,11 +19,8 @@
  * SOFTWARE.
  */
 
-//#include <stdlib.h>
-//#include <math.h>
-
 #include <stdlib.h>
-#include <math.h>
+//#include <math.h>
 
 #include "../chipmunk.h"
 #include "util.h"
@@ -79,7 +76,7 @@ applyImpulse(cpPinJoint *joint)
 static cpFloat
 getImpulse(cpPinJoint *joint)
 {
-	return fabs(joint->jnAcc);
+	return cpfabs(joint->jnAcc);
 }
 
 const cpConstraintClass cpPinJointClass = {

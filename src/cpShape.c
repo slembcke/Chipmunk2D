@@ -24,7 +24,6 @@
 #include <stdio.h>
 
 #include "chipmunk.h"
-#include "math.h"
 
 unsigned int SHAPE_ID_COUNTER = 0;
 
@@ -185,7 +184,7 @@ cpSegmentShapePointQuery(cpShape *shape, cpVect p){
 	
 	// Calculate normal distance from segment.
 	cpFloat dn = cpvdot(seg->tn, p) - cpvdot(seg->ta, seg->tn);
-	cpFloat dist = fabs(dn) - seg->r;
+	cpFloat dist = cpfabs(dn) - seg->r;
 	if(dist > 0.0f) return 0;
 	
 	// Calculate tangential distance along segment.

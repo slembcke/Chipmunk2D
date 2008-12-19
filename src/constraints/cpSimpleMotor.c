@@ -20,7 +20,6 @@
  */
 
 #include <stdlib.h>
-#include <math.h>
 
 #include "../chipmunk.h"
 #include "util.h"
@@ -65,7 +64,7 @@ applyImpulse(cpSimpleMotor *joint)
 static cpFloat
 getImpulse(cpSimpleMotor *joint)
 {
-	return fabs(joint->jAcc);
+	return cpfabs(joint->jAcc);
 }
 
 const cpConstraintClass cpSimpleMotorClass = {

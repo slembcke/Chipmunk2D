@@ -20,7 +20,6 @@
  */
 
 #include <stdlib.h>
-#include <math.h>
 
 #include "../chipmunk.h"
 #include "util.h"
@@ -32,7 +31,7 @@ preStep(cpGearJoint *joint, cpFloat dt, cpFloat dt_inv)
 	cpBody *b = joint->constraint.b;
 	
 	// calculate moment of inertia coefficient.
-	joint->iSum = 1.0f/(a->i_inv*fabs(joint->ratio) + b->i_inv);
+	joint->iSum = 1.0f/(a->i_inv*cpfabs(joint->ratio) + b->i_inv);
 	
 	// calculate bias velocity
 	cpFloat maxBias = joint->constraint.maxBias;
@@ -69,7 +68,7 @@ applyImpulse(cpGearJoint *joint)
 static cpFloat
 getImpulse(cpGearJoint *joint)
 {
-	return fabs(joint->jAcc);
+	return cpfabs(joint->jAcc);
 }
 
 const cpConstraintClass cpGearJointClass = {

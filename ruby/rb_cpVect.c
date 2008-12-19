@@ -215,7 +215,7 @@ void
 Init_cpVect(void)
 {
 	c_cpVect = rb_define_class_under(m_Chipmunk, "Vec2", rb_cObject);
-	rb_define_singleton_method(c_cpBB, "for_angle", rb_cpVectForAngle, 1);
+	rb_define_singleton_method(c_cpVect, "for_angle", rb_cpVectForAngle, 1);
 	
 	rb_define_alloc_func(c_cpVect, rb_cpVectAlloc);
 	rb_define_method(c_cpVect, "initialize", rb_cpVectInitialize, 2);

@@ -53,7 +53,7 @@ applyImpulse(cpDampedRotarySpring *spring)
 	
 	// compute velocity loss from drag
 	// not 100% certain this is derived correctly, though it makes sense
-	cpFloat w_damp = wrn*(1.0f - exp(-spring->damping*spring->dt/spring->iSum));
+	cpFloat w_damp = wrn*(1.0f - cpfexp(-spring->damping*spring->dt/spring->iSum));
 	spring->target_wrn = wrn - w_damp;
 	
 	//apply_impulses(a, b, spring->r1, spring->r2, cpvmult(spring->n, v_damp*spring->nMass));

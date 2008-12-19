@@ -19,9 +19,6 @@
  * SOFTWARE.
  */
 
-//#include <stdlib.h>
-//#include <math.h>
-
 #include <stdlib.h>
 #include <math.h>
 
@@ -67,7 +64,7 @@ applyImpulse(cpDampedSpring *spring)
 	
 	// compute velocity loss from drag
 	// not 100% certain this is derived correctly, though it makes sense
-	cpFloat v_damp = -vrn*(1.0f - exp(-spring->damping*spring->dt/spring->nMass));
+	cpFloat v_damp = -vrn*(1.0f - cpfexp(-spring->damping*spring->dt/spring->nMass));
 	spring->target_vrn = vrn + v_damp;
 	
 	apply_impulses(a, b, spring->r1, spring->r2, cpvmult(spring->n, v_damp*spring->nMass));

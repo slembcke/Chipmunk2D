@@ -42,7 +42,7 @@ update(int ticks)
 	cpSimpleMotor_set_rate(motor, rate);
 	motor->maxForce = (rate) ? 1000000.0f : 0.0f;
 
-	int steps = 1;
+	int steps = 2;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){

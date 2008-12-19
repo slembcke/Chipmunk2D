@@ -20,7 +20,6 @@
  */
  
 #include <stdlib.h>
-#include <math.h>
 #include <float.h>
 
 #include "chipmunk.h"

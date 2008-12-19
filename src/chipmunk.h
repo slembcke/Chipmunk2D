@@ -25,8 +25,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	
+
 typedef double cpFloat;
+#define cpfsqrt sqrt
+#define cpfsin sin
+#define cpfcos cos
+#define cpfatan2 atan2
+#define cpfmod fmod
+#define cpfexp exp
+#define cpfpow pow
 	
 static inline cpFloat
 cpfmax(cpFloat a, cpFloat b)
@@ -38,6 +45,12 @@ static inline cpFloat
 cpfmin(cpFloat a, cpFloat b)
 {
 	return (a < b) ? a : b;
+}
+
+static inline cpFloat
+cpfabs(cpFloat n)
+{
+	return (n < 0) ? -n : n;
 }
 
 static inline cpFloat

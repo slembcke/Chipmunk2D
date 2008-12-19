@@ -20,7 +20,6 @@
  */
 
 #include <stdlib.h>
-#include <math.h>
 
 #include "../chipmunk.h"
 #include "util.h"
@@ -87,7 +86,7 @@ applyImpulse(cpRotaryLimitJoint *joint)
 static cpFloat
 getImpulse(cpRotaryLimitJoint *joint)
 {
-	return fabs(joint->jAcc);
+	return cpfabs(joint->jAcc);
 }
 
 const cpConstraintClass cpRotaryLimitJointClass = {

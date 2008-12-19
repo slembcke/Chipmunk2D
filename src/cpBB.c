@@ -35,11 +35,11 @@ cpVect
 cpBBWrapVect(const cpBB bb, const cpVect v)
 {
 	cpFloat ix = fabsf(bb.r - bb.l);
-	cpFloat modx = fmodf(v.x - bb.l, ix);
+	cpFloat modx = cpfmod(v.x - bb.l, ix);
 	cpFloat x = (modx > 0.0f) ? modx : modx + ix;
 	
 	cpFloat iy = fabsf(bb.t - bb.b);
-	cpFloat mody = fmodf(v.y - bb.b, iy);
+	cpFloat mody = cpfmod(v.y - bb.b, iy);
 	cpFloat y = (mody > 0.0f) ? mody : mody + iy;
 	
 	return cpv(x + bb.l, y + bb.b);

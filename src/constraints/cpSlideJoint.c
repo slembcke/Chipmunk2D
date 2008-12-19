@@ -20,7 +20,6 @@
  */
 
 #include <stdlib.h>
-#include <math.h>
 
 #include "../chipmunk.h"
 #include "util.h"
@@ -94,7 +93,7 @@ applyImpulse(cpSlideJoint *joint)
 static cpFloat
 getImpulse(cpConstraint *joint)
 {
-	return fabs(((cpSlideJoint *)joint)->jnAcc);
+	return cpfabs(((cpSlideJoint *)joint)->jnAcc);
 }
 
 const cpConstraintClass cpSlideJointClass = {

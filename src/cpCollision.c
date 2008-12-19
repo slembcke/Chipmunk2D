@@ -40,7 +40,7 @@ circle2circleQuery(cpVect p1, cpVect p2, cpFloat r1, cpFloat r2, cpContact **con
 	cpFloat distsq = cpvlengthsq(delta);
 	if(distsq >= mindist*mindist) return 0;
 	
-	cpFloat dist = sqrtf(distsq);
+	cpFloat dist = cpfsqrt(distsq);
 	// To avoid singularities, do nothing in the case of dist = 0.
 	cpFloat non_zero_dist = (dist ? dist : INFINITY);
 
@@ -79,7 +79,7 @@ circle2segment(cpShape *circleShape, cpShape *segmentShape, cpContact **con)
 	
 	// Calculate normal distance from segment.
 	cpFloat dn = cpvdot(seg->tn, circ->tc) - cpvdot(seg->ta, seg->tn);
-	cpFloat dist = fabs(dn) - rsum;
+	cpFloat dist = cpfabs(dn) - rsum;
 	if(dist > 0.0f) return 0;
 	
 	// Calculate tangential distance along segment.
