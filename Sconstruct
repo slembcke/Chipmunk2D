@@ -1,0 +1,7 @@
+# I'm experimenting with using SCons to build one of my own projects.
+# Don't expect too much from this yet.
+
+SConscript([
+	'src/SConscript',
+	'ruby/SConscript',
+])

@@ -1,0 +1,23 @@
+import os
+
+def RBConfig(param):
+	return os.popen('ruby -e"require \'rbconfig\'; print Config::CONFIG[\'' + param + '\']"').read()
+
+#print RBConfig('CFLAGS')
+
+env = Environment(
+	# GCC flags for building libchipmunk
+	CCFLAGS = RBConfig('CFLAGS').split() + ['-O3', '-ffast-math', '-std=gnu99'],
+	CPPPATH = ['../src', '../src/constraints', RBConfig('topdir')],
+)
+
+src = [
+	Glob('*.c'),
+]
+
+env.LoadableModule(
+	'chipmunk.bundle', 
+	src,
+	LIBS=['chipmunk', RBConfig('LIBRUBYARG_SHARED')],
+	LIBPATH='..',
+)
