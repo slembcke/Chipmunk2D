@@ -11,7 +11,9 @@ src = [
 	Glob('constraints/*.c'),
 ]
 
-env.StaticLibrary(
+static_lib = env.StaticLibrary(
 	'../chipmunk', 
 	src,
 )
+
+Default(static_lib)

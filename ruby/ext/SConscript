@@ -8,16 +8,24 @@ def RBConfig(param):
 env = Environment(
 	# GCC flags for building libchipmunk
 	CCFLAGS = RBConfig('CFLAGS').split() + ['-O3', '-ffast-math', '-std=gnu99'],
-	CPPPATH = ['../src', '../src/constraints', RBConfig('topdir')],
+	CPPPATH = ['../../src', '../../src/constraints', RBConfig('topdir')],
 )
 
 src = [
 	Glob('*.c'),
 ]
 
-env.LoadableModule(
-	'chipmunk.bundle', 
+ext = env.LoadableModule(
+	'../chipmunk.bundle', 
 	src,
 	LIBS=['chipmunk', RBConfig('LIBRUBYARG_SHARED')],
-	LIBPATH='..',
+	LIBPATH='../..',
 )
+
+docs = Command(
+	target = '../doc/',
+	source = '../doc_dummy.rb',
+	action = 'cd ruby; rdoc doc_dummy.rb',
+)
+
+Alias('..', [ext, docs])

@@ -3,5 +3,5 @@
 
 SConscript([
 	'src/SConscript',
-	'ruby/SConscript',
+	'ruby/ext/SConscript',
 ])
