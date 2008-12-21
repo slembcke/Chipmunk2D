@@ -4,6 +4,5 @@ SConscriptChdir(0)
 # Don't expect too much from this yet.
 
 SConscript([
-	'src/SConscript',
-	'ruby/SConscript',
+	'SConscript',
 ])
