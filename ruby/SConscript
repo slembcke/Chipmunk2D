@@ -13,9 +13,10 @@ env = Environment(
 )
 
 # OSX UB flags
+SDK = "/Developer/SDKs/MacOSX10.4u.sdk"
 env.Append(
-	CCFLAGS = ['-arch', 'ppc', '-arch', 'i386'],
-	LINKFLAGS = ['-arch', 'ppc', '-arch', 'i386'],
+	CCFLAGS = ['-arch', 'ppc', '-arch', 'i386', '-isysroot', SDK],
+	LINKFLAGS = ['-arch', 'ppc', '-arch', 'i386', '-isysroot', SDK, '-Wl,-syslibroot,' + SDK, '-mmacosx-version-min=10.4'],
 )
 
 src = [
