@@ -56,7 +56,7 @@ module CP
 			space.remove_shape(self)
 		end
 	end
-	
+		
 	module Constraint
 		include CP::Object
 		
@@ -78,10 +78,56 @@ module CP
 			obj.chipmunk_objects.each{|elt| elt.add_to_space(self)}
 		end
 		
+		def add_objects(*objs)
+			objs.each{|obj| add_object(obj)}
+		end
+		
 		def remove_object(obj)
 			obj.chipmunk_objects.each{|elt| elt.remove_from_space(self)}
+		end
+		
+		def remove_objects(*objs)
+			objs.each{|obj| remove_object(obj)}
 		end
 	end
 end
 
 require 'chipmunk'
+
+# Create derived static objects that know to add themselves as static.
+module CP
+	class StaticBody < Body
+		def initialize
+			super(Float::INFINITY, Float::INFINITY)
+		end
+		
+		def chipmunk_objects
+			# return [] instead of [self] so the static body will not be added.
+			[]
+		end
+	end
+	
+	module StaticShape
+		include Shape
+		
+		class Circle < Shape::Circle
+			include StaticShape
+		end
+		
+		class Segment < Shape::Segment
+			include StaticShape
+		end
+		
+		class Poly < Shape::Poly
+			include StaticShape
+		end
+
+		def add_to_space(space)
+			space.add_static_shape(self)
+		end
+		
+		def remove_from_space(space)
+			space.remove_static_shape(self)
+		end
+	end
+end
