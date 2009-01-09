@@ -438,7 +438,7 @@ module CP
     def add_static_shape(shape); end
     
     # Add the given rigid body to the space.
-    def addbody(body); end
+    def add_body(body); end
     
     # Add the given constraint to the space.
     def add_constraint(constraint); end
@@ -450,7 +450,7 @@ module CP
     def remove_static_shape(shape); end
     
     # Remove the given body from the space.
-    def removebody(body); end
+    def remove_body(body); end
    
     # Remove the given constraint from the space.
     def remove_constraint(constraint); end
