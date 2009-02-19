@@ -35,5 +35,5 @@ cpRotaryLimitJoint *cpRotaryLimitJointAlloc(void);
 cpRotaryLimitJoint *cpRotaryLimitJointInit(cpRotaryLimitJoint *joint, cpBody *a, cpBody *b, cpFloat min, cpFloat max);
 cpConstraint *cpRotaryLimitJointNew(cpBody *a, cpBody *b, cpFloat min, cpFloat max);
 
-cpConstraintAccessor(cpRotaryLimitJoint, cpFloat, min);
-cpConstraintAccessor(cpRotaryLimitJoint, cpFloat, max);
+MakeConstraintAccessors(cpRotaryLimitJoint, cpFloat, min);
+MakeConstraintAccessors(cpRotaryLimitJoint, cpFloat, max);

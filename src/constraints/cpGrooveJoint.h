@@ -41,4 +41,4 @@ cpGrooveJoint *cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpV
 cpConstraint *cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);
 
 // TODO setters for the groove.
-cpConstraintAccessor(cpGrooveJoint, cpVect, anchr2);
+MakeConstraintAccessors(cpGrooveJoint, cpVect, anchr2);

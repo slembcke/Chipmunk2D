@@ -35,5 +35,5 @@ cpGearJoint *cpGearJointAlloc(void);
 cpGearJoint *cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
 cpConstraint *cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
 
-cpConstraintAccessor(cpGearJoint, cpFloat, phase);
-cpConstraintAccessor(cpGearJoint, cpFloat, ratio);
+MakeConstraintAccessors(cpGearJoint, cpFloat, phase);
+MakeConstraintAccessors(cpGearJoint, cpFloat, ratio);

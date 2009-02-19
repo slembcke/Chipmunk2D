@@ -51,7 +51,7 @@ void cpConstraintFree(cpConstraint *constraint);
 
 void cpConstraintCheckCast(cpConstraint *constraint, const cpConstraintClass *klass);
 
-#define cpConstraintAccessor(s, t, m) \
+#define MakeConstraintAccessors(s, t, m) \
 static inline t \
 s##_get_##m(cpConstraint *constraint){ \
 	cpConstraintCheckCast(constraint, &s##Class); \
