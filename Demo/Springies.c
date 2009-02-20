@@ -49,7 +49,7 @@ add_bar(cpVect a, cpVect b, int group)
 	cpFloat mass = length/160.0f;
 	
 	cpBody *body = cpBodyNew(mass, mass*length*length/12.0f);
-	body->p = center;
+	body->pos = center;
 	cpSpaceAddBody(space, body);
 	
 	cpShape *shape = cpSegmentShapeNew(body, cpvsub(a, center), cpvsub(b, center), 10.0f);
@@ -83,11 +83,11 @@ init(void)
 	cpBody *body13 = add_bar(cpv(   0, -160), cpv(  80, -160), 0);
 	cpBody *body14 = add_bar(cpv( 160, -160), cpv( 240, -160), 0);
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew( body1,  body2, cpv( 40,-40), cpv(-40,-40)));
-	cpSpaceAddConstraint(space, cpPivotJointNew( body5,  body6, cpv( 40,-40), cpv(-40,-40)));
-	cpSpaceAddConstraint(space, cpPivotJointNew( body6,  body7, cpv( 40, 40), cpv(-40,  0)));
-	cpSpaceAddConstraint(space, cpPivotJointNew( body9, body10, cpv(-40,-40), cpv(-40, 40)));
-	cpSpaceAddConstraint(space, cpPivotJointNew(body11, body12, cpv( 40,-40), cpv(-40,  0)));
+	cpSpaceAddConstraint(space, cpPivotJointNew2( body1,  body2, cpv( 40,-40), cpv(-40,-40)));
+	cpSpaceAddConstraint(space, cpPivotJointNew2( body5,  body6, cpv( 40,-40), cpv(-40,-40)));
+	cpSpaceAddConstraint(space, cpPivotJointNew2( body6,  body7, cpv( 40, 40), cpv(-40,  0)));
+	cpSpaceAddConstraint(space, cpPivotJointNew2( body9, body10, cpv(-40,-40), cpv(-40, 40)));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(body11, body12, cpv( 40,-40), cpv(-40,  0)));
 	
 	cpFloat stiff = 100.0f;
 	cpFloat damp = 0.5f;

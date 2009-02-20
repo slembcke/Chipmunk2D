@@ -77,7 +77,7 @@ cpShapeCacheBB(cpShape *shape)
 {
 	cpBody *body = shape->body;
 	
-	shape->bb = shape->klass->cacheData(shape, body->p, body->rot);
+	shape->bb = shape->klass->cacheData(shape, body->pos, body->rot);
 	return shape->bb;
 }
 
@@ -239,4 +239,44 @@ cpShape*
 cpSegmentShapeNew(cpBody *body, cpVect a, cpVect b, cpFloat r)
 {
 	return (cpShape *)cpSegmentShapeInit(cpSegmentShapeAlloc(), body, a, b, r);
+}
+
+// Unsafe API (chipmunk_unsafe.h)
+
+void
+cpCircleShapeSetRadius(cpShape *shape, cpFloat radius)
+{
+	assert(shape->klass == &circleClass);
+	cpCircleShape *circle = (cpCircleShape *)shape;
+	
+	circle->r = radius;
+}
+
+void
+cpCircleShapeSetCenter(cpShape *shape, cpVect center)
+{
+	assert(shape->klass == &circleClass);
+	cpCircleShape *circle = (cpCircleShape *)shape;
+	
+	circle->c = center;
+}
+
+void
+cpSegmentShapeSetEndpoints(cpShape *shape, cpVect a, cpVect b)
+{
+	assert(shape->klass == &segmentClass);
+	cpSegmentShape *seg = (cpSegmentShape *)shape;
+	
+	seg->a = a;
+	seg->b = b;
+	seg->n = cpvperp(cpvnormalize(cpvsub(b, a)));
+}
+
+void
+cpSegmentShapeSetRadius(cpShape *shape, cpFloat radius)
+{
+	assert(shape->klass == &segmentClass);
+	cpSegmentShape *seg = (cpSegmentShape *)shape;
+	
+	seg->r = radius;
 }

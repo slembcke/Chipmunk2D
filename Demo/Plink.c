@@ -34,9 +34,9 @@ extern cpBody *staticBody;
 static void
 eachBody(cpBody *body, void *unused)
 {
-	if(body->p.y < -260 || fabsf(body->p.x) > 340){
+	if(body->pos.y < -260 || fabsf(body->pos.x) > 340){
 		cpFloat x = rand()/(cpFloat)RAND_MAX*640 - 320;
-		body->p = cpv(x, 260);
+		body->pos = cpv(x, 260);
 	}
 }
 
@@ -100,7 +100,7 @@ init(void)
 	for(int i=0; i<300; i++){
 		body = cpBodyNew(1.0, cpMomentForPoly(1.0, NUM_VERTS, verts, cpvzero));
 		cpFloat x = rand()/(cpFloat)RAND_MAX*640 - 320;
-		body->p = cpv(x, 350);
+		body->pos = cpv(x, 350);
 		
 		cpSpaceAddBody(space, body);
 		shape = cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero);

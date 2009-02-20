@@ -26,6 +26,8 @@
 extern "C" {
 #endif
 
+#define CP_ALLOW_DEPRECATED_API_4
+
 typedef double cpFloat;
 #define cpfsqrt sqrt
 #define cpfsin sin

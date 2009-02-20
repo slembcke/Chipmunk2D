@@ -47,7 +47,7 @@ update(int ticks)
 static void
 planetGravityVelocityFunc(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
-	cpVect p = body->p;
+	cpVect p = body->pos;
 	cpVect g = cpvmult(p, -50000.0f/cpvdot(p, p));
 	
 	cpBodyUpdateVelocity(body, g, damping, dt);
@@ -81,8 +81,8 @@ add_box()
 
 	cpBody *body = cpBodyNew(mass, cpMomentForPoly(mass, 4, verts, cpvzero));
 	body->velocity_func = planetGravityVelocityFunc;
-	body->p = rand_pos(radius);
-	body->v = cpvmult(cpv(2*frand() - 1, 2*frand() - 1), 200);
+	body->pos = rand_pos(radius);
+	body->vel = cpvmult(cpv(2*frand() - 1, 2*frand() - 1), 200);
 	cpSpaceAddBody(space, body);
 
 	cpShape *shape = cpPolyShapeNew(body, 4, verts, cpvzero);
@@ -94,7 +94,7 @@ static cpSpace *
 init(void)
 {
 	staticBody = cpBodyNew(INFINITY, INFINITY);
-	staticBody->w = 0.2f;
+	staticBody->ang_vel = 0.2f;
 	
 	cpResetShapeIdCounter();
 	

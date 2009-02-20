@@ -39,16 +39,16 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	cpBodySetMass(body, m);
 	cpBodySetMoment(body, i);
 
-	body->p = cpvzero;
-	body->v = cpvzero;
-	body->f = cpvzero;
+	body->pos = cpvzero;
+	body->vel = cpvzero;
+	body->force = cpvzero;
 	
 	cpBodySetAngle(body, 0.0f);
-	body->w = 0.0f;
-	body->t = 0.0f;
+	body->ang_vel = 0.0f;
+	body->torque = 0.0f;
 	
-	body->v_bias = cpvzero;
-	body->w_bias = 0.0f;
+	body->vel_bias = cpvzero;
+	body->ang_vel_bias = 0.0f;
 	
 	body->data = NULL;
 //	body->active = 1;
@@ -72,62 +72,62 @@ cpBodyFree(cpBody *body)
 }
 
 void
-cpBodySetMass(cpBody *body, cpFloat m)
+cpBodySetMass(cpBody *body, cpFloat mass)
 {
-	body->m = m;
-	body->m_inv = 1.0f/m;
+	body->mass = mass;
+	body->mass_inv = 1.0f/mass;
 }
 
 void
-cpBodySetMoment(cpBody *body, cpFloat i)
+cpBodySetMoment(cpBody *body, cpFloat moment)
 {
-	body->i = i;
-	body->i_inv = 1.0f/i;
+	body->moment = moment;
+	body->moment_inv = 1.0f/moment;
 }
 
 void
-cpBodySetAngle(cpBody *body, cpFloat a)
+cpBodySetAngle(cpBody *body, cpFloat angle)
 {
-	body->a = a;//fmod(a, (cpFloat)M_PI*2.0f);
-	body->rot = cpvforangle(a);
+	body->angle = angle;//fmod(a, (cpFloat)M_PI*2.0f);
+	body->rot = cpvforangle(angle);
 }
 
 void
 cpBodySlew(cpBody *body, cpVect pos, cpFloat dt)
 {
-	cpVect delta = cpvsub(pos, body->p);
-	body->v = cpvmult(delta, 1.0/dt);
+	cpVect delta = cpvsub(pos, body->pos);
+	body->vel = cpvmult(delta, 1.0/dt);
 }
 
 void
 cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
-	body->v = cpvadd(cpvmult(body->v, damping), cpvmult(cpvadd(gravity, cpvmult(body->f, body->m_inv)), dt));
-	body->w = body->w*damping + body->t*body->i_inv*dt;
+	body->vel = cpvadd(cpvmult(body->vel, damping), cpvmult(cpvadd(gravity, cpvmult(body->force, body->mass_inv)), dt));
+	body->ang_vel = body->ang_vel*damping + body->torque*body->moment_inv*dt;
 }
 
 void
 cpBodyUpdatePosition(cpBody *body, cpFloat dt)
 {
-	body->p = cpvadd(body->p, cpvmult(cpvadd(body->v, body->v_bias), dt));
-	cpBodySetAngle(body, body->a + (body->w + body->w_bias)*dt);
+	body->pos = cpvadd(body->pos, cpvmult(cpvadd(body->vel, body->vel_bias), dt));
+	cpBodySetAngle(body, body->angle + (body->ang_vel + body->ang_vel_bias)*dt);
 	
-	body->v_bias = cpvzero;
-	body->w_bias = 0.0f;
+	body->vel_bias = cpvzero;
+	body->ang_vel_bias = 0.0f;
 }
 
 void
 cpBodyResetForces(cpBody *body)
 {
-	body->f = cpvzero;
-	body->t = 0.0f;
+	body->force = cpvzero;
+	body->torque = 0.0f;
 }
 
 void
-cpBodyApplyForce(cpBody *body, cpVect f, cpVect r)
+cpBodyApplyForce(cpBody *body, cpVect force, cpVect r)
 {
-	body->f = cpvadd(body->f, f);
-	body->t += cpvcross(r, f);
+	body->force = cpvadd(body->force, force);
+	body->torque += cpvcross(r, force);
 }
 
 void
@@ -137,20 +137,20 @@ cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat 
 	cpVect r1 = cpvrotate(anchr1, a->rot);
 	cpVect r2 = cpvrotate(anchr2, b->rot);
 	
-	cpVect delta = cpvsub(cpvadd(b->p, r2), cpvadd(a->p, r1));
+	cpVect delta = cpvsub(cpvadd(b->pos, r2), cpvadd(a->pos, r1));
 	cpFloat dist = cpvlength(delta);
 	cpVect n = dist ? cpvmult(delta, 1.0f/dist) : cpvzero;
 	
 	cpFloat f_spring = (dist - rlen)*k;
 
 	// Calculate the world relative velocities of the anchor points.
-	cpVect v1 = cpvadd(a->v, cpvmult(cpvperp(r1), a->w));
-	cpVect v2 = cpvadd(b->v, cpvmult(cpvperp(r2), b->w));
+	cpVect v1 = cpvadd(a->vel, cpvmult(cpvperp(r1), a->ang_vel));
+	cpVect v2 = cpvadd(b->vel, cpvmult(cpvperp(r2), b->ang_vel));
 	
 	// Calculate the damping force.
 	// This really should be in the impulse solver and can produce problems when using large damping values.
 	cpFloat vrn = cpvdot(cpvsub(v2, v1), n);
-	cpFloat f_damp = vrn*cpfmin(dmp, 1.0f/(dt*(a->m_inv + b->m_inv)));
+	cpFloat f_damp = vrn*cpfmin(dmp, 1.0f/(dt*(a->mass_inv + b->mass_inv)));
 	
 	// Apply!
 	cpVect f = cpvmult(n, f_spring + f_damp);

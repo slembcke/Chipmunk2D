@@ -34,7 +34,7 @@ preStep(cpPinJoint *joint, cpFloat dt, cpFloat dt_inv)
 	joint->r1 = cpvrotate(joint->anchr1, a->rot);
 	joint->r2 = cpvrotate(joint->anchr2, b->rot);
 	
-	cpVect delta = cpvsub(cpvadd(b->p, joint->r2), cpvadd(a->p, joint->r1));
+	cpVect delta = cpvsub(cpvadd(b->pos, joint->r2), cpvadd(a->pos, joint->r1));
 	cpFloat dist = cpvlength(delta);
 	joint->n = cpvmult(delta, 1.0f/(dist ? dist : INFINITY));
 	
@@ -99,8 +99,8 @@ cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect an
 	joint->anchr1 = anchr1;
 	joint->anchr2 = anchr2;
 	
-	cpVect p1 = cpvadd(a->p, cpvrotate(anchr1, a->rot));
-	cpVect p2 = cpvadd(b->p, cpvrotate(anchr2, b->rot));
+	cpVect p1 = cpvadd(a->pos, cpvrotate(anchr1, a->rot));
+	cpVect p2 = cpvadd(b->pos, cpvrotate(anchr2, b->rot));
 	joint->dist = cpvlength(cpvsub(p2, p1));
 
 	joint->jnAcc = 0.0;

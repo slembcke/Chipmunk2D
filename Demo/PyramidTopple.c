@@ -81,14 +81,14 @@ init(void)
 		
 		for(int j=0; j<i; j++){
 			body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
-			body->p = cpvadd(cpv(j*60, -220), offset);
+			body->pos = cpvadd(cpv(j*60, -220), offset);
 			cpSpaceAddBody(space, body);
 			shape = cpPolyShapeNew(body, num, verts, cpvzero);
 			shape->e = 0.0; shape->u = u;
 			cpSpaceAddShape(space, shape);
 
 			body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
-			body->p = cpvadd(cpv(j*60, -197), offset);
+			body->pos = cpvadd(cpv(j*60, -197), offset);
 			cpBodySetAngle(body, M_PI/2.0f);
 			cpSpaceAddBody(space, body);
 			shape = cpPolyShapeNew(body, num, verts, cpvzero);
@@ -97,7 +97,7 @@ init(void)
 			
 			if(j == (i - 1)) continue;
 			body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
-			body->p = cpvadd(cpv(j*60 + 30, -191), offset);
+			body->pos = cpvadd(cpv(j*60 + 30, -191), offset);
 			cpBodySetAngle(body, M_PI/2.0f);
 			cpSpaceAddBody(space, body);
 			shape = cpPolyShapeNew(body, num, verts, cpvzero);
@@ -106,14 +106,14 @@ init(void)
 		}
 
 		body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
-		body->p = cpvadd(cpv(-17, -174), offset);
+		body->pos = cpvadd(cpv(-17, -174), offset);
 		cpSpaceAddBody(space, body);
 		shape = cpPolyShapeNew(body, num, verts, cpvzero);
 		shape->e = 0.0; shape->u = u;
 		cpSpaceAddShape(space, shape);		
 
 		body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
-		body->p = cpvadd(cpv((i - 1)*60 + 17, -174), offset);
+		body->pos = cpvadd(cpv((i - 1)*60 + 17, -174), offset);
 		cpSpaceAddBody(space, body);
 		shape = cpPolyShapeNew(body, num, verts, cpvzero);
 		shape->e = 0.0; shape->u = u;

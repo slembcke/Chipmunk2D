@@ -50,6 +50,8 @@
 		D34963D70B56CBBF00CAD239 /* cpShape.c in Sources */ = {isa = PBXBuildFile; fileRef = D37E22FD0AAA63B800BB4C50 /* cpShape.c */; };
 		D34963D80B56CBBF00CAD239 /* cpCollision.c in Sources */ = {isa = PBXBuildFile; fileRef = D37E231F0AAA728A00BB4C50 /* cpCollision.c */; };
 		D34963D90B56CBBF00CAD239 /* cpSpace.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E5F2CF0AAA5589004E361B /* cpSpace.c */; };
+		D35420C00F4E1FD70017F4F7 /* chipmunk_unsafe.h in Headers */ = {isa = PBXBuildFile; fileRef = D35420BF0F4E1FD70017F4F7 /* chipmunk_unsafe.h */; };
+		D35422EC0F4E769F0017F4F7 /* UnsafeOps.c in Sources */ = {isa = PBXBuildFile; fileRef = D35422EB0F4E769F0017F4F7 /* UnsafeOps.c */; };
 		D36B19510EA13B6D0028A362 /* cpDampedRotarySpring.c in Sources */ = {isa = PBXBuildFile; fileRef = D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */; };
 		D36B196F0EA13BA20028A362 /* Test.c in Sources */ = {isa = PBXBuildFile; fileRef = D36B196E0EA13BA20028A362 /* Test.c */; };
 		D37697200B50C53900BB33CC /* LogoSmash.c in Sources */ = {isa = PBXBuildFile; fileRef = D3CCDF460AE35D920080442F /* LogoSmash.c */; };
@@ -120,13 +122,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		D3057A240B6F4FBE00856BA5 /* rb_cpJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpJoint.c; path = ../ruby/rb_cpJoint.c; sourceTree = "<group>"; };
 		D30CE25D0B52535500427129 /* cpHashSet.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpHashSet.c; sourceTree = "<group>"; };
 		D30CE25E0B52535500427129 /* cpHashSet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cpHashSet.h; sourceTree = "<group>"; };
 		D31402940E9DD07E00EF79DB /* Springies.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Springies.c; sourceTree = "<group>"; };
 		D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = TheoJansen.c; sourceTree = "<group>"; };
 		D34963BB0B56CAA300CAD239 /* libChipmunk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libChipmunk.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D353B6480B059C5F0038D274 /* prime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prime.h; sourceTree = "<group>"; };
+		D35420BF0F4E1FD70017F4F7 /* chipmunk_unsafe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_unsafe.h; path = ../src/chipmunk_unsafe.h; sourceTree = SOURCE_ROOT; };
+		D35422EB0F4E769F0017F4F7 /* UnsafeOps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UnsafeOps.c; sourceTree = "<group>"; };
 		D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpDampedRotarySpring.c; sourceTree = "<group>"; };
 		D36B192E0EA1364E0028A362 /* cpDampedRotarySpring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpDampedRotarySpring.h; sourceTree = "<group>"; };
 		D36B196E0EA13BA20028A362 /* Test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Test.c; sourceTree = "<group>"; };
@@ -166,16 +169,6 @@
 		D3BC99AB0AB381AF0025A2C0 /* cpPolyShape.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpPolyShape.c; sourceTree = "<group>"; };
 		D3BC99AC0AB381AF0025A2C0 /* cpPolyShape.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cpPolyShape.h; sourceTree = "<group>"; };
 		D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = ChipmunkDemo.c; sourceTree = "<group>"; };
-		D3C4FD290AE6DECA00339F3A /* extconf.rb */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.ruby; name = extconf.rb; path = ../ruby/extconf.rb; sourceTree = "<group>"; };
-		D3C4FD2A0AE6DECA00339F3A /* rb_chipmunk.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = rb_chipmunk.c; path = ../ruby/rb_chipmunk.c; sourceTree = "<group>"; };
-		D3C4FD2B0AE6DECA00339F3A /* rb_chipmunk.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = rb_chipmunk.h; path = ../ruby/rb_chipmunk.h; sourceTree = "<group>"; };
-		D3C4FD300AE6DF5000339F3A /* intern.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = intern.h; path = "/usr/lib/ruby/1.8/universal-darwin8.0/intern.h"; sourceTree = "<absolute>"; };
-		D3C4FD310AE6DF5000339F3A /* ruby.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ruby.h; path = "/usr/lib/ruby/1.8/universal-darwin8.0/ruby.h"; sourceTree = "<absolute>"; };
-		D3C4FD460AE6E1C100339F3A /* rb_cpSpace.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpSpace.c; path = ../ruby/rb_cpSpace.c; sourceTree = "<group>"; };
-		D3C4FD490AE6E1D100339F3A /* rb_cpBody.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpBody.c; path = ../ruby/rb_cpBody.c; sourceTree = "<group>"; };
-		D3C4FD4C0AE6E1EA00339F3A /* rb_cpBB.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpBB.c; path = ../ruby/rb_cpBB.c; sourceTree = "<group>"; };
-		D3C4FD510AE6E20D00339F3A /* rb_cpVect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpVect.c; path = ../ruby/rb_cpVect.c; sourceTree = "<group>"; };
-		D3C4FD570AE6E33000339F3A /* rb_cpShape.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rb_cpShape.c; path = ../ruby/rb_cpShape.c; sourceTree = "<group>"; };
 		D3CCDF460AE35D920080442F /* LogoSmash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LogoSmash.c; sourceTree = "<group>"; };
 		D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemo.h; sourceTree = "<group>"; };
 		D3E4A95B0E9963DD00EE08BA /* cpBreakableJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpBreakableJoint.h; sourceTree = "<group>"; };
@@ -283,24 +276,6 @@
 			path = ../src/constraints;
 			sourceTree = SOURCE_ROOT;
 		};
-		D3C4FD280AE6DEB000339F3A /* Ruby */ = {
-			isa = PBXGroup;
-			children = (
-				D3C4FD300AE6DF5000339F3A /* intern.h */,
-				D3C4FD310AE6DF5000339F3A /* ruby.h */,
-				D3C4FD290AE6DECA00339F3A /* extconf.rb */,
-				D3C4FD2B0AE6DECA00339F3A /* rb_chipmunk.h */,
-				D3C4FD2A0AE6DECA00339F3A /* rb_chipmunk.c */,
-				D3C4FD510AE6E20D00339F3A /* rb_cpVect.c */,
-				D3C4FD4C0AE6E1EA00339F3A /* rb_cpBB.c */,
-				D3C4FD490AE6E1D100339F3A /* rb_cpBody.c */,
-				D3C4FD570AE6E33000339F3A /* rb_cpShape.c */,
-				D3057A240B6F4FBE00856BA5 /* rb_cpJoint.c */,
-				D3C4FD460AE6E1C100339F3A /* rb_cpSpace.c */,
-			);
-			name = Ruby;
-			sourceTree = "<group>";
-		};
 		D3CCDF5B0AE35DA00080442F /* Demo */ = {
 			isa = PBXGroup;
 			children = (
@@ -320,6 +295,7 @@
 				D3F165320EB3C4960053F15F /* WalkBot.c */,
 				D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */,
 				D3EDBC240ED935F40027D943 /* MagnetsElectric.c */,
+				D35422EB0F4E769F0017F4F7 /* UnsafeOps.c */,
 				D36B196E0EA13BA20028A362 /* Test.c */,
 			);
 			name = Demo;
@@ -332,6 +308,7 @@
 				D380121A0E98707600A3D7FA /* test.c */,
 				D3CCDF5B0AE35DA00080442F /* Demo */,
 				D3E5F0C40AA75CC3004E361B /* chipmunk.h */,
+				D35420BF0F4E1FD70017F4F7 /* chipmunk_unsafe.h */,
 				D3B718E00AB2BC8900B500C9 /* chipmunk.c */,
 				D3E5F2F30AAA575E004E361B /* Basics */,
 				D3E5F0DD0AAA2273004E361B /* cpBody.h */,
@@ -340,7 +317,6 @@
 				D3800E0E0E9815FC00A3D7FA /* constraints */,
 				D3E5F2CE0AAA5589004E361B /* cpSpace.h */,
 				D3E5F2CF0AAA5589004E361B /* cpSpace.c */,
-				D3C4FD280AE6DEB000339F3A /* Ruby */,
 				D3E5F0520AA32FF5004E361B /* frameworks */,
 				D3E5F04A0AA32FDE004E361B /* Products */,
 				D3E5F04C0AA32FDE004E361B /* main-Info.plist */,
@@ -410,6 +386,7 @@
 				D37BB76F0EAADA6300C70958 /* cpRotaryLimitJoint.h in Headers */,
 				D37BB8B40EAB01E400C70958 /* cpGearJoint.h in Headers */,
 				D37BB8F10EAB06B600C70958 /* cpSimpleMotor.h in Headers */,
+				D35420C00F4E1FD70017F4F7 /* chipmunk_unsafe.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -573,6 +550,7 @@
 				D3F165330EB3C4960053F15F /* WalkBot.c in Sources */,
 				D3185D200EC5610A00E6BFCB /* TheoJansen.c in Sources */,
 				D3EDBC250ED935F40027D943 /* MagnetsElectric.c in Sources */,
+				D35422EC0F4E769F0017F4F7 /* UnsafeOps.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

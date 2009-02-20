@@ -108,7 +108,7 @@ int cpShapePointQuery(cpShape *shape, cpVect p);
 typedef struct cpCircleShape{
 	cpShape shape;
 	
-	// Center. (body space coordinates)
+	// Center in body space coordinates
 	cpVect c;
 	// Radius.
 	cpFloat r;

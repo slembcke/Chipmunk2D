@@ -21,6 +21,7 @@
  
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "chipmunk.h"
 
@@ -106,9 +107,9 @@ static const cpShapeClass polyClass = {
 	cpPolyShapePointQuery,
 };
 
-cpPolyShape *
-cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, cpVect *verts, cpVect offset)
-{	
+static void
+setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
+{
 	poly->numVerts = numVerts;
 
 	poly->verts = (cpVect *)calloc(numVerts, sizeof(cpVect));
@@ -125,7 +126,12 @@ cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, cpVect *verts, cp
 		poly->axes[i].n = n;
 		poly->axes[i].d = cpvdot(n, a);
 	}
-	
+}
+
+cpPolyShape *
+cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, cpVect *verts, cpVect offset)
+{
+	setUpVerts(poly, numVerts, verts, offset);
 	cpShapeInit((cpShape *)poly, &polyClass, body);
 
 	return poly;
@@ -135,4 +141,14 @@ cpShape *
 cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset)
 {
 	return (cpShape *)cpPolyShapeInit(cpPolyShapeAlloc(), body, numVerts, verts, offset);
+}
+
+// Unsafe API (chipmunk_unsafe.h)
+
+void
+cpPolyShapeSetVerts(cpShape *shape, int numVerts, cpVect *verts, cpVect offset)
+{
+	assert(shape->klass == &polyClass);
+	cpPolyShapeDestroy(shape);
+	setUpVerts((cpPolyShape *)shape, numVerts, verts, offset);
 }

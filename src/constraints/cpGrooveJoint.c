@@ -42,17 +42,17 @@ preStep(cpGrooveJoint *joint, cpFloat dt, cpFloat dt_inv)
 	joint->r2 = cpvrotate(joint->anchr2, b->rot);
 	
 	// calculate tangential distance along the axis of r2
-	cpFloat td = cpvcross(cpvadd(b->p, joint->r2), n);
+	cpFloat td = cpvcross(cpvadd(b->pos, joint->r2), n);
 	// calculate clamping factor and r2
 	if(td <= cpvcross(ta, n)){
 		joint->clamp = 1.0f;
-		joint->r1 = cpvsub(ta, a->p);
+		joint->r1 = cpvsub(ta, a->pos);
 	} else if(td >= cpvcross(tb, n)){
 		joint->clamp = -1.0f;
-		joint->r1 = cpvsub(tb, a->p);
+		joint->r1 = cpvsub(tb, a->pos);
 	} else {
 		joint->clamp = 0.0f;
-		joint->r1 = cpvsub(cpvadd(cpvmult(cpvperp(n), -td), cpvmult(n, d)), a->p);
+		joint->r1 = cpvsub(cpvadd(cpvmult(cpvperp(n), -td), cpvmult(n, d)), a->pos);
 	}
 	
 	// Calculate mass tensor
@@ -62,7 +62,7 @@ preStep(cpGrooveJoint *joint, cpFloat dt, cpFloat dt_inv)
 	joint->jMaxLen = J_MAX(joint, dt);
 	
 	// calculate bias velocity
-	cpVect delta = cpvsub(cpvadd(b->p, joint->r2), cpvadd(a->p, joint->r1));
+	cpVect delta = cpvsub(cpvadd(b->pos, joint->r2), cpvadd(a->pos, joint->r1));
 	joint->bias = clamp_vect(cpvmult(delta, -joint->constraint.biasCoef*dt_inv), joint->constraint.maxBias);
 	
 	// apply accumulated impulse

@@ -34,7 +34,7 @@ preStep(cpDampedSpring *spring, cpFloat dt, cpFloat dt_inv)
 	spring->r1 = cpvrotate(spring->anchr1, a->rot);
 	spring->r2 = cpvrotate(spring->anchr2, b->rot);
 	
-	cpVect delta = cpvsub(cpvadd(b->p, spring->r2), cpvadd(a->p, spring->r1));
+	cpVect delta = cpvsub(cpvadd(b->pos, spring->r2), cpvadd(a->pos, spring->r1));
 	cpFloat dist = cpvlength(delta);
 	spring->n = cpvmult(delta, 1.0f/(dist ? dist : INFINITY));
 	

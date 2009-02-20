@@ -56,15 +56,15 @@ add_leg(cpBody *chassis, cpBody *crank, cpFloat crankOffset)
 	cpFloat legMoment = cpMomentForSegment(legMass, leg_a, leg_b);
 	
 	cpBody *body = cpBodyNew(legMass, legMoment);
-	body->p = cpvadd(crank->p, cpv(0.0f, -legHLength + crankOffset));
+	body->pos = cpvadd(crank->pos, cpv(0.0f, -legHLength + crankOffset));
 	cpSpaceAddBody(space, body);
 	
 	cpShape *shape = cpSegmentShapeNew(body, leg_a, leg_b, 5.0f);
 	shape->group = 1;
 	cpSpaceAddShape(space, shape);
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew(crank, body, cpv(0.0f, crankOffset), cpv(0.0f, legHLength)));
-	cpSpaceAddConstraint(space, cpGrooveJointNew(body, chassis, cpv(0.0f, legHLength), cpv(0.0f, -legHLength), cpv(crank->p.x - chassis->p.x, 0.0f)));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(crank, body, cpv(0.0f, crankOffset), cpv(0.0f, legHLength)));
+	cpSpaceAddConstraint(space, cpGrooveJointNew(body, chassis, cpv(0.0f, legHLength), cpv(0.0f, -legHLength), cpv(crank->pos.x - chassis->pos.x, 0.0f)));
 	
 	// add a foot
 	shape = cpCircleShapeNew(body, 10.0f, cpv(0.0f, -legHLength));
@@ -114,7 +114,7 @@ init(void)
 	};
 	
 	cpBody *chassis = body = cpBodyNew(chassisMass, cpMomentForPoly(chassisMass, num, verts, cpvzero));
-	body->p = cpv(200, -150);
+	body->pos = cpv(200, -150);
 	cpSpaceAddBody(space, body);
 	
 	shape = cpPolyShapeNew(body, num, verts, cpvzero);
@@ -131,7 +131,7 @@ init(void)
 	cpFloat crankYOffset = crankRadius + 30.0f;
 	
 	cpBody *crank1 = body = cpBodyNew(crankMass, crankMoment);
-	body->p = cpvadd(chassis->p, cpv(crankXOffset, crankYOffset));
+	body->pos = cpvadd(chassis->pos, cpv(crankXOffset, crankYOffset));
 	cpSpaceAddBody(space, body);
 	
 	shape = cpCircleShapeNew(body, crankRadius, cpvzero);
@@ -139,10 +139,10 @@ init(void)
 	shape->group = 1;
 	cpSpaceAddShape(space, shape);
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew(chassis, crank1, cpv(crankXOffset, crankYOffset), cpvzero));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(chassis, crank1, cpv(crankXOffset, crankYOffset), cpvzero));
 	
 	cpBody *crank2 = body = cpBodyNew(crankMass, crankMoment);
-	body->p = cpvadd(chassis->p, cpv(-crankXOffset, crankYOffset));
+	body->pos = cpvadd(chassis->pos, cpv(-crankXOffset, crankYOffset));
 	cpSpaceAddBody(space, body);
 	
 	shape = cpCircleShapeNew(body, crankRadius, cpvzero);
@@ -150,7 +150,7 @@ init(void)
 	shape->group = 1;
 	cpSpaceAddShape(space, shape);
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew(chassis, crank2, cpv(-crankXOffset, crankYOffset), cpvzero));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(chassis, crank2, cpv(-crankXOffset, crankYOffset), cpvzero));
 	
 	motor = cpSimpleMotorNew(chassis, crank1, crankSpeed);
 	cpSpaceAddConstraint(space, motor);

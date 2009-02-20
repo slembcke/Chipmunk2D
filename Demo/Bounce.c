@@ -57,8 +57,8 @@ add_box()
 	cpFloat radius = cpvlength(cpv(size, size));
 
 	cpBody *body = cpBodyNew(mass, cpMomentForPoly(mass, 4, verts, cpvzero));
-	body->p = cpv(frand()*(640 - 2*radius) - (320 - radius), frand()*(480 - 2*radius) - (240 - radius));
-	body->v = cpvmult(cpv(2*frand() - 1, 2*frand() - 1), 200);
+	body->pos = cpv(frand()*(640 - 2*radius) - (320 - radius), frand()*(480 - 2*radius) - (240 - radius));
+	body->vel = cpvmult(cpv(2*frand() - 1, 2*frand() - 1), 200);
 	cpSpaceAddBody(space, body);
 
 	cpShape *shape = cpPolyShapeNew(body, 4, verts, cpvzero);
@@ -106,7 +106,7 @@ init(void)
 	shape->e = 1.0; shape->u = 1.0;
 	cpSpaceAddShape(space, shape);
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew(body, staticBody, cpvzero, cpvzero));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(body, staticBody, cpvzero, cpvzero));
 	
 	return space;
 }

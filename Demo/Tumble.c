@@ -100,13 +100,13 @@ init(void)
 	// update it ourselves. (see above).
 	// NOTE: Normally you would want to add the segments as normal and not static shapes.
 	// I'm just doing it to demonstrate the cpSpaceRehashStatic() function.
-	staticBody->w = 0.4;
+	staticBody->ang_vel = 0.4;
 	
 	// Add the bricks.
 	for(int i=0; i<3; i++){
 		for(int j=0; j<7; j++){
 			body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
-			body->p = cpv(i*60 - 150, j*30 - 150);
+			body->pos = cpv(i*60 - 150, j*30 - 150);
 			cpSpaceAddBody(space, body);
 			shape = cpPolyShapeNew(body, num, verts, cpvzero);
 			shape->e = 0.0; shape->u = 0.7;

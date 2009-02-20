@@ -50,19 +50,19 @@ update(int ticks)
 		
 		for(int i=0; i<numBalls; i++){
 			cpBody *ball = balls[i];
-			if(ball->p.x > 320.0){
-				ball->v = cpvzero;
-				ball->p = cpv(-224.0, 200.0f);
+			if(ball->pos.x > 320.0){
+				ball->vel = cpvzero;
+				ball->pos = cpv(-224.0, 200.0f);
 			}
 		}
 	}
 }
 
 static cpBody *
-add_ball(cpVect p)
+add_ball(cpVect pos)
 {
 	cpBody *body = cpBodyNew(1.0f, cpMomentForCircle(1.0f, 30, 0, cpvzero));
-	body->p = p;
+	body->pos = pos;
 	cpSpaceAddBody(space, body);
 	
 	cpShape *shape = cpCircleShapeNew(body, 30, cpvzero);
@@ -119,7 +119,7 @@ init(void)
 	};
 
 	cpBody *plunger = cpBodyNew(1.0f, INFINITY);
-	plunger->p = cpv(-160,-80);
+	plunger->pos = cpv(-160,-80);
 	cpSpaceAddBody(space, plunger);
 	
 	shape = cpPolyShapeNew(plunger, 4, verts, cpvzero);
@@ -132,7 +132,7 @@ init(void)
 	
 	// add small gear
 	cpBody *smallGear = cpBodyNew(10.0f, cpMomentForCircle(10.0f, 80, 0, cpvzero));
-	smallGear->p = cpv(-160,-160);
+	smallGear->pos = cpv(-160,-160);
 	cpBodySetAngle(smallGear, -M_PI_2);
 	cpSpaceAddBody(space, smallGear);
 
@@ -140,11 +140,11 @@ init(void)
 	shape->layers = 0;
 	cpSpaceAddShape(space, shape);
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew(staticBody, smallGear, cpv(-160,-160), cpvzero));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, smallGear, cpv(-160,-160), cpvzero));
 
 	// add big gear
 	cpBody *bigGear = cpBodyNew(40.0f, cpMomentForCircle(40.0f, 160, 0, cpvzero));
-	bigGear->p = cpv(80,-160);
+	bigGear->pos = cpv(80,-160);
 	cpBodySetAngle(bigGear, M_PI_2);
 	cpSpaceAddBody(space, bigGear);
 	
@@ -152,7 +152,7 @@ init(void)
 	shape->layers = 0;
 	cpSpaceAddShape(space, shape);
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew(staticBody, bigGear, cpv(80,-160), cpvzero));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, bigGear, cpv(80,-160), cpvzero));
 
 	// connect the plunger to the small gear.
 	cpSpaceAddConstraint(space, cpPinJointNew(smallGear, plunger, cpv(80,0), cpv(0,0)));
@@ -164,14 +164,14 @@ init(void)
 	cpFloat bottom = -300.0f;
 	cpFloat top = 32.0f;
 	cpBody *feeder = cpBodyNew(1.0f, cpMomentForSegment(1.0f, cpv(-224.0f, bottom), cpv(-224.0f, top)));
-	feeder->p = cpv(-224, (bottom + top)/2.0);
+	feeder->pos = cpv(-224, (bottom + top)/2.0);
 	cpSpaceAddBody(space, feeder);
 	
 	cpFloat len = top - bottom;
 	shape = cpSegmentShapeNew(feeder, cpv(0.0f, len/2.0f), cpv(0.0f, -len/2.0f), 20.0f);
 	cpSpaceAddShape(space, shape);
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew(staticBody, feeder, cpv(-224.0f, bottom), cpv(0.0f, -len/2.0)));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, feeder, cpv(-224.0f, bottom), cpv(0.0f, -len/2.0)));
 	cpVect anchr = cpBodyWorld2Local(feeder, cpv(-224.0f, -160.0f));
 	cpSpaceAddConstraint(space, cpPinJointNew(feeder, smallGear, anchr, cpv(0.0f, 80.0f)));
 

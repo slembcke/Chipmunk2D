@@ -242,7 +242,7 @@ Init_cpBody(void)
 	rb_define_method(c_cpBody, "pos=", rb_cpBodySetPos, 1);
 	rb_define_method(c_cpBody, "vel=", rb_cpBodySetVel, 1);
 	rb_define_method(c_cpBody, "force=", rb_cpBodySetForce, 1);
-	rb_define_method(c_cpBody, "angl=", rb_cpBodySetAngle, 1);
+	rb_define_method(c_cpBody, "angle=", rb_cpBodySetAngle, 1);
 	rb_define_method(c_cpBody, "ang_vel=", rb_cpBodySetAVel, 1);
 	rb_define_method(c_cpBody, "torque=", rb_cpBodySetTorque, 1);
 	

@@ -67,15 +67,15 @@ make_leg(cpFloat side, cpFloat offset, cpBody *chassis, cpBody *crank, cpVect an
 	// make leg
 	a = cpvzero, b = cpv(0.0f, side);
 	cpBody *upper_leg = cpBodyNew(leg_mass, cpMomentForSegment(leg_mass, a, b));
-	upper_leg->p = cpv(offset, 0.0f);
+	upper_leg->pos = cpv(offset, 0.0f);
 	cpSpaceAddBody(space, upper_leg);
 	cpSpaceAddShape(space, cpSegmentShapeNew(upper_leg, a, b, seg_radius));
-	cpSpaceAddConstraint(space, cpPivotJointNew(chassis, upper_leg, cpv(offset, 0.0f), cpvzero));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(chassis, upper_leg, cpv(offset, 0.0f), cpvzero));
 	
 	// lower leg
 	a = cpvzero, b = cpv(0.0f, -1.0f*side);
 	cpBody *lower_leg = cpBodyNew(leg_mass, cpMomentForSegment(leg_mass, a, b));
-	lower_leg->p = cpv(offset, -side);
+	lower_leg->pos = cpv(offset, -side);
 	cpSpaceAddBody(space, lower_leg);
 	shape = cpSegmentShapeNew(lower_leg, a, b, seg_radius);
 	shape->group = 1;
@@ -146,7 +146,7 @@ init(void)
 	shape = cpCircleShapeNew(crank, crank_radius, cpvzero);
 	shape->group = 1;
 	cpSpaceAddShape(space, shape);
-	cpSpaceAddConstraint(space, cpPivotJointNew(chassis, crank, cpvzero, cpvzero));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(chassis, crank, cpvzero, cpvzero));
 	
 	cpFloat side = 30.0f;
 	

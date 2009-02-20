@@ -152,22 +152,22 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv)
 		cpContact *con = &arb->contacts[i];
 		
 		// Calculate the offsets.
-		con->r1 = cpvsub(con->p, a->p);
-		con->r2 = cpvsub(con->p, b->p);
+		con->r1 = cpvsub(con->p, a->pos);
+		con->r2 = cpvsub(con->p, b->pos);
 		
 		// Calculate the mass normal.
-		cpFloat mass_sum = a->m_inv + b->m_inv;
+		cpFloat mass_sum = a->mass_inv + b->mass_inv;
 		
 		cpFloat r1cn = cpvcross(con->r1, con->n);
 		cpFloat r2cn = cpvcross(con->r2, con->n);
-		cpFloat kn = mass_sum + a->i_inv*r1cn*r1cn + b->i_inv*r2cn*r2cn;
+		cpFloat kn = mass_sum + a->moment_inv*r1cn*r1cn + b->moment_inv*r2cn*r2cn;
 		con->nMass = 1.0f/kn;
 		
 		// Calculate the mass tangent.
 		cpVect t = cpvperp(con->n);
 		cpFloat r1ct = cpvcross(con->r1, t);
 		cpFloat r2ct = cpvcross(con->r2, t);
-		cpFloat kt = mass_sum + a->i_inv*r1ct*r1ct + b->i_inv*r2ct*r2ct;
+		cpFloat kt = mass_sum + a->moment_inv*r1ct*r1ct + b->moment_inv*r2ct*r2ct;
 		con->tMass = 1.0f/kt;
 				
 		// Calculate the target bias velocity.
@@ -175,8 +175,8 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv)
 		con->jBias = 0.0f;
 		
 		// Calculate the target bounce velocity.
-		cpVect v1 = cpvadd(a->v, cpvmult(cpvperp(con->r1), a->w));
-		cpVect v2 = cpvadd(b->v, cpvmult(cpvperp(con->r2), b->w));
+		cpVect v1 = cpvadd(a->vel, cpvmult(cpvperp(con->r1), a->ang_vel));
+		cpVect v2 = cpvadd(b->vel, cpvmult(cpvperp(con->r2), b->ang_vel));
 		con->bounce = cpvdot(con->n, cpvsub(v2, v1))*e;
 	}
 }
@@ -216,8 +216,8 @@ cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef)
 		cpVect r2 = con->r2;
 		
 		// Calculate the relative bias velocities.
-		cpVect vb1 = cpvadd(a->v_bias, cpvmult(cpvperp(r1), a->w_bias));
-		cpVect vb2 = cpvadd(b->v_bias, cpvmult(cpvperp(r2), b->w_bias));
+		cpVect vb1 = cpvadd(a->vel_bias, cpvmult(cpvperp(r1), a->ang_vel_bias));
+		cpVect vb2 = cpvadd(b->vel_bias, cpvmult(cpvperp(r2), b->ang_vel_bias));
 		cpFloat vbn = cpvdot(cpvsub(vb2, vb1), n);
 		
 		// Calculate and clamp the bias impulse.
@@ -232,8 +232,8 @@ cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef)
 		cpBodyApplyBiasImpulse(b, jb, r2);
 
 		// Calculate the relative velocity.
-		cpVect v1 = cpvadd(a->v, cpvmult(cpvperp(r1), a->w));
-		cpVect v2 = cpvadd(b->v, cpvmult(cpvperp(r2), b->w));
+		cpVect v1 = cpvadd(a->vel, cpvmult(cpvperp(r1), a->ang_vel));
+		cpVect v2 = cpvadd(b->vel, cpvmult(cpvperp(r2), b->ang_vel));
 		cpVect vr = cpvsub(v2, v1);
 		cpFloat vrn = cpvdot(vr, n);
 		

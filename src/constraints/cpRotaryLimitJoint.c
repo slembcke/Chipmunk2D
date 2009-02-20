@@ -30,7 +30,7 @@ preStep(cpRotaryLimitJoint *joint, cpFloat dt, cpFloat dt_inv)
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
-	cpFloat dist = b->a - a->a;
+	cpFloat dist = b->angle - a->angle;
 	cpFloat pdist = 0.0;
 	if(dist > joint->max) {
 		pdist = joint->max - dist;
@@ -39,7 +39,7 @@ preStep(cpRotaryLimitJoint *joint, cpFloat dt, cpFloat dt_inv)
 	}
 	
 	// calculate moment of inertia coefficient.
-	joint->iSum = 1.0f/(a->i_inv + b->i_inv);
+	joint->iSum = 1.0f/(a->moment_inv + b->moment_inv);
 	
 	// calculate bias velocity
 	cpFloat maxBias = joint->constraint.maxBias;
@@ -53,8 +53,8 @@ preStep(cpRotaryLimitJoint *joint, cpFloat dt, cpFloat dt_inv)
 		joint->jAcc = 0.0f;
 
 	// apply joint torque
-	a->w -= joint->jAcc*a->i_inv;
-	b->w += joint->jAcc*b->i_inv;
+	a->ang_vel -= joint->jAcc*a->moment_inv;
+	b->ang_vel += joint->jAcc*b->moment_inv;
 }
 
 static void
@@ -66,7 +66,7 @@ applyImpulse(cpRotaryLimitJoint *joint)
 	cpBody *b = joint->constraint.b;
 	
 	// compute relative rotational velocity
-	cpFloat wr = b->w - a->w;
+	cpFloat wr = b->ang_vel - a->ang_vel;
 	
 	// compute normal impulse	
 	cpFloat j = -(joint->bias + wr)*joint->iSum;
@@ -79,8 +79,8 @@ applyImpulse(cpRotaryLimitJoint *joint)
 	j = joint->jAcc - jOld;
 	
 	// apply impulse
-	a->w -= j*a->i_inv;
-	b->w += j*b->i_inv;
+	a->ang_vel -= j*a->moment_inv;
+	b->ang_vel += j*b->moment_inv;
 }
 
 static cpFloat

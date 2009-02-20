@@ -71,6 +71,7 @@ extern chipmunkDemo Pump;
 extern chipmunkDemo WalkBot;
 extern chipmunkDemo TheoJansen;
 extern chipmunkDemo MagnetsElectric;
+extern chipmunkDemo UnsafeOps;
 
 //extern chipmunkDemo Test;
 
@@ -88,6 +89,7 @@ static chipmunkDemo *demos[] = {
 	&WalkBot,
 	&TheoJansen,
 	&MagnetsElectric,
+	&UnsafeOps,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
@@ -157,8 +159,8 @@ display(void)
 	ticks++;
 	
 	cpVect newPoint = cpvadd(mousePoint_last, cpvmult(cpvsub(mousePoint, mousePoint_last), 0.25f));
-	mouseBody->p = newPoint;
-	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0);
+	mouseBody->pos = newPoint;
+	mouseBody->vel = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0);
 	mousePoint_last = newPoint;
 	currDemo->updateFunc(ticks);
 }
@@ -247,7 +249,7 @@ click(int button, int state, int x, int y)
 			cpSpaceShapePointQuery(space, point, findBody, &body);
 			if(!body) return;
 			
-			mouseJoint = cpPivotJointNew(mouseBody, body, cpvzero, cpBodyWorld2Local(body, point));
+			mouseJoint = cpPivotJointNew2(mouseBody, body, cpvzero, cpBodyWorld2Local(body, point));
 			mouseJoint->maxForce = 50000.0f;
 			mouseJoint->biasCoef = 0.15f;
 			cpSpaceAddConstraint(space, mouseJoint);

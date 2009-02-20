@@ -23,8 +23,8 @@ struct cpBody;
 typedef void (*cpBodyVelocityFunc)(struct cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);
 typedef void (*cpBodyPositionFunc)(struct cpBody *body, cpFloat dt);
 
- 
-typedef struct cpBody{
+//#define CP_USE_DEPRECATED_API_4
+typedef struct cpBody {
 	// *** Integration Functions.
 
 	// Function that is called to integrate the body's velocity. (Defaults to cpBodyUpdateVelocity)
@@ -37,20 +37,76 @@ typedef struct cpBody{
 	
 	// Mass and it's inverse.
 	// Always use cpBodySetMass() whenever changing the mass as these values must agree.
-	cpFloat m, m_inv;
+	union{
+		cpFloat mass;
+#ifdef CP_USE_DEPRECATED_API_4
+		cpFloat m;
+#endif
+	};
+	union{
+		cpFloat mass_inv;
+#ifdef CP_USE_DEPRECATED_API_4
+		cpFloat m_inv;
+#endif
+	};
 	
 	// Moment of inertia and it's inverse.
 	// Always use cpBodySetMass() whenever changing the mass as these values must agree.
-	cpFloat i, i_inv;
+	union{
+		cpFloat moment;
+#ifdef CP_USE_DEPRECATED_API_4
+		cpFloat i;
+#endif
+	};
+	union{
+		cpFloat moment_inv;
+#ifdef CP_USE_DEPRECATED_API_4
+		cpFloat i_inv;
+#endif
+	};
 	
 	// *** Positional Properties
 	
 	// Linear components of motion (position, velocity, and force)
-	cpVect p, v, f;
+	union{
+		cpVect pos;
+#ifdef CP_USE_DEPRECATED_API_4
+		cpVect p;
+#endif
+	};
+	union{
+		cpVect vel;
+#ifdef CP_USE_DEPRECATED_API_4
+		cpVect v;
+#endif
+	};
+	union{
+		cpVect force;
+#ifdef CP_USE_DEPRECATED_API_4
+		cpVect f;
+#endif
+	};
 	
 	// Angular components of motion (angle, angular velocity, and torque)
 	// Always use cpBodySetAngle() to set the angle of the body as a and rot must agree.
-	cpFloat a, w, t;
+	union{
+		cpFloat angle;
+#ifdef CP_USE_DEPRECATED_API_4
+		cpFloat a;
+#endif
+	};
+	union{
+		cpFloat ang_vel;
+#ifdef CP_USE_DEPRECATED_API_4
+		cpFloat w;
+#endif
+	};
+	union{
+		cpFloat torque;
+#ifdef CP_USE_DEPRECATED_API_4
+		cpFloat t;
+#endif
+	};
 	
 	// Cached unit length vector representing the angle of the body.
 	// Used for fast vector rotation using cpvrotate().
@@ -64,8 +120,8 @@ typedef struct cpBody{
 	// *** Internally Used Fields
 	
 	// Velocity bias values used when solving penetrations and correcting constraints.
-	cpVect v_bias;
-	cpFloat w_bias;
+	cpVect vel_bias;
+	cpFloat ang_vel_bias;
 	
 //	int active;
 } cpBody;
@@ -95,30 +151,30 @@ void cpBodyUpdatePosition(cpBody *body, cpFloat dt);
 static inline cpVect
 cpBodyLocal2World(cpBody *body, cpVect v)
 {
-	return cpvadd(body->p, cpvrotate(v, body->rot));
+	return cpvadd(body->pos, cpvrotate(v, body->rot));
 }
 
 // Convert world to body local coordinates
 static inline cpVect
 cpBodyWorld2Local(cpBody *body, cpVect v)
 {
-	return cpvunrotate(cpvsub(v, body->p), body->rot);
+	return cpvunrotate(cpvsub(v, body->pos), body->rot);
 }
 
 // Apply an impulse (in world coordinates) to the body.
 static inline void
 cpBodyApplyImpulse(cpBody *body, cpVect j, cpVect r)
 {
-	body->v = cpvadd(body->v, cpvmult(j, body->m_inv));
-	body->w += body->i_inv*cpvcross(r, j);
+	body->vel = cpvadd(body->vel, cpvmult(j, body->mass_inv));
+	body->ang_vel += body->moment_inv*cpvcross(r, j);
 }
 
 // Not intended for external use. Used by cpArbiter.c and cpConstraint.c.
 static inline void
 cpBodyApplyBiasImpulse(cpBody *body, cpVect j, cpVect r)
 {
-	body->v_bias = cpvadd(body->v_bias, cpvmult(j, body->m_inv));
-	body->w_bias += body->i_inv*cpvcross(r, j);
+	body->vel_bias = cpvadd(body->vel_bias, cpvmult(j, body->mass_inv));
+	body->ang_vel_bias += body->moment_inv*cpvcross(r, j);
 }
 
 // Zero the forces on a body.
