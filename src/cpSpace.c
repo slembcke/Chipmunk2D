@@ -250,16 +250,40 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	cpArrayPush(space->constraints, constraint);
 }
 
+static void
+shapeRemovalArbiterReject(cpSpace *space, cpShape *shape)
+{
+	cpArray *old_ary = space->arbiters;
+	int num = old_ary->num;
+	
+	if(num == 0) return;
+	
+	// make a new arbiters array and copy over all valid arbiters
+	cpArray *new_ary = cpArrayNew(num);
+	
+	for(int i=0; i<num; i++){
+		cpArbiter *arb = (cpArbiter *)old_ary->arr[i];
+		if(arb->a != shape && arb->b != shape){
+			cpArrayPush(new_ary, arb);
+		}
+	}
+	
+	space->arbiters = new_ary;
+	cpArrayFree(old_ary);
+}
+
 void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
 	cpSpaceHashRemove(space->activeShapes, shape, shape->id);
+	shapeRemovalArbiterReject(space, shape);
 }
 
 void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
 	cpSpaceHashRemove(space->staticShapes, shape, shape->id);
+	shapeRemovalArbiterReject(space, shape);
 }
 
 void
@@ -462,7 +486,6 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	cpFloat dt_inv = 1.0f/dt;
 
 	cpArray *bodies = space->bodies;
-	cpArray *arbiters = space->arbiters;
 	cpArray *constraints = space->constraints;
 	
 	// Empty the arbiter list.
@@ -483,6 +506,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	cpSpaceHashQueryRehash(space->activeShapes, &queryFunc, space);
 
 	// Prestep the arbiters.
+	cpArray *arbiters = space->arbiters;
 	for(int i=0; i<arbiters->num; i++)
 		cpArbiterPreStep((cpArbiter *)arbiters->arr[i], dt_inv);
 

@@ -160,7 +160,7 @@ cpHashSetRemove(cpHashSet *set, unsigned int hash, void *ptr)
 	
 	// Remove it if it exists.
 	if(bin){
-		// Update the previos bin pointer to point to the next bin.
+		// Update the previous bin pointer to point to the next bin.
 		(*prev_ptr) = bin->next;
 		set->entries--;
 		
