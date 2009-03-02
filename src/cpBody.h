@@ -25,7 +25,7 @@ typedef void (*cpBodyPositionFunc)(struct cpBody *body, cpFloat dt);
 
  
 typedef struct cpBody{
-	// *** Integration Functions.
+	// *** Integration Functions.ntoehu
 
 	// Function that is called to integrate the body's velocity. (Defaults to cpBodyUpdateVelocity)
 	cpBodyVelocityFunc velocity_func;

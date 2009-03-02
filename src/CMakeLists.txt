@@ -1,64 +1,66 @@
-INCLUDE_DIRECTORIES(${CHIPMUNK_SOURCE_DIR}/src)
-
-SET(chipmunk_includes
-	chipmunk.h
-	cpArbiter.h
-	cpArray.h
-	cpBB.h
-	cpBody.h
-	cpCollision.h
-	cpHashSet.h
-	cpPolyShape.h
-	cpShape.h
-	cpSpace.h
-	cpSpaceHash.h
-	cpVect.h
+set(chipmunk_public_header
+  chipmunk.h
+  chipmunk_unsafe.h
+  cpArbiter.h
+  cpArray.h
+  cpBB.h
+  cpBody.h
+  cpCollision.h
+  cpHashSet.h
+  cpPolyShape.h
+  cpShape.h
+  cpSpace.h
+  cpSpaceHash.h
+  cpVect.h
 )
 
-set(chipmunk_constraint_source_files
-    cpBreakableJoint.c
-    cpConstraint.c
-    cpDampedRotarySpring.c
-    cpDampedSpring.c
-    cpGearJoint.c
-    cpGrooveJoint.c
-    cpPinJoint.c
-    cpPivotJoint.c
-    cpRotaryLimitJoint.c
-    cpSimpleMotor.c
-    cpSlideJoint.c
-    )
-FOREACH(f ${chipmunk_constraint_source_files})
-    LIST(APPEND chipmunk_source_files constraints/${f})
-ENDFOREACH(f)
+set(chipmunk_source_files
+  chipmunk.c
+  cpArbiter.c
+  cpArray.c
+  cpBB.c
+  cpBody.c
+  cpCollision.c
+  cpHashSet.c
+  cpPolyShape.c
+  cpShape.c
+  cpSpace.c
+  cpSpaceHash.c
+  cpVect.c
+  constraints/cpBreakableJoint.c
+  constraints/cpConstraint.c
+  constraints/cpDampedRotarySpring.c
+  constraints/cpDampedSpring.c
+  constraints/cpGearJoint.c
+  constraints/cpGrooveJoint.c
+  constraints/cpPinJoint.c
+  constraints/cpPivotJoint.c
+  constraints/cpRotaryLimitJoint.c
+  constraints/cpSimpleMotor.c
+  constraints/cpSlideJoint.c
+)
 
-list(APPEND chipmunk_source_files
-	chipmunk.c
-	cpArbiter.c
-	cpArray.c
-	cpBB.c
-	cpBody.c
-	cpCollision.c
-	cpHashSet.c
-	cpPolyShape.c
-	cpShape.c
-	cpSpace.c
-	cpSpaceHash.c
-	cpVect.c
-    )
-
-ADD_LIBRARY(chipmunk SHARED 
+if(BUILD_SHARED)
+  add_library(chipmunk SHARED
     ${chipmunk_source_files}
-)
+  )
+  # set the lib's version number
+  set_target_properties(chipmunk PROPERTIES VERSION 4)
+  install(TARGETS chipmunk LIBRARY DESTINATION lib)
+endif(BUILD_SHARED)
 
-ADD_LIBRARY(chipmunk_static STATIC 
+if(BUILD_STATIC)
+  add_library(chipmunk_static STATIC
     ${chipmunk_source_files}
-)
+  )
+  # Sets chipmunk_static to output "libchipmunk.a" not "libchipmunk_static.a"
+  set_target_properties(chipmunk_static PROPERTIES OUTPUT_NAME chipmunk)
+  if(INSTALL_STATIC)
+    install(TARGETS chipmunk_static ARCHIVE DESTINATION lib)
+  endif(INSTALL_STATIC)
+endif(BUILD_STATIC)
 
-INSTALL(FILES ${chipmunk_includes} DESTINATION include/chipmunk)
-SET_TARGET_PROPERTIES(chipmunk_static PROPERTIES OUTPUT_NAME chipmunk) #Sets chipmunk_static to output "libchipmunk.a" not "libchipmunk_static.a"
-INSTALL(TARGETS chipmunk chipmunk_static
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib)
-SET_TARGET_PROPERTIES(chipmunk PROPERTIES VERSION 4)
-
+if(BUILD_SHARED OR INSTALL_STATIC)
+  # FIXME: change to PUBLIC_HEADER to allow building frameworks
+  install(FILES ${chipmunk_public_header} DESTINATION include/chipmunk)
+endif(BUILD_SHARED OR INSTALL_STATIC)
