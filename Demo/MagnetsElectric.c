@@ -170,14 +170,14 @@ LRangeForceApply(cpBody *a, cpBody *b){
 				FillForceData (aux2,j,aux,i,&fdata);
 				
 				//Force applied to body A
-				delta=cpvsub(aux->Gpos[i], a->pos);
+				delta=cpvsub(aux->Gpos[i], a->p);
 				cpBodyApplyForce(a,fdata.F, delta);
 				
 	 			if(aux->torque_func[i] != NULL)
 				{
 					//Torque on A
 					aux->torque_func[i](&fdata);
-					a->torque += aux->value[i]*aux2->value[j]*fdata.T;
+					a->t += aux->value[i]*aux2->value[j]*fdata.T;
 					
 				}
 			}
@@ -213,36 +213,36 @@ ChargedBodyUpdatePositionVerlet(cpBody *body, cpFloat dt)
 	  }
 	}
 	
-	cpVect dp = cpvmult(cpvadd(body->vel, body->vel_bias), dt);
-	dp = cpvadd(dp,cpvmult(cpvmult(body->force, body->mass_inv), 0.5e0*dt*dt));
-	body->pos = cpvadd(body->pos, dp);
+	cpVect dp = cpvmult(cpvadd(body->v, body->v_bias), dt);
+	dp = cpvadd(dp,cpvmult(cpvmult(body->f, body->m_inv), 0.5e0*dt*dt));
+	body->p = cpvadd(body->p, dp);
 
-	cpBodySetAngle(body, body->angle + (body->ang_vel + body->ang_vel_bias)*dt 
-				   + 0.5*body->torque*body->moment_inv*dt*dt);
+	cpBodySetAngle(body, body->a + (body->w + body->w_bias)*dt 
+				   + 0.5*body->t*body->i_inv*dt*dt);
 
 	// Update position of the singularities
 	aux = (Sing*)body->data;
 	for (int i=0; i<aux->Nsing; i++)
 	{
-        aux->Gpos[i]=cpvadd(body->pos,cpvrotate(cpv(aux->position[i].x,
+        aux->Gpos[i]=cpvadd(body->p,cpvrotate(cpv(aux->position[i].x,
 										  aux->position[i].y), body->rot));
-		aux->Gangle[i]= aux->angle[i] + body->angle;
+		aux->Gangle[i]= aux->angle[i] + body->a;
 	}
 	
             
- 	body->vel_bias = cpvzero;
-	body->ang_vel_bias = 0.0f;
+ 	body->v_bias = cpvzero;
+	body->w_bias = 0.0f;
 }
 
 // function for the integration of the velocities
 static void
 ChargedBodyUpdateVelocityVerlet(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
-	body->vel = cpvadd(body->vel, cpvmult(cpvadd(gravity, cpvmult(body->force, body->mass_inv)), 0.5e0*dt));
-	body->ang_vel = body->ang_vel + body->torque*body->moment_inv*0.5e0*dt;
+	body->v = cpvadd(body->v, cpvmult(cpvadd(gravity, cpvmult(body->f, body->m_inv)), 0.5e0*dt));
+	body->w = body->w + body->t*body->i_inv*0.5e0*dt;
 	
-	body->force = cpvzero;
-	body->torque = 0.0e0;
+	body->f = cpvzero;
+	body->t = 0.0e0;
 	
 	// Long range interaction
     cpArray *bodies = space->bodies;
@@ -262,8 +262,8 @@ ChargedBodyUpdateVelocityVerlet(cpBody *body, cpVect gravity, cpFloat damping, c
         LRangeForceApply(body, B);
 	  }
 	}
-	body->vel = cpvadd(cpvmult(body->vel,damping), cpvmult(cpvadd(gravity, cpvmult(body->force, body->mass_inv)), 0.5e0*dt));
-	body->ang_vel = body->ang_vel*damping + body->torque*body->moment_inv*0.5e0*dt;
+	body->v = cpvadd(cpvmult(body->v,damping), cpvmult(cpvadd(gravity, cpvmult(body->f, body->m_inv)), 0.5e0*dt));
+	body->w = body->w*damping + body->t*body->i_inv*0.5e0*dt;
 }
 
 static void 
@@ -297,10 +297,10 @@ make_mag(cpVect p, cpFloat ang, cpFloat mag)
 	};
 
 	cpBody *body = cpBodyNew(1.0, cpMomentForPoly(1.0, nverts, verts, cpvzero));
-	body->pos = p;
-	body->vel = cpvzero;
+	body->p = p;
+	body->v = cpvzero;
 	cpBodySetAngle(body, ang);
-	body->ang_vel = 0.0e0;
+	body->w = 0.0e0;
 	
     // Load the singularities
     Sing *magnet=(Sing*)malloc(sizeof(Sing));
@@ -340,10 +340,10 @@ make_charged(cpVect p, cpFloat chg)
 	};
 
 	cpBody *body = cpBodyNew(1.0, cpMomentForPoly(1.0, nverts, verts, cpvzero));
-	body->pos = p;
-	body->vel = cpvzero;
+	body->p = p;
+	body->v = cpvzero;
 	cpBodySetAngle(body, 0);
-	body->ang_vel = 0.0e0;
+	body->w = 0.0e0;
 	
     // Load the singularities
     Sing *charge=(Sing*)malloc(sizeof(Sing));;
@@ -382,10 +382,10 @@ make_mix(cpVect p, cpFloat ang, cpFloat mag,cpFloat chg)
 	};
 
 	cpBody *body = cpBodyNew(1.0, cpMomentForPoly(1.0, nverts, verts, cpvzero));
-	body->pos = p;
-	body->vel = cpvzero;
+	body->p = p;
+	body->v = cpvzero;
 	cpBodySetAngle(body, ang);
-	body->ang_vel = 0.0e0;
+	body->w = 0.0e0;
 	
     // Load the singularities
     Sing *mix=(Sing*)malloc(sizeof(Sing));;

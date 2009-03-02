@@ -77,7 +77,7 @@ cpShapeCacheBB(cpShape *shape)
 {
 	cpBody *body = shape->body;
 	
-	shape->bb = shape->klass->cacheData(shape, body->pos, body->rot);
+	shape->bb = shape->klass->cacheData(shape, body->p, body->rot);
 	return shape->bb;
 }
 

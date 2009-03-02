@@ -25,8 +25,8 @@ void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, 
 
 static inline cpVect
 relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2){
-	cpVect v1_sum = cpvadd(a->vel, cpvmult(cpvperp(r1), a->ang_vel));
-	cpVect v2_sum = cpvadd(b->vel, cpvmult(cpvperp(r2), b->ang_vel));
+	cpVect v1_sum = cpvadd(a->v, cpvmult(cpvperp(r1), a->w));
+	cpVect v2_sum = cpvadd(b->v, cpvmult(cpvperp(r2), b->w));
 	
 	return cpvsub(v2_sum, v1_sum);
 }
@@ -59,11 +59,11 @@ clamp_vect(cpVect v, cpFloat len)
 static inline cpFloat
 k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n)
 {
-	cpFloat mass_sum = a->mass_inv + b->mass_inv;
+	cpFloat mass_sum = a->m_inv + b->m_inv;
 	cpFloat r1cn = cpvcross(r1, n);
 	cpFloat r2cn = cpvcross(r2, n);
 
-	return mass_sum + a->moment_inv*r1cn*r1cn + b->moment_inv*r2cn*r2cn;
+	return mass_sum + a->i_inv*r1cn*r1cn + b->i_inv*r2cn*r2cn;
 }
 
 static inline void
@@ -72,14 +72,14 @@ k_tensor(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect *k1, cpVect *k2)
 		// calculate mass matrix
 	// If I wasn't lazy and wrote a proper matrix class, this wouldn't be so gross...
 	cpFloat k11, k12, k21, k22;
-	cpFloat m_sum = a->mass_inv + b->mass_inv;
+	cpFloat m_sum = a->m_inv + b->m_inv;
 	
 	// start with I*m_sum
 	k11 = m_sum; k12 = 0.0f;
 	k21 = 0.0f;  k22 = m_sum;
 	
 	// add the influence from r1
-	cpFloat a_i_inv = a->moment_inv;
+	cpFloat a_i_inv = a->i_inv;
 	cpFloat r1xsq =  r1.x * r1.x * a_i_inv;
 	cpFloat r1ysq =  r1.y * r1.y * a_i_inv;
 	cpFloat r1nxy = -r1.x * r1.y * a_i_inv;
@@ -87,7 +87,7 @@ k_tensor(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect *k1, cpVect *k2)
 	k21 += r1nxy; k22 += r1xsq;
 	
 	// add the influnce from r2
-	cpFloat b_i_inv = b->moment_inv;
+	cpFloat b_i_inv = b->i_inv;
 	cpFloat r2xsq =  r2.x * r2.x * b_i_inv;
 	cpFloat r2ysq =  r2.y * r2.y * b_i_inv;
 	cpFloat r2nxy = -r2.x * r2.y * b_i_inv;

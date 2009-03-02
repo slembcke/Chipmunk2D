@@ -82,7 +82,7 @@ init(void)
 	for(int i=0; i<14; i++){
 		for(int j=0; j<=i; j++){
 			body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
-			body->pos = cpv(j*32 - i*16, 300 - i*32);
+			body->p = cpv(j*32 - i*16, 300 - i*32);
 			cpSpaceAddBody(space, body);
 			shape = cpPolyShapeNew(body, num, verts, cpvzero);
 			shape->e = 0.0; shape->u = 0.8;
@@ -93,7 +93,7 @@ init(void)
 	// Add a ball to make things more interesting
 	cpFloat radius = 15.0;
 	body = cpBodyNew(10.0, cpMomentForCircle(10.0, 0.0, radius, cpvzero));
-	body->pos = cpv(0, -240 + radius);
+	body->p = cpv(0, -240 + radius);
 	cpSpaceAddBody(space, body);
 
 	shape = cpCircleShapeNew(body, radius, cpvzero);

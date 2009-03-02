@@ -159,8 +159,8 @@ display(void)
 	ticks++;
 	
 	cpVect newPoint = cpvadd(mousePoint_last, cpvmult(cpvsub(mousePoint, mousePoint_last), 0.25f));
-	mouseBody->pos = newPoint;
-	mouseBody->vel = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0);
+	mouseBody->p = newPoint;
+	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0);
 	mousePoint_last = newPoint;
 	currDemo->updateFunc(ticks);
 }

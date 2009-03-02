@@ -127,9 +127,9 @@ drawCircleShape(cpBody *body, cpCircleShape *circle)
 	glVertexPointer(2, GL_FLOAT, 0, circleVAR);
 
 	glPushMatrix(); {
-		cpVect center = cpvadd(body->pos, cpvrotate(circle->c, body->rot));
+		cpVect center = cpvadd(body->p, cpvrotate(circle->c, body->rot));
 		glTranslatef(center.x, center.y, 0.0f);
-		glRotatef(body->angle*180.0/M_PI, 0.0f, 0.0f, 1.0f);
+		glRotatef(body->a*180.0/M_PI, 0.0f, 0.0f, 1.0f);
 		glScalef(circle->r, circle->r, 1.0f);
 		
 		glColor_from_pointer(circle);
@@ -174,8 +174,8 @@ static const int pillVAR_count = sizeof(pillVAR)/sizeof(GLfloat)/2;
 static void
 drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 {
-	cpVect a = cpvadd(body->pos, cpvrotate(seg->a, body->rot));
-	cpVect b = cpvadd(body->pos, cpvrotate(seg->b, body->rot));
+	cpVect a = cpvadd(body->p, cpvrotate(seg->a, body->rot));
+	cpVect b = cpvadd(body->p, cpvrotate(seg->b, body->rot));
 	
 	if(seg->r){
 		cpVect delta = cpvsub(b, a);
@@ -227,7 +227,7 @@ drawPolyShape(cpBody *body, cpPolyShape *poly)
 
 	cpVect *verts = poly->verts;
 	for(int i=0; i<count; i++){
-		cpVect v = cpvadd(body->pos, cpvrotate(verts[i], body->rot));
+		cpVect v = cpvadd(body->p, cpvrotate(verts[i], body->rot));
 		VAR[2*i    ] = v.x;
 		VAR[2*i + 1] = v.y;
 	}
@@ -282,8 +282,8 @@ static const int springVAR_count = sizeof(springVAR)/sizeof(GLfloat)/2;
 static void
 drawSpring(cpDampedSpring *spring, cpBody *body_a, cpBody *body_b)
 {
-	cpVect a = cpvadd(body_a->pos, cpvrotate(spring->anchr1, body_a->rot));
-	cpVect b = cpvadd(body_b->pos, cpvrotate(spring->anchr2, body_b->rot));
+	cpVect a = cpvadd(body_a->p, cpvrotate(spring->anchr1, body_a->rot));
+	cpVect b = cpvadd(body_b->p, cpvrotate(spring->anchr2, body_b->rot));
 
 	glPointSize(5.0f);
 	glBegin(GL_POINTS); {
@@ -323,8 +323,8 @@ drawConstraint(cpConstraint *constraint)
 	if(klass == &cpPinJointClass){
 		cpPinJoint *joint = (cpPinJoint *)constraint;
 	
-		cpVect a = cpvadd(body_a->pos, cpvrotate(joint->anchr1, body_a->rot));
-		cpVect b = cpvadd(body_b->pos, cpvrotate(joint->anchr2, body_b->rot));
+		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
+		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
 
 		glPointSize(5.0f);
 		glBegin(GL_POINTS); {
@@ -339,8 +339,8 @@ drawConstraint(cpConstraint *constraint)
 	} else if(klass == &cpSlideJointClass){
 		cpSlideJoint *joint = (cpSlideJoint *)constraint;
 	
-		cpVect a = cpvadd(body_a->pos, cpvrotate(joint->anchr1, body_a->rot));
-		cpVect b = cpvadd(body_b->pos, cpvrotate(joint->anchr2, body_b->rot));
+		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
+		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
 
 		glPointSize(5.0f);
 		glBegin(GL_POINTS); {
@@ -355,8 +355,8 @@ drawConstraint(cpConstraint *constraint)
 	} else if(klass == &cpPivotJointClass){
 		cpPivotJoint *joint = (cpPivotJoint *)constraint;
 	
-		cpVect a = cpvadd(body_a->pos, cpvrotate(joint->anchr1, body_a->rot));
-		cpVect b = cpvadd(body_b->pos, cpvrotate(joint->anchr2, body_b->rot));
+		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
+		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
 
 		glPointSize(10.0f);
 		glBegin(GL_POINTS); {
@@ -429,7 +429,7 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 			glColor3f(LINE_COLOR);
 			for(int i=0, count = bodies->num; i<count; i++){
 				cpBody *body = (cpBody *)bodies->arr[i];
-				glVertex2f(body->pos.x, body->pos.y);
+				glVertex2f(body->p.x, body->p.y);
 			}
 		} glEnd();
 	}

@@ -40,7 +40,7 @@ preStep(cpPivotJoint *joint, cpFloat dt, cpFloat dt_inv)
 	joint->jMaxLen = J_MAX(joint, dt);
 	
 	// calculate bias velocity
-	cpVect delta = cpvsub(cpvadd(b->pos, joint->r2), cpvadd(a->pos, joint->r1));
+	cpVect delta = cpvsub(cpvadd(b->p, joint->r2), cpvadd(a->p, joint->r1));
 	joint->bias = clamp_vect(cpvmult(delta, -joint->constraint.biasCoef*dt_inv), joint->constraint.maxBias);
 	
 	// apply accumulated impulse

@@ -31,15 +31,15 @@ preStep(cpDampedRotarySpring *spring, cpFloat dt, cpFloat dt_inv)
 	cpBody *a = spring->constraint.a;
 	cpBody *b = spring->constraint.b;
 	
-	spring->iSum = 1.0f/(a->moment_inv + b->moment_inv);
+	spring->iSum = 1.0f/(a->i_inv + b->i_inv);
 
 	spring->dt = dt;
 	spring->target_wrn = 0.0f;
 
 	// apply spring torque
-	cpFloat j_spring = (a->angle - b->angle - spring->restAngle)*spring->stiffness*dt;
-	a->ang_vel -= j_spring*a->moment_inv;
-	b->ang_vel += j_spring*b->moment_inv;
+	cpFloat j_spring = (a->a - b->a - spring->restAngle)*spring->stiffness*dt;
+	a->w -= j_spring*a->i_inv;
+	b->w += j_spring*b->i_inv;
 }
 
 static void
@@ -49,7 +49,7 @@ applyImpulse(cpDampedRotarySpring *spring)
 	cpBody *b = spring->constraint.b;
 	
 	// compute relative velocity
-	cpFloat wrn = a->ang_vel - b->ang_vel;//normal_relative_velocity(a, b, r1, r2, n) - spring->target_vrn;
+	cpFloat wrn = a->w - b->w;//normal_relative_velocity(a, b, r1, r2, n) - spring->target_vrn;
 	
 	// compute velocity loss from drag
 	// not 100% certain this is derived correctly, though it makes sense
@@ -58,8 +58,8 @@ applyImpulse(cpDampedRotarySpring *spring)
 	
 	//apply_impulses(a, b, spring->r1, spring->r2, cpvmult(spring->n, v_damp*spring->nMass));
 	cpFloat j_damp = w_damp*spring->iSum;
-	a->ang_vel -= j_damp*a->moment_inv;
-	b->ang_vel += j_damp*b->moment_inv;
+	a->w -= j_damp*a->i_inv;
+	b->w += j_damp*b->i_inv;
 }
 
 static cpFloat

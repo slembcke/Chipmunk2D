@@ -41,7 +41,7 @@ update(int ticks)
 	if(arrowDirection.y){
 		circleRadius = cpfmax(10.0, circleRadius + arrowDirection.y);
 		
-		circleBody->mass = cpMomentForCircle(1.0, 0.0, circleRadius, cpvzero);
+		circleBody->m = cpMomentForCircle(1.0, 0.0, circleRadius, cpvzero);
 		cpCircleShapeSetRadius(circleShape, circleRadius);
 	}
 	

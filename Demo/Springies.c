@@ -49,7 +49,7 @@ add_bar(cpVect a, cpVect b, int group)
 	cpFloat mass = length/160.0f;
 	
 	cpBody *body = cpBodyNew(mass, mass*length*length/12.0f);
-	body->pos = center;
+	body->p = center;
 	cpSpaceAddBody(space, body);
 	
 	cpShape *shape = cpSegmentShapeNew(body, cpvsub(a, center), cpvsub(b, center), 10.0f);

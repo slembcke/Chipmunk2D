@@ -90,7 +90,7 @@ static cpShape *
 make_ball(cpFloat x, cpFloat y)
 {
 	cpBody *body = cpBodyNew(1.0, INFINITY);
-	body->pos = cpv(x, y);
+	body->p = cpv(x, y);
 
 	cpShape *shape = cpCircleShapeNew(body, 0.95f, cpvzero);
 	shape->e = 0.0f; shape->u = 0.0f;
@@ -123,8 +123,8 @@ init(void)
 	}
 	
 	body = cpBodyNew(INFINITY, INFINITY);
-	body->pos = cpv(-1000.0f, -10.0f);
-	body->vel = cpv(400.0f, 0.0f);
+	body->p = cpv(-1000.0f, -10.0f);
+	body->v = cpv(400.0f, 0.0f);
 	cpSpaceAddBody(space, body);
 
 	shape = cpCircleShapeNew(body, 8.0f, cpvzero);
