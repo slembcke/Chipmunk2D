@@ -89,7 +89,7 @@ void cpSpaceHashRehash(cpSpaceHash *hash);
 void cpSpaceHashRehashObject(cpSpaceHash *hash, void *obj, unsigned int id);
 
 // Query callback.
-typedef int (*cpSpaceHashQueryFunc)(void *obj1, void *obj2, void *data);
+typedef void (*cpSpaceHashQueryFunc)(void *obj1, void *obj2, void *data);
 // Point query the hash. A reference to the query point is passed as obj1 to the query callback.
 void cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpaceHashQueryFunc func, void *data);
 // Query the hash for a given BBox.

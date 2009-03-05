@@ -340,7 +340,7 @@ typedef struct pointQueryFuncPair {
 	void *data;
 } pointQueryFuncPair;
 
-static int 
+static void 
 pointQueryHelper(void *point, void *obj, void *data)
 {
 	cpShape *shape = (cpShape *)obj;
@@ -348,8 +348,6 @@ pointQueryHelper(void *point, void *obj, void *data)
 	
 	if(cpShapePointQuery(shape, *((cpVect *)point)))
 		pair->func(shape, pair->data);
-	
-	return 1; // return value needed for historical reasons (value is ignored)
 }
 
 static void
@@ -387,7 +385,7 @@ queryReject(cpShape *a, cpShape *b)
 
 // Callback from the spatial hash.
 // TODO: Refactor this into separate functions?
-static int
+static void
 queryFunc(void *p1, void *p2, void *data)
 {
 	// Cast the generic pointers from the spatial hash back to usefull types
@@ -396,7 +394,7 @@ queryFunc(void *p1, void *p2, void *data)
 	cpSpace *space = (cpSpace *)data;
 	
 	// Reject any of the simple cases
-	if(queryReject(a,b)) return 0;
+	if(queryReject(a,b)) return;
 	
 	// Shape 'a' should have the lower shape type. (required by cpCollideShapes() )
 	if(a->klass->type > b->klass->type){
@@ -409,12 +407,12 @@ queryFunc(void *p1, void *p2, void *data)
 	unsigned int ids[] = {a->collision_type, b->collision_type};
 	unsigned int hash = CP_HASH_PAIR(a->collision_type, b->collision_type);
 	cpCollPairFunc *pairFunc = (cpCollPairFunc *)cpHashSetFind(space->collFuncSet, hash, ids);
-	if(!pairFunc->func) return 0; // A NULL pair function means don't collide at all.
+	if(!pairFunc->func) return; // A NULL pair function means don't collide at all.
 	
 	// Narrow-phase collision detection.
 	cpContact *contacts = NULL;
 	int numContacts = cpCollideShapes(a, b, &contacts);
-	if(!numContacts) return 0; // Shapes are not colliding.
+	if(!numContacts) return; // Shapes are not colliding.
 	
 	// The collision pair function requires objects to be ordered by their collision types.
 	cpShape *pair_a = a;
@@ -445,13 +443,9 @@ queryFunc(void *p1, void *p2, void *data)
 		
 		// Add the arbiter to the list of active arbiters.
 		cpArrayPush(space->arbiters, arb);
-		
-		return numContacts;
 	} else {
 		// The collision pair function rejected the collision.
-		
 		free(contacts);
-		return 0;
 	}
 }
 
