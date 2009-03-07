@@ -65,11 +65,12 @@ static VALUE
 rb_momentForPoly(VALUE self, VALUE m, VALUE arr, VALUE offset)
 {
 	Check_Type(arr, T_ARRAY);
-	int numVerts = RARRAY(arr)->len;
+	int numVerts = RARRAY_LEN(arr);
+	VALUE *ary_ptr = RARRAY_PTR(arr);
 	cpVect verts[numVerts];
 	
 	for(int i=0; i<numVerts; i++)
-		verts[i] = *VGET(RARRAY(arr)->ptr[i]);
+		verts[i] = *VGET(ary_ptr[i]);
 	
 	cpFloat inertia = cpMomentForPoly(NUM2DBL(m), numVerts, verts, *VGET(offset));
 	return rb_float_new(inertia);
