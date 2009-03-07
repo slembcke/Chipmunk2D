@@ -1,3 +1,5 @@
+import platform
+
 SConscriptChdir(0)
 
 env = Environment(
@@ -5,11 +7,11 @@ env = Environment(
 	CCFLAGS = ['-std=gnu99', '-O3', '-ffast-math'],
 )
 
-# OSX UB flags
-env.Append(
-	CCFLAGS = ['-arch', 'ppc', '-arch', 'i386'],
-	LINKFLAGS = ['-arch', 'ppc', '-arch', 'i386'],
-)
+if(platform.system() == "Darwin"):
+	env.Append(
+		CCFLAGS = ['-arch', 'ppc', '-arch', 'i386'],
+		LINKFLAGS = ['-arch', 'ppc', '-arch', 'i386'],
+	)
 
 src = [
 	Glob('*.c'),

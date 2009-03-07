@@ -1,6 +1,7 @@
 SConscriptChdir(0)
 
 import os
+import platform
 
 def RBConfig(param):
 	return os.popen('ruby -e"require \'rbconfig\'; print Config::CONFIG[\'' + param + '\']"').read()
@@ -12,23 +13,29 @@ env = Environment(
 	CPPPATH = ['../src', '../src/constraints', RBConfig('topdir')],
 )
 
-# OSX UB flags
-SDK = "/Developer/SDKs/MacOSX10.4u.sdk"
-env.Append(
-	CCFLAGS = ['-arch', 'ppc', '-arch', 'i386', '-isysroot', SDK],
-	LINKFLAGS = ['-arch', 'ppc', '-arch', 'i386', '-isysroot', SDK, '-Wl,-syslibroot,' + SDK, '-mmacosx-version-min=10.4'],
-)
+if(platform.system() == "Darwin"):
+	SDK = "/Developer/SDKs/MacOSX10.4u.sdk"
+	env.Append(
+		CCFLAGS = ['-arch', 'ppc', '-arch', 'i386', '-isysroot', SDK],
+		LINKFLAGS = ['-arch', 'ppc', '-arch', 'i386', '-isysroot', SDK, '-Wl,-syslibroot,' + SDK, '-mmacosx-version-min=10.4'],
+	)
 
 src = [
 	Glob('ext/*.c'),
 ]
 
 ext = env.LoadableModule(
-	'chipmunk.bundle', 
+	'chipmunk', 
 	src,
 	LIBS=['chipmunk', RBConfig('LIBRUBYARG_SHARED')],
 	LIBPATH='..',
 )
+
+if(platform.system() == "Darwin"):
+	env.Command('chipmunk.bundle', 'chipmunk', Move("$TARGET", "$SOURCE"))
+elif(platform.system() == "Linux"):
+	env.Command('chipmunk.so', 'libchipmunk.so', Move("$TARGET", "$SOURCE"))
+
 
 docs = env.Command(
 	target = 'doc/',
