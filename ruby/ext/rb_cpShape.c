@@ -221,11 +221,12 @@ rb_cpPolyInitialize(VALUE self, VALUE body, VALUE arr, VALUE offset)
 	cpPolyShape *poly = (cpPolyShape *)SHAPE(self);
 	
 	Check_Type(arr, T_ARRAY);
-	int numVerts = RARRAY(arr)->len;
+	int numVerts = RARRAY_LEN(arr);
+	VALUE *ary_ptr = RARRAY_PTR(arr);
 	cpVect verts[numVerts];
 	
 	for(int i=0; i<numVerts; i++)
-		verts[i] = *VGET(RARRAY(arr)->ptr[i]);
+		verts[i] = *VGET(ary_ptr[i]);
 	
 	cpPolyShapeInit(poly, BODY(body), numVerts, verts, *VGET(offset));
 	poly->shape.data = (void *)self;
