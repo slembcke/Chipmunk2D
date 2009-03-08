@@ -37,10 +37,10 @@ elif(platform.system() == "Linux"):
 	env.Command('chipmunk.so', 'libchipmunk.so', Move("$TARGET", "$SOURCE"))
 
 
-docs = env.Command(
-	target = 'doc/',
-	source = 'doc_dummy.rb',
-	action = 'cd ruby; rdoc doc_dummy.rb',
-)
+#docs = env.Command(
+#	target = 'doc/',
+#	source = 'doc_dummy.rb',
+#	action = 'cd ruby; rdoc doc_dummy.rb',
+#)
 
 Alias('.', [ext])
