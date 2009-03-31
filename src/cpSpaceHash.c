@@ -430,9 +430,10 @@ handleQueryRehashHelper(void *elt, void *data)
 			cpSpaceHashBin *bin = hash->table[index];
 			
 			if(containsHandle(bin, hand)) continue;
+			
+			cpHandleRetain(hand); // this MUST be done first in case the object is removed in func
 			query(hash, bin, obj, func, pair->data);
 			
-			cpHandleRetain(hand);
 			cpSpaceHashBin *newBin = getEmptyBin(hash);
 			newBin->handle = hand;
 			newBin->next = bin;
@@ -448,7 +449,7 @@ void
 cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpaceHashQueryFunc func, void *data)
 {
 	clearHash(hash);
-
+	
 	queryRehashPair pair = {hash, func, data};
 	cpHashSetEach(hash->handleSet, &handleQueryRehashHelper, &pair);
 }
