@@ -165,7 +165,10 @@ cpHashSetRemove(cpHashSet *set, unsigned int hash, void *ptr)
 		set->entries--;
 		
 		void *return_value = bin->elt;
+		
+		*bin = (cpHashSetBin){};
 		free(bin);
+		
 		return return_value;
 	}
 	
@@ -187,9 +190,12 @@ void
 cpHashSetEach(cpHashSet *set, cpHashSetIterFunc func, void *data)
 {
 	for(int i=0; i<set->size; i++){
-		cpHashSetBin *bin;
-		for(bin = set->table[i]; bin; bin = bin->next)
+		cpHashSetBin *bin = set->table[i];
+		while(bin){
+			cpHashSetBin *next = bin->next;
 			func(bin->elt, data);
+			bin = next;
+		}
 	}
 }
 
