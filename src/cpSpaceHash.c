@@ -426,7 +426,7 @@ handleQueryRehashHelper(void *elt, void *data)
 
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
-			// exit the loops if the object has been deleted.
+			// exit the loops if the object has been deleted in func().
 			if(!hand->obj) goto break_out;
 			
 			int index = hash_func(i,j,n);
@@ -434,7 +434,7 @@ handleQueryRehashHelper(void *elt, void *data)
 			
 			if(containsHandle(bin, hand)) continue;
 			
-			cpHandleRetain(hand); // this MUST be done first in case the object is removed in func
+			cpHandleRetain(hand); // this MUST be done first in case the object is removed in func()
 			query(hash, bin, obj, func, pair->data);
 			
 			cpSpaceHashBin *newBin = getEmptyBin(hash);
