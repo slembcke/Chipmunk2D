@@ -426,6 +426,9 @@ handleQueryRehashHelper(void *elt, void *data)
 
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
+			// exit the loops if the object has been deleted.
+			if(!hand->obj) goto break_out;
+			
 			int index = hash_func(i,j,n);
 			cpSpaceHashBin *bin = hash->table[index];
 			
@@ -441,6 +444,7 @@ handleQueryRehashHelper(void *elt, void *data)
 		}
 	}
 	
+	break_out:
 	// Increment the stamp for each object we hash.
 	hash->stamp++;
 }
