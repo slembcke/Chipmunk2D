@@ -4,7 +4,7 @@ SConscriptChdir(0)
 
 env = Environment(
 	# GCC flags for building libchipmunk
-	CCFLAGS = ['-std=gnu99', '-O3', '-ffast-math'],
+	CCFLAGS = ['-std=gnu99', '-O3', '-ffast-math', '-Wall'],
 )
 
 if(platform.system() == "Darwin"):
