@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
  
-#include "stdlib.h"
+#include <stdlib.h>
 
 #include "chipmunk.h"
 
