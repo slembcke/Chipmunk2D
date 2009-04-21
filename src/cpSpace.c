@@ -477,12 +477,11 @@ contactSetReject(void *ptr, void *data)
 static void
 filterArbiterByCallback(cpSpace *space)
 {
-	cpArray *arbiters = space->arbiters;
-	int num = arbiters->num;
+	int num = space->arbiters->num;
 	
 	// copy to the stack
 	cpArbiter *ary[num];
-	memcpy(ary, arbiters->arr, num*sizeof(void *));
+	memcpy(ary, space->arbiters->arr, num*sizeof(void *));
 	
 	for(int i=0; i<num; i++){
 		cpArbiter *arb = ary[i];
@@ -507,7 +506,7 @@ filterArbiterByCallback(cpSpace *space)
 		}
 		
 		if(!pairFunc->func(a, b, arb->contacts, arb->numContacts, normal_coef, pairFunc->data)){
-			cpArrayDeleteObj(arbiters, arb);
+			cpArrayDeleteObj(space->arbiters, arb);
 		}
 	}
 }
