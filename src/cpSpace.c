@@ -21,6 +21,7 @@
  
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include <assert.h>
 
@@ -403,31 +404,31 @@ queryFunc(void *p1, void *p2, void *data)
 		b = temp;
 	}
 	
-	// Find the collision pair function for the shapes.
-	unsigned int ids[] = {a->collision_type, b->collision_type};
-	unsigned int hash = CP_HASH_PAIR(a->collision_type, b->collision_type);
-	cpCollPairFunc *pairFunc = (cpCollPairFunc *)cpHashSetFind(space->collFuncSet, hash, ids);
-	if(!pairFunc->func) return; // A NULL pair function means don't collide at all.
+//	// Find the collision pair function for the shapes.
+//	unsigned int ids[] = {a->collision_type, b->collision_type};
+//	unsigned int hash = CP_HASH_PAIR(a->collision_type, b->collision_type);
+//	cpCollPairFunc *pairFunc = (cpCollPairFunc *)cpHashSetFind(space->collFuncSet, hash, ids);
+//	if(!pairFunc->func) return; // A NULL pair function means don't collide at all.
 	
 	// Narrow-phase collision detection.
 	cpContact *contacts = NULL;
 	int numContacts = cpCollideShapes(a, b, &contacts);
 	if(!numContacts) return; // Shapes are not colliding.
 	
-	// The collision pair function requires objects to be ordered by their collision types.
-	cpShape *pair_a = a;
-	cpShape *pair_b = b;
-	cpFloat normal_coef = 1.0f;
-	
-	// Swap them if necessary.
-	if(pair_a->collision_type != pairFunc->a){
-		cpShape *temp = pair_a;
-		pair_a = pair_b;
-		pair_b = temp;
-		normal_coef = -1.0f;
-	}
-	
-	if(pairFunc->func(pair_a, pair_b, contacts, numContacts, normal_coef, pairFunc->data)){
+//	// The collision pair function requires objects to be ordered by their collision types.
+//	cpShape *pair_a = a;
+//	cpShape *pair_b = b;
+//	cpFloat normal_coef = 1.0f;
+//	
+//	// Swap them if necessary.
+//	if(pair_a->collision_type != pairFunc->a){
+//		cpShape *temp = pair_a;
+//		pair_a = pair_b;
+//		pair_b = temp;
+//		normal_coef = -1.0f;
+//	}
+//	
+//	if(pairFunc->func(pair_a, pair_b, contacts, numContacts, normal_coef, pairFunc->data)){
 		// The collision pair function OKed the collision. Record the contact information.
 		
 		// Get an arbiter from space->contactSet for the two shapes.
@@ -443,10 +444,10 @@ queryFunc(void *p1, void *p2, void *data)
 		
 		// Add the arbiter to the list of active arbiters.
 		cpArrayPush(space->arbiters, arb);
-	} else {
-		// The collision pair function rejected the collision.
-		free(contacts);
-	}
+//	} else {
+//		// The collision pair function rejected the collision.
+//		free(contacts);
+//	}
 }
 
 // Iterator for active/static hash collisions.
@@ -471,6 +472,44 @@ contactSetReject(void *ptr, void *data)
 	}
 	
 	return 1;
+}
+
+static void
+filterArbiterByCallback(cpSpace *space)
+{
+	cpArray *arbiters = space->arbiters;
+	int num = arbiters->num;
+	
+	// copy to the stack
+	cpArbiter *ary[num];
+	memcpy(ary, arbiters->arr, num*sizeof(void *));
+	
+	for(int i=0; i<num; i++){
+		cpArbiter *arb = ary[i];
+		
+		// The collision pair function requires objects to be ordered by their collision types.
+		cpShape *a = arb->a;
+		cpShape *b = arb->b;
+		cpFloat normal_coef = 1.0f;
+		
+		// Find the collision pair function for the shapes.
+		unsigned int ids[] = {a->collision_type, b->collision_type};
+		unsigned int hash = CP_HASH_PAIR(a->collision_type, b->collision_type);
+		cpCollPairFunc *pairFunc = (cpCollPairFunc *)cpHashSetFind(space->collFuncSet, hash, ids);
+		if(!pairFunc->func) continue; // A NULL pair function means don't collide at all.
+		
+		// Swap them if necessary.
+		if(a->collision_type != pairFunc->a){
+			cpShape *temp = a;
+			a = b;
+			b = temp;
+			normal_coef = -1.0f;
+		}
+		
+		if(!pairFunc->func(a, b, arb->contacts, arb->numContacts, normal_coef, pairFunc->data)){
+			cpArrayDeleteObj(arbiters, arb);
+		}
+	}
 }
 
 void
@@ -498,6 +537,9 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// Collide!
 	cpSpaceHashEach(space->activeShapes, &active2staticIter, space);
 	cpSpaceHashQueryRehash(space->activeShapes, &queryFunc, space);
+	
+	// Filter arbiter list based on collision callbacks
+	filterArbiterByCallback(space);
 
 	// Prestep the arbiters.
 	cpArray *arbiters = space->arbiters;

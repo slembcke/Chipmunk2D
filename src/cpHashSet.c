@@ -166,7 +166,7 @@ cpHashSetRemove(cpHashSet *set, unsigned int hash, void *ptr)
 		
 		void *return_value = bin->elt;
 		
-		*bin = (cpHashSetBin){};
+//		*bin = (cpHashSetBin){};
 		free(bin);
 		
 		return return_value;

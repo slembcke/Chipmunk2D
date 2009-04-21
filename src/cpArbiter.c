@@ -120,7 +120,7 @@ cpArbiterInject(cpArbiter *arb, cpContact *contacts, int numContacts)
 		for(int j=0; j<numContacts; j++){
 			cpContact *new_contact = &contacts[j];
 			
-			// This could trigger false possitives.
+			// This could trigger false positives, but is fairly unlikely nor serious if it does.
 			if(new_contact->hash == old->hash){
 				// Copy the persistant contact information.
 				new_contact->jnAcc = old->jnAcc;
