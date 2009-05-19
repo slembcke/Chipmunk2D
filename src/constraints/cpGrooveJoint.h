@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-extern const cpConstraintClass cpGrooveJointClass;
+const cpConstraintClass *cpGrooveJointClass();
 
 typedef struct cpGrooveJoint {
 	cpConstraint constraint;
@@ -41,4 +41,4 @@ cpGrooveJoint *cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpV
 cpConstraint *cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);
 
 // TODO setters for the groove.
-MakeConstraintAccessors(cpGrooveJoint, cpVect, anchr2);
+CP_DefineConstraintProperty(cpGrooveJoint, cpVect, anchr2, Anchr2);

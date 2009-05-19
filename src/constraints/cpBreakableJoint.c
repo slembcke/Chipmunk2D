@@ -54,11 +54,14 @@ getImpulse(cpBreakableJoint *breakable)
 	return delegate->klass->getImpulse(delegate);
 }
 
-const cpConstraintClass cpBreakableJointClass = {
+static const cpConstraintClass klass = {
+	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
+CP_DefineClassAccessor(cpBreakableJoint)
+
 
 cpBreakableJoint *
 cpBreakableJointAlloc(void)
@@ -69,7 +72,7 @@ cpBreakableJointAlloc(void)
 cpBreakableJoint *
 cpBreakableJointInit(cpBreakableJoint *breakable, cpConstraint *delegate, struct cpSpace *space)
 {
-	cpConstraintInit((cpConstraint *)breakable, &cpBreakableJointClass, NULL, NULL);
+	cpConstraintInit((cpConstraint *)breakable, &klass, NULL, NULL);
 	
 	breakable->delegate = delegate;
 	breakable->space = space;

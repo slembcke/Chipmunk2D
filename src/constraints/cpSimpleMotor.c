@@ -67,11 +67,13 @@ getImpulse(cpSimpleMotor *joint)
 	return cpfabs(joint->jAcc);
 }
 
-const cpConstraintClass cpSimpleMotorClass = {
+static const cpConstraintClass klass = {
+	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
+CP_DefineClassAccessor(cpSimpleMotor)
 
 cpSimpleMotor *
 cpSimpleMotorAlloc(void)
@@ -82,7 +84,7 @@ cpSimpleMotorAlloc(void)
 cpSimpleMotor *
 cpSimpleMotorInit(cpSimpleMotor *joint, cpBody *a, cpBody *b, cpFloat rate)
 {
-	cpConstraintInit((cpConstraint *)joint, &cpSimpleMotorClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &klass, a, b);
 	
 	joint->rate = rate;
 	

@@ -76,11 +76,13 @@ getImpulse(cpConstraint *constraint)
 	return 0.0f;
 }
 
-const cpConstraintClass cpDampedSpringClass = {
+static const cpConstraintClass klass = {
+	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
+CP_DefineClassAccessor(cpDampedSpring)
 
 cpDampedSpring *
 cpDampedSpringAlloc(void)
@@ -91,7 +93,7 @@ cpDampedSpringAlloc(void)
 cpDampedSpring *
 cpDampedSpringInit(cpDampedSpring *spring, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping)
 {
-	cpConstraintInit((cpConstraint *)spring, &cpDampedSpringClass, a, b);
+	cpConstraintInit((cpConstraint *)spring, &klass, a, b);
 	
 	spring->anchr1 = anchr1;
 	spring->anchr2 = anchr2;

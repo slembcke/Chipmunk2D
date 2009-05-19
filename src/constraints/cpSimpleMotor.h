@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-extern const cpConstraintClass cpSimpleMotorClass;
+const cpConstraintClass *cpSimpleMotorClass();
 
 typedef struct cpSimpleMotor {
 	cpConstraint constraint;
@@ -34,4 +34,4 @@ cpSimpleMotor *cpSimpleMotorAlloc(void);
 cpSimpleMotor *cpSimpleMotorInit(cpSimpleMotor *joint, cpBody *a, cpBody *b, cpFloat rate);
 cpConstraint *cpSimpleMotorNew(cpBody *a, cpBody *b, cpFloat rate);
 
-MakeConstraintAccessors(cpSimpleMotor, cpFloat, rate);
+CP_DefineConstraintProperty(cpSimpleMotor, cpFloat, rate, Rate);

@@ -46,20 +46,20 @@ static VALUE rb_##func(VALUE self, VALUE value) \
 {func(CONSTRAINT(self), NUM2DBL(value)); return value;} \
 
 #define MAKE_FLT_ACCESSORS(s, m) \
-MAKE_FLT_GETTER(s##_get_##m) \
-MAKE_FLT_SETTER(s##_set_##m)
+MAKE_FLT_GETTER(s##Get##m) \
+MAKE_FLT_SETTER(s##Set##m)
 
 #define MAKE_VEC_GETTER(func) \
 static VALUE rb_##func(VALUE self) \
-{return VNEW(cpPinJoint_get_anchr1(CONSTRAINT(self)));}
+{return VNEW(func(CONSTRAINT(self)));}
 
 #define MAKE_VEC_SETTER(func) \
 static VALUE rb_##func(VALUE self, VALUE value) \
 {func(CONSTRAINT(self), *VGET(value)); return value;} \
 
 #define MAKE_VEC_ACCESSORS(s, m) \
-MAKE_VEC_GETTER(s##_get_##m) \
-MAKE_VEC_SETTER(s##_set_##m)
+MAKE_VEC_GETTER(s##Get##m) \
+MAKE_VEC_SETTER(s##Set##m)
 
 
 #define ALLOC_TEMPLATE(s, alloc) \
@@ -79,9 +79,9 @@ rb_cpPinJoint_init(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2)
 	return self;
 }
 
-MAKE_FLT_ACCESSORS(cpPinJoint, dist)
-MAKE_VEC_ACCESSORS(cpPinJoint, anchr1)
-MAKE_VEC_ACCESSORS(cpPinJoint, anchr2)
+MAKE_FLT_ACCESSORS(cpPinJoint, Dist)
+MAKE_VEC_ACCESSORS(cpPinJoint, Anchr1)
+MAKE_VEC_ACCESSORS(cpPinJoint, Anchr2)
 
 
 ALLOC_TEMPLATE(cpDampedRotarySpring, cpDampedRotarySpringAlloc())
@@ -97,9 +97,9 @@ rb_cpDampedRotarySpring_init(VALUE self, VALUE a, VALUE b, VALUE restAngle, VALU
 	return self;
 }
 
-MAKE_FLT_ACCESSORS(cpDampedRotarySpring, restAngle);
-MAKE_FLT_ACCESSORS(cpDampedRotarySpring, stiffness);
-MAKE_FLT_ACCESSORS(cpDampedRotarySpring, damping);
+MAKE_FLT_ACCESSORS(cpDampedRotarySpring, RestAngle);
+MAKE_FLT_ACCESSORS(cpDampedRotarySpring, Stiffness);
+MAKE_FLT_ACCESSORS(cpDampedRotarySpring, Damping);
 
 
 ALLOC_TEMPLATE(cpDampedSpring, cpDampedSpringAlloc())
@@ -115,11 +115,11 @@ rb_cpDampedSpring_init(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2,
 	return self;
 }
 
-MAKE_VEC_ACCESSORS(cpDampedSpring, anchr1)
-MAKE_VEC_ACCESSORS(cpDampedSpring, anchr2)
-MAKE_FLT_ACCESSORS(cpDampedSpring, restLength);
-MAKE_FLT_ACCESSORS(cpDampedSpring, stiffness);
-MAKE_FLT_ACCESSORS(cpDampedSpring, damping);
+MAKE_VEC_ACCESSORS(cpDampedSpring, Anchr1)
+MAKE_VEC_ACCESSORS(cpDampedSpring, Anchr2)
+MAKE_FLT_ACCESSORS(cpDampedSpring, RestLength);
+MAKE_FLT_ACCESSORS(cpDampedSpring, Stiffness);
+MAKE_FLT_ACCESSORS(cpDampedSpring, Damping);
 
 
 ALLOC_TEMPLATE(cpGearJoint, cpGearJointAlloc())
@@ -135,8 +135,8 @@ rb_cpGearJoint_init(VALUE self, VALUE a, VALUE b, VALUE phase, VALUE ratio)
 	return self;
 }
 
-MAKE_FLT_ACCESSORS(cpGearJoint, phase);
-MAKE_FLT_ACCESSORS(cpGearJoint, ratio);
+MAKE_FLT_ACCESSORS(cpGearJoint, Phase);
+MAKE_FLT_ACCESSORS(cpGearJoint, Ratio);
 
 
 ALLOC_TEMPLATE(cpPivotJoint, cpPivotJointAlloc())
@@ -152,8 +152,8 @@ rb_cpPivotJoint_init(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2)
 	return self;
 }
 
-MAKE_VEC_ACCESSORS(cpPivotJoint, anchr1);
-MAKE_VEC_ACCESSORS(cpPivotJoint, anchr2);
+MAKE_VEC_ACCESSORS(cpPivotJoint, Anchr1);
+MAKE_VEC_ACCESSORS(cpPivotJoint, Anchr2);
 
 
 ALLOC_TEMPLATE(cpRotaryLimitJoint, cpRotaryLimitJointAlloc())
@@ -169,8 +169,8 @@ rb_cpRotaryLimitJoint_init(VALUE self, VALUE a, VALUE b, VALUE min, VALUE max)
 	return self;
 }
 
-MAKE_FLT_ACCESSORS(cpRotaryLimitJoint, min);
-MAKE_FLT_ACCESSORS(cpRotaryLimitJoint, max);
+MAKE_FLT_ACCESSORS(cpRotaryLimitJoint, Min);
+MAKE_FLT_ACCESSORS(cpRotaryLimitJoint, Max);
 
 
 ALLOC_TEMPLATE(cpSimpleMotor, cpSimpleMotorAlloc())
@@ -186,7 +186,7 @@ rb_cpSimpleMotor_init(VALUE self, VALUE a, VALUE b, VALUE rate)
 	return self;
 }
 
-MAKE_FLT_ACCESSORS(cpSimpleMotor, rate);
+MAKE_FLT_ACCESSORS(cpSimpleMotor, Rate);
 
 
 ALLOC_TEMPLATE(cpSlideJoint, cpSlideJointAlloc())
@@ -202,10 +202,10 @@ rb_cpSlideJoint_init(VALUE self, VALUE a, VALUE b, VALUE anchr1, VALUE anchr2, V
 	return self;
 }
 
-MAKE_VEC_ACCESSORS(cpSlideJoint, anchr1)
-MAKE_VEC_ACCESSORS(cpSlideJoint, anchr2)
-MAKE_FLT_ACCESSORS(cpSlideJoint, min);
-MAKE_FLT_ACCESSORS(cpSlideJoint, max);
+MAKE_VEC_ACCESSORS(cpSlideJoint, Anchr1)
+MAKE_VEC_ACCESSORS(cpSlideJoint, Anchr2)
+MAKE_FLT_ACCESSORS(cpSlideJoint, Min);
+MAKE_FLT_ACCESSORS(cpSlideJoint, Max);
 
 
 ALLOC_TEMPLATE(cpGrooveJoint, cpGrooveJointAlloc())
@@ -221,14 +221,14 @@ rb_cpGrooveJoint_init(VALUE self, VALUE a, VALUE b, VALUE grv_a, VALUE grv_b, VA
 	return self;
 }
 
-MAKE_VEC_ACCESSORS(cpGrooveJoint, anchr2)
+MAKE_VEC_ACCESSORS(cpGrooveJoint, Anchr2)
 // TODO more accessors
 
 
 #define STRINGIFY(v) #v
 #define ACCESSOR_METHODS(s, m, name) \
-rb_define_method(c_##s, STRINGIFY(name), rb_##s##_get_##m, 0); \
-rb_define_method(c_##s, STRINGIFY(name=), rb_##s##_set_##m, 1);
+rb_define_method(c_##s, STRINGIFY(name), rb_##s##Get##m, 0); \
+rb_define_method(c_##s, STRINGIFY(name=), rb_##s##Set##m, 1);
 
 static VALUE
 make_class(char *name, void *alloc_func, void *init_func, int init_params)
@@ -255,45 +255,45 @@ Init_cpConstraint(void)
 	rb_define_method(m_cpConstraint, "max_bias=", rb_cpConstraint_set_maxBias, 1);
 	
 	VALUE c_cpPinJoint = make_class("PinJoint", rb_cpPinJoint_alloc, rb_cpPinJoint_init, 4);
-	ACCESSOR_METHODS(cpPinJoint, anchr1, anchr1)
-	ACCESSOR_METHODS(cpPinJoint, anchr2, anchr2)
-	ACCESSOR_METHODS(cpPinJoint, dist, dist)
+	ACCESSOR_METHODS(cpPinJoint, Anchr1, anchr1)
+	ACCESSOR_METHODS(cpPinJoint, Anchr2, anchr2)
+	ACCESSOR_METHODS(cpPinJoint, Dist, dist)
 	
 	VALUE c_cpDampedRotarySpring = make_class("DampedRotarySpring", rb_cpDampedRotarySpring_alloc, rb_cpDampedRotarySpring_init, 5);
-	ACCESSOR_METHODS(cpDampedRotarySpring, restAngle, rest_angle)
-	ACCESSOR_METHODS(cpDampedRotarySpring, stiffness, stiffness)
-	ACCESSOR_METHODS(cpDampedRotarySpring, damping, damping)
+	ACCESSOR_METHODS(cpDampedRotarySpring, RestAngle, rest_angle)
+	ACCESSOR_METHODS(cpDampedRotarySpring, Stiffness, stiffness)
+	ACCESSOR_METHODS(cpDampedRotarySpring, Damping, damping)
 	
 	VALUE c_cpDampedSpring = make_class("DampedSpring", rb_cpDampedSpring_alloc, rb_cpDampedSpring_init, 7);
-	ACCESSOR_METHODS(cpDampedSpring, anchr1, anchr1)
-	ACCESSOR_METHODS(cpDampedSpring, anchr2, anchr2)
-	ACCESSOR_METHODS(cpDampedSpring, restLength, rest_length)
-	ACCESSOR_METHODS(cpDampedSpring, stiffness, stiffness)
-	ACCESSOR_METHODS(cpDampedSpring, damping, damping)
+	ACCESSOR_METHODS(cpDampedSpring, Anchr1, anchr1)
+	ACCESSOR_METHODS(cpDampedSpring, Anchr2, anchr2)
+	ACCESSOR_METHODS(cpDampedSpring, RestLength, rest_length)
+	ACCESSOR_METHODS(cpDampedSpring, Stiffness, stiffness)
+	ACCESSOR_METHODS(cpDampedSpring, Damping, damping)
 	
 	VALUE c_cpGearJoint = make_class("GearJoint", rb_cpGearJoint_alloc, rb_cpGearJoint_init, 4);
-	ACCESSOR_METHODS(cpGearJoint, phase, phase)
-	ACCESSOR_METHODS(cpGearJoint, ratio, ratio)
+	ACCESSOR_METHODS(cpGearJoint, Phase, phase)
+	ACCESSOR_METHODS(cpGearJoint, Ratio, ratio)
 	
 	VALUE c_cpPivotJoint = make_class("PivotJoint", rb_cpPivotJoint_alloc, rb_cpPivotJoint_init, 4);
-	ACCESSOR_METHODS(cpPivotJoint, anchr1, anchr1)
-	ACCESSOR_METHODS(cpPivotJoint, anchr2, anchr2)
+	ACCESSOR_METHODS(cpPivotJoint, Anchr1, anchr1)
+	ACCESSOR_METHODS(cpPivotJoint, Anchr2, anchr2)
 	
 	VALUE c_cpRotaryLimitJoint = make_class("RotaryLimitJoint", rb_cpRotaryLimitJoint_alloc, rb_cpRotaryLimitJoint_init, 4);
-	ACCESSOR_METHODS(cpRotaryLimitJoint, min, min)
-	ACCESSOR_METHODS(cpRotaryLimitJoint, max, max)
+	ACCESSOR_METHODS(cpRotaryLimitJoint, Min, min)
+	ACCESSOR_METHODS(cpRotaryLimitJoint, Max, max)
 	
 	VALUE c_cpSimpleMotor = make_class("SimpleMotor", rb_cpSimpleMotor_alloc, rb_cpSimpleMotor_init, 3);
-	ACCESSOR_METHODS(cpSimpleMotor, rate, rate);
+	ACCESSOR_METHODS(cpSimpleMotor, Rate, rate);
 	
 	VALUE c_cpSlideJoint = make_class("SlideJoint", rb_cpSlideJoint_alloc, rb_cpSlideJoint_init, 6);
-	ACCESSOR_METHODS(cpSlideJoint, anchr1, anchr1)
-	ACCESSOR_METHODS(cpSlideJoint, anchr2, anchr2)
-	ACCESSOR_METHODS(cpSlideJoint, min, min)
-	ACCESSOR_METHODS(cpSlideJoint, max, max)
+	ACCESSOR_METHODS(cpSlideJoint, Anchr1, anchr1)
+	ACCESSOR_METHODS(cpSlideJoint, Anchr2, anchr2)
+	ACCESSOR_METHODS(cpSlideJoint, Min, min)
+	ACCESSOR_METHODS(cpSlideJoint, Max, max)
 	
 	VALUE c_cpGrooveJoint = make_class("GrooveJoint", rb_cpGrooveJoint_alloc, rb_cpGrooveJoint_init, 5);
-	ACCESSOR_METHODS(cpGrooveJoint, anchr2, anchr2)
+	ACCESSOR_METHODS(cpGrooveJoint, Anchr2, anchr2)
 // TODO groove joint accessors
 	
 	// TODO breakable joint

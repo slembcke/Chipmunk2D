@@ -43,7 +43,7 @@ update(int ticks)
 {
 	cpFloat coef = (2.0f + arrowDirection.y)/3.0f;
 	cpFloat rate = arrowDirection.x*10.0f*coef;
-	cpSimpleMotor_set_rate(motor, rate);
+	cpSimpleMotorSetRate(motor, rate);
 	motor->maxForce = (rate) ? 100000.0f : 0.0f;
 	
 	int steps = 3;
@@ -92,10 +92,10 @@ make_leg(cpFloat side, cpFloat offset, cpBody *chassis, cpBody *crank, cpVect an
 	cpFloat diag = sqrtf(side*side + offset*offset);
 	
 	constraint = cpPinJointNew(crank, upper_leg, anchor, cpv(0.0f, side));
-	cpPinJoint_set_dist(constraint, diag);
+	cpPinJointSetDist(constraint, diag);
 	cpSpaceAddConstraint(space, constraint);
 	constraint = cpPinJointNew(crank, lower_leg, anchor, cpvzero);
-	cpPinJoint_set_dist(constraint, diag);
+	cpPinJointSetDist(constraint, diag);
 	cpSpaceAddConstraint(space, constraint);
 }
 

@@ -79,11 +79,14 @@ getImpulse(cpPinJoint *joint)
 	return cpfabs(joint->jnAcc);
 }
 
-const cpConstraintClass cpPinJointClass = {
+static const cpConstraintClass klass = {
+	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
+CP_DefineClassAccessor(cpPinJoint);
+
 
 cpPinJoint *
 cpPinJointAlloc(void)
@@ -94,7 +97,7 @@ cpPinJointAlloc(void)
 cpPinJoint *
 cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
 {
-	cpConstraintInit((cpConstraint *)joint, &cpPinJointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &klass, a, b);
 	
 	joint->anchr1 = anchr1;
 	joint->anchr2 = anchr2;

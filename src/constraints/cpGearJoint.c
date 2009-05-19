@@ -71,11 +71,13 @@ getImpulse(cpGearJoint *joint)
 	return cpfabs(joint->jAcc);
 }
 
-const cpConstraintClass cpGearJointClass = {
+static const cpConstraintClass klass = {
+	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
+CP_DefineClassAccessor(cpGearJoint)
 
 cpGearJoint *
 cpGearJointAlloc(void)
@@ -86,7 +88,7 @@ cpGearJointAlloc(void)
 cpGearJoint *
 cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio)
 {
-	cpConstraintInit((cpConstraint *)joint, &cpGearJointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &klass, a, b);
 	
 	joint->phase = phase;
 	joint->ratio = ratio;

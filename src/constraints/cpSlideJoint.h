@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-extern const cpConstraintClass cpSlideJointClass;
+const cpConstraintClass *cpSlideJointClass();
 
 typedef struct cpSlideJoint {
 	cpConstraint constraint;
@@ -38,7 +38,7 @@ cpSlideJoint *cpSlideJointAlloc(void);
 cpSlideJoint *cpSlideJointInit(cpSlideJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max);
 cpConstraint *cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max);
 
-MakeConstraintAccessors(cpSlideJoint, cpVect, anchr1);
-MakeConstraintAccessors(cpSlideJoint, cpVect, anchr2);
-MakeConstraintAccessors(cpSlideJoint, cpFloat, min);
-MakeConstraintAccessors(cpSlideJoint, cpFloat, max);
+CP_DefineConstraintProperty(cpSlideJoint, cpVect, anchr1, Anchr1);
+CP_DefineConstraintProperty(cpSlideJoint, cpVect, anchr2, Anchr2);
+CP_DefineConstraintProperty(cpSlideJoint, cpFloat, min, Min);
+CP_DefineConstraintProperty(cpSlideJoint, cpFloat, max, Max);

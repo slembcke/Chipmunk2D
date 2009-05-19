@@ -31,10 +31,13 @@ typedef void (*cpConstraintApplyImpulseFunction)(struct cpConstraint *constraint
 typedef cpFloat (*cpConstraintGetImpulseFunction)(struct cpConstraint *constraint);
 
 typedef struct cpConstraintClass {
+	int classSize;
 	cpConstraintPreStepFunction preStep;
 	cpConstraintApplyImpulseFunction applyImpulse;
 	cpConstraintGetImpulseFunction getImpulse;
 } cpConstraintClass;
+
+
 
 typedef struct cpConstraint {
 	const cpConstraintClass *klass;
@@ -55,16 +58,27 @@ void cpConstraintFree(cpConstraint *constraint);
 
 void cpConstraintCheckCast(cpConstraint *constraint, const cpConstraintClass *klass);
 
-#define MakeConstraintAccessors(s, t, m) \
-static inline t \
-s##_get_##m(cpConstraint *constraint){ \
-	cpConstraintCheckCast(constraint, &s##Class); \
-	return ((s *)constraint)->m; \
+#define CP_DefineConstraintProperty(struct, type, member, name) \
+static inline type \
+struct##Get##name(cpConstraint *constraint){ \
+	cpConstraintCheckCast(constraint, struct##Class()); \
+	return ((struct *)constraint)->member; \
 } \
 static inline void \
-s##_set_##m(cpConstraint *constraint, t value){ \
-	cpConstraintCheckCast(constraint, &s##Class); \
-	((s *)constraint)->m = value; \
+struct##Set##name(cpConstraint *constraint, type value){ \
+	cpConstraintCheckCast(constraint, struct##Class()); \
+	((struct *)constraint)->member = value; \
+} \
+/* These are for compatibility with the interim trunk version, for some reason I thought I needed the underscores to make the macro work */ \
+static inline type \
+struct##_get_##member(cpConstraint *constraint){ \
+	cpConstraintCheckCast(constraint, struct##Class()); \
+	return ((struct *)constraint)->member; \
+} \
+static inline void \
+struct##_set_##member(cpConstraint *constraint, type value){ \
+	cpConstraintCheckCast(constraint, struct##Class()); \
+	((struct *)constraint)->member = value; \
 }
 
 // Built in Joint types

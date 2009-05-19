@@ -96,11 +96,13 @@ getImpulse(cpConstraint *joint)
 	return cpfabs(((cpSlideJoint *)joint)->jnAcc);
 }
 
-const cpConstraintClass cpSlideJointClass = {
+static const cpConstraintClass klass = {
+	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
+CP_DefineClassAccessor(cpSlideJoint)
 
 cpSlideJoint *
 cpSlideJointAlloc(void)
@@ -111,7 +113,7 @@ cpSlideJointAlloc(void)
 cpSlideJoint *
 cpSlideJointInit(cpSlideJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max)
 {
-	cpConstraintInit((cpConstraint *)joint, &cpSlideJointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &klass, a, b);
 	
 	joint->anchr1 = anchr1;
 	joint->anchr2 = anchr2;

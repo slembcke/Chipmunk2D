@@ -68,11 +68,13 @@ getImpulse(cpConstraint *constraint)
 	return 0.0f;
 }
 
-const cpConstraintClass cpDampedRotarySpringClass = {
+static const cpConstraintClass klass = {
+	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
+CP_DefineClassAccessor(cpDampedRotarySpring)
 
 cpDampedRotarySpring *
 cpDampedRotarySpringAlloc(void)
@@ -83,7 +85,7 @@ cpDampedRotarySpringAlloc(void)
 cpDampedRotarySpring *
 cpDampedRotarySpringInit(cpDampedRotarySpring *spring, cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping)
 {
-	cpConstraintInit((cpConstraint *)spring, &cpDampedRotarySpringClass, a, b);
+	cpConstraintInit((cpConstraint *)spring, &klass, a, b);
 	
 	spring->restAngle = restAngle;
 	spring->stiffness = stiffness;

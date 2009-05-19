@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-extern const cpConstraintClass cpDampedRotarySpringClass;
+const cpConstraintClass *cpDampedRotarySpringClass();
 
 typedef struct cpDampedRotarySpring {
 	cpConstraint constraint;
@@ -37,6 +37,6 @@ cpDampedRotarySpring *cpDampedRotarySpringAlloc(void);
 cpDampedRotarySpring *cpDampedRotarySpringInit(cpDampedRotarySpring *joint, cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping);
 cpConstraint *cpDampedRotarySpringNew(cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping);
 
-MakeConstraintAccessors(cpDampedRotarySpring, cpFloat, restAngle);
-MakeConstraintAccessors(cpDampedRotarySpring, cpFloat, stiffness);
-MakeConstraintAccessors(cpDampedRotarySpring, cpFloat, damping);
+CP_DefineConstraintProperty(cpDampedRotarySpring, cpFloat, restAngle, RestAngle);
+CP_DefineConstraintProperty(cpDampedRotarySpring, cpFloat, stiffness, Stiffness);
+CP_DefineConstraintProperty(cpDampedRotarySpring, cpFloat, damping, Damping);

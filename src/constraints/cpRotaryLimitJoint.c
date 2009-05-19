@@ -89,11 +89,13 @@ getImpulse(cpRotaryLimitJoint *joint)
 	return cpfabs(joint->jAcc);
 }
 
-const cpConstraintClass cpRotaryLimitJointClass = {
+static const cpConstraintClass klass = {
+	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
+CP_DefineClassAccessor(cpRotaryLimitJoint)
 
 cpRotaryLimitJoint *
 cpRotaryLimitJointAlloc(void)
@@ -104,7 +106,7 @@ cpRotaryLimitJointAlloc(void)
 cpRotaryLimitJoint *
 cpRotaryLimitJointInit(cpRotaryLimitJoint *joint, cpBody *a, cpBody *b, cpFloat min, cpFloat max)
 {
-	cpConstraintInit((cpConstraint *)joint, &cpRotaryLimitJointClass, a, b);
+	cpConstraintInit((cpConstraint *)joint, &klass, a, b);
 	
 	joint->min = min;
 	joint->max  = max;

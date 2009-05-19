@@ -78,10 +78,30 @@ cpBody *cpBodyNew(cpFloat m, cpFloat i);
 void cpBodyDestroy(cpBody *body);
 void cpBodyFree(cpBody *body);
 
-// Setters for some of the special properties (mandatory!)
+#define CP_DefineBodyGetter(type, member, name) static inline type cpBodyGet##name(cpBody *body){return body->member;}
+#define CP_DefineBodySetter(type, member, name) static inline void cpBodySet##name(cpBody *body, type value){body->member = value;}
+
+#define CP_DefineBodyProperty(type, member, name) \
+CP_DefineBodyGetter(type, member, name) \
+CP_DefineBodySetter(type, member, name)
+
+
+// Accessors for cpBody struct members
+CP_DefineBodyGetter(cpFloat, m, Mass);
 void cpBodySetMass(cpBody *body, cpFloat m);
+
+CP_DefineBodyGetter(cpFloat, i, Moment);
 void cpBodySetMoment(cpBody *body, cpFloat i);
+
+
+CP_DefineBodyProperty(cpVect, p, Pos);
+CP_DefineBodyProperty(cpVect, v, Vel);
+CP_DefineBodyProperty(cpVect, f, Force);
+CP_DefineBodyGetter(cpFloat, a, Angle);
 void cpBodySetAngle(cpBody *body, cpFloat a);
+CP_DefineBodyProperty(cpFloat, w, AngVel);
+CP_DefineBodyProperty(cpFloat, t, Torque);
+CP_DefineBodyGetter(cpVect, rot, Rot);
 
 //  Modify the velocity of the body so that it will move to the specified absolute coordinates in the next timestep.
 // Intended for objects that are moved manually with a custom velocity integration function.

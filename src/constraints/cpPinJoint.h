@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
  
-extern const cpConstraintClass cpPinJointClass;
+const cpConstraintClass *cpPinJointClass();
 
 typedef struct cpPinJoint {
 	cpConstraint constraint;
@@ -38,6 +38,6 @@ cpPinJoint *cpPinJointAlloc(void);
 cpPinJoint *cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
 cpConstraint *cpPinJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
 
-MakeConstraintAccessors(cpPinJoint, cpVect, anchr1);
-MakeConstraintAccessors(cpPinJoint, cpVect, anchr2);
-MakeConstraintAccessors(cpPinJoint, cpFloat, dist);
+CP_DefineConstraintProperty(cpPinJoint, cpVect, anchr1, Anchr1);
+CP_DefineConstraintProperty(cpPinJoint, cpVect, anchr2, Anchr2);
+CP_DefineConstraintProperty(cpPinJoint, cpFloat, dist, Dist);

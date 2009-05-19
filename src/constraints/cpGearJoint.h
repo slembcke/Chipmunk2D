@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-extern const cpConstraintClass cpGearJointClass;
+const cpConstraintClass *cpGearJointClass();
 
 typedef struct cpGearJoint {
 	cpConstraint constraint;
@@ -35,5 +35,5 @@ cpGearJoint *cpGearJointAlloc(void);
 cpGearJoint *cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
 cpConstraint *cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
 
-MakeConstraintAccessors(cpGearJoint, cpFloat, phase);
-MakeConstraintAccessors(cpGearJoint, cpFloat, ratio);
+CP_DefineConstraintProperty(cpGearJoint, cpFloat, phase, Phase);
+CP_DefineConstraintProperty(cpGearJoint, cpFloat, ratio, Ratio);

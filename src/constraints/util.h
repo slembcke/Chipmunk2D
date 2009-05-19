@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+#define CP_DefineClassAccessor(t) const cpConstraintClass * t##Class(){return &klass;}
+
 void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b);
 
 #define J_MAX(constraint, dt) (((cpConstraint *)constraint)->maxForce*(dt))

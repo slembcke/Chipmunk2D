@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-extern const cpConstraintClass cpPivotJointClass;
+const cpConstraintClass *cpPivotJointClass();
 
 typedef struct cpPivotJoint {
 	cpConstraint constraint;
@@ -38,5 +38,5 @@ cpPivotJoint *cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect
 cpConstraint *cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot);
 cpConstraint *cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
 
-MakeConstraintAccessors(cpPivotJoint, cpVect, anchr1);
-MakeConstraintAccessors(cpPivotJoint, cpVect, anchr2);
+CP_DefineConstraintProperty(cpPivotJoint, cpVect, anchr1, Anchr1);
+CP_DefineConstraintProperty(cpPivotJoint, cpVect, anchr2, Anchr2);

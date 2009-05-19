@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-extern const cpConstraintClass cpRotaryLimitJointClass;
+const cpConstraintClass *cpRotaryLimitJointClass();
 
 typedef struct cpRotaryLimitJoint {
 	cpConstraint constraint;
@@ -35,5 +35,5 @@ cpRotaryLimitJoint *cpRotaryLimitJointAlloc(void);
 cpRotaryLimitJoint *cpRotaryLimitJointInit(cpRotaryLimitJoint *joint, cpBody *a, cpBody *b, cpFloat min, cpFloat max);
 cpConstraint *cpRotaryLimitJointNew(cpBody *a, cpBody *b, cpFloat min, cpFloat max);
 
-MakeConstraintAccessors(cpRotaryLimitJoint, cpFloat, min);
-MakeConstraintAccessors(cpRotaryLimitJoint, cpFloat, max);
+CP_DefineConstraintProperty(cpRotaryLimitJoint, cpFloat, min, Min);
+CP_DefineConstraintProperty(cpRotaryLimitJoint, cpFloat, max, Max);
