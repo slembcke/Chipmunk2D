@@ -105,6 +105,7 @@ static const cpShapeClass polyClass = {
 	cpPolyShapeCacheData,
 	cpPolyShapeDestroy,
 	cpPolyShapePointQuery,
+	NULL,
 };
 
 static void

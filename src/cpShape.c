@@ -87,6 +87,15 @@ cpShapePointQuery(cpShape *shape, cpVect p){
 	return shape->klass->pointQuery(shape, p);
 }
 
+cpSegmentQueryInfo *
+cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, unsigned int layers, unsigned int group, cpSegmentQueryInfo *info){
+	if((group && shape->group && group == shape->group) || !(layers & shape->layers)){
+		return NULL;
+	} else {
+		return shape->klass->segmentQuery(shape, a, b, info);
+	}
+}
+
 void
 cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info)
 {
@@ -174,6 +183,7 @@ static const cpShapeClass cpCircleShapeClass = {
 	cpCircleShapeCacheData,
 	NULL,
 	cpCircleShapePointQuery,
+	cpCircleShapeSegmentQuery,
 };
 
 cpCircleShape *
@@ -274,6 +284,7 @@ static const cpShapeClass cpSegmentShapeClass = {
 	cpSegmentShapeCacheData,
 	NULL,
 	cpSegmentShapePointQuery,
+	NULL,
 };
 
 cpSegmentShape *

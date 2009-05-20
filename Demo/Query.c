@@ -38,7 +38,8 @@ char messageString[1024];
 cpShape *querySeg = NULL;
 cpShape *circle = NULL;
 
-extern cpSegmentQueryInfo *cpCircleShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+extern cpSegmentQueryInfo *cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, unsigned int layers, unsigned int group, cpSegmentQueryInfo *info);
+
 
 static void
 update(int ticks)
@@ -46,13 +47,15 @@ update(int ticks)
 	messageString[0] = '\0';
 	
 	cpVect end = mousePoint;
-	cpSegmentQueryInfo info;
-	if(cpCircleShapeSegmentQuery(circle, cpvzero, end, &info)){
-		end = info.point;
+	cpSegmentQueryInfo *info = cpShapeSegmentQuery(circle, cpvzero, end, -1, 0, NULL);
+	if(info){
+		end = info->point;
 		
 		char infoString[1024];
-		sprintf(infoString, "Segment Query: Dist(%f) Normal%s", info.dist, cpvstr(info.n));
+		sprintf(infoString, "Segment Query: Dist(%f) Normal%s", info->dist, cpvstr(info->n));
 		strcat(messageString, infoString);
+		
+		free(info);
 	} else {
 		strcat(messageString, "Segment Query (None)");
 	}
@@ -78,7 +81,7 @@ init(void)
 	cpShape *shape;
 	
 	// add a non-collidable segment as a quick and dirty way to draw the query line
-	shape = cpSegmentShapeNew(staticBody, cpvzero, cpv(100.0f, 0.0f), 2.0f);
+	shape = cpSegmentShapeNew(staticBody, cpvzero, cpv(100.0f, 0.0f), 4.0f);
 	cpSpaceAddStaticShape(space, shape);
 	shape->layers = 0;
 	querySeg = shape;

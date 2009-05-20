@@ -18,6 +18,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+ 
+typedef struct cpSegmentQueryInfo{
+	cpFloat t, dist;
+	cpVect point, n;
+} cpSegmentQueryInfo;
 
 // For determinism, you can reset the shape id counter.
 void cpResetShapeIdCounter(void);
@@ -43,8 +48,11 @@ typedef struct cpShapeClass {
 	// Called to by cpShapeDestroy().
 	void (*destroy)(struct cpShape *shape);
 	
-	// called by cpShapeQueryPointQuery().
+	// called by cpShapePointQuery().
 	int (*pointQuery)(struct cpShape *shape, cpVect p);
+	
+	// called by cpShapeSegmentQuery()
+	cpSegmentQueryInfo *(*segmentQuery)(struct cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
 } cpShapeClass;
 
 // Basic shape struct that the others inherit from.
@@ -97,12 +105,6 @@ cpBB cpShapeCacheBB(cpShape *shape);
 
 // Test if a point lies within a shape.
 int cpShapePointQuery(cpShape *shape, cpVect p);
-
-typedef struct cpSegmentQueryInfo{
-	cpFloat t, dist;
-	cpVect point, n;
-} cpSegmentQueryInfo;
-
 void cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info);
 
 #define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(cpShape *shape)
