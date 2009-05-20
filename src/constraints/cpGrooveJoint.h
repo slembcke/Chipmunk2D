@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-const cpConstraintClass *cpGrooveJointClass();
+const cpConstraintClass *cpGrooveJointGetClass();
 
 typedef struct cpGrooveJoint {
 	cpConstraint constraint;

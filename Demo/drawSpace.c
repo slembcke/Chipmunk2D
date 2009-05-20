@@ -320,7 +320,7 @@ drawConstraint(cpConstraint *constraint)
 	cpBody *body_b = constraint->b;
 
 	const cpConstraintClass *klass = constraint->klass;
-	if(klass == cpPinJointClass()){
+	if(klass == cpPinJointGetClass()){
 		cpPinJoint *joint = (cpPinJoint *)constraint;
 	
 		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
@@ -336,7 +336,7 @@ drawConstraint(cpConstraint *constraint)
 			glVertex2f(a.x, a.y);
 			glVertex2f(b.x, b.y);
 		} glEnd();
-	} else if(klass == cpSlideJointClass()){
+	} else if(klass == cpSlideJointGetClass()){
 		cpSlideJoint *joint = (cpSlideJoint *)constraint;
 	
 		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
@@ -352,7 +352,7 @@ drawConstraint(cpConstraint *constraint)
 			glVertex2f(a.x, a.y);
 			glVertex2f(b.x, b.y);
 		} glEnd();
-	} else if(klass == cpPivotJointClass()){
+	} else if(klass == cpPivotJointGetClass()){
 		cpPivotJoint *joint = (cpPivotJoint *)constraint;
 	
 		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
@@ -363,11 +363,11 @@ drawConstraint(cpConstraint *constraint)
 			glVertex2f(a.x, a.y);
 			glVertex2f(b.x, b.y);
 		} glEnd();
-	} else if(klass == cpGrooveJointClass()){
+	} else if(klass == cpGrooveJointGetClass()){
 //		printf("Cannot draw constraint\n");
-	} else if(klass == cpDampedSpringClass()){
+	} else if(klass == cpDampedSpringGetClass()){
 		drawSpring((cpDampedSpring *)constraint, body_a, body_b);
-	} else if(klass == cpBreakableJointClass()){
+	} else if(klass == cpBreakableJointGetClass()){
 		cpBreakableJoint *breakable = (cpBreakableJoint *)constraint;
 		drawConstraint(breakable->delegate);
 	} else {

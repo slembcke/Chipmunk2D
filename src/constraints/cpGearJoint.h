@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-const cpConstraintClass *cpGearJointClass();
+const cpConstraintClass *cpGearJointGetClass();
 
 typedef struct cpGearJoint {
 	cpConstraint constraint;

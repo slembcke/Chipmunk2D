@@ -97,12 +97,11 @@ getImpulse(cpConstraint *joint)
 }
 
 static const cpConstraintClass klass = {
-	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
-CP_DefineClassAccessor(cpSlideJoint)
+CP_DefineClassGetter(cpSlideJoint)
 
 cpSlideJoint *
 cpSlideJointAlloc(void)

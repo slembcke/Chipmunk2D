@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
  
-const cpConstraintClass *cpPinJointClass();
+const cpConstraintClass *cpPinJointGetClass();
 
 typedef struct cpPinJoint {
 	cpConstraint constraint;

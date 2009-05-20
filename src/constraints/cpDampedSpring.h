@@ -19,7 +19,11 @@
  * SOFTWARE.
  */
 
-const cpConstraintClass *cpDampedSpringClass();
+struct cpDampedSpring;
+
+typedef cpFloat (*cpDampedSpringForceFunc)(struct cpConstraint *spring, cpFloat dist);
+
+const cpConstraintClass *cpDampedSpringGetClass();
 
 typedef struct cpDampedSpring {
 	cpConstraint constraint;
@@ -27,6 +31,7 @@ typedef struct cpDampedSpring {
 	cpFloat restLength;
 	cpFloat stiffness;
 	cpFloat damping;
+	cpDampedSpringForceFunc springForceFunc;
 	
 	cpFloat dt;
 	cpFloat target_vrn;
@@ -45,3 +50,4 @@ CP_DefineConstraintProperty(cpDampedSpring, cpVect, anchr2, Anchr2);
 CP_DefineConstraintProperty(cpDampedSpring, cpFloat, restLength, RestLength);
 CP_DefineConstraintProperty(cpDampedSpring, cpFloat, stiffness, Stiffness);
 CP_DefineConstraintProperty(cpDampedSpring, cpFloat, damping, Damping);
+CP_DefineConstraintProperty(cpDampedSpring, cpDampedSpringForceFunc, springForceFunc, SpringForceFunc);

@@ -25,6 +25,12 @@
 #include "../chipmunk.h"
 #include "util.h"
 
+static cpFloat
+defaultSpringForce(cpConstraint *constraint, cpFloat dist){
+	cpDampedSpring *spring = (cpDampedSpring *)constraint;
+	return (spring->restLength - dist)*spring->stiffness;
+}
+
 static void
 preStep(cpDampedSpring *spring, cpFloat dt, cpFloat dt_inv)
 {
@@ -45,7 +51,7 @@ preStep(cpDampedSpring *spring, cpFloat dt, cpFloat dt_inv)
 	spring->target_vrn = 0.0f;
 
 	// apply spring force
-	cpFloat f_spring = (spring->restLength - dist)*spring->stiffness;
+	cpFloat f_spring = spring->springForceFunc((cpConstraint *)spring, dist);//defaultSpringForce(spring, dist);
 	apply_impulses(a, b, spring->r1, spring->r2, cpvmult(spring->n, f_spring*dt));
 }
 
@@ -77,12 +83,11 @@ getImpulse(cpConstraint *constraint)
 }
 
 static const cpConstraintClass klass = {
-	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
-CP_DefineClassAccessor(cpDampedSpring)
+CP_DefineClassGetter(cpDampedSpring)
 
 cpDampedSpring *
 cpDampedSpringAlloc(void)
@@ -93,7 +98,7 @@ cpDampedSpringAlloc(void)
 cpDampedSpring *
 cpDampedSpringInit(cpDampedSpring *spring, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping)
 {
-	cpConstraintInit((cpConstraint *)spring, &klass, a, b);
+	cpConstraintInit((cpConstraint *)spring, cpDampedSpringGetClass(), a, b);
 	
 	spring->anchr1 = anchr1;
 	spring->anchr2 = anchr2;
@@ -101,6 +106,7 @@ cpDampedSpringInit(cpDampedSpring *spring, cpBody *a, cpBody *b, cpVect anchr1, 
 	spring->restLength = restLength;
 	spring->stiffness = stiffness;
 	spring->damping = damping;
+	spring->springForceFunc = defaultSpringForce;
 	
 	return spring;
 }

@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-const cpConstraintClass *cpSlideJointClass();
+const cpConstraintClass *cpSlideJointGetClass();
 
 typedef struct cpSlideJoint {
 	cpConstraint constraint;

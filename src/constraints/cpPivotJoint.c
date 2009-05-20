@@ -76,12 +76,11 @@ getImpulse(cpConstraint *joint)
 }
 
 static const cpConstraintClass klass = {
-	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
-CP_DefineClassAccessor(cpPivotJoint)
+CP_DefineClassGetter(cpPivotJoint)
 
 cpPivotJoint *
 cpPivotJointAlloc(void)

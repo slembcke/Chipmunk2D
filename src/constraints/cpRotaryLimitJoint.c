@@ -90,12 +90,11 @@ getImpulse(cpRotaryLimitJoint *joint)
 }
 
 static const cpConstraintClass klass = {
-	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
-CP_DefineClassAccessor(cpRotaryLimitJoint)
+CP_DefineClassGetter(cpRotaryLimitJoint)
 
 cpRotaryLimitJoint *
 cpRotaryLimitJointAlloc(void)

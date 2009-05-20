@@ -22,7 +22,7 @@
 // required forward declaration
 struct cpSpace;
 
-const cpConstraintClass *cpBreakableJointClass();
+const cpConstraintClass *cpBreakableJointGetClass();
 
 typedef struct cpBreakableJoint {
 	cpConstraint constraint;

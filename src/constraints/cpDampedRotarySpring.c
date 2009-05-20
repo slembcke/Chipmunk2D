@@ -69,12 +69,11 @@ getImpulse(cpConstraint *constraint)
 }
 
 static const cpConstraintClass klass = {
-	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
-CP_DefineClassAccessor(cpDampedRotarySpring)
+CP_DefineClassGetter(cpDampedRotarySpring)
 
 cpDampedRotarySpring *
 cpDampedRotarySpringAlloc(void)

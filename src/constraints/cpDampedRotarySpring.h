@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-const cpConstraintClass *cpDampedRotarySpringClass();
+const cpConstraintClass *cpDampedRotarySpringGetClass();
 
 typedef struct cpDampedRotarySpring {
 	cpConstraint constraint;

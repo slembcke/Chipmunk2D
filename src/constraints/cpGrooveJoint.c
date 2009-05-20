@@ -104,12 +104,11 @@ getImpulse(cpGrooveJoint *joint)
 }
 
 static const cpConstraintClass klass = {
-	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
-CP_DefineClassAccessor(cpGrooveJoint)
+CP_DefineClassGetter(cpGrooveJoint)
 
 cpGrooveJoint *
 cpGrooveJointAlloc(void)

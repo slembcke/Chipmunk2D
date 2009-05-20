@@ -68,12 +68,11 @@ getImpulse(cpSimpleMotor *joint)
 }
 
 static const cpConstraintClass klass = {
-	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
-CP_DefineClassAccessor(cpSimpleMotor)
+CP_DefineClassGetter(cpSimpleMotor)
 
 cpSimpleMotor *
 cpSimpleMotorAlloc(void)

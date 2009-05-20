@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-const cpConstraintClass *cpRotaryLimitJointClass();
+const cpConstraintClass *cpRotaryLimitJointGetClass();
 
 typedef struct cpRotaryLimitJoint {
 	cpConstraint constraint;

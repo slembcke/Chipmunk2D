@@ -55,12 +55,11 @@ getImpulse(cpBreakableJoint *breakable)
 }
 
 static const cpConstraintClass klass = {
-	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
-CP_DefineClassAccessor(cpBreakableJoint)
+CP_DefineClassGetter(cpBreakableJoint)
 
 
 cpBreakableJoint *

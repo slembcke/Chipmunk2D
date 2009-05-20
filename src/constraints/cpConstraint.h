@@ -31,7 +31,6 @@ typedef void (*cpConstraintApplyImpulseFunction)(struct cpConstraint *constraint
 typedef cpFloat (*cpConstraintGetImpulseFunction)(struct cpConstraint *constraint);
 
 typedef struct cpConstraintClass {
-	int classSize;
 	cpConstraintPreStepFunction preStep;
 	cpConstraintApplyImpulseFunction applyImpulse;
 	cpConstraintGetImpulseFunction getImpulse;
@@ -46,6 +45,8 @@ typedef struct cpConstraint {
 	cpFloat maxForce;
 	cpFloat biasCoef;
 	cpFloat maxBias;
+	
+	void *data;
 } cpConstraint;
 
 #ifdef CP_USE_DEPRECATED_API_4
@@ -61,23 +62,23 @@ void cpConstraintCheckCast(cpConstraint *constraint, const cpConstraintClass *kl
 #define CP_DefineConstraintProperty(struct, type, member, name) \
 static inline type \
 struct##Get##name(cpConstraint *constraint){ \
-	cpConstraintCheckCast(constraint, struct##Class()); \
+	cpConstraintCheckCast(constraint, struct##GetClass()); \
 	return ((struct *)constraint)->member; \
 } \
 static inline void \
 struct##Set##name(cpConstraint *constraint, type value){ \
-	cpConstraintCheckCast(constraint, struct##Class()); \
+	cpConstraintCheckCast(constraint, struct##GetClass()); \
 	((struct *)constraint)->member = value; \
 } \
 /* These are for compatibility with the interim trunk version, for some reason I thought I needed the underscores to make the macro work */ \
 static inline type \
 struct##_get_##member(cpConstraint *constraint){ \
-	cpConstraintCheckCast(constraint, struct##Class()); \
+	cpConstraintCheckCast(constraint, struct##GetClass()); \
 	return ((struct *)constraint)->member; \
 } \
 static inline void \
 struct##_set_##member(cpConstraint *constraint, type value){ \
-	cpConstraintCheckCast(constraint, struct##Class()); \
+	cpConstraintCheckCast(constraint, struct##GetClass()); \
 	((struct *)constraint)->member = value; \
 }
 

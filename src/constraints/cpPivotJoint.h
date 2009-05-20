@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-const cpConstraintClass *cpPivotJointClass();
+const cpConstraintClass *cpPivotJointGetClass();
 
 typedef struct cpPivotJoint {
 	cpConstraint constraint;

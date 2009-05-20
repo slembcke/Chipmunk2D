@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-const cpConstraintClass *cpSimpleMotorClass();
+const cpConstraintClass *cpSimpleMotorGetClass();
 
 typedef struct cpSimpleMotor {
 	cpConstraint constraint;

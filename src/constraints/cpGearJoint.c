@@ -72,12 +72,11 @@ getImpulse(cpGearJoint *joint)
 }
 
 static const cpConstraintClass klass = {
-	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
-CP_DefineClassAccessor(cpGearJoint)
+CP_DefineClassGetter(cpGearJoint)
 
 cpGearJoint *
 cpGearJointAlloc(void)

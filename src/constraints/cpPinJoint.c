@@ -80,12 +80,11 @@ getImpulse(cpPinJoint *joint)
 }
 
 static const cpConstraintClass klass = {
-	sizeof(cpConstraintClass),
 	(cpConstraintPreStepFunction)preStep,
 	(cpConstraintApplyImpulseFunction)applyImpulse,
 	(cpConstraintGetImpulseFunction)getImpulse,
 };
-CP_DefineClassAccessor(cpPinJoint);
+CP_DefineClassGetter(cpPinJoint);
 
 
 cpPinJoint *
