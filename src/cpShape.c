@@ -117,7 +117,7 @@ cpCircleShapePointQuery(cpShape *shape, cpVect p){
 	return distSQ <= (circle->r*circle->r);
 }
 
-static const cpShapeClass circleClass = {
+static const cpShapeClass cpCircleShapeClass = {
 	CP_CIRCLE_SHAPE,
 	cpCircleShapeCacheData,
 	NULL,
@@ -130,7 +130,7 @@ cpCircleShapeInit(cpCircleShape *circle, cpBody *body, cpFloat radius, cpVect of
 	circle->c = offset;
 	circle->r = radius;
 	
-	cpShapeInit((cpShape *)circle, &circleClass, body);
+	cpShapeInit((cpShape *)circle, &cpCircleShapeClass, body);
 	
 	return circle;
 }
@@ -140,6 +140,9 @@ cpCircleShapeNew(cpBody *body, cpFloat radius, cpVect offset)
 {
 	return (cpShape *)cpCircleShapeInit(cpCircleShapeAlloc(), body, radius, offset);
 }
+
+CP_DefineShapeGetter(cpCircleShape, cpVect, c, Center)
+CP_DefineShapeGetter(cpCircleShape, cpFloat, r, Radius)
 
 cpSegmentShape *
 cpSegmentShapeAlloc(void)
@@ -214,7 +217,7 @@ cpSegmentShapePointQuery(cpShape *shape, cpVect p){
 	return 1;	
 }
 
-static const cpShapeClass segmentClass = {
+static const cpShapeClass cpSegmentShapeClass = {
 	CP_SEGMENT_SHAPE,
 	cpSegmentShapeCacheData,
 	NULL,
@@ -230,7 +233,7 @@ cpSegmentShapeInit(cpSegmentShape *seg, cpBody *body, cpVect a, cpVect b, cpFloa
 	
 	seg->r = r;
 	
-	cpShapeInit((cpShape *)seg, &segmentClass, body);
+	cpShapeInit((cpShape *)seg, &cpSegmentShapeClass, body);
 	
 	return seg;
 }
@@ -241,12 +244,17 @@ cpSegmentShapeNew(cpBody *body, cpVect a, cpVect b, cpFloat r)
 	return (cpShape *)cpSegmentShapeInit(cpSegmentShapeAlloc(), body, a, b, r);
 }
 
+CP_DefineShapeGetter(cpSegmentShape, cpVect, a, A)
+CP_DefineShapeGetter(cpSegmentShape, cpVect, b, B)
+CP_DefineShapeGetter(cpSegmentShape, cpVect, n, Normal)
+CP_DefineShapeGetter(cpSegmentShape, cpFloat, r, Radius)
+
 // Unsafe API (chipmunk_unsafe.h)
 
 void
 cpCircleShapeSetRadius(cpShape *shape, cpFloat radius)
 {
-	assert(shape->klass == &circleClass);
+	assert(shape->klass == &cpCircleShapeClass);
 	cpCircleShape *circle = (cpCircleShape *)shape;
 	
 	circle->r = radius;
@@ -255,7 +263,7 @@ cpCircleShapeSetRadius(cpShape *shape, cpFloat radius)
 void
 cpCircleShapeSetCenter(cpShape *shape, cpVect center)
 {
-	assert(shape->klass == &circleClass);
+	assert(shape->klass == &cpCircleShapeClass);
 	cpCircleShape *circle = (cpCircleShape *)shape;
 	
 	circle->c = center;
@@ -264,7 +272,7 @@ cpCircleShapeSetCenter(cpShape *shape, cpVect center)
 void
 cpSegmentShapeSetEndpoints(cpShape *shape, cpVect a, cpVect b)
 {
-	assert(shape->klass == &segmentClass);
+	assert(shape->klass == &cpSegmentShapeClass);
 	cpSegmentShape *seg = (cpSegmentShape *)shape;
 	
 	seg->a = a;
@@ -275,7 +283,7 @@ cpSegmentShapeSetEndpoints(cpShape *shape, cpVect a, cpVect b)
 void
 cpSegmentShapeSetRadius(cpShape *shape, cpFloat radius)
 {
-	assert(shape->klass == &segmentClass);
+	assert(shape->klass == &cpSegmentShapeClass);
 	cpSegmentShape *seg = (cpSegmentShape *)shape;
 	
 	seg->r = radius;

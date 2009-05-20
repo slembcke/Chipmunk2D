@@ -103,6 +103,12 @@ int cpShapePointQuery(cpShape *shape, cpVect p);
 // 0 would be a collision at point a, 1 would be a collision at point b.
 //cpFloat cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b);
 
+#define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(cpShape *shape)
+#define CP_DefineShapeGetter(struct, type, member, name) \
+CP_DeclareShapeGetter(struct, type, name){ \
+	assert(shape->klass == &struct##Class); \
+	return ((struct *)shape)->member; \
+}
 
 // Circle shape structure.
 typedef struct cpCircleShape{
@@ -122,6 +128,9 @@ cpCircleShape *cpCircleShapeAlloc(void);
 cpCircleShape *cpCircleShapeInit(cpCircleShape *circle, cpBody *body, cpFloat radius, cpVect offset);
 cpShape *cpCircleShapeNew(cpBody *body, cpFloat radius, cpVect offset);
 
+CP_DeclareShapeGetter(cpCircleShape, cpVect, Center);
+CP_DeclareShapeGetter(cpCircleShape, cpFloat, Radius);
+
 // Segment shape structure.
 typedef struct cpSegmentShape{
 	cpShape shape;
@@ -139,3 +148,8 @@ typedef struct cpSegmentShape{
 cpSegmentShape* cpSegmentShapeAlloc(void);
 cpSegmentShape* cpSegmentShapeInit(cpSegmentShape *seg, cpBody *body, cpVect a, cpVect b, cpFloat radius);
 cpShape* cpSegmentShapeNew(cpBody *body, cpVect a, cpVect b, cpFloat radius);
+
+CP_DeclareShapeGetter(cpSegmentShape, cpVect, A);
+CP_DeclareShapeGetter(cpSegmentShape, cpVect, B);
+CP_DeclareShapeGetter(cpSegmentShape, cpVect, Normal);
+CP_DeclareShapeGetter(cpSegmentShape, cpFloat, Radius);
