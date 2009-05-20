@@ -50,8 +50,7 @@ cpContactsSumImpulses(cpContact *contacts, int numContacts)
 	
 	for(int i=0; i<numContacts; i++){
 		cpContact *con = &contacts[i];
-		cpVect j = cpvmult(con->n, con->jnAcc);
-		sum = cpvadd(sum, j);
+		sum = cpvadd(sum, cpvmult(con->n, con->jnAcc));
 	}
 		
 	return sum;
@@ -64,12 +63,28 @@ cpContactsSumImpulsesWithFriction(cpContact *contacts, int numContacts)
 	
 	for(int i=0; i<numContacts; i++){
 		cpContact *con = &contacts[i];
-		cpVect t = cpvperp(con->n);
-		cpVect j = cpvadd(cpvmult(con->n, con->jnAcc), cpvmult(t, con->jtAcc));
-		sum = cpvadd(sum, j);
+		sum = cpvadd(sum, cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc)));
 	}
 		
 	return sum;
+}
+
+cpFloat
+cpContactsEstimateCrushingImpulse(cpContact *contacts, int numContacts)
+{
+	cpFloat fsum = 0.0f;
+	cpVect vsum = cpvzero;
+	
+	for(int i=0; i<numContacts; i++){
+		cpContact *con = &contacts[i];
+		cpVect j = cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc));
+		
+		fsum += cpvlength(j);
+		vsum = cpvadd(vsum, j);
+	}
+	
+	cpFloat vmag = cpvlength(vsum);
+	return (1.0f - vmag/fsum);
 }
 
 cpArbiter*
