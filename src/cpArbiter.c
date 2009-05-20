@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include "chipmunk.h"
+#include "constraints/util.h"
 
 cpFloat cp_bias_coef = 0.1f;
 cpFloat cp_collision_slop = 0.1f;
@@ -155,28 +156,16 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv)
 		con->r1 = cpvsub(con->p, a->p);
 		con->r2 = cpvsub(con->p, b->p);
 		
-		// Calculate the mass normal.
-		cpFloat mass_sum = a->m_inv + b->m_inv;
-		
-		cpFloat r1cn = cpvcross(con->r1, con->n);
-		cpFloat r2cn = cpvcross(con->r2, con->n);
-		cpFloat kn = mass_sum + a->i_inv*r1cn*r1cn + b->i_inv*r2cn*r2cn;
-		con->nMass = 1.0f/kn;
-		
-		// Calculate the mass tangent.
-		cpFloat r1ct = cpvdot(con->r1, con->n);
-		cpFloat r2ct = cpvdot(con->r2, con->n);
-		cpFloat kt = mass_sum + a->i_inv*r1ct*r1ct + b->i_inv*r2ct*r2ct;
-		con->tMass = 1.0f/kt;
+		// Calculate the mass normal and mass tangent.
+		con->nMass = 1.0f/k_scalar(a, b, con->r1, con->r2, con->n);
+		con->tMass = 1.0f/k_scalar(a, b, con->r1, con->r2, cpvperp(con->n));
 				
 		// Calculate the target bias velocity.
 		con->bias = -cp_bias_coef*dt_inv*cpfmin(0.0f, con->dist + cp_collision_slop);
 		con->jBias = 0.0f;
 		
 		// Calculate the target bounce velocity.
-		cpVect v1 = cpvadd(a->v, cpvmult(cpvperp(con->r1), a->w));
-		cpVect v2 = cpvadd(b->v, cpvmult(cpvperp(con->r2), b->w));
-		con->bounce = cpvdot(con->n, cpvsub(v2, v1))*e;
+		con->bounce = normal_relative_velocity(a, b, con->r1, con->r2, con->n)*e;//cpvdot(con->n, cpvsub(v2, v1))*e;
 	}
 }
 
@@ -194,10 +183,7 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb)
 	
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];
-		
-		cpVect j = cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc));
-		cpBodyApplyImpulse(a, cpvneg(j), con->r1);
-		cpBodyApplyImpulse(b, j, con->r2);
+		apply_impulses(a, b, con->r1, con->r2, cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc)));
 	}
 }
 
@@ -225,14 +211,10 @@ cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef)
 		jbn = con->jBias - jbnOld;
 		
 		// Apply the bias impulse.
-		cpVect jb = cpvmult(n, jbn);
-		cpBodyApplyBiasImpulse(a, cpvneg(jb), r1);
-		cpBodyApplyBiasImpulse(b, jb, r2);
+		apply_bias_impulses(a, b, r1, r2, cpvmult(n, jbn));
 
 		// Calculate the relative velocity.
-		cpVect v1 = cpvadd(a->v, cpvmult(cpvperp(r1), a->w));
-		cpVect v2 = cpvadd(b->v, cpvmult(cpvperp(r2), b->w));
-		cpVect vr = cpvsub(v2, v1);
+		cpVect vr = relative_velocity(a, b, r1, r2);
 		cpFloat vrn = cpvdot(vr, n);
 		
 		// Calculate and clamp the normal impulse.
@@ -242,8 +224,7 @@ cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef)
 		jn = con->jnAcc - jnOld;
 		
 		// Calculate the relative tangent velocity.
-		cpVect t = cpvperp(n);
-		cpFloat vrt = cpvdot(cpvadd(vr, arb->target_v), t);
+		cpFloat vrt = cpvdot(cpvadd(vr, arb->target_v), cpvperp(n));
 		
 		// Calculate and clamp the friction impulse.
 		cpFloat jtMax = arb->u*con->jnAcc;
@@ -253,8 +234,6 @@ cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef)
 		jt = con->jtAcc - jtOld;
 		
 		// Apply the final impulse.
-		cpVect j = cpvrotate(n, cpv(jn, jt));
-		cpBodyApplyImpulse(a, cpvneg(j), r1);
-		cpBodyApplyImpulse(b, j, r2);
+		apply_impulses(a, b, r1, r2, cpvrotate(n, cpv(jn, jt)));
 	}
 }
