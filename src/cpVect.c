@@ -30,12 +30,6 @@ cpvlength(const cpVect v)
 	return cpfsqrt( cpvdot(v, v) );
 }
 
-cpFloat
-cpvlengthsq(const cpVect v)
-{
-	return cpvdot(v, v);
-}
-
 cpVect
 cpvnormalize(const cpVect v)
 {

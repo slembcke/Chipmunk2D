@@ -51,7 +51,7 @@ preStep(cpDampedSpring *spring, cpFloat dt, cpFloat dt_inv)
 	spring->target_vrn = 0.0f;
 
 	// apply spring force
-	cpFloat f_spring = spring->springForceFunc((cpConstraint *)spring, dist);//defaultSpringForce(spring, dist);
+	cpFloat f_spring = spring->springForceFunc((cpConstraint *)spring, dist);
 	apply_impulses(a, b, spring->r1, spring->r2, cpvmult(spring->n, f_spring*dt));
 }
 

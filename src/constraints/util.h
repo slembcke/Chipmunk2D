@@ -55,7 +55,8 @@ apply_bias_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
 static inline cpVect
 clamp_vect(cpVect v, cpFloat len)
 {
-	return (cpvdot(v,v) > len*len) ? cpvmult(cpvnormalize(v), len) : v;
+	return cpvclamp(v, len);
+//	return (cpvdot(v,v) > len*len) ? cpvmult(cpvnormalize(v), len) : v;
 }
 
 static inline cpFloat

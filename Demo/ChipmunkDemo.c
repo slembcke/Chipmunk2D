@@ -158,7 +158,7 @@ display(void)
 	glutSwapBuffers();
 	ticks++;
 	
-	cpVect newPoint = cpvadd(mousePoint_last, cpvmult(cpvsub(mousePoint, mousePoint_last), 0.25f));
+	cpVect newPoint = cpvlerp(mousePoint_last, mousePoint, 0.25f);
 	mouseBody->p = newPoint;
 	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0);
 	mousePoint_last = newPoint;

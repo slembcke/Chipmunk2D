@@ -41,7 +41,7 @@ preStep(cpPivotJoint *joint, cpFloat dt, cpFloat dt_inv)
 	
 	// calculate bias velocity
 	cpVect delta = cpvsub(cpvadd(b->p, joint->r2), cpvadd(a->p, joint->r1));
-	joint->bias = clamp_vect(cpvmult(delta, -joint->constraint.biasCoef*dt_inv), joint->constraint.maxBias);
+	joint->bias = cpvclamp(cpvmult(delta, -joint->constraint.biasCoef*dt_inv), joint->constraint.maxBias);
 	
 	// apply accumulated impulse
 	apply_impulses(a, b, joint->r1, joint->r2, joint->jAcc);
@@ -62,7 +62,7 @@ applyImpulse(cpPivotJoint *joint)
 	// compute normal impulse
 	cpVect j = mult_k(cpvsub(joint->bias, vr), joint->k1, joint->k2);
 	cpVect jOld = joint->jAcc;
-	joint->jAcc = clamp_vect(cpvadd(joint->jAcc, j), joint->jMaxLen);
+	joint->jAcc = cpvclamp(cpvadd(joint->jAcc, j), joint->jMaxLen);
 	j = cpvsub(joint->jAcc, jOld);
 	
 	// apply impulse

@@ -32,6 +32,13 @@ cpv(const cpFloat x, const cpFloat y)
 	return v;
 }
 
+// non-inlined functions
+cpFloat cpvlength(const cpVect v);
+cpVect cpvnormalize(const cpVect v);
+cpVect cpvforangle(const cpFloat a); // convert radians to a normalized vector
+cpFloat cpvtoangle(const cpVect v); // convert a vector to radians
+char *cpvstr(const cpVect v); // get a string representation of a vector
+
 static inline cpVect
 cpvadd(const cpVect v1, const cpVect v2)
 {
@@ -98,9 +105,44 @@ cpvunrotate(const cpVect v1, const cpVect v2)
 	return cpv(v1.x*v2.x + v1.y*v2.y, v1.y*v2.x - v1.x*v2.y);
 }
 
-cpFloat cpvlength(const cpVect v);
-cpFloat cpvlengthsq(const cpVect v); // no sqrt() call
-cpVect cpvnormalize(const cpVect v);
-cpVect cpvforangle(const cpFloat a); // convert radians to a normalized vector
-cpFloat cpvtoangle(const cpVect v); // convert a vector to radians
-char *cpvstr(const cpVect v); // get a string representation of a vector
+static inline cpFloat
+cpvlengthsq(const cpVect v)
+{
+	return cpvdot(v, v);
+}
+
+static inline cpVect
+cpvlerp(const cpVect v1, const cpVect v2, const cpFloat t)
+{
+	return cpvadd(cpvmult(v1, 1.0f - t), cpvmult(v2, t));
+}
+
+static inline cpVect
+cpvclamp(const cpVect v, const cpFloat len)
+{
+	return (cpvdot(v,v) > len*len) ? cpvmult(cpvnormalize(v), len) : v;
+}
+
+static inline cpVect
+cpvnormalize_safe(const cpVect v)
+{
+	return (v.x == 0.0f && v.y == 0.0f ? cpvzero : cpvnormalize(v));
+}
+
+static inline cpFloat
+cpvdist(const cpVect v1, const cpVect v2)
+{
+	return cpvlength(cpvsub(v1, v2));
+}
+
+static inline cpFloat
+cpvdistsq(const cpVect v1, const cpVect v2)
+{
+	return cpvlengthsq(cpvsub(v1, v2));
+}
+
+static inline int
+cpvnear(const cpVect v1, const cpVect v2, const cpFloat dist)
+{
+	return cpvdistsq(v1, v2) < dist*dist;
+}

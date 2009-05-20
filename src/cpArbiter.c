@@ -164,9 +164,8 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv)
 		con->nMass = 1.0f/kn;
 		
 		// Calculate the mass tangent.
-		cpVect t = cpvperp(con->n);
-		cpFloat r1ct = cpvcross(con->r1, t);
-		cpFloat r2ct = cpvcross(con->r2, t);
+		cpFloat r1ct = cpvdot(con->r1, con->n);
+		cpFloat r2ct = cpvdot(con->r2, con->n);
 		cpFloat kt = mass_sum + a->i_inv*r1ct*r1ct + b->i_inv*r2ct*r2ct;
 		con->tMass = 1.0f/kt;
 				
@@ -196,8 +195,7 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb)
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];
 		
-		cpVect t = cpvperp(con->n);
-		cpVect j = cpvadd(cpvmult(con->n, con->jnAcc), cpvmult(t, con->jtAcc));
+		cpVect j = cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc));
 		cpBodyApplyImpulse(a, cpvneg(j), con->r1);
 		cpBodyApplyImpulse(b, j, con->r2);
 	}
@@ -255,7 +253,7 @@ cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef)
 		jt = con->jtAcc - jtOld;
 		
 		// Apply the final impulse.
-		cpVect j = cpvadd(cpvmult(n, jn), cpvmult(t, jt));
+		cpVect j = cpvrotate(n, cpv(jn, jt));
 		cpBodyApplyImpulse(a, cpvneg(j), r1);
 		cpBodyApplyImpulse(b, j, r2);
 	}
