@@ -98,10 +98,12 @@ cpBB cpShapeCacheBB(cpShape *shape);
 // Test if a point lies within a shape.
 int cpShapePointQuery(cpShape *shape, cpVect p);
 
-// Test if a segment collides with a shape.
-// Returns [0-1] if the segment collides and -1 otherwise.
-// 0 would be a collision at point a, 1 would be a collision at point b.
-//cpFloat cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b);
+typedef struct cpSegmentQueryInfo{
+	cpFloat t, dist;
+	cpVect point, n;
+} cpSegmentQueryInfo;
+
+void cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info);
 
 #define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(cpShape *shape)
 #define CP_DefineShapeGetter(struct, type, member, name) \

@@ -350,9 +350,24 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
+extern int cpCircleShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+
 int
 main(int argc, const char **argv)
 {
+//	cpBody *body = cpBodyNew(1.0f, 1.0f);
+//	cpBodySetPos(body, cpv(1,0));
+//	cpShape *circle = cpCircleShapeNew(body, 1.0f, cpvzero);
+//	cpShapeCacheBB(circle);
+//	
+//	cpSegmentQueryInfo info;
+//	if(cpCircleShapeSegmentQuery(circle, cpv(-1,0), cpv(1,0), &info)){
+//		cpSegmentQueryInfoPrint(&info);
+//	} else {
+//		printf("no collision\n");
+//	}
+//	exit(0);
+	
 	cpInitChipmunk();
 		
 	mouseBody = cpBodyNew(INFINITY, INFINITY);

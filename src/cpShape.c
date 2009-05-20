@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "chipmunk.h"
 
@@ -86,6 +87,17 @@ cpShapePointQuery(cpShape *shape, cpVect p){
 	return shape->klass->pointQuery(shape, p);
 }
 
+void
+cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info)
+{
+	printf("Segment Query:\n");
+	printf("\tt: %f\n", info->t);
+	printf("\tdist: %f\n", info->dist);
+	printf("\tpoint: %s\n", cpvstr(info->point));
+	printf("\tn: %s\n", cpvstr(info->n));
+}
+
+
 
 
 cpCircleShape *
@@ -112,9 +124,41 @@ cpCircleShapeCacheData(cpShape *shape, cpVect p, cpVect rot)
 static int
 cpCircleShapePointQuery(cpShape *shape, cpVect p){
 	cpCircleShape *circle = (cpCircleShape *)shape;
+	return cpvnear(circle->tc, p, circle->r);
+}
+
+int
+cpCircleShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+{
+	cpCircleShape *circle = (cpCircleShape *)shape;
 	
-	cpFloat distSQ = cpvlengthsq(cpvsub(circle->tc, p));
-	return distSQ <= (circle->r*circle->r);
+	// umm... gross I normally frown upon such things
+	a = cpvsub(a, circle->tc);
+	b = cpvsub(b, circle->tc);
+	
+	cpFloat qa = cpvdot(a, a) - 2.0f*cpvdot(a, b) + cpvdot(b, b);
+	cpFloat qb = -2.0f*cpvdot(a, a) + 2.0f*cpvdot(a, b);
+	cpFloat qc = cpvdot(a, a) - circle->r*circle->r;
+	
+	cpFloat det = qb*qb - 4.0f*qa*qc;
+	
+	if(det < 0.0f){
+		return 0;
+	} else {
+		cpFloat t = (-qb - cpfsqrt(det))/(2.0f*qa);
+		if(0.0 <= t && t <= 1.0f){
+			cpVect point = cpvadd(circle->tc, cpvlerp(a, b, t));
+			
+			info->t = t;
+			info->dist = t*cpvdist(a, b);
+			info->point = point;
+			info->n = cpvnormalize(cpvsub(point, circle->tc));
+			
+			return 1;
+		} else {
+			return 0;
+		}
+	}
 }
 
 static const cpShapeClass cpCircleShapeClass = {
