@@ -127,7 +127,21 @@ cpCircleShapePointQuery(cpShape *shape, cpVect p){
 	return cpvnear(circle->tc, p, circle->r);
 }
 
-int
+static cpSegmentQueryInfo *
+makeSegmentQueryInfo(cpSegmentQueryInfo *info, cpFloat t, cpFloat dist, cpVect point, cpVect n)
+{
+	if(!info)
+		info = calloc(1, sizeof(cpSegmentQueryInfo));
+	
+	info->t = t;
+	info->dist = dist;
+	info->point = point;
+	info->n = n;
+	
+	return info;
+}
+
+cpSegmentQueryInfo *
 cpCircleShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
 	cpCircleShape *circle = (cpCircleShape *)shape;
@@ -143,20 +157,14 @@ cpCircleShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo
 	cpFloat det = qb*qb - 4.0f*qa*qc;
 	
 	if(det < 0.0f){
-		return 0;
+		return NULL;
 	} else {
 		cpFloat t = (-qb - cpfsqrt(det))/(2.0f*qa);
 		if(0.0 <= t && t <= 1.0f){
 			cpVect point = cpvadd(circle->tc, cpvlerp(a, b, t));
-			
-			info->t = t;
-			info->dist = t*cpvdist(a, b);
-			info->point = point;
-			info->n = cpvnormalize(cpvsub(point, circle->tc));
-			
-			return 1;
+			return makeSegmentQueryInfo(info, t, t*cpvdist(a, b), point, cpvnormalize(cpvsub(point, circle->tc)));
 		} else {
-			return 0;
+			return NULL;
 		}
 	}
 }

@@ -72,11 +72,12 @@ extern chipmunkDemo WalkBot;
 extern chipmunkDemo TheoJansen;
 extern chipmunkDemo MagnetsElectric;
 extern chipmunkDemo UnsafeOps;
+extern chipmunkDemo Query;
 
 //extern chipmunkDemo Test;
 
 static chipmunkDemo *demos[] = {
-//	&Test,
+	&Query,
 	&LogoSmash,
 	&PyramidStack,
 	&Plink,
@@ -90,6 +91,7 @@ static chipmunkDemo *demos[] = {
 	&TheoJansen,
 	&MagnetsElectric,
 	&UnsafeOps,
+	&Query,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
@@ -102,6 +104,8 @@ cpVect mousePoint;
 cpVect mousePoint_last;
 cpBody *mouseBody = NULL;
 cpConstraint *mouseJoint = NULL;
+
+char messageString[1024] = {'H','e','l','l','o','\0'};
 
 int key_up = 0;
 int key_down = 0;
@@ -119,6 +123,24 @@ drawSpaceOptions options = {
 };
 
 static void
+drawString(int x, int y, char *str)
+{
+	glColor3f(0.0f, 0.0f, 0.0f);
+	glRasterPos2i(x, y);
+	
+	for(int i=0, len=strlen(str); i<len; i++){
+		if(str[i] == '\n'){
+			y -= 16;
+			glRasterPos2i(x, y);
+		} else if(str[i] == '*'){ // print out the last demo key
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, 'A' + demoCount - 1);
+		} else {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, str[i]);
+		}
+	}
+}
+
+static void
 drawInstructions()
 {
 	int x = -300;
@@ -132,19 +154,7 @@ drawInstructions()
 		"\\ enables anti-aliasing."
 	);
 	
-	glColor3f(0.0f, 0.0f, 0.0f);
-	glRasterPos2i(x, y);
-	
-	for(int i=0, len=strlen(str); i<len; i++){
-		if(str[i] == '\n'){
-			y -= 16;
-			glRasterPos2i(x, y);
-		} else if(str[i] == '*'){
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, 'A' + demoCount - 1);
-		} else {
-			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, str[i]);
-		}
-	}
+	drawString(x, y, str);
 }
 
 static void
@@ -154,6 +164,7 @@ display(void)
 	
 	drawSpace(space, currDemo->drawOptions ? currDemo->drawOptions : &options);
 	drawInstructions();
+	drawString(-300, -220, messageString);
 		
 	glutSwapBuffers();
 	ticks++;
@@ -184,6 +195,7 @@ runDemo(chipmunkDemo *demo)
 	ticks = 0;
 	mouseJoint = NULL;
 	space = currDemo->initFunc();
+//	messageString[0] = '\0';
 
 	glutSetWindowTitle(demoTitle(currDemo));
 }
