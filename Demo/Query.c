@@ -36,7 +36,7 @@ extern cpVect mousePoint;
 char messageString[1024];
 
 cpShape *querySeg = NULL;
-cpShape *circle = NULL;
+cpShape *queryShape = NULL;
 
 extern cpSegmentQueryInfo *cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, unsigned int layers, unsigned int group, cpSegmentQueryInfo *info);
 
@@ -47,9 +47,10 @@ update(int ticks)
 	messageString[0] = '\0';
 	
 	cpVect end = mousePoint;
-	cpSegmentQueryInfo *info = cpShapeSegmentQuery(circle, cpvzero, end, -1, 0, NULL);
+	cpSegmentQueryInfo *info = cpShapeSegmentQuery(queryShape, cpvzero, end, -1, 0, NULL);
 	if(info){
-		end = info->point;
+//		end = cpvsub(info->point, cpvmult(cpvnormalize(info->point), 4.0f));
+		end = cpvadd(info->point, cpvmult(info->n, 4.0f));
 		
 		char infoString[1024];
 		sprintf(infoString, "Segment Query: Dist(%f) Normal%s", info->dist, cpvstr(info->n));
@@ -86,13 +87,12 @@ init(void)
 	shape->layers = 0;
 	querySeg = shape;
 	
-	// Make a circle to query against
+	// Make a shape to query against
 	body = cpBodyNew(1.0f, 1.0f);
-	body->p = cpv(100.0f, 100.0f);
-	
-	shape = cpCircleShapeNew(body, 20.0f, cpvzero);
+//	shape = cpCircleShapeNew(body, 20.0f, cpv(100, 100));
+	shape = cpSegmentShapeNew(body, cpv(-10, 100), cpv(10, 200), 20.0f);
 	cpSpaceAddStaticShape(space, shape);
-	circle = shape;
+	queryShape = shape;
 	
 	return space;
 }

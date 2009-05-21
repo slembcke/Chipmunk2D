@@ -19,7 +19,12 @@
  * SOFTWARE.
  */
  
+// Forward declarations required for defining other structs.
+struct cpShape;
+struct cpShapeClass;
+
 typedef struct cpSegmentQueryInfo{
+	struct cpShape *shape;
 	cpFloat t, dist;
 	cpVect point, n;
 } cpSegmentQueryInfo;
@@ -34,10 +39,6 @@ typedef enum cpShapeType{
 	CP_POLY_SHAPE,
 	CP_NUM_SHAPES
 } cpShapeType;
-
-// Forward declarations required for defining the cpShape and cpShapeClass structs.
-struct cpShape;
-struct cpShapeClass;
 
 // Shape class. Holds function pointers and type data.
 typedef struct cpShapeClass {

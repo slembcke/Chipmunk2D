@@ -137,11 +137,12 @@ cpCircleShapePointQuery(cpShape *shape, cpVect p){
 }
 
 static cpSegmentQueryInfo *
-makeSegmentQueryInfo(cpSegmentQueryInfo *info, cpFloat t, cpFloat dist, cpVect point, cpVect n)
+makeSegmentQueryInfo(cpSegmentQueryInfo *info, cpShape *shape, cpFloat t, cpFloat dist, cpVect point, cpVect n)
 {
 	if(!info)
 		info = calloc(1, sizeof(cpSegmentQueryInfo));
 	
+	info->shape = shape;
 	info->t = t;
 	info->dist = dist;
 	info->point = point;
@@ -150,18 +151,16 @@ makeSegmentQueryInfo(cpSegmentQueryInfo *info, cpFloat t, cpFloat dist, cpVect p
 	return info;
 }
 
-cpSegmentQueryInfo *
-cpCircleShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+static cpSegmentQueryInfo *
+circleSegmentQuery(cpShape *shape, cpVect center, cpFloat r, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
-	cpCircleShape *circle = (cpCircleShape *)shape;
-	
 	// umm... gross I normally frown upon such things
-	a = cpvsub(a, circle->tc);
-	b = cpvsub(b, circle->tc);
+	a = cpvsub(a, center);
+	b = cpvsub(b, center);
 	
 	cpFloat qa = cpvdot(a, a) - 2.0f*cpvdot(a, b) + cpvdot(b, b);
 	cpFloat qb = -2.0f*cpvdot(a, a) + 2.0f*cpvdot(a, b);
-	cpFloat qc = cpvdot(a, a) - circle->r*circle->r;
+	cpFloat qc = cpvdot(a, a) - r*r;
 	
 	cpFloat det = qb*qb - 4.0f*qa*qc;
 	
@@ -170,12 +169,19 @@ cpCircleShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo
 	} else {
 		cpFloat t = (-qb - cpfsqrt(det))/(2.0f*qa);
 		if(0.0 <= t && t <= 1.0f){
-			cpVect point = cpvadd(circle->tc, cpvlerp(a, b, t));
-			return makeSegmentQueryInfo(info, t, t*cpvdist(a, b), point, cpvnormalize(cpvsub(point, circle->tc)));
+			cpVect point = cpvadd(center, cpvlerp(a, b, t));
+			return makeSegmentQueryInfo(info, shape, t, t*cpvdist(a, b), point, cpvnormalize(cpvsub(point, center)));
 		} else {
 			return NULL;
 		}
 	}
+}
+
+static cpSegmentQueryInfo *
+cpCircleShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+{
+	cpCircleShape *circle = (cpCircleShape *)shape;
+	return circleSegmentQuery(shape, circle->tc, circle->r, a, b, info);
 }
 
 static const cpShapeClass cpCircleShapeClass = {
@@ -279,12 +285,59 @@ cpSegmentShapePointQuery(cpShape *shape, cpVect p){
 	return 1;	
 }
 
+static cpSegmentQueryInfo *
+cpSegmentShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+{
+	cpSegmentShape *seg = (cpSegmentShape *)shape;
+	cpVect n = seg->tn;
+	// flip n if a is behind the axis
+	if(cpvdot(a, n) < cpvdot(seg->ta, n))
+		n = cpvneg(n);
+	
+	cpFloat an = cpvdot(a, n);
+	cpFloat bn = cpvdot(b, n);
+	cpFloat d = cpvdot(seg->ta, n) + seg->r;
+	
+	cpFloat t = (d - an)/(bn - an);
+	if(t < 0.0f || 1.0f < t) return NULL;
+	
+	cpVect point = cpvlerp(a, b, t);
+	cpFloat dt = -cpvcross(seg->tn, point);
+	cpFloat dtMin = -cpvcross(seg->tn, seg->ta);
+	cpFloat dtMax = -cpvcross(seg->tn, seg->tb);
+	
+	if(dtMin < dt && dt < dtMax){
+		return makeSegmentQueryInfo(info, shape, t, cpvdist(a, point), point, n);
+	} else if(seg->r) {
+		cpSegmentQueryInfo *info1 = circleSegmentQuery(shape, seg->ta, seg->r, a, b, NULL);
+		cpSegmentQueryInfo *info2 = circleSegmentQuery(shape, seg->tb, seg->r, a, b, NULL);
+		
+		if(info1 && !info2){
+			return info1;
+		} else if(info2 && !info1){
+			return info2;
+		} else if(info1 && info2){
+			if(info1->dist < info2->dist){
+				free(info2);
+				return info1;
+			} else {
+				free(info1);
+				return info2;
+			}
+		} else {
+			return NULL;
+		}
+	} else {
+		return NULL;
+	}
+}
+
 static const cpShapeClass cpSegmentShapeClass = {
 	CP_SEGMENT_SHAPE,
 	cpSegmentShapeCacheData,
 	NULL,
 	cpSegmentShapePointQuery,
-	NULL,
+	cpSegmentShapeSegmentQuery,
 };
 
 cpSegmentShape *
