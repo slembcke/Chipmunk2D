@@ -38,7 +38,7 @@ char messageString[1024];
 cpShape *querySeg = NULL;
 cpShape *queryShape = NULL;
 
-extern cpSegmentQueryInfo *cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, unsigned int layers, unsigned int group, cpSegmentQueryInfo *info);
+extern int cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, unsigned int layers, unsigned int group, cpSegmentQueryInfo *info);
 #define NUM_VERTS 5
 
 static void
@@ -46,17 +46,24 @@ update(int ticks)
 {
 	messageString[0] = '\0';
 	
+	cpVect start = cpvzero;
 	cpVect end = mousePoint;
-	cpSegmentQueryInfo *info = cpShapeSegmentQuery(queryShape, cpvzero, end, -1, 0, NULL);
-	if(info){
+	
+	{
+		char infoString[1024];
+		sprintf(infoString, "Query: Dist(%f) Point%s, ", cpvdist(start, end), cpvstr(end));
+		strcat(messageString, infoString);
+	}
+	
+	cpSegmentQueryInfo info = {};
+	if(cpShapeSegmentQuery(queryShape, start, end, -1, 0, &info)){
+		cpVect point = cpvlerp(start, end, info.t);
 //		end = cpvsub(info->point, cpvmult(cpvnormalize(info->point), 4.0f));
-		end = cpvadd(info->point, cpvmult(info->n, 4.0f));
+		end = cpvadd(point, cpvmult(info.n, 4.0f));
 		
 		char infoString[1024];
-		sprintf(infoString, "Segment Query: Dist(%f) Normal%s", info->dist, cpvstr(info->n));
+		sprintf(infoString, "Segment Query: Dist(%f) Normal%s", cpvdist(start, mousePoint)*info.t, cpvstr(info.n));
 		strcat(messageString, infoString);
-		
-		free(info);
 	} else {
 		strcat(messageString, "Segment Query (None)");
 	}
@@ -95,9 +102,9 @@ init(void)
 	
 	// Make a shape to query against
 	body = cpBodyNew(1.0f, 1.0f);
-//	shape = cpCircleShapeNew(body, 20.0f, cpv(100, 100));
+	shape = cpCircleShapeNew(body, 20.0f, cpv(100, 100));
 //	shape = cpSegmentShapeNew(body, cpv(-10, 100), cpv(10, 200), 20.0f);
-	shape = cpPolyShapeNew(body, NUM_VERTS, verts, cpv(100,100));
+//	shape = cpPolyShapeNew(body, NUM_VERTS, verts, cpv(100,100));
 	cpSpaceAddStaticShape(space, shape);
 	queryShape = shape;
 	

@@ -87,13 +87,13 @@ cpShapePointQuery(cpShape *shape, cpVect p){
 	return shape->klass->pointQuery(shape, p);
 }
 
-cpSegmentQueryInfo *
+int
 cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, unsigned int layers, unsigned int group, cpSegmentQueryInfo *info){
-	if((group && shape->group && group == shape->group) || !(layers & shape->layers)){
-		return NULL;
-	} else {
-		return shape->klass->segmentQuery(shape, a, b, info);
+	if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
+		shape->klass->segmentQuery(shape, a, b, info);
 	}
+	
+	return (info->shape != NULL);
 }
 
 void
@@ -101,8 +101,8 @@ cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info)
 {
 	printf("Segment Query:\n");
 	printf("\tt: %f\n", info->t);
-	printf("\tdist: %f\n", info->dist);
-	printf("\tpoint: %s\n", cpvstr(info->point));
+//	printf("\tdist: %f\n", info->dist);
+//	printf("\tpoint: %s\n", cpvstr(info->point));
 	printf("\tn: %s\n", cpvstr(info->n));
 }
 
@@ -136,22 +136,7 @@ cpCircleShapePointQuery(cpShape *shape, cpVect p){
 	return cpvnear(circle->tc, p, circle->r);
 }
 
-cpSegmentQueryInfo *
-makeSegmentQueryInfo(cpSegmentQueryInfo *info, cpShape *shape, cpFloat t, cpFloat dist, cpVect point, cpVect n)
-{
-	if(!info)
-		info = calloc(1, sizeof(cpSegmentQueryInfo));
-	
-	info->shape = shape;
-	info->t = t;
-	info->dist = dist;
-	info->point = point;
-	info->n = n;
-	
-	return info;
-}
-
-static cpSegmentQueryInfo *
+static void
 circleSegmentQuery(cpShape *shape, cpVect center, cpFloat r, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
 	// umm... gross I normally frown upon such things
@@ -164,24 +149,21 @@ circleSegmentQuery(cpShape *shape, cpVect center, cpFloat r, cpVect a, cpVect b,
 	
 	cpFloat det = qb*qb - 4.0f*qa*qc;
 	
-	if(det < 0.0f){
-		return NULL;
-	} else {
+	if(det >= 0.0f){
 		cpFloat t = (-qb - cpfsqrt(det))/(2.0f*qa);
 		if(0.0 <= t && t <= 1.0f){
-			cpVect point = cpvadd(center, cpvlerp(a, b, t));
-			return makeSegmentQueryInfo(info, shape, t, t*cpvdist(a, b), point, cpvnormalize(cpvsub(point, center)));
-		} else {
-			return NULL;
+			info->shape = shape;
+			info->t = t;
+			info->n = cpvnormalize(cpvlerp(a, b, t));
 		}
 	}
 }
 
-static cpSegmentQueryInfo *
+static void
 cpCircleShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
 	cpCircleShape *circle = (cpCircleShape *)shape;
-	return circleSegmentQuery(shape, circle->tc, circle->r, a, b, info);
+	circleSegmentQuery(shape, circle->tc, circle->r, a, b, info);
 }
 
 static const cpShapeClass cpCircleShapeClass = {
@@ -287,7 +269,7 @@ cpSegmentShapePointQuery(cpShape *shape, cpVect p){
 	return 1;	
 }
 
-static cpSegmentQueryInfo *
+static void
 cpSegmentShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
 	cpSegmentShape *seg = (cpSegmentShape *)shape;
@@ -301,7 +283,7 @@ cpSegmentShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInf
 	cpFloat d = cpvdot(seg->ta, n) + seg->r;
 	
 	cpFloat t = (d - an)/(bn - an);
-	if(t < 0.0f || 1.0f < t) return NULL;
+	if(t < 0.0f || 1.0f < t) return;
 	
 	cpVect point = cpvlerp(a, b, t);
 	cpFloat dt = -cpvcross(seg->tn, point);
@@ -309,28 +291,25 @@ cpSegmentShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInf
 	cpFloat dtMax = -cpvcross(seg->tn, seg->tb);
 	
 	if(dtMin < dt && dt < dtMax){
-		return makeSegmentQueryInfo(info, shape, t, cpvdist(a, point), point, n);
+		info->shape = shape;
+		info->t = t;
+		info->n = n;
 	} else if(seg->r) {
-		cpSegmentQueryInfo *info1 = circleSegmentQuery(shape, seg->ta, seg->r, a, b, NULL);
-		cpSegmentQueryInfo *info2 = circleSegmentQuery(shape, seg->tb, seg->r, a, b, NULL);
+		cpSegmentQueryInfo info1, info2;
+		circleSegmentQuery(shape, seg->ta, seg->r, a, b, &info1);
+		circleSegmentQuery(shape, seg->tb, seg->r, a, b, &info2);
 		
-		if(info1 && !info2){
-			return info1;
-		} else if(info2 && !info1){
-			return info2;
-		} else if(info1 && info2){
-			if(info1->dist < info2->dist){
-				free(info2);
-				return info1;
+		if(info1.shape && !info2.shape){
+			(*info) = info1;
+		} else if(info2.shape && !info1.shape){
+			(*info) = info2;
+		} else if(info1.shape && info2.shape){
+			if(info1.t < info2.t){
+				(*info) = info1;
 			} else {
-				free(info1);
-				return info2;
+				(*info) = info2;
 			}
-		} else {
-			return NULL;
 		}
-	} else {
-		return NULL;
 	}
 }
 

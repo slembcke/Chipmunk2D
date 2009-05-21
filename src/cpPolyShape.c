@@ -99,9 +99,7 @@ cpPolyShapePointQuery(cpShape *shape, cpVect p){
 	return cpBBcontainsVect(shape->bb, p) && cpPolyShapeContainsVert((cpPolyShape *)shape, p);
 }
 
-extern cpSegmentQueryInfo *makeSegmentQueryInfo(cpSegmentQueryInfo *info, cpShape *shape, cpFloat t, cpFloat dist, cpVect point, cpVect n);
-
-static cpSegmentQueryInfo *
+static void
 cpPolyShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
 	cpPolyShape *poly = (cpPolyShape *)shape;
@@ -124,11 +122,12 @@ cpPolyShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *
 		cpFloat dtMin = -cpvcross(n, verts[i]);
 		cpFloat dtMax = -cpvcross(n, verts[(i+1)%numVerts]);
 		
-		if(dtMin < dt && dt < dtMax)
-			return makeSegmentQueryInfo(info, shape, t, cpvdist(a, point), point, n);
+		if(dtMin <= dt && dt <= dtMax){
+			info->shape = shape;
+			info->t = t;
+			info->n = n;
+		}
 	}
-	
-	return NULL;
 }
 
 static const cpShapeClass polyClass = {

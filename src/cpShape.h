@@ -24,9 +24,9 @@ struct cpShape;
 struct cpShapeClass;
 
 typedef struct cpSegmentQueryInfo{
-	struct cpShape *shape;
-	cpFloat t, dist;
-	cpVect point, n;
+	struct cpShape *shape; // shape that was hit, NULL if no collision
+	cpFloat t; // line(t) = a + (b - a)t, will always be in the range [0, 1]
+	cpVect n; // normal of hit surface
 } cpSegmentQueryInfo;
 
 // For determinism, you can reset the shape id counter.
@@ -53,7 +53,7 @@ typedef struct cpShapeClass {
 	int (*pointQuery)(struct cpShape *shape, cpVect p);
 	
 	// called by cpShapeSegmentQuery()
-	cpSegmentQueryInfo *(*segmentQuery)(struct cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+	 void (*segmentQuery)(struct cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
 } cpShapeClass;
 
 // Basic shape struct that the others inherit from.

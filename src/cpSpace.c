@@ -551,15 +551,15 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		constraint->klass->preStep(constraint, dt, dt_inv);
 	}
 
-	for(int i=0; i<space->elasticIterations; i++){
-		for(int j=0; j<arbiters->num; j++)
-			cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j], 1.0f);
-			
-		for(int j=0; j<constraints->num; j++){
-			cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
-			constraint->klass->applyImpulse(constraint);
-		}
-	}
+//	for(int i=0; i<space->elasticIterations; i++){
+//		for(int j=0; j<arbiters->num; j++)
+//			cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j], 1.0f);
+//			
+//		for(int j=0; j<constraints->num; j++){
+//			cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
+//			constraint->klass->applyImpulse(constraint);
+//		}
+//	}
 
 	// Integrate velocities.
 	cpFloat damping = cpfpow(1.0f/space->damping, -dt);
@@ -574,7 +574,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// Run the impulse solver.
 	for(int i=0; i<space->iterations; i++){
 		for(int j=0; j<arbiters->num; j++)
-			cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j], 0.0f);
+			cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j], 1.0f);
 			
 		for(int j=0; j<constraints->num; j++){
 			cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
