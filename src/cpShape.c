@@ -136,7 +136,7 @@ cpCircleShapePointQuery(cpShape *shape, cpVect p){
 	return cpvnear(circle->tc, p, circle->r);
 }
 
-static cpSegmentQueryInfo *
+cpSegmentQueryInfo *
 makeSegmentQueryInfo(cpSegmentQueryInfo *info, cpShape *shape, cpFloat t, cpFloat dist, cpVect point, cpVect n)
 {
 	if(!info)
@@ -251,6 +251,8 @@ cpSegmentShapeCacheData(cpShape *shape, cpVect p, cpVect rot)
 
 static int
 cpSegmentShapePointQuery(cpShape *shape, cpVect p){
+	if(!cpBBcontainsVect(shape->bb, p)) return 0;
+	
 	cpSegmentShape *seg = (cpSegmentShape *)shape;
 	
 	// Calculate normal distance from segment.

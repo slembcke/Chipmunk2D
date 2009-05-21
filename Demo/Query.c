@@ -39,7 +39,7 @@ cpShape *querySeg = NULL;
 cpShape *queryShape = NULL;
 
 extern cpSegmentQueryInfo *cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, unsigned int layers, unsigned int group, cpSegmentQueryInfo *info);
-
+#define NUM_VERTS 5
 
 static void
 update(int ticks)
@@ -82,15 +82,22 @@ init(void)
 	cpShape *shape;
 	
 	// add a non-collidable segment as a quick and dirty way to draw the query line
-	shape = cpSegmentShapeNew(staticBody, cpvzero, cpv(100.0f, 0.0f), 4.0f);
+	shape = cpSegmentShapeNew(staticBody, cpvzero, cpv(100.0f, 0.0f), 0.0f);
 	cpSpaceAddStaticShape(space, shape);
 	shape->layers = 0;
 	querySeg = shape;
 	
+	cpVect verts[NUM_VERTS];
+	for(int i=0; i<NUM_VERTS; i++){
+		cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
+		verts[i] = cpv(30*cos(angle), 30*sin(angle));
+	}
+	
 	// Make a shape to query against
 	body = cpBodyNew(1.0f, 1.0f);
 //	shape = cpCircleShapeNew(body, 20.0f, cpv(100, 100));
-	shape = cpSegmentShapeNew(body, cpv(-10, 100), cpv(10, 200), 20.0f);
+//	shape = cpSegmentShapeNew(body, cpv(-10, 100), cpv(10, 200), 20.0f);
+	shape = cpPolyShapeNew(body, NUM_VERTS, verts, cpv(100,100));
 	cpSpaceAddStaticShape(space, shape);
 	queryShape = shape;
 	

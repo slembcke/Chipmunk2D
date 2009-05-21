@@ -96,8 +96,39 @@ cpPolyShapeDestroy(cpShape *shape)
 
 static int
 cpPolyShapePointQuery(cpShape *shape, cpVect p){
-	// TODO Check against BB first?
-	return cpPolyShapeContainsVert((cpPolyShape *)shape, p);
+	return cpBBcontainsVect(shape->bb, p) && cpPolyShapeContainsVert((cpPolyShape *)shape, p);
+}
+
+extern cpSegmentQueryInfo *makeSegmentQueryInfo(cpSegmentQueryInfo *info, cpShape *shape, cpFloat t, cpFloat dist, cpVect point, cpVect n);
+
+static cpSegmentQueryInfo *
+cpPolyShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+{
+	cpPolyShape *poly = (cpPolyShape *)shape;
+	cpPolyShapeAxis *axes = poly->tAxes;
+	cpVect *verts = poly->tVerts;
+	int numVerts = poly->numVerts;
+	
+	for(int i=0; i<numVerts; i++){
+		cpVect n = axes[i].n;
+		cpFloat an = cpvdot(a, n);
+		if(axes[i].d > an) continue;
+		
+		cpFloat bn = cpvdot(b, n);
+		cpFloat t = (axes[i].d - an)/(bn - an);
+		printf("%f, %f, %f\n", an, bn, t);
+		if(t < 0.0f || 1.0f < t) continue;
+		
+		cpVect point = cpvlerp(a, b, t);
+		cpFloat dt = -cpvcross(n, point);
+		cpFloat dtMin = -cpvcross(n, verts[i]);
+		cpFloat dtMax = -cpvcross(n, verts[(i+1)%numVerts]);
+		
+		if(dtMin < dt && dt < dtMax)
+			return makeSegmentQueryInfo(info, shape, t, cpvdist(a, point), point, n);
+	}
+	
+	return NULL;
 }
 
 static const cpShapeClass polyClass = {
@@ -105,7 +136,7 @@ static const cpShapeClass polyClass = {
 	cpPolyShapeCacheData,
 	cpPolyShapeDestroy,
 	cpPolyShapePointQuery,
-	NULL,
+	cpPolyShapeSegmentQuery,
 };
 
 static void
