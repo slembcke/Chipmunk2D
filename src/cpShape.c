@@ -283,19 +283,24 @@ cpSegmentShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInf
 	cpFloat d = cpvdot(seg->ta, n) + seg->r;
 	
 	cpFloat t = (d - an)/(bn - an);
-	if(t < 0.0f || 1.0f < t) return;
+	if(0.0f < t && t < 1.0f){
+		cpVect point = cpvlerp(a, b, t);
+		cpFloat dt = -cpvcross(seg->tn, point);
+		cpFloat dtMin = -cpvcross(seg->tn, seg->ta);
+		cpFloat dtMax = -cpvcross(seg->tn, seg->tb);
+		
+		if(dtMin < dt && dt < dtMax){
+			info->shape = shape;
+			info->t = t;
+			info->n = n;
+			
+			return; // don't continue on and check endcaps
+		}
+	}
 	
-	cpVect point = cpvlerp(a, b, t);
-	cpFloat dt = -cpvcross(seg->tn, point);
-	cpFloat dtMin = -cpvcross(seg->tn, seg->ta);
-	cpFloat dtMax = -cpvcross(seg->tn, seg->tb);
-	
-	if(dtMin < dt && dt < dtMax){
-		info->shape = shape;
-		info->t = t;
-		info->n = n;
-	} else if(seg->r) {
-		cpSegmentQueryInfo info1, info2;
+	if(seg->r) {
+		cpSegmentQueryInfo info1 = {.shape = NULL};
+		cpSegmentQueryInfo info2 = {.shape = NULL};
 		circleSegmentQuery(shape, seg->ta, seg->r, a, b, &info1);
 		circleSegmentQuery(shape, seg->tb, seg->r, a, b, &info2);
 		

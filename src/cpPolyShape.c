@@ -114,7 +114,6 @@ cpPolyShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *
 		
 		cpFloat bn = cpvdot(b, n);
 		cpFloat t = (axes[i].d - an)/(bn - an);
-		printf("%f, %f, %f\n", an, bn, t);
 		if(t < 0.0f || 1.0f < t) continue;
 		
 		cpVect point = cpvlerp(a, b, t);
