@@ -61,6 +61,8 @@ segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
 	}
 }
 
+extern void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQueryFunc func, void *data);
+
 static int
 cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, unsigned int layers, unsigned int group, cpSpaceSegmentQueryFunc func, void *data)
 {
@@ -71,14 +73,8 @@ cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, unsigned int 
 		0,
 	};
 	
-	cpFloat l = (start.x < end.x ? start.x : end.x);
-	cpFloat b = (start.y < end.y ? start.y : end.y);
-	cpFloat r = (start.x > end.x ? start.x : end.x);
-	cpFloat t = (start.y > end.y ? start.y : end.y);
-	cpBB bb = cpBBNew(l, b, r, t);
-	
-	cpSpaceHashQuery(space->staticShapes, &context, bb, (cpSpaceHashQueryFunc)segQueryFunc, data);
-	cpSpaceHashQuery(space->activeShapes, &context, bb, (cpSpaceHashQueryFunc)segQueryFunc, data);
+	raytrace(space->staticShapes, &context, start, end, (cpSpaceHashQueryFunc)segQueryFunc, data);
+	raytrace(space->activeShapes, &context, start, end, (cpSpaceHashQueryFunc)segQueryFunc, data);
 	
 	return context.anyCollision;
 }
@@ -127,7 +123,7 @@ update(int ticks)
 	cpSegmentQueryInfo info = {};
 	if(cpSpaceShapeSegmentQueryFirst(space, start, end, -1, 0, &info)){
 		cpVect point = cpvlerp(start, end, info.t);
-		lineEnd = cpvadd(point, cpvmult(info.n, 4.0f));
+		lineEnd = cpvadd(point, cpvzero);//cpvmult(info.n, 4.0f));
 		
 		char infoString[1024];
 		sprintf(infoString, "Segment Query: Dist(%f) Normal%s", cpvdist(start, end)*info.t, cpvstr(info.n));
@@ -164,7 +160,7 @@ init(void)
 	cpShape *shape;
 	
 	// add a non-collidable segment as a quick and dirty way to draw the query line
-	shape = cpSegmentShapeNew(staticBody, cpvzero, cpv(100.0f, 0.0f), 0.0f);
+	shape = cpSegmentShapeNew(staticBody, cpvzero, cpv(100.0f, 0.0f), 4.0f);
 	cpSpaceAddStaticShape(space, shape);
 	shape->layers = 0;
 	querySeg = shape;

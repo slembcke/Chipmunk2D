@@ -18,7 +18,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
+
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -456,4 +457,58 @@ cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpaceHashQueryFunc func, void *data)
 	
 	queryRehashPair pair = {hash, func, data};
 	cpHashSetEach(hash->handleSet, &handleQueryRehashHelper, &pair);
+}
+
+// modified from http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
+void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQueryFunc func, void *data)
+{
+//	printf("(%f, %f) to (%f, %f)\n", a.x, a.y, b.x, b.y);
+	a = cpvmult(a, 1.0f/hash->celldim);
+	b = cpvmult(b, 1.0f/hash->celldim);
+//	printf("(%f, %f) to (%f, %f)\n", a.x, a.y, b.x, b.y);
+	cpFloat dt_dx = 1.0f/fabs(b.x - a.x), dt_dy = 1.0f/fabs(b.y - a.y);
+	
+	int cell_x = (int)floor(a.x), cell_y = (int)floor(a.y);
+
+	cpFloat t = 0;
+
+//	int n = 1 + abs((int)floor(b.x) - cell_x) + abs((int)floor(b.y) - cell_y);
+	int x_inc, y_inc;
+	cpFloat t_next_vertical, t_next_horizontal;
+
+	if (b.x > a.x){
+		x_inc = 1;
+		t_next_horizontal = (ceil(a.x) - a.x)*dt_dx;
+	} else {
+		x_inc = -1;
+		t_next_horizontal = (a.x - floor(a.x))*dt_dx;
+	}
+
+	if (b.y > a.y){
+		y_inc = 1;
+		t_next_vertical = (ceil(a.y) - a.y)*dt_dy;
+	} else {
+		y_inc = -1;
+		t_next_vertical = (a.y - floor(a.y))*dt_dy;
+	}
+
+//	for(int i=0; i<n; i++){
+	int n = hash->numcells;
+	while(t_next_horizontal < 1.0f || t_next_vertical < 1.0f){
+//		printf("cell (%d,%d)\n", cell_x, cell_y);
+		int index = hash_func(cell_x, cell_y, n);
+		query(hash, hash->table[index], obj, func, data);
+
+		if (t_next_vertical < t_next_horizontal){
+			cell_y += y_inc;
+			t = t_next_vertical;
+			t_next_vertical += dt_dy;
+		} else {
+			cell_x += x_inc;
+			t = t_next_horizontal;
+			t_next_horizontal += dt_dx;
+		}
+		
+//		printf("t %f, %f, %f\n", t, t_next_horizontal, t_next_vertical);
+	}
 }
