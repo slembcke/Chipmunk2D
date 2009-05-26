@@ -92,7 +92,7 @@ cpfclamp(cpFloat f, cpFloat min, cpFloat max){
 #include "cpSpace.h"
 
 #define CP_HASH_COEF (3344921057ul)
-#define CP_HASH_PAIR(A, B) ((unsigned int)(A)*CP_HASH_COEF ^ (unsigned int)(B)*CP_HASH_COEF)
+#define CP_HASH_PAIR(A, B) ((size_t)(A)*CP_HASH_COEF ^ (size_t)(B)*CP_HASH_COEF)
 
 void cpInitChipmunk(void);
 

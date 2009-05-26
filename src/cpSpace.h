@@ -28,8 +28,8 @@ typedef int (*cpCollFunc)(cpShape *a, cpShape *b, cpContact *contacts, int numCo
 // Structure for holding collision pair function information.
 // Used internally.
 typedef struct cpCollPairFunc {
-	unsigned int a;
-	unsigned int b;
+	cpCollisionType a;
+	cpCollisionType b;
 	cpCollFunc func;
 	void *data;
 } cpCollPairFunc;
@@ -86,9 +86,9 @@ void cpSpaceFree(cpSpace *space);
 void cpSpaceFreeChildren(cpSpace *space);
 
 // Collision pair function management functions.
-void cpSpaceAddCollisionPairFunc(cpSpace *space, unsigned int a, unsigned int b,
+void cpSpaceAddCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b,
                                  cpCollFunc func, void *data);
-void cpSpaceRemoveCollisionPairFunc(cpSpace *space, unsigned int a, unsigned int b);
+void cpSpaceRemoveCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b);
 void cpSpaceSetDefaultCollisionPairFunc(cpSpace *space, cpCollFunc func, void *data);
 
 // Add and remove entities from the system.

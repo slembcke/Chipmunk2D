@@ -75,7 +75,6 @@ init(void)
 	
 	space = cpSpaceNew();
 	space->iterations = 10;
-	space->elasticIterations = 10;
 	
 	cpShape *shape;
 		

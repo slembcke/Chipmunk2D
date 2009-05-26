@@ -74,9 +74,9 @@ void cpSpaceHashFree(cpSpaceHash *hash);
 void cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells);
 
 // Add an object to the hash.
-void cpSpaceHashInsert(cpSpaceHash *hash, void *obj, unsigned int id, cpBB bb);
+void cpSpaceHashInsert(cpSpaceHash *hash, void *obj, size_t id, cpBB bb);
 // Remove an object from the hash.
-void cpSpaceHashRemove(cpSpaceHash *hash, void *obj, unsigned int id);
+void cpSpaceHashRemove(cpSpaceHash *hash, void *obj, size_t id);
 
 // Iterator function
 typedef void (*cpSpaceHashIterator)(void *obj, void *data);
@@ -86,7 +86,7 @@ void cpSpaceHashEach(cpSpaceHash *hash, cpSpaceHashIterator func, void *data);
 // Rehash the contents of the hash.
 void cpSpaceHashRehash(cpSpaceHash *hash);
 // Rehash only a specific object.
-void cpSpaceHashRehashObject(cpSpaceHash *hash, void *obj, unsigned int id);
+void cpSpaceHashRehashObject(cpSpaceHash *hash, void *obj, size_t id);
 
 // Query callback.
 typedef void (*cpSpaceHashQueryFunc)(void *obj1, void *obj2, void *data);

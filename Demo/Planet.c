@@ -100,7 +100,6 @@ init(void)
 	
 	space = cpSpaceNew();
 	space->iterations = 20;
-	space->elasticIterations = 0;
 	
 	for(int i=0; i<30; i++)
 		add_box();

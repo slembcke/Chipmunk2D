@@ -65,9 +65,9 @@ typedef struct collFuncData {
 static int
 collFuncSetEql(void *ptr, void *elt)
 {
-	unsigned int *ids = (unsigned int *)ptr;
-	unsigned int a = ids[0];
-	unsigned int b = ids[1];
+	size_t *ids = (size_t *)ptr;
+	size_t a = ids[0];
+	size_t b = ids[1];
 	
 	cpCollPairFunc *pair = (cpCollPairFunc *)elt;
 	
@@ -78,7 +78,7 @@ collFuncSetEql(void *ptr, void *elt)
 static void *
 collFuncSetTrans(void *ptr, void *data)
 {
-	unsigned int *ids = (unsigned int *)ptr;
+	size_t *ids = (size_t *)ptr;
 	collFuncData *funcData = (collFuncData *)data;
 
 	cpCollPairFunc *pair = (cpCollPairFunc *)malloc(sizeof(cpCollPairFunc));
@@ -121,7 +121,7 @@ cpSpaceAlloc(void)
 #define DEFAULT_DIM_SIZE 100.0f
 #define DEFAULT_COUNT 1000
 #define DEFAULT_ITERATIONS 10
-#define DEFAULT_ELASTIC_ITERATIONS 10
+#define DEFAULT_ELASTIC_ITERATIONS 0
 
 cpSpace*
 cpSpaceInit(cpSpace *space)
@@ -195,11 +195,11 @@ cpSpaceFreeChildren(cpSpace *space)
 }
 
 void
-cpSpaceAddCollisionPairFunc(cpSpace *space, unsigned int a, unsigned int b,
+cpSpaceAddCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b,
                                  cpCollFunc func, void *data)
 {
-	unsigned int ids[] = {a, b};
-	unsigned int hash = CP_HASH_PAIR(a, b);
+	cpCollisionType ids[] = {a, b};
+	cpCollisionType hash = CP_HASH_PAIR(a, b);
 	// Remove any old function so the new one will get added.
 	cpSpaceRemoveCollisionPairFunc(space, a, b);
 		
@@ -208,10 +208,10 @@ cpSpaceAddCollisionPairFunc(cpSpace *space, unsigned int a, unsigned int b,
 }
 
 void
-cpSpaceRemoveCollisionPairFunc(cpSpace *space, unsigned int a, unsigned int b)
+cpSpaceRemoveCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
-	unsigned int ids[] = {a, b};
-	unsigned int hash = CP_HASH_PAIR(a, b);
+	cpCollisionType ids[] = {a, b};
+	cpCollisionType hash = CP_HASH_PAIR(a, b);
 	cpCollPairFunc *old_pair = (cpCollPairFunc *)cpHashSetRemove(space->collFuncSet, hash, ids);
 	free(old_pair);
 }
@@ -405,8 +405,8 @@ queryFunc(void *p1, void *p2, void *data)
 	}
 	
 //	// Find the collision pair function for the shapes.
-//	unsigned int ids[] = {a->collision_type, b->collision_type};
-//	unsigned int hash = CP_HASH_PAIR(a->collision_type, b->collision_type);
+//	cpCollisionType ids[] = {a->collision_type, b->collision_type};
+//	cpCollisionType hash = CP_HASH_PAIR(a->collision_type, b->collision_type);
 //	cpCollPairFunc *pairFunc = (cpCollPairFunc *)cpHashSetFind(space->collFuncSet, hash, ids);
 //	if(!pairFunc->func) return; // A NULL pair function means don't collide at all.
 	
@@ -492,8 +492,8 @@ filterArbiterByCallback(cpSpace *space)
 		cpFloat normal_coef = 1.0f;
 		
 		// Find the collision pair function for the shapes.
-		unsigned int ids[] = {a->collision_type, b->collision_type};
-		unsigned int hash = CP_HASH_PAIR(a->collision_type, b->collision_type);
+		cpCollisionType ids[] = {a->collision_type, b->collision_type};
+		cpCollisionType hash = CP_HASH_PAIR(a->collision_type, b->collision_type);
 		cpCollPairFunc *pairFunc = (cpCollPairFunc *)cpHashSetFind(space->collFuncSet, hash, ids);
 		if(!pairFunc->func) continue; // A NULL pair function means don't collide at all.
 		
@@ -551,15 +551,15 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		constraint->klass->preStep(constraint, dt, dt_inv);
 	}
 
-//	for(int i=0; i<space->elasticIterations; i++){
-//		for(int j=0; j<arbiters->num; j++)
-//			cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j], 1.0f);
-//			
-//		for(int j=0; j<constraints->num; j++){
-//			cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
-//			constraint->klass->applyImpulse(constraint);
-//		}
-//	}
+	for(int i=0; i<space->elasticIterations; i++){
+		for(int j=0; j<arbiters->num; j++)
+			cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j], 1.0f);
+			
+		for(int j=0; j<constraints->num; j++){
+			cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
+			constraint->klass->applyImpulse(constraint);
+		}
+	}
 
 	// Integrate velocities.
 	cpFloat damping = cpfpow(1.0f/space->damping, -dt);
@@ -572,9 +572,11 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpArbiterApplyCachedImpulse((cpArbiter *)arbiters->arr[i]);
 	
 	// Run the impulse solver.
+	// run the old-style elastic solver if elastic iterations are disabled
+	cpFloat elasticCoef = (space->elasticIterations ? 0.0f : 1.0f);
 	for(int i=0; i<space->iterations; i++){
 		for(int j=0; j<arbiters->num; j++)
-			cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j], 1.0f);
+			cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j], elasticCoef);
 			
 		for(int j=0; j<constraints->num; j++){
 			cpConstraint *constraint = (cpConstraint *)constraints->arr[j];

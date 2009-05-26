@@ -104,7 +104,6 @@ init(void)
 	space = cpSpaceNew();
 	cpSpaceResizeActiveHash(space, 2.0, 10000);
 	space->iterations = 1;
-	space->elasticIterations = 0;
 	
 	cpBody *body;
 	cpShape *shape;

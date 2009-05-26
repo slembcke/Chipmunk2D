@@ -37,14 +37,15 @@ char messageString[1024];
 
 cpShape *querySeg = NULL;
 
-extern int cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, unsigned int layers, unsigned int group, cpSegmentQueryInfo *info);
+extern int cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpLayers layers, cpLayers group, cpSegmentQueryInfo *info);
 
 
 typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, void *data);
 
 typedef struct segQueryContext {
 	cpVect start, end;
-	unsigned int layers, group;
+	cpLayers layers;
+	cpLayers group;
 	cpSpaceSegmentQueryFunc func;
 	int anyCollision;
 } segQueryContext;
@@ -64,7 +65,7 @@ segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
 extern void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQueryFunc func, void *data);
 
 static int
-cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, unsigned int layers, unsigned int group, cpSpaceSegmentQueryFunc func, void *data)
+cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpLayers group, cpSpaceSegmentQueryFunc func, void *data)
 {
 	segQueryContext context = {
 		start, end,
@@ -90,7 +91,7 @@ storeFirstCollision(cpShape *shape, cpFloat t, cpVect n, cpSegmentQueryInfo *inf
 }
 
 static int
-cpSpaceShapeSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, unsigned int layers, unsigned int group, cpSegmentQueryInfo *out)
+cpSpaceShapeSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpLayers group, cpSegmentQueryInfo *out)
 {
 	cpSegmentQueryInfo info;
 	info.t = INFINITY;

@@ -56,6 +56,10 @@ typedef struct cpShapeClass {
 	 void (*segmentQuery)(struct cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
 } cpShapeClass;
 
+typedef unsigned int cpCollisionType;
+typedef unsigned int cpLayers;
+typedef unsigned int cpGroup;
+
 // Basic shape struct that the others inherit from.
 typedef struct cpShape{
 	// The "class" of a shape as defined above 
@@ -82,16 +86,16 @@ typedef struct cpShape{
 	void *data;
 	
 	// User defined collision type for the shape.
-	unsigned int collision_type;
+	cpCollisionType collision_type;
 	// User defined collision group for the shape.
-	unsigned int group;
+	cpLayers group;
 	// User defined layer bitmask for the shape.
-	unsigned int layers;
+	cpLayers layers;
 	
 	// *** Internally Used Fields
 	
 	// Unique id used as the hash value.
-	unsigned int id;
+	size_t id;
 } cpShape;
 
 // Low level shape initialization func.
@@ -109,11 +113,6 @@ int cpShapePointQuery(cpShape *shape, cpVect p);
 void cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info);
 
 #define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(cpShape *shape)
-#define CP_DefineShapeGetter(struct, type, member, name) \
-CP_DeclareShapeGetter(struct, type, name){ \
-	assert(shape->klass == &struct##Class); \
-	return ((struct *)shape)->member; \
-}
 
 // Circle shape structure.
 typedef struct cpCircleShape{

@@ -26,7 +26,12 @@
 
 #include "chipmunk.h"
 
-unsigned int SHAPE_ID_COUNTER = 0;
+#define CP_DefineShapeGetter(struct, type, member, name) \
+CP_DeclareShapeGetter(struct, type, name){ \
+	assert(shape->klass == &struct##Class); \
+	return ((struct *)shape)->member; \
+}
+size_t SHAPE_ID_COUNTER = 0;
 
 void
 cpResetShapeIdCounter(void)
@@ -88,7 +93,7 @@ cpShapePointQuery(cpShape *shape, cpVect p){
 }
 
 int
-cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, unsigned int layers, unsigned int group, cpSegmentQueryInfo *info){
+cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpLayers layers, cpLayers group, cpSegmentQueryInfo *info){
 	if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
 		shape->klass->segmentQuery(shape, a, b, info);
 	}

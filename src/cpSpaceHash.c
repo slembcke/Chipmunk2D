@@ -229,8 +229,8 @@ getEmptyBin(cpSpaceHash *hash)
 }
 
 // The hash function itself.
-static inline unsigned int
-hash_func(unsigned int x, unsigned int y, unsigned int n)
+static inline size_t
+hash_func(size_t x, size_t y, size_t n)
 {
 	return (x*2185031351ul ^ y*4232417593ul) % n;
 }
@@ -265,14 +265,14 @@ hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 }
 
 void
-cpSpaceHashInsert(cpSpaceHash *hash, void *obj, unsigned int id, cpBB bb)
+cpSpaceHashInsert(cpSpaceHash *hash, void *obj, size_t id, cpBB bb)
 {
 	cpHandle *hand = (cpHandle *)cpHashSetInsert(hash->handleSet, id, obj, NULL);
 	hashHandle(hash, hand, bb);
 }
 
 void
-cpSpaceHashRehashObject(cpSpaceHash *hash, void *obj, unsigned int id)
+cpSpaceHashRehashObject(cpSpaceHash *hash, void *obj, size_t id)
 {
 	cpHandle *hand = (cpHandle *)cpHashSetFind(hash->handleSet, id, obj);
 	hashHandle(hash, hand, hash->bbfunc(obj));
@@ -298,7 +298,7 @@ cpSpaceHashRehash(cpSpaceHash *hash)
 }
 
 void
-cpSpaceHashRemove(cpSpaceHash *hash, void *obj, unsigned int id)
+cpSpaceHashRemove(cpSpaceHash *hash, void *obj, size_t id)
 {
 	cpHandle *hand = (cpHandle *)cpHashSetRemove(hash->handleSet, id, obj);
 	

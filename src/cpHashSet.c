@@ -114,7 +114,7 @@ cpHashSetResize(cpHashSet *set)
 }
 
 void *
-cpHashSetInsert(cpHashSet *set, unsigned int hash, void *ptr, void *data)
+cpHashSetInsert(cpHashSet *set, size_t hash, void *ptr, void *data)
 {
 	int index = hash%set->size;
 	
@@ -143,7 +143,7 @@ cpHashSetInsert(cpHashSet *set, unsigned int hash, void *ptr, void *data)
 }
 
 void *
-cpHashSetRemove(cpHashSet *set, unsigned int hash, void *ptr)
+cpHashSetRemove(cpHashSet *set, size_t hash, void *ptr)
 {
 	int index = hash%set->size;
 	
@@ -176,7 +176,7 @@ cpHashSetRemove(cpHashSet *set, unsigned int hash, void *ptr)
 }
 
 void *
-cpHashSetFind(cpHashSet *set, unsigned int hash, void *ptr)
+cpHashSetFind(cpHashSet *set, size_t hash, void *ptr)
 {	
 	int index = hash%set->size;
 	cpHashSetBin *bin = set->table[index];
