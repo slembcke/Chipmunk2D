@@ -36,6 +36,19 @@ typedef double cpFloat;
 #define cpfmod fmod
 #define cpfexp exp
 #define cpfpow pow
+#define cpffloor floor
+#define cpfceil ceil
+	
+//typedef float cpFloat;
+//#define cpfsqrt sqrtf
+//#define cpfsin sinf
+//#define cpfcos cosf
+//#define cpfatan2 atan2f
+//#define cpfmod fmodf
+//#define cpfexp expf
+//#define cpfpow powf
+//#define cpffloor floorf
+//#define cpfceil ceilf
 	
 static inline cpFloat
 cpfmax(cpFloat a, cpFloat b)

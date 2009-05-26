@@ -468,28 +468,28 @@ void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQuery
 //	printf("(%f, %f) to (%f, %f)\n", a.x, a.y, b.x, b.y);
 	cpFloat dt_dx = 1.0f/fabs(b.x - a.x), dt_dy = 1.0f/fabs(b.y - a.y);
 	
-	int cell_x = (int)floor(a.x), cell_y = (int)floor(a.y);
+	int cell_x = (int)cpffloor(a.x), cell_y = (int)cpffloor(a.y);
 
 	cpFloat t = 0;
 
-//	int n = 1 + abs((int)floor(b.x) - cell_x) + abs((int)floor(b.y) - cell_y);
+//	int n = 1 + abs((int)cpffloor(b.x) - cell_x) + abs((int)cpffloor(b.y) - cell_y);
 	int x_inc, y_inc;
 	cpFloat t_next_vertical, t_next_horizontal;
 
 	if (b.x > a.x){
 		x_inc = 1;
-		t_next_horizontal = (ceil(a.x) - a.x)*dt_dx;
+		t_next_horizontal = (cpfceil(a.x) - a.x)*dt_dx;
 	} else {
 		x_inc = -1;
-		t_next_horizontal = (a.x - floor(a.x))*dt_dx;
+		t_next_horizontal = (a.x - cpffloor(a.x))*dt_dx;
 	}
 
 	if (b.y > a.y){
 		y_inc = 1;
-		t_next_vertical = (ceil(a.y) - a.y)*dt_dy;
+		t_next_vertical = (cpfceil(a.y) - a.y)*dt_dy;
 	} else {
 		y_inc = -1;
-		t_next_vertical = (a.y - floor(a.y))*dt_dy;
+		t_next_vertical = (a.y - cpffloor(a.y))*dt_dy;
 	}
 
 //	for(int i=0; i<n; i++){
