@@ -46,6 +46,8 @@ cpPolyShape *cpPolyShapeAlloc(void);
 cpPolyShape *cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, cpVect *verts, cpVect offset);
 cpShape *cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset);
 
+int cpPolyValidate(cpVect *verts, int numVerts);
+
 // Returns the minimum distance of the polygon to the axis.
 static inline cpFloat
 cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)

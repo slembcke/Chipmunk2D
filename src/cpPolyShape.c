@@ -137,6 +137,21 @@ static const cpShapeClass polyClass = {
 	cpPolyShapeSegmentQuery,
 };
 
+int
+cpPolyValidate(cpVect *verts, int numVerts)
+{
+	for(int i=0; i<numVerts; i++){
+		cpVect a = verts[i];
+		cpVect b = verts[(i+1)%numVerts];
+		cpVect c = verts[(i+2)%numVerts];
+		
+		if(cpvcross(cpvsub(b, a), cpvsub(c, b)) >= 0.0f)
+			return 0;
+	}
+	
+	return 1;
+}
+
 static void
 setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 {
@@ -161,6 +176,7 @@ setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 cpPolyShape *
 cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, cpVect *verts, cpVect offset)
 {
+	assert(cpPolyValidate(verts, numVerts));
 	setUpVerts(poly, numVerts, verts, offset);
 	cpShapeInit((cpShape *)poly, &polyClass, body);
 
