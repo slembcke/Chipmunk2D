@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 #include "chipmunk.h"
 #include "chipmunk_unsafe.h"
@@ -31,9 +32,9 @@
 extern cpSpace *space;
 extern cpBody *staticBody;
 
-cpBody *circleBody;
-cpShape *circleShape;
-cpFloat circleRadius = 50.0;
+#define NUM_CIRCLES 30
+cpShape *circles[NUM_CIRCLES];
+cpFloat circleRadius = 30.0;
 
 static void
 update(int ticks)
@@ -41,8 +42,10 @@ update(int ticks)
 	if(arrowDirection.y){
 		circleRadius = cpfmax(10.0, circleRadius + arrowDirection.y);
 		
-		circleBody->m = cpMomentForCircle(1.0, 0.0, circleRadius, cpvzero);
-		cpCircleShapeSetRadius(circleShape, circleRadius);
+		for(int i=0; i<NUM_CIRCLES; i++){
+			circles[i]->body->m = cpMomentForCircle(1.0, 0.0, circleRadius, cpvzero);
+			cpCircleShapeSetRadius(circles[i], circleRadius);
+		}
 	}
 	
 	int steps = 1;
@@ -52,8 +55,6 @@ update(int ticks)
 		cpSpaceStep(space, dt);
 	}
 }
-
-#define NUM_VERTS 5
 
 static cpSpace *
 init(void)
@@ -87,11 +88,17 @@ init(void)
 	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 	
-	circleBody = body = cpBodyNew(1.0, cpMomentForCircle(1.0, 0.0, circleRadius, cpvzero));
-	cpSpaceAddBody(space, body);
-	circleShape = shape = cpCircleShapeNew(body, circleRadius, cpvzero);
-	cpSpaceAddShape(space, shape);
+	for(int i=0; i<NUM_CIRCLES; i++){
+		body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForCircle(1.0, 0.0, circleRadius, cpvzero)));
+		body->p = cpvmult(cpv(frand()*2.0f - 1.0f, frand()*2.0f - 1.0f), circleRadius*5.0f);
+		
+		circles[i] = shape = cpSpaceAddShape(space, cpCircleShapeNew(body, circleRadius, cpvzero));
+		shape->e = 0.0; shape->u = 1.0;
+	}
 	
+	strcat(messageString,
+		"chipmunk_unsafe.h Contains functions for changing shapes, but they can cause severe stability problems if used incorrectly.\n"
+		"Shape changes occur as instantaneous changes to position without an accompanying velocity change. USE WITH CAUTION!");
 	return space;
 }
 

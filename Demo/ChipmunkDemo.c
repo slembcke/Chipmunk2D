@@ -163,7 +163,7 @@ display(void)
 	
 	drawSpace(space, currDemo->drawOptions ? currDemo->drawOptions : &options);
 	drawInstructions();
-	drawString(-300, -220, messageString);
+	drawString(-300, -210, messageString);
 		
 	glutSwapBuffers();
 	ticks++;
@@ -193,8 +193,8 @@ runDemo(chipmunkDemo *demo)
 	currDemo = demo;
 	ticks = 0;
 	mouseJoint = NULL;
+	messageString[0] = '\0';
 	space = currDemo->initFunc();
-//	messageString[0] = '\0';
 
 	glutSetWindowTitle(demoTitle(currDemo));
 }

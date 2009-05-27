@@ -42,6 +42,7 @@ frand(void)
 }
 
 extern cpVect arrowDirection;
+extern char messageString[1024];
 
 #define GRABABLE_MASK_BIT (1<<31)
 #define NOT_GRABABLE_MASK (~GRABABLE_MASK_BIT)

@@ -33,7 +33,6 @@
 extern cpSpace *space;
 extern cpBody *staticBody;
 extern cpVect mousePoint;
-char messageString[1024];
 
 cpShape *querySeg = NULL;
 

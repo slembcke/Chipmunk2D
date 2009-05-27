@@ -223,32 +223,40 @@ cpSpaceSetDefaultCollisionPairFunc(cpSpace *space, cpCollFunc func, void *data)
 	space->defaultPairFunc = pairFunc;
 }
 
-void
+cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
 	assert(shape->body);
 	cpSpaceHashInsert(space->activeShapes, shape, shape->id, shape->bb);
+	
+	return shape;
 }
 
-void
+cpShape *
 cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
 	assert(shape->body);
 
 	cpShapeCacheBB(shape);
 	cpSpaceHashInsert(space->staticShapes, shape, shape->id, shape->bb);
+	
+	return shape;
 }
 
-void
+cpBody *
 cpSpaceAddBody(cpSpace *space, cpBody *body)
 {
 	cpArrayPush(space->bodies, body);
+	
+	return body;
 }
 
-void
+cpConstraint *
 cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
 	cpArrayPush(space->constraints, constraint);
+	
+	return constraint;
 }
 
 static void
@@ -382,7 +390,7 @@ queryFunc(void *p1, void *p2, void *data)
 	
 	// Timestamp the arbiter.
 	arb->stamp = space->stamp;
-	arb->a = a; arb->b = b; // TODO: Investigate why this is still necessary?
+//	arb->a = a; arb->b = b; // TODO: Investigate why this is still necessary?
 	// Inject the new contact points into the arbiter.
 	cpArbiterInject(arb, contacts, numContacts);
 	

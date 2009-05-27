@@ -92,10 +92,10 @@ void cpSpaceRemoveCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisi
 void cpSpaceSetDefaultCollisionPairFunc(cpSpace *space, cpCollFunc func, void *data);
 
 // Add and remove entities from the system.
-void cpSpaceAddShape(cpSpace *space, cpShape *shape);
-void cpSpaceAddStaticShape(cpSpace *space, cpShape *shape);
-void cpSpaceAddBody(cpSpace *space, cpBody *body);
-void cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint);
+cpShape *cpSpaceAddShape(cpSpace *space, cpShape *shape);
+cpShape *cpSpaceAddStaticShape(cpSpace *space, cpShape *shape);
+cpBody *cpSpaceAddBody(cpSpace *space, cpBody *body);
+cpConstraint *cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint);
 
 void cpSpaceRemoveShape(cpSpace *space, cpShape *shape);
 void cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape);
