@@ -95,11 +95,11 @@ alwaysCollide(cpShape *a, cpShape *b, cpContact *arr, int numCon, cpFloat normal
 static cpBB shapeBBFunc(cpShape *shape){return shape->bb;}
 
 // Iterator functions for destructors.
-static void        freeWrap(void *ptr, void *unused){          free(             ptr);}
-static void   shapeFreeWrap(void *ptr, void *unused){   cpShapeFree((cpShape *)  ptr);}
-static void arbiterFreeWrap(void *ptr, void *unused){ cpArbiterFree((cpArbiter *)ptr);}
-static void    bodyFreeWrap(void *ptr, void *unused){    cpBodyFree((cpBody *)   ptr);}
-static void   constraintFreeWrap(void *ptr, void *unused){   cpConstraintFree((cpConstraint *)  ptr);}
+static void             freeWrap(void         *ptr, void *unused){            free(ptr);}
+static void        shapeFreeWrap(cpShape      *ptr, void *unused){     cpShapeFree(ptr);}
+static void      arbiterFreeWrap(cpArbiter    *ptr, void *unused){   cpArbiterFree(ptr);}
+static void         bodyFreeWrap(cpBody       *ptr, void *unused){      cpBodyFree(ptr);}
+static void   constraintFreeWrap(cpConstraint *ptr, void *unused){cpConstraintFree(ptr);}
 
 #pragma mark Memory Management Functions
 
@@ -160,7 +160,8 @@ cpSpaceDestroy(cpSpace *space)
 	cpArrayFree(space->constraints);
 	
 	if(space->contactSet)
-		cpHashSetEach(space->contactSet, &arbiterFreeWrap, NULL);
+		cpHashSetEach(space->contactSet, (cpHashSetIterFunc)&arbiterFreeWrap, NULL);
+	
 	cpHashSetFree(space->contactSet);
 	cpArrayFree(space->arbiters);
 	
@@ -179,17 +180,16 @@ cpSpaceFree(cpSpace *space)
 void
 cpSpaceFreeChildren(cpSpace *space)
 {
-	cpSpaceHashEach(space->staticShapes, &shapeFreeWrap, NULL);
-	cpSpaceHashEach(space->activeShapes, &shapeFreeWrap, NULL);
-	cpArrayEach(space->bodies, &bodyFreeWrap, NULL);
-	cpArrayEach(space->constraints, &constraintFreeWrap, NULL);
+	cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)&shapeFreeWrap, NULL);
+	cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)&shapeFreeWrap, NULL);
+	cpArrayEach(space->bodies,           (cpArrayIter)&bodyFreeWrap,          NULL);
+	cpArrayEach(space->constraints,      (cpArrayIter)&constraintFreeWrap,    NULL);
 }
 
 #pragma mark Collision Pair Function Management
 
 void
-cpSpaceAddCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b,
-                                 cpCollFunc func, void *data)
+cpSpaceAddCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b, cpCollFunc func, void *data)
 {
 	cpCollisionType ids[] = {a, b};
 	cpCollisionType hash = CP_HASH_PAIR(a, b);
@@ -312,9 +312,9 @@ typedef struct pointQueryContext {
 } pointQueryContext;
 
 static void 
-pointQueryHelper(void *point, cpShape *shape, pointQueryContext *context)
+pointQueryHelper(cpVect *point, cpShape *shape, pointQueryContext *context)
 {
-	if(cpShapePointQuery(shape, *((cpVect *)point), context->layers, context->group))
+	if(cpShapePointQuery(shape, *point, context->layers, context->group))
 		context->func(shape, context->data);
 }
 
@@ -327,7 +327,7 @@ cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpLayers group,
 }
 
 static void
-rememberLastPointQuery(cpShape *shape, void **outShape)
+rememberLastPointQuery(cpShape *shape, cpShape **outShape)
 {
 	(*outShape) = shape;
 }
@@ -354,9 +354,8 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data)
 
 // Iterator function used for updating shape BBoxes.
 static void
-updateBBCache(void *ptr, void *unused)
+updateBBCache(cpShape *shape, void *unused)
 {
-	cpShape *shape = (cpShape *)ptr;
 	cpShapeCacheBB(shape);
 }
 
@@ -376,7 +375,7 @@ cpSpaceResizeActiveHash(cpSpace *space, cpFloat dim, int count)
 void 
 cpSpaceRehashStatic(cpSpace *space)
 {
-	cpSpaceHashEach(space->staticShapes, &updateBBCache, NULL);
+	cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)&updateBBCache, NULL);
 	cpSpaceHashRehash(space->staticShapes);
 }
 
@@ -440,11 +439,8 @@ active2staticIter(cpShape *shape, cpSpace *space)
 
 // Hashset reject func to throw away old arbiters.
 static int
-contactSetReject(void *ptr, void *data)
+contactSetReject(cpArbiter *arb, cpSpace *space)
 {
-	cpArbiter *arb = (cpArbiter *)ptr;
-	cpSpace *space = (cpSpace *)data;
-	
 	if((space->stamp - arb->stamp) > cp_contact_persistence){
 		cpArbiterFree(arb);
 		return 0;
@@ -502,7 +498,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	cpArray *constraints = space->constraints;
 	
 	// Empty the arbiter list.
-	cpHashSetReject(space->contactSet, &contactSetReject, space);
+	cpHashSetReject(space->contactSet, (cpHashSetRejectFunc)&contactSetReject, space);
 	space->arbiters->num = 0;
 
 	// Integrate positions.
@@ -512,7 +508,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	}
 	
 	// Pre-cache BBoxes and shape data.
-	cpSpaceHashEach(space->activeShapes, &updateBBCache, NULL);
+	cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)&updateBBCache, NULL);
 	
 	// Collide!
 	cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)&active2staticIter, space);
