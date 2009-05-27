@@ -422,6 +422,8 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	
 	// Timestamp the arbiter.
 	arb->stamp = space->stamp;
+	// For collisions between two similar primitive types, the order could have been swapped.
+	arb->a = a; arb->b = b;
 	// Inject the new contact points into the arbiter.
 	cpArbiterInject(arb, contacts, numContacts);
 	
@@ -431,10 +433,8 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 
 // Iterator for active/static hash collisions.
 static void
-active2staticIter(void *ptr, void *data)
+active2staticIter(cpShape *shape, cpSpace *space)
 {
-	cpShape *shape = (cpShape *)ptr;
-	cpSpace *space = (cpSpace *)data;
 	cpSpaceHashQuery(space->staticShapes, shape, shape->bb, (cpSpaceHashQueryFunc)&queryFunc, space);
 }
 
@@ -515,7 +515,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	cpSpaceHashEach(space->activeShapes, &updateBBCache, NULL);
 	
 	// Collide!
-	cpSpaceHashEach(space->activeShapes, &active2staticIter, space);
+	cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)&active2staticIter, space);
 	cpSpaceHashQueryRehash(space->activeShapes, (cpSpaceHashQueryFunc)&queryFunc, space);
 	
 	// Filter arbiter list based on collision callbacks
