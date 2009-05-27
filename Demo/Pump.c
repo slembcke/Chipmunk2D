@@ -85,30 +85,37 @@ init(void)
 	// beveling all of the line segments helps prevent things from getting stuck on cracks
 	shape = cpSegmentShapeNew(staticBody, cpv(-256,16), cpv(-256,240), 2.0f);
 	shape->e = 1.0; shape->u = 0.5; shape->layers = 1;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
 	shape = cpSegmentShapeNew(staticBody, cpv(-256,16), cpv(-192,0), 2.0f);
 	shape->e = 1.0; shape->u = 0.5; shape->layers = 1;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
 	shape = cpSegmentShapeNew(staticBody, cpv(-192,0), cpv(-192, -64), 2.0f);
 	shape->e = 1.0; shape->u = 0.5; shape->layers = 1;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
 	shape = cpSegmentShapeNew(staticBody, cpv(-128,-64), cpv(-128,144), 2.0f);
 	shape->e = 1.0; shape->u = 0.5; shape->layers = 1;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
 	shape = cpSegmentShapeNew(staticBody, cpv(-192,80), cpv(-192,176), 2.0f);
 	shape->e = 1.0; shape->u = 0.5; shape->layers = 1;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
 	shape = cpSegmentShapeNew(staticBody, cpv(-192,176), cpv(-128,240), 2.0f);
 	shape->e = 1.0; shape->u = 0.5; shape->layers = 1;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
 	shape = cpSegmentShapeNew(staticBody, cpv(-128,144), cpv(192,64), 2.0f);
 	shape->e = 1.0; shape->u = 0.5; shape->layers = 1;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
 	cpVect verts[] = {

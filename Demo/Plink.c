@@ -92,6 +92,7 @@ init(void)
 			cpVect offset = cpv(i*80 - 320 + stagger, j*70 - 240);
 			shape = cpPolyShapeNew(staticBody, 3, tris, offset);
 			shape->e = 1.0; shape->u = 1.0;
+			shape->layers = NOT_GRABABLE_MASK;
 			cpSpaceAddStaticShape(space, shape);
 		}
 	}

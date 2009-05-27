@@ -128,6 +128,7 @@ init(void)
 
 	shape = cpCircleShapeNew(body, 8.0f, cpvzero);
 	shape->e = 0.0f; shape->u = 0.0f;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddShape(space, shape);	
 
 	return space;

@@ -81,18 +81,22 @@ init(void)
 	
 	shape = cpSegmentShapeNew(staticBody, a, b, 0.0f);
 	shape->e = 1.0; shape->u = 1.0;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
 	shape = cpSegmentShapeNew(staticBody, b, c, 0.0f);
 	shape->e = 1.0; shape->u = 1.0;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
 	shape = cpSegmentShapeNew(staticBody, c, d, 0.0f);
 	shape->e = 1.0; shape->u = 1.0;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
 	shape = cpSegmentShapeNew(staticBody, d, a, 0.0f);
 	shape->e = 1.0; shape->u = 1.0;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 	
 	// Give the box a little spin.

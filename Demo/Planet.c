@@ -106,6 +106,7 @@ init(void)
 	
 	cpShape *shape = cpCircleShapeNew(staticBody, 70.0f, cpvzero);
 	shape->e = 1.0; shape->u = 1.0;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 	
 	return space;

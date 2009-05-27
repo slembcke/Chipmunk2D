@@ -91,7 +91,6 @@ static chipmunkDemo *demos[] = {
 	&TheoJansen,
 	&MagnetsElectric,
 	&UnsafeOps,
-	&Query,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
@@ -105,7 +104,7 @@ cpVect mousePoint_last;
 cpBody *mouseBody = NULL;
 cpConstraint *mouseJoint = NULL;
 
-char messageString[1024] = {'H','e','l','l','o','\0'};
+char messageString[1024] = {};
 
 int key_up = 0;
 int key_down = 0;
@@ -244,23 +243,16 @@ mouse(int x, int y)
 }
 
 static void
-findBody(cpShape *shape, void *data)
-{
-	cpBody **body_ptr = (cpBody **)data;
-	*body_ptr = shape->body;
-}
-
-static void
 click(int button, int state, int x, int y)
 {
 	if(button == GLUT_LEFT_BUTTON){
 		if(state == GLUT_DOWN){
 			cpVect point = mouseToSpace(x, y);
 		
-			cpBody *body = NULL;
-			cpSpaceShapePointQuery(space, point, findBody, &body);
-			if(!body) return;
+			cpShape *shape = cpSpacePointQueryFirst(space, point, GRABABLE_MASK_BIT, 0);
+			if(!shape) return;
 			
+			cpBody *body = shape->body;
 			mouseJoint = cpPivotJointNew2(mouseBody, body, cpvzero, cpBodyWorld2Local(body, point));
 			mouseJoint->maxForce = 50000.0f;
 			mouseJoint->biasCoef = 0.15f;

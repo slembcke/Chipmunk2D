@@ -69,6 +69,7 @@ init(void)
 	// Add a floor.
 	shape = cpSegmentShapeNew(staticBody, cpv(-600,-240), cpv(600,-240), 0.0f);
 	shape->e = 1.0; shape->u = 1.0;
+	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 	
 	// Shared friction constant.
