@@ -254,27 +254,27 @@ pointQueryHelper(cpShape *shape, void *block)
 	rb_funcall((VALUE)block, id_call, 1, (VALUE)shape->data);
 }
 
-static VALUE
-rb_cpSpaceShapePointQuery(int argc, VALUE *argv, VALUE self)
-{
-	VALUE point, block;
-	rb_scan_args(argc, argv, "10&", &point, &block);
-	
-	cpSpaceShapePointQuery(SPACE(self), *VGET(point), pointQueryHelper, (void *)block);
-	
-	return Qnil;
-}
-
-static VALUE
-rb_cpSpaceStaticShapePointQuery(int argc, VALUE *argv, VALUE self)
-{
-	VALUE point, block;
-	rb_scan_args(argc, argv, "10&", &point, &block);
-	
-	cpSpaceStaticShapePointQuery(SPACE(self), *VGET(point), pointQueryHelper, (void *)block);
-	
-	return Qnil;
-}
+//static VALUE
+//rb_cpSpaceShapePointQuery(int argc, VALUE *argv, VALUE self)
+//{
+//	VALUE point, block;
+//	rb_scan_args(argc, argv, "10&", &point, &block);
+//	
+//	cpSpaceShapePointQuery(SPACE(self), *VGET(point), pointQueryHelper, (void *)block);
+//	
+//	return Qnil;
+//}
+//
+//static VALUE
+//rb_cpSpaceStaticShapePointQuery(int argc, VALUE *argv, VALUE self)
+//{
+//	VALUE point, block;
+//	rb_scan_args(argc, argv, "10&", &point, &block);
+//	
+//	cpSpaceStaticShapePointQuery(SPACE(self), *VGET(point), pointQueryHelper, (void *)block);
+//	
+//	return Qnil;
+//}
 
 static VALUE
 rb_cpSpaceStep(VALUE self, VALUE dt)
@@ -324,8 +324,8 @@ Init_cpSpace(void)
 	rb_define_method(c_cpSpace, "resize_active_hash", rb_cpSpaceResizeActiveHash, 2);
 	rb_define_method(c_cpSpace, "rehash_static", rb_cpSpaceRehashStatic, 0);
 	
-	rb_define_method(c_cpSpace, "shape_point_query", rb_cpSpaceShapePointQuery, -1);
-	rb_define_method(c_cpSpace, "static_shape_point_query", rb_cpSpaceStaticShapePointQuery, -1);
+//	rb_define_method(c_cpSpace, "shape_point_query", rb_cpSpaceShapePointQuery, -1);
+//	rb_define_method(c_cpSpace, "static_shape_point_query", rb_cpSpaceStaticShapePointQuery, -1);
 	
 	rb_define_method(c_cpSpace, "step", rb_cpSpaceStep, 1);
 }
