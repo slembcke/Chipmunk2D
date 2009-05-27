@@ -29,31 +29,29 @@
 
 int cp_contact_persistence = 3;
 
+#pragma mark Contact Set Helpers
+
 // Equal function for contactSet.
 static int
-contactSetEql(void *ptr, void *elt)
+contactSetEql(cpShape **shapes, cpArbiter *arb)
 {
-	cpShape **shapes = (cpShape **)ptr;
 	cpShape *a = shapes[0];
 	cpShape *b = shapes[1];
-	
-	cpArbiter *arb = (cpArbiter *)elt;
 	
 	return ((a == arb->a && b == arb->b) || (b == arb->a && a == arb->b));
 }
 
 // Transformation function for contactSet.
 static void *
-contactSetTrans(void *ptr, void *data)
+contactSetTrans(cpShape **shapes, cpSpace *space)
 {
-	cpShape **shapes = (cpShape **)ptr;
 	cpShape *a = shapes[0];
 	cpShape *b = shapes[1];
 	
-	cpSpace *space = (cpSpace *)data;
-	
 	return cpArbiterNew(a, b, space->stamp);
 }
+
+#pragma mark Collision Pair Function Helpers
 
 // Collision pair function wrapper struct.
 typedef struct collFuncData {
@@ -63,24 +61,18 @@ typedef struct collFuncData {
 
 // Equals function for collFuncSet.
 static int
-collFuncSetEql(void *ptr, void *elt)
+collFuncSetEql(size_t *ids, cpCollPairFunc *pair)
 {
-	size_t *ids = (size_t *)ptr;
 	size_t a = ids[0];
 	size_t b = ids[1];
-	
-	cpCollPairFunc *pair = (cpCollPairFunc *)elt;
 	
 	return ((a == pair->a && b == pair->b) || (b == pair->a && a == pair->b));
 }
 
 // Transformation function for collFuncSet.
 static void *
-collFuncSetTrans(void *ptr, void *data)
+collFuncSetTrans(size_t *ids, collFuncData *funcData)
 {
-	size_t *ids = (size_t *)ptr;
-	collFuncData *funcData = (collFuncData *)data;
-
 	cpCollPairFunc *pair = (cpCollPairFunc *)malloc(sizeof(cpCollPairFunc));
 	pair->a = ids[0];
 	pair->b = ids[1];
@@ -90,6 +82,8 @@ collFuncSetTrans(void *ptr, void *data)
 	return pair;
 }
 
+#pragma mark Misc Helper Funcs
+
 // Default collision pair function.
 static int
 alwaysCollide(cpShape *a, cpShape *b, cpContact *arr, int numCon, cpFloat normal_coef, void *data)
@@ -98,12 +92,7 @@ alwaysCollide(cpShape *a, cpShape *b, cpContact *arr, int numCon, cpFloat normal
 }
 
 // BBfunc callback for the spatial hash.
-static cpBB
-bbfunc(void *ptr)
-{
-	cpShape *shape = (cpShape *)ptr;
-	return shape->bb;
-}
+static cpBB shapeBBFunc(cpShape *shape){return shape->bb;}
 
 // Iterator functions for destructors.
 static void        freeWrap(void *ptr, void *unused){          free(             ptr);}
@@ -111,6 +100,8 @@ static void   shapeFreeWrap(void *ptr, void *unused){   cpShapeFree((cpShape *) 
 static void arbiterFreeWrap(void *ptr, void *unused){ cpArbiterFree((cpArbiter *)ptr);}
 static void    bodyFreeWrap(void *ptr, void *unused){    cpBodyFree((cpBody *)   ptr);}
 static void   constraintFreeWrap(void *ptr, void *unused){   cpConstraintFree((cpConstraint *)  ptr);}
+
+#pragma mark Memory Management Functions
 
 cpSpace*
 cpSpaceAlloc(void)
@@ -135,18 +126,18 @@ cpSpaceInit(cpSpace *space)
 	
 	space->stamp = 0;
 
-	space->staticShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, &bbfunc);
-	space->activeShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, &bbfunc);
+	space->staticShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpaceHashBBFunc)shapeBBFunc);
+	space->activeShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpaceHashBBFunc)shapeBBFunc);
 	
 	space->bodies = cpArrayNew(0);
 	space->arbiters = cpArrayNew(0);
-	space->contactSet = cpHashSetNew(0, contactSetEql, contactSetTrans);
+	space->contactSet = cpHashSetNew(0, (cpHashSetEqlFunc)contactSetEql, (cpHashSetTransFunc)contactSetTrans);
 	
 	space->constraints = cpArrayNew(0);
 	
 	cpCollPairFunc pairFunc = {0, 0, alwaysCollide, NULL};
 	space->defaultPairFunc = pairFunc;
-	space->collFuncSet = cpHashSetNew(0, collFuncSetEql, collFuncSetTrans);
+	space->collFuncSet = cpHashSetNew(0, (cpHashSetEqlFunc)collFuncSetEql, (cpHashSetTransFunc)collFuncSetTrans);
 	space->collFuncSet->default_value = &space->defaultPairFunc;
 	
 	return space;
@@ -194,6 +185,8 @@ cpSpaceFreeChildren(cpSpace *space)
 	cpArrayEach(space->constraints, &constraintFreeWrap, NULL);
 }
 
+#pragma mark Collision Pair Function Management
+
 void
 cpSpaceAddCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b,
                                  cpCollFunc func, void *data)
@@ -222,6 +215,8 @@ cpSpaceSetDefaultCollisionPairFunc(cpSpace *space, cpCollFunc func, void *data)
 	cpCollPairFunc pairFunc = {0, 0, (func ? func : alwaysCollide), (func ? data : NULL)};
 	space->defaultPairFunc = pairFunc;
 }
+
+#pragma mark Body, Shape, and Joint Management
 
 cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
@@ -307,6 +302,45 @@ cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 	cpArrayDeleteObj(space->constraints, constraint);
 }
 
+#pragma mark Point Query Functions
+
+typedef struct pointQueryContext {
+	cpLayers layers;
+	cpGroup group;
+	cpSpacePointQueryFunc func;
+	void *data;
+} pointQueryContext;
+
+static void 
+pointQueryHelper(void *point, cpShape *shape, pointQueryContext *context)
+{
+	if(cpShapePointQuery(shape, *((cpVect *)point), context->layers, context->group))
+		context->func(shape, context->data);
+}
+
+void
+cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpLayers group, cpSpacePointQueryFunc func, void *data)
+{
+	pointQueryContext context = {layers, group, func, data};
+	cpSpaceHashPointQuery(space->activeShapes, point, (cpSpaceHashQueryFunc)pointQueryHelper, &context);
+	cpSpaceHashPointQuery(space->staticShapes, point, (cpSpaceHashQueryFunc)pointQueryHelper, &context);
+}
+
+static void
+rememberLastPointQuery(cpShape *shape, void **outShape)
+{
+	(*outShape) = shape;
+}
+
+cpShape *
+cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpLayers group)
+{
+	cpShape *shape = NULL;
+	cpSpacePointQuery(space, point, layers, group, (cpSpacePointQueryFunc)rememberLastPointQuery, &shape);
+	
+	return shape;
+}
+
 void
 cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data)
 {
@@ -315,6 +349,8 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data)
 	for(int i=0; i<bodies->num; i++)
 		func((cpBody *)bodies->arr[i], data);
 }
+
+#pragma mark Spatial Hash Management
 
 // Iterator function used for updating shape BBoxes.
 static void
@@ -344,6 +380,8 @@ cpSpaceRehashStatic(cpSpace *space)
 	cpSpaceHashRehash(space->staticShapes);
 }
 
+#pragma mark Collision Detection Functions
+
 static inline int
 queryReject(cpShape *a, cpShape *b)
 {
@@ -359,7 +397,6 @@ queryReject(cpShape *a, cpShape *b)
 }
 
 // Callback from the spatial hash.
-// TODO: Refactor this into separate functions?
 static void
 queryFunc(void *p1, void *p2, void *data)
 {
@@ -390,7 +427,6 @@ queryFunc(void *p1, void *p2, void *data)
 	
 	// Timestamp the arbiter.
 	arb->stamp = space->stamp;
-//	arb->a = a; arb->b = b; // TODO: Investigate why this is still necessary?
 	// Inject the new contact points into the arbiter.
 	cpArbiterInject(arb, contacts, numContacts);
 	
@@ -458,6 +494,8 @@ filterArbiterByCallback(cpSpace *space)
 		}
 	}
 }
+
+#pragma mark All Important cpSpaceStep() Function
 
 void
 cpSpaceStep(cpSpace *space, cpFloat dt)

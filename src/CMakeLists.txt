@@ -25,7 +25,6 @@ set(chipmunk_source_files
   cpPolyShape.c
   cpShape.c
   cpSpace.c
-  cpSpaceQuery.c
   cpSpaceHash.c
   cpVect.c
   constraints/cpBreakableJoint.c
