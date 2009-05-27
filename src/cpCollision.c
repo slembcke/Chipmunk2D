@@ -28,8 +28,6 @@
 
 typedef int (*collisionFunc)(cpShape*, cpShape*, cpContact**);
 
-static collisionFunc *colfuncs = NULL;
-
 // Add contact points for circle to circle collisions.
 // Used by several collision tests.
 static int
@@ -351,6 +349,21 @@ circle2poly(cpShape *shape1, cpShape *shape2, cpContact **con)
 		return circle2circleQuery(circ->tc, a, circ->r, 0.0f, con);
 	}
 }
+
+//static const collisionFunc builtinCollisionFuncs[9] = {
+//	circle2circle,
+//	NULL,
+//	NULL,
+//	circle2segment,
+//	NULL,
+//	NULL,
+//	circle2poly,
+//	seg2poly,
+//	poly2poly,
+//};
+//static const collisionFunc *colfuncs = builtinCollisionFuncs;
+
+static collisionFunc *colfuncs = NULL;
 
 static void
 addColFunc(cpShapeType a, cpShapeType b, collisionFunc func)

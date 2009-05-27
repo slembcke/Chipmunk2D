@@ -104,8 +104,8 @@ void cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint);
 
 // Point query callback function
 typedef void (*cpSpacePointQueryFunc)(cpShape *shape, void *data);
-void cpSpaceShapePointQuery(cpSpace *space, cpVect point, cpSpacePointQueryFunc func, void *data);
-void cpSpaceStaticShapePointQuery(cpSpace *space, cpVect point, cpSpacePointQueryFunc func, void *data);
+void cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpLayers group, cpSpacePointQueryFunc func, void *data);
+cpShape *cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpLayers group);
 
 // Iterator function for iterating the bodies in a space.
 typedef void (*cpSpaceBodyIterator)(cpBody *body, void *data);

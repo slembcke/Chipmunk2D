@@ -45,6 +45,8 @@ void cpCircleShapeSetCenter(cpShape *shape, cpVect center);
 void cpSegmentShapeSetEndpoints(cpShape *shape, cpVect a, cpVect b);
 void cpSegmentShapeSetRadius(cpShape *shape, cpFloat radius);
 
+void cpPolyShapeSetVerts(cpShape *shape, int numVerts, cpVect *verts, cpVect offset);
+
 #ifdef __cplusplus
 }
 #endif

@@ -49,6 +49,11 @@ cpShape *cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset
 // Check that a set of vertexes has a correct winding and that they are convex
 int cpPolyValidate(cpVect *verts, int numVerts);
 
+int cpPolyShapeGetNumVerts(cpShape *shape);
+cpVect cpPolyShapeGetVert(cpShape *shape, int index);
+
+// *** inlined utility functions
+
 // Returns the minimum distance of the polygon to the axis.
 static inline cpFloat
 cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)

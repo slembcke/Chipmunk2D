@@ -152,6 +152,23 @@ cpPolyValidate(cpVect *verts, int numVerts)
 	return 1;
 }
 
+int
+cpPolyShapeGetNumVerts(cpShape *shape)
+{
+	assert(shape->klass == &polyClass);
+	return ((cpPolyShape *)shape)->numVerts;
+}
+
+cpVect
+cpPolyShapeGetVert(cpShape *shape, int index)
+{
+	assert(shape->klass == &polyClass);
+	assert(index < cpPolyShapeGetNumVerts(shape));
+	
+	return ((cpPolyShape *)shape)->verts[index];
+}
+
+
 static void
 setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 {
@@ -176,7 +193,9 @@ setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 cpPolyShape *
 cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, cpVect *verts, cpVect offset)
 {
+	// Fail if the user attempts to pass a concave poly, or a bad winding.
 	assert(cpPolyValidate(verts, numVerts));
+	
 	setUpVerts(poly, numVerts, verts, offset);
 	cpShapeInit((cpShape *)poly, &polyClass, body);
 

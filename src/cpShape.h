@@ -109,7 +109,7 @@ void cpShapeFree(cpShape *shape);
 cpBB cpShapeCacheBB(cpShape *shape);
 
 // Test if a point lies within a shape.
-int cpShapePointQuery(cpShape *shape, cpVect p);
+int cpShapePointQuery(cpShape *shape, cpVect p, cpLayers layers, cpLayers group);
 void cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info);
 
 #define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(cpShape *shape)

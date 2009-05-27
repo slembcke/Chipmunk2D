@@ -26,8 +26,6 @@
 extern "C" {
 #endif
 
-#define CP_ALLOW_DEPRECATED_API_4
-
 typedef double cpFloat;
 #define cpfsqrt sqrt
 #define cpfsin sin
@@ -109,8 +107,14 @@ cpfclamp(cpFloat f, cpFloat min, cpFloat max){
 
 void cpInitChipmunk(void);
 
+// Calculate the moment of inertia for a circle, r1 and r2 are the inner and outer diameters.
+// (A solid circle has an inner diameter of 0)
 cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset);
+
+// Calculate the moment of inertia for a line segment. (beveling radius not supported)
 cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b);
+
+// Calculate the moment of inertia for a solid polygon shape.
 cpFloat cpMomentForPoly(cpFloat m, int numVerts, cpVect *verts, cpVect offset);
 
 #ifdef __cplusplus

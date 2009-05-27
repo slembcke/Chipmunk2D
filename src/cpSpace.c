@@ -336,40 +336,6 @@ cpSpaceRehashStatic(cpSpace *space)
 	cpSpaceHashRehash(space->staticShapes);
 }
 
-typedef struct pointQueryFuncPair {
-	cpSpacePointQueryFunc func;
-	void *data;
-} pointQueryFuncPair;
-
-static void 
-pointQueryHelper(void *point, void *obj, void *data)
-{
-	cpShape *shape = (cpShape *)obj;
-	pointQueryFuncPair *pair = (pointQueryFuncPair *)data;
-	
-	if(cpShapePointQuery(shape, *((cpVect *)point)))
-		pair->func(shape, pair->data);
-}
-
-static void
-pointQuery(cpSpaceHash *hash, cpVect point, cpSpacePointQueryFunc func, void *data)
-{
-	pointQueryFuncPair pair = {func, data};
-	cpSpaceHashPointQuery(hash, point, pointQueryHelper, &pair);
-}
-
-void
-cpSpaceShapePointQuery(cpSpace *space, cpVect point, cpSpacePointQueryFunc func, void *data)
-{
-	pointQuery(space->activeShapes, point, func, data);
-}
-
-void
-cpSpaceStaticShapePointQuery(cpSpace *space, cpVect point, cpSpacePointQueryFunc func, void *data)
-{
-	pointQuery(space->staticShapes, point, func, data);
-}
-
 static inline int
 queryReject(cpShape *a, cpShape *b)
 {
@@ -404,50 +370,24 @@ queryFunc(void *p1, void *p2, void *data)
 		b = temp;
 	}
 	
-//	// Find the collision pair function for the shapes.
-//	cpCollisionType ids[] = {a->collision_type, b->collision_type};
-//	cpCollisionType hash = CP_HASH_PAIR(a->collision_type, b->collision_type);
-//	cpCollPairFunc *pairFunc = (cpCollPairFunc *)cpHashSetFind(space->collFuncSet, hash, ids);
-//	if(!pairFunc->func) return; // A NULL pair function means don't collide at all.
-	
 	// Narrow-phase collision detection.
 	cpContact *contacts = NULL;
 	int numContacts = cpCollideShapes(a, b, &contacts);
 	if(!numContacts) return; // Shapes are not colliding.
 	
-//	// The collision pair function requires objects to be ordered by their collision types.
-//	cpShape *pair_a = a;
-//	cpShape *pair_b = b;
-//	cpFloat normal_coef = 1.0f;
-//	
-//	// Swap them if necessary.
-//	if(pair_a->collision_type != pairFunc->a){
-//		cpShape *temp = pair_a;
-//		pair_a = pair_b;
-//		pair_b = temp;
-//		normal_coef = -1.0f;
-//	}
-//	
-//	if(pairFunc->func(pair_a, pair_b, contacts, numContacts, normal_coef, pairFunc->data)){
-		// The collision pair function OKed the collision. Record the contact information.
-		
-		// Get an arbiter from space->contactSet for the two shapes.
-		// This is where the persistant contact magic comes from.
-		cpShape *shape_pair[] = {a, b};
-		cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->contactSet, CP_HASH_PAIR(a, b), shape_pair, space);
-		
-		// Timestamp the arbiter.
-		arb->stamp = space->stamp;
-		arb->a = a; arb->b = b; // TODO: Investigate why this is still necessary?
-		// Inject the new contact points into the arbiter.
-		cpArbiterInject(arb, contacts, numContacts);
-		
-		// Add the arbiter to the list of active arbiters.
-		cpArrayPush(space->arbiters, arb);
-//	} else {
-//		// The collision pair function rejected the collision.
-//		free(contacts);
-//	}
+	// Get an arbiter from space->contactSet for the two shapes.
+	// This is where the persistant contact magic comes from.
+	cpShape *shape_pair[] = {a, b};
+	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->contactSet, CP_HASH_PAIR(a, b), shape_pair, space);
+	
+	// Timestamp the arbiter.
+	arb->stamp = space->stamp;
+	arb->a = a; arb->b = b; // TODO: Investigate why this is still necessary?
+	// Inject the new contact points into the arbiter.
+	cpArbiterInject(arb, contacts, numContacts);
+	
+	// Add the arbiter to the list of active arbiters.
+	cpArrayPush(space->arbiters, arb);
 }
 
 // Iterator for active/static hash collisions.

@@ -88,8 +88,12 @@ cpShapeCacheBB(cpShape *shape)
 }
 
 int
-cpShapePointQuery(cpShape *shape, cpVect p){
-	return shape->klass->pointQuery(shape, p);
+cpShapePointQuery(cpShape *shape, cpVect p, cpLayers layers, cpLayers group){
+	if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
+		return shape->klass->pointQuery(shape, p);
+	}
+	
+	return 0;
 }
 
 int

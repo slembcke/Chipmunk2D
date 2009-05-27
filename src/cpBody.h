@@ -125,7 +125,7 @@ cpBodyWorld2Local(cpBody *body, cpVect v)
 	return cpvunrotate(cpvsub(v, body->p), body->rot);
 }
 
-// Apply an impulse (in world coordinates) to the body.
+// Apply an impulse (in world coordinates) to the body at a point relative to the center of gravity (also in world coordinates).
 static inline void
 cpBodyApplyImpulse(cpBody *body, cpVect j, cpVect r)
 {
@@ -143,10 +143,11 @@ cpBodyApplyBiasImpulse(cpBody *body, cpVect j, cpVect r)
 
 // Zero the forces on a body.
 void cpBodyResetForces(cpBody *body);
-// Apply a force (in world coordinates) to a body.
+// Apply a force (in world coordinates) to a body at a point relative to the center of gravity (also in world coordinates).
 void cpBodyApplyForce(cpBody *body, cpVect f, cpVect r);
 
 // Apply a damped spring force between two bodies.
+// Warning: Large damping values can be unstable. Use a cpDampedSpring constraint for this instead.
 void cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat rlen, cpFloat k, cpFloat dmp, cpFloat dt);
 
 //int cpBodyMarkLowEnergy(cpBody *body, cpFloat dvsq, int max);
