@@ -25,6 +25,11 @@
 #include "../chipmunk.h"
 #include "util.h"
 
+static cpFloat
+defaultSpringTorque(cpDampedRotarySpring *spring, cpFloat relativeAngle){
+	return (relativeAngle - spring->restAngle)*spring->stiffness;
+}
+
 static void
 preStep(cpDampedRotarySpring *spring, cpFloat dt, cpFloat dt_inv)
 {
@@ -37,7 +42,7 @@ preStep(cpDampedRotarySpring *spring, cpFloat dt, cpFloat dt_inv)
 	spring->target_wrn = 0.0f;
 
 	// apply spring torque
-	cpFloat j_spring = (a->a - b->a - spring->restAngle)*spring->stiffness*dt;
+	cpFloat j_spring = spring->springTorqueFunc((cpConstraint *)spring, a->a - b->a)*dt;
 	a->w -= j_spring*a->i_inv;
 	b->w += j_spring*b->i_inv;
 }
@@ -89,6 +94,7 @@ cpDampedRotarySpringInit(cpDampedRotarySpring *spring, cpBody *a, cpBody *b, cpF
 	spring->restAngle = restAngle;
 	spring->stiffness = stiffness;
 	spring->damping = damping;
+	spring->springTorqueFunc = (cpDampedRotarySpringTorqueFunc)defaultSpringTorque;
 	
 	return spring;
 }

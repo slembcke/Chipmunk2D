@@ -26,8 +26,7 @@
 #include "util.h"
 
 static cpFloat
-defaultSpringForce(cpConstraint *constraint, cpFloat dist){
-	cpDampedSpring *spring = (cpDampedSpring *)constraint;
+defaultSpringForce(cpDampedSpring *spring, cpFloat dist){
 	return (spring->restLength - dist)*spring->stiffness;
 }
 
@@ -106,7 +105,7 @@ cpDampedSpringInit(cpDampedSpring *spring, cpBody *a, cpBody *b, cpVect anchr1, 
 	spring->restLength = restLength;
 	spring->stiffness = stiffness;
 	spring->damping = damping;
-	spring->springForceFunc = defaultSpringForce;
+	spring->springForceFunc = (cpDampedSpringForceFunc)defaultSpringForce;
 	
 	return spring;
 }

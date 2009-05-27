@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+typedef cpFloat (*cpDampedRotarySpringTorqueFunc)(struct cpConstraint *spring, cpFloat relativeAngle);
+
 const cpConstraintClass *cpDampedRotarySpringGetClass();
 
 typedef struct cpDampedRotarySpring {
@@ -26,6 +28,7 @@ typedef struct cpDampedRotarySpring {
 	cpFloat restAngle;
 	cpFloat stiffness;
 	cpFloat damping;
+	cpDampedRotarySpringTorqueFunc springTorqueFunc;
 	
 	cpFloat dt;
 	cpFloat target_wrn;
