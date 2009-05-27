@@ -398,13 +398,8 @@ queryReject(cpShape *a, cpShape *b)
 
 // Callback from the spatial hash.
 static void
-queryFunc(void *p1, void *p2, void *data)
+queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 {
-	// Cast the generic pointers from the spatial hash back to usefull types
-	cpShape *a = (cpShape *)p1;
-	cpShape *b = (cpShape *)p2;
-	cpSpace *space = (cpSpace *)data;
-	
 	// Reject any of the simple cases
 	if(queryReject(a,b)) return;
 	
@@ -440,7 +435,7 @@ active2staticIter(void *ptr, void *data)
 {
 	cpShape *shape = (cpShape *)ptr;
 	cpSpace *space = (cpSpace *)data;
-	cpSpaceHashQuery(space->staticShapes, shape, shape->bb, &queryFunc, space);
+	cpSpaceHashQuery(space->staticShapes, shape, shape->bb, (cpSpaceHashQueryFunc)&queryFunc, space);
 }
 
 // Hashset reject func to throw away old arbiters.
@@ -521,7 +516,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	
 	// Collide!
 	cpSpaceHashEach(space->activeShapes, &active2staticIter, space);
-	cpSpaceHashQueryRehash(space->activeShapes, &queryFunc, space);
+	cpSpaceHashQueryRehash(space->activeShapes, (cpSpaceHashQueryFunc)&queryFunc, space);
 	
 	// Filter arbiter list based on collision callbacks
 	filterArbiterByCallback(space);

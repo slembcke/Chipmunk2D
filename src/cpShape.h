@@ -132,7 +132,7 @@ cpCircleShape *cpCircleShapeAlloc(void);
 cpCircleShape *cpCircleShapeInit(cpCircleShape *circle, cpBody *body, cpFloat radius, cpVect offset);
 cpShape *cpCircleShapeNew(cpBody *body, cpFloat radius, cpVect offset);
 
-CP_DeclareShapeGetter(cpCircleShape, cpVect, Center);
+CP_DeclareShapeGetter(cpCircleShape, cpVect, Offset);
 CP_DeclareShapeGetter(cpCircleShape, cpFloat, Radius);
 
 // Segment shape structure.

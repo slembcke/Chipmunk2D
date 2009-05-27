@@ -372,12 +372,12 @@ cpCircleShapeSetRadius(cpShape *shape, cpFloat radius)
 }
 
 void
-cpCircleShapeSetCenter(cpShape *shape, cpVect center)
+cpCircleShapeSetOffset(cpShape *shape, cpVect offset)
 {
 	assert(shape->klass == &cpCircleShapeClass);
 	cpCircleShape *circle = (cpCircleShape *)shape;
 	
-	circle->c = center;
+	circle->c = offset;
 }
 
 void

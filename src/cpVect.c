@@ -31,12 +31,6 @@ cpvlength(const cpVect v)
 }
 
 cpVect
-cpvnormalize(const cpVect v)
-{
-	return cpvmult( v, 1.0f/cpvlength(v) );
-}
-
-cpVect
 cpvforangle(const cpFloat a)
 {
 	return cpv(cpfcos(a), cpfsin(a));

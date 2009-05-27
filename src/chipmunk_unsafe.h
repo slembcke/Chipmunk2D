@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 void cpCircleShapeSetRadius(cpShape *shape, cpFloat radius);
-void cpCircleShapeSetCenter(cpShape *shape, cpVect center);
+void cpCircleShapeSetOffset(cpShape *shape, cpVect offset);
 
 void cpSegmentShapeSetEndpoints(cpShape *shape, cpVect a, cpVect b);
 void cpSegmentShapeSetRadius(cpShape *shape, cpFloat radius);

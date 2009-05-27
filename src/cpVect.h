@@ -34,7 +34,6 @@ cpv(const cpFloat x, const cpFloat y)
 
 // non-inlined functions
 cpFloat cpvlength(const cpVect v);
-cpVect cpvnormalize(const cpVect v);
 cpVect cpvforangle(const cpFloat a); // convert radians to a normalized vector
 cpFloat cpvtoangle(const cpVect v); // convert a vector to radians
 char *cpvstr(const cpVect v); // get a string representation of a vector
@@ -118,15 +117,21 @@ cpvlerp(const cpVect v1, const cpVect v2, const cpFloat t)
 }
 
 static inline cpVect
-cpvclamp(const cpVect v, const cpFloat len)
+cpvnormalize(const cpVect v)
 {
-	return (cpvdot(v,v) > len*len) ? cpvmult(cpvnormalize(v), len) : v;
+	return cpvmult(v, 1.0f/cpvlength(v));
 }
 
 static inline cpVect
 cpvnormalize_safe(const cpVect v)
 {
 	return (v.x == 0.0f && v.y == 0.0f ? cpvzero : cpvnormalize(v));
+}
+
+static inline cpVect
+cpvclamp(const cpVect v, const cpFloat len)
+{
+	return (cpvdot(v,v) > len*len) ? cpvmult(cpvnormalize(v), len) : v;
 }
 
 static inline cpFloat
