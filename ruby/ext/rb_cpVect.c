@@ -19,6 +19,7 @@
  * SOFTWARE.
  */
  
+#include <stdlib.h>
 #include "chipmunk.h"
 
 #include "ruby.h"
