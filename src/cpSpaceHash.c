@@ -462,53 +462,51 @@ cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpaceHashQueryFunc func, void *data)
 // modified from http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
 void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQueryFunc func, void *data)
 {
-//	printf("(%f, %f) to (%f, %f)\n", a.x, a.y, b.x, b.y);
 	a = cpvmult(a, 1.0f/hash->celldim);
 	b = cpvmult(b, 1.0f/hash->celldim);
-//	printf("(%f, %f) to (%f, %f)\n", a.x, a.y, b.x, b.y);
 	cpFloat dt_dx = 1.0f/fabs(b.x - a.x), dt_dy = 1.0f/fabs(b.y - a.y);
 	
 	int cell_x = (int)cpffloor(a.x), cell_y = (int)cpffloor(a.y);
 
 	cpFloat t = 0;
 
-//	int n = 1 + abs((int)cpffloor(b.x) - cell_x) + abs((int)cpffloor(b.y) - cell_y);
 	int x_inc, y_inc;
-	cpFloat t_next_vertical, t_next_horizontal;
+	cpFloat next_v, next_h;
 
 	if (b.x > a.x){
 		x_inc = 1;
-		t_next_horizontal = (cpfceil(a.x) - a.x)*dt_dx;
+		next_h = (cpfceil(a.x) - a.x)*dt_dx;
 	} else {
 		x_inc = -1;
-		t_next_horizontal = (a.x - cpffloor(a.x))*dt_dx;
+		next_h = (a.x - cpffloor(a.x))*dt_dx;
 	}
 
 	if (b.y > a.y){
 		y_inc = 1;
-		t_next_vertical = (cpfceil(a.y) - a.y)*dt_dy;
+		next_v = (cpfceil(a.y) - a.y)*dt_dy;
 	} else {
 		y_inc = -1;
-		t_next_vertical = (a.y - cpffloor(a.y))*dt_dy;
+		next_v = (a.y - cpffloor(a.y))*dt_dy;
 	}
+	
+	// fix NANs in horizontal directions
+	next_h = (next_h == next_h ? next_h : dt_dx);
+	next_v = (next_v == next_v ? next_v : dt_dy);
 
-//	for(int i=0; i<n; i++){
 	int n = hash->numcells;
-	while(t_next_horizontal < 1.0f || t_next_vertical < 1.0f){
-//		printf("cell (%d,%d)\n", cell_x, cell_y);
+	while(next_h < 1.0f || next_v < 1.0f){
+		printf("cell (%d,%d)\n", cell_x, cell_y);
 		int index = hash_func(cell_x, cell_y, n);
 		query(hash, hash->table[index], obj, func, data);
 
-		if (t_next_vertical < t_next_horizontal){
+		if (next_v < next_h){
 			cell_y += y_inc;
-			t = t_next_vertical;
-			t_next_vertical += dt_dy;
+			t = next_v;
+			next_v += dt_dy;
 		} else {
 			cell_x += x_inc;
-			t = t_next_horizontal;
-			t_next_horizontal += dt_dx;
+			t = next_h;
+			next_h += dt_dx;
 		}
-		
-//		printf("t %f, %f, %f\n", t, t_next_horizontal, t_next_vertical);
 	}
 }

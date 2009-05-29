@@ -354,22 +354,12 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
-extern int cpCircleShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQueryFunc func, void *data);
 
 int
 main(int argc, const char **argv)
 {
-//	cpBody *body = cpBodyNew(1.0f, 1.0f);
-//	cpBodySetPos(body, cpv(1,0));
-//	cpShape *circle = cpCircleShapeNew(body, 1.0f, cpvzero);
-//	cpShapeCacheBB(circle);
-//	
-//	cpSegmentQueryInfo info;
-//	if(cpCircleShapeSegmentQuery(circle, cpv(-1,0), cpv(1,0), &info)){
-//		cpSegmentQueryInfoPrint(&info);
-//	} else {
-//		printf("no collision\n");
-//	}
+//	raytrace(NULL, NULL, cpv(0,0), cpv(0,-100), NULL, NULL);
 //	exit(0);
 	
 	cpInitChipmunk();
