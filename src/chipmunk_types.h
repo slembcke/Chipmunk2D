@@ -21,6 +21,6 @@ typedef double cpFloat;
 //#define cpfceil ceilf
 
 typedef size_t cpHashValue;
-typedef void * cpCollisionType;
+typedef unsigned int cpCollisionType;
 typedef unsigned int cpLayers;
-typedef void * cpGroup;
+typedef unsigned int cpGroup;
