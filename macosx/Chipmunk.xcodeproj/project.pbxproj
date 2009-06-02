@@ -161,6 +161,7 @@
 		D380121A0E98707600A3D7FA /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
 		D380121E0E98709000A3D7FA /* test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test; sourceTree = BUILT_PRODUCTS_DIR; };
 		D393275B0EA02C710026F6A2 /* Pump.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Pump.c; sourceTree = "<group>"; };
+		D39F46C70FD4A2CF00B244CA /* chipmunk_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = chipmunk_types.h; sourceTree = "<group>"; };
 		D3B718E00AB2BC8900B500C9 /* chipmunk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chipmunk.c; path = ../src/chipmunk.c; sourceTree = "<group>"; };
 		D3BAF9C40E9C4F250039DD5C /* PyramidStack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = PyramidStack.c; sourceTree = "<group>"; };
 		D3BAFA030E9C52810039DD5C /* Plink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Plink.c; sourceTree = "<group>"; };
@@ -311,6 +312,7 @@
 				D380121A0E98707600A3D7FA /* test.c */,
 				D3CCDF5B0AE35DA00080442F /* Demo */,
 				D3E5F0C40AA75CC3004E361B /* chipmunk.h */,
+				D39F46C70FD4A2CF00B244CA /* chipmunk_types.h */,
 				D35420BF0F4E1FD70017F4F7 /* chipmunk_unsafe.h */,
 				D3B718E00AB2BC8900B500C9 /* chipmunk.c */,
 				D3E5F2F30AAA575E004E361B /* Basics */,

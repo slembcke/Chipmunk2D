@@ -56,10 +56,6 @@ typedef struct cpShapeClass {
 	 void (*segmentQuery)(struct cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
 } cpShapeClass;
 
-typedef unsigned int cpCollisionType;
-typedef unsigned int cpLayers;
-typedef unsigned int cpGroup;
-
 // Basic shape struct that the others inherit from.
 typedef struct cpShape{
 	// The "class" of a shape as defined above 
