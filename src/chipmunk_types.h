@@ -20,6 +20,7 @@ typedef double cpFloat;
 //#define cpffloor floorf
 //#define cpfceil ceilf
 
-typedef unsigned int cpCollisionType;
+typedef size_t cpHashValue;
+typedef void * cpCollisionType;
 typedef unsigned int cpLayers;
-typedef unsigned int cpGroup;
+typedef void * cpGroup;

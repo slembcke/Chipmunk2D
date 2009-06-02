@@ -40,11 +40,11 @@ typedef struct cpContact{
 	cpFloat bias;
 	
 	// Hash value used to (mostly) uniquely identify a contact.
-	size_t hash;
+	cpHashValue hash;
 } cpContact;
 
 // Contacts are always allocated in groups.
-cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, size_t hash);
+cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash);
 
 // Sum the contact impulses. (Can be used after cpSpaceStep() returns)
 cpVect cpContactsSumImpulses(cpContact *contacts, int numContacts);

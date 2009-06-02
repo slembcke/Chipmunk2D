@@ -61,17 +61,17 @@ typedef struct collFuncData {
 
 // Equals function for collFuncSet.
 static int
-collFuncSetEql(size_t *ids, cpCollPairFunc *pair)
+collFuncSetEql(cpCollisionType *ids, cpCollPairFunc *pair)
 {
-	size_t a = ids[0];
-	size_t b = ids[1];
+	cpCollisionType a = ids[0];
+	cpCollisionType b = ids[1];
 	
 	return ((a == pair->a && b == pair->b) || (b == pair->a && a == pair->b));
 }
 
 // Transformation function for collFuncSet.
 static void *
-collFuncSetTrans(size_t *ids, collFuncData *funcData)
+collFuncSetTrans(cpCollisionType *ids, collFuncData *funcData)
 {
 	cpCollPairFunc *pair = (cpCollPairFunc *)malloc(sizeof(cpCollPairFunc));
 	pair->a = ids[0];
@@ -192,7 +192,7 @@ void
 cpSpaceAddCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b, cpCollFunc func, void *data)
 {
 	cpCollisionType ids[] = {a, b};
-	cpCollisionType hash = CP_HASH_PAIR(a, b);
+	cpHashValue hash = CP_HASH_PAIR(a, b);
 	// Remove any old function so the new one will get added.
 	cpSpaceRemoveCollisionPairFunc(space, a, b);
 		
@@ -204,7 +204,7 @@ void
 cpSpaceRemoveCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
 	cpCollisionType ids[] = {a, b};
-	cpCollisionType hash = CP_HASH_PAIR(a, b);
+	cpHashValue hash = CP_HASH_PAIR(a, b);
 	cpCollPairFunc *old_pair = (cpCollPairFunc *)cpHashSetRemove(space->collFuncSet, hash, ids);
 	free(old_pair);
 }
@@ -319,7 +319,7 @@ pointQueryHelper(cpVect *point, cpShape *shape, pointQueryContext *context)
 }
 
 void
-cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpLayers group, cpSpacePointQueryFunc func, void *data)
+cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data)
 {
 	pointQueryContext context = {layers, group, func, data};
 	cpSpaceHashPointQuery(space->activeShapes, point, (cpSpaceHashQueryFunc)pointQueryHelper, &context);
@@ -333,7 +333,7 @@ rememberLastPointQuery(cpShape *shape, cpShape **outShape)
 }
 
 cpShape *
-cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpLayers group)
+cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpGroup group)
 {
 	cpShape *shape = NULL;
 	cpSpacePointQuery(space, point, layers, group, (cpSpacePointQueryFunc)rememberLastPointQuery, &shape);
@@ -468,7 +468,7 @@ filterArbiterByCallback(cpSpace *space)
 		
 		// Find the collision pair function for the shapes.
 		cpCollisionType ids[] = {a->collision_type, b->collision_type};
-		cpCollisionType hash = CP_HASH_PAIR(a->collision_type, b->collision_type);
+		cpHashValue hash = CP_HASH_PAIR(a->collision_type, b->collision_type);
 		cpCollPairFunc *pairFunc = (cpCollPairFunc *)cpHashSetFind(space->collFuncSet, hash, ids);
 		if(!pairFunc->func) continue; // A NULL pair function means don't collide at all.
 		

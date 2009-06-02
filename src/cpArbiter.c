@@ -27,10 +27,8 @@
 cpFloat cp_bias_coef = 0.1f;
 cpFloat cp_collision_slop = 0.1f;
 
-size_t a = 5;
-
 cpContact*
-cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, size_t hash)
+cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash)
 {
 	con->p = p;
 	con->n = n;

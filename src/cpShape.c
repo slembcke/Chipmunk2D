@@ -31,7 +31,7 @@ CP_DeclareShapeGetter(struct, type, name){ \
 	assert(shape->klass == &struct##Class); \
 	return ((struct *)shape)->member; \
 }
-size_t SHAPE_ID_COUNTER = 0;
+cpHashValue SHAPE_ID_COUNTER = 0;
 
 void
 cpResetShapeIdCounter(void)
@@ -88,7 +88,7 @@ cpShapeCacheBB(cpShape *shape)
 }
 
 int
-cpShapePointQuery(cpShape *shape, cpVect p, cpLayers layers, cpLayers group){
+cpShapePointQuery(cpShape *shape, cpVect p, cpLayers layers, cpGroup group){
 	if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
 		return shape->klass->pointQuery(shape, p);
 	}
@@ -97,7 +97,7 @@ cpShapePointQuery(cpShape *shape, cpVect p, cpLayers layers, cpLayers group){
 }
 
 int
-cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpLayers layers, cpLayers group, cpSegmentQueryInfo *info){
+cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpLayers layers, cpGroup group, cpSegmentQueryInfo *info){
 	if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
 		shape->klass->segmentQuery(shape, a, b, info);
 	}

@@ -27,7 +27,7 @@ typedef struct cpHashSetBin {
 	// Pointer to the element.
 	void *elt;
 	// Hash value of the element.
-	size_t hash;
+	cpHashValue hash;
 	// Next element in the chain.
 	struct cpHashSetBin *next;
 } cpHashSetBin;
@@ -67,11 +67,11 @@ cpHashSet *cpHashSetNew(int size, cpHashSetEqlFunc eqlFunc, cpHashSetTransFunc t
 
 // Insert an element into the set, returns the element.
 // If it doesn't already exist, the transformation function is applied.
-void *cpHashSetInsert(cpHashSet *set, size_t hash, void *ptr, void *data);
+void *cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data);
 // Remove and return an element from the set.
-void *cpHashSetRemove(cpHashSet *set, size_t hash, void *ptr);
+void *cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr);
 // Find an element in the set. Returns the default value if the element isn't found.
-void *cpHashSetFind(cpHashSet *set, size_t hash, void *ptr);
+void *cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr);
 
 // Iterate over a hashset.
 void cpHashSetEach(cpHashSet *set, cpHashSetIterFunc func, void *data);

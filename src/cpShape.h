@@ -84,14 +84,14 @@ typedef struct cpShape{
 	// User defined collision type for the shape.
 	cpCollisionType collision_type;
 	// User defined collision group for the shape.
-	cpLayers group;
+	cpGroup group;
 	// User defined layer bitmask for the shape.
 	cpLayers layers;
 	
 	// *** Internally Used Fields
 	
 	// Unique id used as the hash value.
-	size_t id;
+	cpHashValue id;
 } cpShape;
 
 // Low level shape initialization func.
@@ -105,7 +105,7 @@ void cpShapeFree(cpShape *shape);
 cpBB cpShapeCacheBB(cpShape *shape);
 
 // Test if a point lies within a shape.
-int cpShapePointQuery(cpShape *shape, cpVect p, cpLayers layers, cpLayers group);
+int cpShapePointQuery(cpShape *shape, cpVect p, cpLayers layers, cpGroup group);
 void cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info);
 
 #define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(cpShape *shape)
