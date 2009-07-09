@@ -89,7 +89,6 @@ struct##_set_##member(cpConstraint *constraint, type value){ \
 #include "cpGrooveJoint.h"
 #include "cpDampedSpring.h"
 #include "cpDampedRotarySpring.h"
-#include "cpBreakableJoint.h"
 #include "cpRotaryLimitJoint.h"
 #include "cpGearJoint.h"
 #include "cpSimpleMotor.h"

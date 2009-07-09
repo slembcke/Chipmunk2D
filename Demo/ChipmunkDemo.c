@@ -72,12 +72,10 @@ extern chipmunkDemo WalkBot;
 extern chipmunkDemo TheoJansen;
 extern chipmunkDemo MagnetsElectric;
 extern chipmunkDemo UnsafeOps;
-extern chipmunkDemo Query;
 
 //extern chipmunkDemo Test;
 
 static chipmunkDemo *demos[] = {
-	&Query,
 	&LogoSmash,
 	&PyramidStack,
 	&Plink,
