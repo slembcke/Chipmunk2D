@@ -49,10 +49,6 @@ typedef struct cpConstraint {
 	void *data;
 } cpConstraint;
 
-#ifdef CP_USE_DEPRECATED_API_4
-typedef cpConstraint cpJoint;
-#endif
-
 void cpConstraintDestroy(cpConstraint *constraint);
 void cpConstraintFree(cpConstraint *constraint);
 
