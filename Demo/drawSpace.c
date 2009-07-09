@@ -367,9 +367,9 @@ drawConstraint(cpConstraint *constraint)
 //		printf("Cannot draw constraint\n");
 	} else if(klass == cpDampedSpringGetClass()){
 		drawSpring((cpDampedSpring *)constraint, body_a, body_b);
-	} else if(klass == cpBreakableJointGetClass()){
-		cpBreakableJoint *breakable = (cpBreakableJoint *)constraint;
-		drawConstraint(breakable->delegate);
+//	} else if(klass == cpBreakableJointGetClass()){
+//		cpBreakableJoint *breakable = (cpBreakableJoint *)constraint;
+//		drawConstraint(breakable->delegate);
 	} else {
 //		printf("Cannot draw constraint\n");
 	}
