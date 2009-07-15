@@ -46,7 +46,7 @@ typedef struct cpConstraint {
 	cpFloat biasCoef;
 	cpFloat maxBias;
 	
-	void *data;
+	cpDataPointer data;
 } cpConstraint;
 
 #ifdef CP_USE_DEPRECATED_API_4

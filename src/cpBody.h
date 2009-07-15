@@ -59,7 +59,7 @@ typedef struct cpBody{
 	// *** User Definable Fields
 	
 	// User defined data pointer.
-	void *data;
+	cpDataPointer data;
 	
 	// *** Internally Used Fields
 	

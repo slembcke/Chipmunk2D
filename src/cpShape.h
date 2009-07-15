@@ -79,7 +79,7 @@ typedef struct cpShape{
 	// *** User Definable Fields
 
 	// User defined data pointer for the shape.
-	void *data;
+	cpDataPointer data;
 	
 	// User defined collision type for the shape.
 	cpCollisionType collision_type;
