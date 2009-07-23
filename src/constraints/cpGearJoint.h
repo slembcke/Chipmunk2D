@@ -24,6 +24,7 @@ const cpConstraintClass *cpGearJointGetClass();
 typedef struct cpGearJoint {
 	cpConstraint constraint;
 	cpFloat phase, ratio;
+	cpFloat inv_ratio;
 	
 	cpFloat iSum;
 		
@@ -36,4 +37,5 @@ cpGearJoint *cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat p
 cpConstraint *cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
 
 CP_DefineConstraintProperty(cpGearJoint, cpFloat, phase, Phase);
-CP_DefineConstraintProperty(cpGearJoint, cpFloat, ratio, Ratio);
+CP_DefineConstraintGetter(cpGearJoint, cpFloat, ratio, Ratio);
+void cpGearJointSetRatio(cpConstraint *constraint, cpFloat value);
