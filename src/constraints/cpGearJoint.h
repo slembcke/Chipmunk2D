@@ -24,7 +24,7 @@ const cpConstraintClass *cpGearJointGetClass();
 typedef struct cpGearJoint {
 	cpConstraint constraint;
 	cpFloat phase, ratio;
-	cpFloat inv_ratio;
+	cpFloat ratio_inv;
 	
 	cpFloat iSum;
 		

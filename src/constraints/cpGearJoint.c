@@ -31,7 +31,7 @@ preStep(cpGearJoint *joint, cpFloat dt, cpFloat dt_inv)
 	cpBody *b = joint->constraint.b;
 	
 	// calculate moment of inertia coefficient.
-	joint->iSum = 1.0f/(a->i_inv/joint->ratio + joint->ratio*b->i_inv);
+	joint->iSum = 1.0f/(a->i_inv*joint->ratio_inv + joint->ratio*b->i_inv);
 	
 	// calculate bias velocity
 	cpFloat maxBias = 0.0f;//joint->constraint.maxBias;
@@ -42,7 +42,7 @@ preStep(cpGearJoint *joint, cpFloat dt, cpFloat dt_inv)
 
 	// apply joint torque
 	cpFloat j = joint->jAcc;
-	a->w -= j/(a->i*joint->ratio);
+	a->w -= j*a->i_inv*joint->ratio_inv;
 	b->w += j*b->i_inv;
 }
 
@@ -62,7 +62,7 @@ applyImpulse(cpGearJoint *joint)
 	j = joint->jAcc - jOld;
 	
 	// apply impulse
-	a->w -= j/(a->i*joint->ratio);
+	a->w -= j*a->i_inv*joint->ratio_inv;
 	b->w += j*b->i_inv;
 }
 
@@ -92,6 +92,7 @@ cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat
 	
 	joint->phase = phase;
 	joint->ratio = ratio;
+	joint->ratio_inv = 1.0f/ratio;
 	
 	joint->jAcc = 0.0f;
 	
@@ -109,5 +110,5 @@ cpGearJointSetRatio(cpConstraint *constraint, cpFloat value)
 {
 	cpConstraintCheckCast(constraint, cpGearJointGetClass());
 	((cpGearJoint *)constraint)->ratio = value;
-	((cpGearJoint *)constraint)->inv_ratio = 1.0f/value;
+	((cpGearJoint *)constraint)->ratio_inv = 1.0f/value;
 }
