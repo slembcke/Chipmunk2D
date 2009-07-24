@@ -30,11 +30,14 @@ cpBodyAlloc(void)
 	return (cpBody *)malloc(sizeof(cpBody));
 }
 
+cpBodyVelocityFunc cpBodyUpdateVelocityDefault = cpBodyUpdateVelocity;
+cpBodyPositionFunc cpBodyUpdatePositionDefault = cpBodyUpdatePosition;
+
 cpBody*
 cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 {
-	body->velocity_func = cpBodyUpdateVelocity;
-	body->position_func = cpBodyUpdatePosition;
+	body->velocity_func = cpBodyUpdateVelocityDefault;
+	body->position_func = cpBodyUpdatePositionDefault;
 	
 	cpBodySetMass(body, m);
 	cpBodySetMoment(body, i);

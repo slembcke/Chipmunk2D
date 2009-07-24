@@ -23,6 +23,8 @@ struct cpBody;
 typedef void (*cpBodyVelocityFunc)(struct cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);
 typedef void (*cpBodyPositionFunc)(struct cpBody *body, cpFloat dt);
 
+extern cpBodyVelocityFunc cpBodyUpdateVelocityDefault;
+extern cpBodyPositionFunc cpBodyUpdatePositionDefault;
  
 typedef struct cpBody{
 	// *** Integration Functions.ntoehu
