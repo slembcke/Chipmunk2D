@@ -108,7 +108,7 @@ cpRatchetJointInit(cpRatchetJoint *joint, cpBody *a, cpBody *b, cpFloat directio
 	joint->angle = 0.0f;
 	joint->direction  = direction;
 	
-	joint->jAcc = b->a - a->a;
+	joint->angle = b->a - a->a;
 	
 	return joint;
 }
