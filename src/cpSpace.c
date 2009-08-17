@@ -455,7 +455,9 @@ filterArbiterByCallback(cpSpace *space)
 	int num = space->arbiters->num;
 	
 	// copy to the stack
-	cpArbiter *ary[num];
+//	cpArbiter *ary[num];
+	cpArbiter **ary = alloca(num*sizeof(cpArbiter *));
+	
 	memcpy(ary, space->arbiters->arr, num*sizeof(void *));
 	
 	for(int i=0; i<num; i++){
@@ -470,7 +472,10 @@ filterArbiterByCallback(cpSpace *space)
 		cpCollisionType ids[] = {a->collision_type, b->collision_type};
 		cpHashValue hash = CP_HASH_PAIR(a->collision_type, b->collision_type);
 		cpCollPairFunc *pairFunc = (cpCollPairFunc *)cpHashSetFind(space->collFuncSet, hash, ids);
-		if(!pairFunc->func) continue; // A NULL pair function means don't collide at all.
+		if(!pairFunc->func){
+			cpArrayDeleteObj(space->arbiters, arb);
+			continue; // A NULL pair function means don't collide at all.
+		}
 		
 		// Swap them if necessary.
 		if(a->collision_type != pairFunc->a){

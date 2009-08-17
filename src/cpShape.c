@@ -308,8 +308,8 @@ cpSegmentShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInf
 	}
 	
 	if(seg->r) {
-		cpSegmentQueryInfo info1 = {.shape = NULL};
-		cpSegmentQueryInfo info2 = {.shape = NULL};
+		cpSegmentQueryInfo info1; info1.shape = NULL;
+		cpSegmentQueryInfo info2; info2.shape = NULL;
 		circleSegmentQuery(shape, seg->ta, seg->r, a, b, &info1);
 		circleSegmentQuery(shape, seg->tb, seg->r, a, b, &info2);
 		
