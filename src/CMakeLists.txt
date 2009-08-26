@@ -1,5 +1,6 @@
 set(chipmunk_public_header
   chipmunk.h
+  chipmunk_types.h
   chipmunk_unsafe.h
   cpArbiter.h
   cpArray.h
@@ -12,6 +13,22 @@ set(chipmunk_public_header
   cpSpace.h
   cpSpaceHash.h
   cpVect.h
+)
+
+set(chipmunk_constraint_header
+  constraints/cpBreakableJoint.h
+  constraints/cpConstraint.h
+  constraints/cpDampedRotarySpring.h
+  constraints/cpDampedSpring.h
+  constraints/cpGearJoint.h
+  constraints/cpGrooveJoint.h
+  constraints/cpPinJoint.h
+  constraints/cpPivotJoint.h
+  constraints/cpRatchetJoint.h
+  constraints/cpRotaryLimitJoint.h
+  constraints/cpSimpleMotor.h
+  constraints/cpSlideJoint.h
+  constraints/util.h
 )
 
 set(chipmunk_source_files
@@ -63,4 +80,5 @@ endif(BUILD_STATIC)
 if(BUILD_SHARED OR INSTALL_STATIC)
   # FIXME: change to PUBLIC_HEADER to allow building frameworks
   install(FILES ${chipmunk_public_header} DESTINATION include/chipmunk)
+  install(FILES ${chipmunk_constraint_header} DESTINATION include/chipmunk/constraints)
 endif(BUILD_SHARED OR INSTALL_STATIC)

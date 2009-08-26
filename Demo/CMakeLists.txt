@@ -29,6 +29,7 @@ set(chipmunk_demos_source_files
   MagnetsElectric.c
   drawSpace.c
   UnsafeOps.c
+  Query.c
 )
 
 include_directories(${chipmunk_demos_include_dirs})
