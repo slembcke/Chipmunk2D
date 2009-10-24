@@ -240,10 +240,10 @@ hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 {
 	// Find the dimensions in cell coordinates.
 	cpFloat dim = hash->celldim;
-	int l = bb.l/dim;
-	int r = bb.r/dim;
-	int b = bb.b/dim;
-	int t = bb.t/dim;
+	int l = (int)cpffloor(bb.l/dim); // Fix by ShiftZ
+	int r = (int)cpffloor(bb.r/dim);
+	int b = (int)cpffloor(bb.b/dim);
+	int t = (int)cpffloor(bb.t/dim);
 	
 	int n = hash->numcells;
 	for(int i=l; i<=r; i++){
@@ -363,7 +363,7 @@ void
 cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpaceHashQueryFunc func, void *data)
 {
 	cpFloat dim = hash->celldim;
-	int index = hash_func((int)(point.x/dim), (int)(point.y/dim), hash->numcells);
+	int index = hash_func((int)cpffloor(point.x/dim), (int)cpffloor(point.y/dim), hash->numcells);  // Fix by ShiftZ
 	
 	query(hash, hash->table[index], &point, func, data);
 
@@ -377,10 +377,10 @@ cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc fun
 {
 	// Get the dimensions in cell coordinates.
 	cpFloat dim = hash->celldim;
-	int l = bb.l/dim;
-	int r = bb.r/dim;
-	int b = bb.b/dim;
-	int t = bb.t/dim;
+	int l = (int)cpffloor(bb.l/dim);  // Fix by ShiftZ
+	int r = (int)cpffloor(bb.r/dim);
+	int b = (int)cpffloor(bb.b/dim);
+	int t = (int)cpffloor(bb.t/dim);
 	
 	int n = hash->numcells;
 	
@@ -420,10 +420,10 @@ handleQueryRehashHelper(void *elt, void *data)
 	void *obj = hand->obj;
 	cpBB bb = hash->bbfunc(obj);
 
-	int l = bb.l/dim;
-	int r = bb.r/dim;
-	int b = bb.b/dim;
-	int t = bb.t/dim;
+	int l = (int)cpffloor(bb.l/dim);
+	int r = (int)cpffloor(bb.r/dim);
+	int b = (int)cpffloor(bb.b/dim);
+	int t = (int)cpffloor(bb.t/dim);
 
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
@@ -509,4 +509,10 @@ void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQuery
 			next_h += dt_dx;
 		}
 	}
+	
+	// Fixed by ShiftZ
+	int index = hash_func(cell_x, cell_y, n);
+	query(hash, hash->table[index], obj, func, data);
+
+	hash->stamp++;
 }
