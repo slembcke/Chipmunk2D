@@ -424,13 +424,11 @@ handleQueryRehashHelper(void *elt, void *data)
 	int r = (int)cpffloor(bb.r/dim);
 	int b = (int)cpffloor(bb.b/dim);
 	int t = (int)cpffloor(bb.t/dim);
-//	printf("hashing from (%d,%d) to (%d,%d)\n", l, b, r, t);
 
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
 //			// exit the loops if the object has been deleted in func().
 //			if(!hand->obj) goto break_out;
-//			printf("hashing cell (%d,%d)\n", i, j);
 			
 			int index = hash_func(i,j,n);
 			cpSpaceHashBin *bin = hash->table[index];
@@ -461,18 +459,42 @@ cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpaceHashQueryFunc func, void *data)
 	cpHashSetEach(hash->handleSet, &handleQueryRehashHelper, &pair);
 }
 
+static inline cpFloat
+segmentQuery(cpSpaceHash *hash, cpSpaceHashBin *bin, void *obj, cpSpaceHashSegmentQueryFunc func, void *data)
+{
+	for(; bin; bin = bin->next){
+		cpHandle *hand = bin->handle;
+		void *other = hand->obj;
+		
+		// Skip over certain conditions
+		if(
+			// Have we already tried this pair in this query?
+			hand->stamp == hash->stamp
+			// Has other been removed since the last rehash?
+			|| !other
+			) continue;
+		
+		// Stamp that the handle was checked already against this object.
+		hand->stamp = hash->stamp;
+		
+		return func(obj, other, data);
+	}
+	
+	return 1.0f;
+}
+
 // modified from http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
-void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQueryFunc func, void *data)
+void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashSegmentQueryFunc func, void *data)
 {
 	a = cpvmult(a, 1.0f/hash->celldim);
 	b = cpvmult(b, 1.0f/hash->celldim);
-//	printf("tracing from (%.2f,%.2f) to (%.2f,%.2f)\n", a.x, a.y, b.x, b.y);
 	
 	cpFloat dt_dx = 1.0f/fabs(b.x - a.x), dt_dy = 1.0f/fabs(b.y - a.y);
 	
 	int cell_x = (int)cpffloor(a.x), cell_y = (int)cpffloor(a.y);
 
 	cpFloat t = 0;
+	cpFloat t_exit = 1.0f;
 
 	int x_inc, y_inc;
 	cpFloat next_v, next_h;
@@ -498,10 +520,9 @@ void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQuery
 	next_v = (next_v == next_v ? next_v : dt_dy);
 
 	int n = hash->numcells;
-	while(next_h < 1.0f || next_v < 1.0f){
-//		printf("tracing cell (%d,%d)\n", cell_x, cell_y);
+	do {
 		int index = hash_func(cell_x, cell_y, n);
-		query(hash, hash->table[index], obj, func, data);
+		t_exit = cpfmin(t_exit, segmentQuery(hash, hash->table[index], obj, func, data));
 
 		if (next_v < next_h){
 			cell_y += y_inc;
@@ -512,11 +533,7 @@ void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQuery
 			t = next_h;
 			next_h += dt_dx;
 		}
-	}
+	} while(next_h < t_exit || next_v < t_exit); // Fix by ShiftZ
 	
-	// Fixed by ShiftZ
-	int index = hash_func(cell_x, cell_y, n);
-	query(hash, hash->table[index], obj, func, data);
-
 	hash->stamp++;
 }

@@ -25,12 +25,9 @@ struct cpShapeClass;
 
 typedef struct cpSegmentQueryInfo{
 	struct cpShape *shape; // shape that was hit, NULL if no collision
-	cpFloat t; // line(t) = a + (b - a)t, will always be in the range [0, 1]
+	cpFloat t; // Distance along query segment, will always be in the range [0, 1].
 	cpVect n; // normal of hit surface
 } cpSegmentQueryInfo;
-
-// For determinism, you can reset the shape id counter.
-void cpResetShapeIdCounter(void);
 
 // Enumeration of shape types.
 typedef enum cpShapeType{
@@ -106,7 +103,6 @@ cpBB cpShapeCacheBB(cpShape *shape);
 
 // Test if a point lies within a shape.
 int cpShapePointQuery(cpShape *shape, cpVect p, cpLayers layers, cpGroup group);
-void cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info);
 
 #define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(cpShape *shape)
 
@@ -153,3 +149,11 @@ CP_DeclareShapeGetter(cpSegmentShape, cpVect, A);
 CP_DeclareShapeGetter(cpSegmentShape, cpVect, B);
 CP_DeclareShapeGetter(cpSegmentShape, cpVect, Normal);
 CP_DeclareShapeGetter(cpSegmentShape, cpFloat, Radius);
+
+// For determinism, you can reset the shape id counter.
+void cpResetShapeIdCounter(void);
+
+// Directed segment queries against individual shapes.
+void cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info);
+
+int cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpLayers layers, cpLayers group, cpSegmentQueryInfo *info);

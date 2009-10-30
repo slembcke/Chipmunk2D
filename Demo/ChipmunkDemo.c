@@ -354,14 +354,9 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
-void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQueryFunc func, void *data);
-
 int
 main(int argc, const char **argv)
 {
-//	raytrace(NULL, NULL, cpv(0,0), cpv(0,-100), NULL, NULL);
-//	exit(0);
-	
 	cpInitChipmunk();
 		
 	mouseBody = cpBodyNew(INFINITY, INFINITY);

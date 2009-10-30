@@ -98,3 +98,9 @@ void cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFun
 void cpSpaceHashQueryInsert(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc func, void *data);
 // Rehashes while querying for each object. (Optimized case) 
 void cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpaceHashQueryFunc func, void *data);
+
+// Segment Query callback.
+// Return value is uesd for early exits of the query.
+// If while traversing the grid, the raytrace function detects that an entire grid cell is beyond the hit point, it will stop the trace.
+typedef cpFloat (*cpSpaceHashSegmentQueryFunc)(void *obj1, void *obj2, void *data);
+void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashSegmentQueryFunc func, void *data);

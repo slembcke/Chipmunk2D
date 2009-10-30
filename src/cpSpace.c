@@ -353,6 +353,72 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data)
 		func((cpBody *)bodies->arr[i], data);
 }
 
+#pragma mark Segment Query Functions
+
+typedef struct segQueryContext {
+	cpVect start, end;
+	cpLayers layers;
+	cpLayers group;
+	cpSpaceSegmentQueryFunc func;
+	int anyCollision;
+} segQueryContext;
+
+static cpFloat
+segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
+{
+	cpSegmentQueryInfo info = {NULL, 0.0f, cpvzero};
+	if(cpShapeSegmentQuery(shape, context->start, context->end, context->layers, context->group, &info)){
+		if(context->func)
+			context->func(shape, info.t, info.n, data);
+		
+		context->anyCollision = 1;
+		return info.t;
+	}
+	
+	return 1.0f;
+}
+
+int
+cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpLayers group, cpSpaceSegmentQueryFunc func, void *data)
+{
+	segQueryContext context = {
+		start, end,
+		layers, group,
+		func,
+		0,
+	};
+	
+	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
+	cpSpaceHashSegmentQuery(space->activeShapes, &context, start, end, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
+	
+	return context.anyCollision;
+}
+
+static void
+storeFirstCollision(cpShape *shape, cpFloat t, cpVect n, cpSegmentQueryInfo *info)
+{
+	if(t < info->t){
+		info->shape = shape;
+		info->t = t;
+		info->n = n;
+	}
+}
+
+int
+cpSpaceShapeSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpLayers group, cpSegmentQueryInfo *out)
+{
+	cpSegmentQueryInfo info = {NULL, INFINITY, cpvzero};
+	
+	if(cpSpaceShapeSegmentQuery(space, start, end, -1, 0, (cpSpaceSegmentQueryFunc)storeFirstCollision, &info)){
+		(*out) = info;
+		return 1;
+	} else {
+		info.t = 1.0f;
+		(*out) = info;
+		return 0;
+	}
+}
+
 #pragma mark Spatial Hash Management
 
 // Iterator function used for updating shape BBoxes.
