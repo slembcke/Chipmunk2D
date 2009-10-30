@@ -372,7 +372,6 @@ segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
 			context->func(shape, info.t, info.n, data);
 		
 		context->anyCollision = 1;
-		return info.t;
 	}
 	
 	return 1.0f;
@@ -394,29 +393,41 @@ cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers laye
 	return context.anyCollision;
 }
 
-static void
-storeFirstCollision(cpShape *shape, cpFloat t, cpVect n, cpSegmentQueryInfo *info)
+typedef struct segQueryFirstContext {
+	cpVect start, end;
+	cpLayers layers;
+	cpLayers group;
+} segQueryFirstContext;
+
+static cpFloat
+segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo *out)
 {
-	if(t < info->t){
-		info->shape = shape;
-		info->t = t;
-		info->n = n;
+	cpSegmentQueryInfo info = {NULL, 1.0f, cpvzero};
+	if(cpShapeSegmentQuery(shape, context->start, context->end, context->layers, context->group, &info)){
+		if(info.t < out->t){
+			out->shape = info.shape;
+			out->t = info.t;
+			out->n = info.n;
+		}
 	}
+	
+	return info.t;
 }
 
 int
 cpSpaceShapeSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpLayers group, cpSegmentQueryInfo *out)
 {
-	cpSegmentQueryInfo info = {NULL, INFINITY, cpvzero};
+	out->t = 1.0f;
 	
-	if(cpSpaceShapeSegmentQuery(space, start, end, -1, 0, (cpSpaceSegmentQueryFunc)storeFirstCollision, &info)){
-		(*out) = info;
-		return 1;
-	} else {
-		info.t = 1.0f;
-		(*out) = info;
-		return 0;
-	}
+	segQueryFirstContext context = {
+		start, end,
+		layers, group
+	};
+	
+	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, (cpSpaceHashSegmentQueryFunc)segQueryFirst, out);
+	cpSpaceHashSegmentQuery(space->activeShapes, &context, start, cpvlerp(start, end, out->t), (cpSpaceHashSegmentQueryFunc)segQueryFirst, out);
+	
+	return (out->shape != NULL);
 }
 
 #pragma mark Spatial Hash Management
