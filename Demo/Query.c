@@ -54,11 +54,11 @@ update(int ticks)
 	
 	cpSegmentQueryInfo info = {};
 	if(cpSpaceShapeSegmentQueryFirst(space, start, end, -1, 0, &info)){
-		cpVect point = cpvlerp(start, end, info.t);
+		cpVect point = cpSegmentQueryHitPoint(start, end, info);
 		lineEnd = cpvadd(point, cpvzero);//cpvmult(info.n, 4.0f));
 		
 		char infoString[1024];
-		sprintf(infoString, "Segment Query: Dist(%f) Normal%s", cpvdist(start, end)*info.t, cpvstr(info.n));
+		sprintf(infoString, "Segment Query: Dist(%f) Normal%s", cpSegmentQueryHitDist(start, end, info), cpvstr(info.n));
 		strcat(messageString, infoString);
 	} else {
 		strcat(messageString, "Segment Query (None)");

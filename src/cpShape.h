@@ -157,3 +157,15 @@ void cpResetShapeIdCounter(void);
 void cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info);
 
 int cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpLayers layers, cpLayers group, cpSegmentQueryInfo *info);
+
+static inline cpVect
+cpSegmentQueryHitPoint(cpVect start, cpVect end, cpSegmentQueryInfo info)
+{
+	return cpvlerp(start, end, info.t);
+}
+
+static inline cpFloat
+cpSegmentQueryHitDist(cpVect start, cpVect end, cpSegmentQueryInfo info)
+{
+	return cpvdist(start, end)*info.t;
+}
