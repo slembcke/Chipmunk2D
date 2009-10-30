@@ -43,7 +43,7 @@ update(int ticks)
 	messageString[0] = '\0';
 	
 	cpVect start = cpvzero;
-	cpVect end = mousePoint;//cpv(-10.0f, 200.0f);
+	cpVect end = mousePoint;
 	cpVect lineEnd = end;
 	
 	{

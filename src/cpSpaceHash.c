@@ -520,7 +520,7 @@ void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, c
 	next_v = (next_v == next_v ? next_v : dt_dy);
 
 	int n = hash->numcells;
-	do {
+	do { // Fix by ShiftZ
 		int index = hash_func(cell_x, cell_y, n);
 		t_exit = cpfmin(t_exit, segmentQuery(hash, hash->table[index], obj, func, data));
 
@@ -533,7 +533,7 @@ void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, c
 			t = next_h;
 			next_h += dt_dx;
 		}
-	} while(next_h < t_exit || next_v < t_exit); // Fix by ShiftZ
+	} while(next_h < t_exit || next_v < t_exit);
 	
 	hash->stamp++;
 }
