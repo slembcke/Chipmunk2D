@@ -57,7 +57,7 @@ segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
 		if(context->func)
 			context->func(shape, info.t, info.n, data);
 		
-		context->anyCollision = context->anyCollision || 1;
+		context->anyCollision = 1;
 	}
 }
 
@@ -82,23 +82,25 @@ cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers laye
 static void
 storeFirstCollision(cpShape *shape, cpFloat t, cpVect n, cpSegmentQueryInfo *info)
 {
-	if(t > info->t) return;
-	
-	info->shape = shape;
-	info->t = t;
-	info->n = n;
+	if(t < info->t){
+		info->shape = shape;
+		info->t = t;
+		info->n = n;
+	}
 }
 
 static int
 cpSpaceShapeSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpLayers group, cpSegmentQueryInfo *out)
 {
-	cpSegmentQueryInfo info;
+	cpSegmentQueryInfo info = {};
 	info.t = INFINITY;
 	
 	if(cpSpaceShapeSegmentQuery(space, start, end, -1, 0, (cpSpaceSegmentQueryFunc)storeFirstCollision, &info)){
 		(*out) = info;
 		return 1;
 	} else {
+		info.t = 1.0f;
+		(*out) = info;
 		return 0;
 	}
 }
@@ -111,7 +113,7 @@ update(int ticks)
 	messageString[0] = '\0';
 	
 	cpVect start = cpvzero;
-	cpVect end = mousePoint;
+	cpVect end = mousePoint;//cpv(-10.0f, 200.0f);
 	cpVect lineEnd = end;
 	
 	{

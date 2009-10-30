@@ -424,11 +424,13 @@ handleQueryRehashHelper(void *elt, void *data)
 	int r = (int)cpffloor(bb.r/dim);
 	int b = (int)cpffloor(bb.b/dim);
 	int t = (int)cpffloor(bb.t/dim);
+//	printf("hashing from (%d,%d) to (%d,%d)\n", l, b, r, t);
 
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
 //			// exit the loops if the object has been deleted in func().
 //			if(!hand->obj) goto break_out;
+//			printf("hashing cell (%d,%d)\n", i, j);
 			
 			int index = hash_func(i,j,n);
 			cpSpaceHashBin *bin = hash->table[index];
@@ -464,6 +466,8 @@ void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQuery
 {
 	a = cpvmult(a, 1.0f/hash->celldim);
 	b = cpvmult(b, 1.0f/hash->celldim);
+//	printf("tracing from (%.2f,%.2f) to (%.2f,%.2f)\n", a.x, a.y, b.x, b.y);
+	
 	cpFloat dt_dx = 1.0f/fabs(b.x - a.x), dt_dy = 1.0f/fabs(b.y - a.y);
 	
 	int cell_x = (int)cpffloor(a.x), cell_y = (int)cpffloor(a.y);
@@ -475,7 +479,7 @@ void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQuery
 
 	if (b.x > a.x){
 		x_inc = 1;
-		next_h = (cpfceil(a.x) - a.x)*dt_dx;
+		next_h = (cpffloor(a.x + 1.0f) - a.x)*dt_dx;
 	} else {
 		x_inc = -1;
 		next_h = (a.x - cpffloor(a.x))*dt_dx;
@@ -483,7 +487,7 @@ void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQuery
 
 	if (b.y > a.y){
 		y_inc = 1;
-		next_v = (cpfceil(a.y) - a.y)*dt_dy;
+		next_v = (cpffloor(a.y + 1.0f) - a.y)*dt_dy;
 	} else {
 		y_inc = -1;
 		next_v = (a.y - cpffloor(a.y))*dt_dy;
@@ -495,7 +499,7 @@ void raytrace(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashQuery
 
 	int n = hash->numcells;
 	while(next_h < 1.0f || next_v < 1.0f){
-		printf("cell (%d,%d)\n", cell_x, cell_y);
+//		printf("tracing cell (%d,%d)\n", cell_x, cell_y);
 		int index = hash_func(cell_x, cell_y, n);
 		query(hash, hash->table[index], obj, func, data);
 
