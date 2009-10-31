@@ -77,7 +77,6 @@ extern chipmunkDemo Query;
 //extern chipmunkDemo Test;
 
 static chipmunkDemo *demos[] = {
-	&Query,
 	&LogoSmash,
 	&PyramidStack,
 	&Plink,
@@ -91,6 +90,7 @@ static chipmunkDemo *demos[] = {
 	&TheoJansen,
 	&MagnetsElectric,
 	&UnsafeOps,
+	&Query,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
