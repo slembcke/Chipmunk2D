@@ -358,7 +358,7 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data)
 typedef struct segQueryContext {
 	cpVect start, end;
 	cpLayers layers;
-	cpLayers group;
+	cpGroup group;
 	cpSpaceSegmentQueryFunc func;
 	int anyCollision;
 } segQueryContext;
@@ -378,7 +378,7 @@ segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
 }
 
 int
-cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpLayers group, cpSpaceSegmentQueryFunc func, void *data)
+cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data)
 {
 	segQueryContext context = {
 		start, end,
@@ -396,7 +396,7 @@ cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers laye
 typedef struct segQueryFirstContext {
 	cpVect start, end;
 	cpLayers layers;
-	cpLayers group;
+	cpGroup group;
 } segQueryFirstContext;
 
 static cpFloat
@@ -415,7 +415,7 @@ segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo 
 }
 
 int
-cpSpaceShapeSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpLayers group, cpSegmentQueryInfo *out)
+cpSpaceShapeSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out)
 {
 	out->t = 1.0f;
 	

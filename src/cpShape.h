@@ -156,7 +156,7 @@ void cpResetShapeIdCounter(void);
 // Directed segment queries against individual shapes.
 void cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info);
 
-int cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpLayers layers, cpLayers group, cpSegmentQueryInfo *info);
+int cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpLayers layers, cpGroup group, cpSegmentQueryInfo *info);
 
 static inline cpVect
 cpSegmentQueryHitPoint(cpVect start, cpVect end, cpSegmentQueryInfo info)
