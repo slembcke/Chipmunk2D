@@ -109,6 +109,10 @@ init(void)
 		cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 20.0f));
 	}
 	
+	{ // add a static segment
+		cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(0, 300), cpv(300, 0), 0.0f));
+	}
+	
 	{ // add a pentagon
 		cpFloat mass = 1.0f;
 		int NUM_VERTS = 5;

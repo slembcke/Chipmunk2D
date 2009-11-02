@@ -484,7 +484,7 @@ segmentQuery(cpSpaceHash *hash, cpSpaceHashBin *bin, void *obj, cpSpaceHashSegme
 }
 
 // modified from http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
-void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashSegmentQueryFunc func, void *data)
+void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpaceHashSegmentQueryFunc func, void *data)
 {
 	a = cpvmult(a, 1.0f/hash->celldim);
 	b = cpvmult(b, 1.0f/hash->celldim);
@@ -494,7 +494,6 @@ void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, c
 	int cell_x = (int)cpffloor(a.x), cell_y = (int)cpffloor(a.y);
 
 	cpFloat t = 0;
-	cpFloat t_exit = 1.0f;
 
 	int x_inc, y_inc;
 	cpFloat next_v, next_h;

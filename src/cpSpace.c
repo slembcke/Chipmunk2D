@@ -387,8 +387,8 @@ cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers laye
 		0,
 	};
 	
-	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
-	cpSpaceHashSegmentQuery(space->activeShapes, &context, start, end, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
+	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
+	cpSpaceHashSegmentQuery(space->activeShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
 	
 	return context.anyCollision;
 }
@@ -424,8 +424,8 @@ cpSpaceShapeSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers
 		layers, group
 	};
 	
-	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, (cpSpaceHashSegmentQueryFunc)segQueryFirst, out);
-	cpSpaceHashSegmentQuery(space->activeShapes, &context, start, cpvlerp(start, end, out->t), (cpSpaceHashSegmentQueryFunc)segQueryFirst, out);
+	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFirst, out);
+	cpSpaceHashSegmentQuery(space->activeShapes, &context, start, end, out->t, (cpSpaceHashSegmentQueryFunc)segQueryFirst, out);
 	
 	return (out->shape != NULL);
 }

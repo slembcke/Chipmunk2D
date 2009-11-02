@@ -103,4 +103,4 @@ void cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpaceHashQueryFunc func, void *
 // Return value is uesd for early exits of the query.
 // If while traversing the grid, the raytrace function detects that an entire grid cell is beyond the hit point, it will stop the trace.
 typedef cpFloat (*cpSpaceHashSegmentQueryFunc)(void *obj1, void *obj2, void *data);
-void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpSpaceHashSegmentQueryFunc func, void *data);
+void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpaceHashSegmentQueryFunc func, void *data);
