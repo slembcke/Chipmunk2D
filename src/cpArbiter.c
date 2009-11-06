@@ -122,8 +122,10 @@ cpArbiterDestroy(cpArbiter *arb)
 void
 cpArbiterFree(cpArbiter *arb)
 {
-	if(arb) cpArbiterDestroy(arb);
-	free(arb);
+	if(arb){
+		cpArbiterDestroy(arb);
+		free(arb);
+	}
 }
 
 void

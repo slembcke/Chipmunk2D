@@ -74,8 +74,10 @@ cpShapeDestroy(cpShape *shape)
 void
 cpShapeFree(cpShape *shape)
 {
-	if(shape) cpShapeDestroy(shape);
-	free(shape);
+	if(shape){
+		cpShapeDestroy(shape);
+		free(shape);
+	}
 }
 
 cpBB

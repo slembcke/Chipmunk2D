@@ -46,8 +46,10 @@ cpHashSetDestroy(cpHashSet *set)
 void
 cpHashSetFree(cpHashSet *set)
 {
-	if(set) cpHashSetDestroy(set);
-	free(set);
+	if(set){
+		cpHashSetDestroy(set);
+		free(set);
+	}
 }
 
 cpHashSet *

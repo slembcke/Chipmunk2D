@@ -34,8 +34,10 @@ void cpConstraintDestroy(cpConstraint *constraint){}
 void
 cpConstraintFree(cpConstraint *constraint)
 {
-	if(constraint) cpConstraintDestroy(constraint);
-	free(constraint);
+	if(constraint){
+		cpConstraintDestroy(constraint);
+		free(constraint);
+	}
 }
 
 void

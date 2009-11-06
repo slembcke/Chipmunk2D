@@ -176,8 +176,10 @@ cpSpaceDestroy(cpSpace *space)
 void
 cpSpaceFree(cpSpace *space)
 {
-	if(space) cpSpaceDestroy(space);
-	free(space);
+	if(space){
+		cpSpaceDestroy(space);
+		free(space);
+	}
 }
 
 void

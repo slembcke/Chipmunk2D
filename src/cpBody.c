@@ -70,8 +70,10 @@ void cpBodyDestroy(cpBody *body){}
 void
 cpBodyFree(cpBody *body)
 {
-	if(body) cpBodyDestroy(body);
-	free(body);
+	if(body){
+		cpBodyDestroy(body);
+		free(body);
+	}
 }
 
 void

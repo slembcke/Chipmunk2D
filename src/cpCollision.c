@@ -169,13 +169,13 @@ findVerts(cpContact **arr, cpPolyShape *poly1, cpPolyShape *poly2, cpVect n, cpF
 	for(int i=0; i<poly1->numVerts; i++){
 		cpVect v = poly1->tVerts[i];
 		if(cpPolyShapeContainsVertPartial(poly2, v, cpvneg(n)))
-			cpContactInit(addContactPoint(arr, &max, &num), v, n, dist, CP_HASH_PAIR(poly1, i));
+			cpContactInit(addContactPoint(arr, &max, &num), v, n, dist, CP_HASH_PAIR(poly1->shape.id, i));
 	}
 	
 	for(int i=0; i<poly2->numVerts; i++){
 		cpVect v = poly2->tVerts[i];
 		if(cpPolyShapeContainsVertPartial(poly1, v, n))
-			cpContactInit(addContactPoint(arr, &max, &num), v, n, dist, CP_HASH_PAIR(poly2, i));
+			cpContactInit(addContactPoint(arr, &max, &num), v, n, dist, CP_HASH_PAIR(poly2->shape.id, i));
 	}
 	
 	//	if(!num)
@@ -228,7 +228,7 @@ findPointsBehindSeg(cpContact **arr, int *max, int *num, cpSegmentShape *seg, cp
 		if(cpvdot(v, n) < cpvdot(seg->tn, seg->ta)*coef + seg->r){
 			cpFloat dt = cpvcross(seg->tn, v);
 			if(dta >= dt && dt >= dtb){
-				cpContactInit(addContactPoint(arr, max, num), v, n, pDist, CP_HASH_PAIR(poly, i));
+				cpContactInit(addContactPoint(arr, max, num), v, n, pDist, CP_HASH_PAIR(poly->shape.id, i));
 			}
 		}
 	}
