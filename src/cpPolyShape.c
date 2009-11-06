@@ -145,7 +145,7 @@ cpPolyValidate(cpVect *verts, int numVerts)
 		cpVect b = verts[(i+1)%numVerts];
 		cpVect c = verts[(i+2)%numVerts];
 		
-		if(cpvcross(cpvsub(b, a), cpvsub(c, b)) >= 0.0f)
+		if(cpvcross(cpvsub(b, a), cpvsub(c, b)) > 0.0f)
 			return 0;
 	}
 	
