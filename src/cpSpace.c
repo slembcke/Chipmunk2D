@@ -227,6 +227,7 @@ cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
 	assert(shape->body);
+	assert(!cpHashSetFind(space->activeShapes->handleSet, shape->id, shape));
 	cpSpaceHashInsert(space->activeShapes, shape, shape->id, shape->bb);
 	
 	return shape;
@@ -236,6 +237,7 @@ cpShape *
 cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
 	assert(shape->body);
+	assert(!cpHashSetFind(space->staticShapes->handleSet, shape->id, shape));
 
 	cpShapeCacheBB(shape);
 	cpSpaceHashInsert(space->staticShapes, shape, shape->id, shape->bb);
@@ -246,6 +248,8 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 cpBody *
 cpSpaceAddBody(cpSpace *space, cpBody *body)
 {
+	assert(!cpArrayContains(space->bodies, body));
+	
 	cpArrayPush(space->bodies, body);
 	
 	return body;
@@ -254,6 +258,8 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 cpConstraint *
 cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
+	assert(!cpArrayContains(space->constraints, constraint));
+	
 	cpArrayPush(space->constraints, constraint);
 	
 	return constraint;
@@ -284,6 +290,8 @@ shapeRemovalArbiterReject(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
+	assert(cpHashSetFind(space->activeShapes->handleSet, shape->id, shape));
+	
 	cpSpaceHashRemove(space->activeShapes, shape, shape->id);
 	shapeRemovalArbiterReject(space, shape);
 }
@@ -291,6 +299,8 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
+	assert(cpHashSetFind(space->staticShapes->handleSet, shape->id, shape));
+	
 	cpSpaceHashRemove(space->staticShapes, shape, shape->id);
 	shapeRemovalArbiterReject(space, shape);
 }
@@ -298,12 +308,16 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 {
+	assert(cpArrayContains(space->bodies, body));
+	
 	cpArrayDeleteObj(space->bodies, body);
 }
 
 void
 cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 {
+	assert(cpArrayContains(space->constraints, constraint));
+	
 	cpArrayDeleteObj(space->constraints, constraint);
 }
 
