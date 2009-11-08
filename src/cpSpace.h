@@ -18,6 +18,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+struct cpSpace;
  
 // Number of frames that contact information should persist.
 extern int cp_contact_persistence;
@@ -33,6 +35,9 @@ typedef struct cpCollPairFunc {
 	cpCollFunc func;
 	void *data;
 } cpCollPairFunc;
+
+// Delayed callback function
+typedef int (*cpDelayedCallbackFunc)(void *data, struct cpSpace *space);
 
 typedef struct cpSpace{
 	// *** User definable fields
@@ -72,6 +77,8 @@ typedef struct cpSpace{
 	cpHashSet *collFuncSet;
 	// Default collision pair function.
 	cpCollPairFunc defaultPairFunc;
+	
+	cpHashSet *delayedCallbacks;
 } cpSpace;
 
 // Basic allocation/destruction functions.

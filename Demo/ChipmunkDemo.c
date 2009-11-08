@@ -257,7 +257,7 @@ click(int button, int state, int x, int y)
 			mouseJoint->maxForce = 50000.0f;
 			mouseJoint->biasCoef = 0.15f;
 			cpSpaceAddConstraint(space, mouseJoint);
-		} else {
+		} else if(mouseJoint){
 			cpSpaceRemoveConstraint(space, mouseJoint);
 			cpConstraintFree(mouseJoint);
 			mouseJoint = NULL;

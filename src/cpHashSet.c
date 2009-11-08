@@ -202,7 +202,7 @@ cpHashSetEach(cpHashSet *set, cpHashSetIterFunc func, void *data)
 }
 
 void
-cpHashSetReject(cpHashSet *set, cpHashSetRejectFunc func, void *data)
+cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data)
 {
 	// Iterate over all the chains.
 	for(int i=0; i<set->size; i++){

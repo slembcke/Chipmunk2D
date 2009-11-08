@@ -38,8 +38,8 @@ typedef int (*cpHashSetEqlFunc)(void *ptr, void *elt);
 typedef void *(*cpHashSetTransFunc)(void *ptr, void *data);
 // Iterator function for a hashset.
 typedef void (*cpHashSetIterFunc)(void *elt, void *data);
-// Reject function. Returns true if elt should be dropped.
-typedef int (*cpHashSetRejectFunc)(void *elt, void *data);
+// Filter function. Returns false if elt should be dropped.
+typedef int (*cpHashSetFilterFunc)(void *elt, void *data);
 
 typedef struct cpHashSet {
 	// Number of elements stored in the table.
@@ -75,5 +75,5 @@ void *cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr);
 
 // Iterate over a hashset.
 void cpHashSetEach(cpHashSet *set, cpHashSetIterFunc func, void *data);
-// Iterate over a hashset while rejecting certain elements.
-void cpHashSetReject(cpHashSet *set, cpHashSetRejectFunc func, void *data);
+// Iterate over a hashset, retain .
+void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);
