@@ -236,15 +236,24 @@ hash_func(cpHashValue x, cpHashValue y, cpHashValue n)
 	return (x*2185031351ul ^ y*4232417593ul) % n;
 }
 
+// Much faster than (int)floor(f)
+// Profiling showed floor() to be a sizable performance hog
+static inline int
+floor_int(cpFloat f)
+{
+	int i = (int)f;
+	return (f >= 0.0f && f != i ? i : i - 1);
+}
+
 static inline void
 hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 {
 	// Find the dimensions in cell coordinates.
 	cpFloat dim = hash->celldim;
-	int l = (int)cpffloor(bb.l/dim); // Fix by ShiftZ
-	int r = (int)cpffloor(bb.r/dim);
-	int b = (int)cpffloor(bb.b/dim);
-	int t = (int)cpffloor(bb.t/dim);
+	int l = floor_int(bb.l/dim); // Fix by ShiftZ
+	int r = floor_int(bb.r/dim);
+	int b = floor_int(bb.b/dim);
+	int t = floor_int(bb.t/dim);
 	
 	int n = hash->numcells;
 	for(int i=l; i<=r; i++){
@@ -364,7 +373,7 @@ void
 cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpaceHashQueryFunc func, void *data)
 {
 	cpFloat dim = hash->celldim;
-	int index = hash_func((int)cpffloor(point.x/dim), (int)cpffloor(point.y/dim), hash->numcells);  // Fix by ShiftZ
+	int index = hash_func(floor_int(point.x/dim), floor_int(point.y/dim), hash->numcells);  // Fix by ShiftZ
 	
 	query(hash, hash->table[index], &point, func, data);
 
@@ -378,10 +387,10 @@ cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc fun
 {
 	// Get the dimensions in cell coordinates.
 	cpFloat dim = hash->celldim;
-	int l = (int)cpffloor(bb.l/dim);  // Fix by ShiftZ
-	int r = (int)cpffloor(bb.r/dim);
-	int b = (int)cpffloor(bb.b/dim);
-	int t = (int)cpffloor(bb.t/dim);
+	int l = floor_int(bb.l/dim);  // Fix by ShiftZ
+	int r = floor_int(bb.r/dim);
+	int b = floor_int(bb.b/dim);
+	int t = floor_int(bb.t/dim);
 	
 	int n = hash->numcells;
 	
@@ -421,10 +430,10 @@ handleQueryRehashHelper(void *elt, void *data)
 	void *obj = hand->obj;
 	cpBB bb = hash->bbfunc(obj);
 
-	int l = (int)cpffloor(bb.l/dim);
-	int r = (int)cpffloor(bb.r/dim);
-	int b = (int)cpffloor(bb.b/dim);
-	int t = (int)cpffloor(bb.t/dim);
+	int l = floor_int(bb.l/dim);
+	int r = floor_int(bb.r/dim);
+	int b = floor_int(bb.b/dim);
+	int t = floor_int(bb.t/dim);
 
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
@@ -492,7 +501,7 @@ void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, c
 	
 	cpFloat dt_dx = 1.0f/fabs(b.x - a.x), dt_dy = 1.0f/fabs(b.y - a.y);
 	
-	int cell_x = (int)cpffloor(a.x), cell_y = (int)cpffloor(a.y);
+	int cell_x = floor_int(a.x), cell_y = floor_int(a.y);
 
 	cpFloat t = 0;
 

@@ -36,7 +36,6 @@
 #include <string.h>
 #include <math.h>
 #include <limits.h>
-//#include <sys/time.h>
 
 #ifdef __APPLE__
 	#include "OpenGL/gl.h"
@@ -354,11 +353,37 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
+//#include <sys/time.h>
+//void time_trial(char index, int count)
+//{
+//	currDemo = demos[index];
+//	space = currDemo->initFunc();
+//	
+//	struct timeval start_time, end_time;
+//	gettimeofday(&start_time, NULL);
+//	
+//	for(int i=0; i<count; i++)
+//		currDemo->updateFunc(i);
+//	
+//	currDemo->destroyFunc();
+//	
+//	gettimeofday(&end_time, NULL);
+//	long millisecs = (end_time.tv_sec - start_time.tv_sec)*1000;
+//	millisecs += (end_time.tv_usec - start_time.tv_usec)/1000;
+//	
+//	printf("Time(%c) = %ldms\n", index + 'a', millisecs);
+//}
+
 int
 main(int argc, const char **argv)
 {
 	cpInitChipmunk();
-		
+	
+//	for(int i=0; i<demoCount; i++)
+//		time_trial(i, 1000);
+//	time_trial('c' - 'a', 10000);
+//	exit(0);
+	
 	mouseBody = cpBodyNew(INFINITY, INFINITY);
 	
 	glutStuff(argc, argv);
