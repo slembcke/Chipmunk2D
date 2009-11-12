@@ -85,23 +85,23 @@ collFuncSetTrans(cpCollisionType *ids, collFuncData *funcData)
 	return pair;
 }
 
-#pragma mark Delayed Callback Helpers
+#pragma mark Post Step Function Helpers
 
-typedef struct delayedCallback {
-	cpDelayedCallbackFunc func;
+typedef struct postStepCallback {
+	cpPostStepCallbackFunc func;
 	void *obj;
 	void *data;
-} delayedCallback;
+} postStepCallback;
 
 static int
-delayedFuncSetEql(delayedCallback *a, delayedCallback *b){
+postStepFuncSetEql(postStepCallback *a, postStepCallback *b){
 	return a->obj == b->obj;
 }
 
 static void *
-delayedFuncSetTrans(delayedCallback *callback, void *ignored)
+postStepFuncSetTrans(postStepCallback *callback, void *ignored)
 {
-	delayedCallback *value = (delayedCallback *)malloc(sizeof(delayedCallback));
+	postStepCallback *value = (postStepCallback *)malloc(sizeof(postStepCallback));
 	(*value) = (*callback);
 	
 	return value;
@@ -165,7 +165,7 @@ cpSpaceInit(cpSpace *space)
 	space->collFuncSet = cpHashSetNew(0, (cpHashSetEqlFunc)collFuncSetEql, (cpHashSetTransFunc)collFuncSetTrans);
 	space->collFuncSet->default_value = &space->defaultPairFunc;
 	
-	space->delayedCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)delayedFuncSetEql, (cpHashSetTransFunc)delayedFuncSetTrans);
+	space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql, (cpHashSetTransFunc)postStepFuncSetTrans);
 	
 	return space;
 }
@@ -321,13 +321,13 @@ cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 	cpArrayDeleteObj(space->constraints, constraint);
 }
 
-#pragma mark Delayed Callbacks
+#pragma mark Post Step Functions
 
 void
-cpSpaceAddDelayedCallback(cpSpace *space, cpDelayedCallbackFunc func, void *obj, void *data)
+cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepCallbackFunc func, void *obj, void *data)
 {
-	delayedCallback callback = {func, obj, data};
-	cpHashSetInsert(space->delayedCallbacks, (cpHashValue)obj, &callback, NULL);
+	postStepCallback callback = {func, obj, data};
+	cpHashSetInsert(space->postStepCallbacks, (cpHashValue)obj, &callback, NULL);
 }
 
 static void
@@ -338,9 +338,9 @@ removeAndFreeShapeAndBody(cpShape *shape, cpSpace *space)
 }
 
 void
-cpSpaceDelayedRemoveAndFreeShapeAndBody(cpSpace *space, cpShape *shape)
+cpSpacePostStepRemoveAndFreeShapeAndBody(cpSpace *space, cpShape *shape)
 {
-	cpSpaceAddDelayedCallback(space, (cpDelayedCallbackFunc)removeAndFreeShapeAndBody, shape, space);
+	cpSpaceAddPostStepCallback(space, (cpPostStepCallbackFunc)removeAndFreeShapeAndBody, shape, space);
 }
 
 #pragma mark Point Query Functions
@@ -416,7 +416,7 @@ segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
 }
 
 int
-cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data)
+cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data)
 {
 	segQueryContext context = {
 		start, end,
@@ -453,8 +453,11 @@ segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo 
 }
 
 int
-cpSpaceShapeSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out)
+cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out)
 {
+	cpSegmentQueryInfo info = {NULL, 1.0f, cpvzero};
+	if(!out) out = &info;
+	
 	out->t = 1.0f;
 	
 	segQueryFirstContext context = {
@@ -590,9 +593,9 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 	return 1;
 }
 
-// Hashset filter func to call and throw away delayed callbacks.
+// Hashset filter func to call and throw away post step functions.
 static int
-delayedCallbackSetFilter(delayedCallback *callback, cpSpace *space)
+postStepCallbackSetFilter(postStepCallback *callback, cpSpace *space)
 {
 	callback->func(callback->obj, callback->data);
 	free(callback);
@@ -674,9 +677,9 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		}
 	}
 	
-	// Run the delayed callbacks
+	// Run the post step functions
 	// Use filter as an easy way to clear out the queue as it runs
-	cpHashSetFilter(space->delayedCallbacks, (cpHashSetFilterFunc)delayedCallbackSetFilter, NULL);
+	cpHashSetFilter(space->postStepCallbacks, (cpHashSetFilterFunc)postStepCallbackSetFilter, NULL);
 	
 //	cpFloat dvsq = cpvdot(space->gravity, space->gravity);
 //	dvsq *= dt*dt * space->damping*space->damping;

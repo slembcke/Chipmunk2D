@@ -19,8 +19,6 @@
  * SOFTWARE.
  */
 
-struct cpSpace;
- 
 // Number of frames that contact information should persist.
 extern int cp_contact_persistence;
 
@@ -35,9 +33,6 @@ typedef struct cpCollPairFunc {
 	cpCollFunc func;
 	void *data;
 } cpCollPairFunc;
-
-// Delayed callback function
-typedef int (*cpDelayedCallbackFunc)(void *data, struct cpSpace *space);
 
 typedef struct cpSpace{
 	// *** User definable fields
@@ -78,7 +73,7 @@ typedef struct cpSpace{
 	// Default collision pair function.
 	cpCollPairFunc defaultPairFunc;
 	
-	cpHashSet *delayedCallbacks;
+	cpHashSet *postStepCallbacks;
 } cpSpace;
 
 // Basic allocation/destruction functions.
@@ -109,6 +104,12 @@ void cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape);
 void cpSpaceRemoveBody(cpSpace *space, cpBody *body);
 void cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint);
 
+// Post Step function definition
+typedef void (*cpPostStepCallbackFunc)(void *obj, void *data);
+// Register a post step function to be called after cpSpaceStep() has finished.
+// obj is used a key, you can only register one callback per unique value for obj
+void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepCallbackFunc func, void *obj, void *data);
+
 // Point query callback function
 typedef void (*cpSpacePointQueryFunc)(cpShape *shape, void *data);
 void cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data);
@@ -116,8 +117,8 @@ cpShape *cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, c
 
 // Segment query callback function
 typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, void *data);
-int cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
-int cpSpaceShapeSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out);
+int cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
+int cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out);
 
 
 // Iterator function for iterating the bodies in a space.
