@@ -88,7 +88,7 @@ collFuncSetTrans(cpCollisionType *ids, collFuncData *funcData)
 #pragma mark Post Step Function Helpers
 
 typedef struct postStepCallback {
-	cpPostStepCallbackFunc func;
+	cpPostStepFunc func;
 	void *obj;
 	void *data;
 } postStepCallback;
@@ -324,7 +324,7 @@ cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 #pragma mark Post Step Functions
 
 void
-cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepCallbackFunc func, void *obj, void *data)
+cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)
 {
 	postStepCallback callback = {func, obj, data};
 	cpHashSetInsert(space->postStepCallbacks, (cpHashValue)obj, &callback, NULL);
@@ -340,7 +340,7 @@ removeAndFreeShapeAndBody(cpShape *shape, cpSpace *space)
 void
 cpSpacePostStepRemoveAndFreeShapeAndBody(cpSpace *space, cpShape *shape)
 {
-	cpSpaceAddPostStepCallback(space, (cpPostStepCallbackFunc)removeAndFreeShapeAndBody, shape, space);
+	cpSpaceAddPostStepCallback(space, (cpPostStepFunc)removeAndFreeShapeAndBody, shape, space);
 }
 
 #pragma mark Point Query Functions
@@ -593,7 +593,7 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 	return 1;
 }
 
-// Hashset filter func to call and throw away post step functions.
+// Hashset filter func to call and throw away post step callbacks.
 static int
 postStepCallbackSetFilter(postStepCallback *callback, cpSpace *space)
 {
@@ -677,7 +677,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		}
 	}
 	
-	// Run the post step functions
+	// Run the post step callbacks
 	// Use filter as an easy way to clear out the queue as it runs
 	cpHashSetFilter(space->postStepCallbacks, (cpHashSetFilterFunc)postStepCallbackSetFilter, NULL);
 	
