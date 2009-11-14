@@ -128,7 +128,7 @@ static void   constraintFreeWrap(cpConstraint *ptr, void *unused){cpConstraintFr
 cpSpace*
 cpSpaceAlloc(void)
 {
-	return (cpSpace *)calloc(1, sizeof(cpSpace));
+	return (cpSpace *)cpcalloc(1, sizeof(cpSpace));
 }
 
 #define DEFAULT_DIM_SIZE 100.0f

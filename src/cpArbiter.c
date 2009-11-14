@@ -90,7 +90,7 @@ cpContactsEstimateCrushingImpulse(cpContact *contacts, int numContacts)
 cpArbiter*
 cpArbiterAlloc(void)
 {
-	return (cpArbiter *)calloc(1, sizeof(cpArbiter));
+	return (cpArbiter *)cpcalloc(1, sizeof(cpArbiter));
 }
 
 cpArbiter*

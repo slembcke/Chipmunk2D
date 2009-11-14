@@ -66,6 +66,7 @@ cpfclamp(cpFloat f, cpFloat min, cpFloat max){
 #endif
 
 #define cpmalloc malloc
+#define cpcalloc calloc
 #define cprealloc realloc
 #define cpfree free
 

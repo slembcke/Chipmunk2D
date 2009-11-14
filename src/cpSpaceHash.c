@@ -73,7 +73,7 @@ cpHandleRelease(cpHandle *hand)
 cpSpaceHash*
 cpSpaceHashAlloc(void)
 {
-	return (cpSpaceHash *)calloc(1, sizeof(cpSpaceHash));
+	return (cpSpaceHash *)cpcalloc(1, sizeof(cpSpaceHash));
 }
 
 // Frees the old table, and allocates a new one.
@@ -83,7 +83,7 @@ cpSpaceHashAllocTable(cpSpaceHash *hash, int numcells)
 	cpfree(hash->table);
 	
 	hash->numcells = numcells;
-	hash->table = (cpSpaceHashBin **)calloc(numcells, sizeof(cpSpaceHashBin *));
+	hash->table = (cpSpaceHashBin **)cpcalloc(numcells, sizeof(cpSpaceHashBin *));
 }
 
 // Equality function for the handleset.

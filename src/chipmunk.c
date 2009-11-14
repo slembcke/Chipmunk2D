@@ -56,7 +56,7 @@ cpMomentForSegment(cpFloat m, cpVect a, cpVect b)
 cpFloat
 cpMomentForPoly(cpFloat m, const int numVerts, cpVect *verts, cpVect offset)
 {
-	cpVect *tVerts = (cpVect *)calloc(numVerts, sizeof(cpVect));
+	cpVect *tVerts = (cpVect *)cpcalloc(numVerts, sizeof(cpVect));
 	for(int i=0; i<numVerts; i++)
 		tVerts[i] = cpvadd(verts[i], offset);
 	

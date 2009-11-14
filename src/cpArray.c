@@ -32,7 +32,7 @@
 cpArray*
 cpArrayAlloc(void)
 {
-	return (cpArray *)calloc(1, sizeof(cpArray));
+	return (cpArray *)cpcalloc(1, sizeof(cpArray));
 }
 
 cpArray*

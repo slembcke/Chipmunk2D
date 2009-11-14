@@ -55,7 +55,7 @@ cpHashSetFree(cpHashSet *set)
 cpHashSet *
 cpHashSetAlloc(void)
 {
-	return (cpHashSet *)calloc(1, sizeof(cpHashSet));
+	return (cpHashSet *)cpcalloc(1, sizeof(cpHashSet));
 }
 
 cpHashSet *
@@ -69,7 +69,7 @@ cpHashSetInit(cpHashSet *set, int size, cpHashSetEqlFunc eqlFunc, cpHashSetTrans
 	
 	set->default_value = NULL;
 	
-	set->table = (cpHashSetBin **)calloc(set->size, sizeof(cpHashSetBin *));
+	set->table = (cpHashSetBin **)cpcalloc(set->size, sizeof(cpHashSetBin *));
 	
 	return set;
 }
@@ -92,7 +92,7 @@ cpHashSetResize(cpHashSet *set)
 	// Get the next approximate doubled prime.
 	int newSize = next_prime(set->size + 1);
 	// Allocate a new table.
-	cpHashSetBin **newTable = (cpHashSetBin **)calloc(newSize, sizeof(cpHashSetBin *));
+	cpHashSetBin **newTable = (cpHashSetBin **)cpcalloc(newSize, sizeof(cpHashSetBin *));
 	
 	// Iterate over the chains.
 	for(int i=0; i<set->size; i++){

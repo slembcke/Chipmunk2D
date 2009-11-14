@@ -380,7 +380,7 @@ extern "C" {
 	cpInitCollisionFuncs(void)
 	{
 		if(!colfuncs)
-			colfuncs = (collisionFunc *)calloc(CP_NUM_SHAPES*CP_NUM_SHAPES, sizeof(collisionFunc));
+			colfuncs = (collisionFunc *)cpcalloc(CP_NUM_SHAPES*CP_NUM_SHAPES, sizeof(collisionFunc));
 		
 		addColFunc(CP_CIRCLE_SHAPE,  CP_CIRCLE_SHAPE,  circle2circle);
 		addColFunc(CP_CIRCLE_SHAPE,  CP_SEGMENT_SHAPE, circle2segment);

@@ -28,7 +28,7 @@
 cpPolyShape *
 cpPolyShapeAlloc(void)
 {
-	return (cpPolyShape *)calloc(1, sizeof(cpPolyShape));
+	return (cpPolyShape *)cpcalloc(1, sizeof(cpPolyShape));
 }
 
 static void
@@ -174,10 +174,10 @@ setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 {
 	poly->numVerts = numVerts;
 
-	poly->verts = (cpVect *)calloc(numVerts, sizeof(cpVect));
-	poly->tVerts = (cpVect *)calloc(numVerts, sizeof(cpVect));
-	poly->axes = (cpPolyShapeAxis *)calloc(numVerts, sizeof(cpPolyShapeAxis));
-	poly->tAxes = (cpPolyShapeAxis *)calloc(numVerts, sizeof(cpPolyShapeAxis));
+	poly->verts = (cpVect *)cpcalloc(numVerts, sizeof(cpVect));
+	poly->tVerts = (cpVect *)cpcalloc(numVerts, sizeof(cpVect));
+	poly->axes = (cpPolyShapeAxis *)cpcalloc(numVerts, sizeof(cpPolyShapeAxis));
+	poly->tAxes = (cpPolyShapeAxis *)cpcalloc(numVerts, sizeof(cpPolyShapeAxis));
 	
 	for(int i=0; i<numVerts; i++){
 		cpVect a = cpvadd(offset, verts[i]);
