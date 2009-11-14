@@ -116,7 +116,7 @@ cpArbiterNew(cpShape *a, cpShape *b, int stamp)
 void
 cpArbiterDestroy(cpArbiter *arb)
 {
-	free(arb->contacts);
+	cpfree(arb->contacts);
 }
 
 void
@@ -124,7 +124,7 @@ cpArbiterFree(cpArbiter *arb)
 {
 	if(arb){
 		cpArbiterDestroy(arb);
-		free(arb);
+		cpfree(arb);
 	}
 }
 
@@ -147,7 +147,7 @@ cpArbiterInject(cpArbiter *arb, cpContact *contacts, int numContacts)
 		}
 	}
 
-	free(arb->contacts);
+	cpfree(arb->contacts);
 	
 	arb->contacts = contacts;
 	arb->numContacts = numContacts;

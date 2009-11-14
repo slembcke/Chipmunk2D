@@ -65,6 +65,10 @@ cpfclamp(cpFloat f, cpFloat min, cpFloat max){
 	#endif
 #endif
 
+#define cpmalloc malloc
+#define cprealloc realloc
+#define cpfree free
+
 #include "cpVect.h"
 #include "cpBB.h"
 #include "cpBody.h"

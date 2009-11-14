@@ -24,9 +24,6 @@
 #include <string.h>
 #include <math.h>
 #include <assert.h>
-#ifdef _MSC_VER
-	#include <malloc.h>
-#endif
 
 #include "chipmunk.h"
 
@@ -76,7 +73,7 @@ collFuncSetEql(cpCollisionType *ids, cpCollPairFunc *pair)
 static void *
 collFuncSetTrans(cpCollisionType *ids, collFuncData *funcData)
 {
-	cpCollPairFunc *pair = (cpCollPairFunc *)malloc(sizeof(cpCollPairFunc));
+	cpCollPairFunc *pair = (cpCollPairFunc *)cpmalloc(sizeof(cpCollPairFunc));
 	pair->a = ids[0];
 	pair->b = ids[1];
 	pair->func = funcData->func;
@@ -101,7 +98,7 @@ postStepFuncSetEql(postStepCallback *a, postStepCallback *b){
 static void *
 postStepFuncSetTrans(postStepCallback *callback, void *ignored)
 {
-	postStepCallback *value = (postStepCallback *)malloc(sizeof(postStepCallback));
+	postStepCallback *value = (postStepCallback *)cpmalloc(sizeof(postStepCallback));
 	(*value) = (*callback);
 	
 	return value;
@@ -120,7 +117,7 @@ alwaysCollide(cpShape *a, cpShape *b, cpContact *arr, int numCon, cpFloat normal
 static cpBB shapeBBFunc(cpShape *shape){return shape->bb;}
 
 // Iterator functions for destructors.
-static void             freeWrap(void         *ptr, void *unused){            free(ptr);}
+static void             freeWrap(void         *ptr, void *unused){            cpfree(ptr);}
 static void        shapeFreeWrap(cpShape      *ptr, void *unused){     cpShapeFree(ptr);}
 static void      arbiterFreeWrap(cpArbiter    *ptr, void *unused){   cpArbiterFree(ptr);}
 static void         bodyFreeWrap(cpBody       *ptr, void *unused){      cpBodyFree(ptr);}
@@ -202,7 +199,7 @@ cpSpaceFree(cpSpace *space)
 {
 	if(space){
 		cpSpaceDestroy(space);
-		free(space);
+		cpfree(space);
 	}
 }
 
@@ -235,7 +232,7 @@ cpSpaceRemoveCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionTyp
 	cpCollisionType ids[] = {a, b};
 	cpHashValue hash = CP_HASH_PAIR(a, b);
 	cpCollPairFunc *old_pair = (cpCollPairFunc *)cpHashSetRemove(space->collFuncSet, hash, ids);
-	free(old_pair);
+	cpfree(old_pair);
 }
 
 void
@@ -570,7 +567,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 		// Add the arbiter to the list of active arbiters.
 		cpArrayPush(space->arbiters, arb);
 	} else {
-		free(contacts);
+		cpfree(contacts);
 	}
 }
 
@@ -598,7 +595,7 @@ static int
 postStepCallbackSetFilter(postStepCallback *callback, cpSpace *space)
 {
 	callback->func(callback->obj, callback->data);
-	free(callback);
+	cpfree(callback);
 	
 	return 0;
 }

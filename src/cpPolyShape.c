@@ -87,11 +87,11 @@ cpPolyShapeDestroy(cpShape *shape)
 {
 	cpPolyShape *poly = (cpPolyShape *)shape;
 	
-	free(poly->verts);
-	free(poly->tVerts);
+	cpfree(poly->verts);
+	cpfree(poly->tVerts);
 	
-	free(poly->axes);
-	free(poly->tAxes);
+	cpfree(poly->axes);
+	cpfree(poly->tAxes);
 }
 
 static int

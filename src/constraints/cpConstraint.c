@@ -36,7 +36,7 @@ cpConstraintFree(cpConstraint *constraint)
 {
 	if(constraint){
 		cpConstraintDestroy(constraint);
-		free(constraint);
+		cpfree(constraint);
 	}
 }
 

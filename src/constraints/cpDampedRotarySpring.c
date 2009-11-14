@@ -83,7 +83,7 @@ CP_DefineClassGetter(cpDampedRotarySpring)
 cpDampedRotarySpring *
 cpDampedRotarySpringAlloc(void)
 {
-	return (cpDampedRotarySpring *)malloc(sizeof(cpDampedRotarySpring));
+	return (cpDampedRotarySpring *)cpmalloc(sizeof(cpDampedRotarySpring));
 }
 
 cpDampedRotarySpring *

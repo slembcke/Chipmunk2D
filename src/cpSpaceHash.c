@@ -30,7 +30,7 @@
 static cpHandle*
 cpHandleAlloc(void)
 {
-	return (cpHandle *)malloc(sizeof(cpHandle));
+	return (cpHandle *)cpmalloc(sizeof(cpHandle));
 }
 
 static cpHandle*
@@ -58,7 +58,7 @@ cpHandleRetain(cpHandle *hand)
 static inline void
 cpHandleFree(cpHandle *hand)
 {
-	free(hand);
+	cpfree(hand);
 }
 
 static inline void
@@ -80,7 +80,7 @@ cpSpaceHashAlloc(void)
 static void
 cpSpaceHashAllocTable(cpSpaceHash *hash, int numcells)
 {
-	free(hash->table);
+	cpfree(hash->table);
 	
 	hash->numcells = numcells;
 	hash->table = (cpSpaceHashBin **)calloc(numcells, sizeof(cpSpaceHashBin *));
@@ -154,12 +154,12 @@ clearHash(cpSpaceHash *hash)
 
 // Free the recycled hash bins.
 static void
-freeBins(cpSpaceHash *hash)
+cpfreeBins(cpSpaceHash *hash)
 {
 	cpSpaceHashBin *bin = hash->bins;
 	while(bin){
 		cpSpaceHashBin *next = bin->next;
-		free(bin);
+		cpfree(bin);
 		bin = next;
 	}
 }
@@ -176,13 +176,13 @@ void
 cpSpaceHashDestroy(cpSpaceHash *hash)
 {
 	clearHash(hash);
-	freeBins(hash);
+	cpfreeBins(hash);
 	
 	// Free the handles.
 	cpHashSetEach(hash->handleSet, &handleFreeWrap, NULL);
 	cpHashSetFree(hash->handleSet);
 	
-	free(hash->table);
+	cpfree(hash->table);
 }
 
 void
@@ -190,7 +190,7 @@ cpSpaceHashFree(cpSpaceHash *hash)
 {
 	if(!hash){
 		cpSpaceHashDestroy(hash);
-		free(hash);
+		cpfree(hash);
 	}
 }
 
@@ -223,7 +223,7 @@ getEmptyBin(cpSpaceHash *hash)
 	cpSpaceHashBin *bin = hash->bins;
 	
 	// Make a new one if necessary.
-	if(bin == NULL) return (cpSpaceHashBin *)malloc(sizeof(cpSpaceHashBin));
+	if(bin == NULL) return (cpSpaceHashBin *)cpmalloc(sizeof(cpSpaceHashBin));
 
 	hash->bins = bin->next;
 	return bin;

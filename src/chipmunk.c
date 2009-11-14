@@ -73,6 +73,6 @@ cpMomentForPoly(cpFloat m, const int numVerts, cpVect *verts, cpVect offset)
 		sum2 += a;
 	}
 	
-	free(tVerts);
+	cpfree(tVerts);
 	return (m*sum1)/(6.0f*sum2);
 }

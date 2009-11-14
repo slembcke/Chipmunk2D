@@ -76,7 +76,7 @@ cpShapeFree(cpShape *shape)
 {
 	if(shape){
 		cpShapeDestroy(shape);
-		free(shape);
+		cpfree(shape);
 	}
 }
 

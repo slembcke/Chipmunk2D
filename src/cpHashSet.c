@@ -34,13 +34,13 @@ cpHashSetDestroy(cpHashSet *set)
 		cpHashSetBin *bin = set->table[i];
 		while(bin){
 			cpHashSetBin *next = bin->next;
-			free(bin);
+			cpfree(bin);
 			bin = next;
 		}
 	}
 	
 	// Free the table.
-	free(set->table);
+	cpfree(set->table);
 }
 
 void
@@ -48,7 +48,7 @@ cpHashSetFree(cpHashSet *set)
 {
 	if(set){
 		cpHashSetDestroy(set);
-		free(set);
+		cpfree(set);
 	}
 }
 
@@ -109,7 +109,7 @@ cpHashSetResize(cpHashSet *set)
 		}
 	}
 	
-	free(set->table);
+	cpfree(set->table);
 	
 	set->table = newTable;
 	set->size = newSize;
@@ -127,7 +127,7 @@ cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data)
 	
 	// Create it necessary.
 	if(!bin){
-		bin = (cpHashSetBin *)malloc(sizeof(cpHashSetBin));
+		bin = (cpHashSetBin *)cpmalloc(sizeof(cpHashSetBin));
 		bin->hash = hash;
 		bin->elt = set->trans(ptr, data); // Transform the pointer.
 		
@@ -169,7 +169,7 @@ cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 		void *return_value = bin->elt;
 		
 //		*bin = (cpHashSetBin){};
-		free(bin);
+		cpfree(bin);
 		
 		return return_value;
 	}
@@ -218,7 +218,7 @@ cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data)
 				(*prev_ptr) = next;
 
 				set->entries--;
-				free(bin);
+				cpfree(bin);
 			}
 			
 			bin = next;
