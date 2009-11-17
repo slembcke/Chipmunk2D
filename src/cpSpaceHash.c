@@ -242,7 +242,7 @@ static inline int
 floor_int(cpFloat f)
 {
 	int i = (int)f;
-	return (f >= 0.0f && f != i ? i : i - 1);
+	return (f < 0.0f && f != i ? i - 1 : i);
 }
 
 static inline void
@@ -472,6 +472,8 @@ cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpaceHashQueryFunc func, void *data)
 static inline cpFloat
 segmentQuery(cpSpaceHash *hash, cpSpaceHashBin *bin, void *obj, cpSpaceHashSegmentQueryFunc func, void *data)
 {
+	cpFloat t = 1.0f;
+	 
 	for(; bin; bin = bin->next){
 		cpHandle *hand = bin->handle;
 		void *other = hand->obj;
@@ -487,10 +489,10 @@ segmentQuery(cpSpaceHash *hash, cpSpaceHashBin *bin, void *obj, cpSpaceHashSegme
 		// Stamp that the handle was checked already against this object.
 		hand->stamp = hash->stamp;
 		
-		return func(obj, other, data);
+		t = cpfmin(t, func(obj, other, data));
 	}
 	
-	return 1.0f;
+	return t;
 }
 
 // modified from http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
