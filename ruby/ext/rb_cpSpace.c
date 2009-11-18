@@ -106,11 +106,12 @@ rb_cpSpaceSetGravity(VALUE self, VALUE val)
 }
 
 static int
-collisionCallback(cpShape *a, cpShape *b, cpContact *contacts, int numContacts, cpFloat normal_coef, void *data)
+collisionCallback(cpArbiter *arb, cpSpace *space, void *data)
 {
+	int swapped = arb->swappedColl;
 	VALUE block = (VALUE)data;
-	VALUE shapea = (VALUE)a->data;
-	VALUE shapeb = (VALUE)b->data;
+	VALUE shapea = (VALUE)(swapped ? arb->b : arb->a)->data;
+	VALUE shapeb = (VALUE)(swapped ? arb->a : arb->b)->data;
 	
 	return rb_funcall(block, id_call, 2, shapea, shapeb);
 }

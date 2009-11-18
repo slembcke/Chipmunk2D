@@ -41,6 +41,48 @@ update(int ticks)
 	}
 }
 
+static void
+untouch(cpArbiter *arb, cpSpace *space, void *unused)
+{
+	printf("untouched a wall\n");
+}
+
+// This function has existed for a while, but was not useful until now really
+cpVect cpContactsSumImpulses(cpContact *contacts, int numContacts);
+
+static void
+printCollisionImpulse(cpArbiter *arb, void *unused)
+{
+	cpVect j = cpContactsSumImpulses(arb->contacts, arb->numContacts);
+	printf("Collision impulse:%s magnitude:%f\n", cpvstr(j), cpvlength(j));
+}
+
+static int
+collision(cpArbiter *arb, cpSpace *space, void *data){
+// The old arguments would still be easy to get. I'd probably write helper/getter functions for these.
+//	int swapped = arb->swappedColl;
+//	cpShape *a = (swapped ? arb->b : arb->a);
+//	cpShape *b = (swapped ? arb->a : arb->b);
+//	cpContact *contacts = arb->contacts;
+//	int numContacts = arb->numContacts;
+//	cpFloat normal_coef = (swapped ? -1.0 : 1.0);
+	
+	// Now for some neat new stuff
+	if(space->stamp == arb->stamp){ // if these are equal, the collision is brand new
+		printf("Just touched a wall\n");
+		// Need to come up with a name and some useful arguments, but arb->func() will
+		// be called when the objects untouch.
+		arb->separationFunc = untouch;
+		
+		// Let's register a post step callback to further process the arbiter
+		cpSpaceAddPostStepCallback(space, (cpPostStepFunc)printCollisionImpulse, arb, space);
+	} else {
+		// This collision is not brand new, do something else maybe?
+	}
+	
+	return 1;
+}
+
 static cpSpace *
 init(void)
 {
@@ -82,13 +124,14 @@ init(void)
 	cpSpaceAddStaticShape(space, shape);
 	
 	// Add lots of boxes.
-	for(int i=0; i<14; i++){
+	for(int i=0; i<2; i++){
 		for(int j=0; j<=i; j++){
 			body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
 			body->p = cpv(j*32 - i*16, 300 - i*32);
 			cpSpaceAddBody(space, body);
 			shape = cpPolyShapeNew(body, num, verts, cpvzero);
 			shape->e = 0.0; shape->u = 0.8;
+			shape->collision_type = 1;
 			cpSpaceAddShape(space, shape);
 		}
 	}
@@ -96,12 +139,16 @@ init(void)
 	// Add a ball to make things more interesting
 	cpFloat radius = 15.0;
 	body = cpBodyNew(10.0, cpMomentForCircle(10.0, 0.0, radius, cpvzero));
-	body->p = cpv(0, -240 + radius);
-	cpSpaceAddBody(space, body);
+	body->p = cpv(0, -240 + radius+5);
+//	cpSpaceAddBody(space, body);
 
 	shape = cpCircleShapeNew(body, radius, cpvzero);
 	shape->e = 0.0; shape->u = 0.9;
+	shape->collision_type = 2;
+	shape->sensor = 1;
 	cpSpaceAddShape(space, shape);
+	
+	cpSpaceAddCollisionPairFunc(space, 1, 2, collision, NULL);
 	
 	return space;
 }

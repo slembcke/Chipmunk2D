@@ -113,7 +113,7 @@ CP_DefineClassGetter(cpGrooveJoint)
 cpGrooveJoint *
 cpGrooveJointAlloc(void)
 {
-	return (cpGrooveJoint *)malloc(sizeof(cpGrooveJoint));
+	return (cpGrooveJoint *)cpmalloc(sizeof(cpGrooveJoint));
 }
 
 cpGrooveJoint *

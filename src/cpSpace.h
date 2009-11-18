@@ -18,12 +18,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
+
+struct cpSpace;
+
 // Number of frames that contact information should persist.
 extern int cp_contact_persistence;
 
 // User collision pair function.
-typedef int (*cpCollFunc)(cpShape *a, cpShape *b, cpContact *contacts, int numContacts, cpFloat normal_coef, void *data);
+typedef int (*cpCollFunc)(cpArbiter *arb, struct cpSpace *space, cpDataPointer data);
 
 // Structure for holding collision pair function information.
 // Used internally.
@@ -72,6 +74,8 @@ typedef struct cpSpace{
 	cpHashSet *collFuncSet;
 	// Default collision pair function.
 	cpCollPairFunc defaultPairFunc;
+	
+	cpHashSet *postStepCallbacks;
 } cpSpace;
 
 // Basic allocation/destruction functions.
@@ -87,9 +91,9 @@ void cpSpaceFreeChildren(cpSpace *space);
 
 // Collision pair function management functions.
 void cpSpaceAddCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b,
-                                 cpCollFunc func, void *data);
+                                 cpCollFunc func, cpDataPointer data);
 void cpSpaceRemoveCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b);
-void cpSpaceSetDefaultCollisionPairFunc(cpSpace *space, cpCollFunc func, void *data);
+void cpSpaceSetDefaultCollisionPairFunc(cpSpace *space, cpCollFunc func, cpDataPointer data);
 
 // Add and remove entities from the system.
 cpShape *cpSpaceAddShape(cpSpace *space, cpShape *shape);
@@ -102,6 +106,12 @@ void cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape);
 void cpSpaceRemoveBody(cpSpace *space, cpBody *body);
 void cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint);
 
+// Post Step function definition
+typedef void (*cpPostStepFunc)(void *obj, void *data);
+// Register a post step function to be called after cpSpaceStep() has finished.
+// obj is used a key, you can only register one callback per unique value for obj
+void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data);
+
 // Point query callback function
 typedef void (*cpSpacePointQueryFunc)(cpShape *shape, void *data);
 void cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data);
@@ -109,8 +119,8 @@ cpShape *cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, c
 
 // Segment query callback function
 typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, void *data);
-int cpSpaceShapeSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
-int cpSpaceShapeSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out);
+int cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
+int cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out);
 
 
 // Iterator function for iterating the bodies in a space.

@@ -18,6 +18,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+ 
+ struct cpArbiter;
+ struct cpSpace;
 
 // Determines how fast penetrations resolve themselves.
 extern cpFloat cp_bias_coef;
@@ -50,6 +53,8 @@ cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHas
 cpVect cpContactsSumImpulses(cpContact *contacts, int numContacts);
 cpVect cpContactsSumImpulsesWithFriction(cpContact *contacts, int numContacts);
 
+typedef void (*cpSeparationFunc)(struct cpArbiter *arb, struct cpSpace *space, void *separationData);
+
 // Data structure for tracking collisions between shapes.
 typedef struct cpArbiter{
 	// Information on the contact points between the objects.
@@ -65,6 +70,12 @@ typedef struct cpArbiter{
 	
 	// Time stamp of the arbiter. (from cpSpace)
 	int stamp;
+	
+	// Are the shapes swapped in relation to the collision pair callback?
+	int swappedColl;
+	
+	void *separationData;
+	cpSeparationFunc separationFunc;
 } cpArbiter;
 
 // Basic allocation/destruction functions.

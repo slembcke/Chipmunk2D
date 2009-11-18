@@ -34,26 +34,28 @@ cpHashSetDestroy(cpHashSet *set)
 		cpHashSetBin *bin = set->table[i];
 		while(bin){
 			cpHashSetBin *next = bin->next;
-			free(bin);
+			cpfree(bin);
 			bin = next;
 		}
 	}
 	
 	// Free the table.
-	free(set->table);
+	cpfree(set->table);
 }
 
 void
 cpHashSetFree(cpHashSet *set)
 {
-	if(set) cpHashSetDestroy(set);
-	free(set);
+	if(set){
+		cpHashSetDestroy(set);
+		cpfree(set);
+	}
 }
 
 cpHashSet *
 cpHashSetAlloc(void)
 {
-	return (cpHashSet *)calloc(1, sizeof(cpHashSet));
+	return (cpHashSet *)cpcalloc(1, sizeof(cpHashSet));
 }
 
 cpHashSet *
@@ -67,7 +69,7 @@ cpHashSetInit(cpHashSet *set, int size, cpHashSetEqlFunc eqlFunc, cpHashSetTrans
 	
 	set->default_value = NULL;
 	
-	set->table = (cpHashSetBin **)calloc(set->size, sizeof(cpHashSetBin *));
+	set->table = (cpHashSetBin **)cpcalloc(set->size, sizeof(cpHashSetBin *));
 	
 	return set;
 }
@@ -90,7 +92,7 @@ cpHashSetResize(cpHashSet *set)
 	// Get the next approximate doubled prime.
 	int newSize = next_prime(set->size + 1);
 	// Allocate a new table.
-	cpHashSetBin **newTable = (cpHashSetBin **)calloc(newSize, sizeof(cpHashSetBin *));
+	cpHashSetBin **newTable = (cpHashSetBin **)cpcalloc(newSize, sizeof(cpHashSetBin *));
 	
 	// Iterate over the chains.
 	for(int i=0; i<set->size; i++){
@@ -107,7 +109,7 @@ cpHashSetResize(cpHashSet *set)
 		}
 	}
 	
-	free(set->table);
+	cpfree(set->table);
 	
 	set->table = newTable;
 	set->size = newSize;
@@ -125,7 +127,7 @@ cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data)
 	
 	// Create it necessary.
 	if(!bin){
-		bin = (cpHashSetBin *)malloc(sizeof(cpHashSetBin));
+		bin = (cpHashSetBin *)cpmalloc(sizeof(cpHashSetBin));
 		bin->hash = hash;
 		bin->elt = set->trans(ptr, data); // Transform the pointer.
 		
@@ -167,7 +169,7 @@ cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 		void *return_value = bin->elt;
 		
 //		*bin = (cpHashSetBin){};
-		free(bin);
+		cpfree(bin);
 		
 		return return_value;
 	}
@@ -200,7 +202,7 @@ cpHashSetEach(cpHashSet *set, cpHashSetIterFunc func, void *data)
 }
 
 void
-cpHashSetReject(cpHashSet *set, cpHashSetRejectFunc func, void *data)
+cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data)
 {
 	// Iterate over all the chains.
 	for(int i=0; i<set->size; i++){
@@ -216,7 +218,7 @@ cpHashSetReject(cpHashSet *set, cpHashSetRejectFunc func, void *data)
 				(*prev_ptr) = next;
 
 				set->entries--;
-				free(bin);
+				cpfree(bin);
 			}
 			
 			bin = next;

@@ -36,7 +36,6 @@
 #include <string.h>
 #include <math.h>
 #include <limits.h>
-//#include <sys/time.h>
 
 #ifdef __APPLE__
 	#include "OpenGL/gl.h"
@@ -94,7 +93,7 @@ static chipmunkDemo *demos[] = {
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
-static const int firstDemoIndex = 'a' - 'a';
+static const int firstDemoIndex = 'b' - 'a';
 
 static int ticks = 0;
 static cpSpace *space;
@@ -257,7 +256,7 @@ click(int button, int state, int x, int y)
 			mouseJoint->maxForce = 50000.0f;
 			mouseJoint->biasCoef = 0.15f;
 			cpSpaceAddConstraint(space, mouseJoint);
-		} else {
+		} else if(mouseJoint){
 			cpSpaceRemoveConstraint(space, mouseJoint);
 			cpConstraintFree(mouseJoint);
 			mouseJoint = NULL;
@@ -354,11 +353,37 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
+//#include <sys/time.h>
+//void time_trial(char index, int count)
+//{
+//	currDemo = demos[index];
+//	space = currDemo->initFunc();
+//	
+//	struct timeval start_time, end_time;
+//	gettimeofday(&start_time, NULL);
+//	
+//	for(int i=0; i<count; i++)
+//		currDemo->updateFunc(i);
+//	
+//	gettimeofday(&end_time, NULL);
+//	long millisecs = (end_time.tv_sec - start_time.tv_sec)*1000;
+//	millisecs += (end_time.tv_usec - start_time.tv_usec)/1000;
+//	
+//	currDemo->destroyFunc();
+//	
+//	printf("Time(%c) = %ldms\n", index + 'a', millisecs);
+//}
+
 int
 main(int argc, const char **argv)
 {
 	cpInitChipmunk();
-		
+	
+//	for(int i=0; i<demoCount; i++)
+//		time_trial(i, 1000);
+//	time_trial('c' - 'a', 10000);
+//	exit(0);
+	
 	mouseBody = cpBodyNew(INFINITY, INFINITY);
 	
 	glutStuff(argc, argv);

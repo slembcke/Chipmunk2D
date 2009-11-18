@@ -30,7 +30,7 @@
 static cpHandle*
 cpHandleAlloc(void)
 {
-	return (cpHandle *)malloc(sizeof(cpHandle));
+	return (cpHandle *)cpmalloc(sizeof(cpHandle));
 }
 
 static cpHandle*
@@ -58,7 +58,7 @@ cpHandleRetain(cpHandle *hand)
 static inline void
 cpHandleFree(cpHandle *hand)
 {
-	free(hand);
+	cpfree(hand);
 }
 
 static inline void
@@ -73,17 +73,17 @@ cpHandleRelease(cpHandle *hand)
 cpSpaceHash*
 cpSpaceHashAlloc(void)
 {
-	return (cpSpaceHash *)calloc(1, sizeof(cpSpaceHash));
+	return (cpSpaceHash *)cpcalloc(1, sizeof(cpSpaceHash));
 }
 
 // Frees the old table, and allocates a new one.
 static void
 cpSpaceHashAllocTable(cpSpaceHash *hash, int numcells)
 {
-	free(hash->table);
+	cpfree(hash->table);
 	
 	hash->numcells = numcells;
-	hash->table = (cpSpaceHashBin **)calloc(numcells, sizeof(cpSpaceHashBin *));
+	hash->table = (cpSpaceHashBin **)cpcalloc(numcells, sizeof(cpSpaceHashBin *));
 }
 
 // Equality function for the handleset.
@@ -154,12 +154,12 @@ clearHash(cpSpaceHash *hash)
 
 // Free the recycled hash bins.
 static void
-freeBins(cpSpaceHash *hash)
+cpfreeBins(cpSpaceHash *hash)
 {
 	cpSpaceHashBin *bin = hash->bins;
 	while(bin){
 		cpSpaceHashBin *next = bin->next;
-		free(bin);
+		cpfree(bin);
 		bin = next;
 	}
 }
@@ -176,21 +176,22 @@ void
 cpSpaceHashDestroy(cpSpaceHash *hash)
 {
 	clearHash(hash);
-	freeBins(hash);
+	cpfreeBins(hash);
 	
 	// Free the handles.
 	cpHashSetEach(hash->handleSet, &handleFreeWrap, NULL);
 	cpHashSetFree(hash->handleSet);
 	
-	free(hash->table);
+	cpfree(hash->table);
 }
 
 void
 cpSpaceHashFree(cpSpaceHash *hash)
 {
-	if(!hash) return;
-	cpSpaceHashDestroy(hash);
-	free(hash);
+	if(!hash){
+		cpSpaceHashDestroy(hash);
+		cpfree(hash);
+	}
 }
 
 void
@@ -222,7 +223,7 @@ getEmptyBin(cpSpaceHash *hash)
 	cpSpaceHashBin *bin = hash->bins;
 	
 	// Make a new one if necessary.
-	if(bin == NULL) return (cpSpaceHashBin *)malloc(sizeof(cpSpaceHashBin));
+	if(bin == NULL) return (cpSpaceHashBin *)cpmalloc(sizeof(cpSpaceHashBin));
 
 	hash->bins = bin->next;
 	return bin;
@@ -235,15 +236,24 @@ hash_func(cpHashValue x, cpHashValue y, cpHashValue n)
 	return (x*2185031351ul ^ y*4232417593ul) % n;
 }
 
+// Much faster than (int)floor(f)
+// Profiling showed floor() to be a sizable performance hog
+static inline int
+floor_int(cpFloat f)
+{
+	int i = (int)f;
+	return (f < 0.0f && f != i ? i - 1 : i);
+}
+
 static inline void
 hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 {
 	// Find the dimensions in cell coordinates.
 	cpFloat dim = hash->celldim;
-	int l = (int)cpffloor(bb.l/dim); // Fix by ShiftZ
-	int r = (int)cpffloor(bb.r/dim);
-	int b = (int)cpffloor(bb.b/dim);
-	int t = (int)cpffloor(bb.t/dim);
+	int l = floor_int(bb.l/dim); // Fix by ShiftZ
+	int r = floor_int(bb.r/dim);
+	int b = floor_int(bb.b/dim);
+	int t = floor_int(bb.t/dim);
 	
 	int n = hash->numcells;
 	for(int i=l; i<=r; i++){
@@ -363,7 +373,7 @@ void
 cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpaceHashQueryFunc func, void *data)
 {
 	cpFloat dim = hash->celldim;
-	int index = hash_func((int)cpffloor(point.x/dim), (int)cpffloor(point.y/dim), hash->numcells);  // Fix by ShiftZ
+	int index = hash_func(floor_int(point.x/dim), floor_int(point.y/dim), hash->numcells);  // Fix by ShiftZ
 	
 	query(hash, hash->table[index], &point, func, data);
 
@@ -377,10 +387,10 @@ cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc fun
 {
 	// Get the dimensions in cell coordinates.
 	cpFloat dim = hash->celldim;
-	int l = (int)cpffloor(bb.l/dim);  // Fix by ShiftZ
-	int r = (int)cpffloor(bb.r/dim);
-	int b = (int)cpffloor(bb.b/dim);
-	int t = (int)cpffloor(bb.t/dim);
+	int l = floor_int(bb.l/dim);  // Fix by ShiftZ
+	int r = floor_int(bb.r/dim);
+	int b = floor_int(bb.b/dim);
+	int t = floor_int(bb.t/dim);
 	
 	int n = hash->numcells;
 	
@@ -420,10 +430,10 @@ handleQueryRehashHelper(void *elt, void *data)
 	void *obj = hand->obj;
 	cpBB bb = hash->bbfunc(obj);
 
-	int l = (int)cpffloor(bb.l/dim);
-	int r = (int)cpffloor(bb.r/dim);
-	int b = (int)cpffloor(bb.b/dim);
-	int t = (int)cpffloor(bb.t/dim);
+	int l = floor_int(bb.l/dim);
+	int r = floor_int(bb.r/dim);
+	int b = floor_int(bb.b/dim);
+	int t = floor_int(bb.t/dim);
 
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
@@ -462,6 +472,8 @@ cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpaceHashQueryFunc func, void *data)
 static inline cpFloat
 segmentQuery(cpSpaceHash *hash, cpSpaceHashBin *bin, void *obj, cpSpaceHashSegmentQueryFunc func, void *data)
 {
+	cpFloat t = 1.0f;
+	 
 	for(; bin; bin = bin->next){
 		cpHandle *hand = bin->handle;
 		void *other = hand->obj;
@@ -477,10 +489,10 @@ segmentQuery(cpSpaceHash *hash, cpSpaceHashBin *bin, void *obj, cpSpaceHashSegme
 		// Stamp that the handle was checked already against this object.
 		hand->stamp = hash->stamp;
 		
-		return func(obj, other, data);
+		t = cpfmin(t, func(obj, other, data));
 	}
 	
-	return 1.0f;
+	return t;
 }
 
 // modified from http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
@@ -491,7 +503,7 @@ void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, c
 	
 	cpFloat dt_dx = 1.0f/fabs(b.x - a.x), dt_dy = 1.0f/fabs(b.y - a.y);
 	
-	int cell_x = (int)cpffloor(a.x), cell_y = (int)cpffloor(a.y);
+	int cell_x = floor_int(a.x), cell_y = floor_int(a.y);
 
 	cpFloat t = 0;
 

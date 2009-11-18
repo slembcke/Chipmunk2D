@@ -91,7 +91,7 @@ CP_DefineClassGetter(cpDampedSpring)
 cpDampedSpring *
 cpDampedSpringAlloc(void)
 {
-	return (cpDampedSpring *)malloc(sizeof(cpDampedSpring));
+	return (cpDampedSpring *)cpmalloc(sizeof(cpDampedSpring));
 }
 
 cpDampedSpring *

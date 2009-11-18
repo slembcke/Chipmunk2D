@@ -49,5 +49,25 @@ cpBBcontainsVect(const cpBB bb, const cpVect v)
 	return (bb.l < v.x && bb.r > v.x && bb.b < v.y && bb.t > v.y);
 }
 
+static inline cpBB
+cpBBmerge(const cpBB a, const cpBB b){
+	return cpBBNew(
+		cpfmin(a.l, b.l),
+		cpfmin(a.b, b.b),
+		cpfmax(a.r, b.r),
+		cpfmax(a.t, b.t)
+	);
+}
+
+static inline cpBB
+cpBBexpand(const cpBB bb, const cpVect v){
+	return cpBBNew(
+		cpfmin(bb.l, v.x),
+		cpfmin(bb.b, v.y),
+		cpfmax(bb.r, v.x),
+		cpfmax(bb.t, v.y)
+	);
+}
+
 cpVect cpBBClampVect(const cpBB bb, const cpVect v); // clamps the vector to lie within the bbox
 cpVect cpBBWrapVect(const cpBB bb, const cpVect v); // wrap a vector to a bbox

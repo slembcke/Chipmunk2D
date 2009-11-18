@@ -49,6 +49,7 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 	SHAPE_ID_COUNTER++;
 	
 	shape->body = body;
+	shape->sensor = 0;
 	
 	shape->e = 0.0f;
 	shape->u = 0.0f;
@@ -74,8 +75,10 @@ cpShapeDestroy(cpShape *shape)
 void
 cpShapeFree(cpShape *shape)
 {
-	if(shape) cpShapeDestroy(shape);
-	free(shape);
+	if(shape){
+		cpShapeDestroy(shape);
+		cpfree(shape);
+	}
 }
 
 cpBB
@@ -121,7 +124,7 @@ cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info)
 cpCircleShape *
 cpCircleShapeAlloc(void)
 {
-	return (cpCircleShape *)calloc(1, sizeof(cpCircleShape));
+	return (cpCircleShape *)cpcalloc(1, sizeof(cpCircleShape));
 }
 
 static inline cpBB
@@ -206,7 +209,7 @@ CP_DefineShapeGetter(cpCircleShape, cpFloat, r, Radius)
 cpSegmentShape *
 cpSegmentShapeAlloc(void)
 {
-	return (cpSegmentShape *)calloc(1, sizeof(cpSegmentShape));
+	return (cpSegmentShape *)cpcalloc(1, sizeof(cpSegmentShape));
 }
 
 static cpBB

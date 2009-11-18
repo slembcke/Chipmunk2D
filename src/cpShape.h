@@ -64,6 +64,9 @@ typedef struct cpShape{
 	// Cached BBox for the shape.
 	cpBB bb;
 	
+	// Sensors invoke callbacks, but do not generate collisions
+	int sensor;
+	
 	// *** Surface properties.
 	
 	// Coefficient of restitution. (elasticity)

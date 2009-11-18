@@ -27,7 +27,7 @@
 cpBody*
 cpBodyAlloc(void)
 {
-	return (cpBody *)malloc(sizeof(cpBody));
+	return (cpBody *)cpmalloc(sizeof(cpBody));
 }
 
 cpBodyVelocityFunc cpBodyUpdateVelocityDefault = cpBodyUpdateVelocity;
@@ -70,8 +70,10 @@ void cpBodyDestroy(cpBody *body){}
 void
 cpBodyFree(cpBody *body)
 {
-	if(body) cpBodyDestroy(body);
-	free(body);
+	if(body){
+		cpBodyDestroy(body);
+		cpfree(body);
+	}
 }
 
 void

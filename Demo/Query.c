@@ -53,7 +53,7 @@ update(int ticks)
 	}
 	
 	cpSegmentQueryInfo info = {};
-	if(cpSpaceShapeSegmentQueryFirst(space, start, end, -1, 0, &info)){
+	if(cpSpaceSegmentQueryFirst(space, start, end, -1, 0, &info)){
 		cpVect point = cpSegmentQueryHitPoint(start, end, info);
 		lineEnd = cpvadd(point, cpvzero);//cpvmult(info.n, 4.0f));
 		

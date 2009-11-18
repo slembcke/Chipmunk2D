@@ -65,7 +65,7 @@ CP_DefineClassGetter(cpBreakableJoint)
 cpBreakableJoint *
 cpBreakableJointAlloc(void)
 {
-	return (cpBreakableJoint *)malloc(sizeof(cpBreakableJoint));
+	return (cpBreakableJoint *)cpmalloc(sizeof(cpBreakableJoint));
 }
 
 cpBreakableJoint *
