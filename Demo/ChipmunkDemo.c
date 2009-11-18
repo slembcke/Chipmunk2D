@@ -113,7 +113,7 @@ cpVect arrowDirection = {};
 drawSpaceOptions options = {
 	0,
 	1,
-	0.0f,
+	4.0f,
 	0.0f,
 	1.5f,
 };
@@ -147,7 +147,8 @@ drawInstructions()
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
 		"Arrow keys control some demos.\n"
-		"\\ enables anti-aliasing."
+		"\\ enables anti-aliasing.\n"
+		"= toggles bounding boxes."
 	);
 	
 	drawString(x, y, str);
@@ -205,6 +206,8 @@ keyboard(unsigned char key, int x, int y)
 		runDemo(demos[index]);
 	} else if(key == '\r'){
 		runDemo(currDemo);
+	} else if(key == '='){
+		options.drawBBs = !options.drawBBs;
 	} else if(key == '\\'){
 		glEnable(GL_LINE_SMOOTH);
 		glEnable(GL_POINT_SMOOTH);

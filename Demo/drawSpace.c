@@ -403,7 +403,7 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 {
 	glLineWidth(1.0f);
 	if(options->drawBBs){
-		glColor3f(0.6, 1.0, 0.6);
+		glColor3f(0.3, 0.5, 0.3);
 		cpSpaceHashEach(space->activeShapes, &drawBB, NULL);
 		cpSpaceHashEach(space->staticShapes, &drawBB, NULL);
 	}
