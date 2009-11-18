@@ -54,7 +54,6 @@
 		D35420C00F4E1FD70017F4F7 /* chipmunk_unsafe.h in Headers */ = {isa = PBXBuildFile; fileRef = D35420BF0F4E1FD70017F4F7 /* chipmunk_unsafe.h */; };
 		D35422EC0F4E769F0017F4F7 /* UnsafeOps.c in Sources */ = {isa = PBXBuildFile; fileRef = D35422EB0F4E769F0017F4F7 /* UnsafeOps.c */; };
 		D36B19510EA13B6D0028A362 /* cpDampedRotarySpring.c in Sources */ = {isa = PBXBuildFile; fileRef = D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */; };
-		D36B196F0EA13BA20028A362 /* Test.c in Sources */ = {isa = PBXBuildFile; fileRef = D36B196E0EA13BA20028A362 /* Test.c */; };
 		D36D87831012D63600DB5078 /* cpRatchetJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D36D87811012D63600DB5078 /* cpRatchetJoint.c */; };
 		D36D87841012D63600DB5078 /* cpRatchetJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D36D87821012D63600DB5078 /* cpRatchetJoint.h */; };
 		D37697200B50C53900BB33CC /* LogoSmash.c in Sources */ = {isa = PBXBuildFile; fileRef = D3CCDF460AE35D920080442F /* LogoSmash.c */; };
@@ -89,7 +88,6 @@
 		D3E5F0550AA3303F004E361B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0530AA3303F004E361B /* GLUT.framework */; };
 		D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0540AA3303F004E361B /* OpenGL.framework */; };
 		D3EDBC250ED935F40027D943 /* MagnetsElectric.c in Sources */ = {isa = PBXBuildFile; fileRef = D3EDBC240ED935F40027D943 /* MagnetsElectric.c */; };
-		D3F165330EB3C4960053F15F /* WalkBot.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F165320EB3C4960053F15F /* WalkBot.c */; };
 		D3FBA1A70E9B1E0400950BCC /* drawSpace.c in Sources */ = {isa = PBXBuildFile; fileRef = D3FBA1A60E9B1E0400950BCC /* drawSpace.c */; };
 /* End PBXBuildFile section */
 
@@ -136,7 +134,6 @@
 		D35422EB0F4E769F0017F4F7 /* UnsafeOps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UnsafeOps.c; sourceTree = "<group>"; };
 		D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpDampedRotarySpring.c; sourceTree = "<group>"; };
 		D36B192E0EA1364E0028A362 /* cpDampedRotarySpring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpDampedRotarySpring.h; sourceTree = "<group>"; };
-		D36B196E0EA13BA20028A362 /* Test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Test.c; sourceTree = "<group>"; };
 		D36D87811012D63600DB5078 /* cpRatchetJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpRatchetJoint.c; sourceTree = "<group>"; };
 		D36D87821012D63600DB5078 /* cpRatchetJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpRatchetJoint.h; sourceTree = "<group>"; };
 		D37BB76C0EAADA6300C70958 /* cpRotaryLimitJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpRotaryLimitJoint.c; sourceTree = "<group>"; };
@@ -200,7 +197,6 @@
 		D3E5F2DE0AAA562B004E361B /* cpSpaceHash.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cpSpaceHash.h; sourceTree = "<group>"; };
 		D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpSpaceHash.c; sourceTree = "<group>"; };
 		D3EDBC240ED935F40027D943 /* MagnetsElectric.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MagnetsElectric.c; sourceTree = "<group>"; };
-		D3F165320EB3C4960053F15F /* WalkBot.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = WalkBot.c; sourceTree = "<group>"; };
 		D3FBA1A60E9B1E0400950BCC /* drawSpace.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = drawSpace.c; sourceTree = "<group>"; };
 		D3FBA1B80E9B1F6300950BCC /* drawSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = drawSpace.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -301,11 +297,9 @@
 				D3BAFB8A0E9C7C150039DD5C /* Planet.c */,
 				D31402940E9DD07E00EF79DB /* Springies.c */,
 				D393275B0EA02C710026F6A2 /* Pump.c */,
-				D3F165320EB3C4960053F15F /* WalkBot.c */,
 				D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */,
 				D3EDBC240ED935F40027D943 /* MagnetsElectric.c */,
 				D35422EB0F4E769F0017F4F7 /* UnsafeOps.c */,
-				D36B196E0EA13BA20028A362 /* Test.c */,
 				D31847740FC458FD00E30B0D /* Query.c */,
 			);
 			name = Demo;
@@ -559,8 +553,6 @@
 				D3BAFB8B0E9C7C150039DD5C /* Planet.c in Sources */,
 				D31402950E9DD07E00EF79DB /* Springies.c in Sources */,
 				D393275C0EA02C710026F6A2 /* Pump.c in Sources */,
-				D36B196F0EA13BA20028A362 /* Test.c in Sources */,
-				D3F165330EB3C4960053F15F /* WalkBot.c in Sources */,
 				D3185D200EC5610A00E6BFCB /* TheoJansen.c in Sources */,
 				D3EDBC250ED935F40027D943 /* MagnetsElectric.c in Sources */,
 				D35422EC0F4E769F0017F4F7 /* UnsafeOps.c in Sources */,

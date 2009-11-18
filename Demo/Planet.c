@@ -79,15 +79,13 @@ add_box()
 	
 	cpFloat radius = cpvlength(cpv(size, size));
 
-	cpBody *body = cpBodyNew(mass, cpMomentForPoly(mass, 4, verts, cpvzero));
+	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 4, verts, cpvzero)));
 	body->velocity_func = planetGravityVelocityFunc;
 	body->p = rand_pos(radius);
 	body->v = cpvmult(cpv(2*frand() - 1, 2*frand() - 1), 200);
-	cpSpaceAddBody(space, body);
 
-	cpShape *shape = cpPolyShapeNew(body, 4, verts, cpvzero);
+	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 4, verts, cpvzero));
 	shape->e = 0.0f; shape->u = 0.7f;
-	cpSpaceAddShape(space, shape);
 }
 
 static cpSpace *
@@ -104,10 +102,9 @@ init(void)
 	for(int i=0; i<30; i++)
 		add_box();
 	
-	cpShape *shape = cpCircleShapeNew(staticBody, 70.0f, cpvzero);
+	cpShape *shape = cpSpaceAddStaticShape(space, cpCircleShapeNew(staticBody, 70.0f, cpvzero));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 	
 	return space;
 }

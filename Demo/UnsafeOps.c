@@ -73,20 +73,17 @@ init(void)
 	cpBody *body;
 	cpShape *shape;
 	
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 	
 	for(int i=0; i<NUM_CIRCLES; i++){
 		body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForCircle(1.0, 0.0, circleRadius, cpvzero)));

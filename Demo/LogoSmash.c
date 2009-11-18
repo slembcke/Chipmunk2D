@@ -121,15 +121,13 @@ init(void)
 		}
 	}
 	
-	body = cpBodyNew(INFINITY, INFINITY);
+	body = cpSpaceAddBody(space, cpBodyNew(INFINITY, INFINITY));
 	body->p = cpv(-1000.0f, -10.0f);
 	body->v = cpv(400.0f, 0.0f);
-	cpSpaceAddBody(space, body);
 
-	shape = cpCircleShapeNew(body, 8.0f, cpvzero);
+	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, 8.0f, cpvzero));
 	shape->e = 0.0f; shape->u = 0.0f;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddShape(space, shape);	
 
 	return space;
 }

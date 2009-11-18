@@ -67,7 +67,6 @@ extern chipmunkDemo Bounce;
 extern chipmunkDemo Planet;
 extern chipmunkDemo Springies;
 extern chipmunkDemo Pump;
-extern chipmunkDemo WalkBot;
 extern chipmunkDemo TheoJansen;
 extern chipmunkDemo MagnetsElectric;
 extern chipmunkDemo UnsafeOps;
@@ -85,7 +84,6 @@ static chipmunkDemo *demos[] = {
 	&Planet,
 	&Springies,
 	&Pump,
-	&WalkBot,
 	&TheoJansen,
 	&MagnetsElectric,
 	&UnsafeOps,

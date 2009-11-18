@@ -79,25 +79,21 @@ init(void)
 	cpVect c = cpv( 200,  200);
 	cpVect d = cpv( 200, -200);
 	
-	shape = cpSegmentShapeNew(staticBody, a, b, 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, a, b, 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, b, c, 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, b, c, 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, c, d, 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, c, d, 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, d, a, 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, d, a, 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 	
 	// Give the box a little spin.
 	// Because staticBody is never added to the space, we will need to
@@ -109,12 +105,11 @@ init(void)
 	// Add the bricks.
 	for(int i=0; i<3; i++){
 		for(int j=0; j<7; j++){
-			body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
+			body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero)));
 			body->p = cpv(i*60 - 150, j*30 - 150);
-			cpSpaceAddBody(space, body);
-			shape = cpPolyShapeNew(body, num, verts, cpvzero);
+			
+			shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
 			shape->e = 0.0; shape->u = 0.7;
-			cpSpaceAddShape(space, shape);
 		}
 	}
 	

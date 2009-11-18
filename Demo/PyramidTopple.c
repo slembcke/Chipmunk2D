@@ -67,10 +67,9 @@ init(void)
 	};
 	
 	// Add a floor.
-	shape = cpSegmentShapeNew(staticBody, cpv(-600,-240), cpv(600,-240), 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-600,-240), cpv(600,-240), 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 	
 	// Shared friction constant.
 	cpFloat u = 0.6;
@@ -81,44 +80,42 @@ init(void)
 		cpVect offset = cpv(-i*60/2.0f, (n - i)*52);
 		
 		for(int j=0; j<i; j++){
-			body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
+			body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero)));
 			body->p = cpvadd(cpv(j*60, -220), offset);
-			cpSpaceAddBody(space, body);
-			shape = cpPolyShapeNew(body, num, verts, cpvzero);
+			
+			shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
 			shape->e = 0.0; shape->u = u;
-			cpSpaceAddShape(space, shape);
+			
 
-			body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
+			body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero)));
 			body->p = cpvadd(cpv(j*60, -197), offset);
 			cpBodySetAngle(body, M_PI/2.0f);
-			cpSpaceAddBody(space, body);
-			shape = cpPolyShapeNew(body, num, verts, cpvzero);
+			
+			shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
 			shape->e = 0.0; shape->u = u;
-			cpSpaceAddShape(space, shape);
+			
 			
 			if(j == (i - 1)) continue;
-			body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
+			body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero)));
 			body->p = cpvadd(cpv(j*60 + 30, -191), offset);
 			cpBodySetAngle(body, M_PI/2.0f);
-			cpSpaceAddBody(space, body);
-			shape = cpPolyShapeNew(body, num, verts, cpvzero);
+			
+			shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
 			shape->e = 0.0; shape->u = u;
-			cpSpaceAddShape(space, shape);		
 		}
 
-		body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
+		body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero)));
 		body->p = cpvadd(cpv(-17, -174), offset);
-		cpSpaceAddBody(space, body);
-		shape = cpPolyShapeNew(body, num, verts, cpvzero);
+		
+		shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
 		shape->e = 0.0; shape->u = u;
-		cpSpaceAddShape(space, shape);		
+		
 
-		body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
+		body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero)));
 		body->p = cpvadd(cpv((i - 1)*60 + 17, -174), offset);
-		cpSpaceAddBody(space, body);
-		shape = cpPolyShapeNew(body, num, verts, cpvzero);
+		
+		shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
 		shape->e = 0.0; shape->u = u;
-		cpSpaceAddShape(space, shape);		
 	}
 	
 	// Give the last domino a little tap.

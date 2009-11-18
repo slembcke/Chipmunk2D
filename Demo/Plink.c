@@ -90,23 +90,20 @@ init(void)
 		for(int j=0; j<6; j++){
 			cpFloat stagger = (j%2)*40;
 			cpVect offset = cpv(i*80 - 320 + stagger, j*70 - 240);
-			shape = cpPolyShapeNew(staticBody, 3, tris, offset);
+			shape = cpSpaceAddStaticShape(space, cpPolyShapeNew(staticBody, 3, tris, offset));
 			shape->e = 1.0; shape->u = 1.0;
 			shape->layers = NOT_GRABABLE_MASK;
-			cpSpaceAddStaticShape(space, shape);
 		}
 	}
 	
 	// Add lots of pentagons.
 	for(int i=0; i<300; i++){
-		body = cpBodyNew(1.0, cpMomentForPoly(1.0, NUM_VERTS, verts, cpvzero));
+		body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForPoly(1.0, NUM_VERTS, verts, cpvzero)));
 		cpFloat x = rand()/(cpFloat)RAND_MAX*640 - 320;
 		body->p = cpv(x, 350);
 		
-		cpSpaceAddBody(space, body);
-		shape = cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero);
+		shape = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 		shape->e = 0.0; shape->u = 0.4;
-		cpSpaceAddShape(space, shape);
 	}
 	
 	return space;
