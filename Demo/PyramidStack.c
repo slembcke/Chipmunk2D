@@ -73,6 +73,7 @@ collision(cpArbiter *arb, cpSpace *space, void *data){
 		// Need to come up with a name and some useful arguments, but arb->func() will
 		// be called when the objects untouch.
 		arb->separationFunc = untouch;
+		arb->separationData = NULL; // This is passed to the separation func. Just showing it exists for the moment.
 		
 		// Let's register a post step callback to further process the arbiter
 		cpSpaceAddPostStepCallback(space, (cpPostStepFunc)printCollisionImpulse, arb, space);
