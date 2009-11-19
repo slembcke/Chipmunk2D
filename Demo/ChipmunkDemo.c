@@ -59,6 +59,7 @@
 
 //extern chipmunkDemo Test;
 extern chipmunkDemo LogoSmash;
+extern chipmunkDemo Simple;
 extern chipmunkDemo PyramidStack;
 extern chipmunkDemo Plink;
 extern chipmunkDemo Tumble;
@@ -76,6 +77,7 @@ extern chipmunkDemo Query;
 
 static chipmunkDemo *demos[] = {
 	&LogoSmash,
+	&Simple,
 	&PyramidStack,
 	&Plink,
 	&Tumble,
@@ -139,10 +141,7 @@ drawString(int x, int y, char *str)
 static void
 drawInstructions()
 {
-	int x = -300;
-	int y =  220;
-	
-	char *str = (
+	drawString(-300, 220,
 		"Controls:\n"
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
@@ -150,8 +149,42 @@ drawInstructions()
 		"\\ enables anti-aliasing.\n"
 		"= toggles bounding boxes."
 	);
+}
+
+static int maxArbiters = 0;
+static int maxPoints = 0;
+static int maxConstraints = 0;
+
+static void
+drawInfo()
+{
+	int arbiters = space->arbiters->num;
+	int points = 0;
 	
-	drawString(x, y, str);
+	for(int i=0; i<arbiters; i++)
+		points += ((cpArbiter *)(space->arbiters->arr[i]))->numContacts;
+	
+	int constraints = (space->constraints->num + points)*(space->iterations + space->elasticIterations);
+	
+	maxArbiters = arbiters > maxArbiters ? arbiters : maxArbiters;
+	maxPoints = points > maxPoints ? points : maxPoints;
+	maxConstraints = constraints > maxConstraints ? constraints : maxConstraints;
+	
+	char buffer[1000];
+	char *format = 
+		"Arbiters: %d (%d) - "
+		"Contact Points: %d (%d)\n"
+		"Other Constraints: %d, Iterations: %d\n"
+		"Constraints x Iterations: %d (%d)";
+	
+	snprintf(buffer, 1000, format,
+		arbiters, maxArbiters,
+		points, maxPoints,
+		space->constraints->num, space->iterations + space->elasticIterations,
+		constraints, maxConstraints
+	);
+	
+	drawString(0, 220, buffer);
 }
 
 static void
@@ -161,6 +194,7 @@ display(void)
 	
 	drawSpace(space, currDemo->drawOptions ? currDemo->drawOptions : &options);
 	drawInstructions();
+	drawInfo();
 	drawString(-300, -210, messageString);
 		
 	glutSwapBuffers();
@@ -192,6 +226,9 @@ runDemo(chipmunkDemo *demo)
 	ticks = 0;
 	mouseJoint = NULL;
 	messageString[0] = '\0';
+	maxArbiters = 0;
+	maxPoints = 0;
+	maxConstraints = 0;
 	space = currDemo->initFunc();
 
 	glutSetWindowTitle(demoTitle(currDemo));
