@@ -77,7 +77,6 @@ extern chipmunkDemo OneWay;
 //extern chipmunkDemo Test;
 
 static chipmunkDemo *demos[] = {
-	&OneWay,
 	&LogoSmash,
 	&Simple,
 	&PyramidStack,
@@ -92,6 +91,7 @@ static chipmunkDemo *demos[] = {
 	&MagnetsElectric,
 	&UnsafeOps,
 	&Query,
+	&OneWay,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
@@ -425,7 +425,7 @@ main(int argc, const char **argv)
 	
 //	for(int i=0; i<demoCount; i++)
 //		time_trial(i, 1000);
-//	time_trial('c' - 'a', 10000);
+//	time_trial('a' - 'a', 10000);
 //	exit(0);
 	
 	mouseBody = cpBodyNew(INFINITY, INFINITY);

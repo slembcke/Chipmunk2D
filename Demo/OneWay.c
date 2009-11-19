@@ -30,13 +30,20 @@
 cpSpace *space;
 cpBody *staticBody;
 
+typedef struct OneWayPlatform {
+	cpVect n; // direction objects may pass through
+	cpArray *passThruList; // lit of objects passing through
+} OneWayPlatform;
+
+static OneWayPlatform platformInstance;
+
 static void
 separate(cpArbiter *arb, cpSpace *space, void *ignore)
 {
 	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
 	
 	// remove the object from the pass thru list
-	cpArrayDeleteObj((cpArray *)a->data, b);
+	cpArrayDeleteObj(((OneWayPlatform *)a->data)->passThruList, b);
 }
 
 static int
@@ -46,20 +53,18 @@ collision(cpArbiter *arb, cpSpace *space, void *ignore)
 	arb->separationFunc = separate;
 	
 	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
-	cpArray *passThruList = a->data;
+	OneWayPlatform *platform = a->data;
 	
-	if(cpArrayContains(passThruList, b)){
+	if(cpArrayContains(platform->passThruList, b)){
 		// The object is in the pass thru list, ignore it until separates.
 		return 0;
 	} else {
-		cpVect passThruNormal = cpv(0.0, 1.0); // objects moving upwards should pass through.
-		
 		int swapped = arb->swappedColl;
-		cpFloat dot = cpvdot(arb->contacts[0].n, passThruNormal)*(swapped ? -1.0 : 1.0);
+		cpFloat dot = cpvdot(arb->contacts[0].n, platform->n)*(swapped ? -1.0 : 1.0);
 		
 		if(dot < 0){
 			// Add the object to the pass thrru list
-			cpArrayPush(passThruList, b);
+			cpArrayPush(platform->passThruList, b);
 			return 0;
 		} else {
 			return 1;
@@ -70,7 +75,7 @@ collision(cpArbiter *arb, cpSpace *space, void *ignore)
 static void
 update(int ticks)
 {
-	int steps = 3;
+	int steps = 1;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
@@ -86,7 +91,7 @@ init(void)
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
-	space->iterations = 20;
+	space->iterations = 10;
 	cpSpaceResizeStaticHash(space, 40.0, 1000);
 	cpSpaceResizeActiveHash(space, 40.0, 1000);
 	space->gravity = cpv(0, -100);
@@ -112,14 +117,18 @@ init(void)
 	shape->e = 1.0; shape->u = 1.0;
 	shape->collision_type = 1;
 	shape->layers = NOT_GRABABLE_MASK;
-	// Use the data pointer to store a list of objects passing through
-	shape->data = cpArrayNew(0);
+	
+	// We'll use the data pointer for the OneWayPlatform struct
+	platformInstance.n = cpv(0, 1); // let objects pass upwards
+	platformInstance.passThruList = cpArrayNew(0);
+	shape->data = &platformInstance;
 	
 	
 	// Add a ball to make things more interesting
 	cpFloat radius = 15.0;
 	body = cpSpaceAddBody(space, cpBodyNew(10.0, cpMomentForCircle(10.0, 0.0, radius, cpvzero)));
-	body->p = cpv(0, -240 + radius+5);
+	body->p = cpv(0, -200);
+	body->v = cpv(0, 170);
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
 	shape->e = 0.0; shape->u = 0.9;
@@ -136,6 +145,8 @@ destroy(void)
 	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
+	
+	cpArrayFree(platformInstance.passThruList);
 }
 
 const chipmunkDemo OneWay = {
