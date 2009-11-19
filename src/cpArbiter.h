@@ -94,3 +94,13 @@ void cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv);
 void cpArbiterApplyCachedImpulse(cpArbiter *arb);
 // Run an iteration of the solver on the arbiter.
 void cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef);
+
+static inline void
+cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
+{
+	if(arb->swappedColl){
+		(*a) = arb->b, (*b) = arb->a;
+	} else {
+		(*a) = arb->a, (*b) = arb->b;
+	}
+}

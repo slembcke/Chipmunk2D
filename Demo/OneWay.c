@@ -31,6 +31,43 @@ cpSpace *space;
 cpBody *staticBody;
 
 static void
+separate(cpArbiter *arb, cpSpace *space, void *ignore)
+{
+	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	
+	// remove the object from the pass thru list
+	cpArrayDeleteObj((cpArray *)a->data, b);
+}
+
+static int
+collision(cpArbiter *arb, cpSpace *space, void *ignore)
+{
+	// Set a separate function so we can reset the pass thru state of the pair.
+	arb->separationFunc = separate;
+	
+	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	cpArray *passThruList = a->data;
+	
+	if(cpArrayContains(passThruList, b)){
+		// The object is in the pass thru list, ignore it until separates.
+		return 0;
+	} else {
+		cpVect passThruNormal = cpv(0.0, 1.0); // objects moving upwards should pass through.
+		
+		int swapped = arb->swappedColl;
+		cpFloat dot = cpvdot(arb->contacts[0].n, passThruNormal)*(swapped ? -1.0 : 1.0);
+		
+		if(dot < 0){
+			// Add the object to the pass thrru list
+			cpArrayPush(passThruList, b);
+			return 0;
+		} else {
+			return 1;
+		}
+	}
+}
+
+static void
 update(int ticks)
 {
 	int steps = 3;
@@ -78,17 +115,14 @@ init(void)
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
 	
-	// Add lots of boxes.
-	for(int i=0; i<14; i++){
-		for(int j=0; j<=i; j++){
-			body = cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero));
-			body->p = cpv(j*32 - i*16, 300 - i*32);
-			cpSpaceAddBody(space, body);
-			shape = cpPolyShapeNew(body, num, verts, cpvzero);
-			shape->e = 0.0; shape->u = 0.8;
-			cpSpaceAddShape(space, shape);
-		}
-	}
+	// Add our one way segment
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-160,-100), cpv(160,-100), 10.0f));
+	shape->e = 1.0; shape->u = 1.0;
+	shape->collision_type = 1;
+	shape->layers = NOT_GRABABLE_MASK;
+	// Use the data pointer to store a list of objects passing through
+	shape->data = cpArrayNew(0);
+	
 	
 	// Add a ball to make things more interesting
 	cpFloat radius = 15.0;
@@ -97,6 +131,9 @@ init(void)
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
 	shape->e = 0.0; shape->u = 0.9;
+	shape->collision_type = 2;
+	
+	cpSpaceAddCollisionPairFunc(space, 1, 2, (cpCollFunc)collision, NULL);
 	
 	return space;
 }
@@ -109,8 +146,8 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo PyramidStack = {
-	"Pyramid Stack",
+const chipmunkDemo OneWay = {
+	"One Way Platforms",
 	NULL,
 	init,
 	update,

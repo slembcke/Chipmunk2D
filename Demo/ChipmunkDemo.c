@@ -72,10 +72,12 @@ extern chipmunkDemo TheoJansen;
 extern chipmunkDemo MagnetsElectric;
 extern chipmunkDemo UnsafeOps;
 extern chipmunkDemo Query;
+extern chipmunkDemo OneWay;
 
 //extern chipmunkDemo Test;
 
 static chipmunkDemo *demos[] = {
+	&OneWay,
 	&LogoSmash,
 	&Simple,
 	&PyramidStack,
@@ -93,7 +95,7 @@ static chipmunkDemo *demos[] = {
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
-static const int firstDemoIndex = 'b' - 'a';
+static const int firstDemoIndex = 'a' - 'a';
 
 static int ticks = 0;
 static cpSpace *space;

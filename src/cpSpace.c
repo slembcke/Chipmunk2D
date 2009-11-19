@@ -556,13 +556,15 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	// Record if they need to be swapped
 	arb->swappedColl = (a->collision_type != pairFunc->a);
 	
-	if(pairFunc->func(arb, space, pairFunc->data) || sensor){
-		// Timestamp the arbiter and add it to the arbiter list
-		arb->stamp = space->stamp;
-		
-		if(!sensor)
-			cpArrayPush(space->arbiters, arb);
+	if(pairFunc->func(arb, space, pairFunc->data)){
+		cpArrayPush(space->arbiters, arb);
+	} else {
+		cpfree(arb->contacts);
+		arb->contacts = NULL;
 	}
+	
+	// Time stamp the arbiter so we know it was used recently.
+	arb->stamp = space->stamp;
 }
 
 // Iterator for active/static hash collisions.

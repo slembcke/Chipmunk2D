@@ -119,7 +119,7 @@ cpArbiterNew(cpShape *a, cpShape *b, int stamp)
 void
 cpArbiterDestroy(cpArbiter *arb)
 {
-	cpfree(arb->contacts);
+	if(arb->contacts) cpfree(arb->contacts);
 }
 
 void
@@ -134,23 +134,26 @@ cpArbiterFree(cpArbiter *arb)
 void
 cpArbiterInject(cpArbiter *arb, cpContact *contacts, int numContacts)
 {
-	// Iterate over the possible pairs to look for hash value matches.
-	for(int i=0; i<arb->numContacts; i++){
-		cpContact *old = &arb->contacts[i];
-		
-		for(int j=0; j<numContacts; j++){
-			cpContact *new_contact = &contacts[j];
+	// Arbiters without contact data may exist if a collision function rejected the collision.
+	if(arb->contacts){
+		// Iterate over the possible pairs to look for hash value matches.
+		for(int i=0; i<arb->numContacts; i++){
+			cpContact *old = &arb->contacts[i];
 			
-			// This could trigger false positives, but is fairly unlikely nor serious if it does.
-			if(new_contact->hash == old->hash){
-				// Copy the persistant contact information.
-				new_contact->jnAcc = old->jnAcc;
-				new_contact->jtAcc = old->jtAcc;
+			for(int j=0; j<numContacts; j++){
+				cpContact *new_contact = &contacts[j];
+				
+				// This could trigger false positives, but is fairly unlikely nor serious if it does.
+				if(new_contact->hash == old->hash){
+					// Copy the persistant contact information.
+					new_contact->jnAcc = old->jnAcc;
+					new_contact->jtAcc = old->jtAcc;
+				}
 			}
 		}
-	}
 
-	cpfree(arb->contacts);
+		cpfree(arb->contacts);
+	}
 	
 	arb->contacts = contacts;
 	arb->numContacts = numContacts;
