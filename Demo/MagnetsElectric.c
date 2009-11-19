@@ -432,7 +432,7 @@ init(void)
 	space->gravity = cpvzero; //cpv(0,-100);
 	
 	cpSpaceResizeStaticHash(space, 10.0, 999);
-	cpSpaceResizeActiveHash(space, 5.0, 2999);
+	cpSpaceResizeActiveHash(space, 20.0, 2999);
 	
 	// Screen border
 /*	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);

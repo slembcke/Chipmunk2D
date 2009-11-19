@@ -114,6 +114,7 @@ cpVect arrowDirection = {};
 
 drawSpaceOptions options = {
 	0,
+	0,
 	1,
 	4.0f,
 	0.0f,
@@ -147,6 +148,7 @@ drawInstructions()
 		"Use the mouse to grab objects.\n"
 		"Arrow keys control some demos.\n"
 		"\\ enables anti-aliasing.\n"
+		"- toggles spatial hash visualization.\n"
 		"= toggles bounding boxes."
 	);
 }
@@ -243,6 +245,8 @@ keyboard(unsigned char key, int x, int y)
 		runDemo(demos[index]);
 	} else if(key == '\r'){
 		runDemo(currDemo);
+	} else if(key == '-'){
+		options.drawHash = !options.drawHash;
 	} else if(key == '='){
 		options.drawBBs = !options.drawBBs;
 	} else if(key == '\\'){

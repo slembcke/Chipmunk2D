@@ -140,7 +140,7 @@ destroy(void)
 }
 
 drawSpaceOptions draw_options = {
-	0, 0, 2.0f, 3.0f, 0.0f,
+	0, 0, 0, 2.0f, 3.0f, 0.0f,
 };
 
 const chipmunkDemo LogoSmash = {

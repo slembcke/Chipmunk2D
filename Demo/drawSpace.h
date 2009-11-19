@@ -20,6 +20,7 @@
  */
 
 typedef struct drawSpaceOptions {
+	int drawHash;
 	int drawBBs;
 	int drawShapes;
 	float collisionPointSize;
