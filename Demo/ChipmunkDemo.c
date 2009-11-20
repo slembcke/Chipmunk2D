@@ -73,6 +73,7 @@ extern chipmunkDemo MagnetsElectric;
 extern chipmunkDemo UnsafeOps;
 extern chipmunkDemo Query;
 extern chipmunkDemo OneWay;
+extern chipmunkDemo Player;
 
 //extern chipmunkDemo Test;
 
@@ -92,6 +93,7 @@ static chipmunkDemo *demos[] = {
 	&UnsafeOps,
 	&Query,
 	&OneWay,
+	&Player,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;

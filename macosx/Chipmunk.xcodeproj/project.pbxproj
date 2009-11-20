@@ -75,6 +75,7 @@
 		D38687D30BAFC695008B7008 /* libChipmunk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D34963BB0B56CAA300CAD239 /* libChipmunk.a */; };
 		D393275C0EA02C710026F6A2 /* Pump.c in Sources */ = {isa = PBXBuildFile; fileRef = D393275B0EA02C710026F6A2 /* Pump.c */; };
 		D3BACF8310B5DF8900376394 /* OneWay.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BACF8210B5DF8900376394 /* OneWay.c */; };
+		D3BAD0C810B61AAD00376394 /* Player.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAD0C710B61AAD00376394 /* Player.c */; };
 		D3BAF9C50E9C4F250039DD5C /* PyramidStack.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAF9C40E9C4F250039DD5C /* PyramidStack.c */; };
 		D3BAFA040E9C52810039DD5C /* Plink.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFA030E9C52810039DD5C /* Plink.c */; };
 		D3BAFA360E9C53E50039DD5C /* Tumble.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFA350E9C53E50039DD5C /* Tumble.c */; };
@@ -168,6 +169,7 @@
 		D39F478A0FD4AB4E00B244CA /* chipmunk_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_types.h; path = ../src/chipmunk_types.h; sourceTree = SOURCE_ROOT; };
 		D3B718E00AB2BC8900B500C9 /* chipmunk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chipmunk.c; path = ../src/chipmunk.c; sourceTree = "<group>"; };
 		D3BACF8210B5DF8900376394 /* OneWay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = OneWay.c; sourceTree = "<group>"; };
+		D3BAD0C710B61AAD00376394 /* Player.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Player.c; sourceTree = "<group>"; };
 		D3BAF9C40E9C4F250039DD5C /* PyramidStack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = PyramidStack.c; sourceTree = "<group>"; };
 		D3BAFA030E9C52810039DD5C /* Plink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Plink.c; sourceTree = "<group>"; };
 		D3BAFA350E9C53E50039DD5C /* Tumble.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tumble.c; sourceTree = "<group>"; };
@@ -307,6 +309,7 @@
 				D35422EB0F4E769F0017F4F7 /* UnsafeOps.c */,
 				D31847740FC458FD00E30B0D /* Query.c */,
 				D3BACF8210B5DF8900376394 /* OneWay.c */,
+				D3BAD0C710B61AAD00376394 /* Player.c */,
 			);
 			name = Demo;
 			path = ../Demo;
@@ -565,6 +568,7 @@
 				D31847750FC458FD00E30B0D /* Query.c in Sources */,
 				D365D90410B595CE0005A03B /* Simple.c in Sources */,
 				D3BACF8310B5DF8900376394 /* OneWay.c in Sources */,
+				D3BAD0C810B61AAD00376394 /* Player.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

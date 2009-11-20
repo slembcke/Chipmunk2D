@@ -513,12 +513,17 @@ queryReject(cpShape *a, cpShape *b)
 		|| !(a->layers & b->layers);
 }
 
+int queryCount = 0;
+int passCount = 0;
+
 // Callback from the spatial hash.
 static void
 queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 {
+	queryCount++;
 	// Reject any of the simple cases
 	if(queryReject(a,b)) return;
+	passCount++;
 	
 	// Find the collision pair function for the shapes.
 	cpCollisionType ids[] = {a->collision_type, b->collision_type};
