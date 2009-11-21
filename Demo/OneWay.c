@@ -37,21 +37,17 @@ typedef struct OneWayPlatform {
 
 static OneWayPlatform platformInstance;
 
-static void
-separate(cpArbiter *arb, cpSpace *space, void *ignore)
+static int
+begin(cpArbiter *arb, cpSpace *space, void *ignore)
 {
-	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
-	
-	// remove the object from the pass thru list
-	cpArrayDeleteObj(((OneWayPlatform *)a->data)->passThruList, b);
+	printf("begin\n");
+	return 1;
 }
 
 static int
-collision(cpArbiter *arb, cpSpace *space, void *ignore)
+preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 {
-	// Set a separate function so we can reset the pass thru state of the pair.
-	arb->separationFunc = separate;
-	
+	printf("preSolve\n");
 	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
 	OneWayPlatform *platform = a->data;
 	
@@ -70,6 +66,22 @@ collision(cpArbiter *arb, cpSpace *space, void *ignore)
 			return 1;
 		}
 	}
+}
+
+static void
+postSolve(cpArbiter *arb, cpSpace *space, void *ignore)
+{
+	printf("postSolve\n");
+}
+
+static void
+separate(cpArbiter *arb, cpSpace *space, void *ignore)
+{
+	printf("separate\n");
+	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	
+	// remove the object from the pass thru list
+	cpArrayDeleteObj(((OneWayPlatform *)a->data)->passThruList, b);
 }
 
 static void
@@ -134,7 +146,16 @@ init(void)
 	shape->e = 0.0; shape->u = 0.9;
 	shape->collision_type = 2;
 	
-	cpSpaceAddCollisionPairFunc(space, 1, 2, (cpCollFunc)collision, NULL);
+//	cpSpaceAddCollisionPairFunc(space, 1, 2, (cpCollFunc)collision, NULL);
+	cpCollisionHandler handler = {
+		1, 2,
+		begin,
+		preSolve,
+		postSolve,
+		separate,
+		NULL
+	};
+	cpSpaceAddCollisionHandler(space, handler);
 	
 	return space;
 }

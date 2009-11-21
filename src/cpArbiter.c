@@ -94,7 +94,7 @@ cpArbiterAlloc(void)
 }
 
 cpArbiter*
-cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b, int stamp)
+cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 {
 	arb->numContacts = 0;
 	arb->contacts = NULL;
@@ -102,18 +102,15 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b, int stamp)
 	arb->a = a;
 	arb->b = b;
 	
-	arb->stamp = stamp;
+	arb->stamp = -1;
 	
-	arb->separationData = NULL;
-	arb->separationFunc = NULL;
-		
 	return arb;
 }
 
 cpArbiter*
-cpArbiterNew(cpShape *a, cpShape *b, int stamp)
+cpArbiterNew(cpShape *a, cpShape *b)
 {
-	return cpArbiterInit(cpArbiterAlloc(), a, b, stamp);
+	return cpArbiterInit(cpArbiterAlloc(), a, b);
 }
 
 void

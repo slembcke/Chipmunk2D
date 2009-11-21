@@ -51,6 +51,12 @@ cpfclamp(cpFloat f, cpFloat min, cpFloat max){
 	return cpfmin(cpfmax(f, min), max);
 }
 
+static inline cpFloat
+cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
+{
+	return f1 + cpfclamp(f2 - f1, -d, d);
+}
+
 #ifndef INFINITY
 	#ifdef _MSC_VER
 		union MSVC_EVIL_FLOAT_HACK

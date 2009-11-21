@@ -24,17 +24,23 @@ struct cpSpace;
 // Number of frames that contact information should persist.
 extern int cp_contact_persistence;
 
-// User collision pair function.
-typedef int (*cpCollFunc)(cpArbiter *arb, struct cpSpace *space, cpDataPointer data);
+// User collision handler function types.
+typedef int (*cpCollisionBeginFunc)(cpArbiter *arb, struct cpSpace *space, cpDataPointer data);
+typedef int (*cpCollisionPreSolveFunc)(cpArbiter *arb, struct cpSpace *space, cpDataPointer data);
+typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, struct cpSpace *space, cpDataPointer data);
+typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, struct cpSpace *space, cpDataPointer data);
 
 // Structure for holding collision pair function information.
 // Used internally.
-typedef struct cpCollPairFunc {
+typedef struct cpCollisionHandler {
 	cpCollisionType a;
 	cpCollisionType b;
-	cpCollFunc func;
+	cpCollisionBeginFunc begin;
+	cpCollisionPreSolveFunc preSolve;
+	cpCollisionPostSolveFunc postSolve;
+	cpCollisionSeparateFunc separate;
 	void *data;
-} cpCollPairFunc;
+} cpCollisionHandler;
 
 typedef struct cpSpace{
 	// *** User definable fields
@@ -72,8 +78,8 @@ typedef struct cpSpace{
 	
 	// Set of collisionpair functions.
 	cpHashSet *collFuncSet;
-	// Default collision pair function.
-	cpCollPairFunc defaultPairFunc;
+	// Default collision handler.
+	cpCollisionHandler defaultHandler;
 	
 	cpHashSet *postStepCallbacks;
 } cpSpace;
@@ -89,11 +95,10 @@ void cpSpaceFree(cpSpace *space);
 // Convenience function. Frees all referenced entities. (bodies, shapes and constraints)
 void cpSpaceFreeChildren(cpSpace *space);
 
-// Collision pair function management functions.
-void cpSpaceAddCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b,
-                                 cpCollFunc func, cpDataPointer data);
-void cpSpaceRemoveCollisionPairFunc(cpSpace *space, cpCollisionType a, cpCollisionType b);
-void cpSpaceSetDefaultCollisionPairFunc(cpSpace *space, cpCollFunc func, cpDataPointer data);
+// Collision handler management functions.
+void cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionHandler handler);
+void cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
+//void cpSpaceSetDefaultCollisionPairFunc(cpSpace *space, cpCollFunc func, cpDataPointer data);
 
 // Add and remove entities from the system.
 cpShape *cpSpaceAddShape(cpSpace *space, cpShape *shape);

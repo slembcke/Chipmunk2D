@@ -21,6 +21,7 @@
  
  struct cpArbiter;
  struct cpSpace;
+ struct cpCollisionHandler;
 
 // Determines how fast penetrations resolve themselves.
 extern cpFloat cp_bias_coef;
@@ -53,8 +54,6 @@ cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHas
 cpVect cpContactsSumImpulses(cpContact *contacts, int numContacts);
 cpVect cpContactsSumImpulsesWithFriction(cpContact *contacts, int numContacts);
 
-typedef void (*cpSeparationFunc)(struct cpArbiter *arb, struct cpSpace *space, void *separationData);
-
 // Data structure for tracking collisions between shapes.
 typedef struct cpArbiter{
 	// Information on the contact points between the objects.
@@ -74,14 +73,13 @@ typedef struct cpArbiter{
 	// Are the shapes swapped in relation to the collision pair callback?
 	int swappedColl;
 	
-	void *separationData;
-	cpSeparationFunc separationFunc;
+	struct cpCollisionHandler *handler;
 } cpArbiter;
 
 // Basic allocation/destruction functions.
 cpArbiter* cpArbiterAlloc(void);
-cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b, int stamp);
-cpArbiter* cpArbiterNew(cpShape *a, cpShape *b, int stamp);
+cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
+cpArbiter* cpArbiterNew(cpShape *a, cpShape *b);
 
 void cpArbiterDestroy(cpArbiter *arb);
 void cpArbiterFree(cpArbiter *arb);

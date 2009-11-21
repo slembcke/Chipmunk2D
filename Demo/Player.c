@@ -72,10 +72,15 @@ collision(cpArbiter *arb, cpSpace *space, void *ignore)
 static void
 update(int ticks)
 {
-	playerInstance.shape->surface_v = cpv(-400*arrowDirection.x, 0);
+	playerInstance.shape->surface_v = cpv(-400.0*arrowDirection.x, 0.0);
 	
-	if(arrowDirection.y > 0.0 && playerInstance.contacts != 0){
-		playerInstance.shape->body->v.y += 500.0;
+	cpBody *body = playerInstance.shape->body;
+	if(playerInstance.contacts == 0){
+		body->v.x = cpflerpconst(body->v.x, 400.0*arrowDirection.x, 1000.0/60.0);
+	} else {
+		if(arrowDirection.y > 0.0){
+			body->v.y += 500.0;
+		}
 	}
 	
 	int steps = 1;

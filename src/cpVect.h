@@ -134,6 +134,12 @@ cpvclamp(const cpVect v, const cpFloat len)
 	return (cpvdot(v,v) > len*len) ? cpvmult(cpvnormalize(v), len) : v;
 }
 
+static inline cpVect
+cpvlerpconst(cpVect v1, cpVect v2, cpFloat d)
+{
+	return cpvadd(v1, cpvclamp(cpvsub(v2, v1), d));
+}
+
 static inline cpFloat
 cpvdist(const cpVect v1, const cpVect v2)
 {
