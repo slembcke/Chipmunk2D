@@ -38,16 +38,8 @@ typedef struct OneWayPlatform {
 static OneWayPlatform platformInstance;
 
 static int
-begin(cpArbiter *arb, cpSpace *space, void *ignore)
-{
-	printf("begin\n");
-	return 1;
-}
-
-static int
 preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 {
-	printf("preSolve\n");
 	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
 	OneWayPlatform *platform = a->data;
 	
@@ -69,15 +61,8 @@ preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 }
 
 static void
-postSolve(cpArbiter *arb, cpSpace *space, void *ignore)
-{
-	printf("postSolve\n");
-}
-
-static void
 separate(cpArbiter *arb, cpSpace *space, void *ignore)
 {
-	printf("separate\n");
 	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
 	
 	// remove the object from the pass thru list
@@ -149,9 +134,9 @@ init(void)
 //	cpSpaceAddCollisionPairFunc(space, 1, 2, (cpCollFunc)collision, NULL);
 	cpCollisionHandler handler = {
 		1, 2,
-		begin,
+		NULL,
 		preSolve,
-		postSolve,
+		NULL,
 		separate,
 		NULL
 	};

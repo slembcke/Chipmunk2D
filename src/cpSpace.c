@@ -546,7 +546,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	arb->a = a; arb->b = b;
 	
 	// Call the begin function first if we need to
-	int beginPass = (arb->stamp > 0) || (handler->begin(arb, space, handler->data));
+	int beginPass = (arb->stamp >= 0) || (handler->begin(arb, space, handler->data));
 	if(beginPass && handler->preSolve(arb, space, handler->data)){
 		cpArrayPush(space->arbiters, arb);
 	} else {

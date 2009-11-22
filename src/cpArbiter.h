@@ -102,3 +102,16 @@ cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
 		(*a) = arb->a, (*b) = arb->b;
 	}
 }
+
+static inline int
+cpArbiterIsFirstContact(cpArbiter *arb)
+{
+	return arb->stamp == -1;
+}
+
+static inline cpVect
+cpArbiterGetNormal(cpArbiter *arb, int i)
+{
+	cpVect n = arb->contacts[i].n;
+	return arb->swappedColl ? cpvneg(n) : n;
+}

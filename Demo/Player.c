@@ -32,11 +32,45 @@ cpBody *staticBody;
 
 typedef struct PlayerStruct {
 	cpFloat u;
-	int contacts;
 	cpShape *shape;
+	cpVect groundNormal;
+	cpArray *groundShapes;
 } PlayerStruct;
 
 PlayerStruct playerInstance;
+
+static int
+begin(cpArbiter *arb, cpSpace *space, void *ignore)
+{
+	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	PlayerStruct *player = a->data;
+	
+	cpVect n = cpvneg(cpArbiterGetNormal(arb, 0));
+	if(n.y > 0.0){
+		cpArrayPush(player->groundShapes, b);
+	}
+	
+	return 1;
+}
+
+static int
+preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
+{
+	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	PlayerStruct *player = a->data;
+	
+	if(arb->stamp > 0){
+		a->u = player->u;
+		
+		// pick the most upright jump normal each frame
+		cpVect n = cpvneg(cpArbiterGetNormal(arb, 0));
+		if(n.y >= player->groundNormal.y){
+			player->groundNormal = n;
+		}
+	}
+	
+	return 1;
+}
 
 static void
 separate(cpArbiter *arb, cpSpace *space, void *ignore)
@@ -44,51 +78,58 @@ separate(cpArbiter *arb, cpSpace *space, void *ignore)
 	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
 	PlayerStruct *player = a->data;
 	
-	player->contacts -= 1;
+	cpArrayDeleteObj(player->groundShapes, b);
 	
-	if(!player->contacts){
+	if(player->groundShapes->num == 0){
 		a->u = 0.0f;
 	}
 }
 
-static int
-collision(cpArbiter *arb, cpSpace *space, void *ignore)
+static void
+playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
-	// Set a separate function so we can reset the pass thru state of the pair.
-	arb->separationFunc = separate;
-	
-	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
-	PlayerStruct *player = a->data;
-	
-	if(arb->stamp == space->stamp){
-		player->contacts += 1;
-	} else {
-		a->u = player->u;
-	}
-	
-	return 1;
+	cpBodyUpdateVelocity(body, gravity, damping, dt);
+	body->v.y = cpfmax(body->v.y, -700);
+	body->v.x = cpfclamp(body->v.x, -400, 400);
 }
+
 
 static void
 update(int ticks)
 {
-	playerInstance.shape->surface_v = cpv(-400.0*arrowDirection.x, 0.0);
+	static int lastJumpState = 0;
+	int jumpState = (arrowDirection.y > 0.0);
 	
-	cpBody *body = playerInstance.shape->body;
-	if(playerInstance.contacts == 0){
-		body->v.x = cpflerpconst(body->v.x, 400.0*arrowDirection.x, 1000.0/60.0);
+	cpVect groundNormal = playerInstance.groundNormal;
+	if(groundNormal.y > 0.0){
+		playerInstance.shape->surface_v = cpvmult(cpvperp(groundNormal), 400.0*arrowDirection.x);
 	} else {
-		if(arrowDirection.y > 0.0){
-			body->v.y += 500.0;
-		}
+		playerInstance.shape->surface_v = cpvzero;
 	}
 	
-	int steps = 1;
+	cpBody *body = playerInstance.shape->body;
+	
+	// apply jump
+	if(jumpState && !lastJumpState && cpvlengthsq(groundNormal)){
+//		body->v = cpvmult(cpvslerp(groundNormal, cpv(0.0, 1.0), 0.5), 500.0);
+		body->v = cpvadd(body->v, cpvmult(cpvslerp(groundNormal, cpv(0.0, 1.0), 0.75), 500.0));
+	}
+	
+	if(playerInstance.groundShapes->num == 0){
+		cpFloat air_accel = body->v.x + arrowDirection.x*(2000.0);
+		body->f.x = body->m*air_accel;
+//		body->v.x = cpflerpconst(body->v.x, 400.0*arrowDirection.x, 2000.0/60.0);
+	}
+	
+	int steps = 3;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
 	
+	playerInstance.groundNormal = cpvzero;
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
 	}
+	
+	lastJumpState = jumpState;
 }
 
 static cpSpace *
@@ -102,7 +143,7 @@ init(void)
 	space->iterations = 10;
 	cpSpaceResizeStaticHash(space, 40.0, 1000);
 	cpSpaceResizeActiveHash(space, 40.0, 1000);
-	space->gravity = cpv(0, -1000);
+	space->gravity = cpv(0, -1500);
 	
 	cpBody *body;
 	cpShape *shape;
@@ -123,21 +164,57 @@ init(void)
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 	
-	// Add a ball to make things more interesting
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
+	shape->e = 1.0; shape->u = 1.0;
+	shape->layers = NOT_GRABABLE_MASK;
+	shape->collision_type = 2;
+	
+	// add some other segments to play with
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-220,-200), cpv(-220,240), 0.0f));
+	shape->e = 1.0; shape->u = 1.0;
+	shape->layers = NOT_GRABABLE_MASK;
+	shape->collision_type = 2;
+
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(0,-240), cpv(320,-200), 0.0f));
+	shape->e = 1.0; shape->u = 1.0;
+	shape->layers = NOT_GRABABLE_MASK;
+	shape->collision_type = 2;
+
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(200,-240), cpv(320,-100), 0.0f));
+	shape->e = 1.0; shape->u = 1.0;
+	shape->layers = NOT_GRABABLE_MASK;
+	shape->collision_type = 2;
+
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-220,-80), cpv(200,-80), 0.0f));
+	shape->e = 1.0; shape->u = 1.0;
+	shape->layers = NOT_GRABABLE_MASK;
+	shape->collision_type = 2;
+	
+	// Set up the player
 	cpFloat radius = 15.0;
 	body = cpSpaceAddBody(space, cpBodyNew(10.0, INFINITY));
-	body->p = cpv(0, -240 + radius);
+	body->p = cpv(0, -220);
+	body->velocity_func = playerUpdateVelocity;
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
-	shape->e = 0.0; shape->u = 3.0;
+	shape->e = 0.0; shape->u = 2.0;
 	shape->collision_type = 1;
 	
 	playerInstance.u = shape->u;
-	playerInstance.contacts = 0;
 	playerInstance.shape = shape;
+	playerInstance.groundShapes = cpArrayNew(0);
 	shape->data = &playerInstance;
 	
-	cpSpaceAddCollisionPairFunc(space, 1, 2, (cpCollFunc)collision, NULL);
+//	cpSpaceAddCollisionPairFunc(space, 1, 2, (cpCollFunc)collision, NULL);
+	cpCollisionHandler handler = {
+		1, 2,
+		begin,
+		preSolve,
+		NULL,
+		separate,
+		NULL
+	};
+	cpSpaceAddCollisionHandler(space, handler);
 	
 	return space;
 }
@@ -148,6 +225,8 @@ destroy(void)
 	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
+	
+	cpArrayFree(playerInstance.groundShapes);
 }
 
 const chipmunkDemo Player = {
