@@ -523,23 +523,17 @@ queryReject(cpShape *a, cpShape *b)
 		|| !(a->layers & b->layers);
 }
 
-int queryCount = 0;
-int passCount = 0;
-
 // Callback from the spatial hash.
 static void
 queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 {
-	queryCount++;
 	// Reject any of the simple cases
 	if(queryReject(a,b)) return;
-	passCount++;
 	
 	// Find the collision pair function for the shapes.
 	cpCollisionType ids[] = {a->collision_type, b->collision_type};
 	cpHashValue collHashID = CP_HASH_PAIR(a->collision_type, b->collision_type);
 	cpCollisionHandler *handler = (cpCollisionHandler *)cpHashSetFind(space->collFuncSet, collHashID, ids);
-//	if(!handler) return; // TODO halp!
 	
 	int sensor = a->sensor || b->sensor;
 	if(sensor && handler == &space->defaultHandler) return;
@@ -565,7 +559,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	
 	// Call the begin function first if we need to
 	int beginPass = (arb->stamp >= 0) || (handler->begin(arb, space, handler->data));
-	if(beginPass && handler->preSolve(arb, space, handler->data)){
+	if(beginPass && handler->preSolve(arb, space, handler->data) && !sensor){
 		cpArrayPush(space->arbiters, arb);
 	} else {
 		cpfree(arb->contacts);
@@ -607,7 +601,7 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 static int
 postStepCallbackSetFilter(postStepCallback *callback, cpSpace *space)
 {
-	callback->func(callback->obj, callback->data);
+	callback->func(space, callback->obj, callback->data);
 	cpfree(callback);
 	
 	return 0;
@@ -698,7 +692,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	
 	// Run the post step callbacks
 	// Use filter as an easy way to clear out the queue as it runs
-	cpHashSetFilter(space->postStepCallbacks, (cpHashSetFilterFunc)postStepCallbackSetFilter, NULL);
+	cpHashSetFilter(space->postStepCallbacks, (cpHashSetFilterFunc)postStepCallbackSetFilter, space);
 	
 //	cpFloat dvsq = cpvdot(space->gravity, space->gravity);
 //	dvsq *= dt*dt * space->damping*space->damping;

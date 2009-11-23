@@ -128,7 +128,7 @@ void cpSpaceRemoveBody(cpSpace *space, cpBody *body);
 void cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint);
 
 // Post Step function definition
-typedef void (*cpPostStepFunc)(void *obj, void *data);
+typedef void (*cpPostStepFunc)(cpSpace *space, void *obj, void *data);
 // Register a post step function to be called after cpSpaceStep() has finished.
 // obj is used a key, you can only register one callback per unique value for obj
 void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data);

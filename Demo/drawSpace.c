@@ -132,8 +132,10 @@ drawCircleShape(cpBody *body, cpCircleShape *circle)
 		glRotatef(body->a*180.0/M_PI, 0.0f, 0.0f, 1.0f);
 		glScalef(circle->r, circle->r, 1.0f);
 		
-		glColor_from_pointer(circle);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, circleVAR_count - 1);
+		if(!circle->shape.sensor){
+			glColor_from_pointer(circle);
+			glDrawArrays(GL_TRIANGLE_FAN, 0, circleVAR_count - 1);
+		}
 		
 		glColor3f(LINE_COLOR);
 		glDrawArrays(GL_LINE_STRIP, 0, circleVAR_count);
@@ -203,8 +205,10 @@ drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 			
 			glMultMatrixf(matrix);
 				
-			glColor_from_pointer(seg);
-			glDrawArrays(GL_TRIANGLE_FAN, 0, pillVAR_count);
+			if(!seg->shape.sensor){
+				glColor_from_pointer(seg);
+				glDrawArrays(GL_TRIANGLE_FAN, 0, pillVAR_count);
+			}
 			
 			glColor3f(LINE_COLOR);
 			glDrawArrays(GL_LINE_LOOP, 0, pillVAR_count);
@@ -231,9 +235,11 @@ drawPolyShape(cpBody *body, cpPolyShape *poly)
 		VAR[2*i    ] = v.x;
 		VAR[2*i + 1] = v.y;
 	}
-
-	glColor_from_pointer(poly);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, count);
+	
+	if(!poly->shape.sensor){
+		glColor_from_pointer(poly);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, count);
+	}
 	
 	glColor3f(LINE_COLOR);
 	glDrawArrays(GL_LINE_LOOP, 0, count);

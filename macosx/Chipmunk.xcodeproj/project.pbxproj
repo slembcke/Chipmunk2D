@@ -26,6 +26,7 @@
 		D31402950E9DD07E00EF79DB /* Springies.c in Sources */ = {isa = PBXBuildFile; fileRef = D31402940E9DD07E00EF79DB /* Springies.c */; };
 		D31847750FC458FD00E30B0D /* Query.c in Sources */ = {isa = PBXBuildFile; fileRef = D31847740FC458FD00E30B0D /* Query.c */; };
 		D3185D200EC5610A00E6BFCB /* TheoJansen.c in Sources */ = {isa = PBXBuildFile; fileRef = D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */; };
+		D329CC9C10BADC7200909DB1 /* Sensors.c in Sources */ = {isa = PBXBuildFile; fileRef = D329CC9B10BADC7200909DB1 /* Sensors.c */; };
 		D34963C10B56CBA900CAD239 /* chipmunk.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0C40AA75CC3004E361B /* chipmunk.h */; };
 		D34963C20B56CBA900CAD239 /* cpVect.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0270AA32F16004E361B /* cpVect.h */; };
 		D34963C30B56CBA900CAD239 /* cpBB.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F2D90AAA5622004E361B /* cpBB.h */; };
@@ -131,6 +132,7 @@
 		D31402940E9DD07E00EF79DB /* Springies.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Springies.c; sourceTree = "<group>"; };
 		D31847740FC458FD00E30B0D /* Query.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Query.c; sourceTree = "<group>"; };
 		D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = TheoJansen.c; sourceTree = "<group>"; };
+		D329CC9B10BADC7200909DB1 /* Sensors.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Sensors.c; sourceTree = "<group>"; };
 		D34963BB0B56CAA300CAD239 /* libChipmunk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libChipmunk.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D353B6480B059C5F0038D274 /* prime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prime.h; sourceTree = "<group>"; };
 		D35420BF0F4E1FD70017F4F7 /* chipmunk_unsafe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_unsafe.h; path = ../src/chipmunk_unsafe.h; sourceTree = SOURCE_ROOT; };
@@ -310,6 +312,7 @@
 				D31847740FC458FD00E30B0D /* Query.c */,
 				D3BACF8210B5DF8900376394 /* OneWay.c */,
 				D3BAD0C710B61AAD00376394 /* Player.c */,
+				D329CC9B10BADC7200909DB1 /* Sensors.c */,
 			);
 			name = Demo;
 			path = ../Demo;
@@ -569,6 +572,7 @@
 				D365D90410B595CE0005A03B /* Simple.c in Sources */,
 				D3BACF8310B5DF8900376394 /* OneWay.c in Sources */,
 				D3BAD65810B8B52900376394 /* Player.c in Sources */,
+				D329CC9C10BADC7200909DB1 /* Sensors.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
