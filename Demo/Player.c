@@ -205,16 +205,7 @@ init(void)
 	playerInstance.groundShapes = cpArrayNew(0);
 	shape->data = &playerInstance;
 	
-//	cpSpaceAddCollisionPairFunc(space, 1, 2, (cpCollFunc)collision, NULL);
-	cpCollisionHandler handler = {
-		1, 2,
-		begin,
-		preSolve,
-		NULL,
-		separate,
-		NULL
-	};
-	cpSpaceAddCollisionHandler(space, handler);
+	cpSpaceAddCollisionHandler(space, 1, 2, begin, preSolve, NULL, separate, NULL);
 	
 	return space;
 }

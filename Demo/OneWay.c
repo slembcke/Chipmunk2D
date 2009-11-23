@@ -130,16 +130,7 @@ init(void)
 	shape->e = 0.0; shape->u = 0.9;
 	shape->collision_type = 2;
 	
-//	cpSpaceAddCollisionPairFunc(space, 1, 2, (cpCollFunc)collision, NULL);
-	cpCollisionHandler handler = {
-		1, 2,
-		NULL,
-		preSolve,
-		NULL,
-		separate,
-		NULL
-	};
-	cpSpaceAddCollisionHandler(space, handler);
+	cpSpaceAddCollisionHandler(space, 1, 2, NULL, preSolve, NULL, separate, NULL);
 	
 	return space;
 }

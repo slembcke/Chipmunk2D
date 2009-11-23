@@ -96,9 +96,25 @@ void cpSpaceFree(cpSpace *space);
 void cpSpaceFreeChildren(cpSpace *space);
 
 // Collision handler management functions.
-void cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionHandler handler);
+void cpSpaceSetDefaultCollisionPairFunc(
+	cpSpace *space,
+	cpCollisionType a, cpCollisionType b,
+	cpCollisionBeginFunc begin,
+	cpCollisionPreSolveFunc preSolve,
+	cpCollisionPostSolveFunc postSolve,
+	cpCollisionSeparateFunc separate,
+	void *data
+);
+void cpSpaceAddCollisionHandler(
+	cpSpace *space,
+	cpCollisionType a, cpCollisionType b,
+	cpCollisionBeginFunc begin,
+	cpCollisionPreSolveFunc preSolve,
+	cpCollisionPostSolveFunc postSolve,
+	cpCollisionSeparateFunc separate,
+	void *data
+);
 void cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
-//void cpSpaceSetDefaultCollisionPairFunc(cpSpace *space, cpCollFunc func, cpDataPointer data);
 
 // Add and remove entities from the system.
 cpShape *cpSpaceAddShape(cpSpace *space, cpShape *shape);

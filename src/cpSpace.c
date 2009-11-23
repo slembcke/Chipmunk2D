@@ -198,36 +198,59 @@ cpSpaceFreeChildren(cpSpace *space)
 #pragma mark Collision Pair Function Management
 
 void
-cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionHandler handler)
-{
-	cpHashValue hash = CP_HASH_PAIR(handler.a, handler.b);
+cpSpaceAddCollisionHandler(
+	cpSpace *space,
+	cpCollisionType a, cpCollisionType b,
+	cpCollisionBeginFunc begin,
+	cpCollisionPreSolveFunc preSolve,
+	cpCollisionPostSolveFunc postSolve,
+	cpCollisionSeparateFunc separate,
+	void *data
+){
 	// Remove any old function so the new one will get added.
-	cpSpaceRemoveCollisionHandler(space, handler.a, handler.b);
+	cpSpaceRemoveCollisionHandler(space, a, b);
 	
-	// Replace NULLs, with do-nothing functions
-	handler.begin = handler.begin ? handler.begin : alwaysCollide;
-	handler.preSolve = handler.preSolve ? handler.preSolve : alwaysCollide;
-	handler.postSolve = handler.postSolve ? handler.postSolve : nothing;
-	handler.separate = handler.separate ? handler.separate : nothing;
+	cpCollisionHandler handler = {
+		a, b,
+		begin ? begin : alwaysCollide,
+		preSolve ? preSolve : alwaysCollide,
+		postSolve ? postSolve : nothing,
+		separate ? separate : nothing,
+		data
+	};
 	
-	cpHashSetInsert(space->collFuncSet, hash, &handler, NULL);
+	cpHashSetInsert(space->collFuncSet, CP_HASH_PAIR(a, b), &handler, NULL);
 }
 
 void
 cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
 	cpCollisionHandler handler = {a, b, NULL, NULL, NULL, NULL, NULL};
-	cpHashValue hash = CP_HASH_PAIR(a, b);
-	cpCollisionHandler *old_handler = (cpCollisionHandler *)cpHashSetRemove(space->collFuncSet, hash, &handler);
+	cpCollisionHandler *old_handler = cpHashSetRemove(space->collFuncSet, CP_HASH_PAIR(a, b), &handler);
 	cpfree(old_handler);
 }
 
-//void
-//cpSpaceSetDefaultCollisionPairFunc(cpSpace *space, cpCollFunc func, void *data)
-//{
-//	cpCollPairFunc pairFunc = {0, 0, (func ? func : alwaysCollide), (func ? data : NULL)};
-//	space->defaultPairFunc = pairFunc;
-//}
+void
+cpSpaceSetDefaultCollisionPairFunc(
+	cpSpace *space,
+	cpCollisionType a, cpCollisionType b,
+	cpCollisionBeginFunc begin,
+	cpCollisionPreSolveFunc preSolve,
+	cpCollisionPostSolveFunc postSolve,
+	cpCollisionSeparateFunc separate,
+	void *data
+){
+	cpCollisionHandler handler = {
+		a, b,
+		begin ? begin : alwaysCollide,
+		preSolve ? preSolve : alwaysCollide,
+		postSolve ? postSolve : nothing,
+		separate ? separate : nothing,
+		data
+	};
+	
+	space->defaultHandler = handler;
+}
 
 #pragma mark Body, Shape, and Joint Management
 
