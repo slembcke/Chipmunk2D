@@ -32,7 +32,7 @@ cpBody *staticBody;
 
 typedef struct OneWayPlatform {
 	cpVect n; // direction objects may pass through
-	cpArray *passThruList; // lit of objects passing through
+	cpArray *passThruList; // list of objects passing through
 } OneWayPlatform;
 
 static OneWayPlatform platformInstance;
@@ -47,8 +47,7 @@ preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 		// The object is in the pass thru list, ignore it until separates.
 		return 0;
 	} else {
-		int swapped = arb->swappedColl;
-		cpFloat dot = cpvdot(arb->contacts[0].n, platform->n)*(swapped ? -1.0 : 1.0);
+		cpFloat dot = cpvdot(cpArbiterGetNormal(arb, 0), platform->n);
 		
 		if(dot < 0){
 			// Add the object to the pass thrru list

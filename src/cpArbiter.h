@@ -63,14 +63,17 @@ typedef struct cpArbiter{
 	// The two shapes involved in the collision.
 	cpShape *a, *b;
 	
-	// Calculated by cpArbiterPreStep().
+	// Calculated before calling the pre-solve collision handler
+	// Override them with custom
+	cpFloat e;
 	cpFloat u;
-	cpVect target_v;
+	 // Used for surface_v calculations, implementation may change
+	cpVect surface_vr;
 	
 	// Time stamp of the arbiter. (from cpSpace)
 	int stamp;
 	
-	// Are the shapes swapped in relation to the collision pair callback?
+	// Are the shapes swapped in relation to the collision handler?
 	int swappedColl;
 	
 	struct cpCollisionHandler *handler;
@@ -86,7 +89,7 @@ void cpArbiterFree(cpArbiter *arb);
 
 // These functions are all intended to be used internally.
 // Inject new contact points into the arbiter while preserving contact history.
-void cpArbiterInject(cpArbiter *arb, cpContact *contacts, int numContacts);
+void cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
 // Precalculate values used by the solver.
 void cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv);
 void cpArbiterApplyCachedImpulse(cpArbiter *arb);

@@ -538,12 +538,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	cpShape *shape_pair[] = {a, b};
 	cpHashValue arbHashID = CP_HASH_PAIR(a, b);
 	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->contactSet, arbHashID, shape_pair, NULL);
-	cpArbiterInject(arb, contacts, numContacts); // retains the contacts array
-	arb->handler = handler;
-	arb->swappedColl = (a->collision_type != handler->a);
-	
-	// For collisions between two similar primitive types, the order could have been swapped.
-	arb->a = a; arb->b = b;
+	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b); // retains the contacts array
 	
 	// Call the begin function first if we need to
 	int beginPass = (arb->stamp >= 0) || (handler->begin(arb, space, handler->data));

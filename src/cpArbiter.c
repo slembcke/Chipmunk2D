@@ -129,7 +129,7 @@ cpArbiterFree(cpArbiter *arb)
 }
 
 void
-cpArbiterInject(cpArbiter *arb, cpContact *contacts, int numContacts)
+cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisionHandler *handler, cpShape *a, cpShape *b)
 {
 	// Arbiters without contact data may exist if a collision function rejected the collision.
 	if(arb->contacts){
@@ -154,6 +154,16 @@ cpArbiterInject(cpArbiter *arb, cpContact *contacts, int numContacts)
 	
 	arb->contacts = contacts;
 	arb->numContacts = numContacts;
+	
+	arb->handler = handler;
+	arb->swappedColl = (a->collision_type != handler->a);
+	
+	arb->e = a->e * b->e;
+	arb->u = a->u * b->u;
+	arb->surface_vr = cpvsub(a->surface_v, b->surface_v);
+	
+	// For collisions between two similar primitive types, the order could have been swapped.
+	arb->a = a; arb->b = b;
 }
 
 void
@@ -161,10 +171,6 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv)
 {
 	cpShape *shapea = arb->a;
 	cpShape *shapeb = arb->b;
-		
-	cpFloat e = shapea->e * shapeb->e;
-	arb->u = shapea->u * shapeb->u;
-	arb->target_v = cpvsub(shapeb->surface_v, shapea->surface_v);
 
 	cpBody *a = shapea->body;
 	cpBody *b = shapeb->body;
@@ -185,7 +191,7 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv)
 		con->jBias = 0.0f;
 		
 		// Calculate the target bounce velocity.
-		con->bounce = normal_relative_velocity(a, b, con->r1, con->r2, con->n)*e;//cpvdot(con->n, cpvsub(v2, v1))*e;
+		con->bounce = normal_relative_velocity(a, b, con->r1, con->r2, con->n)*arb->e;//cpvdot(con->n, cpvsub(v2, v1))*e;
 	}
 }
 
@@ -196,7 +202,7 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb)
 	cpShape *shapeb = arb->b;
 		
 	arb->u = shapea->u * shapeb->u;
-	arb->target_v = cpvsub(shapeb->surface_v, shapea->surface_v);
+	arb->surface_vr = cpvsub(shapeb->surface_v, shapea->surface_v);
 
 	cpBody *a = shapea->body;
 	cpBody *b = shapeb->body;
@@ -244,7 +250,7 @@ cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef)
 		jn = con->jnAcc - jnOld;
 		
 		// Calculate the relative tangent velocity.
-		cpFloat vrt = cpvdot(cpvadd(vr, arb->target_v), cpvperp(n));
+		cpFloat vrt = cpvdot(cpvadd(vr, arb->surface_vr), cpvperp(n));
 		
 		// Calculate and clamp the friction impulse.
 		cpFloat jtMax = arb->u*con->jnAcc;
