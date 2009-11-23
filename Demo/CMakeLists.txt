@@ -30,6 +30,9 @@ set(chipmunk_demos_source_files
   drawSpace.c
   UnsafeOps.c
   Query.c
+	OneWay.c,
+	Player.c,
+	Sensors.c,
 )
 
 include_directories(${chipmunk_demos_include_dirs})
