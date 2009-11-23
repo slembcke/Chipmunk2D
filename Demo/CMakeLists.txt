@@ -16,6 +16,7 @@ set(chipmunk_demos_libraries
 set(chipmunk_demos_source_files
   ChipmunkDemo.c
   LogoSmash.c
+  Simple.c
   PyramidStack.c
   Plink.c
   Tumble.c
@@ -24,15 +25,14 @@ set(chipmunk_demos_source_files
   Planet.c
   Springies.c
   Pump.c
-  WalkBot.c
   TheoJansen.c
   MagnetsElectric.c
   drawSpace.c
   UnsafeOps.c
   Query.c
-  OneWay.c,
-  Player.c,
-  Sensors.c,
+  OneWay.c
+  Player.c
+  Sensors.c
 )
 
 include_directories(${chipmunk_demos_include_dirs})
