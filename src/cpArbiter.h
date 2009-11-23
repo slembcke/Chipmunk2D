@@ -18,6 +18,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+ 
+ struct cpArbiter;
+ struct cpSpace;
+ struct cpCollisionHandler;
 
 // Determines how fast penetrations resolve themselves.
 extern cpFloat cp_bias_coef;
@@ -59,27 +63,58 @@ typedef struct cpArbiter{
 	// The two shapes involved in the collision.
 	cpShape *a, *b;
 	
-	// Calculated by cpArbiterPreStep().
+	// Calculated before calling the pre-solve collision handler
+	// Override them with custom
+	cpFloat e;
 	cpFloat u;
-	cpVect target_v;
+	 // Used for surface_v calculations, implementation may change
+	cpVect surface_vr;
 	
 	// Time stamp of the arbiter. (from cpSpace)
 	int stamp;
+	
+	// Are the shapes swapped in relation to the collision handler?
+	int swappedColl;
+	
+	struct cpCollisionHandler *handler;
 } cpArbiter;
 
 // Basic allocation/destruction functions.
 cpArbiter* cpArbiterAlloc(void);
-cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b, int stamp);
-cpArbiter* cpArbiterNew(cpShape *a, cpShape *b, int stamp);
+cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
+cpArbiter* cpArbiterNew(cpShape *a, cpShape *b);
 
 void cpArbiterDestroy(cpArbiter *arb);
 void cpArbiterFree(cpArbiter *arb);
 
 // These functions are all intended to be used internally.
 // Inject new contact points into the arbiter while preserving contact history.
-void cpArbiterInject(cpArbiter *arb, cpContact *contacts, int numContacts);
+void cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
 // Precalculate values used by the solver.
 void cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv);
 void cpArbiterApplyCachedImpulse(cpArbiter *arb);
 // Run an iteration of the solver on the arbiter.
 void cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef);
+
+static inline void
+cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
+{
+	if(arb->swappedColl){
+		(*a) = arb->b, (*b) = arb->a;
+	} else {
+		(*a) = arb->a, (*b) = arb->b;
+	}
+}
+
+static inline int
+cpArbiterIsFirstContact(cpArbiter *arb)
+{
+	return arb->stamp == -1;
+}
+
+static inline cpVect
+cpArbiterGetNormal(cpArbiter *arb, int i)
+{
+	cpVect n = arb->contacts[i].n;
+	return arb->swappedColl ? cpvneg(n) : n;
+}

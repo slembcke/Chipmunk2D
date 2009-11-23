@@ -56,14 +56,12 @@ add_box()
 	
 	cpFloat radius = cpvlength(cpv(size, size));
 
-	cpBody *body = cpBodyNew(mass, cpMomentForPoly(mass, 4, verts, cpvzero));
+	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 4, verts, cpvzero)));
 	body->p = cpv(frand()*(640 - 2*radius) - (320 - radius), frand()*(480 - 2*radius) - (240 - radius));
 	body->v = cpvmult(cpv(2*frand() - 1, 2*frand() - 1), 200);
-	cpSpaceAddBody(space, body);
-
-	cpShape *shape = cpPolyShapeNew(body, 4, verts, cpvzero);
+	
+	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 4, verts, cpvzero));
 	shape->e = 1.0f; shape->u = 0.0f;
-	cpSpaceAddShape(space, shape);
 }
 
 static cpSpace *
@@ -79,35 +77,29 @@ init(void)
 	cpShape *shape;
 		
 	// Create segments around the edge of the screen.
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 	
 	for(int i=0; i<10; i++)
 		add_box();
 	
-	cpBody *body = cpBodyNew(100.0f, 10000.0f);
-	cpSpaceAddBody(space, body);
+	cpBody *body = cpSpaceAddBody(space, cpBodyNew(100.0f, 10000.0f));
 
-	shape = cpSegmentShapeNew(body, cpv(-75,0), cpv(75,0), 5.0f);
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpv(-75,0), cpv(75,0), 5.0f));
 	shape->e = 1.0; shape->u = 1.0;
-	cpSpaceAddShape(space, shape);
 	
 	cpSpaceAddConstraint(space, cpPivotJointNew2(body, staticBody, cpvzero, cpvzero));
 	

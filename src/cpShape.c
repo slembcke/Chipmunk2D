@@ -49,6 +49,7 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 	SHAPE_ID_COUNTER++;
 	
 	shape->body = body;
+	shape->sensor = 0;
 	
 	shape->e = 0.0f;
 	shape->u = 0.0f;

@@ -132,8 +132,10 @@ drawCircleShape(cpBody *body, cpCircleShape *circle)
 		glRotatef(body->a*180.0/M_PI, 0.0f, 0.0f, 1.0f);
 		glScalef(circle->r, circle->r, 1.0f);
 		
-		glColor_from_pointer(circle);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, circleVAR_count - 1);
+		if(!circle->shape.sensor){
+			glColor_from_pointer(circle);
+			glDrawArrays(GL_TRIANGLE_FAN, 0, circleVAR_count - 1);
+		}
 		
 		glColor3f(LINE_COLOR);
 		glDrawArrays(GL_LINE_STRIP, 0, circleVAR_count);
@@ -203,8 +205,10 @@ drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 			
 			glMultMatrixf(matrix);
 				
-			glColor_from_pointer(seg);
-			glDrawArrays(GL_TRIANGLE_FAN, 0, pillVAR_count);
+			if(!seg->shape.sensor){
+				glColor_from_pointer(seg);
+				glDrawArrays(GL_TRIANGLE_FAN, 0, pillVAR_count);
+			}
 			
 			glColor3f(LINE_COLOR);
 			glDrawArrays(GL_LINE_LOOP, 0, pillVAR_count);
@@ -231,9 +235,11 @@ drawPolyShape(cpBody *body, cpPolyShape *poly)
 		VAR[2*i    ] = v.x;
 		VAR[2*i + 1] = v.y;
 	}
-
-	glColor_from_pointer(poly);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, count);
+	
+	if(!poly->shape.sensor){
+		glColor_from_pointer(poly);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, count);
+	}
 	
 	glColor3f(LINE_COLOR);
 	glDrawArrays(GL_LINE_LOOP, 0, count);
@@ -398,12 +404,50 @@ drawCollisions(void *ptr, void *data)
 	}
 }
 
+// copied from cpSpaceHash.c
+static inline cpHashValue
+hash_func(cpHashValue x, cpHashValue y, cpHashValue n)
+{
+	return (x*2185031351ul ^ y*4232417593ul) % n;
+}
+
+static void
+drawSpatialHash(cpSpaceHash *hash)
+{
+	cpBB bb = cpBBNew(-320, -240, 320, 240);
+	
+	cpFloat dim = hash->celldim;
+	int n = hash->numcells;
+	
+	int l = (int)floor(bb.l/dim);
+	int r = (int)floor(bb.r/dim);
+	int b = (int)floor(bb.b/dim);
+	int t = (int)floor(bb.t/dim);
+	
+	for(int i=l; i<=r; i++){
+		for(int j=b; j<=t; j++){
+			int cell_count = 0;
+			
+			int index = hash_func(i,j,n);
+			for(cpSpaceHashBin *bin = hash->table[index]; bin; bin = bin->next)
+				cell_count++;
+			
+			GLfloat v = 1.0f - (GLfloat)cell_count/10.0f;
+			glColor3f(v, v, v);
+			glRectf(i*dim, j*dim, (i + 1)*dim, (j + 1)*dim);
+		}
+	}
+}
+
 void
 drawSpace(cpSpace *space, drawSpaceOptions *options)
 {
+	if(options->drawHash)
+		drawSpatialHash(space->activeShapes);
+	
 	glLineWidth(1.0f);
 	if(options->drawBBs){
-		glColor3f(0.6, 1.0, 0.6);
+		glColor3f(0.3, 0.5, 0.3);
 		cpSpaceHashEach(space->activeShapes, &drawBB, NULL);
 		cpSpaceHashEach(space->staticShapes, &drawBB, NULL);
 	}

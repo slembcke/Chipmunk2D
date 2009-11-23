@@ -22,32 +22,55 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <string.h>
 
 #include "chipmunk.h"
-#include "chipmunk_unsafe.h"
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
-extern cpSpace *space;
-extern cpBody *staticBody;
+cpSpace *space;
+cpBody *staticBody;
 
-#define NUM_CIRCLES 30
-cpShape *circles[NUM_CIRCLES];
-cpFloat circleRadius = 30.0;
+typedef struct OneWayPlatform {
+	cpVect n; // direction objects may pass through
+	cpArray *passThruList; // list of objects passing through
+} OneWayPlatform;
+
+static OneWayPlatform platformInstance;
+
+static int
+preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
+{
+	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	OneWayPlatform *platform = a->data;
+	
+	if(cpArrayContains(platform->passThruList, b)){
+		// The object is in the pass thru list, ignore it until separates.
+		return 0;
+	} else {
+		cpFloat dot = cpvdot(cpArbiterGetNormal(arb, 0), platform->n);
+		
+		if(dot < 0){
+			// Add the object to the pass thrru list
+			cpArrayPush(platform->passThruList, b);
+			return 0;
+		} else {
+			return 1;
+		}
+	}
+}
+
+static void
+separate(cpArbiter *arb, cpSpace *space, void *ignore)
+{
+	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	
+	// remove the object from the pass thru list
+	cpArrayDeleteObj(((OneWayPlatform *)a->data)->passThruList, b);
+}
 
 static void
 update(int ticks)
 {
-	if(arrowDirection.y){
-		circleRadius = cpfmax(10.0, circleRadius + arrowDirection.y);
-		
-		for(int i=0; i<NUM_CIRCLES; i++){
-			circles[i]->body->m = cpMomentForCircle(1.0, 0.0, circleRadius, cpvzero);
-			cpCircleShapeSetRadius(circles[i], circleRadius);
-		}
-	}
-	
 	int steps = 1;
 	cpFloat dt = 1.0/60.0/(cpFloat)steps;
 	
@@ -64,15 +87,15 @@ init(void)
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
-	space->iterations = 5;
+	space->iterations = 10;
+	cpSpaceResizeStaticHash(space, 40.0, 1000);
+	cpSpaceResizeActiveHash(space, 40.0, 1000);
 	space->gravity = cpv(0, -100);
-	
-	cpSpaceResizeStaticHash(space, 40.0, 999);
-	cpSpaceResizeActiveHash(space, 30.0, 2999);
 	
 	cpBody *body;
 	cpShape *shape;
 	
+	// Create segments around the edge of the screen.
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
@@ -85,17 +108,30 @@ init(void)
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
 	
-	for(int i=0; i<NUM_CIRCLES; i++){
-		body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForCircle(1.0, 0.0, circleRadius, cpvzero)));
-		body->p = cpvmult(cpv(frand()*2.0f - 1.0f, frand()*2.0f - 1.0f), circleRadius*5.0f);
-		
-		circles[i] = shape = cpSpaceAddShape(space, cpCircleShapeNew(body, circleRadius, cpvzero));
-		shape->e = 0.0; shape->u = 1.0;
-	}
+	// Add our one way segment
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-160,-100), cpv(160,-100), 10.0f));
+	shape->e = 1.0; shape->u = 1.0;
+	shape->collision_type = 1;
+	shape->layers = NOT_GRABABLE_MASK;
 	
-	strcat(messageString,
-		"chipmunk_unsafe.h Contains functions for changing shapes, but they can cause severe stability problems if used incorrectly.\n"
-		"Shape changes occur as instantaneous changes to position without an accompanying velocity change. USE WITH CAUTION!");
+	// We'll use the data pointer for the OneWayPlatform struct
+	platformInstance.n = cpv(0, 1); // let objects pass upwards
+	platformInstance.passThruList = cpArrayNew(0);
+	shape->data = &platformInstance;
+	
+	
+	// Add a ball to make things more interesting
+	cpFloat radius = 15.0;
+	body = cpSpaceAddBody(space, cpBodyNew(10.0, cpMomentForCircle(10.0, 0.0, radius, cpvzero)));
+	body->p = cpv(0, -200);
+	body->v = cpv(0, 170);
+
+	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
+	shape->e = 0.0; shape->u = 0.9;
+	shape->collision_type = 2;
+	
+	cpSpaceAddCollisionHandler(space, 1, 2, NULL, preSolve, NULL, separate, NULL);
+	
 	return space;
 }
 
@@ -105,10 +141,12 @@ destroy(void)
 	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
+	
+	cpArrayFree(platformInstance.passThruList);
 }
 
-const chipmunkDemo UnsafeOps = {
-	"Unsafe Operations",
+const chipmunkDemo OneWay = {
+	"One Way Platforms",
 	NULL,
 	init,
 	update,

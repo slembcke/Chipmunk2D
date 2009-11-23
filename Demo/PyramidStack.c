@@ -66,20 +66,17 @@ init(void)
 	};
 	
 	// Create segments around the edge of the screen.
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0; shape->u = 1.0;
 	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddStaticShape(space, shape);
 	
 	// Add lots of boxes.
 	for(int i=0; i<14; i++){
@@ -95,13 +92,11 @@ init(void)
 	
 	// Add a ball to make things more interesting
 	cpFloat radius = 15.0;
-	body = cpBodyNew(10.0, cpMomentForCircle(10.0, 0.0, radius, cpvzero));
-	body->p = cpv(0, -240 + radius);
-	cpSpaceAddBody(space, body);
+	body = cpSpaceAddBody(space, cpBodyNew(10.0, cpMomentForCircle(10.0, 0.0, radius, cpvzero)));
+	body->p = cpv(0, -240 + radius+5);
 
-	shape = cpCircleShapeNew(body, radius, cpvzero);
+	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
 	shape->e = 0.0; shape->u = 0.9;
-	cpSpaceAddShape(space, shape);
 	
 	return space;
 }

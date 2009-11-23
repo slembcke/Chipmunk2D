@@ -4,6 +4,7 @@ typedef double cpFloat;
 #define cpfsqrt sqrt
 #define cpfsin sin
 #define cpfcos cos
+#define cpfacos acos
 #define cpfatan2 atan2
 #define cpfmod fmod
 #define cpfexp exp
@@ -17,6 +18,7 @@ typedef float cpFloat;
 #define cpfsqrt sqrtf
 #define cpfsin sinf
 #define cpfcos cosf
+#define cpfacos acosf
 #define cpfatan2 atan2f
 #define cpfmod fmodf
 #define cpfexp expf

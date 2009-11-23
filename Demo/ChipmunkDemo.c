@@ -59,6 +59,7 @@
 
 //extern chipmunkDemo Test;
 extern chipmunkDemo LogoSmash;
+extern chipmunkDemo Simple;
 extern chipmunkDemo PyramidStack;
 extern chipmunkDemo Plink;
 extern chipmunkDemo Tumble;
@@ -67,16 +68,19 @@ extern chipmunkDemo Bounce;
 extern chipmunkDemo Planet;
 extern chipmunkDemo Springies;
 extern chipmunkDemo Pump;
-extern chipmunkDemo WalkBot;
 extern chipmunkDemo TheoJansen;
 extern chipmunkDemo MagnetsElectric;
 extern chipmunkDemo UnsafeOps;
 extern chipmunkDemo Query;
+extern chipmunkDemo OneWay;
+extern chipmunkDemo Player;
+extern chipmunkDemo Sensors;
 
 //extern chipmunkDemo Test;
 
 static chipmunkDemo *demos[] = {
 	&LogoSmash,
+	&Simple,
 	&PyramidStack,
 	&Plink,
 	&Tumble,
@@ -85,11 +89,13 @@ static chipmunkDemo *demos[] = {
 	&Planet,
 	&Springies,
 	&Pump,
-	&WalkBot,
 	&TheoJansen,
 	&MagnetsElectric,
 	&UnsafeOps,
 	&Query,
+	&OneWay,
+	&Player,
+	&Sensors,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
@@ -114,8 +120,9 @@ cpVect arrowDirection = {};
 
 drawSpaceOptions options = {
 	0,
+	0,
 	1,
-	0.0f,
+	4.0f,
 	0.0f,
 	1.5f,
 };
@@ -141,18 +148,51 @@ drawString(int x, int y, char *str)
 static void
 drawInstructions()
 {
-	int x = -300;
-	int y =  220;
-	
-	char *str = (
+	drawString(-300, 220,
 		"Controls:\n"
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
 		"Arrow keys control some demos.\n"
-		"\\ enables anti-aliasing."
+		"\\ enables anti-aliasing.\n"
+		"- toggles spatial hash visualization.\n"
+		"= toggles bounding boxes."
+	);
+}
+
+static int maxArbiters = 0;
+static int maxPoints = 0;
+static int maxConstraints = 0;
+
+static void
+drawInfo()
+{
+	int arbiters = space->arbiters->num;
+	int points = 0;
+	
+	for(int i=0; i<arbiters; i++)
+		points += ((cpArbiter *)(space->arbiters->arr[i]))->numContacts;
+	
+	int constraints = (space->constraints->num + points)*(space->iterations + space->elasticIterations);
+	
+	maxArbiters = arbiters > maxArbiters ? arbiters : maxArbiters;
+	maxPoints = points > maxPoints ? points : maxPoints;
+	maxConstraints = constraints > maxConstraints ? constraints : maxConstraints;
+	
+	char buffer[1000];
+	char *format = 
+		"Arbiters: %d (%d) - "
+		"Contact Points: %d (%d)\n"
+		"Other Constraints: %d, Iterations: %d\n"
+		"Constraints x Iterations: %d (%d)";
+	
+	snprintf(buffer, 1000, format,
+		arbiters, maxArbiters,
+		points, maxPoints,
+		space->constraints->num, space->iterations + space->elasticIterations,
+		constraints, maxConstraints
 	);
 	
-	drawString(x, y, str);
+	drawString(0, 220, buffer);
 }
 
 static void
@@ -162,6 +202,7 @@ display(void)
 	
 	drawSpace(space, currDemo->drawOptions ? currDemo->drawOptions : &options);
 	drawInstructions();
+	drawInfo();
 	drawString(-300, -210, messageString);
 		
 	glutSwapBuffers();
@@ -193,6 +234,9 @@ runDemo(chipmunkDemo *demo)
 	ticks = 0;
 	mouseJoint = NULL;
 	messageString[0] = '\0';
+	maxArbiters = 0;
+	maxPoints = 0;
+	maxConstraints = 0;
 	space = currDemo->initFunc();
 
 	glutSetWindowTitle(demoTitle(currDemo));
@@ -207,6 +251,10 @@ keyboard(unsigned char key, int x, int y)
 		runDemo(demos[index]);
 	} else if(key == '\r'){
 		runDemo(currDemo);
+	} else if(key == '-'){
+		options.drawHash = !options.drawHash;
+	} else if(key == '='){
+		options.drawBBs = !options.drawBBs;
 	} else if(key == '\\'){
 		glEnable(GL_LINE_SMOOTH);
 		glEnable(GL_POINT_SMOOTH);
@@ -365,11 +413,11 @@ glutStuff(int argc, const char *argv[])
 //	for(int i=0; i<count; i++)
 //		currDemo->updateFunc(i);
 //	
-//	currDemo->destroyFunc();
-//	
 //	gettimeofday(&end_time, NULL);
 //	long millisecs = (end_time.tv_sec - start_time.tv_sec)*1000;
 //	millisecs += (end_time.tv_usec - start_time.tv_usec)/1000;
+//	
+//	currDemo->destroyFunc();
 //	
 //	printf("Time(%c) = %ldms\n", index + 'a', millisecs);
 //}
@@ -381,7 +429,7 @@ main(int argc, const char **argv)
 	
 //	for(int i=0; i<demoCount; i++)
 //		time_trial(i, 1000);
-//	time_trial('c' - 'a', 10000);
+//	time_trial('d' - 'a', 10000);
 //	exit(0);
 	
 	mouseBody = cpBodyNew(INFINITY, INFINITY);

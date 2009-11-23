@@ -102,8 +102,7 @@ init(void)
 		cpFloat length = 100.0f;
 		cpVect a = cpv(-length/2.0f, 0.0f), b = cpv(length/2.0f, 0.0f);
 		
-		cpBody *body = cpBodyNew(mass, cpMomentForSegment(mass, a, b));
-		cpSpaceAddBody(space, body);
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
 		body->p = cpv(0.0f, 100.0f);
 		
 		cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 20.0f));
@@ -123,8 +122,7 @@ init(void)
 			verts[i] = cpv(30*cos(angle), 30*sin(angle));
 		}
 		
-		cpBody *body = cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero));
-		cpSpaceAddBody(space, body);
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
 		body->p = cpv(50.0f, 50.0f);
 		
 		cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
@@ -134,8 +132,7 @@ init(void)
 		cpFloat mass = 1.0f;
 		cpFloat r = 20.0f;
 		
-		cpBody *body = cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, r, cpvzero));
-		cpSpaceAddBody(space, body);
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, r, cpvzero)));
 		body->p = cpv(100.0f, 100.0f);
 		
 		cpSpaceAddShape(space, cpCircleShapeNew(body, r, cpvzero));
