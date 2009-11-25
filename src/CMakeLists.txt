@@ -16,7 +16,6 @@ set(chipmunk_public_header
 )
 
 set(chipmunk_constraint_header
-  constraints/cpBreakableJoint.h
   constraints/cpConstraint.h
   constraints/cpDampedRotarySpring.h
   constraints/cpDampedSpring.h

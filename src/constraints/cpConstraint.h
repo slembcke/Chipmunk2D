@@ -95,7 +95,6 @@ CP_DefineConstraintSetter(struct, type, member, name)
 #include "cpGrooveJoint.h"
 #include "cpDampedSpring.h"
 #include "cpDampedRotarySpring.h"
-#include "cpBreakableJoint.h"
 #include "cpRotaryLimitJoint.h"
 #include "cpRatchetJoint.h"
 #include "cpGearJoint.h"
