@@ -24,6 +24,7 @@
 #include <assert.h>
 
 #include "chipmunk.h"
+#include "chipmunk_unsafe.h"
 
 cpPolyShape *
 cpPolyShapeAlloc(void)
@@ -160,12 +161,12 @@ cpPolyShapeGetNumVerts(cpShape *shape)
 }
 
 cpVect
-cpPolyShapeGetVert(cpShape *shape, int index)
+cpPolyShapeGetVert(cpShape *shape, int idx)
 {
 	assert(shape->klass == &polyClass);
-	assert(index < cpPolyShapeGetNumVerts(shape));
+	assert(idx < cpPolyShapeGetNumVerts(shape));
 	
-	return ((cpPolyShape *)shape)->verts[index];
+	return ((cpPolyShape *)shape)->verts[idx];
 }
 
 

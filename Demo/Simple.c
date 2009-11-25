@@ -49,8 +49,8 @@ init(void)
 	space->iterations = 10;
 	// These parameters tune the efficiency of the collision detection.
 	// For more info: http://code.google.com/p/chipmunk-physics/wiki/cpSpace
-	cpSpaceResizeStaticHash(space, 40.0, 1000);
-	cpSpaceResizeActiveHash(space, 2.0, 1000);
+	cpSpaceResizeStaticHash(space, 40.0f, 1000);
+	cpSpaceResizeActiveHash(space, 2.0f, 1000);
 	// Give it some gravity
 	space->gravity = cpv(0, -100);
 	
@@ -58,7 +58,7 @@ init(void)
 	cpShape *ground = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
 	// Set some parameters of the shape.
 	// For more info: http://code.google.com/p/chipmunk-physics/wiki/cpShape
-	ground->e = 1.0; ground->u = 1.0;
+	ground->e = 1.0f; ground->u = 1.0f;
 	ground->layers = NOT_GRABABLE_MASK; // Used by the Demo mouse grabbing code
 	// Add the shape to the space as a static shape
 	// If a shape never changes position, add it as static so Chipmunk knows it only needs to
@@ -67,10 +67,10 @@ init(void)
 	cpSpaceAddStaticShape(space, ground);
 	
 	// Add a moving circle object.
-	cpFloat radius = 15.0;
-	cpFloat mass = 10.0;
+	cpFloat radius = 15.0f;
+	cpFloat mass = 10.0f;
 	// This time we need to give a mass and moment of inertia when creating the circle.
-	cpBody *ballBody = cpBodyNew(mass, cpMomentForCircle(mass, 0.0, radius, cpvzero));
+	cpBody *ballBody = cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero));
 	// Set some parameters of the body:
 	// For more info: http://code.google.com/p/chipmunk-physics/wiki/cpBody
 	ballBody->p = cpv(0, -240 + radius+5);
@@ -83,7 +83,7 @@ init(void)
 	// When the body moves or rotates, the shape will move with it.
 	// Additionally, all of the cpSpaceAdd*() functions return the thing they added so you can create and add in one go.
 	cpShape *ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero));
-	ballShape->e = 0.0; ballShape->u = 0.9;
+	ballShape->e = 0.0f; ballShape->u = 0.9f;
 	
 	return space;
 }
@@ -94,7 +94,7 @@ update(int ticks)
 {
 	// Chipmunk allows you to use a different timestep each frame, but it works much better when you use a fixed timestep.
 	// An excellent article on why fixed timesteps for game logic can be found here: http://gafferongames.com/game-physics/fix-your-timestep/
-	cpSpaceStep(space, 1.0/60.0);
+	cpSpaceStep(space, 1.0f/60.0f);
 }
 
 // destroy is called by the demo code to free all the memory we've allocated

@@ -46,7 +46,7 @@ begin(cpArbiter *arb, cpSpace *space, void *ignore)
 	PlayerStruct *player = a->data;
 	
 	cpVect n = cpvneg(cpArbiterGetNormal(arb, 0));
-	if(n.y > 0.0){
+	if(n.y > 0.0f){
 		cpArrayPush(player->groundShapes, b);
 	}
 	
@@ -98,11 +98,11 @@ static void
 update(int ticks)
 {
 	static int lastJumpState = 0;
-	int jumpState = (arrowDirection.y > 0.0);
+	int jumpState = (arrowDirection.y > 0.0f);
 	
 	cpVect groundNormal = playerInstance.groundNormal;
-	if(groundNormal.y > 0.0){
-		playerInstance.shape->surface_v = cpvmult(cpvperp(groundNormal), 400.0*arrowDirection.x);
+	if(groundNormal.y > 0.0f){
+		playerInstance.shape->surface_v = cpvmult(cpvperp(groundNormal), 400.0f*arrowDirection.x);
 	} else {
 		playerInstance.shape->surface_v = cpvzero;
 	}
@@ -111,18 +111,18 @@ update(int ticks)
 	
 	// apply jump
 	if(jumpState && !lastJumpState && cpvlengthsq(groundNormal)){
-//		body->v = cpvmult(cpvslerp(groundNormal, cpv(0.0, 1.0), 0.5), 500.0);
-		body->v = cpvadd(body->v, cpvmult(cpvslerp(groundNormal, cpv(0.0, 1.0), 0.75), 500.0));
+//		body->v = cpvmult(cpvslerp(groundNormal, cpv(0.0f, 1.0f), 0.5f), 500.0f);
+		body->v = cpvadd(body->v, cpvmult(cpvslerp(groundNormal, cpv(0.0f, 1.0f), 0.75f), 500.0f));
 	}
 	
 	if(playerInstance.groundShapes->num == 0){
-		cpFloat air_accel = body->v.x + arrowDirection.x*(2000.0);
+		cpFloat air_accel = body->v.x + arrowDirection.x*(2000.0f);
 		body->f.x = body->m*air_accel;
-//		body->v.x = cpflerpconst(body->v.x, 400.0*arrowDirection.x, 2000.0/60.0);
+//		body->v.x = cpflerpconst(body->v.x, 400.0f*arrowDirection.x, 2000.0f/60.0f);
 	}
 	
 	int steps = 3;
-	cpFloat dt = 1.0/60.0/(cpFloat)steps;
+	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	playerInstance.groundNormal = cpvzero;
 	for(int i=0; i<steps; i++){
@@ -141,8 +141,8 @@ init(void)
 	
 	space = cpSpaceNew();
 	space->iterations = 10;
-	cpSpaceResizeStaticHash(space, 40.0, 1000);
-	cpSpaceResizeActiveHash(space, 40.0, 1000);
+	cpSpaceResizeStaticHash(space, 40.0f, 1000);
+	cpSpaceResizeActiveHash(space, 40.0f, 1000);
 	space->gravity = cpv(0, -1500);
 	
 	cpBody *body;
@@ -150,54 +150,54 @@ init(void)
 	
 	// Create segments around the edge of the screen.
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 	
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 	
 	// add some other segments to play with
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-220,-200), cpv(-220,240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(0,-240), cpv(320,-200), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(200,-240), cpv(320,-100), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-220,-80), cpv(200,-80), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 	
 	// Set up the player
-	cpFloat radius = 15.0;
-	body = cpSpaceAddBody(space, cpBodyNew(10.0, INFINITY));
+	cpFloat radius = 15.0f;
+	body = cpSpaceAddBody(space, cpBodyNew(10.0f, INFINITY));
 	body->p = cpv(0, -220);
 	body->velocity_func = playerUpdateVelocity;
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
-	shape->e = 0.0; shape->u = 2.0;
+	shape->e = 0.0f; shape->u = 2.0f;
 	shape->collision_type = 1;
 	
 	playerInstance.u = shape->u;

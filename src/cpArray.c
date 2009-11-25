@@ -81,10 +81,10 @@ cpArrayPush(cpArray *arr, void *object)
 }
 
 void
-cpArrayDeleteIndex(cpArray *arr, int index)
+cpArrayDeleteIndex(cpArray *arr, int idx)
 {
 	int last = --arr->num;
-	arr->arr[index] = arr->arr[last];
+	arr->arr[idx] = arr->arr[last];
 }
 
 void

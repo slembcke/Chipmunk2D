@@ -68,7 +68,7 @@ update(int ticks)
 	
 	// normal other stuff.
 	int steps = 1;
-	cpFloat dt = 1.0/60.0/(cpFloat)steps;
+	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
@@ -86,8 +86,8 @@ init(void)
 	space->elasticIterations = 0;
 	space->iterations = 5;
 	
-	cpSpaceResizeStaticHash(space, 40.0, 999);
-	cpSpaceResizeActiveHash(space, 30.0, 2999);
+	cpSpaceResizeStaticHash(space, 40.0f, 999);
+	cpSpaceResizeActiveHash(space, 30.0f, 2999);
 	
 	cpShape *shape;
 	

@@ -34,22 +34,22 @@ extern cpBody *staticBody;
 
 #define NUM_CIRCLES 30
 cpShape *circles[NUM_CIRCLES];
-cpFloat circleRadius = 30.0;
+cpFloat circleRadius = 30.0f;
 
 static void
 update(int ticks)
 {
 	if(arrowDirection.y){
-		circleRadius = cpfmax(10.0, circleRadius + arrowDirection.y);
+		circleRadius = cpfmax(10.0f, circleRadius + arrowDirection.y);
 		
 		for(int i=0; i<NUM_CIRCLES; i++){
-			circles[i]->body->m = cpMomentForCircle(1.0, 0.0, circleRadius, cpvzero);
+			circles[i]->body->m = cpMomentForCircle(1.0f, 0.0f, circleRadius, cpvzero);
 			cpCircleShapeSetRadius(circles[i], circleRadius);
 		}
 	}
 	
 	int steps = 1;
-	cpFloat dt = 1.0/60.0/(cpFloat)steps;
+	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
@@ -67,30 +67,30 @@ init(void)
 	space->iterations = 5;
 	space->gravity = cpv(0, -100);
 	
-	cpSpaceResizeStaticHash(space, 40.0, 999);
-	cpSpaceResizeActiveHash(space, 30.0, 2999);
+	cpSpaceResizeStaticHash(space, 40.0f, 999);
+	cpSpaceResizeActiveHash(space, 30.0f, 2999);
 	
 	cpBody *body;
 	cpShape *shape;
 	
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	for(int i=0; i<NUM_CIRCLES; i++){
-		body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForCircle(1.0, 0.0, circleRadius, cpvzero)));
+		body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForCircle(1.0f, 0.0f, circleRadius, cpvzero)));
 		body->p = cpvmult(cpv(frand()*2.0f - 1.0f, frand()*2.0f - 1.0f), circleRadius*5.0f);
 		
 		circles[i] = shape = cpSpaceAddShape(space, cpCircleShapeNew(body, circleRadius, cpvzero));
-		shape->e = 0.0; shape->u = 1.0;
+		shape->e = 0.0f; shape->u = 1.0f;
 	}
 	
 	strcat(messageString,

@@ -25,6 +25,7 @@
 #include <math.h>
 
 #include "chipmunk.h"
+#include "chipmunk_unsafe.h"
 
 #define CP_DefineShapeGetter(struct, type, member, name) \
 CP_DeclareShapeGetter(struct, type, name){ \
@@ -45,7 +46,7 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 {
 	shape->klass = klass;
 	
-	shape->id = SHAPE_ID_COUNTER;
+	shape->hashid = SHAPE_ID_COUNTER;
 	SHAPE_ID_COUNTER++;
 	
 	shape->body = body;
@@ -91,20 +92,13 @@ cpShapeCacheBB(cpShape *shape)
 }
 
 int
-cpShapePointQuery(cpShape *shape, cpVect p, cpLayers layers, cpGroup group){
-	if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
-		return shape->klass->pointQuery(shape, p);
-	}
-	
-	return 0;
+cpShapePointQuery(cpShape *shape, cpVect p){
+	return shape->klass->pointQuery(shape, p);
 }
 
 int
-cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpLayers layers, cpGroup group, cpSegmentQueryInfo *info){
-	if(!(group && shape->group && group == shape->group) && (layers&shape->layers)){
-		shape->klass->segmentQuery(shape, a, b, info);
-	}
-	
+cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info){
+	shape->klass->segmentQuery(shape, a, b, info);
 	return (info->shape != NULL);
 }
 
@@ -163,7 +157,7 @@ circleSegmentQuery(cpShape *shape, cpVect center, cpFloat r, cpVect a, cpVect b,
 	
 	if(det >= 0.0f){
 		cpFloat t = (-qb - cpfsqrt(det))/(2.0f*qa);
-		if(0.0 <= t && t <= 1.0f){
+		if(0.0f<= t && t <= 1.0f){
 			info->shape = shape;
 			info->t = t;
 			info->n = cpvnormalize(cpvlerp(a, b, t));

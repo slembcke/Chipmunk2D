@@ -72,7 +72,7 @@ static void
 update(int ticks)
 {
 	int steps = 1;
-	cpFloat dt = 1.0/60.0/(cpFloat)steps;
+	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
@@ -88,8 +88,8 @@ init(void)
 	
 	space = cpSpaceNew();
 	space->iterations = 10;
-	cpSpaceResizeStaticHash(space, 40.0, 1000);
-	cpSpaceResizeActiveHash(space, 40.0, 1000);
+	cpSpaceResizeStaticHash(space, 40.0f, 1000);
+	cpSpaceResizeActiveHash(space, 40.0f, 1000);
 	space->gravity = cpv(0, -100);
 	
 	cpBody *body;
@@ -97,20 +97,20 @@ init(void)
 	
 	// Create segments around the edge of the screen.
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	// Add our one way segment
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-160,-100), cpv(160,-100), 10.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->collision_type = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 	
@@ -121,13 +121,13 @@ init(void)
 	
 	
 	// Add a ball to make things more interesting
-	cpFloat radius = 15.0;
-	body = cpSpaceAddBody(space, cpBodyNew(10.0, cpMomentForCircle(10.0, 0.0, radius, cpvzero)));
+	cpFloat radius = 15.0f;
+	body = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 0.0f, radius, cpvzero)));
 	body->p = cpv(0, -200);
 	body->v = cpv(0, 170);
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
-	shape->e = 0.0; shape->u = 0.9;
+	shape->e = 0.0f; shape->u = 0.9f;
 	shape->collision_type = 2;
 	
 	cpSpaceAddCollisionHandler(space, 1, 2, NULL, preSolve, NULL, separate, NULL);

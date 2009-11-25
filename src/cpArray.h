@@ -38,7 +38,7 @@ void cpArrayFree(cpArray *arr);
 void cpArrayClear(cpArray *arr);
 
 void cpArrayPush(cpArray *arr, void *object);
-void cpArrayDeleteIndex(cpArray *arr, int index);
+void cpArrayDeleteIndex(cpArray *arr, int idx);
 void cpArrayDeleteObj(cpArray *arr, void *obj);
 
 void cpArrayEach(cpArray *arr, cpArrayIter iterFunc, void *data);

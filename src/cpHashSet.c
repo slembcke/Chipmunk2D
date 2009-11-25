@@ -101,9 +101,9 @@ cpHashSetResize(cpHashSet *set)
 		while(bin){
 			cpHashSetBin *next = bin->next;
 			
-			int index = bin->hash%newSize;
-			bin->next = newTable[index];
-			newTable[index] = bin;
+			int idx = bin->hash%newSize;
+			bin->next = newTable[idx];
+			newTable[idx] = bin;
 			
 			bin = next;
 		}
@@ -118,10 +118,10 @@ cpHashSetResize(cpHashSet *set)
 void *
 cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data)
 {
-	int index = hash%set->size;
+	int idx = hash%set->size;
 	
 	// Find the bin with the matching element.
-	cpHashSetBin *bin = set->table[index];
+	cpHashSetBin *bin = set->table[idx];
 	while(bin && !set->eql(ptr, bin->elt))
 		bin = bin->next;
 	
@@ -131,8 +131,8 @@ cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data)
 		bin->hash = hash;
 		bin->elt = set->trans(ptr, data); // Transform the pointer.
 		
-		bin->next = set->table[index];
-		set->table[index] = bin;
+		bin->next = set->table[idx];
+		set->table[idx] = bin;
 		
 		set->entries++;
 		
@@ -147,12 +147,12 @@ cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data)
 void *
 cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 {
-	int index = hash%set->size;
+	int idx = hash%set->size;
 	
 	// Pointer to the previous bin pointer.
-	cpHashSetBin **prev_ptr = &set->table[index];
+	cpHashSetBin **prev_ptr = &set->table[idx];
 	// Pointer the the current bin.
-	cpHashSetBin *bin = set->table[index];
+	cpHashSetBin *bin = set->table[idx];
 	
 	// Find the bin
 	while(bin && !set->eql(ptr, bin->elt)){
@@ -180,8 +180,8 @@ cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 void *
 cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr)
 {	
-	int index = hash%set->size;
-	cpHashSetBin *bin = set->table[index];
+	int idx = hash%set->size;
+	cpHashSetBin *bin = set->table[idx];
 	while(bin && !set->eql(ptr, bin->elt))
 		bin = bin->next;
 		

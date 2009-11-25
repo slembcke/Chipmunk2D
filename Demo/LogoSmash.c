@@ -79,7 +79,7 @@ static void
 update(int ticks)
 {
 	int steps = 1;
-	cpFloat dt = 1.0/60.0/(cpFloat)steps;
+	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
@@ -89,7 +89,7 @@ update(int ticks)
 static cpShape *
 make_ball(cpFloat x, cpFloat y)
 {
-	cpBody *body = cpBodyNew(1.0, INFINITY);
+	cpBody *body = cpBodyNew(1.0f, INFINITY);
 	body->p = cpv(x, y);
 
 	cpShape *shape = cpCircleShapeNew(body, 0.95f, cpvzero);
@@ -102,7 +102,7 @@ static cpSpace *
 init(void)
 {
 	space = cpSpaceNew();
-	cpSpaceResizeActiveHash(space, 2.0, 10000);
+	cpSpaceResizeActiveHash(space, 2.0f, 10000);
 	space->iterations = 1;
 	
 	cpBody *body;
@@ -112,8 +112,8 @@ init(void)
 		for(int x=0; x<image_width; x++){
 			if(!get_pixel(x, y)) continue;
 			
-			cpFloat x_jitter = 0.05*frand();
-			cpFloat y_jitter = 0.05*frand();
+			cpFloat x_jitter = 0.05f*frand();
+			cpFloat y_jitter = 0.05f*frand();
 			
 			shape = make_ball(2*(x - image_width/2 + x_jitter), 2*(image_height/2 - y + y_jitter));
 			cpSpaceAddBody(space, shape->body);

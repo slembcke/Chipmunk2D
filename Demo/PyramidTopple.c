@@ -34,7 +34,7 @@ static void
 update(int ticks)
 {
 	int steps = 2;
-	cpFloat dt = 1.0/60.0/(cpFloat)steps;
+	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++)
 		cpSpaceStep(space, dt);
@@ -49,8 +49,8 @@ init(void)
 	
 	space = cpSpaceNew();
 	space->iterations = 20;
-	cpSpaceResizeActiveHash(space, 40.0, 2999);
-	cpSpaceResizeStaticHash(space, 40.0, 999);
+	cpSpaceResizeActiveHash(space, 40.0f, 2999);
+	cpSpaceResizeStaticHash(space, 40.0f, 999);
 	space->gravity = cpv(0, -300);
 	
 	cpBody *body;
@@ -68,11 +68,11 @@ init(void)
 	
 	// Add a floor.
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-600,-240), cpv(600,-240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	// Shared friction constant.
-	cpFloat u = 0.6;
+	cpFloat u = 0.6f;
 	
 	// Add the dominoes. Skim over this. It doesn't do anything fancy, and it's hard to follow.
 	int n = 9;
@@ -80,42 +80,42 @@ init(void)
 		cpVect offset = cpv(-i*60/2.0f, (n - i)*52);
 		
 		for(int j=0; j<i; j++){
-			body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero)));
+			body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForPoly(1.0f, num, verts, cpvzero)));
 			body->p = cpvadd(cpv(j*60, -220), offset);
 			
 			shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
-			shape->e = 0.0; shape->u = u;
+			shape->e = 0.0f; shape->u = u;
 			
 
-			body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero)));
+			body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForPoly(1.0f, num, verts, cpvzero)));
 			body->p = cpvadd(cpv(j*60, -197), offset);
 			cpBodySetAngle(body, M_PI/2.0f);
 			
 			shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
-			shape->e = 0.0; shape->u = u;
+			shape->e = 0.0f; shape->u = u;
 			
 			
 			if(j == (i - 1)) continue;
-			body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero)));
+			body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForPoly(1.0f, num, verts, cpvzero)));
 			body->p = cpvadd(cpv(j*60 + 30, -191), offset);
 			cpBodySetAngle(body, M_PI/2.0f);
 			
 			shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
-			shape->e = 0.0; shape->u = u;
+			shape->e = 0.0f; shape->u = u;
 		}
 
-		body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero)));
+		body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForPoly(1.0f, num, verts, cpvzero)));
 		body->p = cpvadd(cpv(-17, -174), offset);
 		
 		shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
-		shape->e = 0.0; shape->u = u;
+		shape->e = 0.0f; shape->u = u;
 		
 
-		body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForPoly(1.0, num, verts, cpvzero)));
+		body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForPoly(1.0f, num, verts, cpvzero)));
 		body->p = cpvadd(cpv((i - 1)*60 + 17, -174), offset);
 		
 		shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
-		shape->e = 0.0; shape->u = u;
+		shape->e = 0.0f; shape->u = u;
 	}
 	
 	// Give the last domino a little tap.

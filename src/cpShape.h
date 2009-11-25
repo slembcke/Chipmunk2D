@@ -91,7 +91,7 @@ typedef struct cpShape{
 	// *** Internally Used Fields
 	
 	// Unique id used as the hash value.
-	cpHashValue id;
+	cpHashValue hashid;
 } cpShape;
 
 // Low level shape initialization func.
@@ -105,7 +105,7 @@ void cpShapeFree(cpShape *shape);
 cpBB cpShapeCacheBB(cpShape *shape);
 
 // Test if a point lies within a shape.
-int cpShapePointQuery(cpShape *shape, cpVect p, cpLayers layers, cpGroup group);
+int cpShapePointQuery(cpShape *shape, cpVect p);
 
 #define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(cpShape *shape)
 
@@ -159,7 +159,7 @@ void cpResetShapeIdCounter(void);
 // Directed segment queries against individual shapes.
 void cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info);
 
-int cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpLayers layers, cpGroup group, cpSegmentQueryInfo *info);
+int cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
 
 static inline cpVect
 cpSegmentQueryHitPoint(cpVect start, cpVect end, cpSegmentQueryInfo info)

@@ -50,7 +50,7 @@ cpShape *cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset
 int cpPolyValidate(cpVect *verts, int numVerts);
 
 int cpPolyShapeGetNumVerts(cpShape *shape);
-cpVect cpPolyShapeGetVert(cpShape *shape, int index);
+cpVect cpPolyShapeGetVert(cpShape *shape, int idx);
 
 // *** inlined utility functions
 
@@ -77,7 +77,7 @@ cpPolyShapeContainsVert(cpPolyShape *poly, cpVect v)
 	int i;
 	for(i=0; i<poly->numVerts; i++){
 		cpFloat dist = cpvdot(axes[i].n, v) - axes[i].d;
-		if(dist > 0.0) return 0;
+		if(dist > 0.0f) return 0;
 	}
 	
 	return 1;
@@ -93,7 +93,7 @@ cpPolyShapeContainsVertPartial(cpPolyShape *poly, cpVect v, cpVect n)
 	for(i=0; i<poly->numVerts; i++){
 		if(cpvdot(axes[i].n, n) < 0.0f) continue;
 		cpFloat dist = cpvdot(axes[i].n, v) - axes[i].d;
-		if(dist > 0.0) return 0;
+		if(dist > 0.0f) return 0;
 	}
 	
 	return 1;

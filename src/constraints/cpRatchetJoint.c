@@ -36,7 +36,7 @@ preStep(cpRatchetJoint *joint, cpFloat dt, cpFloat dt_inv)
 	
 	cpFloat delta = b->a - a->a;
 	cpFloat diff = angle - delta;
-	cpFloat pdist = (diff*dir > 0.0f ? diff : 0.0);
+	cpFloat pdist = (diff*dir > 0.0f ? diff : 0.0f);
 	joint->angle = dir*cpfmax(delta*dir, angle*dir);
 	
 	// calculate moment of inertia coefficient.

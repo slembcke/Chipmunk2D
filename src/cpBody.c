@@ -101,7 +101,7 @@ void
 cpBodySlew(cpBody *body, cpVect pos, cpFloat dt)
 {
 	cpVect delta = cpvsub(pos, body->p);
-	body->v = cpvmult(delta, 1.0/dt);
+	body->v = cpvmult(delta, 1.0f/dt);
 }
 
 void

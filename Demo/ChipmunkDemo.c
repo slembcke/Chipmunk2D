@@ -210,7 +210,7 @@ display(void)
 	
 	cpVect newPoint = cpvlerp(mousePoint_last, mousePoint, 0.25f);
 	mouseBody->p = newPoint;
-	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0);
+	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0f);
 	mousePoint_last = newPoint;
 	currDemo->updateFunc(ticks);
 }
@@ -364,12 +364,12 @@ idle(void)
 static void
 initGL(void)
 {
-	glClearColor(1.0f, 1.0f, 1.0f, 0.0);
+	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-320.0, 320.0, -240.0, 240.0, -1.0, 1.0);
-	glTranslatef(0.5, 0.5, 0.0);
+	glOrtho(-320.0f, 320.0f, -240.0f, 240.0f, -1.0f, 1.0f);
+	glTranslatef(0.5f, 0.5f, 0.0f);
 	
 	glEnableClientState(GL_VERTEX_ARRAY);
 }

@@ -59,12 +59,12 @@ collFuncSetEql(cpCollisionHandler *check, cpCollisionHandler *pair)
 
 // Transformation function for collFuncSet.
 static void *
-collFuncSetTrans(cpCollisionHandler *ids, void *unused)
+collFuncSetTrans(cpCollisionHandler *handler, void *unused)
 {
-	cpCollisionHandler *handler = (cpCollisionHandler *)cpmalloc(sizeof(cpCollisionHandler));
-	(*handler) = (*ids);
+	cpCollisionHandler *copy = (cpCollisionHandler *)cpmalloc(sizeof(cpCollisionHandler));
+	(*copy) = (*handler);
 	
-	return handler;
+	return copy;
 }
 
 #pragma mark Post Step Function Helpers
@@ -225,8 +225,8 @@ cpSpaceAddCollisionHandler(
 void
 cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
-	cpCollisionHandler handler = {a, b, NULL, NULL, NULL, NULL, NULL};
-	cpCollisionHandler *old_handler = cpHashSetRemove(space->collFuncSet, CP_HASH_PAIR(a, b), &handler);
+	struct{cpCollisionType a, b;} ids = {a, b};
+	cpCollisionHandler *old_handler = cpHashSetRemove(space->collFuncSet, CP_HASH_PAIR(a, b), &ids);
 	cpfree(old_handler);
 }
 
@@ -258,8 +258,8 @@ cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
 	assert(shape->body);
-	assert(!cpHashSetFind(space->activeShapes->handleSet, shape->id, shape));
-	cpSpaceHashInsert(space->activeShapes, shape, shape->id, shape->bb);
+	assert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape));
+	cpSpaceHashInsert(space->activeShapes, shape, shape->hashid, shape->bb);
 	
 	return shape;
 }
@@ -268,10 +268,10 @@ cpShape *
 cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
 	assert(shape->body);
-	assert(!cpHashSetFind(space->staticShapes->handleSet, shape->id, shape));
+	assert(!cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape));
 
 	cpShapeCacheBB(shape);
-	cpSpaceHashInsert(space->staticShapes, shape, shape->id, shape->bb);
+	cpSpaceHashInsert(space->staticShapes, shape, shape->hashid, shape->bb);
 	
 	return shape;
 }
@@ -299,17 +299,17 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
-	assert(cpHashSetFind(space->activeShapes->handleSet, shape->id, shape));
+	assert(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape));
 	
-	cpSpaceHashRemove(space->activeShapes, shape, shape->id);
+	cpSpaceHashRemove(space->activeShapes, shape, shape->hashid);
 }
 
 void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
-	assert(cpHashSetFind(space->staticShapes->handleSet, shape->id, shape));
+	assert(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape));
 	
-	cpSpaceHashRemove(space->staticShapes, shape, shape->id);
+	cpSpaceHashRemove(space->staticShapes, shape, shape->hashid);
 }
 
 void
@@ -362,8 +362,12 @@ typedef struct pointQueryContext {
 static void 
 pointQueryHelper(cpVect *point, cpShape *shape, pointQueryContext *context)
 {
-	if(cpShapePointQuery(shape, *point, context->layers, context->group))
+	if(
+		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
+		cpShapePointQuery(shape, *point)
+	){
 		context->func(shape, context->data);
+	}
 }
 
 void
@@ -412,9 +416,13 @@ static cpFloat
 segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
 {
 	cpSegmentQueryInfo info = {NULL, 0.0f, cpvzero};
-	if(cpShapeSegmentQuery(shape, context->start, context->end, context->layers, context->group, &info)){
-		if(context->func)
+	if(
+		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
+		cpShapeSegmentQuery(shape, context->start, context->end, &info)
+	){
+		if(context->func){
 			context->func(shape, info.t, info.n, data);
+		}
 		
 		context->anyCollision = 1;
 	}
@@ -448,7 +456,10 @@ static cpFloat
 segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo *out)
 {
 	cpSegmentQueryInfo info = {NULL, 1.0f, cpvzero};
-	if(cpShapeSegmentQuery(shape, context->start, context->end, context->layers, context->group, &info)){
+	if(
+		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
+		cpShapeSegmentQuery(shape, context->start, context->end, &info)
+	){
 		if(info.t < out->t){
 			out->shape = info.shape;
 			out->t = info.t;
@@ -459,11 +470,11 @@ segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo 
 	return info.t;
 }
 
-int
+cpShape *
 cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out)
 {
 	cpSegmentQueryInfo info = {NULL, 1.0f, cpvzero};
-	if(!out) out = &info;
+	out = out ? out : &info;
 	
 	out->t = 1.0f;
 	
@@ -475,7 +486,7 @@ cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers laye
 	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFirst, out);
 	cpSpaceHashSegmentQuery(space->activeShapes, &context, start, end, out->t, (cpSpaceHashSegmentQueryFunc)segQueryFirst, out);
 	
-	return (out->shape != NULL);
+	return out->shape;
 }
 
 #pragma mark Spatial Hash Management
@@ -531,9 +542,9 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	if(queryReject(a,b)) return;
 	
 	// Find the collision pair function for the shapes.
-	cpCollisionType ids[] = {a->collision_type, b->collision_type};
+	struct{cpCollisionType a, b;} ids = {a->collision_type, b->collision_type};
 	cpHashValue collHashID = CP_HASH_PAIR(a->collision_type, b->collision_type);
-	cpCollisionHandler *handler = (cpCollisionHandler *)cpHashSetFind(space->collFuncSet, collHashID, ids);
+	cpCollisionHandler *handler = (cpCollisionHandler *)cpHashSetFind(space->collFuncSet, collHashID, &ids);
 	
 	int sensor = a->sensor || b->sensor;
 	if(sensor && handler == &space->defaultHandler) return;

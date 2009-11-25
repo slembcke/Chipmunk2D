@@ -86,22 +86,22 @@ catcherBarBegin(cpArbiter *arb, cpSpace *space, void *unused)
 	return 0;
 }
 
-static cpFloat frand_unit(){return 2.0*((cpFloat)rand()/(cpFloat)RAND_MAX) - 1.0;}
+static cpFloat frand_unit(){return 2.0f*((cpFloat)rand()/(cpFloat)RAND_MAX) - 1.0f;}
 
 static void
 update(int ticks)
 {
 	int steps = 1;
-	cpFloat dt = 1.0/60.0/(cpFloat)steps;
+	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	if(!emitterInstance.blocked && emitterInstance.queue){
 		emitterInstance.queue--;
 		
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(1.0, cpMomentForCircle(1.0, 15.0, 0.0, cpvzero)));
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForCircle(1.0f, 15.0f, 0.0f, cpvzero)));
 		body->p = emitterInstance.position;
-		body->v = cpvmult(cpv(frand_unit(), frand_unit()), 100.0);
+		body->v = cpvmult(cpv(frand_unit(), frand_unit()), 100.0f);
 		
-		cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, 15.0, cpvzero));
+		cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, 15.0f, cpvzero));
 		shape->collision_type = BALL_TYPE;
 	}
 	
@@ -119,8 +119,8 @@ init(void)
 	
 	space = cpSpaceNew();
 	space->iterations = 10;
-	cpSpaceResizeStaticHash(space, 40.0, 1000);
-	cpSpaceResizeActiveHash(space, 40.0, 1000);
+	cpSpaceResizeStaticHash(space, 40.0f, 1000);
+	cpSpaceResizeActiveHash(space, 40.0f, 1000);
 	space->gravity = cpv(0, -100);
 	
 	cpShape *shape;
@@ -133,13 +133,13 @@ init(void)
 	emitterInstance.position = cpv(0, 150);
 	
 	// Create our blocking sensor, so we know when the emitter is clear to emit another ball
-	shape = cpSpaceAddStaticShape(space, cpCircleShapeNew(staticBody, 15.0, emitterInstance.position));
+	shape = cpSpaceAddStaticShape(space, cpCircleShapeNew(staticBody, 15.0f, emitterInstance.position));
 	shape->sensor = 1;
 	shape->collision_type = BLOCKING_SENSOR_TYPE;
 	shape->data = &emitterInstance;
 	
 	// Create our catch sensor to requeue the balls when they reach the bottom of the screen
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-2000, -200), cpv(2000, -200), 15.0));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-2000, -200), cpv(2000, -200), 15.0f));
 	shape->sensor = 1;
 	shape->collision_type = CATCH_SENSOR_TYPE;
 	shape->data = &emitterInstance;

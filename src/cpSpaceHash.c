@@ -126,9 +126,9 @@ cpSpaceHashNew(cpFloat celldim, int cells, cpSpaceHashBBFunc bbfunc)
 }
 
 static inline void
-clearHashCell(cpSpaceHash *hash, int index)
+clearHashCell(cpSpaceHash *hash, int idx)
 {
-	cpSpaceHashBin *bin = hash->table[index];
+	cpSpaceHashBin *bin = hash->table[idx];
 	while(bin){
 		cpSpaceHashBin *next = bin->next;
 		
@@ -141,7 +141,7 @@ clearHashCell(cpSpaceHash *hash, int index)
 		bin = next;
 	}
 	
-	hash->table[index] = NULL;
+	hash->table[idx] = NULL;
 }
 
 // Clear all cells in the hashtable.
@@ -258,8 +258,8 @@ hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 	int n = hash->numcells;
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
-			int index = hash_func(i,j,n);
-			cpSpaceHashBin *bin = hash->table[index];
+			int idx = hash_func(i,j,n);
+			cpSpaceHashBin *bin = hash->table[idx];
 			
 			// Don't add an object twice to the same cell.
 			if(containsHandle(bin, hand)) continue;
@@ -269,22 +269,22 @@ hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 			cpSpaceHashBin *newBin = getEmptyBin(hash);
 			newBin->handle = hand;
 			newBin->next = bin;
-			hash->table[index] = newBin;
+			hash->table[idx] = newBin;
 		}
 	}
 }
 
 void
-cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue id, cpBB bb)
+cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue hashid, cpBB bb)
 {
-	cpHandle *hand = (cpHandle *)cpHashSetInsert(hash->handleSet, id, obj, NULL);
+	cpHandle *hand = (cpHandle *)cpHashSetInsert(hash->handleSet, hashid, obj, NULL);
 	hashHandle(hash, hand, bb);
 }
 
 void
-cpSpaceHashRehashObject(cpSpaceHash *hash, void *obj, cpHashValue id)
+cpSpaceHashRehashObject(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 {
-	cpHandle *hand = (cpHandle *)cpHashSetFind(hash->handleSet, id, obj);
+	cpHandle *hand = (cpHandle *)cpHashSetFind(hash->handleSet, hashid, obj);
 	hashHandle(hash, hand, hash->bbfunc(obj));
 }
 
@@ -308,9 +308,9 @@ cpSpaceHashRehash(cpSpaceHash *hash)
 }
 
 void
-cpSpaceHashRemove(cpSpaceHash *hash, void *obj, cpHashValue id)
+cpSpaceHashRemove(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 {
-	cpHandle *hand = (cpHandle *)cpHashSetRemove(hash->handleSet, id, obj);
+	cpHandle *hand = (cpHandle *)cpHashSetRemove(hash->handleSet, hashid, obj);
 	
 	if(hand){
 		hand->obj = NULL;
@@ -373,9 +373,9 @@ void
 cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpaceHashQueryFunc func, void *data)
 {
 	cpFloat dim = hash->celldim;
-	int index = hash_func(floor_int(point.x/dim), floor_int(point.y/dim), hash->numcells);  // Fix by ShiftZ
+	int idx = hash_func(floor_int(point.x/dim), floor_int(point.y/dim), hash->numcells);  // Fix by ShiftZ
 	
-	query(hash, hash->table[index], &point, func, data);
+	query(hash, hash->table[idx], &point, func, data);
 
 	// Increment the stamp.
 	// Only one cell is checked, but query() requires it anyway.
@@ -397,8 +397,8 @@ cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc fun
 	// Iterate over the cells and query them.
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
-			int index = hash_func(i,j,n);
-			query(hash, hash->table[index], obj, func, data);
+			int idx = hash_func(i,j,n);
+			query(hash, hash->table[idx], obj, func, data);
 		}
 	}
 	
@@ -440,8 +440,8 @@ handleQueryRehashHelper(void *elt, void *data)
 //			// exit the loops if the object has been deleted in func().
 //			if(!hand->obj) goto break_out;
 			
-			int index = hash_func(i,j,n);
-			cpSpaceHashBin *bin = hash->table[index];
+			int idx = hash_func(i,j,n);
+			cpSpaceHashBin *bin = hash->table[idx];
 			
 			if(containsHandle(bin, hand)) continue;
 			
@@ -451,7 +451,7 @@ handleQueryRehashHelper(void *elt, void *data)
 			cpSpaceHashBin *newBin = getEmptyBin(hash);
 			newBin->handle = hand;
 			newBin->next = bin;
-			hash->table[index] = newBin;
+			hash->table[idx] = newBin;
 		}
 	}
 	
@@ -532,8 +532,8 @@ void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, c
 
 	int n = hash->numcells;
 	while(t < t_exit){
-		int index = hash_func(cell_x, cell_y, n);
-		t_exit = cpfmin(t_exit, segmentQuery(hash, hash->table[index], obj, func, data));
+		int idx = hash_func(cell_x, cell_y, n);
+		t_exit = cpfmin(t_exit, segmentQuery(hash, hash->table[idx], obj, func, data));
 
 		if (next_v < next_h){
 			cell_y += y_inc;

@@ -34,7 +34,7 @@ static void
 update(int ticks)
 {
 	int steps = 3;
-	cpFloat dt = 1.0/60.0/(cpFloat)steps;
+	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
@@ -78,19 +78,19 @@ init(void)
 		
 	// Create segments around the edge of the screen.
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
 	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	for(int i=0; i<10; i++)
@@ -99,7 +99,7 @@ init(void)
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(100.0f, 10000.0f));
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpv(-75,0), cpv(75,0), 5.0f));
-	shape->e = 1.0; shape->u = 1.0;
+	shape->e = 1.0f; shape->u = 1.0f;
 	
 	cpSpaceAddConstraint(space, cpPivotJointNew2(body, staticBody, cpvzero, cpvzero));
 	

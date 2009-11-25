@@ -46,8 +46,8 @@ circle2circleQuery(cpVect p1, cpVect p2, cpFloat r1, cpFloat r2, cpContact **con
 	(*con) = (cpContact *)cpmalloc(sizeof(cpContact));
 	cpContactInit(
 		(*con),
-		cpvadd(p1, cpvmult(delta, 0.5 + (r1 - 0.5*mindist)/non_zero_dist)),
-		cpvmult(delta, 1.0/non_zero_dist),
+		cpvadd(p1, cpvmult(delta, 0.5f + (r1 - 0.5f*mindist)/non_zero_dist)),
+		cpvmult(delta, 1.0f/non_zero_dist),
 		dist - mindist,
 		0
 	);
@@ -143,11 +143,11 @@ findMSA(cpPolyShape *poly, cpPolyShapeAxis *axes, int num, cpFloat *min_out)
 {
 	int min_index = 0;
 	cpFloat min = cpPolyShapeValueOnAxis(poly, axes->n, axes->d);
-	if(min > 0.0) return -1;
+	if(min > 0.0f) return -1;
 	
 	for(int i=1; i<num; i++){
 		cpFloat dist = cpPolyShapeValueOnAxis(poly, axes[i].n, axes[i].d);
-		if(dist > 0.0) {
+		if(dist > 0.0f) {
 			return -1;
 		} else if(dist > min){
 			min = dist;
@@ -169,13 +169,13 @@ findVerts(cpContact **arr, cpPolyShape *poly1, cpPolyShape *poly2, cpVect n, cpF
 	for(int i=0; i<poly1->numVerts; i++){
 		cpVect v = poly1->tVerts[i];
 		if(cpPolyShapeContainsVertPartial(poly2, v, cpvneg(n)))
-			cpContactInit(addContactPoint(arr, &max, &num), v, n, dist, CP_HASH_PAIR(poly1->shape.id, i));
+			cpContactInit(addContactPoint(arr, &max, &num), v, n, dist, CP_HASH_PAIR(poly1->shape.hashid, i));
 	}
 	
 	for(int i=0; i<poly2->numVerts; i++){
 		cpVect v = poly2->tVerts[i];
 		if(cpPolyShapeContainsVertPartial(poly1, v, n))
-			cpContactInit(addContactPoint(arr, &max, &num), v, n, dist, CP_HASH_PAIR(poly2->shape.id, i));
+			cpContactInit(addContactPoint(arr, &max, &num), v, n, dist, CP_HASH_PAIR(poly2->shape.hashid, i));
 	}
 	
 	//	if(!num)
@@ -207,7 +207,7 @@ poly2poly(cpShape *shape1, cpShape *shape2, cpContact **arr)
 }
 
 // Like cpPolyValueOnAxis(), but for segments.
-static inline float
+static inline cpFloat
 segValueOnAxis(cpSegmentShape *seg, cpVect n, cpFloat d)
 {
 	cpFloat a = cpvdot(n, seg->ta) - seg->r;
@@ -228,7 +228,7 @@ findPointsBehindSeg(cpContact **arr, int *max, int *num, cpSegmentShape *seg, cp
 		if(cpvdot(v, n) < cpvdot(seg->tn, seg->ta)*coef + seg->r){
 			cpFloat dt = cpvcross(seg->tn, v);
 			if(dta >= dt && dt >= dtb){
-				cpContactInit(addContactPoint(arr, max, num), v, n, pDist, CP_HASH_PAIR(poly->shape.id, i));
+				cpContactInit(addContactPoint(arr, max, num), v, n, pDist, CP_HASH_PAIR(poly->shape.hashid, i));
 			}
 		}
 	}
@@ -317,7 +317,7 @@ circle2poly(cpShape *shape1, cpShape *shape2, cpContact **con)
 	cpFloat min = cpvdot(axes->n, circ->tc) - axes->d - circ->r;
 	for(int i=0; i<poly->numVerts; i++){
 		cpFloat dist = cpvdot(axes[i].n, circ->tc) - axes[i].d - circ->r;
-		if(dist > 0.0){
+		if(dist > 0.0f){
 			return 0;
 		} else if(dist > min) {
 			min = dist;
@@ -374,6 +374,8 @@ addColFunc(cpShapeType a, cpShapeType b, collisionFunc func)
 #ifdef __cplusplus
 extern "C" {
 #endif
+	void cpInitCollisionFuncs(void);
+	
 	// Initializes the array of collision functions.
 	// Called by cpInitChipmunk().
 	void
