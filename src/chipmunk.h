@@ -47,8 +47,15 @@ cpfabs(cpFloat n)
 }
 
 static inline cpFloat
-cpfclamp(cpFloat f, cpFloat min, cpFloat max){
+cpfclamp(cpFloat f, cpFloat min, cpFloat max)
+{
 	return cpfmin(cpfmax(f, min), max);
+}
+
+static inline cpFloat
+cpflerp(cpFloat f1, cpFloat f2, cpFloat t)
+{
+	return f1*(1.0f - t) + f2*t;
 }
 
 static inline cpFloat

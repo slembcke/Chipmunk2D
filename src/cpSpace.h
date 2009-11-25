@@ -25,10 +25,10 @@ struct cpSpace;
 extern int cp_contact_persistence;
 
 // User collision handler function types.
-typedef int (*cpCollisionBeginFunc)(cpArbiter *arb, struct cpSpace *space, cpDataPointer data);
-typedef int (*cpCollisionPreSolveFunc)(cpArbiter *arb, struct cpSpace *space, cpDataPointer data);
-typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, struct cpSpace *space, cpDataPointer data);
-typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, struct cpSpace *space, cpDataPointer data);
+typedef int (*cpCollisionBeginFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
+typedef int (*cpCollisionPreSolveFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
+typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
+typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
 
 // Structure for holding collision pair function information.
 // Used internally.
