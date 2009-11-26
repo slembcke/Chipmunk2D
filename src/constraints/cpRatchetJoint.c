@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "../chipmunk.h"
 #include "util.h"
@@ -31,13 +32,19 @@ preStep(cpRatchetJoint *joint, cpFloat dt, cpFloat dt_inv)
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
-	cpFloat dir = joint->direction;
 	cpFloat angle = joint->angle;
+	cpFloat phase = joint->phase;
+	cpFloat ratchet = joint->ratchet;
 	
 	cpFloat delta = b->a - a->a;
 	cpFloat diff = angle - delta;
-	cpFloat pdist = (diff*dir > 0.0f ? diff : 0.0f);
-	joint->angle = dir*cpfmax(delta*dir, angle*dir);
+	cpFloat pdist = 0.0f;
+	
+	if(diff*ratchet > 0.0f){
+		pdist = diff;
+	} else {
+		joint->angle = cpffloor((delta - phase)/ratchet)*ratchet + phase;
+	}
 	
 	// calculate moment of inertia coefficient.
 	joint->iSum = 1.0f/(a->i_inv + b->i_inv);
@@ -68,12 +75,12 @@ applyImpulse(cpRatchetJoint *joint)
 	
 	// compute relative rotational velocity
 	cpFloat wr = b->w - a->w;
-	cpFloat dir = joint->direction;
+	cpFloat ratchet = joint->ratchet;
 	
 	// compute normal impulse	
 	cpFloat j = -(joint->bias + wr)*joint->iSum;
 	cpFloat jOld = joint->jAcc;
-	joint->jAcc = cpfclamp((jOld + j)*dir, 0.0f, joint->jMax)*dir;
+	joint->jAcc = cpfclamp((jOld + j)*ratchet, 0.0f, joint->jMax*cpfabs(ratchet))/ratchet;
 	j = joint->jAcc - jOld;
 	
 	// apply impulse
@@ -101,12 +108,13 @@ cpRatchetJointAlloc(void)
 }
 
 cpRatchetJoint *
-cpRatchetJointInit(cpRatchetJoint *joint, cpBody *a, cpBody *b, cpFloat direction)
+cpRatchetJointInit(cpRatchetJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratchet)
 {
 	cpConstraintInit((cpConstraint *)joint, &klass, a, b);
 	
 	joint->angle = 0.0f;
-	joint->direction  = direction;
+	joint->phase = phase;
+	joint->ratchet = ratchet;
 	
 	joint->angle = b->a - a->a;
 	
@@ -114,7 +122,7 @@ cpRatchetJointInit(cpRatchetJoint *joint, cpBody *a, cpBody *b, cpFloat directio
 }
 
 cpConstraint *
-cpRatchetJointNew(cpBody *a, cpBody *b, cpFloat direction)
+cpRatchetJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratchet)
 {
-	return (cpConstraint *)cpRatchetJointInit(cpRatchetJointAlloc(), a, b, direction);
+	return (cpConstraint *)cpRatchetJointInit(cpRatchetJointAlloc(), a, b, phase, ratchet);
 }

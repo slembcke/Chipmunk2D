@@ -23,7 +23,7 @@ const cpConstraintClass *cpRatchetJointGetClass();
 
 typedef struct cpRatchetJoint {
 	cpConstraint constraint;
-	cpFloat angle, direction;
+	cpFloat angle, phase, ratchet;
 	
 	cpFloat iSum;
 		
@@ -32,8 +32,9 @@ typedef struct cpRatchetJoint {
 } cpRatchetJoint;
 
 cpRatchetJoint *cpRatchetJointAlloc(void);
-cpRatchetJoint *cpRatchetJointInit(cpRatchetJoint *joint, cpBody *a, cpBody *b, cpFloat direction);
-cpConstraint *cpRatchetJointNew(cpBody *a, cpBody *b, cpFloat direction);
+cpRatchetJoint *cpRatchetJointInit(cpRatchetJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratchet);
+cpConstraint *cpRatchetJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratchet);
 
 CP_DefineConstraintProperty(cpRatchetJoint, cpFloat, angle, Angle);
-CP_DefineConstraintProperty(cpRatchetJoint, cpFloat, direction, Direction);
+CP_DefineConstraintProperty(cpRatchetJoint, cpFloat, phase, Phase);
+CP_DefineConstraintProperty(cpRatchetJoint, cpFloat, ratchet, Ratchet);
