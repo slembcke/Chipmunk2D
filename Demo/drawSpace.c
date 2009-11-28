@@ -370,7 +370,21 @@ drawConstraint(cpConstraint *constraint)
 			glVertex2f(b.x, b.y);
 		} glEnd();
 	} else if(klass == cpGrooveJointGetClass()){
-//		printf("Cannot draw constraint\n");
+		cpGrooveJoint *joint = (cpGrooveJoint *)constraint;
+	
+		cpVect a = cpvadd(body_a->p, cpvrotate(joint->grv_a, body_a->rot));
+		cpVect b = cpvadd(body_a->p, cpvrotate(joint->grv_b, body_a->rot));
+		cpVect c = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
+
+		glPointSize(5.0f);
+		glBegin(GL_POINTS); {
+			glVertex2f(c.x, c.y);
+		} glEnd();
+		
+		glBegin(GL_LINES); {
+			glVertex2f(a.x, a.y);
+			glVertex2f(b.x, b.y);
+		} glEnd();
 	} else if(klass == cpDampedSpringGetClass()){
 		drawSpring((cpDampedSpring *)constraint, body_a, body_b);
 	} else {

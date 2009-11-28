@@ -33,6 +33,7 @@ set(chipmunk_demos_source_files
   OneWay.c
   Player.c
   Sensors.c
+  Joints.c
 )
 
 include_directories(${chipmunk_demos_include_dirs})

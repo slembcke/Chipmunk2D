@@ -75,6 +75,7 @@ extern chipmunkDemo Query;
 extern chipmunkDemo OneWay;
 extern chipmunkDemo Player;
 extern chipmunkDemo Sensors;
+extern chipmunkDemo Joints;
 
 //extern chipmunkDemo Test;
 
@@ -96,6 +97,7 @@ static chipmunkDemo *demos[] = {
 	&OneWay,
 	&Player,
 	&Sensors,
+	&Joints,
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;

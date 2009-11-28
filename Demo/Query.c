@@ -150,7 +150,7 @@ destroy(void)
 }
 
 const chipmunkDemo Query = {
-	"Query",
+	"Segment Query",
 	NULL,
 	init,
 	update,
