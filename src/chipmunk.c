@@ -20,6 +20,7 @@
  */
  
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "chipmunk.h"
 
@@ -31,10 +32,15 @@ extern "C" {
 }
 #endif
 
+char *cpVersionString = "5.0.0";
 
 void
 cpInitChipmunk(void)
 {
+#ifndef NDEBUG	
+	printf("Initializing Chipmunk v%s (Debug Enabled)\n", cpVersionString);
+#endif
+	
 	cpInitCollisionFuncs();
 }
 

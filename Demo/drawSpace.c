@@ -419,7 +419,7 @@ drawCollisions(void *ptr, void *data)
 static inline cpHashValue
 hash_func(cpHashValue x, cpHashValue y, cpHashValue n)
 {
-	return (x*2185031351ul ^ y*4232417593ul) % n;
+	return (x*1640531513ul ^ y*2654435789ul) % n;
 }
 
 static void
@@ -444,7 +444,7 @@ drawSpatialHash(cpSpaceHash *hash)
 				cell_count++;
 			
 			GLfloat v = 1.0f - (GLfloat)cell_count/10.0f;
-			glColor3f(v, v, v);
+			glColor3f(v,v,v);
 			glRectf(i*dim, j*dim, (i + 1)*dim, (j + 1)*dim);
 		}
 	}

@@ -44,11 +44,12 @@ cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash
 }
 
 cpVect
-cpContactsSumImpulses(cpContact *contacts, int numContacts)
+cpArbiterTotalImpulse(cpArbiter *arb)
 {
+	cpContact *contacts = arb->contacts;
 	cpVect sum = cpvzero;
 	
-	for(int i=0; i<numContacts; i++){
+	for(int i=0, count=arb->numContacts; i<count; i++){
 		cpContact *con = &contacts[i];
 		sum = cpvadd(sum, cpvmult(con->n, con->jnAcc));
 	}
@@ -57,11 +58,12 @@ cpContactsSumImpulses(cpContact *contacts, int numContacts)
 }
 
 cpVect
-cpContactsSumImpulsesWithFriction(cpContact *contacts, int numContacts)
+cpArbiterTotalImpulseWithFriction(cpArbiter *arb)
 {
+	cpContact *contacts = arb->contacts;
 	cpVect sum = cpvzero;
 	
-	for(int i=0; i<numContacts; i++){
+	for(int i=0, count=arb->numContacts; i<count; i++){
 		cpContact *con = &contacts[i];
 		sum = cpvadd(sum, cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc)));
 	}

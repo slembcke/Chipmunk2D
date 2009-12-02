@@ -233,7 +233,7 @@ getEmptyBin(cpSpaceHash *hash)
 static inline cpHashValue
 hash_func(cpHashValue x, cpHashValue y, cpHashValue n)
 {
-	return (x*2185031351ul ^ y*4232417593ul) % n;
+	return (x*1640531513ul ^ y*2654435789ul) % n;
 }
 
 // Much faster than (int)floor(f)
