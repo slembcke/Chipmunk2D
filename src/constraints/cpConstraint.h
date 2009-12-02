@@ -65,12 +65,6 @@ struct##Get##name(cpConstraint *constraint){ \
 	cpConstraintCheckCast(constraint, struct##GetClass()); \
 	return ((struct *)constraint)->member; \
 } \
-/* These are for compatibility with the interim trunk version, for some reason I thought I needed the underscores to make the macro work */ \
-static inline type \
-struct##_get_##member(cpConstraint *constraint){ \
-	cpConstraintCheckCast(constraint, struct##GetClass()); \
-	return ((struct *)constraint)->member; \
-}
 
 #define CP_DefineConstraintSetter(struct, type, member, name) \
 static inline void \
@@ -78,11 +72,6 @@ struct##Set##name(cpConstraint *constraint, type value){ \
 	cpConstraintCheckCast(constraint, struct##GetClass()); \
 	((struct *)constraint)->member = value; \
 } \
-static inline void \
-struct##_set_##member(cpConstraint *constraint, type value){ \
-	cpConstraintCheckCast(constraint, struct##GetClass()); \
-	((struct *)constraint)->member = value; \
-}
 
 #define CP_DefineConstraintProperty(struct, type, member, name) \
 CP_DefineConstraintGetter(struct, type, member, name) \

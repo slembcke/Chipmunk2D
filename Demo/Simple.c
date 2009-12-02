@@ -50,7 +50,7 @@ init(void)
 	// These parameters tune the efficiency of the collision detection.
 	// For more info: http://code.google.com/p/chipmunk-physics/wiki/cpSpace
 	cpSpaceResizeStaticHash(space, 40.0f, 1000);
-	cpSpaceResizeActiveHash(space, 2.0f, 1000);
+	cpSpaceResizeActiveHash(space, 40.0f, 1000);
 	// Give it some gravity
 	space->gravity = cpv(0, -100);
 	
