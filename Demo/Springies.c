@@ -80,8 +80,6 @@ init(void)
 	staticBody = cpBodyNew(INFINITY, INFINITY);
 	
 	space = cpSpaceNew();
-	cpSpaceResizeActiveHash(space, 30.0f, 999);
-	cpSpaceResizeStaticHash(space, 200.0f, 99);
 	
 	cpBody *body1  = add_bar(cpv(-240,  160), cpv(-160,   80), 1);
 	cpBody *body2  = add_bar(cpv(-160,   80), cpv( -80,  160), 1);

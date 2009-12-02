@@ -141,8 +141,6 @@ init(void)
 	
 	space = cpSpaceNew();
 	space->iterations = 10;
-	cpSpaceResizeStaticHash(space, 40.0f, 1000);
-	cpSpaceResizeActiveHash(space, 40.0f, 1000);
 	space->gravity = cpv(0, -1500);
 	
 	cpBody *body;

@@ -57,8 +57,8 @@ init(void)
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
-	cpSpaceResizeActiveHash(space, 30.0f, 999);
-	cpSpaceResizeStaticHash(space, 200.0f, 99);
+	cpSpaceResizeActiveHash(space, 40.0f, 999);
+	cpSpaceResizeStaticHash(space, 40.0f, 99);
 	space->gravity = cpv(0, -600);
 	
 	cpBody *body;
