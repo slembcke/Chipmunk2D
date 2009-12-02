@@ -43,7 +43,6 @@ set(chipmunk_source_files
   cpSpace.c
   cpSpaceHash.c
   cpVect.c
-  constraints/cpBreakableJoint.c
   constraints/cpConstraint.c
   constraints/cpDampedRotarySpring.c
   constraints/cpDampedSpring.c
@@ -51,6 +50,7 @@ set(chipmunk_source_files
   constraints/cpGrooveJoint.c
   constraints/cpPinJoint.c
   constraints/cpPivotJoint.c
+  constraints/cpRatchetJoint.c
   constraints/cpRotaryLimitJoint.c
   constraints/cpSimpleMotor.c
   constraints/cpSlideJoint.c
