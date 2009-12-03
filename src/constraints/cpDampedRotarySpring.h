@@ -43,3 +43,4 @@ cpConstraint *cpDampedRotarySpringNew(cpBody *a, cpBody *b, cpFloat restAngle, c
 CP_DefineConstraintProperty(cpDampedRotarySpring, cpFloat, restAngle, RestAngle);
 CP_DefineConstraintProperty(cpDampedRotarySpring, cpFloat, stiffness, Stiffness);
 CP_DefineConstraintProperty(cpDampedRotarySpring, cpFloat, damping, Damping);
+CP_DefineConstraintProperty(cpDampedRotarySpring, cpDampedRotarySpringTorqueFunc, springTorqueFunc, SpringTorqueFunc);
