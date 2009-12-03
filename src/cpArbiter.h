@@ -29,7 +29,7 @@ extern cpFloat cp_bias_coef;
 extern cpFloat cp_collision_slop;
 
 // Data structure for contact points.
-typedef struct cpContact{
+typedef struct cpContact {
 	// Contact point and normal.
 	cpVect p, n;
 	// Penetration distance.
@@ -55,7 +55,7 @@ cpVect cpContactsSumImpulses(cpContact *contacts, int numContacts);
 cpVect cpContactsSumImpulsesWithFriction(cpContact *contacts, int numContacts);
 
 // Data structure for tracking collisions between shapes.
-typedef struct cpArbiter{
+typedef struct cpArbiter {
 	// Information on the contact points between the objects.
 	int numContacts;
 	cpContact *contacts;
@@ -64,7 +64,7 @@ typedef struct cpArbiter{
 	cpShape *a, *b;
 	
 	// Calculated before calling the pre-solve collision handler
-	// Override them with custom
+	// Override them with custom values if you want specialized behavior
 	cpFloat e;
 	cpFloat u;
 	 // Used for surface_v calculations, implementation may change
@@ -96,6 +96,11 @@ void cpArbiterApplyCachedImpulse(cpArbiter *arb);
 // Run an iteration of the solver on the arbiter.
 void cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef);
 
+// Collision Helper Functions
+cpVect cpArbiterTotalImpulse(cpArbiter *arb);
+cpVect cpArbiterTotalImpulseWithFriction(cpArbiter *arb);
+
+
 static inline void
 cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
 {
@@ -105,6 +110,7 @@ cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
 		(*a) = arb->a, (*b) = arb->b;
 	}
 }
+#define CP_ARBITER_GET_SHAPES(arb, a, b) cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
 
 static inline int
 cpArbiterIsFirstContact(cpArbiter *arb)
@@ -117,4 +123,10 @@ cpArbiterGetNormal(cpArbiter *arb, int i)
 {
 	cpVect n = arb->contacts[i].n;
 	return arb->swappedColl ? cpvneg(n) : n;
+}
+
+static inline cpVect
+cpArbiterGetPoint(cpArbiter *arb, int i)
+{
+	return arb->contacts[i].p;
 }

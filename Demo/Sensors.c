@@ -47,7 +47,7 @@ static Emitter emitterInstance;
 static int
 blockerBegin(cpArbiter *arb, cpSpace *space, void *unused)
 {
-	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	CP_ARBITER_GET_SHAPES(arb, a, b);
 	Emitter *emitter = a->data;
 	
 	emitter->blocked++;
@@ -58,7 +58,7 @@ blockerBegin(cpArbiter *arb, cpSpace *space, void *unused)
 static void
 blockerSeparate(cpArbiter *arb, cpSpace *space, void *unused)
 {
-	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	CP_ARBITER_GET_SHAPES(arb, a, b);
 	Emitter *emitter = a->data;
 	
 	emitter->blocked--;

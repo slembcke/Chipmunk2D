@@ -40,7 +40,7 @@ static OneWayPlatform platformInstance;
 static int
 preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 {
-	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	CP_ARBITER_GET_SHAPES(arb, a, b);
 	OneWayPlatform *platform = a->data;
 	
 	if(cpArrayContains(platform->passThruList, b)){
@@ -62,7 +62,7 @@ preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 static void
 separate(cpArbiter *arb, cpSpace *space, void *ignore)
 {
-	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	CP_ARBITER_GET_SHAPES(arb, a, b);
 	
 	// remove the object from the pass thru list
 	cpArrayDeleteObj(((OneWayPlatform *)a->data)->passThruList, b);

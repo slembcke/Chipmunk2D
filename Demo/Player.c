@@ -42,7 +42,7 @@ PlayerStruct playerInstance;
 static int
 begin(cpArbiter *arb, cpSpace *space, void *ignore)
 {
-	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	CP_ARBITER_GET_SHAPES(arb, a, b);
 	PlayerStruct *player = a->data;
 	
 	cpVect n = cpvneg(cpArbiterGetNormal(arb, 0));
@@ -56,7 +56,7 @@ begin(cpArbiter *arb, cpSpace *space, void *ignore)
 static int
 preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 {
-	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	CP_ARBITER_GET_SHAPES(arb, a, b);
 	PlayerStruct *player = a->data;
 	
 	if(arb->stamp > 0){
@@ -75,7 +75,7 @@ preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 static void
 separate(cpArbiter *arb, cpSpace *space, void *ignore)
 {
-	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+	CP_ARBITER_GET_SHAPES(arb, a, b);
 	PlayerStruct *player = a->data;
 	
 	cpArrayDeleteObj(player->groundShapes, b);
