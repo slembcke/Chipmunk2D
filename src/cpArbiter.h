@@ -73,10 +73,11 @@ typedef struct cpArbiter {
 	// Time stamp of the arbiter. (from cpSpace)
 	int stamp;
 	
-	// Are the shapes swapped in relation to the collision handler?
-	int swappedColl;
-	
 	struct cpCollisionHandler *handler;
+	
+	// Are the shapes swapped in relation to the collision handler?
+	char swappedColl;
+	char firstColl;
 } cpArbiter;
 
 // Basic allocation/destruction functions.
@@ -115,7 +116,7 @@ cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
 static inline int
 cpArbiterIsFirstContact(cpArbiter *arb)
 {
-	return arb->stamp == -1;
+	return arb->firstColl;
 }
 
 static inline cpVect

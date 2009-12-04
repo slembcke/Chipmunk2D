@@ -697,8 +697,11 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// run the post solve callbacks
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiter *arb = arbiters->arr[i];
+		
 		cpCollisionHandler *handler = arb->handler;
 		handler->postSolve(arb, space, handler->data);
+		
+		arb->firstColl = 0;
 	}
 	
 	// Run the post step callbacks

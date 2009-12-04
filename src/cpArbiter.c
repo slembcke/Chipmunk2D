@@ -105,6 +105,7 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 	arb->b = b;
 	
 	arb->stamp = -1;
+	arb->firstColl = 1;
 	
 	return arb;
 }
