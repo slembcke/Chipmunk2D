@@ -231,7 +231,7 @@ cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType
 }
 
 void
-cpSpaceSetDefaultCollisionPairFunc(
+cpSpaceSetDefaultCollisionHandler(
 	cpSpace *space,
 	cpCollisionType a, cpCollisionType b,
 	cpCollisionBeginFunc begin,
