@@ -98,6 +98,9 @@ cpShapePointQuery(cpShape *shape, cpVect p){
 
 int
 cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info){
+	cpSegmentQueryInfo blank = {NULL, 0.0f, cpvzero};
+	(*info) = blank;
+	
 	shape->klass->segmentQuery(shape, a, b, info);
 	return (info->shape != NULL);
 }

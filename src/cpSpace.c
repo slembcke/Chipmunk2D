@@ -415,7 +415,8 @@ typedef struct segQueryContext {
 static cpFloat
 segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
 {
-	cpSegmentQueryInfo info = {NULL, 0.0f, cpvzero};
+	cpSegmentQueryInfo info;
+	
 	if(
 		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
 		cpShapeSegmentQuery(shape, context->start, context->end, &info)
@@ -455,7 +456,7 @@ typedef struct segQueryFirstContext {
 static cpFloat
 segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo *out)
 {
-	cpSegmentQueryInfo info = {NULL, 1.0f, cpvzero};
+	cpSegmentQueryInfo info;// = {NULL, 1.0f, cpvzero};
 	if(
 		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
 		cpShapeSegmentQuery(shape, context->start, context->end, &info)
@@ -465,16 +466,22 @@ segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo 
 			out->t = info.t;
 			out->n = info.n;
 		}
+		
+		return info.t;
 	}
 	
-	return info.t;
+	return 1.0f;
 }
 
 cpShape *
 cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out)
 {
 	cpSegmentQueryInfo info = {NULL, 1.0f, cpvzero};
-	out = out ? out : &info;
+	if(out){
+		(*out) = info;
+  } else {
+		out = &info;
+	}
 	
 	out->t = 1.0f;
 	
