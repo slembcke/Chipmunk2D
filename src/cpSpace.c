@@ -195,7 +195,7 @@ cpSpaceFreeChildren(cpSpace *space)
 	cpArrayEach(space->constraints,      (cpArrayIter)&constraintFreeWrap,    NULL);
 }
 
-#pragma mark Collision Pair Function Management
+#pragma mark Collision Handler Function Management
 
 void
 cpSpaceAddCollisionHandler(
