@@ -92,8 +92,8 @@ postStepFuncSetTrans(postStepCallback *callback, void *ignored)
 #pragma mark Misc Helper Funcs
 
 // Default collision functions.
-static int alwaysCollide(cpArbiter *arb, cpSpace *space, cpDataPointer data){return 1;}
-static void nothing(cpArbiter *arb, cpSpace *space, cpDataPointer data){}
+static int alwaysCollide(cpArbiter *arb, cpSpace *space, void *data){return 1;}
+static void nothing(cpArbiter *arb, cpSpace *space, void *data){}
 
 // BBfunc callback for the spatial hash.
 static cpBB shapeBBFunc(cpShape *shape){return shape->bb;}
