@@ -72,15 +72,15 @@ cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 			float Value;
 		};
 		static union MSVC_EVIL_FLOAT_HACK INFINITY_HACK = {{0x00, 0x00, 0x80, 0x7F}};
-		#define INFINITY ((cpFloat)INFINITY_HACK.Value)
+		#define INFINITY (INFINITY_HACK.Value)
 	#endif
 	
 	#ifdef __GNUC__
-		#define INFINITY ((cpFloat)__builtin_inf())
+		#define INFINITY (__builtin_inf())
 	#endif
 	
 	#ifndef INFINITY
-		#define INFINITY ((cpFloat)1e1000)
+		#define INFINITY (1e1000)
 	#endif
 #endif
 
