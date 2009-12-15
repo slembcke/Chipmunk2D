@@ -41,7 +41,7 @@ static int
 preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
-	OneWayPlatform *platform = a->data;
+	OneWayPlatform *platform = (OneWayPlatform *)a->data;
 	
 	if(cpArrayContains(platform->passThruList, b)){
 		// The object is in the pass thru list, ignore it until separates.

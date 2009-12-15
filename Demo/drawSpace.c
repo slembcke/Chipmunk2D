@@ -183,7 +183,8 @@ drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 		cpVect delta = cpvsub(b, a);
 		cpFloat len = cpvlength(delta)/seg->r;
 		
-		GLfloat VAR[pillVAR_count*2];
+		GLfloat *VAR;
+		VAR = (GLfloat *)alloca(pillVAR_count*2*sizeof(GLfloat));
 		memcpy(VAR, pillVAR, sizeof(pillVAR));
 		
 		for(int i=0, half=pillVAR_count; i<half; i+=2)
@@ -473,7 +474,7 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 
 	glColor3f(0.5f, 1.0f, 0.5f);
 	for(int i=0, count = constraints->num; i<count; i++){
-		drawConstraint(constraints->arr[i]);
+		drawConstraint((cpConstraint *)constraints->arr[i]);
 	}
 	
 	if(options->bodyPointSize){
