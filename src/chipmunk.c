@@ -117,3 +117,7 @@ MAKE_REF(cpBBexpand);
 MAKE_REF(cpBodyWorld2Local);
 MAKE_REF(cpBodyLocal2World);
 MAKE_REF(cpBodyApplyImpulse);
+
+MAKE_REF(cpArbiterGetShapes);
+MAKE_REF(cpArbiterGetNormal);
+MAKE_REF(cpArbiterGetPoint);
