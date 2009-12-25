@@ -98,7 +98,6 @@ void cpSpaceFreeChildren(cpSpace *space);
 // Collision handler management functions.
 void cpSpaceSetDefaultCollisionHandler(
 	cpSpace *space,
-	cpCollisionType a, cpCollisionType b,
 	cpCollisionBeginFunc begin,
 	cpCollisionPreSolveFunc preSolve,
 	cpCollisionPostSolveFunc postSolve,

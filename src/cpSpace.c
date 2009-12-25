@@ -233,7 +233,6 @@ cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType
 void
 cpSpaceSetDefaultCollisionHandler(
 	cpSpace *space,
-	cpCollisionType a, cpCollisionType b,
 	cpCollisionBeginFunc begin,
 	cpCollisionPreSolveFunc preSolve,
 	cpCollisionPostSolveFunc postSolve,
@@ -241,7 +240,7 @@ cpSpaceSetDefaultCollisionHandler(
 	void *data
 ){
 	cpCollisionHandler handler = {
-		a, b,
+		0, 0,
 		begin ? begin : alwaysCollide,
 		preSolve ? preSolve : alwaysCollide,
 		postSolve ? postSolve : nothing,
