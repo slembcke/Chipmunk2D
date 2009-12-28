@@ -108,7 +108,7 @@ CP_DefineBodyProperty(cpFloat, w, AngVel);
 CP_DefineBodyProperty(cpFloat, t, Torque);
 CP_DefineBodyGetter(cpVect, rot, Rot);
 CP_DefineBodyProperty(cpFloat, v_limit, VelLimit);
-CP_DefineBodyProperty(cpFloat, v_limit, AngVelLimit);
+CP_DefineBodyProperty(cpFloat, w_limit, AngVelLimit);
 
 //  Modify the velocity of the body so that it will move to the specified absolute coordinates in the next timestep.
 // Intended for objects that are moved manually with a custom velocity integration function.
