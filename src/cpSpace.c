@@ -581,6 +581,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	} else {
 		cpfree(arb->contacts);
 		arb->contacts = NULL;
+		arb->numContacts = 0;
 	}
 	
 	// Time stamp the arbiter so we know it was used recently.
