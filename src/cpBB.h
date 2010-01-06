@@ -70,4 +70,5 @@ cpBBexpand(const cpBB bb, const cpVect v){
 }
 
 cpVect cpBBClampVect(const cpBB bb, const cpVect v); // clamps the vector to lie within the bbox
+// TODO edge case issue
 cpVect cpBBWrapVect(const cpBB bb, const cpVect v); // wrap a vector to a bbox

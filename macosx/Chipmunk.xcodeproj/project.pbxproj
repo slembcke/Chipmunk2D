@@ -607,6 +607,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				INSTALL_PATH = /usr/local/lib;
+				OTHER_CFLAGS = "-ffast-math";
 				PREBINDING = NO;
 				PRODUCT_NAME = Chipmunk;
 				ZERO_LINK = YES;

@@ -592,7 +592,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 static void
 active2staticIter(cpShape *shape, cpSpace *space)
 {
-	cpSpaceHashQuery(space->staticShapes, shape, shape->bb, (cpSpaceHashQueryFunc)&queryFunc, space);
+	cpSpaceHashQuery(space->staticShapes, shape, shape->bb, (cpSpaceHashQueryFunc)queryFunc, space);
 }
 
 // Hashset filter func to throw away old arbiters.
@@ -647,11 +647,11 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	}
 	
 	// Pre-cache BBoxes and shape data.
-	cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)&updateBBCache, NULL);
+	cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)updateBBCache, NULL);
 	
 	// Collide!
-	cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)&active2staticIter, space);
-	cpSpaceHashQueryRehash(space->activeShapes, (cpSpaceHashQueryFunc)&queryFunc, space);
+	cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)active2staticIter, space);
+	cpSpaceHashQueryRehash(space->activeShapes, (cpSpaceHashQueryFunc)queryFunc, space);
 	
 	// Clear out old cached arbiters and dispatch untouch functions
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilter, space);
