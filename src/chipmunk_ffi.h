@@ -36,6 +36,7 @@ MAKE_REF(cpBodyWorld2Local);
 MAKE_REF(cpBodyLocal2World);
 MAKE_REF(cpBodyApplyImpulse);
 
+MAKE_REF(cpArbiterIsFirstContact);
 MAKE_REF(cpArbiterGetShapes);
 MAKE_REF(cpArbiterGetNormal);
 MAKE_REF(cpArbiterGetPoint);
