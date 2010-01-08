@@ -574,9 +574,19 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->contactSet, arbHashID, shape_pair, NULL);
 	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b); // retains the contacts array
 	
-	// Call the begin function first if we need to
-	int beginPass = (arb->stamp >= 0) || (handler->begin(arb, space, handler->data));
-	if(beginPass && handler->preSolve(arb, space, handler->data) && !sensor){
+	// Call the begin function first if it's the first step
+	if(!(arb->stamp >= 0) && !handler->begin(arb, space, handler->data)){
+		cpArbiterIgnore(arb);
+	}
+	
+	if(
+		// Ignore the arbiter if it has been flagged
+		(arb->state != cpArbiterStateIgnore) && 
+		// Call preSolve
+		handler->preSolve(arb, space, handler->data) &&
+		// Process, but don't add collisions for sensors.
+		!sensor
+	){
 		cpArrayPush(space->arbiters, arb);
 	} else {
 		cpfree(arb->contacts);
@@ -708,7 +718,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpCollisionHandler *handler = arb->handler;
 		handler->postSolve(arb, space, handler->data);
 		
-		arb->firstColl = 0;
+		arb->state = cpArbiterStateNormal;
 	}
 	
 	// Run the post step callbacks

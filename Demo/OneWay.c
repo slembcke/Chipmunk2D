@@ -42,30 +42,13 @@ preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
 	OneWayPlatform *platform = (OneWayPlatform *)a->data;
-	
-	if(cpArrayContains(platform->passThruList, b)){
-		// The object is in the pass thru list, ignore it until separates.
-		return 0;
-	} else {
-		cpFloat dot = cpvdot(cpArbiterGetNormal(arb, 0), platform->n);
 		
-		if(dot < 0){
-			// Add the object to the pass thrru list
-			cpArrayPush(platform->passThruList, b);
-			return 0;
-		} else {
-			return 1;
-		}
+	if(cpvdot(cpArbiterGetNormal(arb, 0), platform->n) < 0){
+		cpArbiterIgnore(arb);
+		return 0;
 	}
-}
-
-static void
-separate(cpArbiter *arb, cpSpace *space, void *ignore)
-{
-	CP_ARBITER_GET_SHAPES(arb, a, b);
 	
-	// remove the object from the pass thru list
-	cpArrayDeleteObj(((OneWayPlatform *)a->data)->passThruList, b);
+	return 1;
 }
 
 static void
@@ -128,7 +111,7 @@ init(void)
 	shape->e = 0.0f; shape->u = 0.9f;
 	shape->collision_type = 2;
 	
-	cpSpaceAddCollisionHandler(space, 1, 2, NULL, preSolve, NULL, separate, NULL);
+	cpSpaceAddCollisionHandler(space, 1, 2, NULL, preSolve, NULL, NULL, NULL);
 	
 	return space;
 }
