@@ -188,7 +188,7 @@ cpSpaceHashDestroy(cpSpaceHash *hash)
 void
 cpSpaceHashFree(cpSpaceHash *hash)
 {
-	if(!hash){
+	if(hash){
 		cpSpaceHashDestroy(hash);
 		cpfree(hash);
 	}

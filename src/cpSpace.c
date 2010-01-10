@@ -172,6 +172,10 @@ cpSpaceDestroy(cpSpace *space)
 	cpHashSetFree(space->contactSet);
 	cpArrayFree(space->arbiters);
 	
+	if(space->postStepCallbacks)
+		cpHashSetEach(space->postStepCallbacks, &freeWrap, NULL);
+	cpHashSetFree(space->postStepCallbacks);
+	
 	if(space->collFuncSet)
 		cpHashSetEach(space->collFuncSet, &freeWrap, NULL);
 	cpHashSetFree(space->collFuncSet);
