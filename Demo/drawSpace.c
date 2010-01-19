@@ -143,35 +143,35 @@ drawCircleShape(cpBody *body, cpCircleShape *circle)
 }
 
 static const GLfloat pillVAR[] = {
-	 0.0000f,  1.0000f,
-	 0.2588f,  0.9659f,
-	 0.5000f,  0.8660f,
-	 0.7071f,  0.7071f,
-	 0.8660f,  0.5000f,
-	 0.9659f,  0.2588f,
-	 1.0000f,  0.0000f,
-	 0.9659f, -0.2588f,
-	 0.8660f, -0.5000f,
-	 0.7071f, -0.7071f,
-	 0.5000f, -0.8660f,
-	 0.2588f, -0.9659f,
-	 0.0000f, -1.0000f,
+	 0.0000f,  1.0000f, 1.0f,
+	 0.2588f,  0.9659f, 1.0f,
+	 0.5000f,  0.8660f, 1.0f,
+	 0.7071f,  0.7071f, 1.0f,
+	 0.8660f,  0.5000f, 1.0f,
+	 0.9659f,  0.2588f, 1.0f,
+	 1.0000f,  0.0000f, 1.0f,
+	 0.9659f, -0.2588f, 1.0f,
+	 0.8660f, -0.5000f, 1.0f,
+	 0.7071f, -0.7071f, 1.0f,
+	 0.5000f, -0.8660f, 1.0f,
+	 0.2588f, -0.9659f, 1.0f,
+	 0.0000f, -1.0000f, 1.0f,
 
-	 0.0000f, -1.0000f,
-	-0.2588f, -0.9659f,
-	-0.5000f, -0.8660f,
-	-0.7071f, -0.7071f,
-	-0.8660f, -0.5000f,
-	-0.9659f, -0.2588f,
-	-1.0000f, -0.0000f,
-	-0.9659f,  0.2588f,
-	-0.8660f,  0.5000f,
-	-0.7071f,  0.7071f,
-	-0.5000f,  0.8660f,
-	-0.2588f,  0.9659f,
-	 0.0000f,  1.0000f,
+	 0.0000f, -1.0000f, 0.0f,
+	-0.2588f, -0.9659f, 0.0f,
+	-0.5000f, -0.8660f, 0.0f,
+	-0.7071f, -0.7071f, 0.0f,
+	-0.8660f, -0.5000f, 0.0f,
+	-0.9659f, -0.2588f, 0.0f,
+	-1.0000f, -0.0000f, 0.0f,
+	-0.9659f,  0.2588f, 0.0f,
+	-0.8660f,  0.5000f, 0.0f,
+	-0.7071f,  0.7071f, 0.0f,
+	-0.5000f,  0.8660f, 0.0f,
+	-0.2588f,  0.9659f, 0.0f,
+	 0.0000f,  1.0000f, 0.0f,
 };
-static const int pillVAR_count = sizeof(pillVAR)/sizeof(GLfloat)/2;
+static const int pillVAR_count = sizeof(pillVAR)/sizeof(GLfloat)/3;
 
 static void
 drawSegmentShape(cpBody *body, cpSegmentShape *seg)
@@ -180,32 +180,24 @@ drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 	cpVect b = cpvadd(body->p, cpvrotate(seg->b, body->rot));
 	
 	if(seg->r){
-		cpVect delta = cpvsub(b, a);
-		cpFloat len = cpvlength(delta)/seg->r;
-		
-		GLfloat *VAR;
-		VAR = (GLfloat *)alloca(pillVAR_count*2*sizeof(GLfloat));
-		memcpy(VAR, pillVAR, sizeof(pillVAR));
-		
-		for(int i=0, half=pillVAR_count; i<half; i+=2)
-			VAR[i] += len;
-			
-		glVertexPointer(2, GL_FLOAT, 0, VAR);
+		glVertexPointer(3, GL_FLOAT, 0, pillVAR);
 		glPushMatrix(); {
 			GLfloat x = a.x;
 			GLfloat y = a.y;
-			GLfloat cos = delta.x/len;
-			GLfloat sin = delta.y/len;
+			
+			cpVect d = cpvsub(b, a);
+			cpFloat len = cpvlength(d)/seg->r;
+			GLfloat cos = d.x/len;
+			GLfloat sin = d.y/len;
 
 			const GLfloat matrix[] = {
-				 cos,  sin, 0.0f, 0.0f,
-				-sin,  cos, 0.0f, 0.0f,
-				0.0f, 0.0f, 1.0f, 1.0f,
-					 x,    y, 0.0f, 1.0f,
+				 cos, sin, 0.0f, 0.0f,
+				-sin, cos, 0.0f, 0.0f,
+				 d.x, d.y, 1.0f, 0.0f,
+				   x,   y, 0.0f, 1.0f,
 			};
-			
 			glMultMatrixf(matrix);
-				
+			
 			if(!seg->shape.sensor){
 				glColor_from_pointer(seg);
 				glDrawArrays(GL_TRIANGLE_FAN, 0, pillVAR_count);
@@ -309,10 +301,10 @@ drawSpring(cpDampedSpring *spring, cpBody *body_a, cpBody *body_b)
 		GLfloat s = 1.0f/cpvlength(delta);
 
 		const GLfloat matrix[] = {
-			 cos,  sin, 0.0f, 0.0f,
+				 cos,    sin, 0.0f, 0.0f,
 			-sin*s,  cos*s, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 1.0f,
-				 x,    y, 0.0f, 1.0f,
+				0.0f,   0.0f, 1.0f, 0.0f,
+					 x,      y, 0.0f, 1.0f,
 		};
 		
 		glMultMatrixf(matrix);
