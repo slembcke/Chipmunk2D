@@ -10,7 +10,7 @@ def RBConfig(param):
 env = Environment(
 	# GCC flags for building libchipmunk
 	CCFLAGS = RBConfig('CFLAGS').split() + ['-O3', '-ffast-math', '-std=gnu99'],
-	CPPPATH = ['../src', '../src/constraints', RBConfig('topdir')],
+	CPPPATH = ['../include/chipmunk', RBConfig('topdir')],
 )
 
 if(platform.system() == "Darwin"):

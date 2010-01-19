@@ -23,7 +23,7 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "util.h"
+#include "constraints/util.h"
 
 static cpFloat
 defaultSpringForce(cpDampedSpring *spring, cpFloat dist){
