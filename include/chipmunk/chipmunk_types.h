@@ -45,7 +45,7 @@
 	typedef struct cpVect{cpFloat x,y;} cpVect;
 #endif
 
-typedef size_t cpHashValue;
+typedef unsigned int cpHashValue;
 typedef void * cpDataPointer;
 typedef unsigned int cpCollisionType;
 typedef unsigned int cpLayers;
