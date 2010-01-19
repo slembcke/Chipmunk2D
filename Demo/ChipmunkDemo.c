@@ -357,11 +357,11 @@ arrowKeyUpFunc(int key, int x, int y)
 	set_arrowDirection();
 }
 
-static void
-idle(void)
-{
-	glutPostRedisplay();
-}
+//static void
+//idle(void)
+//{
+//	glutPostRedisplay();
+//}
 
 static void
 initGL(void)
