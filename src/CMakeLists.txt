@@ -1,67 +1,15 @@
-set(chipmunk_public_header
-  chipmunk.h
-  chipmunk_types.h
-  chipmunk_unsafe.h
-  cpArbiter.h
-  cpArray.h
-  cpBB.h
-  cpBody.h
-  cpCollision.h
-  cpHashSet.h
-  cpPolyShape.h
-  cpShape.h
-  cpSpace.h
-  cpSpaceHash.h
-  cpVect.h
-)
+file(GLOB chipmunk_source_files "*.c" "constraints/*.c")
+file(GLOB chipmunk_public_header "${chipmunk_SOURCE_DIR}/include/chipmunk/*.h")
+file(GLOB chipmunk_constraint_header "${chipmunk_SOURCE_DIR}/include/chipmunk/constraints/*.h")
 
-set(chipmunk_constraint_header
-  constraints/cpConstraint.h
-  constraints/cpDampedRotarySpring.h
-  constraints/cpDampedSpring.h
-  constraints/cpGearJoint.h
-  constraints/cpGrooveJoint.h
-  constraints/cpPinJoint.h
-  constraints/cpPivotJoint.h
-  constraints/cpRatchetJoint.h
-  constraints/cpRotaryLimitJoint.h
-  constraints/cpSimpleMotor.h
-  constraints/cpSlideJoint.h
-  constraints/util.h
-)
-
-set(chipmunk_source_files
-  chipmunk.c
-  cpArbiter.c
-  cpArray.c
-  cpBB.c
-  cpBody.c
-  cpCollision.c
-  cpHashSet.c
-  cpPolyShape.c
-  cpShape.c
-  cpSpace.c
-  cpSpaceHash.c
-  cpVect.c
-  constraints/cpConstraint.c
-  constraints/cpDampedRotarySpring.c
-  constraints/cpDampedSpring.c
-  constraints/cpGearJoint.c
-  constraints/cpGrooveJoint.c
-  constraints/cpPinJoint.c
-  constraints/cpPivotJoint.c
-  constraints/cpRatchetJoint.c
-  constraints/cpRotaryLimitJoint.c
-  constraints/cpSimpleMotor.c
-  constraints/cpSlideJoint.c
-)
+include_directories(${chipmunk_SOURCE_DIR}/include/chipmunk)
 
 if(BUILD_SHARED)
   add_library(chipmunk SHARED
     ${chipmunk_source_files}
   )
   # set the lib's version number
-  set_target_properties(chipmunk PROPERTIES VERSION 5)
+  set_target_properties(chipmunk PROPERTIES VERSION 5.1)
   install(TARGETS chipmunk RUNTIME DESTINATION lib LIBRARY DESTINATION lib)
 endif(BUILD_SHARED)
 

@@ -3,7 +3,7 @@ find_package(Ruby REQUIRED)
 file(GLOB ruby_ext_source_files "ext/*.c")
 
 set(ruby_ext_include_dirs
-  ${chipmunk_SOURCE_DIR}/src
+  ${chipmunk_SOURCE_DIR}/include/chipmunk
   ${RUBY_INCLUDE_PATH}
 )
 
