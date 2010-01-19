@@ -18,10 +18,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
-typedef struct cpVect{
-	cpFloat x,y;
-} cpVect;
 
 static const cpVect cpvzero={0.0f,0.0f};
 

@@ -190,7 +190,7 @@
 		D380115F0E984FA400A3D7FA /* cpDampedSpring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpDampedSpring.c; sourceTree = "<group>"; };
 		D38011600E984FA400A3D7FA /* cpDampedSpring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpDampedSpring.h; path = ../../include/chipmunk/constraints/cpDampedSpring.h; sourceTree = "<group>"; };
 		D380121A0E98707600A3D7FA /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
-		D380121E0E98709000A3D7FA /* test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test; sourceTree = BUILT_PRODUCTS_DIR; };
+		D380121E0E98709000A3D7FA /* test */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "compiled.mach-o.executable"; path = test; sourceTree = BUILT_PRODUCTS_DIR; };
 		D393275B0EA02C710026F6A2 /* Pump.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Pump.c; sourceTree = "<group>"; };
 		D39F478A0FD4AB4E00B244CA /* chipmunk_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_types.h; path = ../include/chipmunk/chipmunk_types.h; sourceTree = SOURCE_ROOT; };
 		D3B718E00AB2BC8900B500C9 /* chipmunk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chipmunk.c; path = ../src/chipmunk.c; sourceTree = "<group>"; };
@@ -866,6 +866,7 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_THUMB_SUPPORT = NO;
 				PREBINDING = NO;
 				PRODUCT_NAME = chipmunk;
 				SDKROOT = iphoneos3.0;
@@ -879,8 +880,10 @@
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_AUTO_VECTORIZATION = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_THUMB_SUPPORT = NO;
 				OTHER_CFLAGS = (
 					"-DNDEBUG",
 					"-ffast-math",
@@ -897,6 +900,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				GCC_THUMB_SUPPORT = NO;
 				PREBINDING = NO;
 				PRODUCT_NAME = chipmunk;
 				SDKROOT = iphoneos3.0;
