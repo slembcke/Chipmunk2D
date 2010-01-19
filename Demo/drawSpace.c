@@ -127,7 +127,7 @@ drawCircleShape(cpBody *body, cpCircleShape *circle)
 	glVertexPointer(2, GL_FLOAT, 0, circleVAR);
 
 	glPushMatrix(); {
-		cpVect center = cpvadd(body->p, cpvrotate(circle->c, body->rot));
+		cpVect center = circle->tc;
 		glTranslatef(center.x, center.y, 0.0f);
 		glRotatef(body->a*180.0f/M_PI, 0.0f, 0.0f, 1.0f);
 		glScalef(circle->r, circle->r, 1.0f);
@@ -176,8 +176,8 @@ static const int pillVAR_count = sizeof(pillVAR)/sizeof(GLfloat)/3;
 static void
 drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 {
-	cpVect a = cpvadd(body->p, cpvrotate(seg->a, body->rot));
-	cpVect b = cpvadd(body->p, cpvrotate(seg->b, body->rot));
+	cpVect a = seg->ta;
+	cpVect b = seg->tb;
 	
 	if(seg->r){
 		glVertexPointer(3, GL_FLOAT, 0, pillVAR);
@@ -219,15 +219,7 @@ static void
 drawPolyShape(cpBody *body, cpPolyShape *poly)
 {
 	int count = count=poly->numVerts;
-	GLfloat VAR[count*2];
-	glVertexPointer(2, GL_FLOAT, 0, VAR);
-
-	cpVect *verts = poly->verts;
-	for(int i=0; i<count; i++){
-		cpVect v = cpvadd(body->p, cpvrotate(verts[i], body->rot));
-		VAR[2*i    ] = v.x;
-		VAR[2*i + 1] = v.y;
-	}
+	glVertexPointer(2, GL_DOUBLE, 0, poly->tVerts);
 	
 	if(!poly->shape.sensor){
 		glColor_from_pointer(poly);
