@@ -53,7 +53,7 @@ update(int ticks)
 	}
 	
 	cpSegmentQueryInfo info = {};
-	if(cpSpaceSegmentQueryFirst(space, start, end, -1, 0, &info)){
+	if(cpSpaceSegmentQueryFirst(space, start, end, CP_ALL_LAYERS, CP_NO_GROUP, &info)){
 		cpVect point = cpSegmentQueryHitPoint(start, end, info);
 		lineEnd = cpvadd(point, cpvzero);//cpvmult(info.n, 4.0f));
 		
@@ -64,7 +64,8 @@ update(int ticks)
 		strcat(messageString, "Segment Query (None)");
 	}
 	
-	cpSegmentShapeSetEndpoints(querySeg, cpvzero, lineEnd);
+	cpSegmentShapeSetEndpoints(querySeg, start, lineEnd);
+	cpShapeCacheBB(querySeg); // force it to update it's collision detection data so it will draw
 	
 	// normal other stuff.
 	int steps = 1;

@@ -50,3 +50,6 @@ typedef void * cpDataPointer;
 typedef unsigned int cpCollisionType;
 typedef unsigned int cpLayers;
 typedef unsigned int cpGroup;
+
+#define CP_NO_GROUP ((cpGroup)0)
+#define CP_ALL_LAYERS (~(cpLayers)0)
