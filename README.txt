@@ -38,6 +38,7 @@ CHANGES SINCE 5.0.0:
 * Added a static library target for the iPhone.
 * Type changes when building on the iPhone to make it friendlier to other APIs.
 * Added an AABB query to complement point and segment queries.
+* Added CP_NO_GROUP and CP_ALL_LAYERS constants.
 
 CHANGES SINCE 4.x:
 * Brand new Joint/Constraint API: New constraints can be added easily and are much more flexible than the old joint system
