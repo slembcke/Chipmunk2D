@@ -142,6 +142,10 @@ typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, voi
 int cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
 cpShape *cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out);
 
+// BB query callback function
+typedef void (*cpSpaceBBQueryFunc)(cpShape *shape, void *data);
+void cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryFunc func, void *data);
+
 
 // Iterator function for iterating the bodies in a space.
 typedef void (*cpSpaceBodyIterator)(cpBody *body, void *data);

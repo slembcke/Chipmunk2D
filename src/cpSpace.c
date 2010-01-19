@@ -499,6 +499,34 @@ cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers laye
 	return out->shape;
 }
 
+#pragma mark BB Query functions
+
+typedef struct bbQueryContext {
+	cpLayers layers;
+	cpGroup group;
+	cpSpaceBBQueryFunc func;
+	void *data;
+} bbQueryContext;
+
+static void 
+bbQueryHelper(cpBB *bb, cpShape *shape, bbQueryContext *context)
+{
+	if(
+		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
+		cpBBintersects(*bb, shape->bb)
+	){
+		context->func(shape, context->data);
+	}
+}
+
+void
+cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryFunc func, void *data)
+{
+	bbQueryContext context = {layers, group, func, data};
+	cpSpaceHashQuery(space->activeShapes, &bb, bb, (cpSpaceHashQueryFunc)bbQueryHelper, &context);
+	cpSpaceHashQuery(space->staticShapes, &bb, bb, (cpSpaceHashQueryFunc)bbQueryHelper, &context);
+}
+
 #pragma mark Spatial Hash Management
 
 // Iterator function used for updating shape BBoxes.
@@ -579,8 +607,8 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b); // retains the contacts array
 	
 	// Call the begin function first if it's the first step
-	if(!(arb->stamp >= 0) && !handler->begin(arb, space, handler->data)){
-		cpArbiterIgnore(arb);
+	if(arb->stamp == -1 && !handler->begin(arb, space, handler->data)){
+		cpArbiterIgnore(arb); // permanently ignore the collision until separation
 	}
 	
 	if(
