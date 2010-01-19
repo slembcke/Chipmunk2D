@@ -26,8 +26,18 @@ http://www.slembcke.net/forums
 CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
-CHANGES SINCE 5.0:
-* 
+CHANGES SINCE 5.0.0:
+* Fixed a NaN issue where raycasts for horizontal or vertical lines would end up in an infinite loop.
+* Fixed a number of memory leaks.
+* Fixed a number of warnings for various compiler/OS combinations.
+* Fixed a number of API issues:
+  * Rejecting a collision from a begin() callback permanently rejects the collision until separation.
+  * Erroneous collision type parameterns removed from cpSpaceDefaulteCollisionHandler().
+* Moved FFI declarations of inlined functions into their own header.
+* Rearranged the project structure to separate out the header files into a separate include/ directory.
+* Added a static library target for the iPhone.
+* Type changes when building on the iPhone to make it friendlier to other APIs.
+* Added an AABB query to complement point and segment queries.
 
 CHANGES SINCE 4.x:
 * Brand new Joint/Constraint API: New constraints can be added easily and are much more flexible than the old joint system
