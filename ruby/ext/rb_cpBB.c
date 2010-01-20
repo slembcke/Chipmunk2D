@@ -49,8 +49,8 @@ rb_cpBBInitialize(VALUE self, VALUE l, VALUE b, VALUE r, VALUE t)
 static VALUE
 rb_cpBBintersects(VALUE self, VALUE other)
 {
-	int bool = cpBBintersects(*BBGET(self), *BBGET(other));
-	return bool ? Qtrue : Qfalse;
+	int value = cpBBintersects(*BBGET(self), *BBGET(other));
+	return value ? Qtrue : Qfalse;
 }
 
 static VALUE
