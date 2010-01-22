@@ -182,19 +182,14 @@ drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 	if(seg->r){
 		glVertexPointer(3, GL_FLOAT, 0, pillVAR);
 		glPushMatrix(); {
-			GLfloat x = a.x;
-			GLfloat y = a.y;
-			
 			cpVect d = cpvsub(b, a);
-			cpFloat len = cpvlength(d)/seg->r;
-			GLfloat cos = d.x/len;
-			GLfloat sin = d.y/len;
+			cpVect r = cpvmult(d, seg->r/cpvlength(d));
 
 			const GLfloat matrix[] = {
-				 cos, sin, 0.0f, 0.0f,
-				-sin, cos, 0.0f, 0.0f,
+				 r.x, r.y, 0.0f, 0.0f,
+				-r.y, r.x, 0.0f, 0.0f,
 				 d.x, d.y, 0.0f, 0.0f,
-				   x,   y, 0.0f, 1.0f,
+				 a.x, a.y, 0.0f, 1.0f,
 			};
 			glMultMatrixf(matrix);
 			
