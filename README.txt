@@ -27,20 +27,19 @@ CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
 CHANGES SINCE 5.0.0:
-* Fixed a NaN issue where raycasts for horizontal or vertical lines would end up in an infinite loop.
-* Fixed a number of memory leaks.
-* Fixed a number of warnings for various compiler/OS combinations.
-* Fixed a number of API issues:
-  * Rejecting a collision from a begin() callback permanently rejects the collision until separation.
-  * Erroneous collision type parameterns removed from cpSpaceDefaulteCollisionHandler().
-* Moved FFI declarations of inlined functions into their own header.
-* Rearranged the project structure to separate out the header files into a separate include/ directory.
-* Added a static library target for the iPhone.
-* Type changes when building on the iPhone to make it friendlier to other APIs.
-* Added an AABB query to complement point and segment queries.
-* Added CP_NO_GROUP and CP_ALL_LAYERS constants.
+ * FIX: fixed a NaN issue that was causing raycasts for horizontal or vertical lines to end up in an infinite loop
+ * FIX: fixed a number of memory leaks
+ * FIX: fixed warnings for various compiler/OS combinations
+ * API: Rejecting a collision from a begin() callback permanently rejects the collision until separation
+ * API: Erroneous collision type parameterns removed from cpSpaceDefaulteCollisionHandler()
+ * MOVE: FFI declarations of inlined functions into their own header
+ * MOVE: Rearranged the project structure to separate out the header files into a separate include/ directory.
+ * NEW: Added a static library target for the iPhone.
+ * NEW: Type changes when building on the iPhone to make it friendlier to other iPhone APIs
+ * NEW: Added an AABB query to complement point and segment queries
+ * NEW: CP_NO_GROUP and CP_ALL_LAYERS constants
 
 CHANGES SINCE 4.x:
-* Brand new Joint/Constraint API: New constraints can be added easily and are much more flexible than the old joint system
-* Efficient Segment Queries - Like raycasting, but with line segments.
-* Brand new collision callback API: Collision begin/separate events, API for removal of objects within callbacks, more programable control over collision handling.
+ * Brand new Joint/Constraint API: New constraints can be added easily and are much more flexible than the old joint system
+ * Efficient Segment Queries - Like raycasting, but with line segments.
+ * Brand new collision callback API: Collision begin/separate events, API for removal of objects within callbacks, more programable control over collision handling.

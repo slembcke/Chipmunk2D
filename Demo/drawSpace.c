@@ -193,7 +193,7 @@ drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 			const GLfloat matrix[] = {
 				 cos, sin, 0.0f, 0.0f,
 				-sin, cos, 0.0f, 0.0f,
-				 d.x, d.y, 1.0f, 0.0f,
+				 d.x, d.y, 0.0f, 0.0f,
 				   x,   y, 0.0f, 1.0f,
 			};
 			glMultMatrixf(matrix);
