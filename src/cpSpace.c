@@ -38,7 +38,7 @@ contactSetEql(cpShape **shapes, cpArbiter *arb)
 	cpShape *a = shapes[0];
 	cpShape *b = shapes[1];
 	
-	return ((a == arb->a && b == arb->b) || (b == arb->a && a == arb->b));
+	return ((a == arb->private_a && b == arb->private_b) || (b == arb->private_a && a == arb->private_b));
 }
 
 // Transformation function for contactSet.

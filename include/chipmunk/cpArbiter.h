@@ -67,7 +67,8 @@ typedef struct cpArbiter {
 	cpContact *contacts;
 	
 	// The two shapes involved in the collision.
-	cpShape *a, *b;
+	// These variables are NOT in the order defined by the collision handler.
+	cpShape *private_a, *private_b;
 	
 	// Calculated before calling the pre-solve collision handler
 	// Override them with custom values if you want specialized behavior
@@ -113,9 +114,9 @@ static inline void
 cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
 {
 	if(arb->swappedColl){
-		(*a) = arb->b, (*b) = arb->a;
+		(*a) = arb->private_b, (*b) = arb->private_a;
 	} else {
-		(*a) = arb->a, (*b) = arb->b;
+		(*a) = arb->private_a, (*b) = arb->private_b;
 	}
 }
 #define CP_ARBITER_GET_SHAPES(arb, a, b) cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
