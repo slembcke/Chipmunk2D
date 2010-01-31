@@ -84,11 +84,10 @@ cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 	#endif
 #endif
 
-#include <stdio.h>
-#define cpmalloc(size) malloc(size); printf("malloc() @ %s:%d\n", __FILE__, __LINE__);
-#define cpcalloc(size, count) calloc(size, count); printf("calloc() @ %s:%d\n", __FILE__, __LINE__);
+#define cpmalloc malloc
+#define cpcalloc calloc
 #define cprealloc realloc
-#define cpfree(ptr) {printf("free() @ %s:%d\n", __FILE__, __LINE__); free(ptr);}
+#define cpfree free
 
 #include "cpVect.h"
 #include "cpBB.h"

@@ -207,7 +207,7 @@ cpSpaceDestroy(cpSpace *space)
 	cpArrayFree(space->arbiters);
 	if(space->freeArbiters)
 		cpArrayEach(space->freeArbiters, (cpArrayIter)arbiterFreeWrap, NULL);
-	cpArrayFree(space->arbiters);
+	cpArrayFree(space->freeArbiters);
 	
 	if(space->postStepCallbacks)
 		cpHashSetEach(space->postStepCallbacks, freeWrap, NULL);
