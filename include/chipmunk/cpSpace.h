@@ -82,6 +82,7 @@ typedef struct cpSpace{
 	cpArray *bodies;
 	// List of active arbiters for the impulse solver.
 	cpArray *arbiters;
+	cpArray *freeArbiters;
 	
 	cpContactBuffer *contactBuffersHead, *contactBuffersTail;
 	

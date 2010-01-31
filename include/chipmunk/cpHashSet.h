@@ -55,6 +55,9 @@ typedef struct cpHashSet {
 	void *default_value;
 	
 	cpHashSetBin **table;
+	
+	// List of recycled bins.
+	cpHashSetBin *bins;
 } cpHashSet;
 
 // Basic allocation/destruction functions.

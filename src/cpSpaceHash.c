@@ -222,11 +222,13 @@ getEmptyBin(cpSpaceHash *hash)
 {
 	cpSpaceHashBin *bin = hash->bins;
 	
-	// Make a new one if necessary.
-	if(bin == NULL) return (cpSpaceHashBin *)cpmalloc(sizeof(cpSpaceHashBin));
-
-	hash->bins = bin->next;
-	return bin;
+	if(bin){
+		hash->bins = bin->next;
+		return bin;
+	} else {
+		// Pool is exhausted, make a new one
+		return (cpSpaceHashBin *)cpmalloc(sizeof(cpSpaceHashBin));
+	}
 }
 
 // The hash function itself.

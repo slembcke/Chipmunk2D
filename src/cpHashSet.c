@@ -41,6 +41,13 @@ cpHashSetDestroy(cpHashSet *set)
 	
 	// Free the table.
 	cpfree(set->table);
+	
+	cpHashSetBin *bin = set->bins;
+	while(bin){
+		cpHashSetBin *next = bin->next;
+		cpfree(bin);
+		bin = next;
+	}
 }
 
 void
@@ -70,6 +77,7 @@ cpHashSetInit(cpHashSet *set, int size, cpHashSetEqlFunc eqlFunc, cpHashSetTrans
 	set->default_value = NULL;
 	
 	set->table = (cpHashSetBin **)cpcalloc(set->size, sizeof(cpHashSetBin *));
+	set->bins = NULL;
 	
 	return set;
 }
@@ -115,6 +123,20 @@ cpHashSetResize(cpHashSet *set)
 	set->size = newSize;
 }
 
+static cpHashSetBin *
+getUnusedBin(cpHashSet *set)
+{
+	cpHashSetBin *bin = set->bins;
+	
+	if(bin){
+		set->bins = bin->next;
+		return bin;
+	} else {
+		// Pool is exhausted, make a new one
+		return (cpHashSetBin *)cpmalloc(sizeof(cpHashSetBin));
+	}
+}
+
 void *
 cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data)
 {
@@ -127,7 +149,7 @@ cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data)
 	
 	// Create it necessary.
 	if(!bin){
-		bin = (cpHashSetBin *)cpmalloc(sizeof(cpHashSetBin));
+		bin = getUnusedBin(set);
 		bin->hash = hash;
 		bin->elt = set->trans(ptr, data); // Transform the pointer.
 		
@@ -168,8 +190,10 @@ cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 		
 		void *return_value = bin->elt;
 		
-//		*bin = (cpHashSetBin){};
-		cpfree(bin);
+		//cpfree(bin);
+		bin->next = set->bins;
+		set->bins = bin;
+		bin->elt = NULL;
 		
 		return return_value;
 	}
@@ -218,7 +242,9 @@ cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data)
 				(*prev_ptr) = next;
 
 				set->entries--;
-				cpfree(bin);
+				bin->next = set->bins;
+				set->bins = bin;
+				bin->elt = NULL;
 			}
 			
 			bin = next;
