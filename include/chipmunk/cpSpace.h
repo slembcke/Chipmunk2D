@@ -70,6 +70,12 @@ typedef struct cpSpace{
 	cpArray *bodies;
 	// List of active arbiters for the impulse solver.
 	cpArray *arbiters;
+	
+	int numContacts;
+	cpContact *contacts;
+	cpContact *contactsA;
+	cpContact *contactsB;
+	
 	// Persistant contact set.
 	cpHashSet *contactSet;
 	

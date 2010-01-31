@@ -27,7 +27,7 @@
 
 #include "chipmunk.h"
 
-int cp_contact_persistence = 3;
+int cp_contact_persistence = 1;
 
 #pragma mark Contact Set Helpers
 
@@ -118,6 +118,8 @@ cpSpaceAlloc(void)
 #define DEFAULT_ITERATIONS 10
 #define DEFAULT_ELASTIC_ITERATIONS 0
 
+#define MAX_CONTACTS 10000
+
 cpCollisionHandler defaultHandler = {0, 0, alwaysCollide, alwaysCollide, nothing, nothing, NULL};
 
 cpSpace*
@@ -137,6 +139,12 @@ cpSpaceInit(cpSpace *space)
 	
 	space->bodies = cpArrayNew(0);
 	space->arbiters = cpArrayNew(0);
+	
+	space->contactsA = malloc(MAX_CONTACTS*sizeof(cpContact));
+	space->contactsB = malloc(MAX_CONTACTS*sizeof(cpContact));
+	space->contacts = space->contactsA;
+	space->numContacts = 0;
+	
 	space->contactSet = cpHashSetNew(0, (cpHashSetEqlFunc)contactSetEql, (cpHashSetTransFunc)contactSetTrans);
 	
 	space->constraints = cpArrayNew(0);
@@ -595,9 +603,11 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	}
 	
 	// Narrow-phase collision detection.
-	cpContact *contacts = NULL;
-	int numContacts = cpCollideShapes(a, b, &contacts);
+	cpContact *contacts = space->contacts + space->numContacts;
+	int numContacts = cpCollideShapes(a, b, contacts);
 	if(!numContacts) return; // Shapes are not colliding.
+	space->numContacts += numContacts;
+	assert(space->numContacts <= MAX_CONTACTS);
 	
 	// Get an arbiter from space->contactSet for the two shapes.
 	// This is where the persistant contact magic comes from.
@@ -621,7 +631,8 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	){
 		cpArrayPush(space->arbiters, arb);
 	} else {
-		cpfree(arb->contacts);
+//		cpfree(arb->contacts);
+		space->numContacts -= numContacts;
 		arb->contacts = NULL;
 		arb->numContacts = 0;
 	}
@@ -673,6 +684,12 @@ void
 cpSpaceStep(cpSpace *space, cpFloat dt)
 {
 	if(!dt) return; // don't step if the timestep is 0!
+	
+	space->contacts = space->contactsA;
+	space->contactsA = space->contactsB;
+	space->contactsB = space->contacts;
+	
+	space->numContacts = 0;
 	
 	cpFloat dt_inv = 1.0f/dt;
 

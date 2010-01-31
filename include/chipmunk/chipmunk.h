@@ -84,10 +84,19 @@ cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 	#endif
 #endif
 
+#include <stdio.h>
+#include <stdlib.h>
+static inline void
+print_free(void *ptr)
+{
+	printf("free\n");
+	free(ptr);
+}
+
 #define cpmalloc malloc
 #define cpcalloc calloc
 #define cprealloc realloc
-#define cpfree free
+#define cpfree print_free
 
 #include "cpVect.h"
 #include "cpBB.h"

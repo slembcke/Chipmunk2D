@@ -125,7 +125,7 @@ cpArbiterNew(cpShape *a, cpShape *b)
 void
 cpArbiterDestroy(cpArbiter *arb)
 {
-	if(arb->contacts) cpfree(arb->contacts);
+//	if(arb->contacts) cpfree(arb->contacts);
 }
 
 void
@@ -158,7 +158,7 @@ cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisio
 			}
 		}
 
-		cpfree(arb->contacts);
+//		cpfree(arb->contacts);
 	}
 	
 	arb->contacts = contacts;
