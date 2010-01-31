@@ -429,10 +429,10 @@ main(int argc, const char **argv)
 {
 	cpInitChipmunk();
 	
-//	for(int i=0; i<demoCount; i++)
-//		time_trial(i, 1000);
-//	time_trial('d' - 'a', 10000);
-//	exit(0);
+	for(int i=0; i<demoCount; i++)
+		time_trial(i, 1000);
+	time_trial('d' - 'a', 10000);
+	exit(0);
 	
 	mouseBody = cpBodyNew(INFINITY, INFINITY);
 	

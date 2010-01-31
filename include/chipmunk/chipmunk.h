@@ -89,7 +89,7 @@ cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 static inline void
 print_free(void *ptr)
 {
-	printf("free\n");
+//	printf("free\n");
 	free(ptr);
 }
 

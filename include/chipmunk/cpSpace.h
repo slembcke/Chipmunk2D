@@ -42,6 +42,18 @@ typedef struct cpCollisionHandler {
 	void *data;
 } cpCollisionHandler;
 
+#define CP_CONTACTS_BUFFER_MAX_BYTES (64*1024)
+#define CP_CONTACTS_BUFFER_SIZE (CP_CONTACTS_BUFFER_MAX_BYTES/sizeof(cpContact))
+#define CP_MAX_CONTACTS_PER_ARBITER 6
+
+typedef struct cpContactBuffer {
+	int stamp;
+	struct cpContactBuffer *next;
+	
+	unsigned int numContacts;
+	cpContact contacts[CP_CONTACTS_BUFFER_SIZE];
+} cpContactBuffer;
+
 typedef struct cpSpace{
 	// *** User definable fields
 	
@@ -71,10 +83,7 @@ typedef struct cpSpace{
 	// List of active arbiters for the impulse solver.
 	cpArray *arbiters;
 	
-	int numContacts;
-	cpContact *contacts;
-	cpContact *contactsA;
-	cpContact *contactsB;
+	cpContactBuffer *contactBuffersHead, *contactBuffersTail;
 	
 	// Persistant contact set.
 	cpHashSet *contactSet;
