@@ -37,7 +37,7 @@ char *cpVersionString = "5.1.0";
 void
 cpInitChipmunk(void)
 {
-#ifndef NDEBUG	
+#ifndef NDEBUG
 	printf("Initializing Chipmunk v%s (Debug Enabled)\n", cpVersionString);
 	printf("Compile with NDEBUG defined to disable debug mode and assert() checks\n");
 #endif
