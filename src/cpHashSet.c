@@ -25,29 +25,16 @@
 #include "chipmunk.h"
 #include "prime.h"
 
+static void freeWrap(void *ptr, void *unused){cpfree(ptr);}
+
 void
 cpHashSetDestroy(cpHashSet *set)
 {
-	// Free the chains.
-	for(int i=0; i<set->size; i++){
-		// Free the bins in the chain.
-		cpHashSetBin *bin = set->table[i];
-		while(bin){
-			cpHashSetBin *next = bin->next;
-			cpfree(bin);
-			bin = next;
-		}
-	}
-	
 	// Free the table.
 	cpfree(set->table);
 	
-	cpHashSetBin *bin = set->bins;
-	while(bin){
-		cpHashSetBin *next = bin->next;
-		cpfree(bin);
-		bin = next;
-	}
+	cpArrayEach(set->allocatedBuffers, freeWrap, NULL);
+	cpArrayFree(set->allocatedBuffers);
 }
 
 void
@@ -77,7 +64,9 @@ cpHashSetInit(cpHashSet *set, int size, cpHashSetEqlFunc eqlFunc, cpHashSetTrans
 	set->default_value = NULL;
 	
 	set->table = (cpHashSetBin **)cpcalloc(set->size, sizeof(cpHashSetBin *));
-	set->bins = NULL;
+	set->pooledBins = NULL;
+	
+	set->allocatedBuffers = cpArrayNew(0);
 	
 	return set;
 }
@@ -123,17 +112,36 @@ cpHashSetResize(cpHashSet *set)
 	set->size = newSize;
 }
 
+static inline void
+recycleBin(cpHashSet *set, cpHashSetBin *bin)
+{
+	bin->next = set->pooledBins;
+	set->pooledBins = bin;
+	bin->elt = NULL;
+}
+
+#include <stdio.h>
+
 static cpHashSetBin *
 getUnusedBin(cpHashSet *set)
 {
-	cpHashSetBin *bin = set->bins;
+	cpHashSetBin *bin = set->pooledBins;
 	
 	if(bin){
-		set->bins = bin->next;
+		set->pooledBins = bin->next;
 		return bin;
 	} else {
-		// Pool is exhausted, make a new one
-		return (cpHashSetBin *)cpmalloc(sizeof(cpHashSetBin));
+		// Pool is exhausted, make more
+		int count = CP_MAX_BUFFER_BYTES/sizeof(cpHashSetBin);
+		assert(count);
+		
+		cpHashSetBin *buffer = (cpHashSetBin *)cpmalloc(count*sizeof(cpHashSetBin));
+		cpArrayPush(set->allocatedBuffers, buffer);
+		
+		// push all but the first one, return the first instead
+		for(int i=1; i<count; i++) recycleBin(set, buffer + i);
+		printf("hash set bins %d\n", count);
+		return buffer;
 	}
 }
 
@@ -190,10 +198,7 @@ cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 		
 		void *return_value = bin->elt;
 		
-		//cpfree(bin);
-		bin->next = set->bins;
-		set->bins = bin;
-		bin->elt = NULL;
+		recycleBin(set, bin);
 		
 		return return_value;
 	}
@@ -242,9 +247,7 @@ cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data)
 				(*prev_ptr) = next;
 
 				set->entries--;
-				bin->next = set->bins;
-				set->bins = bin;
-				bin->elt = NULL;
+				recycleBin(set, bin);
 			}
 			
 			bin = next;

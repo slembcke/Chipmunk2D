@@ -28,12 +28,6 @@
 #include "prime.h"
 
 static cpHandle*
-cpHandleAlloc(void)
-{
-	return (cpHandle *)cpmalloc(sizeof(cpHandle));
-}
-
-static cpHandle*
 cpHandleInit(cpHandle *hand, void *obj)
 {
 	hand->obj = obj;
@@ -43,12 +37,6 @@ cpHandleInit(cpHandle *hand, void *obj)
 	return hand;
 }
 
-static cpHandle*
-cpHandleNew(void *obj)
-{
-	return cpHandleInit(cpHandleAlloc(), obj);
-}
-
 static inline void
 cpHandleRetain(cpHandle *hand)
 {
@@ -56,19 +44,11 @@ cpHandleRetain(cpHandle *hand)
 }
 
 static inline void
-cpHandleFree(cpHandle *hand)
-{
-	cpfree(hand);
-}
-
-static inline void
-cpHandleRelease(cpHandle *hand)
+cpHandleRelease(cpHandle *hand, cpArray *pooledHandles)
 {
 	hand->retain--;
-	if(hand->retain == 0)
-		cpHandleFree(hand);
+	if(hand->retain == 0) cpArrayPush(pooledHandles, hand);
 }
-
 
 cpSpaceHash*
 cpSpaceHashAlloc(void)
@@ -96,9 +76,20 @@ handleSetEql(void *obj, void *elt)
 
 // Transformation function for the handleset.
 static void *
-handleSetTrans(void *obj, void *unused)
+handleSetTrans(void *obj, cpSpaceHash *hash)
 {
-	cpHandle *hand = cpHandleNew(obj);
+	if(hash->pooledHandles->num == 0){
+		// handle pool is exhausted, make more
+		int count = CP_MAX_BUFFER_BYTES/sizeof(cpHandle);
+		assert(count);
+		
+		cpHandle *buffer = (cpHandle *)cpmalloc(count*sizeof(cpHandle));
+		cpArrayPush(hash->allocatedBuffers, buffer);
+		
+		for(int i=0; i<count; i++) cpArrayPush(hash->pooledHandles, buffer + i);
+	}
+	
+	cpHandle *hand = cpHandleInit(cpArrayPop(hash->pooledHandles), obj);
 	cpHandleRetain(hand);
 	
 	return hand;
@@ -111,7 +102,8 @@ cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpaceHashBBF
 	hash->celldim = celldim;
 	hash->bbfunc = bbfunc;
 	
-	hash->handleSet = cpHashSetNew(0, &handleSetEql, &handleSetTrans);
+	hash->handleSet = cpHashSetNew(0, handleSetEql, (cpHashSetTransFunc)handleSetTrans);
+	hash->pooledHandles = cpArrayNew(0);
 	
 	hash->pooledBins = NULL;
 	hash->allocatedBuffers = cpArrayNew(0);
@@ -142,7 +134,7 @@ clearHashCell(cpSpaceHash *hash, int idx)
 		cpSpaceHashBin *next = bin->next;
 		
 		// Release the lock on the handle.
-		cpHandleRelease(bin->handle);
+		cpHandleRelease(bin->handle, hash->pooledHandles);
 		recycleBin(hash, bin);
 		
 		bin = next;
@@ -159,26 +151,17 @@ clearHash(cpSpaceHash *hash)
 		clearHashCell(hash, i);
 }
 
-// Hashset iterator function to free the handles.
-static void
-handleFreeWrap(void *elt, void *unused)
-{
-	cpHandle *hand = (cpHandle *)elt;
-	cpHandleFree(hand);
-}
-
 static void freeWrap(void *ptr, void *unused){cpfree(ptr);}
 
 void
 cpSpaceHashDestroy(cpSpaceHash *hash)
 {
 	clearHash(hash);
+	
+	cpHashSetFree(hash->handleSet);
+	
 	cpArrayEach(hash->allocatedBuffers, freeWrap, NULL);
 	cpArrayFree(hash->allocatedBuffers);
-	
-	// Free the handles.
-	cpHashSetEach(hash->handleSet, &handleFreeWrap, NULL);
-	cpHashSetFree(hash->handleSet);
 	
 	cpfree(hash->table);
 }
@@ -285,7 +268,7 @@ hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 void
 cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue hashid, cpBB bb)
 {
-	cpHandle *hand = (cpHandle *)cpHashSetInsert(hash->handleSet, hashid, obj, NULL);
+	cpHandle *hand = (cpHandle *)cpHashSetInsert(hash->handleSet, hashid, obj, hash);
 	hashHandle(hash, hand, bb);
 }
 
@@ -322,7 +305,7 @@ cpSpaceHashRemove(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 	
 	if(hand){
 		hand->obj = NULL;
-		cpHandleRelease(hand);
+		cpHandleRelease(hand, hash->pooledHandles);
 	}
 }
 

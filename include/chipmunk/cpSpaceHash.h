@@ -51,13 +51,14 @@ typedef struct cpSpaceHash{
 	// BBox callback.
 	cpSpaceHashBBFunc bbfunc;
 
-	// Hashset of all the handles.
+	// Hashset of the handles and the recycled ones.
 	cpHashSet *handleSet;
+	cpArray *pooledHandles;
 	
-	cpSpaceHashBin **table;
+	// The table and the recycled bins.
+	cpSpaceHashBin **table, *pooledBins;
 	
-	// List of recycled bins.
-	cpSpaceHashBin *pooledBins;
+	// list of buffers to free on destruction.
 	cpArray *allocatedBuffers;
 	
 	// Incremented on each query. See cpHandle.stamp.
