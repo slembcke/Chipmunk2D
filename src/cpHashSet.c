@@ -140,7 +140,6 @@ getUnusedBin(cpHashSet *set)
 		
 		// push all but the first one, return the first instead
 		for(int i=1; i<count; i++) recycleBin(set, buffer + i);
-		printf("hash set bins %d\n", count);
 		return buffer;
 	}
 }

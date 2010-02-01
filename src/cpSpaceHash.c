@@ -162,6 +162,7 @@ cpSpaceHashDestroy(cpSpaceHash *hash)
 	
 	cpArrayEach(hash->allocatedBuffers, freeWrap, NULL);
 	cpArrayFree(hash->allocatedBuffers);
+	cpArrayFree(hash->pooledHandles);
 	
 	cpfree(hash->table);
 }

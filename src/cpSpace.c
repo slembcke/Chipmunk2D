@@ -118,9 +118,11 @@ static void   constraintFreeWrap(cpConstraint *ptr, void *unused){cpConstraintFr
 #pragma mark Memory Management Functions
 
 static cpContactBuffer *
-cpContactBufferAlloc(void)
+cpSpaceAllocContactBuffer(cpSpace *space)
 {
-	return (cpContactBuffer *)malloc(sizeof(cpContactBuffer));
+	cpContactBuffer *buffer = (cpContactBuffer *)malloc(sizeof(cpContactBuffer));
+	cpArrayPush(space->allocatedBuffers, buffer);
+	return buffer;
 }
 
 static cpContactBuffer *
@@ -163,16 +165,16 @@ cpSpaceInit(cpSpace *space)
 	space->staticShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpaceHashBBFunc)shapeBBFunc);
 	space->activeShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpaceHashBBFunc)shapeBBFunc);
 	
+	space->allocatedBuffers = cpArrayNew(0);
+	
 	space->bodies = cpArrayNew(0);
 	space->arbiters = cpArrayNew(0);
 	space->pooledArbiters = cpArrayNew(0);
 	
-	cpContactBuffer *buffer = cpContactBufferInit(cpContactBufferAlloc(), space);
+	cpContactBuffer *buffer = cpContactBufferInit(cpSpaceAllocContactBuffer(space), space);
 	space->contactBuffersHead = buffer;
 	space->contactBuffersTail = buffer;
 	buffer->next = buffer; // Buffers will form a ring, start the ring explicitly
-	
-	space->allocatedBuffers = cpArrayNew(0);
 	
 	space->contactSet = cpHashSetNew(0, (cpHashSetEqlFunc)contactSetEql, (cpHashSetTransFunc)contactSetTrans);
 	
@@ -210,6 +212,7 @@ cpSpaceDestroy(cpSpace *space)
 	
 	if(space->allocatedBuffers){
 		cpArrayEach(space->allocatedBuffers, freeWrap, NULL);
+		cpArrayFree(space->allocatedBuffers);
 	}
 	
 	if(space->postStepCallbacks){
@@ -609,8 +612,7 @@ cpSpaceGetFreeContactBuffer(cpSpace *space)
 		
 		return cpContactBufferInit(buffer, space);
 	} else {
-		cpContactBuffer *buffer = cpContactBufferAlloc();
-		cpArrayPush(space->allocatedBuffers, buffer);
+		cpContactBuffer *buffer = cpSpaceAllocContactBuffer(space);
 		return cpContactBufferInit(buffer, space);
 	}
 }
