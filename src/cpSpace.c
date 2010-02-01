@@ -43,11 +43,20 @@ contactSetEql(cpShape **shapes, cpArbiter *arb)
 
 // Transformation function for contactSet.
 static void *
-contactSetTrans(cpShape **shapes, cpArray *freeArbiters)
+contactSetTrans(cpShape **shapes, cpSpace *space)
 {
-	// grab an arbiter out of the free list before allocating a new one.
-	cpArbiter *arb = (freeArbiters->num ? cpArrayPop(freeArbiters) : cpArbiterAlloc());
-	return cpArbiterInit(arb, shapes[0], shapes[1]);
+	if(space->pooledArbiters->num == 0){
+		// arbiter pool is exhausted, make more
+		int count = CP_MAX_BUFFER_BYTES/sizeof(cpArbiter);
+		assert(count);
+		
+		cpArbiter *buffer = (cpArbiter *)cpmalloc(count*sizeof(cpArbiter));
+		cpArrayPush(space->allocatedBuffers, buffer);
+		
+		for(int i=0; i<count; i++) cpArrayPush(space->pooledArbiters, buffer + i);
+	}
+	
+	return cpArbiterInit(cpArrayPop(space->pooledArbiters), shapes[0], shapes[1]);
 }
 
 #pragma mark Collision Pair Function Helpers
@@ -103,7 +112,6 @@ static cpBB shapeBBFunc(cpShape *shape){return shape->bb;}
 // Iterator functions for destructors.
 static void             freeWrap(void         *ptr, void *unused){            cpfree(ptr);}
 static void        shapeFreeWrap(cpShape      *ptr, void *unused){     cpShapeFree(ptr);}
-static void      arbiterFreeWrap(cpArbiter    *ptr, void *unused){   cpArbiterFree(ptr);}
 static void         bodyFreeWrap(cpBody       *ptr, void *unused){      cpBodyFree(ptr);}
 static void   constraintFreeWrap(cpConstraint *ptr, void *unused){cpConstraintFree(ptr);}
 
@@ -157,12 +165,14 @@ cpSpaceInit(cpSpace *space)
 	
 	space->bodies = cpArrayNew(0);
 	space->arbiters = cpArrayNew(0);
-	space->freeArbiters = cpArrayNew(0);
+	space->pooledArbiters = cpArrayNew(0);
 	
 	cpContactBuffer *buffer = cpContactBufferInit(cpContactBufferAlloc(), space);
 	space->contactBuffersHead = buffer;
 	space->contactBuffersTail = buffer;
 	buffer->next = buffer; // Buffers will form a ring, start the ring explicitly
+	
+	space->allocatedBuffers = cpArrayNew(0);
 	
 	space->contactSet = cpHashSetNew(0, (cpHashSetEqlFunc)contactSetEql, (cpHashSetTransFunc)contactSetTrans);
 	
@@ -193,29 +203,24 @@ cpSpaceDestroy(cpSpace *space)
 	
 	cpArrayFree(space->constraints);
 	
-	cpContactBuffer *buffer = space->contactBuffersTail;
-	do {
-		cpContactBuffer *next = buffer->next;
-		cpfree(buffer);
-		buffer = next;
-	} while(buffer != space->contactBuffersTail);
-	
-	if(space->contactSet)
-		cpHashSetEach(space->contactSet, (cpHashSetIterFunc)arbiterFreeWrap, NULL);
 	cpHashSetFree(space->contactSet);
 	
 	cpArrayFree(space->arbiters);
-	if(space->freeArbiters)
-		cpArrayEach(space->freeArbiters, (cpArrayIter)arbiterFreeWrap, NULL);
-	cpArrayFree(space->freeArbiters);
+	cpArrayFree(space->pooledArbiters);
 	
-	if(space->postStepCallbacks)
+	if(space->allocatedBuffers){
+		cpArrayEach(space->allocatedBuffers, freeWrap, NULL);
+	}
+	
+	if(space->postStepCallbacks){
 		cpHashSetEach(space->postStepCallbacks, freeWrap, NULL);
-	cpHashSetFree(space->postStepCallbacks);
+		cpHashSetFree(space->postStepCallbacks);
+	}
 	
-	if(space->collFuncSet)
+	if(space->collFuncSet){
 		cpHashSetEach(space->collFuncSet, freeWrap, NULL);
-	cpHashSetFree(space->collFuncSet);
+		cpHashSetFree(space->collFuncSet);
+	}
 }
 
 void
@@ -604,7 +609,9 @@ cpSpaceGetFreeContactBuffer(cpSpace *space)
 		
 		return cpContactBufferInit(buffer, space);
 	} else {
-		return cpContactBufferInit(cpContactBufferAlloc(), space);
+		cpContactBuffer *buffer = cpContactBufferAlloc();
+		cpArrayPush(space->allocatedBuffers, buffer);
+		return cpContactBufferInit(buffer, space);
 	}
 }
 
@@ -672,7 +679,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	// This is where the persistant contact magic comes from.
 	cpShape *shape_pair[] = {a, b};
 	cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
-	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->contactSet, arbHashID, shape_pair, space->freeArbiters);
+	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->contactSet, arbHashID, shape_pair, space);
 	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b); // retains the contacts array
 	
 	// Call the begin function first if it's the first step
@@ -720,7 +727,7 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 	}
 	
 	if(ticks >= cp_contact_persistence){
-		cpArrayPush(space->freeArbiters, arb);
+		cpArrayPush(space->pooledArbiters, arb);
 		return 0;
 	}
 	

@@ -84,6 +84,9 @@ cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 	#endif
 #endif
 
+// Maximum allocated size for various Chipmunk buffer sizes
+#define CP_MAX_BUFFER_BYTES (64*1024)
+
 #define cpmalloc malloc
 #define cpcalloc calloc
 #define cprealloc realloc

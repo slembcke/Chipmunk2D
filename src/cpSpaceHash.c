@@ -111,8 +111,10 @@ cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpaceHashBBF
 	hash->celldim = celldim;
 	hash->bbfunc = bbfunc;
 	
-	hash->bins = NULL;
 	hash->handleSet = cpHashSetNew(0, &handleSetEql, &handleSetTrans);
+	
+	hash->pooledBins = NULL;
+	hash->allocatedBuffers = cpArrayNew(0);
 	
 	hash->stamp = 1;
 	
@@ -126,6 +128,13 @@ cpSpaceHashNew(cpFloat celldim, int cells, cpSpaceHashBBFunc bbfunc)
 }
 
 static inline void
+recycleBin(cpSpaceHash *hash, cpSpaceHashBin *bin)
+{
+	bin->next = hash->pooledBins;
+	hash->pooledBins = bin;
+}
+
+static inline void
 clearHashCell(cpSpaceHash *hash, int idx)
 {
 	cpSpaceHashBin *bin = hash->table[idx];
@@ -134,9 +143,7 @@ clearHashCell(cpSpaceHash *hash, int idx)
 		
 		// Release the lock on the handle.
 		cpHandleRelease(bin->handle);
-		// Recycle the bin.
-		bin->next = hash->bins;
-		hash->bins = bin;
+		recycleBin(hash, bin);
 		
 		bin = next;
 	}
@@ -152,18 +159,6 @@ clearHash(cpSpaceHash *hash)
 		clearHashCell(hash, i);
 }
 
-// Free the recycled hash bins.
-static void
-cpfreeBins(cpSpaceHash *hash)
-{
-	cpSpaceHashBin *bin = hash->bins;
-	while(bin){
-		cpSpaceHashBin *next = bin->next;
-		cpfree(bin);
-		bin = next;
-	}
-}
-
 // Hashset iterator function to free the handles.
 static void
 handleFreeWrap(void *elt, void *unused)
@@ -172,11 +167,14 @@ handleFreeWrap(void *elt, void *unused)
 	cpHandleFree(hand);
 }
 
+static void freeWrap(void *ptr, void *unused){cpfree(ptr);}
+
 void
 cpSpaceHashDestroy(cpSpaceHash *hash)
 {
 	clearHash(hash);
-	cpfreeBins(hash);
+	cpArrayEach(hash->allocatedBuffers, freeWrap, NULL);
+	cpArrayFree(hash->allocatedBuffers);
 	
 	// Free the handles.
 	cpHashSetEach(hash->handleSet, &handleFreeWrap, NULL);
@@ -220,14 +218,22 @@ containsHandle(cpSpaceHashBin *bin, cpHandle *hand)
 static inline cpSpaceHashBin *
 getEmptyBin(cpSpaceHash *hash)
 {
-	cpSpaceHashBin *bin = hash->bins;
+	cpSpaceHashBin *bin = hash->pooledBins;
 	
 	if(bin){
-		hash->bins = bin->next;
+		hash->pooledBins = bin->next;
 		return bin;
 	} else {
-		// Pool is exhausted, make a new one
-		return (cpSpaceHashBin *)cpmalloc(sizeof(cpSpaceHashBin));
+		// Pool is exhausted, make more
+		int count = CP_MAX_BUFFER_BYTES/sizeof(cpSpaceHashBin);
+		assert(count);
+		
+		cpSpaceHashBin *buffer = (cpSpaceHashBin *)cpmalloc(count*sizeof(cpSpaceHashBin));
+		cpArrayPush(hash->allocatedBuffers, buffer);
+		
+		// push all but the first one, return the first instead
+		for(int i=1; i<count; i++) recycleBin(hash, buffer + i);
+		return buffer;
 	}
 }
 

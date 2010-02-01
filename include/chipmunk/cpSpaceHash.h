@@ -55,9 +55,11 @@ typedef struct cpSpaceHash{
 	cpHashSet *handleSet;
 	
 	cpSpaceHashBin **table;
+	
 	// List of recycled bins.
-	cpSpaceHashBin *bins;
-
+	cpSpaceHashBin *pooledBins;
+	cpArray *allocatedBuffers;
+	
 	// Incremented on each query. See cpHandle.stamp.
 	int stamp;
 } cpSpaceHash;
