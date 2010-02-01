@@ -344,11 +344,31 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	return constraint;
 }
 
+typedef struct removalContext {
+	cpSpace *space;
+	cpShape *shape;
+} removalContext;
+
+// Hashset filter func to throw away old arbiters.
+static int
+contactSetFilterRemovedShape(cpArbiter *arb, removalContext *context)
+{
+	if(context->shape == arb->private_a || context->shape == arb->private_b){
+		arb->handler->separate(arb, context->space, arb->handler->data);
+		cpArrayPush(context->space->pooledArbiters, arb);
+		return 0;
+	}
+	
+	return 1;
+}
+
 void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
 	assert(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape));
 	
+	removalContext context = {space, shape};
+	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
 	cpSpaceHashRemove(space->activeShapes, shape, shape->hashid);
 }
 
@@ -357,6 +377,8 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
 	assert(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape));
 	
+	removalContext context = {space, shape};
+	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
 	cpSpaceHashRemove(space->staticShapes, shape, shape->hashid);
 }
 
