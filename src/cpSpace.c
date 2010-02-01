@@ -47,10 +47,10 @@ contactSetTrans(cpShape **shapes, cpSpace *space)
 {
 	if(space->pooledArbiters->num == 0){
 		// arbiter pool is exhausted, make more
-		int count = CP_MAX_BUFFER_BYTES/sizeof(cpArbiter);
+		int count = CP_BUFFER_BYTES/sizeof(cpArbiter);
 		assert(count);
 		
-		cpArbiter *buffer = (cpArbiter *)cpmalloc(CP_MAX_BUFFER_BYTES);
+		cpArbiter *buffer = (cpArbiter *)cpmalloc(CP_BUFFER_BYTES);
 		cpArrayPush(space->allocatedBuffers, buffer);
 		
 		for(int i=0; i<count; i++) cpArrayPush(space->pooledArbiters, buffer + i);

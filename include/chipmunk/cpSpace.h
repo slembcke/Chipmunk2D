@@ -42,7 +42,7 @@ typedef struct cpCollisionHandler {
 	void *data;
 } cpCollisionHandler;
 
-#define CP_CONTACTS_BUFFER_SIZE (CP_MAX_BUFFER_BYTES/sizeof(cpContact) - 1)
+#define CP_CONTACTS_BUFFER_SIZE (CP_BUFFER_BYTES/sizeof(cpContact) - 1)
 #define CP_MAX_CONTACTS_PER_ARBITER 6
 
 typedef struct cpContactBuffer {

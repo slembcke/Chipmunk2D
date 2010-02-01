@@ -80,10 +80,10 @@ handleSetTrans(void *obj, cpSpaceHash *hash)
 {
 	if(hash->pooledHandles->num == 0){
 		// handle pool is exhausted, make more
-		int count = CP_MAX_BUFFER_BYTES/sizeof(cpHandle);
+		int count = CP_BUFFER_BYTES/sizeof(cpHandle);
 		assert(count);
 		
-		cpHandle *buffer = (cpHandle *)cpmalloc(CP_MAX_BUFFER_BYTES);
+		cpHandle *buffer = (cpHandle *)cpmalloc(CP_BUFFER_BYTES);
 		cpArrayPush(hash->allocatedBuffers, buffer);
 		
 		for(int i=0; i<count; i++) cpArrayPush(hash->pooledHandles, buffer + i);
@@ -209,10 +209,10 @@ getEmptyBin(cpSpaceHash *hash)
 		return bin;
 	} else {
 		// Pool is exhausted, make more
-		int count = CP_MAX_BUFFER_BYTES/sizeof(cpSpaceHashBin);
+		int count = CP_BUFFER_BYTES/sizeof(cpSpaceHashBin);
 		assert(count);
 		
-		cpSpaceHashBin *buffer = (cpSpaceHashBin *)cpmalloc(CP_MAX_BUFFER_BYTES);
+		cpSpaceHashBin *buffer = (cpSpaceHashBin *)cpmalloc(CP_BUFFER_BYTES);
 		cpArrayPush(hash->allocatedBuffers, buffer);
 		
 		// push all but the first one, return the first instead

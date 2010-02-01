@@ -130,10 +130,10 @@ getUnusedBin(cpHashSet *set)
 		return bin;
 	} else {
 		// Pool is exhausted, make more
-		int count = CP_MAX_BUFFER_BYTES/sizeof(cpHashSetBin);
+		int count = CP_BUFFER_BYTES/sizeof(cpHashSetBin);
 		assert(count);
 		
-		cpHashSetBin *buffer = (cpHashSetBin *)cpmalloc(CP_MAX_BUFFER_BYTES);
+		cpHashSetBin *buffer = (cpHashSetBin *)cpmalloc(CP_BUFFER_BYTES);
 		cpArrayPush(set->allocatedBuffers, buffer);
 		
 		// push all but the first one, return the first instead
