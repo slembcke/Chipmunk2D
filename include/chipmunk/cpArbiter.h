@@ -87,13 +87,8 @@ typedef struct cpArbiter {
 	char state;
 } cpArbiter;
 
-// Basic allocation/destruction functions.
-cpArbiter* cpArbiterAlloc(void);
+// Arbiters are allocated in large buffers by the space and don't require a destroy function
 cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
-cpArbiter* cpArbiterNew(cpShape *a, cpShape *b);
-
-void cpArbiterDestroy(cpArbiter *arb);
-void cpArbiterFree(cpArbiter *arb);
 
 // These functions are all intended to be used internally.
 // Inject new contact points into the arbiter while preserving contact history.
