@@ -22,7 +22,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <assert.h>
 
 #include "chipmunk.h"
 #include "prime.h"
@@ -81,7 +80,7 @@ handleSetTrans(void *obj, cpSpaceHash *hash)
 	if(hash->pooledHandles->num == 0){
 		// handle pool is exhausted, make more
 		int count = CP_BUFFER_BYTES/sizeof(cpHandle);
-		assert(count);
+		cpAssert(count, "Buffer size is too small.");
 		
 		cpHandle *buffer = (cpHandle *)cpmalloc(CP_BUFFER_BYTES);
 		cpArrayPush(hash->allocatedBuffers, buffer);
@@ -210,7 +209,7 @@ getEmptyBin(cpSpaceHash *hash)
 	} else {
 		// Pool is exhausted, make more
 		int count = CP_BUFFER_BYTES/sizeof(cpSpaceHashBin);
-		assert(count);
+		cpAssert(count, "Buffer size is too small.");
 		
 		cpSpaceHashBin *buffer = (cpSpaceHashBin *)cpmalloc(CP_BUFFER_BYTES);
 		cpArrayPush(hash->allocatedBuffers, buffer);

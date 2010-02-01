@@ -21,7 +21,6 @@
  
 #include <stdlib.h>
 #include <stdio.h>
-#include <assert.h>
 
 #include "chipmunk.h"
 #include "chipmunk_unsafe.h"
@@ -156,15 +155,15 @@ cpPolyValidate(cpVect *verts, int numVerts)
 int
 cpPolyShapeGetNumVerts(cpShape *shape)
 {
-	assert(shape->klass == &polyClass);
+	cpAssert(shape->klass == &polyClass, "Shape is not a poly shape.");
 	return ((cpPolyShape *)shape)->numVerts;
 }
 
 cpVect
 cpPolyShapeGetVert(cpShape *shape, int idx)
 {
-	assert(shape->klass == &polyClass);
-	assert(idx < cpPolyShapeGetNumVerts(shape));
+	cpAssert(shape->klass == &polyClass, "Shape is not a poly shape.");
+	cpAssert(0 <= idx && idx < cpPolyShapeGetNumVerts(shape), "Index out of range.");
 	
 	return ((cpPolyShape *)shape)->verts[idx];
 }
@@ -195,7 +194,7 @@ cpPolyShape *
 cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, cpVect *verts, cpVect offset)
 {
 	// Fail if the user attempts to pass a concave poly, or a bad winding.
-	assert(cpPolyValidate(verts, numVerts));
+	cpAssert(cpPolyValidate(verts, numVerts), "Polygon is concave or has a reversed winding.");
 	
 	setUpVerts(poly, numVerts, verts, offset);
 	cpShapeInit((cpShape *)poly, &polyClass, body);
@@ -214,7 +213,7 @@ cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset)
 void
 cpPolyShapeSetVerts(cpShape *shape, int numVerts, cpVect *verts, cpVect offset)
 {
-	assert(shape->klass == &polyClass);
+	cpAssert(shape->klass == &polyClass, "Shape is not a poly shape.");
 	cpPolyShapeDestroy(shape);
 	setUpVerts((cpPolyShape *)shape, numVerts, verts, offset);
 }

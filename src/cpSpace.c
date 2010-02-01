@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <assert.h>
 
 #include "chipmunk.h"
 
@@ -48,7 +47,7 @@ contactSetTrans(cpShape **shapes, cpSpace *space)
 	if(space->pooledArbiters->num == 0){
 		// arbiter pool is exhausted, make more
 		int count = CP_BUFFER_BYTES/sizeof(cpArbiter);
-		assert(count);
+		cpAssert(count, "Buffer size too small.");
 		
 		cpArbiter *buffer = (cpArbiter *)cpmalloc(CP_BUFFER_BYTES);
 		cpArrayPush(space->allocatedBuffers, buffer);
@@ -160,6 +159,7 @@ cpSpaceInit(cpSpace *space)
 	space->gravity = cpvzero;
 	space->damping = 1.0f;
 	
+	space->locked = 0;
 	space->stamp = 0;
 
 	space->staticShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpaceHashBBFunc)shapeBBFunc);
@@ -302,22 +302,30 @@ cpSpaceSetDefaultCollisionHandler(
 
 #pragma mark Body, Shape, and Joint Management
 
+#define cpAssertSpaceUnlocked(space) \
+	cpAssert(!space->locked, \
+		"Cannot safely add or remove objects from a space during a call to cpSpaceStep(). " \
+		"Put these calls into a Post Step Callback." \
+	);
+
 cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
-	assert(shape->body);
-	assert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape));
-	cpSpaceHashInsert(space->activeShapes, shape, shape->hashid, shape->bb);
+	cpAssert(shape->body, "Cannot add a shape with a NULL body.");
+	cpAssert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape), "Cannot add the same shape more than once.");
+	cpAssertSpaceUnlocked(space);
 	
+	cpSpaceHashInsert(space->activeShapes, shape, shape->hashid, shape->bb);
 	return shape;
 }
 
 cpShape *
 cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
-	assert(shape->body);
-	assert(!cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape));
-
+	cpAssert(shape->body, "Cannot add a static shape with a NULL body.");
+	cpAssert(!cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape), "Cannot add the same static shape more than once.");
+	cpAssertSpaceUnlocked(space);
+	
 	cpShapeCacheBB(shape);
 	cpSpaceHashInsert(space->staticShapes, shape, shape->hashid, shape->bb);
 	
@@ -327,7 +335,8 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 cpBody *
 cpSpaceAddBody(cpSpace *space, cpBody *body)
 {
-	assert(!cpArrayContains(space->bodies, body));
+	cpAssert(!cpArrayContains(space->bodies, body), "Cannot add the same body more than once.");
+	cpAssertSpaceUnlocked(space);
 	
 	cpArrayPush(space->bodies, body);
 	
@@ -337,7 +346,8 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 cpConstraint *
 cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
-	assert(!cpArrayContains(space->constraints, constraint));
+	cpAssert(!cpArrayContains(space->constraints, constraint), "Cannot add the same constraint more than once.");
+	cpAssertSpaceUnlocked(space);
 	
 	cpArrayPush(space->constraints, constraint);
 	
@@ -365,7 +375,8 @@ contactSetFilterRemovedShape(cpArbiter *arb, removalContext *context)
 void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
-	assert(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape));
+	cpAssert(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape), "Cannot remove a shape that was never added to the space.");
+	cpAssertSpaceUnlocked(space);
 	
 	removalContext context = {space, shape};
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
@@ -375,7 +386,8 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
-	assert(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape));
+	cpAssert(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape), "Cannot remove a static shape that was never added to the space.");
+	cpAssertSpaceUnlocked(space);
 	
 	removalContext context = {space, shape};
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
@@ -385,7 +397,8 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 {
-	assert(cpArrayContains(space->bodies, body));
+	cpAssert(cpArrayContains(space->bodies, body), "Cannot remove a body that was never added to the space.");
+	cpAssertSpaceUnlocked(space);
 	
 	cpArrayDeleteObj(space->bodies, body);
 }
@@ -393,7 +406,8 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 void
 cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 {
-	assert(cpArrayContains(space->constraints, constraint));
+	cpAssert(cpArrayContains(space->constraints, constraint), "Cannot remove a constraint that was never added to the space.");
+	cpAssertSpaceUnlocked(space);
 	
 	cpArrayDeleteObj(space->constraints, constraint);
 }
@@ -780,6 +794,8 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	cpArray *bodies = space->bodies;
 	cpArray *constraints = space->constraints;
 	
+	space->locked = 1;
+	
 	// Empty the arbiter list.
 	space->arbiters->num = 0;
 
@@ -844,6 +860,8 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 			constraint->klass->applyImpulse(constraint);
 		}
 	}
+	
+	space->locked = 0;
 	
 	// run the post solve callbacks
 	for(int i=0; i<arbiters->num; i++){

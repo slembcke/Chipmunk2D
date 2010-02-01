@@ -26,6 +26,13 @@
 extern "C" {
 #endif
 
+void cpAbort(char *message, char *condition, char *file, int line);
+#ifdef NDEBUG
+	#define	cpAssert(condition, message)	((void)0)
+#else
+	#define cpAssert(condition, message) if(!(condition)) cpAbort(message, #condition, __FILE__, __LINE__)
+#endif
+
 #include "chipmunk_types.h"
 	
 static inline cpFloat

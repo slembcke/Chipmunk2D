@@ -70,6 +70,9 @@ typedef struct cpSpace{
 	
 	// *** Internally Used Fields
 	
+	// When the space is locked, you should not add or remove objects;
+	int locked;
+	
 	// Time stamp. Is incremented on every call to cpSpaceStep().
 	int stamp;
 

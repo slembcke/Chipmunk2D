@@ -131,7 +131,7 @@ getUnusedBin(cpHashSet *set)
 	} else {
 		// Pool is exhausted, make more
 		int count = CP_BUFFER_BYTES/sizeof(cpHashSetBin);
-		assert(count);
+		cpAssert(count, "Buffer size is too small.");
 		
 		cpHashSetBin *buffer = (cpHashSetBin *)cpmalloc(CP_BUFFER_BYTES);
 		cpArrayPush(set->allocatedBuffers, buffer);

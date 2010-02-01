@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
-#include <assert.h>
 
 #include "chipmunk.h"
 
@@ -385,7 +384,7 @@ int
 cpCollideShapes(cpShape *a, cpShape *b, cpContact *arr)
 {
 	// Their shape types must be in order.
-	assert(a->klass->type <= b->klass->type);
+	cpAssert(a->klass->type <= b->klass->type, "Collision shapes passed to cpCollideShapes() are not sorted.");
 	
 	collisionFunc cfunc = colfuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
 	return (cfunc) ? cfunc(a, b, arr) : 0;
