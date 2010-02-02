@@ -46,7 +46,7 @@ cpAbort(char *message, char *condition, char *file, int line)
 }
 
 
-char *cpVersionString = "5.1.0";
+char *cpVersionString = "5.x.x";
 
 void
 cpInitChipmunk(void)
