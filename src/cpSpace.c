@@ -116,22 +116,28 @@ static void   constraintFreeWrap(cpConstraint *ptr, void *unused){cpConstraintFr
 
 #pragma mark Memory Management Functions
 
-static cpContactBuffer *
+#define CP_CONTACTS_BUFFER_SIZE ((CP_BUFFER_BYTES - sizeof(cpContactBufferHeader))/sizeof(cpContact))
+typedef struct cpContactBuffer {
+	cpContactBufferHeader header;
+	cpContact contacts[CP_CONTACTS_BUFFER_SIZE];
+} cpContactBuffer;
+
+static cpContactBufferHeader *
 cpSpaceAllocContactBuffer(cpSpace *space)
 {
 	cpContactBuffer *buffer = (cpContactBuffer *)malloc(sizeof(cpContactBuffer));
 	cpArrayPush(space->allocatedBuffers, buffer);
-	return buffer;
+	return (cpContactBufferHeader *)buffer;
 }
 
-static cpContactBuffer *
-cpContactBufferInit(cpContactBuffer *buffer, cpSpace *space)
+static cpContactBufferHeader *
+cpContactBufferHeaderInit(cpContactBufferHeader *header, cpSpace *space)
 {
-	buffer->stamp = space->stamp;
-	buffer->next = space->contactBuffersTail;
-	buffer->numContacts = 0;
+	header->stamp = space->stamp;
+	header->next = space->contactBuffersTail;
+	header->numContacts = 0;
 	
-	return buffer;
+	return header;
 }
 
 cpSpace *
@@ -171,10 +177,10 @@ cpSpaceInit(cpSpace *space)
 	space->arbiters = cpArrayNew(0);
 	space->pooledArbiters = cpArrayNew(0);
 	
-	cpContactBuffer *buffer = cpContactBufferInit(cpSpaceAllocContactBuffer(space), space);
-	space->contactBuffersHead = buffer;
-	space->contactBuffersTail = buffer;
-	buffer->next = buffer; // Buffers will form a ring, start the ring explicitly
+	cpContactBufferHeader *header = cpContactBufferHeaderInit(cpSpaceAllocContactBuffer(space), space);
+	space->contactBuffersHead = header;
+	space->contactBuffersTail = header;
+	header->next = header; // Buffers will form a ring, start the ring explicitly
 	
 	space->contactSet = cpHashSetNew(0, (cpHashSetEqlFunc)contactSetEql, (cpHashSetTransFunc)contactSetTrans);
 	
@@ -304,7 +310,7 @@ cpSpaceSetDefaultCollisionHandler(
 
 #define cpAssertSpaceUnlocked(space) \
 	cpAssert(!space->locked, \
-		"Cannot safely add or remove objects from a space during a call to cpSpaceStep(). " \
+		"This addition/removal cannot be done safely during a call to cpSpaceStep(). " \
 		"Put these calls into a Post Step Callback." \
 	);
 
@@ -336,7 +342,7 @@ cpBody *
 cpSpaceAddBody(cpSpace *space, cpBody *body)
 {
 	cpAssert(!cpArrayContains(space->bodies, body), "Cannot add the same body more than once.");
-	cpAssertSpaceUnlocked(space);
+//	cpAssertSpaceUnlocked(space); This should be safe as long as it's not from an integration callback
 	
 	cpArrayPush(space->bodies, body);
 	
@@ -347,7 +353,7 @@ cpConstraint *
 cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
 	cpAssert(!cpArrayContains(space->constraints, constraint), "Cannot add the same constraint more than once.");
-	cpAssertSpaceUnlocked(space);
+//	cpAssertSpaceUnlocked(space); This should be safe as long as its not from a constraint callback.
 	
 	cpArrayPush(space->constraints, constraint);
 	
@@ -407,7 +413,7 @@ void
 cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 {
 	cpAssert(cpArrayContains(space->constraints, constraint), "Cannot remove a constraint that was never added to the space.");
-	cpAssertSpaceUnlocked(space);
+//	cpAssertSpaceUnlocked(space); Should be safe as long as its not from a constraint callback.
 	
 	cpArrayDeleteObj(space->constraints, constraint);
 }
@@ -639,17 +645,17 @@ cpSpaceRehashStatic(cpSpace *space)
 
 #pragma mark Collision Detection Functions
 
-static cpContactBuffer *
+static cpContactBufferHeader *
 cpSpaceGetFreeContactBuffer(cpSpace *space)
 {
 	if(space->stamp - space->contactBuffersTail->stamp > cp_contact_persistence){
-		cpContactBuffer *buffer = space->contactBuffersTail;
-		space->contactBuffersTail = buffer->next;
+		cpContactBufferHeader *header = space->contactBuffersTail;
+		space->contactBuffersTail = header->next;
 		
-		return cpContactBufferInit(buffer, space);
+		return cpContactBufferHeaderInit(header, space);
 	} else {
-		cpContactBuffer *buffer = cpSpaceAllocContactBuffer(space);
-		return cpContactBufferInit(buffer, space);
+		cpContactBufferHeader *header = cpSpaceAllocContactBuffer(space);
+		return cpContactBufferHeaderInit(header, space);
 	}
 }
 
@@ -661,7 +667,7 @@ cpSpacePushNewContactBuffer(cpSpace *space)
 //	}
 //	printf("%p (head)\n", space->contactBuffersHead);
 	
-	cpContactBuffer *buffer = cpSpaceGetFreeContactBuffer(space);
+	cpContactBufferHeader *buffer = cpSpaceGetFreeContactBuffer(space);
 	space->contactBuffersHead->next = buffer;
 	space->contactBuffersHead = buffer;
 }
@@ -708,7 +714,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	}
 	
 	// Narrow-phase collision detection.
-	cpContact *contacts = space->contactBuffersHead->contacts + space->contactBuffersHead->numContacts;
+	cpContact *contacts = ((cpContactBuffer *)(space->contactBuffersHead))->contacts + space->contactBuffersHead->numContacts;
 	int numContacts = cpCollideShapes(a, b, contacts);
 	if(!numContacts) return; // Shapes are not colliding.
 	space->contactBuffersHead->numContacts += numContacts;

@@ -42,16 +42,12 @@ typedef struct cpCollisionHandler {
 	void *data;
 } cpCollisionHandler;
 
-#define CP_CONTACTS_BUFFER_SIZE (CP_BUFFER_BYTES/sizeof(cpContact) - 1)
 #define CP_MAX_CONTACTS_PER_ARBITER 6
-
-typedef struct cpContactBuffer {
+typedef struct cpContactBufferHeader {
 	int stamp;
-	struct cpContactBuffer *next;
-	
+	struct cpContactBufferHeader *next;
 	unsigned int numContacts;
-	cpContact contacts[CP_CONTACTS_BUFFER_SIZE];
-} cpContactBuffer;
+} cpContactBufferHeader;
 
 typedef struct cpSpace{
 	// *** User definable fields
@@ -89,7 +85,7 @@ typedef struct cpSpace{
 	// Linked list ring of contact buffers.
 	// Head is the current buffer. Tail is the oldest buffer.
 	// The list points in the direction of tail->head.
-	cpContactBuffer *contactBuffersHead, *contactBuffersTail;
+	cpContactBufferHeader *contactBuffersHead, *contactBuffersTail;
 	
 	// List of buffers to be free()ed when destroying the space.
 	cpArray *allocatedBuffers;
