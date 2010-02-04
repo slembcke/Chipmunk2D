@@ -33,16 +33,13 @@ extern "C" {
 #endif
 
 void
-cpAbort(char *message, char *condition, char *file, int line)
+cpMessage(char *message, char *condition, char *file, int line, int isError)
 {
-	fprintf(stderr,
-		"Aborting due to Chipmunk error: %s\n"
-		"\tFailed condition: %s\n"
-		"\tSource:%s:%d\n",
-		message, condition, file, line
-	);
+	fprintf(stderr, (isError ? "Aborting due to Chipmunk error: %s\n" : "Chipmunk warning: %s\n"), message);
+	fprintf(stderr, "\tFailed condition: %s\n", condition);
+	fprintf(stderr, "\tSource:%s:%d\n", file, line);
 	
-	abort();
+	if(isError) abort();
 }
 
 
@@ -53,7 +50,7 @@ cpInitChipmunk(void)
 {
 #ifndef NDEBUG
 	printf("Initializing Chipmunk v%s (Debug Enabled)\n", cpVersionString);
-	printf("Compile with NDEBUG defined to disable debug mode and runtime assertion checks\n");
+	printf("Compile with -DNDEBUG defined to disable debug mode and runtime assertion checks\n");
 #endif
 	
 	cpInitCollisionFuncs();

@@ -318,7 +318,8 @@ cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
 	cpAssert(shape->body, "Cannot add a shape with a NULL body.");
-	cpAssert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape), "Cannot add the same shape more than once.");
+	cpAssert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
+		"Cannot add the same shape more than once.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpSpaceHashInsert(space->activeShapes, shape, shape->hashid, shape->bb);
@@ -329,7 +330,8 @@ cpShape *
 cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
 	cpAssert(shape->body, "Cannot add a static shape with a NULL body.");
-	cpAssert(!cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape), "Cannot add the same static shape more than once.");
+	cpAssert(!cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
+		"Cannot add the same static shape more than once.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpShapeCacheBB(shape);
@@ -381,7 +383,8 @@ contactSetFilterRemovedShape(cpArbiter *arb, removalContext *context)
 void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
-	cpAssert(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape), "Cannot remove a shape that was never added to the space.");
+	cpAssertWarn(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
+		"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	removalContext context = {space, shape};
@@ -392,7 +395,8 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
-	cpAssert(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape), "Cannot remove a static shape that was never added to the space.");
+	cpAssertWarn(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
+		"Cannot remove a static shape that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	removalContext context = {space, shape};
@@ -403,7 +407,8 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 {
-	cpAssert(cpArrayContains(space->bodies, body), "Cannot remove a body that was never added to the space.");
+	cpAssertWarn(cpArrayContains(space->bodies, body),
+		"Cannot remove a body that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	cpArrayDeleteObj(space->bodies, body);
@@ -412,7 +417,8 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 void
 cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 {
-	cpAssert(cpArrayContains(space->constraints, constraint), "Cannot remove a constraint that was never added to the space.");
+	cpAssertWarn(cpArrayContains(space->constraints, constraint),
+		"Cannot remove a constraint that was never added to the space. (Removed twice maybe?)");
 //	cpAssertSpaceUnlocked(space); Should be safe as long as its not from a constraint callback.
 	
 	cpArrayDeleteObj(space->constraints, constraint);

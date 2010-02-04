@@ -26,11 +26,17 @@
 extern "C" {
 #endif
 
-void cpAbort(char *message, char *condition, char *file, int line);
+void cpMessage(char *message, char *condition, char *file, int line, int isError);
 #ifdef NDEBUG
-	#define	cpAssert(condition, message)	((void)0)
+	#define	cpAssertWarn(condition, message)
 #else
-	#define cpAssert(condition, message) if(!(condition)) cpAbort(message, #condition, __FILE__, __LINE__)
+	#define cpAssertWarn(condition, message) if(!(condition)) cpMessage(message, #condition, __FILE__, __LINE__, 0)
+#endif
+
+#ifdef NDEBUG
+	#define	cpAssert(condition, message)
+#else
+	#define cpAssert(condition, message) if(!(condition)) cpMessage(message, #condition, __FILE__, __LINE__, 1)
 #endif
 
 #include "chipmunk_types.h"
