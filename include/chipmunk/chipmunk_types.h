@@ -3,7 +3,7 @@
 #endif
 
 // Use single precision floats on the iPhone.
-#ifdef TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE==1
 	#define CP_USE_DOUBLES 0
 #else
 	// use doubles by default for higher precision
