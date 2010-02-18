@@ -138,6 +138,9 @@ cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b);
 // Calculate the moment of inertia for a solid polygon shape.
 cpFloat cpMomentForPoly(cpFloat m, int numVerts, cpVect *verts, cpVect offset);
 
+// Calculate the moment of inertia for a solid box.
+cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height);
+
 #ifdef __cplusplus
 }
 #endif

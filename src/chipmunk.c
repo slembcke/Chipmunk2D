@@ -95,4 +95,11 @@ cpMomentForPoly(cpFloat m, const int numVerts, cpVect *verts, cpVect offset)
 	return (m*sum1)/(6.0f*sum2);
 }
 
+cpFloat
+cpMomentForBox(cpFloat m, cpFloat width, cpFloat height)
+{
+	return m*(width*width + height*height)/12.0;
+}
+
+
 #include "chipmunk_ffi.h"
