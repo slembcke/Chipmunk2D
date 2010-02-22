@@ -4,14 +4,17 @@ Chipmunk is a simple, lightweight and fast 2D rigid body physics library written
 CONTRACTING:
 Howling Moon Software (my company) is available for contracting if you want to make the physics in your game really stand out. Given our unique experience with the library, we can help you use Chipmunk to it's fullest potential. Feel free to contact us through our webpage: http://howlingmoonsoftware.com/contracting.php
 
+Objective-Chipmunk:
+The Objective-Chipmunk.tgz archive contains an Objective-C wrapper for the Chipmunk Physics Library as well as some sample code from shipping iPhone Apps. Chipmunk was written in C to allow it to  The primary advantages of a native Objective-C API include integrating with the Cocoa memory management model and the Chipmunk Object protocol. The Chipmunk Object protocol unifies the basic Chipmunk types as well as making it easy to create custom composite collections of the basic types. Additionally, the wrapper adds many convenience methods for doing common setup tasks as well as helper methods that integrate it with the rest of the Cocoa Touch API. The wrapper tries to do things the Objective-C way, adding useful method variations where it makes sense to do so.
+
 BUILDING:
 Mac OS X: There is an included XCode project file for building the static library and demo application. Alteratively you could use the CMake files.
 
-iPhone: The XCode project can build a static library with all the proper compiler settings. Additionally, if you run the iphonestatic.sh script in the macosx/ directory, it will build you a fat library compiled as release for the device and debug for the simulator. After building that, just copy the static lib and include/chipmunk/ directory to your project.
+iPhone: If you want a native Objective-C API, check out the Objective-Chipmunk.tgz archive for the Objective-C binding and some sample code from shipping iPhone Apps. Otherwise, the XCode project can build a static library with all the proper compiler settings. Additionally, if you run the iphonestatic.sh script in the macosx/ directory, it will build you a fat library compiled as release for the device and debug for the simulator. After building that, just copy the static lib and include/chipmunk/ directory to your project.
 
 UNIX: A forum user was kind enough to make a set of CMake files for Chipmunk. This will require you to have CMake installed. To build run 'cmake .' then 'make'. This should build a dynamic library, a static library, and the demo application.
 
-Windows: There is an included MSVC project for building the library and demo application. I do not personally maintain the MSVC project and it apparently hasn't worked for a while. If you are a MSVC whiz, consider lending a hand.
+Windows: There is an included MSVC project for building the library and demo application. I do not personally maintain the MSVC project. It needs 
 
 Ruby: I've been using maintaining a Ruby extension for Chipmunk, but at this time is not up to date with all the latest changes. A forum member has been working on an FFI based extention, and that may be a better way to take advantage of Chipmunk from Ruby. Another forum user has offered to maintain the non-FFI version of the extension. Stay tuned.
 
