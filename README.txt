@@ -26,6 +26,14 @@ http://www.slembcke.net/forums
 CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
+CHANGES SINCE 5.1.0:
+ * OPTIMIZATION: Chipmunk structs used within the solver are now allocated linearly in large blocks. This is much more CPU cache friendly. Programs have seen up to 50% performance improvements though 15-20% should be expected.
+ * API: Shape references in cpArbiter structs changed to private_a and private_b to discourage accessing the fields directly and getting them out of order. You should be using cpArbiterGetShapes() or CP_ARBITER_GET_SHAPES() to access the shapes in the correct order.
+ * API: Added assertion error messages as well as warnings and covered many new assertion cases.
+ * FIX: separate() callbacks are called before shapes are removed from the space to prevent dangling pointers.
+ * NEW: Added convenience functions for creating box shapes and calculating moments.
+ 
+
 CHANGES SINCE 5.0.0:
  * FIX: fixed a NaN issue that was causing raycasts for horizontal or vertical lines to end up in an infinite loop
  * FIX: fixed a number of memory leaks
