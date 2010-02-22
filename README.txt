@@ -14,7 +14,7 @@ iPhone: If you want a native Objective-C API, check out the Objective-Chipmunk.t
 
 UNIX: A forum user was kind enough to make a set of CMake files for Chipmunk. This will require you to have CMake installed. To build run 'cmake .' then 'make'. This should build a dynamic library, a static library, and the demo application.
 
-Windows: There is an included MSVC project for building the library and demo application. I do not personally maintain the MSVC project. It needs 
+Windows: There is an included MSVC project for building the library and demo application. I do not personally maintain the MSVC project. It needs someone to update it for the new include structure.
 
 Ruby: I've been using maintaining a Ruby extension for Chipmunk, but at this time is not up to date with all the latest changes. A forum member has been working on an FFI based extention, and that may be a better way to take advantage of Chipmunk from Ruby. Another forum user has offered to maintain the non-FFI version of the extension. Stay tuned.
 
