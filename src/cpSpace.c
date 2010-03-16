@@ -151,8 +151,6 @@ cpSpaceAlloc(void)
 #define DEFAULT_ITERATIONS 10
 #define DEFAULT_ELASTIC_ITERATIONS 0
 
-#define MAX_CONTACTS 10000
-
 cpCollisionHandler defaultHandler = {0, 0, alwaysCollide, alwaysCollide, nothing, nothing, NULL};
 
 cpSpace*

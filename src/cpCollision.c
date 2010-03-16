@@ -120,7 +120,7 @@ nextContactPoint(cpContact *arr, int *numPtr)
 {
 	int num = *numPtr;
 	
-	if(num <= CP_MAX_CONTACTS_PER_ARBITER)
+	if(num < CP_MAX_CONTACTS_PER_ARBITER)
 		(*numPtr) = num + 1;
 	
 	return &arr[num];
