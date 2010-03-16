@@ -783,13 +783,11 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 }
 
 // Hashset filter func to call and throw away post step callbacks.
-static int
-postStepCallbackSetFilter(postStepCallback *callback, cpSpace *space)
+static void
+postStepCallbackSetIter(postStepCallback *callback, cpSpace *space)
 {
 	callback->func(space, callback->obj, callback->data);
 	cpfree(callback);
-	
-	return 0;
 }
 
 #pragma mark All Important cpSpaceStep() Function
@@ -884,8 +882,11 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	}
 	
 	// Run the post step callbacks
-	// Use filter as an easy way to clear out the queue as it runs
-	cpHashSetFilter(space->postStepCallbacks, (cpHashSetFilterFunc)postStepCallbackSetFilter, space);
+	while(space->postStepCallbacks->entries){
+		cpHashSet *callbacks = space->postStepCallbacks;
+		space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql, (cpHashSetTransFunc)postStepFuncSetTrans);
+		cpHashSetEach(callbacks, (cpHashSetIterFunc)postStepCallbackSetIter, space);
+	}
 	
 //	cpFloat dvsq = cpvdot(space->gravity, space->gravity);
 //	dvsq *= dt*dt * space->damping*space->damping;
