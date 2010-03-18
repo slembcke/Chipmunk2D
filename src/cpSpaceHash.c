@@ -384,12 +384,13 @@ cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc fun
 	int t = floor_int(bb.t/dim);
 	
 	int n = hash->numcells;
+	cpSpaceHashBin **table = hash->table;
 	
 	// Iterate over the cells and query them.
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
 			int idx = hash_func(i,j,n);
-			query(hash, hash->table[idx], obj, func, data);
+			query(hash, table[idx], obj, func, data);
 		}
 	}
 	
@@ -425,6 +426,8 @@ handleQueryRehashHelper(void *elt, void *data)
 	int r = floor_int(bb.r/dim);
 	int b = floor_int(bb.b/dim);
 	int t = floor_int(bb.t/dim);
+	
+	cpSpaceHashBin **table = hash->table;
 
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
@@ -432,7 +435,7 @@ handleQueryRehashHelper(void *elt, void *data)
 //			if(!hand->obj) goto break_out;
 			
 			int idx = hash_func(i,j,n);
-			cpSpaceHashBin *bin = hash->table[idx];
+			cpSpaceHashBin *bin = table[idx];
 			
 			if(containsHandle(bin, hand)) continue;
 			
@@ -442,7 +445,7 @@ handleQueryRehashHelper(void *elt, void *data)
 			cpSpaceHashBin *newBin = getEmptyBin(hash);
 			newBin->handle = hand;
 			newBin->next = bin;
-			hash->table[idx] = newBin;
+			table[idx] = newBin;
 		}
 	}
 	
@@ -520,11 +523,13 @@ void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, c
 	// fix NANs in horizontal directions
 	cpFloat next_h = (temp_h ? temp_h*dt_dx : dt_dx);
 	cpFloat next_v = (temp_v ? temp_v*dt_dy : dt_dy);
+	
+	cpSpaceHashBin **table = hash->table;
 
 	int n = hash->numcells;
 	while(t < t_exit){
 		int idx = hash_func(cell_x, cell_y, n);
-		t_exit = cpfmin(t_exit, segmentQuery(hash, hash->table[idx], obj, func, data));
+		t_exit = cpfmin(t_exit, segmentQuery(hash, table[idx], obj, func, data));
 
 		if (next_v < next_h){
 			cell_y += y_inc;
