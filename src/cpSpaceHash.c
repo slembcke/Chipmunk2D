@@ -66,12 +66,7 @@ cpSpaceHashAllocTable(cpSpaceHash *hash, int numcells)
 }
 
 // Equality function for the handleset.
-static int
-handleSetEql(void *obj, void *elt)
-{
-	cpHandle *hand = (cpHandle *)elt;
-	return (obj == hand->obj);
-}
+static int handleSetEql(void *obj, cpHandle *hand){return (obj == hand->obj);}
 
 // Transformation function for the handleset.
 static void *
@@ -101,7 +96,7 @@ cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpaceHashBBF
 	hash->celldim = celldim;
 	hash->bbfunc = bbfunc;
 	
-	hash->handleSet = cpHashSetNew(0, handleSetEql, (cpHashSetTransFunc)handleSetTrans);
+	hash->handleSet = cpHashSetNew(0, (cpHashSetEqlFunc)handleSetEql, (cpHashSetTransFunc)handleSetTrans);
 	hash->pooledHandles = cpArrayNew(0);
 	
 	hash->pooledBins = NULL;
