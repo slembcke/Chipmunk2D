@@ -102,6 +102,9 @@ typedef struct cpSpace{
 	cpCollisionHandler defaultHandler;
 	
 	cpHashSet *postStepCallbacks;
+	
+	// Shared static body assigned to all joints/shapes with NULL bodies
+	cpBody staticBody;
 } cpSpace;
 
 // Basic allocation/destruction functions.

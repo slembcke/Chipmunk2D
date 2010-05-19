@@ -189,6 +189,7 @@ cpSpaceInit(cpSpace *space)
 	space->collFuncSet->default_value = &space->defaultHandler;
 	
 	space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql, (cpHashSetTransFunc)postStepFuncSetTrans);
+	cpBodyInit(&space->staticBody, INFINITY, INFINITY);
 	
 	return space;
 }
@@ -315,7 +316,9 @@ cpSpaceSetDefaultCollisionHandler(
 cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
-	cpAssert(shape->body, "Cannot add a shape with a NULL body.");
+//	cpAssert(shape->body, "Cannot add a shape with a NULL body.");
+	if(!shape->body) return cpSpaceAddStaticShape(space, shape);
+
 	cpAssert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
 		"Cannot add the same shape more than once.");
 	cpAssertSpaceUnlocked(space);
@@ -327,7 +330,9 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 cpShape *
 cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
-	cpAssert(shape->body, "Cannot add a static shape with a NULL body.");
+//	cpAssert(shape->body, "Cannot add a static shape with a NULL body.");
+	if(!shape->body) shape->body = &space->staticBody;
+	
 	cpAssert(!cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
 		"Cannot add the same static shape more than once.");
 	cpAssertSpaceUnlocked(space);
@@ -341,6 +346,7 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 cpBody *
 cpSpaceAddBody(cpSpace *space, cpBody *body)
 {
+	cpAssertWarn(body->m != INFINITY, "Did you really mean to add an infinite mass body to the space?");
 	cpAssert(!cpArrayContains(space->bodies, body), "Cannot add the same body more than once.");
 //	cpAssertSpaceUnlocked(space); This should be safe as long as it's not from an integration callback
 	
@@ -352,6 +358,9 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 cpConstraint *
 cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
+	if(!constraint->a) constraint->a = &space->staticBody;
+	if(!constraint->b) constraint->b = &space->staticBody;
+	
 	cpAssert(!cpArrayContains(space->constraints, constraint), "Cannot add the same constraint more than once.");
 //	cpAssertSpaceUnlocked(space); This should be safe as long as its not from a constraint callback.
 	

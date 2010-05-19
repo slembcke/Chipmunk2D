@@ -61,7 +61,7 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 	
 	shape->data = NULL;
 	
-	cpShapeCacheBB(shape);
+//	cpShapeCacheBB(shape);
 	
 	return shape;
 }
