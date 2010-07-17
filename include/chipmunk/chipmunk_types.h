@@ -2,12 +2,14 @@
    #import "TargetConditionals.h"
 #endif
 
-// Use single precision floats on the iPhone.
-#if TARGET_OS_IPHONE==1
-	#define CP_USE_DOUBLES 0
-#else
-	// use doubles by default for higher precision
-	#define CP_USE_DOUBLES 1
+#ifndef CP_USE_DOUBLES
+  // Use single precision floats on the iPhone.
+  #if TARGET_OS_IPHONE
+    #define CP_USE_DOUBLES 0
+  #else
+    // use doubles by default for higher precision
+    #define CP_USE_DOUBLES 1
+  #endif
 #endif
 
 #if CP_USE_DOUBLES

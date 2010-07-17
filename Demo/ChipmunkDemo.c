@@ -187,13 +187,23 @@ drawInfo()
 		"Arbiters: %d (%d) - "
 		"Contact Points: %d (%d)\n"
 		"Other Constraints: %d, Iterations: %d\n"
-		"Constraints x Iterations: %d (%d)";
+		"Constraints x Iterations: %d (%d)\n"
+		"KE:% 5.2e";
+	
+	cpArray *bodies = space->bodies;
+	cpFloat ke = 0.0f;
+	for(int i=0; i<bodies->num; i++){
+		cpBody *body = (cpBody *)bodies->arr[i];
+		if(body->m == INFINITY || body->i == INFINITY) continue;
+		
+		ke += body->m*cpvdot(body->v, body->v) + body->i*body->w*body->w;
+	}
 	
 	snprintf(buffer, 1000, format,
 		arbiters, maxArbiters,
 		points, maxPoints,
 		space->constraints->num, space->iterations + space->elasticIterations,
-		constraints, maxConstraints
+		constraints, maxConstraints, (ke < 1e-10f ? 0.0f : ke)
 	);
 	
 	drawString(0, 220, buffer);
