@@ -43,11 +43,11 @@ preStep(cpDampedSpring *spring, cpFloat dt, cpFloat dt_inv)
 	cpFloat dist = cpvlength(delta);
 	spring->n = cpvmult(delta, 1.0f/(dist ? dist : INFINITY));
 	
-	// calculate mass normal
-	spring->nMass = 1.0f/k_scalar(a, b, spring->r1, spring->r2, spring->n);
-
-	spring->dt = dt;
+	cpFloat k = k_scalar(a, b, spring->r1, spring->r2, spring->n);
+	spring->nMass = 1.0f/k;
+	
 	spring->target_vrn = 0.0f;
+	spring->v_coef = 1.0f - cpfexp(-spring->damping*dt*k);
 
 	// apply spring force
 	cpFloat f_spring = spring->springForceFunc((cpConstraint *)spring, dist);
@@ -69,7 +69,7 @@ applyImpulse(cpDampedSpring *spring)
 	
 	// compute velocity loss from drag
 	// not 100% certain this is derived correctly, though it makes sense
-	cpFloat v_damp = -vrn*(1.0f - cpfexp(-spring->damping*spring->dt/spring->nMass));
+	cpFloat v_damp = -vrn*spring->v_coef;
 	spring->target_vrn = vrn + v_damp;
 	
 	apply_impulses(a, b, spring->r1, spring->r2, cpvmult(spring->n, v_damp*spring->nMass));
