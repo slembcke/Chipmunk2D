@@ -33,7 +33,7 @@ cpBody *staticBody;
 static void
 update(int ticks)
 {
-	int steps = 2;
+	int steps = 3;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++)
@@ -48,7 +48,7 @@ init(void)
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
-	space->iterations = 20;
+	space->iterations = 30;
 	cpSpaceResizeActiveHash(space, 30.0f, 2999);
 	cpSpaceResizeStaticHash(space, 30.0f, 999);
 	space->gravity = cpv(0, -300);

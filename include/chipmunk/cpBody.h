@@ -25,7 +25,7 @@ typedef void (*cpBodyPositionFunc)(struct cpBody *body, cpFloat dt);
 
 extern cpBodyVelocityFunc cpBodyUpdateVelocityDefault;
 extern cpBodyPositionFunc cpBodyUpdatePositionDefault;
- 
+
 typedef struct cpBody{
 	// *** Integration Functions.ntoehu
 
@@ -72,7 +72,7 @@ typedef struct cpBody{
 	cpVect v_bias;
 	cpFloat w_bias;
 	
-//	int active;
+	int activeStamp;
 } cpBody;
 
 // Basic allocation/destruction functions
@@ -157,4 +157,4 @@ void cpBodyApplyForce(cpBody *body, cpVect f, cpVect r);
 // Warning: Large damping values can be unstable. Use a cpDampedSpring constraint for this instead.
 void cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat rlen, cpFloat k, cpFloat dmp, cpFloat dt);
 
-//int cpBodyMarkLowEnergy(cpBody *body, cpFloat dvsq, int max);
+void cpBodyMarkLowEnergy(cpBody *body, cpFloat dvsq, int stamp);

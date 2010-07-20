@@ -897,10 +897,10 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpHashSetEach(callbacks, (cpHashSetIterFunc)postStepCallbackSetIter, space);
 	}
 	
-//	cpFloat dvsq = cpvdot(space->gravity, space->gravity);
+	cpFloat dvsq = cpvdot(space->gravity, space->gravity)*dt*dt;
 //	dvsq *= dt*dt * space->damping*space->damping;
-//	for(int i=0; i<bodies->num; i++)
-//		cpBodyMarkLowEnergy(bodies->arr[i], dvsq, space->sleepTicks);
+	for(int i=0; i<bodies->num; i++)
+		cpBodyMarkLowEnergy((cpBody *)bodies->arr[i], dvsq, space->stamp);
 	
 	// Increment the stamp.
 	space->stamp++;

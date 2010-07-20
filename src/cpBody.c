@@ -167,22 +167,21 @@ cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat 
 	cpBodyApplyForce(b, cpvneg(f), r2);
 }
 
-//int
-//cpBodyMarkLowEnergy(cpBody *body, cpFloat dvsq, int max)
-//{
-//	cpFloat ke = body->m*cpvdot(body->v, body->v);
-//	cpFloat re = body->i*body->w*body->w;
-//	
-//	if(ke + re > body->m*dvsq)
-//		body->active = 1;
-//	else if(body->active)
-//		body->active = (body->active + 1)%(max + 1);
-//	else {
+void
+cpBodyMarkLowEnergy(cpBody *body, cpFloat dvsq, int stamp)
+{
+	cpFloat ke = body->m*cpvdot(body->v, body->v);
+	cpFloat re = body->i*body->w*body->w;
+	
+	if(ke + re > body->m*dvsq){
+		body->activeStamp = stamp;
+	} 
+//	else if(stamp - body->activeStamp > 5) {
 //		body->v = cpvzero;
 //		body->v_bias = cpvzero;
 //		body->w = 0.0f;
 //		body->w_bias = 0.0f;
 //	}
-//	
-//	return body->active;
-//}
+	
+//	return body->activeStamp;
+}
