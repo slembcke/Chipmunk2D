@@ -144,43 +144,43 @@ init(void)
 	cpShape *shape;
 	
 	// Create segments around the edge of the screen.
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 	
 	// add some other segments to play with
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-220,-200), cpv(-220,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-220,-200), cpv(-220,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(0,-240), cpv(320,-200), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(0,-240), cpv(320,-200), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(200,-240), cpv(320,-100), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(200,-240), cpv(320,-100), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-220,-80), cpv(200,-80), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-220,-80), cpv(200,-80), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	shape->collision_type = 2;

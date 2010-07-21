@@ -58,7 +58,7 @@ init(void)
 	// If a shape never changes position, add it as static so Chipmunk knows it only needs to
 	// calculate collision information for it once when it is added.
 	// Do not change the postion of a static shape after adding it.
-	cpSpaceAddStaticShape(space, ground);
+	cpSpaceAddShape(space, ground);
 	
 	// Add a moving circle object.
 	cpFloat radius = 15.0f;

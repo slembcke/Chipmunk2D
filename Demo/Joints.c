@@ -122,44 +122,44 @@ init(void)
 	
 	cpShape *shape;
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,120), cpv(320,120), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,120), cpv(320,120), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,0), cpv(320,0), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,0), cpv(320,0), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-120), cpv(320,-120), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-120), cpv(320,-120), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-160,-240), cpv(-160,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-160,-240), cpv(-160,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(0,-240), cpv(0,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(0,-240), cpv(0,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(160,-240), cpv(160,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(160,-240), cpv(160,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	

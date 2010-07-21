@@ -91,7 +91,7 @@ init(void)
 	
 	// add a non-collidable segment as a quick and dirty way to draw the query line
 	shape = cpSegmentShapeNew(NULL, cpvzero, cpv(100.0f, 0.0f), 4.0f);
-	cpSpaceAddStaticShape(space, shape);
+	cpSpaceAddShape(space, shape);
 	shape->layers = 0;
 	querySeg = shape;
 	
@@ -107,7 +107,7 @@ init(void)
 	}
 	
 	{ // add a static segment
-		cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(0, 300), cpv(300, 0), 0.0f));
+		cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(0, 300), cpv(300, 0), 0.0f));
 	}
 	
 	{ // add a pentagon

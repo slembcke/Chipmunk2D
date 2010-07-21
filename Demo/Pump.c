@@ -78,31 +78,31 @@ init(void)
 	cpShape *shape;
 	
 	// beveling all of the line segments helps prevent things from getting stuck on cracks
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-256,16), cpv(-256,240), 2.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-256,16), cpv(-256,240), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-256,16), cpv(-192,0), 2.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-256,16), cpv(-192,0), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-192,0), cpv(-192, -64), 2.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-192,0), cpv(-192, -64), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-128,-64), cpv(-128,144), 2.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-128,-64), cpv(-128,144), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-192,80), cpv(-192,176), 2.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-192,80), cpv(-192,176), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-192,176), cpv(-128,240), 2.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-192,176), cpv(-128,240), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-128,144), cpv(192,64), 2.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-128,144), cpv(192,64), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 

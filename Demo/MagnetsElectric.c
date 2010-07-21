@@ -432,21 +432,21 @@ init(void)
 	// Screen border
 /*	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);
 	shape->e = 1.0; shape->u = 1.0;
-	cpSpaceAddStaticShape(space, shape);
+	cpSpaceAddShape(space, shape);
 
 	shape = cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f);
 	shape->e = 1.0; shape->u = 1.0;
-	cpSpaceAddStaticShape(space, shape);
+	cpSpaceAddShape(space, shape);
 
 	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
 	shape->e = 1.0; shape->u = 1.0;
-	cpSpaceAddStaticShape(space, shape);
+	cpSpaceAddShape(space, shape);
 
 	// Reference line
 	// Does not collide with other objects, we just want to draw it.
 	shape = cpSegmentShapeNew(staticBody, cpv(-320,0), cpv(320,0), 0.0f);
 	shape->collision_type = 1;
-	cpSpaceAddStaticShape(space, shape);
+	cpSpaceAddShape(space, shape);
 	// Add a collision pair function to filter collisions
 	cpSpaceAddCollisionPairFunc(space, 0, 1, NULL, NULL);
 */		
