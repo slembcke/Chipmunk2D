@@ -29,21 +29,19 @@ typedef void (*cpBodyPositionFunc)(struct cpBody *body, cpFloat dt);
 extern cpBodyVelocityFunc cpBodyUpdateVelocityDefault;
 extern cpBodyPositionFunc cpBodyUpdatePositionDefault;
 
-typedef struct cpContactComponent {
-	cpArray bodies;
-} cpContactComponent;
-
-cpContactComponent *cpContactComponentNew(void);
-void cpContactComponentAdd(cpContactComponent *component, struct cpBody *body);
-void cpContactComponentFree(cpContactComponent *component);
+//typedef struct cpContactComponent {
+//	cpArray bodies;
+//} cpContactComponent;
+//
+//cpContactComponent *cpContactComponentNew(void);
+//void cpContactComponentAdd(cpContactComponent *component, struct cpBody *body);
+//void cpContactComponentFree(cpContactComponent *component);
 
 typedef struct cpComponentNode {
-	struct cpSpace *space;
-	cpFloat idleTime;
-	struct cpComponentNode *parent;
+	struct cpBody *parent;
+	struct cpBody *next;
 	int rank;
-	
-	cpContactComponent *component;
+	cpFloat idleTime;
 } cpComponentNode;
 
 typedef struct cpBody{
@@ -92,8 +90,9 @@ typedef struct cpBody{
 	cpVect v_bias;
 	cpFloat w_bias;
 	
+	struct cpSpace *space;
 	struct cpShape *shapesList;
-	cpComponentNode componentNode;
+	cpComponentNode node;
 } cpBody;
 
 // Basic allocation/destruction functions
@@ -187,7 +186,7 @@ cpBodyKineticEnergy(cpBody *body)
 	// Need to do some fudging to avoid NaNs
 	cpFloat vsq = cpvdot(body->v, body->v);
 	cpFloat wsq = body->w*body->w;
-	return (vsq ? vsq*body->m : 0.0f) + (wsq ? wsq*body->m : 0.0f);
+	return (vsq ? vsq*body->m : 0.0f) + (wsq ? wsq*body->i : 0.0f);
 }
 
 // Apply a damped spring force between two bodies.

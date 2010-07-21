@@ -389,7 +389,7 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 //	cpAssertSpaceUnlocked(space); This should be safe as long as it's not from an integration callback
 	
 	cpArrayPush(space->bodies, body);
-	body->componentNode.space = space;
+	body->space = space;
 	
 	return body;
 }
@@ -400,8 +400,8 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	cpAssert(!cpArrayContains(space->constraints, constraint), "Cannot add the same constraint more than once.");
 //	cpAssertSpaceUnlocked(space); This should be safe as long as its not from a constraint callback.
 	
-	if(constraint->a) cpBodyActivate(constraint->a, space);
-	if(constraint->b) cpBodyActivate(constraint->b, space);
+//	if(constraint->a) cpBodyActivate(constraint->a, space);
+//	if(constraint->b) cpBodyActivate(constraint->b, space);
 	cpArrayPush(space->constraints, constraint);
 	
 	return constraint;
@@ -474,7 +474,7 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 	
 	cpBodyActivate(body, space);
 	cpArrayDeleteObj(space->bodies, body);
-	body->componentNode.space = NULL;
+	body->space = NULL;
 }
 
 void
@@ -859,55 +859,58 @@ postStepCallbackSetIter(postStepCallback *callback, cpSpace *space)
 
 #pragma mark Experimental Sleeping Functions
 
-static inline cpComponentNode *
-componentNodeRoot(cpComponentNode *node)
+static inline cpBody *
+componentNodeRoot(cpBody *body)
 {
-	cpComponentNode *parent = node->parent;
+	cpBody *parent = body->node.parent;
 	
 	if(!parent){
-		return node;
+		return body;
 	} else {
 		// path compression, attaches this node directly to the root
-		return (node->parent = componentNodeRoot(parent));
+		return (body->node.parent = componentNodeRoot(parent));
 	}
 }
 
 static inline void
-componentNodeMerge(cpComponentNode *a, cpComponentNode *b)
+componentNodeMerge(cpBody *a_root, cpBody *b_root)
 {
-	cpComponentNode *a_root = componentNodeRoot(a);
-	cpComponentNode *b_root = componentNodeRoot(b);
-	
-	if(a_root->rank < b_root->rank){
-		a_root->parent = b_root;
-	} else if(a_root->rank > b_root->rank){
-		b_root->parent = a_root;
+	if(a_root->node.rank < b_root->node.rank){
+		a_root->node.parent = b_root;
+	} else if(a_root->node.rank > b_root->node.rank){
+		b_root->node.parent = a_root;
 	} else if(a_root != b_root){
-		b_root->parent = a_root;
-		a_root->rank++;
+		b_root->node.parent = a_root;
+		a_root->node.rank++;
 	}
+}
+
+static inline void
+cpComponentActivate(cpBody *root, cpSpace *space)
+{
+	if(!root->node.next) return;
+	
+	cpBody *body = root, *next;
+	do {
+		next = body->node.next;
+		body->node.next = NULL;
+//		body->componentNode.parent = NULL;
+		cpArrayPush(space->bodies, body);
+		
+		for(cpShape *shape=body->shapesList; shape; shape=shape->next){
+			removeShapeRaw(shape, space->staticShapes);
+			addShapeRaw(shape, space->activeShapes);
+		}
+	} while((body = next) != root);
+	
+	cpArrayDeleteObj(space->components, root);
 }
 
 static inline void
 cpBodyActivate(cpBody *body, cpSpace *space)
 {
-	cpContactComponent *component = body->componentNode.component;
-	if(!component) return;
-	
-	for(int i=0; i<component->bodies.num; i++){
-		cpBody *body = component->bodies.arr[i];
-		body->componentNode.component = NULL;
-//		body->componentNode.parent = NULL;
-		cpArrayPush(space->bodies, body);
-		
-		for(cpShape *shape = body->shapesList; shape; shape = shape->next){
-			removeShapeRaw(shape, space->staticShapes);
-			addShapeRaw(shape, space->activeShapes);
-		}
-	}
-	
-	cpArrayDeleteObj(space->components, component);
-	cpContactComponentFree(component);
+	cpBody *root = componentNodeRoot(body);
+	if(root) cpComponentActivate(root, space);
 }
 
 static inline void
@@ -919,29 +922,30 @@ mergeBodies(cpSpace *space, cpArray *components, cpArray *rougeBodies, cpBody *a
 	// Don't merge with the static body
 	if(!a || !b) return;
 	
-	cpBodyActivate(a, space);
-	cpBodyActivate(b, space);
-	
-	cpComponentNode *node_a = &a->componentNode;
-	cpComponentNode *node_b = &b->componentNode;
+	cpBody *a_root = componentNodeRoot(a);
+	cpBody *b_root = componentNodeRoot(b);
+
+	cpComponentActivate(a_root, space);
+	cpComponentActivate(b_root, space);
 	
 	// both nodes already inactive
-	if(node_a->component && node_b->component) return;
+	if(a->node.next && b->node.next) return;
 	
 	// Add any rouge bodies (bodies not added to the space)
-	if(!node_a->space) cpArrayPush(rougeBodies, a);
-	if(!node_b->space) cpArrayPush(rougeBodies, b);
+	if(!a->space) cpArrayPush(rougeBodies, a);
+	if(!b->space) cpArrayPush(rougeBodies, b);
 	
-	componentNodeMerge(node_a, node_b);
+	componentNodeMerge(a_root, b_root);
 }
 
 static inline int
-componentActive(cpContactComponent *component, cpFloat threshold)
+componentActive(cpBody *root, cpFloat threshold)
 {
-	for(int i=0; i<component->bodies.num; i++){
-		cpBody *body = component->bodies.arr[i];
-		if(!body->componentNode.space || body->componentNode.idleTime < threshold) return 1;
-	}
+	cpBody *body = root, *next;
+	do {
+		next = body->node.next;
+		if(!body->space || body->node.idleTime < threshold) return 1;
+	} while((body = next) != root);
 	
 	return 0;
 }
@@ -949,18 +953,18 @@ componentActive(cpContactComponent *component, cpFloat threshold)
 static inline void
 addComponent(cpBody *body, cpArray *components)
 {
-	cpComponentNode *node = &body->componentNode;
-	cpComponentNode *root = componentNodeRoot(node);
+	if(body->node.next) return;
+	cpBody *root = componentNodeRoot(body);
 	
-	cpContactComponent *component = root->component;
-	if(!component){
-		component = cpContactComponentNew();
-		root->component = component;
-		cpArrayPush(components, component);
+	cpBody *next = root->node.next;
+	if(!next){
+		cpArrayPush(components, root);
+		body->node.next = root;
+		root->node.next = body;
+	} else if(root != body) {
+		body->node.next = next;
+		root->node.next = body;
 	}
-	
-	node->component = component;
-	cpContactComponentAdd(component, body);
 }
 
 static void
@@ -972,17 +976,15 @@ doComponentStuff(cpSpace *space, cpFloat dt)
 	cpArray *arbiters = space->arbiters;
 	cpArray *constraints = space->constraints;
 	cpArray *components = cpArrayNew(bodies->num/8);
-	// TODO statically allocate components? implicit linked list?
 	
 	cpFloat dv = space->idleSpeedThreshold;
 	cpFloat dvsq = (dv ? dv*dv : cpvdot(space->gravity, space->gravity)*dt*dt);
 	// update idling
 	for(int i=0; i<bodies->num; i++){
 		cpBody *body = bodies->arr[i];
-		cpComponentNode *node = &body->componentNode;
 		
 		cpFloat thresh = (dvsq ? body->m*dvsq : 0.0f);
-		node->idleTime = (cpBodyKineticEnergy(body) > thresh ? 0.0f : node->idleTime + dt);
+		body->node.idleTime = (cpBodyKineticEnergy(body) > thresh ? 0.0f : body->node.idleTime + dt);
 	}
 	
 	// iterate edges and build forests
@@ -1003,30 +1005,29 @@ doComponentStuff(cpSpace *space, cpFloat dt)
 	
 	// iterate components, copy or deactivate
 	for(int i=0; i<components->num; i++){
-		cpContactComponent *component = components->arr[i];
-		if(componentActive(component, space->idleTimeThreshold)){
-			for(int i=0; i<component->bodies.num; i++){
-				cpBody *body = component->bodies.arr[i];
-				cpComponentNode *node = &body->componentNode;
+		cpBody *root = components->arr[i];
+		if(componentActive(root, space->idleTimeThreshold)){
+			cpBody *body = root, *next;
+			do {
+				next = body->node.next;
 				
-				if(node->space) cpArrayPush(newBodies, body);
-				node->component = NULL;
-				node->parent = NULL;
-				node->rank = 0;
-			}
-			
-			cpContactComponentFree(component);
+				if(body->space) cpArrayPush(newBodies, body);
+				body->node.next = NULL;
+				body->node.parent = NULL;
+				body->node.rank = 0;
+			} while((body = next) != root);
 		} else {
-			for(int i=0; i<component->bodies.num; i++){
-				cpBody *body = component->bodies.arr[i];
+			cpBody *body = root, *next;
+			do {
+				next = body->node.next;
 				
 				for(cpShape *shape = body->shapesList; shape; shape = shape->next){
 					removeShapeRaw(shape, space->activeShapes);
 					addShapeRaw(shape, space->staticShapes);
 				}
-			}
+			} while((body = next) != root);
 			
-			cpArrayPush(space->components, component);
+			cpArrayPush(space->components, root);
 		}
 	}
 	

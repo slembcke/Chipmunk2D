@@ -103,7 +103,7 @@ static chipmunkDemo *demos[] = {
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
-static const int firstDemoIndex = 'a' - 'a';
+static const int firstDemoIndex = 'e' - 'a';
 
 static int ticks = 0;
 static cpSpace *space;
@@ -444,9 +444,8 @@ main(int argc, const char **argv)
 	cpInitChipmunk();
 	
 #ifdef TIME_TRIAL
-//	for(int i=0; i<demoCount; i++)
-//		time_trial(i, 1000);
-	time_trial('j' - 'a', 10000);
+	for(int i=0; i<demoCount; i++)
+		time_trial(i, 1000);
 	exit(0);
 #endif
 	

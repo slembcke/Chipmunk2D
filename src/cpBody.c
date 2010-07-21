@@ -27,28 +27,28 @@
 // initialized in cpInitChipmunk()
 cpBody cpStaticBodySingleton;
 
-cpContactComponent *
-cpContactComponentNew(void)
-{
-	cpContactComponent *component = (cpContactComponent *)cpmalloc(sizeof(cpContactComponent));
-	cpArrayInit(&component->bodies, 1);
-	
-	return component;
-}
-
-void
-cpContactComponentAdd(cpContactComponent *component, struct cpBody *body)
-{
-	cpArrayPush(&component->bodies, body);
-}
-
-#import <stdio.h>
-void
-cpContactComponentFree(cpContactComponent *component)
-{
-	cpArrayDestroy(&component->bodies);
-	free(component);
-}
+//cpContactComponent *
+//cpContactComponentNew(void)
+//{
+//	cpContactComponent *component = (cpContactComponent *)cpmalloc(sizeof(cpContactComponent));
+//	cpArrayInit(&component->bodies, 1);
+//	
+//	return component;
+//}
+//
+//void
+//cpContactComponentAdd(cpContactComponent *component, struct cpBody *body)
+//{
+//	cpArrayPush(&component->bodies, body);
+//}
+//
+//#import <stdio.h>
+//void
+//cpContactComponentFree(cpContactComponent *component)
+//{
+//	cpArrayDestroy(&component->bodies);
+//	free(component);
+//}
 
 
 cpBody*
@@ -84,14 +84,14 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->v_limit = (cpFloat)INFINITY;
 	body->w_limit = (cpFloat)INFINITY;
 	
-	body->componentNode.space = NULL;
-	body->componentNode.parent = NULL;
-	body->componentNode.rank = 0;
-	body->componentNode.idleTime = 0.0f;
-	body->componentNode.component = NULL;
-	
+	body->space = NULL;
 	body->shapesList = NULL;
 
+	body->node.parent = NULL;
+	body->node.next = NULL;
+	body->node.rank = 0;
+	body->node.idleTime = 0.0f;
+	
 	return body;
 }
 
