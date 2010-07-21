@@ -94,8 +94,9 @@ glColor_from_pointer(void *ptr)
 static void
 glColor_for_shape(cpShape *shape, cpSpace *space)
 {
-	if(space->stamp - shape->body->activeStamp > 30){
-		GLfloat v = 0.25f;
+	cpComponentNode *node = &shape->body->componentNode;
+	if(space->stamp - node->stamp > 30 && node->tempComponent){
+		GLfloat v = 0.1f*node->tempComponent;
 		glColor3f(v,v,v);
 	} else {
 		glColor_from_pointer(shape);

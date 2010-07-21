@@ -28,7 +28,6 @@
 #include "ChipmunkDemo.h"
 
 extern cpSpace *space;
-//extern cpBody *staticBody;
 
 // Iterate over all of the bodies and reset the ones that have fallen offscreen.
 static void
@@ -57,8 +56,6 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-//	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
@@ -112,7 +109,6 @@ init(void)
 static void
 destroy(void)
 {
-//	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 }

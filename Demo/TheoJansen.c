@@ -34,7 +34,6 @@
 #include "ChipmunkDemo.h"
 
 cpSpace *space;
-cpBody *staticBody;
 
 cpConstraint *motor;
 
@@ -103,7 +102,6 @@ static cpSpace *
 init(void)
 {
 	space = cpSpaceNew();
-	staticBody = cpBodyNew(INFINITY, INFINITY);
 	
 	cpResetShapeIdCounter();
 	
@@ -115,17 +113,17 @@ init(void)
 	cpVect a, b;
 	
 	// Create segments around the edge of the screen.
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);
+	shape = cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f);
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f);
+	shape = cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f);
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
+	shape = cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f);
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);

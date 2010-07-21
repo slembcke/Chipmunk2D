@@ -71,7 +71,6 @@ typedef struct DataforForce{
 
 // Global Varibales
 cpSpace *space;
-cpBody *staticBody;
 
 
 // **** Forces ****** // 
@@ -423,9 +422,6 @@ make_mix(cpVect p, cpFloat ang, cpFloat mag,cpFloat chg)
 static cpSpace* 
 init(void)
 {
-	
-	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	cpResetShapeIdCounter();
 	space = cpSpaceNew();
 	space->iterations = 5;
@@ -492,7 +488,6 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 	

@@ -56,7 +56,11 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->data = NULL;
 	body->v_limit = (cpFloat)INFINITY;
 	body->w_limit = (cpFloat)INFINITY;
-//	body->active = 1;
+	
+	body->componentNode.parent = NULL;
+	body->componentNode.rank = 0;
+	body->componentNode.stamp = 0;
+	body->componentNode.tempComponent = 0;
 
 	return body;
 }
@@ -165,23 +169,4 @@ cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat 
 	cpVect f = cpvmult(n, f_spring + f_damp);
 	cpBodyApplyForce(a, f, r1);
 	cpBodyApplyForce(b, cpvneg(f), r2);
-}
-
-void
-cpBodyMarkLowEnergy(cpBody *body, cpFloat dvsq, int stamp)
-{
-	cpFloat ke = body->m*cpvdot(body->v, body->v);
-	cpFloat re = body->i*body->w*body->w;
-	
-	if(ke + re > body->m*dvsq){
-		body->activeStamp = stamp;
-	} 
-//	else if(stamp - body->activeStamp > 5) {
-//		body->v = cpvzero;
-//		body->v_bias = cpvzero;
-//		body->w = 0.0f;
-//		body->w_bias = 0.0f;
-//	}
-	
-//	return body->activeStamp;
 }

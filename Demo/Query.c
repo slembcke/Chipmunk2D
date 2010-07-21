@@ -31,7 +31,6 @@
 #include "chipmunk_unsafe.h"
 
 extern cpSpace *space;
-extern cpBody *staticBody;
 extern cpVect mousePoint;
 
 cpShape *querySeg = NULL;
@@ -79,8 +78,6 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
@@ -93,7 +90,7 @@ init(void)
 	cpShape *shape;
 	
 	// add a non-collidable segment as a quick and dirty way to draw the query line
-	shape = cpSegmentShapeNew(staticBody, cpvzero, cpv(100.0f, 0.0f), 4.0f);
+	shape = cpSegmentShapeNew(NULL, cpvzero, cpv(100.0f, 0.0f), 4.0f);
 	cpSpaceAddStaticShape(space, shape);
 	shape->layers = 0;
 	querySeg = shape;
@@ -110,7 +107,7 @@ init(void)
 	}
 	
 	{ // add a static segment
-		cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(0, 300), cpv(300, 0), 0.0f));
+		cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(0, 300), cpv(300, 0), 0.0f));
 	}
 	
 	{ // add a pentagon
@@ -145,7 +142,6 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 }

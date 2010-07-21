@@ -799,6 +799,103 @@ postStepCallbackSetIter(postStepCallback *callback, cpSpace *space)
 	cpfree(callback);
 }
 
+#pragma mark Experimental Sleeping Functions
+
+static inline cpComponentNode *
+componentRoot(cpComponentNode *node)
+{
+	cpComponentNode *parent = node->parent;
+	
+	if(parent == node || parent == NULL){
+		return parent;
+	} else {
+		// path compression, attaches this node directly to the root
+		return (node->parent = componentRoot(parent));
+	}
+}
+
+static inline void
+componentMerge(cpComponentNode *a, cpComponentNode *b)
+{
+	if(a == b){
+		printf("weird\n");
+		return;
+	}
+	
+	cpComponentNode *a_root = componentRoot(a);
+	cpComponentNode *b_root = componentRoot(b);
+	
+	if(a_root == NULL || b_root == NULL) return;
+	
+	if(a_root->rank < b_root->rank){
+		a_root->parent = b_root;
+	} else if(a_root->rank > b_root->rank){
+		b_root->parent = a_root;
+	} else if(a_root != b_root){
+		b_root->parent = a_root;
+		a_root->rank++;
+	}
+}
+
+static void
+doSleepingStuff(cpSpace *space, cpFloat dt)
+{
+	cpArray *bodies = space->bodies;
+	cpArray *arbiters = space->arbiters;
+	
+	// reset components and energy
+	cpFloat dvsq = cpvdot(space->gravity, space->gravity)*dt*dt;
+//	dvsq *= dt*dt * space->damping*space->damping;
+	for(int i=0; i<bodies->num; i++){
+		cpBody *body = bodies->arr[i];
+		body->componentNode.parent = &body->componentNode;
+		body->componentNode.rank = 0;
+		body->componentNode.tempComponent = 0;
+		
+		cpFloat ke = body->m*cpvdot(body->v, body->v);
+		cpFloat re = body->i*body->w*body->w;
+		
+		if(ke + re > body->m*dvsq){
+			body->componentNode.stamp = space->stamp;
+		}
+	}
+	
+	// iterate edges and build forests
+//	cpBody *staticBody = &space->staticBody;
+	for(int i=0; i<arbiters->num; i++){
+		cpArbiter *arb = arbiters->arr[i];
+		
+		cpBody *a = arb->private_a->body;
+		cpBody *b = arb->private_b->body;
+		
+		// TODO handle special merging cases here
+		// how to handle statics?
+		// active-sleeping
+		// sleeping-sleeping
+		componentMerge(&a->componentNode, &b->componentNode);
+	}
+	
+	// iterate bodies and add components
+	int component = 0;
+	for(int i=0; i<bodies->num; i++){
+		cpBody *body = bodies->arr[i];
+		cpComponentNode *node = &body->componentNode;
+		cpComponentNode *root = componentRoot(node);
+		
+		if(!root->tempComponent) root->tempComponent = ++component;
+		node->tempComponent = root->tempComponent;
+	}
+	
+	cpArray *newBodies = cpArrayNew(bodies->num);
+	for(int i=0; i<bodies->num; i++){
+		cpArrayPush(newBodies, bodies->arr[i]);
+	}
+	
+	space->bodies = newBodies;
+	cpArrayFree(bodies);
+//	printf("component count:%d\n", component);
+}
+
 #pragma mark All Important cpSpaceStep() Function
 
 void
@@ -897,10 +994,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpHashSetEach(callbacks, (cpHashSetIterFunc)postStepCallbackSetIter, space);
 	}
 	
-	cpFloat dvsq = cpvdot(space->gravity, space->gravity)*dt*dt;
-//	dvsq *= dt*dt * space->damping*space->damping;
-	for(int i=0; i<bodies->num; i++)
-		cpBodyMarkLowEnergy((cpBody *)bodies->arr[i], dvsq, space->stamp);
+	doSleepingStuff(space, dt);
 	
 	// Increment the stamp.
 	space->stamp++;

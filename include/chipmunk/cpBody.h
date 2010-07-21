@@ -26,6 +26,14 @@ typedef void (*cpBodyPositionFunc)(struct cpBody *body, cpFloat dt);
 extern cpBodyVelocityFunc cpBodyUpdateVelocityDefault;
 extern cpBodyPositionFunc cpBodyUpdatePositionDefault;
 
+typedef struct cpComponentNode {
+	int stamp;
+	struct cpComponentNode *parent;
+	int rank;
+	
+	int tempComponent;
+} cpComponentNode;
+
 typedef struct cpBody{
 	// *** Integration Functions.ntoehu
 
@@ -72,7 +80,7 @@ typedef struct cpBody{
 	cpVect v_bias;
 	cpFloat w_bias;
 	
-	int activeStamp;
+	cpComponentNode componentNode;
 } cpBody;
 
 // Basic allocation/destruction functions
@@ -122,14 +130,14 @@ void cpBodyUpdatePosition(cpBody *body, cpFloat dt);
 static inline cpVect
 cpBodyLocal2World(cpBody *body, cpVect v)
 {
-	return cpvadd(body->p, cpvrotate(v, body->rot));
+	return (body ? cpvadd(body->p, cpvrotate(v, body->rot)) : v);
 }
 
 // Convert world to body local coordinates
 static inline cpVect
 cpBodyWorld2Local(cpBody *body, cpVect v)
 {
-	return cpvunrotate(cpvsub(v, body->p), body->rot);
+	return (body ? cpvunrotate(cpvsub(v, body->p), body->rot) : v);
 }
 
 // Apply an impulse (in world coordinates) to the body at a point relative to the center of gravity (also in world coordinates).
@@ -156,5 +164,3 @@ void cpBodyApplyForce(cpBody *body, cpVect f, cpVect r);
 // Apply a damped spring force between two bodies.
 // Warning: Large damping values can be unstable. Use a cpDampedSpring constraint for this instead.
 void cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat rlen, cpFloat k, cpFloat dmp, cpFloat dt);
-
-void cpBodyMarkLowEnergy(cpBody *body, cpFloat dvsq, int stamp);
