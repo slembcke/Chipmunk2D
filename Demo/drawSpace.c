@@ -94,13 +94,21 @@ glColor_from_pointer(void *ptr)
 static void
 glColor_for_shape(cpShape *shape, cpSpace *space)
 {
-	cpComponentNode *node = (shape->body ? &shape->body->componentNode : NULL);
-	if(node && node->component){
-		GLfloat v = 0.25f;
-		glColor3f(v,v,v);
-	} else {
-		glColor_from_pointer(shape);
+	cpBody *body = shape->body;
+	if(body){
+		cpComponentNode *node = &body->componentNode;
+		if(node->component){
+			GLfloat v = 0.25f;
+			glColor3f(v,v,v);
+			return;
+		} else if(node->idleTime > space->idleTimeThreshold) {
+			GLfloat v = 0.9f;
+			glColor3f(v,v,v);
+			return;
+		}
 	}
+	
+	glColor_from_pointer(shape);
 }
 
 static const GLfloat circleVAR[] = {
@@ -465,14 +473,24 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 	}
 	
 	if(options->bodyPointSize){
-		cpArray *bodies = space->bodies;
-
 		glPointSize(options->bodyPointSize);
+		
 		glBegin(GL_POINTS); {
 			glColor3f(LINE_COLOR);
+			cpArray *bodies = space->bodies;
 			for(int i=0, count = bodies->num; i<count; i++){
 				cpBody *body = (cpBody *)bodies->arr[i];
 				glVertex2f(body->p.x, body->p.y);
+			}
+			
+			glColor3f(0.0f, 0.0f, 1.0f);
+			cpArray *components = space->components;
+			for(int i=0; i<components->num; i++){
+				cpContactComponent *component = components->arr[i];
+				for(int i=0; i<component->bodies.num; i++){
+					cpBody *body = component->bodies.arr[i];
+					glVertex2f(body->p.x, body->p.y);
+				}
 			}
 		} glEnd();
 	}

@@ -181,6 +181,15 @@ void cpBodyResetForces(cpBody *body);
 // Apply a force (in world coordinates) to a body at a point relative to the center of gravity (also in world coordinates).
 void cpBodyApplyForce(cpBody *body, cpVect f, cpVect r);
 
+static inline cpFloat
+cpBodyKineticEnergy(cpBody *body)
+{
+	// Need to do some fudging to avoid NaNs
+	cpFloat vsq = cpvdot(body->v, body->v);
+	cpFloat wsq = body->w*body->w;
+	return (vsq ? vsq*body->m : 0.0f) + (wsq ? wsq*body->m : 0.0f);
+}
+
 // Apply a damped spring force between two bodies.
 // Warning: Large damping values can be unstable. Use a cpDampedSpring constraint for this instead.
 void cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat rlen, cpFloat k, cpFloat dmp, cpFloat dt);

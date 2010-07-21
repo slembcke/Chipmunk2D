@@ -49,6 +49,7 @@ init(void)
 	cpSpaceResizeActiveHash(space, 30.0f, 2999);
 	cpSpaceResizeStaticHash(space, 30.0f, 999);
 	space->gravity = cpv(0, -300);
+//	space->idleTimeThreshold = 0.5f;
 	
 	cpBody *body;
 	

@@ -174,8 +174,9 @@ cpSpaceInit(cpSpace *space)
 	space->allocatedBuffers = cpArrayNew(0);
 	
 	space->bodies = cpArrayNew(0);
-	space->bodies2 = cpArrayNew(0);
 	space->components = cpArrayNew(0);
+	space->idleTimeThreshold = 0.5f;
+	space->idleSpeedThreshold = 0.0f;
 	
 	space->arbiters = cpArrayNew(0);
 	space->pooledArbiters = cpArrayNew(0);
@@ -211,7 +212,6 @@ cpSpaceDestroy(cpSpace *space)
 	cpSpaceHashFree(space->activeShapes);
 	
 	cpArrayFree(space->bodies);
-	cpArrayFree(space->bodies2);
 	cpArrayFree(space->components); // TODO free release components
 	
 	cpArrayFree(space->constraints);
@@ -341,10 +341,15 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
 	(*prev_ptr) = node->next;
 }
 
+static inline void
+addShapeRaw(cpShape *shape, cpSpaceHash *hash)
+{
+	cpSpaceHashInsert(hash, shape, shape->hashid, shape->bb);
+}
+
 cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
-//	cpAssert(shape->body, "Cannot add a shape with a NULL body.");
 	cpBody *body = shape->body;
 	if(!body) return cpSpaceAddStaticShape(space, shape);
 
@@ -352,9 +357,9 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 		"Cannot add the same shape more than once.");
 	cpAssertSpaceUnlocked(space);
 	
-//TODO	componentActivate(body->componentNode.component, space);
+	cpBodyActivate(body, space);
 	if(body) cpBodyAddShape(body, shape);
-	cpSpaceHashInsert(space->activeShapes, shape, shape->hashid, shape->bb);
+	addShapeRaw(shape, space->activeShapes);
 		
 	return shape;
 }
@@ -367,11 +372,11 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
-//TODO	componentActivate(body->componentNode.component, space);
+	if(body) cpBodyActivate(body, space);
 	if(body) cpBodyAddShape(body, shape);
 	
 	cpShapeCacheBB(shape);
-	cpSpaceHashInsert(space->staticShapes, shape, shape->hashid, shape->bb);
+	addShapeRaw(shape, space->staticShapes);
 	
 	return shape;
 }
@@ -420,49 +425,54 @@ contactSetFilterRemovedShape(cpArbiter *arb, removalContext *context)
 	return 1;
 }
 
+static inline void
+removeShapeRaw(cpShape *shape, cpSpaceHash *hash)
+{
+	cpSpaceHashRemove(hash, shape, shape->hashid);
+}
+
 void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
-	// TODO reactivate components
+	cpBody *body = shape->body;
+	if(!body) cpSpaceRemoveStaticShape(space, shape);
+
 	cpAssertWarn(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
 		"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
-	cpBody *body = shape->body;
-//TODO	componentActivate(body->componentNode.component, space);
+	if(body) cpBodyActivate(body, space);
 	if(body) cpBodyRemoveShape(body, shape);
 	
 	removalContext context = {space, shape};
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
-	cpSpaceHashRemove(space->activeShapes, shape, shape->hashid);
+	removeShapeRaw(shape, space->activeShapes);
 }
 
 void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
-	// TODO reactivate components
 	cpAssertWarn(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
 		"Cannot remove a static shape that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
-//TODO	componentActivate(body->componentNode.component, space);
+	cpBodyActivate(body, space);
 	if(body) cpBodyRemoveShape(body, shape);
 	
 	removalContext context = {space, shape};
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
-	cpSpaceHashRemove(space->staticShapes, shape, shape->hashid);
+	removeShapeRaw(shape, space->staticShapes);
 }
 
 void
 cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 {
-	// TODO reactivate components
 	cpAssertWarn(cpArrayContains(space->bodies, body),
 		"Cannot remove a body that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
-//TODO	componentActivate(body->componentNode.component, space);
+	cpBodyActivate(body, space);
 	cpArrayDeleteObj(space->bodies, body);
 	body->componentNode.space = NULL;
 }
@@ -470,7 +480,6 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 void
 cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 {
-	// TODO reactivate components
 	cpAssertWarn(cpArrayContains(space->constraints, constraint),
 		"Cannot remove a constraint that was never added to the space. (Removed twice maybe?)");
 //	cpAssertSpaceUnlocked(space); Should be safe as long as its not from a constraint callback.
@@ -892,8 +901,8 @@ cpBodyActivate(cpBody *body, cpSpace *space)
 		cpArrayPush(space->bodies, body);
 		
 		for(cpShape *shape = body->shapesList; shape; shape = shape->next){
-			cpSpaceRemoveStaticShape(space, shape);
-			cpSpaceAddShape(space, shape);
+			removeShapeRaw(shape, space->staticShapes);
+			addShapeRaw(shape, space->activeShapes);
 		}
 	}
 	
@@ -927,11 +936,11 @@ mergeBodies(cpSpace *space, cpArray *components, cpArray *rougeBodies, cpBody *a
 }
 
 static inline int
-componentActive(cpContactComponent *component, int stamp)
+componentActive(cpContactComponent *component, cpFloat threshold)
 {
 	for(int i=0; i<component->bodies.num; i++){
 		cpBody *body = component->bodies.arr[i];
-		if(!body->componentNode.space || body->componentNode.idleTime < 0.5f) return 1;
+		if(!body->componentNode.space || body->componentNode.idleTime < threshold) return 1;
 	}
 	
 	return 0;
@@ -959,25 +968,21 @@ doComponentStuff(cpSpace *space, cpFloat dt)
 {
 	cpArray *bodies = space->bodies;
 	cpArray *newBodies = cpArrayNew(bodies->num);
-	cpArray *rougeBodies = cpArrayNew(0);
+	cpArray *rougeBodies = cpArrayNew(16);
 	cpArray *arbiters = space->arbiters;
 	cpArray *constraints = space->constraints;
-	cpArray *components = cpArrayNew(0);
+	cpArray *components = cpArrayNew(bodies->num/8);
 	// TODO statically allocate components? implicit linked list?
 	
-	// reset components and energy
-	cpFloat dvsq = cpvdot(space->gravity, space->gravity)*dt*dt;
-//	dvsq *= dt*dt * space->damping*space->damping;
+	cpFloat dv = space->idleSpeedThreshold;
+	cpFloat dvsq = (dv ? dv*dv : cpvdot(space->gravity, space->gravity)*dt*dt);
+	// update idling
 	for(int i=0; i<bodies->num; i++){
 		cpBody *body = bodies->arr[i];
 		cpComponentNode *node = &body->componentNode;
-		node->rank = 0;
-		node->component = NULL;
 		
-		cpFloat ke = body->m*cpvdot(body->v, body->v);
-		cpFloat re = body->i*body->w*body->w;
-		
-		node->idleTime = (ke + re > body->m*dvsq ? 0.0f : node->idleTime + dt);
+		cpFloat thresh = (dvsq ? body->m*dvsq : 0.0f);
+		node->idleTime = (cpBodyKineticEnergy(body) > thresh ? 0.0f : node->idleTime + dt);
 	}
 	
 	// iterate edges and build forests
@@ -999,7 +1004,7 @@ doComponentStuff(cpSpace *space, cpFloat dt)
 	// iterate components, copy or deactivate
 	for(int i=0; i<components->num; i++){
 		cpContactComponent *component = components->arr[i];
-		if(componentActive(component, space->stamp)){
+		if(componentActive(component, space->idleTimeThreshold)){
 			for(int i=0; i<component->bodies.num; i++){
 				cpBody *body = component->bodies.arr[i];
 				cpComponentNode *node = &body->componentNode;
@@ -1007,6 +1012,7 @@ doComponentStuff(cpSpace *space, cpFloat dt)
 				if(node->space) cpArrayPush(newBodies, body);
 				node->component = NULL;
 				node->parent = NULL;
+				node->rank = 0;
 			}
 			
 			cpContactComponentFree(component);
@@ -1015,8 +1021,8 @@ doComponentStuff(cpSpace *space, cpFloat dt)
 				cpBody *body = component->bodies.arr[i];
 				
 				for(cpShape *shape = body->shapesList; shape; shape = shape->next){
-					cpSpaceRemoveShape(space, shape);
-					cpSpaceAddStaticShape(space, shape);
+					removeShapeRaw(shape, space->activeShapes);
+					addShapeRaw(shape, space->staticShapes);
 				}
 			}
 			
@@ -1128,7 +1134,9 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpHashSetEach(callbacks, (cpHashSetIterFunc)postStepCallbackSetIter, space);
 	}
 	
-	doComponentStuff(space, dt);
+	if(space->idleTimeThreshold != INFINITY){
+		doComponentStuff(space, dt);
+	}
 	
 	// Increment the stamp.
 	space->stamp++;
