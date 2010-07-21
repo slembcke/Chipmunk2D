@@ -92,6 +92,7 @@ typedef struct cpShape{
 	
 	// Unique id used as the hash value.
 	cpHashValue hashid;
+	struct cpShape *next;
 } cpShape;
 
 // Low level shape initialization func.

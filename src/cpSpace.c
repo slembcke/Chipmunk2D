@@ -26,6 +26,8 @@
 
 #include "chipmunk.h"
 
+static inline void componentActivate(cpContactComponent *component, cpSpace *space);
+
 int cp_contact_persistence = 1;
 
 #pragma mark Contact Set Helpers
@@ -318,17 +320,43 @@ cpSpaceSetDefaultCollisionHandler(
 		"Put these calls into a Post Step Callback." \
 	);
 
+static void
+cpBodyAddShape(cpBody *body, cpShape *shape)
+{
+	shape->next = shape->body->shapesList;
+	shape->body->shapesList = shape;
+}
+
+static void
+cpBodyRemoveShape(cpBody *body, cpShape *shape)
+{
+	cpShape **prev_ptr = &body->shapesList;
+	cpShape *node = body->shapesList;
+	
+	while(node && node != shape){
+		prev_ptr = &node->next;
+		node = node->next;
+	}
+	
+	cpAssert(node, "Attempted to remove a shape from a body it was never attached to.");
+	(*prev_ptr) = node->next;
+}
+
 cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
 //	cpAssert(shape->body, "Cannot add a shape with a NULL body.");
-	if(!shape->body) return cpSpaceAddStaticShape(space, shape);
+	cpBody *body = shape->body;
+	if(!body) return cpSpaceAddStaticShape(space, shape);
 
 	cpAssert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
 		"Cannot add the same shape more than once.");
 	cpAssertSpaceUnlocked(space);
 	
+//TODO	componentActivate(body->componentNode.component, space);
+	cpBodyAddShape(body, shape);
 	cpSpaceHashInsert(space->activeShapes, shape, shape->hashid, shape->bb);
+		
 	return shape;
 }
 
@@ -341,6 +369,10 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	cpAssert(!cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
 		"Cannot add the same static shape more than once.");
 	cpAssertSpaceUnlocked(space);
+	
+	cpBody *body = shape->body;
+//TODO	componentActivate(body->componentNode.component, space);
+	cpBodyAddShape(body, shape);
 	
 	cpShapeCacheBB(shape);
 	cpSpaceHashInsert(space->staticShapes, shape, shape->hashid, shape->bb);
@@ -369,6 +401,8 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	cpAssert(!cpArrayContains(space->constraints, constraint), "Cannot add the same constraint more than once.");
 //	cpAssertSpaceUnlocked(space); This should be safe as long as its not from a constraint callback.
 	
+	componentActivate(constraint->a->componentNode.component, space);
+	componentActivate(constraint->b->componentNode.component, space);
 	cpArrayPush(space->constraints, constraint);
 	
 	return constraint;
@@ -395,9 +429,14 @@ contactSetFilterRemovedShape(cpArbiter *arb, removalContext *context)
 void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
+	// TODO reactivate components
 	cpAssertWarn(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
 		"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
+	
+	cpBody *body = shape->body;
+//TODO	componentActivate(body->componentNode.component, space);
+	cpBodyRemoveShape(body, shape);
 	
 	removalContext context = {space, shape};
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
@@ -407,9 +446,14 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
+	// TODO reactivate components
 	cpAssertWarn(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
 		"Cannot remove a static shape that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
+	
+	cpBody *body = shape->body;
+//TODO	componentActivate(body->componentNode.component, space);
+	cpBodyRemoveShape(body, shape);
 	
 	removalContext context = {space, shape};
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
@@ -419,20 +463,25 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 {
+	// TODO reactivate components
 	cpAssertWarn(cpArrayContains(space->bodies, body),
 		"Cannot remove a body that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
+//TODO	componentActivate(body->componentNode.component, space);
 	cpArrayDeleteObj(space->bodies, body);
 }
 
 void
 cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 {
+	// TODO reactivate components
 	cpAssertWarn(cpArrayContains(space->constraints, constraint),
 		"Cannot remove a constraint that was never added to the space. (Removed twice maybe?)");
 //	cpAssertSpaceUnlocked(space); Should be safe as long as its not from a constraint callback.
 	
+	componentActivate(constraint->a->componentNode.component, space);
+	componentActivate(constraint->b->componentNode.component, space);
 	cpArrayDeleteObj(space->constraints, constraint);
 }
 
@@ -842,11 +891,30 @@ componentNodeMerge(cpComponentNode *a, cpComponentNode *b)
 }
 
 static inline void
+componentActivate(cpContactComponent *component, cpSpace *space)
+{
+	if(!component) return;
+	
+	for(int i=0; i<component->bodies.num; i++){
+		cpBody *body = component->bodies.arr[i];
+		body->componentNode.component = NULL;
+		cpArrayPush(space->bodies, body);
+		
+		for(cpShape *shape = body->shapesList; shape; shape = shape->next){
+			cpSpaceRemoveStaticShape(space, shape);
+			cpSpaceAddShape(space, shape);
+		}
+	}
+	
+	cpArrayDeleteObj(space->components, component);
+	cpContactComponentFree(component);
+}
+
+static inline void
 mergeBodies(cpSpace *space, cpArray *components, cpBody *a, cpBody *b)
 {
 	// TODO handle special merging cases here
 	// how to handle statics?
-	// active-inactive
 	
 	cpComponentNode *node_a = &a->componentNode;
 	cpComponentNode *node_b = &b->componentNode;
@@ -854,26 +922,9 @@ mergeBodies(cpSpace *space, cpArray *components, cpBody *a, cpBody *b)
 	// both nodes already inactive
 	if(node_a->component && node_b->component) return;
 	
-	if(
-		(!componentNodeRoot(node_a) && node_b->component) ||
-		(!componentNodeRoot(node_b) && node_a->component)
-	){
-		return;
-	}
 //	cpContactComponent *inactive = node_a->component ?: node_b->component;
-//	if(inactive){
-////		cpArrayPush(components, inactive);
-//		
-//		// reactivate bodies
-//		for(int i=0; i<inactive->bodies.num; i++){
-//			cpBody *body = inactive->bodies.arr[i];
-//			body->componentNode.component = NULL;
-//			cpArrayPush(space->bodies, body);
-//		}
-//		
-//		cpArrayDeleteObj(space->components, inactive);
-//		cpContactComponentFree(inactive);
-//	}
+	componentActivate(node_a->component, space);
+	componentActivate(node_b->component, space);
 	
 	componentNodeMerge(node_a, node_b);
 }
@@ -951,7 +1002,15 @@ doComponentStuff(cpSpace *space, cpFloat dt)
 			
 			cpContactComponentFree(component);
 		} else {
-			printf("deactivating %d\n", component->bodies.num);
+			for(int i=0; i<component->bodies.num; i++){
+				cpBody *body = component->bodies.arr[i];
+				
+				for(cpShape *shape = body->shapesList; shape; shape = shape->next){
+					cpSpaceRemoveShape(space, shape);
+					cpSpaceAddStaticShape(space, shape);
+				}
+			}
+			
 			cpArrayPush(space->components, component);
 		}
 	}

@@ -84,6 +84,8 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->componentNode.rank = 0;
 	body->componentNode.stamp = 0;
 	body->componentNode.component = NULL;
+	
+	body->shapesList = NULL;
 
 	return body;
 }

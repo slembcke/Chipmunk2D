@@ -103,7 +103,7 @@ static chipmunkDemo *demos[] = {
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
-static const int firstDemoIndex = 'c' - 'a';
+static const int firstDemoIndex = 'b' - 'a';
 
 static int ticks = 0;
 static cpSpace *space;
@@ -415,7 +415,7 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
-/*
+//*
 #include <sys/time.h>
 void time_trial(int index, int count)
 {

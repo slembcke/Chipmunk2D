@@ -20,6 +20,8 @@
  */
 
 struct cpBody;
+struct cpShape;
+
 typedef void (*cpBodyVelocityFunc)(struct cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);
 typedef void (*cpBodyPositionFunc)(struct cpBody *body, cpFloat dt);
 
@@ -88,6 +90,7 @@ typedef struct cpBody{
 	cpVect v_bias;
 	cpFloat w_bias;
 	
+	struct cpShape *shapesList;
 	cpComponentNode componentNode;
 } cpBody;
 

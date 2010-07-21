@@ -60,6 +60,7 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 	shape->layers = CP_ALL_LAYERS;
 	
 	shape->data = NULL;
+	shape->next = NULL;
 	
 //	cpShapeCacheBB(shape);
 	
