@@ -24,6 +24,29 @@
 
 #include "chipmunk.h"
 
+cpContactComponent *
+cpContactComponentNew(void)
+{
+	cpContactComponent *component = (cpContactComponent *)cpmalloc(sizeof(cpContactComponent));
+	cpArrayInit(&component->bodies, 1);
+	
+	return component;
+}
+
+void
+cpContactComponentAdd(cpContactComponent *component, struct cpBody *body)
+{
+	cpArrayPush(&component->bodies, body);
+}
+
+void
+cpContactComponentFree(cpContactComponent *component)
+{
+	cpArrayDestroy(&component->bodies);
+	free(component);
+}
+
+
 cpBody*
 cpBodyAlloc(void)
 {
@@ -60,7 +83,7 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->componentNode.parent = NULL;
 	body->componentNode.rank = 0;
 	body->componentNode.stamp = 0;
-	body->componentNode.tempComponent = 0;
+	body->componentNode.component = NULL;
 
 	return body;
 }

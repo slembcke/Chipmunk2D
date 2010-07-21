@@ -78,6 +78,7 @@ typedef struct cpSpace{
 	
 	// List of bodies in the system.
 	cpArray *bodies;
+	cpArray *bodies2, *components;
 	
 	// List of active arbiters for the impulse solver.
 	cpArray *arbiters, *pooledArbiters;

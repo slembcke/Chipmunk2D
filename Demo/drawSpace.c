@@ -95,8 +95,8 @@ static void
 glColor_for_shape(cpShape *shape, cpSpace *space)
 {
 	cpComponentNode *node = &shape->body->componentNode;
-	if(space->stamp - node->stamp > 30 && node->tempComponent){
-		GLfloat v = 0.1f*node->tempComponent;
+	if(space->stamp - node->stamp > 30 && node->component){
+		GLfloat v = 0.25f;
 		glColor3f(v,v,v);
 	} else {
 		glColor_from_pointer(shape);

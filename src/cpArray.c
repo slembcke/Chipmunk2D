@@ -112,6 +112,18 @@ cpArrayDeleteObj(cpArray *arr, void *obj)
 }
 
 void
+cpArrayAppend(cpArray *arr, cpArray *other)
+{
+	arr->num += other->num;
+	if(arr->num >= arr->max){
+		arr->max = arr->num;
+		arr->arr = (void **)cprealloc(arr->arr, arr->max*sizeof(void**));
+	}
+	
+	memcpy(arr->arr, other->arr, other->num);
+}
+
+void
 cpArrayEach(cpArray *arr, cpArrayIter iterFunc, void *data)
 {
 	for(int i=0; i<arr->num; i++)

@@ -26,12 +26,20 @@ typedef void (*cpBodyPositionFunc)(struct cpBody *body, cpFloat dt);
 extern cpBodyVelocityFunc cpBodyUpdateVelocityDefault;
 extern cpBodyPositionFunc cpBodyUpdatePositionDefault;
 
+typedef struct cpContactComponent {
+	cpArray bodies;
+} cpContactComponent;
+
+cpContactComponent *cpContactComponentNew(void);
+void cpContactComponentAdd(cpContactComponent *component, struct cpBody *body);
+void cpContactComponentFree(cpContactComponent *component);
+
 typedef struct cpComponentNode {
 	int stamp;
 	struct cpComponentNode *parent;
 	int rank;
 	
-	int tempComponent;
+	cpContactComponent *component;
 } cpComponentNode;
 
 typedef struct cpBody{
