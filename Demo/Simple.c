@@ -79,21 +79,6 @@ init(void)
 	cpShape *ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero));
 	ballShape->e = 0.0f; ballShape->u = 0.9f;
 	
-	ballBody = cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero));
-	// Set some parameters of the body:
-	// For more info: http://code.google.com/p/chipmunk-physics/wiki/cpBody
-	ballBody->p = cpv(0, -240 + radius+350);
-	// Add the body to the space so it will be simulated and move around.
-	cpSpaceAddBody(space, ballBody);
-	
-	
-	// Add a circle shape for the ball.
-	// Shapes are always defined relative to the center of gravity of the body they are attached to.
-	// When the body moves or rotates, the shape will move with it.
-	// Additionally, all of the cpSpaceAdd*() functions return the thing they added so you can create and add in one go.
-	ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero));
-	ballShape->e = 0.0f; ballShape->u = 0.9f;
-	
 	return space;
 }
 

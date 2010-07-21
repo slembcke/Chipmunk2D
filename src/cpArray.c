@@ -57,6 +57,7 @@ void
 cpArrayDestroy(cpArray *arr)
 {
 	cpfree(arr->arr);
+	arr->arr = NULL;
 }
 
 void

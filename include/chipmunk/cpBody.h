@@ -21,6 +21,7 @@
 
 struct cpBody;
 struct cpShape;
+struct cpSpace;
 
 typedef void (*cpBodyVelocityFunc)(struct cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);
 typedef void (*cpBodyPositionFunc)(struct cpBody *body, cpFloat dt);
@@ -37,7 +38,8 @@ void cpContactComponentAdd(cpContactComponent *component, struct cpBody *body);
 void cpContactComponentFree(cpContactComponent *component);
 
 typedef struct cpComponentNode {
-	int stamp;
+	struct cpSpace *space;
+	cpFloat idleTime;
 	struct cpComponentNode *parent;
 	int rank;
 	

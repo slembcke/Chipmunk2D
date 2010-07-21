@@ -42,6 +42,7 @@ cpContactComponentAdd(cpContactComponent *component, struct cpBody *body)
 	cpArrayPush(&component->bodies, body);
 }
 
+#import <stdio.h>
 void
 cpContactComponentFree(cpContactComponent *component)
 {
@@ -83,9 +84,10 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->v_limit = (cpFloat)INFINITY;
 	body->w_limit = (cpFloat)INFINITY;
 	
+	body->componentNode.space = NULL;
 	body->componentNode.parent = NULL;
 	body->componentNode.rank = 0;
-	body->componentNode.stamp = 0;
+	body->componentNode.idleTime = 0.0f;
 	body->componentNode.component = NULL;
 	
 	body->shapesList = NULL;
