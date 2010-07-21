@@ -45,7 +45,7 @@ typedef struct cpComponentNode {
 } cpComponentNode;
 
 typedef struct cpBody{
-	// *** Integration Functions.ntoehu
+	// *** Integration Functions.
 
 	// Function that is called to integrate the body's velocity. (Defaults to cpBodyUpdateVelocity)
 	cpBodyVelocityFunc velocity_func;
@@ -101,6 +101,13 @@ cpBody *cpBodyNew(cpFloat m, cpFloat i);
 
 void cpBodyDestroy(cpBody *body);
 void cpBodyFree(cpBody *body);
+
+extern cpBody cpStaticBodySingleton;
+static inline cpBody *
+cpBodyValidPointer(cpBody *body)
+{
+	return (body ? body : &cpStaticBodySingleton);
+}
 
 #define CP_DefineBodyGetter(type, member, name) static inline type cpBodyGet##name(cpBody *body){return body->member;}
 #define CP_DefineBodySetter(type, member, name) static inline void cpBodySet##name(cpBody *body, type value){body->member = value;}

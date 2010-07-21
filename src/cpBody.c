@@ -24,6 +24,9 @@
 
 #include "chipmunk.h"
 
+// initialized in cpInitChipmunk()
+cpBody cpStaticBodySingleton;
+
 cpContactComponent *
 cpContactComponentNew(void)
 {

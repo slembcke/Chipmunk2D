@@ -181,8 +181,8 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv)
 	cpShape *shapea = arb->private_a;
 	cpShape *shapeb = arb->private_b;
 
-	cpBody *a = shapea->body;
-	cpBody *b = shapeb->body;
+	cpBody *a = cpBodyValidPointer(shapea->body);
+	cpBody *b = cpBodyValidPointer(shapeb->body);
 	
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];
@@ -213,8 +213,8 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb)
 	arb->u = shapea->u * shapeb->u;
 	arb->surface_vr = cpvsub(shapeb->surface_v, shapea->surface_v);
 
-	cpBody *a = shapea->body;
-	cpBody *b = shapeb->body;
+	cpBody *a = cpBodyValidPointer(shapea->body);
+	cpBody *b = cpBodyValidPointer(shapeb->body);
 	
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];
@@ -225,8 +225,8 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb)
 void
 cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef)
 {
-	cpBody *a = arb->private_a->body;
-	cpBody *b = arb->private_b->body;
+	cpBody *a = cpBodyValidPointer(arb->private_a->body);
+	cpBody *b = cpBodyValidPointer(arb->private_b->body);
 
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];

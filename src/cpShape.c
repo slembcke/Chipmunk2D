@@ -85,7 +85,7 @@ cpShapeFree(cpShape *shape)
 cpBB
 cpShapeCacheBB(cpShape *shape)
 {
-	cpBody *body = shape->body;
+	cpBody *body = cpBodyValidPointer(shape->body);
 	
 	shape->bb = shape->klass->cacheData(shape, body->p, body->rot);
 	return shape->bb;

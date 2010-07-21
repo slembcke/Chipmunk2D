@@ -33,8 +33,7 @@ defaultSpringTorque(cpDampedRotarySpring *spring, cpFloat relativeAngle){
 static void
 preStep(cpDampedRotarySpring *spring, cpFloat dt, cpFloat dt_inv)
 {
-	cpBody *a = spring->constraint.a;
-	cpBody *b = spring->constraint.b;
+	CONSTRAINT_BEGIN(spring, a, b);
 	
 	spring->iSum = 1.0f/(a->i_inv + b->i_inv);
 
@@ -50,8 +49,7 @@ preStep(cpDampedRotarySpring *spring, cpFloat dt, cpFloat dt_inv)
 static void
 applyImpulse(cpDampedRotarySpring *spring)
 {
-	cpBody *a = spring->constraint.a;
-	cpBody *b = spring->constraint.b;
+	CONSTRAINT_BEGIN(spring, a, b);
 	
 	// compute relative velocity
 	cpFloat wrn = a->w - b->w;//normal_relative_velocity(a, b, r1, r2, n) - spring->target_vrn;

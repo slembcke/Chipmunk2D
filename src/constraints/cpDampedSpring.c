@@ -33,8 +33,7 @@ defaultSpringForce(cpDampedSpring *spring, cpFloat dist){
 static void
 preStep(cpDampedSpring *spring, cpFloat dt, cpFloat dt_inv)
 {
-	cpBody *a = spring->constraint.a;
-	cpBody *b = spring->constraint.b;
+	CONSTRAINT_BEGIN(spring, a, b);
 	
 	spring->r1 = cpvrotate(spring->anchr1, a->rot);
 	spring->r2 = cpvrotate(spring->anchr2, b->rot);
@@ -57,8 +56,7 @@ preStep(cpDampedSpring *spring, cpFloat dt, cpFloat dt_inv)
 static void
 applyImpulse(cpDampedSpring *spring)
 {
-	cpBody *a = spring->constraint.a;
-	cpBody *b = spring->constraint.b;
+	CONSTRAINT_BEGIN(spring, a, b);
 	
 	cpVect n = spring->n;
 	cpVect r1 = spring->r1;

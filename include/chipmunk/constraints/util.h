@@ -25,6 +25,12 @@ void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, 
 
 #define J_MAX(constraint, dt) (((cpConstraint *)constraint)->maxForce*(dt))
 
+// Get valid body pointers and exit early if the bodies are idle
+#define CONSTRAINT_BEGIN(constraint, a_var, b_var) \
+cpBody *a_var = cpBodyValidPointer(((cpConstraint *)constraint)->a); \
+cpBody *b_var = cpBodyValidPointer(((cpConstraint *)constraint)->b); \
+if(a_var->componentNode.component || b_var->componentNode.component) return;
+
 static inline cpVect
 relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2){
 	cpVect v1_sum = cpvadd(a->v, cpvmult(cpvperp(r1), a->w));

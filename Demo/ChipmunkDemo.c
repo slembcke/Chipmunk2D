@@ -415,7 +415,7 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
-//*
+/*
 #include <sys/time.h>
 void time_trial(int index, int count)
 {
