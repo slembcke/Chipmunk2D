@@ -822,15 +822,14 @@ componentNodeRoot(cpComponentNode *node)
 static inline void
 componentNodeMerge(cpComponentNode *a, cpComponentNode *b)
 {
-	if(a == b){
-		printf("weird\n");
-		return;
-	}
+//	if(a == b){
+//		printf("weird\n");
+//		return;
+//	}
 	
-	cpComponentNode *a_root = componentNodeRoot(a);
-	cpComponentNode *b_root = componentNodeRoot(b);
-	
-	if(a_root == NULL || b_root == NULL) return;
+	// Bodies aren't added to the space return NULL as their component's root
+	cpComponentNode *a_root = componentNodeRoot(a); if(!a_root) return;
+	cpComponentNode *b_root = componentNodeRoot(b); if(!b_root) return;
 	
 	if(a_root->rank < b_root->rank){
 		a_root->parent = b_root;
@@ -843,13 +842,40 @@ componentNodeMerge(cpComponentNode *a, cpComponentNode *b)
 }
 
 static inline void
-mergeBodies(cpBody *a, cpBody *b)
+mergeBodies(cpSpace *space, cpArray *components, cpBody *a, cpBody *b)
 {
 	// TODO handle special merging cases here
 	// how to handle statics?
-	// active-sleeping
-	// sleeping-sleeping
-	componentNodeMerge(&a->componentNode, &b->componentNode);
+	// active-inactive
+	
+	cpComponentNode *node_a = &a->componentNode;
+	cpComponentNode *node_b = &b->componentNode;
+	
+	// both nodes already inactive
+	if(node_a->component && node_b->component) return;
+	
+	if(
+		(!componentNodeRoot(node_a) && node_b->component) ||
+		(!componentNodeRoot(node_b) && node_a->component)
+	){
+		return;
+	}
+//	cpContactComponent *inactive = node_a->component ?: node_b->component;
+//	if(inactive){
+////		cpArrayPush(components, inactive);
+//		
+//		// reactivate bodies
+//		for(int i=0; i<inactive->bodies.num; i++){
+//			cpBody *body = inactive->bodies.arr[i];
+//			body->componentNode.component = NULL;
+//			cpArrayPush(space->bodies, body);
+//		}
+//		
+//		cpArrayDeleteObj(space->components, inactive);
+//		cpContactComponentFree(inactive);
+//	}
+	
+	componentNodeMerge(node_a, node_b);
 }
 
 static inline int
@@ -857,7 +883,7 @@ componentActive(cpContactComponent *component, int stamp)
 {
 	for(int i=0; i<component->bodies.num; i++){
 		cpBody *body = component->bodies.arr[i];
-		if(stamp - body->componentNode.stamp < 30) return 1;
+		if(stamp - body->componentNode.stamp < 120) return 1;
 	}
 	
 	return 0;
@@ -867,6 +893,7 @@ static void
 doComponentStuff(cpSpace *space, cpFloat dt)
 {
 	cpArray *bodies = space->bodies;
+	cpArray *newBodies = cpArrayNew(bodies->num);
 	cpArray *arbiters = space->arbiters;
 	cpArray *components = cpArrayNew(0);
 	// TODO statically allocate components?
@@ -892,7 +919,7 @@ doComponentStuff(cpSpace *space, cpFloat dt)
 //	cpBody *staticBody = &space->staticBody;
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiter *arb = arbiters->arr[i];
-		mergeBodies(arb->private_a->body, arb->private_b->body);
+		mergeBodies(space, components, arb->private_a->body, arb->private_b->body);
 	}
 	
 	// iterate bodies and add components
@@ -915,18 +942,23 @@ doComponentStuff(cpSpace *space, cpFloat dt)
 	for(int i=0; i<components->num; i++){
 		cpContactComponent *component = components->arr[i];
 		if(componentActive(component, space->stamp)){
-			cpArrayAppend(bodies, &component->bodies);
+//			cpArrayAppend(newBodies, &component->bodies);
+			for(int i=0; i<component->bodies.num; i++){
+				cpBody *body = component->bodies.arr[i];
+				cpArrayPush(newBodies, body);
+				body->componentNode.component = NULL;
+			}
+			
 			cpContactComponentFree(component);
 		} else {
-			cpArrayPush(components, component);
+			printf("deactivating %d\n", component->bodies.num);
+			cpArrayPush(space->components, component);
 		}
-		cpContactComponentFree(component);
 	}
 	
-	cpArray *newBodies = cpArrayNew(bodies->num);
-	for(int i=0; i<bodies->num; i++){
-		cpArrayPush(newBodies, bodies->arr[i]);
-	}
+//	for(int i=0; i<bodies->num; i++){
+//		cpArrayPush(newBodies, bodies->arr[i]);
+//	}
 	
 	space->bodies = newBodies;
 	cpArrayFree(bodies);
