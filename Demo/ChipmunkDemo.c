@@ -418,6 +418,7 @@ glutStuff(int argc, const char *argv[])
 //*
 #define TIME_TRIAL
 #include <sys/time.h>
+#include <unistd.h>
 void time_trial(int index, int count)
 {
 	currDemo = demos[index];
@@ -444,8 +445,12 @@ main(int argc, const char **argv)
 	cpInitChipmunk();
 	
 #ifdef TIME_TRIAL
-	for(int i=0; i<demoCount; i++)
+	sleep(1);
+	for(int i=0; i<demoCount; i++){
+		if(i == 'l' - 'a') continue;
 		time_trial(i, 1000);
+	}
+//	time_trial(0, 1000);
 	exit(0);
 #endif
 	

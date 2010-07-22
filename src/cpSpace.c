@@ -173,7 +173,7 @@ cpSpaceInit(cpSpace *space)
 	
 	space->bodies = cpArrayNew(0);
 	space->components = cpArrayNew(0);
-	space->idleTimeThreshold = 0.5;
+	space->idleTimeThreshold = INFINITY;
 	space->idleSpeedThreshold = 0.0f;
 	
 	space->arbiters = cpArrayNew(0);
@@ -831,19 +831,21 @@ active2staticIter(cpShape *shape, cpSpace *space)
 static int
 contactSetFilter(cpArbiter *arb, cpSpace *space)
 {
-	cpBody *a = arb->private_a->body;
-	cpBody *b = arb->private_b->body;
-	
-	// both bodies are either static or sleeping
-	int sleepingNow = (!a|| a->node.next) && (!b|| b->node.next);
-	
-	if(sleepingNow){
-		arb->state = cpArbiterStateSleep;
-		return 1;
-	} else if(arb->state == cpArbiterStateSleep){
-		// wake up the arbiter and continue as normal
-		arb->state = cpArbiterStateNormal;
-		// TODO is it possible that cpArbiterStateIgnore should be set here instead?
+	if(space->idleTimeThreshold != INFINITY){
+		cpBody *a = arb->private_body_a;
+		cpBody *b = arb->private_body_b;
+		
+		// both bodies are either static or sleeping
+		int sleepingNow = (!a|| a->node.next) && (!b|| b->node.next);
+		
+		if(sleepingNow){
+			arb->state = cpArbiterStateSleep;
+			return 1;
+		} else if(arb->state == cpArbiterStateSleep){
+			// wake up the arbiter and continue as normal
+			arb->state = cpArbiterStateNormal;
+			// TODO is it possible that cpArbiterStateIgnore should be set here instead?
+		}
 	}
 	
 	int ticks = space->stamp - arb->stamp;
@@ -988,9 +990,10 @@ addComponent(cpBody *body, cpArray *components)
 	}
 }
 
-static void
+__attribute__((noinline)) static void
 doComponentStuff(cpSpace *space, cpFloat dt)
 {
+	asm ("");
 	cpArray *bodies = space->bodies;
 	cpArray *newBodies = cpArrayNew(bodies->num);
 	cpArray *rougeBodies = cpArrayNew(16);
