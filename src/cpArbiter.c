@@ -110,7 +110,7 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 	arb->private_a = a;
 	arb->private_b = b;
 	
-	arb->stamp = -1;
+	arb->stamp = 0;
 	arb->state = cpArbiterStateFirstColl;
 	
 	return arb;

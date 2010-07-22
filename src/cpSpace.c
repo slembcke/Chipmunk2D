@@ -26,7 +26,7 @@
 
 #include "chipmunk.h"
 
-int cp_contact_persistence = 1;
+int cp_contact_persistence = 2;
 
 #pragma mark Contact Set Helpers
 
@@ -796,7 +796,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b); // retains the contacts array
 	
 	// Call the begin function first if it's the first step
-	if(arb->stamp == -1 && !handler->begin(arb, space, handler->data)){
+	if(arb->state == cpArbiterStateFirstColl && !handler->begin(arb, space, handler->data)){
 		cpArbiterIgnore(arb); // permanently ignore the collision until separation
 	}
 	
@@ -831,15 +831,35 @@ active2staticIter(cpShape *shape, cpSpace *space)
 static int
 contactSetFilter(cpArbiter *arb, cpSpace *space)
 {
+	cpBody *a = arb->private_a->body;
+	cpBody *b = arb->private_b->body;
+	
+	// both bodies are either static or sleeping
+	int sleepingNow = (!a|| a->node.next) && (!b|| b->node.next);
+	
+	if(sleepingNow){
+		arb->state = cpArbiterStateSleep;
+		return 1;
+	} else if(arb->state == cpArbiterStateSleep){
+		// wake up the arbiter and continue as normal
+		arb->state = cpArbiterStateNormal;
+		// TODO is it possible that cpArbiterStateIgnore should be set here instead?
+	}
+	
 	int ticks = space->stamp - arb->stamp;
 	
 	// was used last frame, but not this one
-	if(ticks == 1){
+	if(ticks >= 1 && arb->state != cpArbiterStateCached){
+//		printf("calling separate %d\n", space->stamp);
 		arb->handler->separate(arb, space, arb->handler->data);
-		arb->stamp = -1; // mark it as a new pair again.
+		arb->state = cpArbiterStateCached;
 	}
 	
 	if(ticks >= cp_contact_persistence){
+//		printf("recycling arbiter %d\n", space->stamp);
+		arb->contacts = NULL;
+		arb->numContacts = 0;
+		
 		cpArrayPush(space->pooledArbiters, arb);
 		return 0;
 	}

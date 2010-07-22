@@ -29,6 +29,33 @@
 
 cpSpace *space;
 
+static int
+beginFunc(cpArbiter *arb, struct cpSpace *space, void *data)
+{
+	printf("begin %d\n", space->stamp);
+	return 1;
+}
+
+static int
+preSolveFunc(cpArbiter *arb, struct cpSpace *space, void *data)
+{
+//	printf("pre solve %d\n", space->stamp);
+	return 1;
+}
+
+static void
+postSolveFunc(cpArbiter *arb, struct cpSpace *space, void *data)
+{
+//	printf("post solve %d\n", space->stamp);
+}
+
+static void
+separateFunc(cpArbiter *arb, struct cpSpace *space, void *data)
+{
+	printf("separate %d\n", space->stamp);
+}
+
+
 // Init is called by the demo code to set up the demo.
 static cpSpace *
 init(void)
@@ -46,6 +73,8 @@ init(void)
 	cpSpaceResizeActiveHash(space, 30.0f, 1000);
 	// Give it some gravity
 	space->gravity = cpv(0, -100);
+//	space->idleTimeThreshold = 0.0f;
+	cp_contact_persistence = 100;
 	
 	// Create A ground segment along the bottom of the screen
 	// By attaching it to NULL instead of a body, we make it a static shape.
@@ -67,7 +96,8 @@ init(void)
 	cpBody *ballBody = cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero));
 	// Set some parameters of the body:
 	// For more info: http://code.google.com/p/chipmunk-physics/wiki/cpBody
-	ballBody->p = cpv(0, -240 + radius+5);
+	ballBody->p = cpv(0, -240 + radius+50);
+	ballBody->v = cpv(0, -20);
 	// Add the body to the space so it will be simulated and move around.
 	cpSpaceAddBody(space, ballBody);
 	
@@ -78,6 +108,8 @@ init(void)
 	// Additionally, all of the cpSpaceAdd*() functions return the thing they added so you can create and add in one go.
 	cpShape *ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero));
 	ballShape->e = 0.0f; ballShape->u = 0.9f;
+	
+	cpSpaceAddCollisionHandler(space, 0, 0, beginFunc, preSolveFunc, postSolveFunc, separateFunc, NULL);
 	
 	return space;
 }

@@ -58,7 +58,7 @@ preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 	CP_ARBITER_GET_SHAPES(arb, a, b);
 	PlayerStruct *player = (PlayerStruct *)a->data;
 	
-	if(arb->stamp > 0){
+	if(cpArbiterIsFirstContact(arb)){
 		a->u = player->u;
 		
 		// pick the most upright jump normal each frame
@@ -105,7 +105,7 @@ update(int ticks)
 	cpVect groundNormal = playerInstance.groundNormal;
 	if(groundNormal.y > 0.0f){
 		playerInstance.shape->surface_v = cpvmult(cpvperp(groundNormal), 400.0f*arrowDirection.x);
-		if(arrowDirection.x){ cpBodyActivate(body); printf("woo\n");}
+		if(arrowDirection.x) cpBodyActivate(body);
 	} else {
 		playerInstance.shape->surface_v = cpvzero;
 	}

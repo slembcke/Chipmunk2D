@@ -58,6 +58,8 @@ typedef enum cpArbiterState {
 	cpArbiterStateNormal,
 	cpArbiterStateFirstColl,
 	cpArbiterStateIgnore,
+	cpArbiterStateSleep,
+	cpArbiterStateCached,
 } cpArbiterState;
 
 // Data structure for tracking collisions between shapes.
@@ -115,6 +117,15 @@ cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
 	}
 }
 #define CP_ARBITER_GET_SHAPES(arb, a, b) cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+
+static inline void
+cpArbiterGetBodies(cpArbiter *arb, cpBody **a, cpBody **b)
+{
+	CP_ARBITER_GET_SHAPES(arb, shape_a, shape_b);
+	(*a) = cpBodyValidPointer(shape_a->body);
+	(*b) = cpBodyValidPointer(shape_b->body);
+}
+#define CP_ARBITER_GET_BODIES(arb, a, b) cpBody *a, *b; cpArbiterGetBodies(arb, &a, &b);
 
 static inline int
 cpArbiterIsFirstContact(cpArbiter *arb)
