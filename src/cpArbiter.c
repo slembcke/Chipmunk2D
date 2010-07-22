@@ -173,6 +173,9 @@ cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisio
 	
 	// For collisions between two similar primitive types, the order could have been swapped.
 	arb->private_a = a; arb->private_b = b;
+	
+	// mark it as new if it's been cached
+	if(arb->state == cpArbiterStateCached) arb->state = cpArbiterStateFirstColl;
 }
 
 void

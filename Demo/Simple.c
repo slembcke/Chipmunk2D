@@ -109,7 +109,7 @@ init(void)
 	cpShape *ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero));
 	ballShape->e = 0.0f; ballShape->u = 0.9f;
 	
-	cpSpaceAddCollisionHandler(space, 0, 0, beginFunc, preSolveFunc, postSolveFunc, separateFunc, NULL);
+//	cpSpaceAddCollisionHandler(space, 0, 0, beginFunc, preSolveFunc, postSolveFunc, separateFunc, NULL);
 	
 	return space;
 }
