@@ -492,12 +492,6 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 					glVertex2f(body->p.x, body->p.y);
 				} while((body = next) != root);
 			}
-//				cpContactComponent *component = components->arr[i];
-//				for(int i=0; i<component->bodies.num; i++){
-//					cpBody *body = component->bodies.arr[i];
-//					glVertex2f(body->p.x, body->p.y);
-//				}
-//			}
 		} glEnd();
 	}
 
