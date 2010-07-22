@@ -27,9 +27,11 @@ void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, 
 
 // Get valid body pointers and exit early if the bodies are idle
 #define CONSTRAINT_BEGIN(constraint, a_var, b_var) \
-cpBody *a_var = cpBodyValidPointer(((cpConstraint *)constraint)->a); \
-cpBody *b_var = cpBodyValidPointer(((cpConstraint *)constraint)->b); \
-if(a_var->node.next || b_var->node.next) return;
+cpBody *a_var, *b_var; { \
+	cpBody *a_temp = ((cpConstraint *)constraint)->a; a_var = cpBodyValidPointer(a_temp); \
+	cpBody *b_temp = ((cpConstraint *)constraint)->b; b_var = cpBodyValidPointer(b_temp); \
+	if((a_var->node.next || !a_temp) && (b_var->node.next || !b_temp)) return; \
+}
 
 static inline cpVect
 relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2){

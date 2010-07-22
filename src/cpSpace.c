@@ -175,7 +175,7 @@ cpSpaceInit(cpSpace *space)
 	
 	space->bodies = cpArrayNew(0);
 	space->components = cpArrayNew(0);
-	space->idleTimeThreshold = 0.5f;
+	space->idleTimeThreshold = 0.5;
 	space->idleSpeedThreshold = 0.0f;
 	
 	space->arbiters = cpArrayNew(0);
@@ -347,6 +347,12 @@ addShapeRaw(cpShape *shape, cpSpaceHash *hash)
 	cpSpaceHashInsert(hash, shape, shape->hashid, shape->bb);
 }
 
+static inline void
+removeShapeRaw(cpShape *shape, cpSpaceHash *hash)
+{
+	cpSpaceHashRemove(hash, shape, shape->hashid);
+}
+
 cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
@@ -423,12 +429,6 @@ contactSetFilterRemovedShape(cpArbiter *arb, removalContext *context)
 	}
 	
 	return 1;
-}
-
-static inline void
-removeShapeRaw(cpShape *shape, cpSpaceHash *hash)
-{
-	cpSpaceHashRemove(hash, shape, shape->hashid);
 }
 
 void
@@ -924,12 +924,16 @@ mergeBodies(cpSpace *space, cpArray *components, cpArray *rougeBodies, cpBody *a
 	
 	cpBody *a_root = componentNodeRoot(a);
 	cpBody *b_root = componentNodeRoot(b);
-
-	cpComponentActivate(a_root, space);
-	cpComponentActivate(b_root, space);
 	
-	// both nodes already inactive
-	if(a->node.next && b->node.next) return;
+	cpBody *a_next = a_root->node.next;
+	cpBody *b_next = b_root->node.next;
+	
+	if(a_next && b_next){
+		return;
+	} else if(a_next || b_next){
+		cpComponentActivate(a_root, space);
+		cpComponentActivate(b_root, space);
+	} 
 	
 	// Add any rouge bodies (bodies not added to the space)
 	if(!a->space) cpArrayPush(rougeBodies, a);
