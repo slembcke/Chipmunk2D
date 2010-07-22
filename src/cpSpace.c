@@ -917,8 +917,6 @@ componentActivate(cpBody *root)
 	do {
 		next = body->node.next;
 		body->node.next = NULL;
-		body->node.parent = NULL;
-		body->node.rank = 0;
 		cpArrayPush(space->bodies, body);
 		
 		for(cpShape *shape=body->shapesList; shape; shape=shape->next){
@@ -994,10 +992,9 @@ addComponent(cpBody *body, cpArray *components)
 	}
 }
 
-__attribute__((noinline)) static void
+static void
 doComponentStuff(cpSpace *space, cpFloat dt)
 {
-	asm ("");
 	cpArray *bodies = space->bodies;
 	cpArray *newBodies = cpArrayNew(bodies->num);
 	cpArray *rougeBodies = cpArrayNew(16);
@@ -1096,6 +1093,11 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)active2staticIter, space);
 	cpSpaceHashQueryRehash(space->activeShapes, (cpSpaceHashQueryFunc)queryFunc, space);
 	
+	if(space->idleTimeThreshold != INFINITY){
+		doComponentStuff(space, dt);
+		bodies = space->bodies;
+	}
+	
 	// Clear out old cached arbiters and dispatch untouch functions
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilter, space);
 
@@ -1161,10 +1163,6 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpHashSet *callbacks = space->postStepCallbacks;
 		space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql, (cpHashSetTransFunc)postStepFuncSetTrans);
 		cpHashSetEach(callbacks, (cpHashSetIterFunc)postStepCallbackSetIter, space);
-	}
-	
-	if(space->idleTimeThreshold != INFINITY){
-		doComponentStuff(space, dt);
 	}
 	
 	// Increment the stamp.
