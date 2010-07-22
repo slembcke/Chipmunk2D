@@ -38,8 +38,9 @@ update(int ticks)
 {
 	cpFloat coef = (2.0f + arrowDirection.y)/3.0f;
 	cpFloat rate = arrowDirection.x*30.0f*coef;
+	
 	cpSimpleMotorSetRate(motor, rate);
-	motor->maxForce = (rate) ? 1000000.0f : 0.0f;
+	motor->maxForce = (rate ? 1000000.0f : 0.0f);
 
 	int steps = 2;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -121,7 +122,7 @@ init(void)
 	
 	// add balls to hopper
 	for(int i=0; i<numBalls; i++)
-		balls[i] = add_ball(cpv(-224,80 + 64*i));
+		balls[i] = add_ball(cpv(-224 + i,80 + 64*i));
 	
 	// add small gear
 	cpBody *smallGear = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 80, 0, cpvzero)));

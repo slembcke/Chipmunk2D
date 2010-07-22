@@ -917,6 +917,8 @@ componentActivate(cpBody *root)
 	do {
 		next = body->node.next;
 		body->node.next = NULL;
+		body->node.parent = NULL;
+		body->node.rank = 0;
 		cpArrayPush(space->bodies, body);
 		
 		for(cpShape *shape=body->shapesList; shape; shape=shape->next){
@@ -931,6 +933,8 @@ componentActivate(cpBody *root)
 void
 cpBodyActivate(cpBody *body)
 {
+	body->node.idleTime = 0.0f;
+	
 	cpBody *root = componentNodeRoot(body);
 	if(root) componentActivate(root);
 }

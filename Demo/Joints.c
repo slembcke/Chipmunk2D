@@ -119,6 +119,7 @@ init(void)
 	space = cpSpaceNew();
 	space->iterations = 10;
 	space->gravity = cpv(0, -100);
+	space->idleTimeThreshold = 0.5f;
 	
 	cpShape *shape;
 	

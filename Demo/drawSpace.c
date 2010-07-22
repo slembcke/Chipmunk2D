@@ -482,16 +482,16 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 				glVertex2f(body->p.x, body->p.y);
 			}
 			
-			glColor3f(0.0f, 0.0f, 1.0f);
-			cpArray *components = space->components;
-			for(int i=0; i<components->num; i++){
-				cpBody *root = components->arr[i];
-				cpBody *body = root, *next;
-				do {
-					next = body->node.next;
-					glVertex2f(body->p.x, body->p.y);
-				} while((body = next) != root);
-			}
+//			glColor3f(0.5f, 0.5f, 0.5f);
+//			cpArray *components = space->components;
+//			for(int i=0; i<components->num; i++){
+//				cpBody *root = components->arr[i];
+//				cpBody *body = root, *next;
+//				do {
+//					next = body->node.next;
+//					glVertex2f(body->p.x, body->p.y);
+//				} while((body = next) != root);
+//			}
 		} glEnd();
 	}
 
