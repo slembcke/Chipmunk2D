@@ -81,6 +81,7 @@ separate(cpArbiter *arb, cpSpace *space, void *ignore)
 	
 	if(player->groundShapes->num == 0){
 		a->u = 0.0f;
+		player->groundNormal = cpvzero;
 	}
 }
 
@@ -99,19 +100,21 @@ update(int ticks)
 	static int lastJumpState = 0;
 	int jumpState = (arrowDirection.y > 0.0f);
 	
+	cpBody *body = playerInstance.shape->body;
+	
 	cpVect groundNormal = playerInstance.groundNormal;
 	if(groundNormal.y > 0.0f){
 		playerInstance.shape->surface_v = cpvmult(cpvperp(groundNormal), 400.0f*arrowDirection.x);
+		if(arrowDirection.x){ cpBodyActivate(body); printf("woo\n");}
 	} else {
 		playerInstance.shape->surface_v = cpvzero;
 	}
-	
-	cpBody *body = playerInstance.shape->body;
 	
 	// apply jump
 	if(jumpState && !lastJumpState && cpvlengthsq(groundNormal)){
 //		body->v = cpvmult(cpvslerp(groundNormal, cpv(0.0f, 1.0f), 0.5f), 500.0f);
 		body->v = cpvadd(body->v, cpvmult(cpvslerp(groundNormal, cpv(0.0f, 1.0f), 0.75f), 500.0f));
+		cpBodyActivate(body);
 	}
 	
 	if(playerInstance.groundShapes->num == 0){
@@ -123,7 +126,6 @@ update(int ticks)
 	int steps = 3;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
-	playerInstance.groundNormal = cpvzero;
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
 	}

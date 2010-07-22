@@ -26,8 +26,6 @@
 
 #include "chipmunk.h"
 
-static inline void cpBodyActivate(cpBody *body, cpSpace *space);
-
 int cp_contact_persistence = 1;
 
 #pragma mark Contact Set Helpers
@@ -358,12 +356,12 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
 	cpBody *body = shape->body;
 	if(!body) return cpSpaceAddStaticShape(space, shape);
-
+	
 	cpAssert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
 		"Cannot add the same shape more than once.");
 	cpAssertSpaceUnlocked(space);
 	
-	cpBodyActivate(body, space);
+	cpBodyActivate(body);
 	if(body) cpBodyAddShape(body, shape);
 	addShapeRaw(shape, space->activeShapes);
 		
@@ -378,7 +376,7 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
-	if(body) cpBodyActivate(body, space);
+	if(body) cpBodyActivate(body);
 	if(body) cpBodyAddShape(body, shape);
 	
 	cpShapeCacheBB(shape);
@@ -391,7 +389,7 @@ cpBody *
 cpSpaceAddBody(cpSpace *space, cpBody *body)
 {
 	cpAssertWarn(body->m != INFINITY, "Did you really mean to add an infinite mass body to the space?");
-	cpAssert(!cpArrayContains(space->bodies, body), "Cannot add the same body more than once.");
+	cpAssert(!body->space, "Cannot add a body to a more than one space or to the same space twice.");
 //	cpAssertSpaceUnlocked(space); This should be safe as long as it's not from an integration callback
 	
 	cpArrayPush(space->bodies, body);
@@ -441,7 +439,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 		"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
-	if(body) cpBodyActivate(body, space);
+	if(body) cpBodyActivate(body);
 	if(body) cpBodyRemoveShape(body, shape);
 	
 	removalContext context = {space, shape};
@@ -457,7 +455,7 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
-	cpBodyActivate(body, space);
+	cpBodyActivate(body);
 	if(body) cpBodyRemoveShape(body, shape);
 	
 	removalContext context = {space, shape};
@@ -468,11 +466,11 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 {
-	cpAssertWarn(cpArrayContains(space->bodies, body),
+	cpAssertWarn(body->space == space,
 		"Cannot remove a body that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
-	cpBodyActivate(body, space);
+	cpBodyActivate(body);
 	cpArrayDeleteObj(space->bodies, body);
 	body->space = NULL;
 }
@@ -484,8 +482,8 @@ cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 		"Cannot remove a constraint that was never added to the space. (Removed twice maybe?)");
 //	cpAssertSpaceUnlocked(space); Should be safe as long as its not from a constraint callback.
 	
-	if(constraint->a) cpBodyActivate(constraint->a, space);
-	if(constraint->a) cpBodyActivate(constraint->b, space);
+	if(constraint->a) cpBodyActivate(constraint->a);
+	if(constraint->a) cpBodyActivate(constraint->b);
 	cpArrayDeleteObj(space->constraints, constraint);
 }
 
@@ -886,15 +884,17 @@ componentNodeMerge(cpBody *a_root, cpBody *b_root)
 }
 
 static inline void
-cpComponentActivate(cpBody *root, cpSpace *space)
+componentActivate(cpBody *root)
 {
 	if(!root->node.next) return;
+	
+	cpSpace *space = root->space;
+	cpAssert(space, "Trying to activate a body that was never added to a space.");
 	
 	cpBody *body = root, *next;
 	do {
 		next = body->node.next;
 		body->node.next = NULL;
-//		body->componentNode.parent = NULL;
 		cpArrayPush(space->bodies, body);
 		
 		for(cpShape *shape=body->shapesList; shape; shape=shape->next){
@@ -906,19 +906,16 @@ cpComponentActivate(cpBody *root, cpSpace *space)
 	cpArrayDeleteObj(space->components, root);
 }
 
-static inline void
-cpBodyActivate(cpBody *body, cpSpace *space)
+void
+cpBodyActivate(cpBody *body)
 {
 	cpBody *root = componentNodeRoot(body);
-	if(root) cpComponentActivate(root, space);
+	if(root) componentActivate(root);
 }
 
 static inline void
 mergeBodies(cpSpace *space, cpArray *components, cpArray *rougeBodies, cpBody *a, cpBody *b)
 {
-	// TODO handle special merging cases here
-	// how to handle statics?
-	
 	// Don't merge with the static body
 	if(!a || !b) return;
 	
@@ -931,8 +928,8 @@ mergeBodies(cpSpace *space, cpArray *components, cpArray *rougeBodies, cpBody *a
 	if(a_next && b_next){
 		return;
 	} else if(a_next || b_next){
-		cpComponentActivate(a_root, space);
-		cpComponentActivate(b_root, space);
+		componentActivate(a_root);
+		componentActivate(b_root);
 	} 
 	
 	// Add any rouge bodies (bodies not added to the space)

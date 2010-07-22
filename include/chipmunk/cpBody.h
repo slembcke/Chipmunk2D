@@ -110,8 +110,18 @@ cpBodyValidPointer(cpBody *body)
 	return (body ? body : &cpStaticBodySingleton);
 }
 
-#define CP_DefineBodyGetter(type, member, name) static inline type cpBodyGet##name(cpBody *body){return body->member;}
-#define CP_DefineBodySetter(type, member, name) static inline void cpBodySet##name(cpBody *body, type value){body->member = value;}
+void cpBodyActivate(cpBody *body);
+
+
+#define CP_DefineBodyGetter(type, member, name) \
+static inline type cpBodyGet##name(cpBody *body){return body->member;}
+
+#define CP_DefineBodySetter(type, member, name) \
+static inline void \
+cpBodySet##name(cpBody *body, type value){ \
+	body->member = value; \
+	cpBodyActivate(body); \
+} \
 
 #define CP_DefineBodyProperty(type, member, name) \
 CP_DefineBodyGetter(type, member, name) \
