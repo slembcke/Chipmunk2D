@@ -26,7 +26,7 @@
 
 #include "chipmunk.h"
 
-int cp_contact_persistence = 2;
+int cp_contact_persistence = 3;
 
 #pragma mark Contact Set Helpers
 
@@ -923,6 +923,7 @@ componentActivate(cpBody *root)
 	do {
 		next = body->node.next;
 		body->node.next = NULL;
+		body->node.idleTime = 0.0f;
 		cpArrayPush(space->bodies, body);
 		
 		for(cpShape *shape=body->shapesList; shape; shape=shape->next){
@@ -937,8 +938,6 @@ componentActivate(cpBody *root)
 void
 cpBodyActivate(cpBody *body)
 {
-	body->node.idleTime = 0.0f;
-	
 	cpBody *root = componentNodeRoot(body);
 	if(root) componentActivate(root);
 }

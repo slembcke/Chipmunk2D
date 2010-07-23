@@ -401,15 +401,6 @@ drawBB(cpShape *shape, void *unused)
 	} glEnd();
 }
 
-static void
-drawCollisions(cpArbiter *arb, void *unused)
-{
-	for(int i=0; i<arb->numContacts; i++){
-		cpVect v = arb->contacts[i].p;
-		glVertex2f(v.x, v.y);
-	}
-}
-
 // copied from cpSpaceHash.c
 static inline cpHashValue
 hash_func(cpHashValue x, cpHashValue y, cpHashValue n)
@@ -498,8 +489,16 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 	if(options->collisionPointSize){
 		glPointSize(options->collisionPointSize);
 		glBegin(GL_POINTS); {
-			glColor3f(COLLISION_COLOR);
-			cpArrayEach(space->arbiters, (cpArrayIter)drawCollisions, NULL);
+			cpArray *arbiters = space->arbiters;
+			for(int i=0; i<arbiters->num; i++){
+				cpArbiter *arb = arbiters->arr[i];
+				
+				glColor3f(COLLISION_COLOR);
+				for(int i=0; i<arb->numContacts; i++){
+					cpVect v = arb->contacts[i].p;
+					glVertex2f(v.x, v.y);
+				}
+			}
 		} glEnd();
 	}
 }
