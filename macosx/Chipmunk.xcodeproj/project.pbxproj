@@ -613,74 +613,6 @@
 			};
 			name = Release;
 		};
-		D39095AB0C383BEA004B92B1 /* Native Only */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
-				PRODUCT_NAME = Chipmunk;
-				ZERO_LINK = NO;
-			};
-			name = "Native Only";
-		};
-		D39095AC0C383BEA004B92B1 /* Native Only */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_AUTO_VECTORIZATION = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "main-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				LIBRARY_SEARCH_PATHS = (
-					/usr/local/lib,
-					"$(inherited)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
-				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = ChipmunkDemo;
-				SHARED_PRECOMPS_DIR = "";
-				WARNING_CFLAGS = "-Wall";
-				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
-			};
-			name = "Native Only";
-		};
-		D39095AD0C383BEA004B92B1 /* Native Only */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_OPTIMIZATION_LEVEL = 3;
-				HEADER_SEARCH_PATHS = ../include/chipmunk;
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-W",
-					"-Wno-unused-parameter",
-					"-Werror",
-					"-Wnewline-eof",
-				);
-			};
-			name = "Native Only";
-		};
 		D3C3787B11063B1C003EF1D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -717,18 +649,6 @@
 				ZERO_LINK = NO;
 			};
 			name = Release;
-		};
-		D3C3787D11063B1C003EF1D9 /* Native Only */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
-				GCC_THUMB_SUPPORT = NO;
-				PREBINDING = NO;
-				PRODUCT_NAME = "Chipmunk-iPhone";
-				SDKROOT = iphoneos3.0;
-			};
-			name = "Native Only";
 		};
 		D3E5F01B0AA32EAC004E361B /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -853,7 +773,6 @@
 			buildConfigurations = (
 				D34963BF0B56CACA00CAD239 /* Debug */,
 				D34963C00B56CACA00CAD239 /* Release */,
-				D39095AB0C383BEA004B92B1 /* Native Only */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -863,7 +782,6 @@
 			buildConfigurations = (
 				D3C3787B11063B1C003EF1D9 /* Debug */,
 				D3C3787C11063B1C003EF1D9 /* Release */,
-				D3C3787D11063B1C003EF1D9 /* Native Only */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -873,7 +791,6 @@
 			buildConfigurations = (
 				D3E5F01B0AA32EAC004E361B /* Debug */,
 				D3E5F01C0AA32EAC004E361B /* Release */,
-				D39095AD0C383BEA004B92B1 /* Native Only */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -883,7 +800,6 @@
 			buildConfigurations = (
 				D3E5F04E0AA32FDF004E361B /* Debug */,
 				D3E5F04F0AA32FDF004E361B /* Release */,
-				D39095AC0C383BEA004B92B1 /* Native Only */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

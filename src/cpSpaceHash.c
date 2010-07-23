@@ -334,42 +334,43 @@ cpSpaceHashEach(cpSpaceHash *hash, cpSpaceHashIterator func, void *data)
 static inline void
 query(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpaceHashQueryFunc func, void *data)
 {
-	for(cpSpaceHashBin *bin=*bin_ptr; bin; bin_ptr=&bin->next, bin=bin->next){
+	cpSpaceHashBin *bin = *bin_ptr;
+	while(bin){
+//	for(cpSpaceHashBin *bin=*bin_ptr; bin; bin_ptr=&bin->next, bin=bin->next){
 		cpHandle *hand = bin->handle;
 		void *other = hand->obj;
 		
-		continue_skip:
 		// Skip over certain conditions
 		if(
-			// Have we already tried this pair in this query?
+			// Have we already tried this pair in the currnt query in a different cell?
 			hand->stamp == hash->stamp
 			// Is obj the same as other?
 			|| obj == other 
-		) continue;
-		
-		// If the object has been removed, free the bin
-		if(!other){
-			printf("removed!\n");
-			cpSpaceHashBin *next = bin->next;
-			
-			(*bin_ptr) = bin->next;
-			cpHandleRelease(bin->handle, hash->pooledHandles);
-			recycleBin(hash, bin);
-			
-			if(next){
-				bin = next;
-				hand = bin->handle;
-				other = hand->obj;
-				goto continue_skip;
-			} else {
-				break;
-			}
+		){
+			bin = bin->next;
+			continue;
 		}
 		
-		func(obj, other, data);
-
-		// Stamp that the handle was checked already against this object.
-		hand->stamp = hash->stamp;
+		if(other){
+			func(obj, other, data);
+			
+			// Stamp that the handle was checked already against this object.
+			hand->stamp = hash->stamp;
+			
+			bin = bin->next;
+		} else {
+			// The object has been removed 
+			cpSpaceHashBin *next = bin->next;
+			
+			// unlink and recycle the bin
+			(*bin_ptr) = bin->next;
+			recycleBin(hash, bin);
+			
+			// release the reference to the handle
+			cpHandleRelease(hand, hash->pooledHandles);
+			
+			bin = next;
+		}
 	}
 }
 
