@@ -342,6 +342,7 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
 static inline void
 addShapeRaw(cpShape *shape, cpSpaceHash *hash)
 {
+	cpShapeCacheBB(shape);
 	cpSpaceHashInsert(hash, shape, shape->hashid, shape->bb);
 }
 
@@ -379,7 +380,6 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	if(body) cpBodyActivate(body);
 	if(body) cpBodyAddShape(body, shape);
 	
-	cpShapeCacheBB(shape);
 	addShapeRaw(shape, space->staticShapes);
 	
 	return shape;

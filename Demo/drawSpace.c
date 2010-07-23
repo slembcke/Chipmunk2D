@@ -439,8 +439,19 @@ drawSpatialHash(cpSpaceHash *hash)
 void
 drawSpace(cpSpace *space, drawSpaceOptions *options)
 {
-	if(options->drawHash)
+	if(options->drawHash){
+		glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
 		drawSpatialHash(space->activeShapes);
+		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+		drawSpatialHash(space->staticShapes);
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	}
+	
+	glLineWidth(options->lineThickness);
+	if(options->drawShapes){
+		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)drawObject, space);
+		cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)drawObject, space);
+	}
 	
 	glLineWidth(1.0f);
 	if(options->drawBBs){
@@ -449,12 +460,6 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 		cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)drawBB, NULL);
 	}
 
-	glLineWidth(options->lineThickness);
-	if(options->drawShapes){
-		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)drawObject, space);
-		cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)drawObject, space);
-	}
-	
 	cpArray *constraints = space->constraints;
 
 	glColor3f(0.5f, 1.0f, 0.5f);

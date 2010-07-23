@@ -359,6 +359,8 @@ query(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpaceHashQueryFu
 			
 			bin = bin->next;
 		} else {
+//			bin = bin->next;
+//			continue;
 			// The object has been removed 
 			cpSpaceHashBin *next = bin->next;
 			
