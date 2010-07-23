@@ -133,11 +133,11 @@ cpArrayEach(cpArray *arr, cpArrayIter iterFunc, void *data)
 		iterFunc(arr->arr[i], data);
 }
 
-int
+cpBool
 cpArrayContains(cpArray *arr, void *ptr)
 {
 	for(int i=0; i<arr->num; i++)
-		if(arr->arr[i] == ptr) return 1;
+		if(arr->arr[i] == ptr) return cpTrue;
 	
-	return 0;
+	return cpFalse;
 }

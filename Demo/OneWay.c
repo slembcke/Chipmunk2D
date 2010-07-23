@@ -36,7 +36,7 @@ typedef struct OneWayPlatform {
 
 static OneWayPlatform platformInstance;
 
-static int
+static cpBool
 preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
@@ -44,10 +44,10 @@ preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 		
 	if(cpvdot(cpArbiterGetNormal(arb, 0), platform->n) < 0){
 		cpArbiterIgnore(arb);
-		return 0;
+		return cpFalse;
 	}
 	
-	return 1;
+	return cpTrue;
 }
 
 static void

@@ -88,8 +88,8 @@ typedef struct cpArbiter {
 	struct cpCollisionHandler *handler;
 	
 	// Are the shapes swapped in relation to the collision handler?
-	char swappedColl;
-	char state;
+	cpBool swappedColl;
+	cpArbiterState state;
 } cpArbiter;
 
 // Arbiters are allocated in large buffers by the space and don't require a destroy function
@@ -132,7 +132,7 @@ cpArbiterGetBodies(cpArbiter *arb, cpBody **a, cpBody **b)
 }
 #define CP_ARBITER_GET_BODIES(arb, a, b) cpBody *a, *b; cpArbiterGetBodies(arb, &a, &b);
 
-static inline int
+static inline cpBool
 cpArbiterIsFirstContact(cpArbiter *arb)
 {
 	return arb->state == cpArbiterStateFirstColl;

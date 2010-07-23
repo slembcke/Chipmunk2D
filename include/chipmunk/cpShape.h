@@ -47,7 +47,7 @@ typedef struct cpShapeClass {
 	void (*destroy)(struct cpShape *shape);
 	
 	// called by cpShapePointQuery().
-	int (*pointQuery)(struct cpShape *shape, cpVect p);
+	cpBool (*pointQuery)(struct cpShape *shape, cpVect p);
 	
 	// called by cpShapeSegmentQuery()
 	 void (*segmentQuery)(struct cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
@@ -65,7 +65,7 @@ typedef struct cpShape{
 	cpBB bb;
 	
 	// Sensors invoke callbacks, but do not generate collisions
-	int sensor;
+	cpBool sensor;
 	
 	// *** Surface properties.
 	
@@ -106,7 +106,7 @@ void cpShapeFree(cpShape *shape);
 cpBB cpShapeCacheBB(cpShape *shape);
 
 // Test if a point lies within a shape.
-int cpShapePointQuery(cpShape *shape, cpVect p);
+cpBool cpShapePointQuery(cpShape *shape, cpVect p);
 
 #define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(cpShape *shape)
 
@@ -160,7 +160,7 @@ void cpResetShapeIdCounter(void);
 // Directed segment queries against individual shapes.
 void cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info);
 
-int cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
 
 static inline cpVect
 cpSegmentQueryHitPoint(cpVect start, cpVect end, cpSegmentQueryInfo info)

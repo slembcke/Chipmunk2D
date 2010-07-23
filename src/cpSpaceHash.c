@@ -181,15 +181,15 @@ cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells)
 }
 
 // Return true if the chain contains the handle.
-static inline int
+static inline cpBool
 containsHandle(cpSpaceHashBin *bin, cpHandle *hand)
 {
 	while(bin){
-		if(bin->handle == hand) return 1;
+		if(bin->handle == hand) return cpTrue;
 		bin = bin->next;
 	}
 	
-	return 0;
+	return cpFalse;
 }
 
 // Get a recycled or new bin.

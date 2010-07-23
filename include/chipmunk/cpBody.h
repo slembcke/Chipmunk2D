@@ -177,14 +177,6 @@ cpBodyApplyImpulse(cpBody *body, cpVect j, cpVect r)
 	body->w += body->i_inv*cpvcross(r, j);
 }
 
-// Not intended for external use. Used by cpArbiter.c and cpConstraint.c.
-static inline void
-cpBodyApplyBiasImpulse(cpBody *body, cpVect j, cpVect r)
-{
-	body->v_bias = cpvadd(body->v_bias, cpvmult(j, body->m_inv));
-	body->w_bias += body->i_inv*cpvcross(r, j);
-}
-
 // Zero the forces on a body.
 void cpBodyResetForces(cpBody *body);
 // Apply a force (in world coordinates) to a body at a point relative to the center of gravity (also in world coordinates).

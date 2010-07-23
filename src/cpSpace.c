@@ -417,16 +417,16 @@ typedef struct removalContext {
 } removalContext;
 
 // Hashset filter func to throw away old arbiters.
-static int
+static cpBool
 contactSetFilterRemovedShape(cpArbiter *arb, removalContext *context)
 {
 	if(context->shape == arb->private_a || context->shape == arb->private_b){
 		arb->handler->separate(arb, context->space, arb->handler->data);
 		cpArrayPush(context->space->pooledArbiters, arb);
-		return 0;
+		return cpFalse;
 	}
 	
-	return 1;
+	return cpTrue;
 }
 
 void
@@ -596,7 +596,7 @@ segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
 	return 1.0f;
 }
 
-int
+cpBool
 cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data)
 {
 	segQueryContext context = {
@@ -834,7 +834,7 @@ active2staticIter(cpShape *shape, cpSpace *space)
 }
 
 // Hashset filter func to throw away old arbiters.
-static int
+static cpBool
 contactSetFilter(cpArbiter *arb, cpSpace *space)
 {
 	if(space->idleTimeThreshold != INFINITY){
@@ -846,7 +846,7 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 		
 		if(sleepingNow){
 			arb->state = cpArbiterStateSleep;
-			return 1;
+			return cpTrue;
 		} else if(arb->state == cpArbiterStateSleep){
 			// wake up the arbiter and continue as normal
 			arb->state = cpArbiterStateNormal;
@@ -869,10 +869,10 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 		arb->numContacts = 0;
 		
 		cpArrayPush(space->pooledArbiters, arb);
-		return 0;
+		return cpFalse;
 	}
 	
-	return 1;
+	return cpTrue;
 }
 
 // Hashset filter func to call and throw away post step callbacks.
@@ -968,16 +968,16 @@ mergeBodies(cpSpace *space, cpArray *components, cpArray *rougeBodies, cpBody *a
 	componentNodeMerge(a_root, b_root);
 }
 
-static inline int
+static inline cpBool
 componentActive(cpBody *root, cpFloat threshold)
 {
 	cpBody *body = root, *next;
 	do {
 		next = body->node.next;
-		if(!body->space || body->node.idleTime < threshold) return 1;
+		if(!body->space || body->node.idleTime < threshold) return cpTrue;
 	} while((body = next) != root);
 	
-	return 0;
+	return cpFalse;
 }
 
 static inline void

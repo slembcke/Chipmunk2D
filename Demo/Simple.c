@@ -29,18 +29,18 @@
 
 cpSpace *space;
 
-static int
+static cpBool
 beginFunc(cpArbiter *arb, struct cpSpace *space, void *data)
 {
 	printf("begin %d\n", space->stamp);
-	return 1;
+	return cpTrue;
 }
 
-static int
+static cpBool
 preSolveFunc(cpArbiter *arb, struct cpSpace *space, void *data)
 {
 //	printf("pre solve %d\n", space->stamp);
-	return 1;
+	return cpTrue;
 }
 
 static void

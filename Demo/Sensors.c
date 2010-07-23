@@ -43,7 +43,7 @@ typedef struct Emitter {
 
 static Emitter emitterInstance;
 
-static int
+static cpBool
 blockerBegin(cpArbiter *arb, cpSpace *space, void *unused)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
@@ -51,7 +51,7 @@ blockerBegin(cpArbiter *arb, cpSpace *space, void *unused)
 	
 	emitter->blocked++;
 	
-	return 0; // Return values from sensors callbacks are ignored,
+	return cpFalse; // Return values from sensors callbacks are ignored,
 }
 
 static void
@@ -73,7 +73,7 @@ postStepRemove(cpSpace *space, cpShape *shape, void *unused)
 	cpShapeFree(shape);
 }
 
-static int
+static cpBool
 catcherBarBegin(cpArbiter *arb, cpSpace *space, void *unused)
 {
 	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
@@ -82,7 +82,7 @@ catcherBarBegin(cpArbiter *arb, cpSpace *space, void *unused)
 	emitter->queue++;
 	cpSpaceAddPostStepCallback(space, (cpPostStepFunc)postStepRemove, b, NULL);
 	
-	return 0;
+	return cpFalse;
 }
 
 static cpFloat frand_unit(){return 2.0f*((cpFloat)rand()/(cpFloat)RAND_MAX) - 1.0f;}

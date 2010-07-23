@@ -49,6 +49,21 @@
 
 typedef unsigned int cpHashValue;
 
+// Oh C, how we love to define our own boolean types to get compiler compatibility
+#ifdef CP_BOOL_TYPE
+	typedef CP_BOOL_TYPE cpBool;
+#else
+	typedef int cpBool;
+#endif
+
+#ifndef cpTrue
+	#define cpTrue 1
+#endif
+
+#ifndef cpFalse
+	#define cpFalse 0
+#endif
+
 #ifdef CP_DATA_POINTER_TYPE
 	typedef CP_DATA_POINTER_TYPE cpDataPointer;
 #else

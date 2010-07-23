@@ -25,8 +25,8 @@ struct cpSpace;
 extern cpTimestamp cp_contact_persistence;
 
 // User collision handler function types.
-typedef int (*cpCollisionBeginFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
-typedef int (*cpCollisionPreSolveFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
+typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
+typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
 typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
 typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
 
@@ -67,7 +67,7 @@ typedef struct cpSpace{
 	// *** Internally Used Fields
 	
 	// When the space is locked, you should not add or remove objects;
-	int locked;
+	cpBool locked;
 	
 	// Time stamp. Is incremented on every call to cpSpaceStep().
 	cpTimestamp stamp;
@@ -162,7 +162,7 @@ cpShape *cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, c
 
 // Segment query callback function
 typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, void *data);
-int cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
+cpBool cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
 cpShape *cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out);
 
 // BB query callback function

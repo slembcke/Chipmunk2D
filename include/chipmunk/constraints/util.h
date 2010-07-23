@@ -54,10 +54,17 @@ apply_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
 }
 
 static inline void
+apply_bias_impulse(cpBody *body, cpVect j, cpVect r)
+{
+	body->v_bias = cpvadd(body->v_bias, cpvmult(j, body->m_inv));
+	body->w_bias += body->i_inv*cpvcross(r, j);
+}
+
+static inline void
 apply_bias_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
 {
-	cpBodyApplyBiasImpulse(a, cpvneg(j), r1);
-	cpBodyApplyBiasImpulse(b, j, r2);
+	apply_bias_impulse(a, cpvneg(j), r1);
+	apply_bias_impulse(b, j, r2);
 }
 
 static inline cpVect

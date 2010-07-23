@@ -38,7 +38,7 @@ typedef struct PlayerStruct {
 
 PlayerStruct playerInstance;
 
-static int
+static cpBool
 begin(cpArbiter *arb, cpSpace *space, void *ignore)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
@@ -49,10 +49,10 @@ begin(cpArbiter *arb, cpSpace *space, void *ignore)
 		cpArrayPush(player->groundShapes, b);
 	}
 	
-	return 1;
+	return cpTrue;
 }
 
-static int
+static cpBool
 preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
@@ -68,7 +68,7 @@ preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 		}
 	}
 	
-	return 1;
+	return cpTrue;
 }
 
 static void

@@ -156,7 +156,7 @@ cpvdistsq(const cpVect v1, const cpVect v2)
 	return cpvlengthsq(cpvsub(v1, v2));
 }
 
-static inline int
+static inline cpBool
 cpvnear(const cpVect v1, const cpVect v2, const cpFloat dist)
 {
 	return cpvdistsq(v1, v2) < dist*dist;
