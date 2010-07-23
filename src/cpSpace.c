@@ -31,7 +31,7 @@ cpTimestamp cp_contact_persistence = 3;
 #pragma mark Contact Set Helpers
 
 // Equal function for contactSet.
-static int
+static cpBool
 contactSetEql(cpShape **shapes, cpArbiter *arb)
 {
 	cpShape *a = shapes[0];
@@ -61,7 +61,7 @@ contactSetTrans(cpShape **shapes, cpSpace *space)
 #pragma mark Collision Pair Function Helpers
 
 // Equals function for collFuncSet.
-static int
+static cpBool
 collFuncSetEql(cpCollisionHandler *check, cpCollisionHandler *pair)
 {
 	return ((check->a == pair->a && check->b == pair->b) || (check->b == pair->a && check->a == pair->b));
@@ -85,7 +85,7 @@ typedef struct postStepCallback {
 	void *data;
 } postStepCallback;
 
-static int
+static cpBool
 postStepFuncSetEql(postStepCallback *a, postStepCallback *b){
 	return a->obj == b->obj;
 }
@@ -102,7 +102,7 @@ postStepFuncSetTrans(postStepCallback *callback, void *ignored)
 #pragma mark Misc Helper Funcs
 
 // Default collision functions.
-static int alwaysCollide(cpArbiter *arb, cpSpace *space, void *data){return 1;}
+static cpBool alwaysCollide(cpArbiter *arb, cpSpace *space, void *data){return 1;}
 static void nothing(cpArbiter *arb, cpSpace *space, void *data){}
 
 // BBfunc callback for the spatial hash.
@@ -574,7 +574,7 @@ typedef struct segQueryContext {
 	cpLayers layers;
 	cpGroup group;
 	cpSpaceSegmentQueryFunc func;
-	int anyCollision;
+	cpBool anyCollision;
 } segQueryContext;
 
 static cpFloat
@@ -590,7 +590,7 @@ segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
 			context->func(shape, info.t, info.n, data);
 		}
 		
-		context->anyCollision = 1;
+		context->anyCollision = cpTrue;
 	}
 	
 	return 1.0f;
@@ -603,7 +603,7 @@ cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, c
 		start, end,
 		layers, group,
 		func,
-		0,
+		cpFalse,
 	};
 	
 	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
@@ -747,7 +747,7 @@ cpSpacePushNewContactBuffer(cpSpace *space)
 	space->contactBuffersHead = buffer;
 }
 
-static inline int
+static inline cpBool
 queryReject(cpShape *a, cpShape *b)
 {
 	return
@@ -773,7 +773,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	cpHashValue collHashID = CP_HASH_PAIR(a->collision_type, b->collision_type);
 	cpCollisionHandler *handler = (cpCollisionHandler *)cpHashSetFind(space->collFuncSet, collHashID, &ids);
 	
-	int sensor = a->sensor || b->sensor;
+	cpBool sensor = a->sensor || b->sensor;
 	if(sensor && handler == &space->defaultHandler) return;
 	
 	// Shape 'a' should have the lower shape type. (required by cpCollideShapes() )
@@ -842,7 +842,7 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 		cpBody *b = arb->private_body_b;
 		
 		// both bodies are either static or sleeping
-		int sleepingNow = (!a|| a->node.next) && (!b|| b->node.next);
+		cpBool sleepingNow = (!a|| a->node.next) && (!b|| b->node.next);
 		
 		if(sleepingNow){
 			arb->state = cpArbiterStateSleep;
@@ -1078,7 +1078,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	cpArray *bodies = space->bodies;
 	cpArray *constraints = space->constraints;
 	
-	space->locked = 1;
+	space->locked = cpTrue;
 	
 	// Empty the arbiter list.
 	space->arbiters->num = 0;
@@ -1151,7 +1151,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		}
 	}
 	
-	space->locked = 0;
+	space->locked = cpFalse;
 	
 	// run the post solve callbacks
 	for(int i=0; i<arbiters->num; i++){
