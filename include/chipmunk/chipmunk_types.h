@@ -73,6 +73,12 @@ typedef unsigned int cpHashValue;
 	typedef unsigned int cpLayers;
 #endif
 
+#ifdef CP_TIMESTAMP_TYPE
+	typedef CP_TIMESTAMP_TYPE cpTimestamp;
+#else
+	typedef unsigned int cpTimestamp;
+#endif
+
 #ifndef CP_NO_GROUP
 	#define CP_NO_GROUP ((cpGroup)0)
 #endif

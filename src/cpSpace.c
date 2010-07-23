@@ -26,7 +26,7 @@
 
 #include "chipmunk.h"
 
-int cp_contact_persistence = 3;
+cpTimestamp cp_contact_persistence = 3;
 
 #pragma mark Contact Set Helpers
 
@@ -854,7 +854,7 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 		}
 	}
 	
-	int ticks = space->stamp - arb->stamp;
+	cpTimestamp ticks = space->stamp - arb->stamp;
 	
 	// was used last frame, but not this one
 	if(ticks >= 1 && arb->state != cpArbiterStateCached){

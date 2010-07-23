@@ -83,7 +83,7 @@ typedef struct cpArbiter {
 	cpVect surface_vr;
 	
 	// Time stamp of the arbiter. (from cpSpace)
-	int stamp;
+	cpTimestamp stamp;
 	
 	struct cpCollisionHandler *handler;
 	

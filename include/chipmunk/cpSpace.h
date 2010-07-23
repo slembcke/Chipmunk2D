@@ -22,7 +22,7 @@
 struct cpSpace;
 
 // Number of frames that contact information should persist.
-extern int cp_contact_persistence;
+extern cpTimestamp cp_contact_persistence;
 
 // User collision handler function types.
 typedef int (*cpCollisionBeginFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
@@ -44,7 +44,7 @@ typedef struct cpCollisionHandler {
 
 #define CP_MAX_CONTACTS_PER_ARBITER 6
 typedef struct cpContactBufferHeader {
-	int stamp;
+	cpTimestamp stamp;
 	struct cpContactBufferHeader *next;
 	unsigned int numContacts;
 } cpContactBufferHeader;
@@ -70,7 +70,7 @@ typedef struct cpSpace{
 	int locked;
 	
 	// Time stamp. Is incremented on every call to cpSpaceStep().
-	int stamp;
+	cpTimestamp stamp;
 
 	// The static and active shape spatial hashes.
 	cpSpaceHash *staticShapes;
