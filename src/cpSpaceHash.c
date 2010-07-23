@@ -332,21 +332,39 @@ cpSpaceHashEach(cpSpaceHash *hash, cpSpaceHashIterator func, void *data)
 
 // Calls the callback function for the objects in a given chain.
 static inline void
-query(cpSpaceHash *hash, cpSpaceHashBin *bin, void *obj, cpSpaceHashQueryFunc func, void *data)
+query(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpaceHashQueryFunc func, void *data)
 {
-	for(; bin; bin = bin->next){
+	for(cpSpaceHashBin *bin=*bin_ptr; bin; bin_ptr=&bin->next, bin=bin->next){
 		cpHandle *hand = bin->handle;
 		void *other = hand->obj;
 		
+		continue_skip:
 		// Skip over certain conditions
 		if(
 			// Have we already tried this pair in this query?
 			hand->stamp == hash->stamp
 			// Is obj the same as other?
 			|| obj == other 
-			// Has other been removed since the last rehash?
-			|| !other
-			) continue;
+		) continue;
+		
+		// If the object has been removed, free the bin
+		if(!other){
+			printf("removed!\n");
+			cpSpaceHashBin *next = bin->next;
+			
+			(*bin_ptr) = bin->next;
+			cpHandleRelease(bin->handle, hash->pooledHandles);
+			recycleBin(hash, bin);
+			
+			if(next){
+				bin = next;
+				hand = bin->handle;
+				other = hand->obj;
+				goto continue_skip;
+			} else {
+				break;
+			}
+		}
 		
 		func(obj, other, data);
 
@@ -361,7 +379,7 @@ cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpaceHashQueryFunc func
 	cpFloat dim = hash->celldim;
 	int idx = hash_func(floor_int(point.x/dim), floor_int(point.y/dim), hash->numcells);  // Fix by ShiftZ
 	
-	query(hash, hash->table[idx], &point, func, data);
+	query(hash, &hash->table[idx], &point, func, data);
 
 	// Increment the stamp.
 	// Only one cell is checked, but query() requires it anyway.
@@ -385,7 +403,7 @@ cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc fun
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
 			int idx = hash_func(i,j,n);
-			query(hash, table[idx], obj, func, data);
+			query(hash, &table[idx], obj, func, data);
 		}
 	}
 	
@@ -435,7 +453,7 @@ handleQueryRehashHelper(void *elt, void *data)
 			if(containsHandle(bin, hand)) continue;
 			
 			cpHandleRetain(hand); // this MUST be done first in case the object is removed in func()
-			query(hash, bin, obj, func, pair->data);
+			query(hash, &bin, obj, func, pair->data);
 			
 			cpSpaceHashBin *newBin = getEmptyBin(hash);
 			newBin->handle = hand;

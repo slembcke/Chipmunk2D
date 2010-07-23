@@ -434,13 +434,19 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
 	cpBody *body = shape->body;
 	if(!body) cpSpaceRemoveStaticShape(space, shape);
-
-	cpAssertWarn(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
-		"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
-	cpAssertSpaceUnlocked(space);
 	
-	if(body) cpBodyActivate(body);
-	if(body) cpBodyRemoveShape(body, shape);
+	cpAssertSpaceUnlocked(space);
+	if(body->node.next){
+		cpAssertWarn(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
+			"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
+		
+		cpBodyActivate(body);
+	} else {
+		cpAssertWarn(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
+			"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
+	}
+	
+	cpBodyRemoveShape(body, shape);
 	
 	removalContext context = {space, shape};
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
