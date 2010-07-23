@@ -938,6 +938,10 @@ componentActivate(cpBody *root)
 void
 cpBodyActivate(cpBody *body)
 {
+	// Force the body to wake up even if it's not in a currently sleeping component
+	// Like a body resting on or jointed to a rouge body.
+	body->node.idleTime = 0.0f;
+	
 	cpBody *root = componentNodeRoot(body);
 	if(root) componentActivate(root);
 }

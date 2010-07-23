@@ -444,6 +444,7 @@ int
 main(int argc, const char **argv)
 {
 	cpInitChipmunk();
+	cp_collision_slop = 0.2f;
 	
 #ifdef TIME_TRIAL
 	sleep(1);
