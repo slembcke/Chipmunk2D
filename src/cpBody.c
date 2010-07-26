@@ -27,30 +27,6 @@
 // initialized in cpInitChipmunk()
 cpBody cpStaticBodySingleton;
 
-//cpContactComponent *
-//cpContactComponentNew(void)
-//{
-//	cpContactComponent *component = (cpContactComponent *)cpmalloc(sizeof(cpContactComponent));
-//	cpArrayInit(&component->bodies, 1);
-//	
-//	return component;
-//}
-//
-//void
-//cpContactComponentAdd(cpContactComponent *component, struct cpBody *body)
-//{
-//	cpArrayPush(&component->bodies, body);
-//}
-//
-//#import <stdio.h>
-//void
-//cpContactComponentFree(cpContactComponent *component)
-//{
-//	cpArrayDestroy(&component->bodies);
-//	free(component);
-//}
-
-
 cpBody*
 cpBodyAlloc(void)
 {

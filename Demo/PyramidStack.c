@@ -46,11 +46,11 @@ init(void)
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
-	space->iterations = 20;
+	space->iterations = 30;
 	cpSpaceResizeStaticHash(space, 40.0f, 1000);
 	cpSpaceResizeActiveHash(space, 40.0f, 1000);
 	space->gravity = cpv(0, -100);
-	space->idleTimeThreshold = 0.5f;
+	space->sleepTimeThreshold = 0.5f;
 	
 	cpBody *body;
 	cpShape *shape;

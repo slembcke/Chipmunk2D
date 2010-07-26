@@ -124,11 +124,9 @@ cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
 static inline void
 cpArbiterGetBodies(cpArbiter *arb, cpBody **a, cpBody **b)
 {
-	if(arb->swappedColl){
-		(*a) = arb->private_body_b, (*b) = arb->private_body_a;
-	} else {
-		(*a) = arb->private_body_a, (*b) = arb->private_body_b;
-	}
+	CP_ARBITER_GET_SHAPES(arb, shape_a, shape_b);
+	(*a) = shape_a->body;
+	(*b) = shape_b->body;
 }
 #define CP_ARBITER_GET_BODIES(arb, a, b) cpBody *a, *b; cpArbiterGetBodies(arb, &a, &b);
 

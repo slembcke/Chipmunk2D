@@ -29,14 +29,9 @@ typedef void (*cpBodyPositionFunc)(struct cpBody *body, cpFloat dt);
 extern cpBodyVelocityFunc cpBodyUpdateVelocityDefault;
 extern cpBodyPositionFunc cpBodyUpdatePositionDefault;
 
-//typedef struct cpContactComponent {
-//	cpArray bodies;
-//} cpContactComponent;
-//
-//cpContactComponent *cpContactComponentNew(void);
-//void cpContactComponentAdd(cpContactComponent *component, struct cpBody *body);
-//void cpContactComponentFree(cpContactComponent *component);
-
+// Structure to hold information about the contact graph components
+// when putting groups of objects to sleep.
+// No interesting user accessible fields.
 typedef struct cpComponentNode {
 	struct cpBody *parent;
 	struct cpBody *next;
@@ -90,8 +85,14 @@ typedef struct cpBody{
 	cpVect v_bias;
 	cpFloat w_bias;
 	
+	// Space this body has been added to
 	struct cpSpace *space;
+	
+	// Pointer to the shape list.
+	// Shapes form a linked list using cpShape.next when added to a space.
 	struct cpShape *shapesList;
+	
+	// Used by cpSpaceStep() to store contact graph information.
 	cpComponentNode node;
 } cpBody;
 
@@ -103,13 +104,17 @@ cpBody *cpBodyNew(cpFloat m, cpFloat i);
 void cpBodyDestroy(cpBody *body);
 void cpBodyFree(cpBody *body);
 
+// Singleton cpBody substituted instead of the NULL body
 extern cpBody cpStaticBodySingleton;
+
+// Replaces NULL bodies with a pointer to cpStaticBodySingleton.
 static inline cpBody *
 cpBodyValidPointer(cpBody *body)
 {
 	return (body ? body : &cpStaticBodySingleton);
 }
 
+// Wake up a sleeping or idle body.
 void cpBodyActivate(cpBody *body);
 
 

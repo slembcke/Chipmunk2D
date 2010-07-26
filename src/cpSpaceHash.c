@@ -358,10 +358,7 @@ query(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpaceHashQueryFu
 			hand->stamp = hash->stamp;
 			
 			bin = bin->next;
-		} else {
-//			bin = bin->next;
-//			continue;
-			// The object has been removed 
+		} else { // The object has been removed 
 			cpSpaceHashBin *next = bin->next;
 			
 			// unlink and recycle the bin

@@ -64,6 +64,14 @@ typedef struct cpSpace{
 	// Default damping to supply when integrating rigid body motions.
 	cpFloat damping;
 	
+	// Speed threshold for a body to be considered idle.
+	// A value of 0 (the default) means to let the space guess the threshold.
+	cpFloat idleSpeedThreshold;
+	
+	// Time a group of bodies must remain idle in order to fall asleep
+	// A value of INFINITY (the default) disables the sleeping algorithm.
+	cpFloat sleepTimeThreshold;
+	
 	// *** Internally Used Fields
 	
 	// When the space is locked, you should not add or remove objects;
@@ -78,9 +86,9 @@ typedef struct cpSpace{
 	
 	// List of bodies in the system.
 	cpArray *bodies;
-	cpArray *components;
-	cpFloat idleTimeThreshold;
-	cpFloat idleSpeedThreshold;
+	
+	// List of groups of sleeping bodies.
+	cpArray *sleepingComponents;
 	
 	// List of active arbiters for the impulse solver.
 	cpArray *arbiters, *pooledArbiters;

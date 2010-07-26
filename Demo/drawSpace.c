@@ -100,7 +100,7 @@ glColor_for_shape(cpShape *shape, cpSpace *space)
 			GLfloat v = 0.25f;
 			glColor3f(v,v,v);
 			return;
-		} else if(body->node.idleTime > space->idleTimeThreshold) {
+		} else if(body->node.idleTime > space->sleepTimeThreshold) {
 			GLfloat v = 0.9f;
 			glColor3f(v,v,v);
 			return;
@@ -247,7 +247,7 @@ drawPolyShape(cpBody *body, cpPolyShape *poly, cpSpace *space)
 static void
 drawObject(cpShape *shape, cpSpace *space)
 {
-	cpBody *body = cpBodyValidPointer(shape->body);
+	cpBody *body = shape->body;
 	
 	switch(shape->klass->type){
 		case CP_CIRCLE_SHAPE:
@@ -320,8 +320,8 @@ drawSpring(cpDampedSpring *spring, cpBody *body_a, cpBody *body_b)
 static void
 drawConstraint(cpConstraint *constraint)
 {
-	cpBody *body_a = cpBodyValidPointer(constraint->a);
-	cpBody *body_b = cpBodyValidPointer(constraint->b);
+	cpBody *body_a = constraint->a;
+	cpBody *body_b = constraint->b;
 
 	const cpConstraintClass *klass = constraint->klass;
 	if(klass == cpPinJointGetClass()){

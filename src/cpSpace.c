@@ -172,8 +172,8 @@ cpSpaceInit(cpSpace *space)
 	space->allocatedBuffers = cpArrayNew(0);
 	
 	space->bodies = cpArrayNew(0);
-	space->components = cpArrayNew(0);
-	space->idleTimeThreshold = INFINITY;
+	space->sleepingComponents = cpArrayNew(0);
+	space->sleepTimeThreshold = INFINITY;
 	space->idleSpeedThreshold = 0.0f;
 	
 	space->arbiters = cpArrayNew(0);
@@ -210,7 +210,7 @@ cpSpaceDestroy(cpSpace *space)
 	cpSpaceHashFree(space->activeShapes);
 	
 	cpArrayFree(space->bodies);
-	cpArrayFree(space->components); // TODO free release components
+	cpArrayFree(space->sleepingComponents);
 	
 	cpArrayFree(space->constraints);
 	
@@ -342,7 +342,6 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
 static inline void
 addShapeRaw(cpShape *shape, cpSpaceHash *hash)
 {
-	cpShapeCacheBB(shape);
 	cpSpaceHashInsert(hash, shape, shape->hashid, shape->bb);
 }
 
@@ -404,8 +403,6 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	cpAssert(!cpArrayContains(space->constraints, constraint), "Cannot add the same constraint more than once.");
 //	cpAssertSpaceUnlocked(space); This should be safe as long as its not from a constraint callback.
 	
-//	if(constraint->a) cpBodyActivate(constraint->a, space);
-//	if(constraint->b) cpBodyActivate(constraint->b, space);
 	cpArrayPush(space->constraints, constraint);
 	
 	return constraint;
@@ -737,11 +734,6 @@ cpSpaceGetFreeContactBuffer(cpSpace *space)
 static void
 cpSpacePushNewContactBuffer(cpSpace *space)
 {
-//	for(cpContactBuffer *buffer = space->contactBuffersTail; buffer != space->contactBuffersHead; buffer = buffer->next){
-//		printf("%p -> ", buffer);
-//	}
-//	printf("%p (head)\n", space->contactBuffersHead);
-	
 	cpContactBufferHeader *buffer = cpSpaceGetFreeContactBuffer(space);
 	space->contactBuffersHead->next = buffer;
 	space->contactBuffersHead = buffer;
@@ -816,7 +808,6 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	){
 		cpArrayPush(space->arbiters, arb);
 	} else {
-//		cpfree(arb->contacts);
 		space->contactBuffersHead->numContacts -= numContacts;
 		arb->contacts = NULL;
 		arb->numContacts = 0;
@@ -837,7 +828,7 @@ active2staticIter(cpShape *shape, cpSpace *space)
 static cpBool
 contactSetFilter(cpArbiter *arb, cpSpace *space)
 {
-	if(space->idleTimeThreshold != INFINITY){
+	if(space->sleepTimeThreshold != INFINITY){
 		cpBody *a = arb->private_body_a;
 		cpBody *b = arb->private_body_b;
 		
@@ -858,13 +849,14 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 	
 	// was used last frame, but not this one
 	if(ticks >= 1 && arb->state != cpArbiterStateCached){
-//		printf("calling separate %d\n", space->stamp);
+		arb->contacts = NULL;
+		arb->numContacts = 0;
+		
 		arb->handler->separate(arb, space, arb->handler->data);
 		arb->state = cpArbiterStateCached;
 	}
 	
 	if(ticks >= cp_contact_persistence){
-//		printf("recycling arbiter %d\n", space->stamp);
 		arb->contacts = NULL;
 		arb->numContacts = 0;
 		
@@ -883,7 +875,11 @@ postStepCallbackSetIter(postStepCallback *callback, cpSpace *space)
 	cpfree(callback);
 }
 
-#pragma mark Experimental Sleeping Functions
+#pragma mark Sleeping Functions
+
+// Chipmunk uses a data structure called a disjoint set forest.
+// My attempts to find a way to splice circularly linked lists in
+// constant time failed, and so I found this neat data structure instead.
 
 static inline cpBody *
 componentNodeRoot(cpBody *body)
@@ -932,7 +928,7 @@ componentActivate(cpBody *root)
 		}
 	} while((body = next) != root);
 	
-	cpArrayDeleteObj(space->components, root);
+	cpArrayDeleteObj(space->sleepingComponents, root);
 }
 
 void
@@ -1001,8 +997,9 @@ addComponent(cpBody *body, cpArray *components)
 	}
 }
 
+// TODO this function needs more commenting.
 static void
-doComponentStuff(cpSpace *space, cpFloat dt)
+processContactComponents(cpSpace *space, cpFloat dt)
 {
 	cpArray *bodies = space->bodies;
 	cpArray *newBodies = cpArrayNew(bodies->num);
@@ -1040,7 +1037,7 @@ doComponentStuff(cpSpace *space, cpFloat dt)
 	// iterate components, copy or deactivate
 	for(int i=0; i<components->num; i++){
 		cpBody *root = components->arr[i];
-		if(componentActive(root, space->idleTimeThreshold)){
+		if(componentActive(root, space->sleepTimeThreshold)){
 			cpBody *body = root, *next;
 			do {
 				next = body->node.next;
@@ -1061,7 +1058,7 @@ doComponentStuff(cpSpace *space, cpFloat dt)
 				}
 			} while((body = next) != root);
 			
-			cpArrayPush(space->components, root);
+			cpArrayPush(space->sleepingComponents, root);
 		}
 	}
 	
@@ -1102,9 +1099,10 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)active2staticIter, space);
 	cpSpaceHashQueryRehash(space->activeShapes, (cpSpaceHashQueryFunc)queryFunc, space);
 	
-	if(space->idleTimeThreshold != INFINITY){
-		doComponentStuff(space, dt);
-		bodies = space->bodies;
+	// If body sleeping is enabled, do that now.
+	if(space->sleepTimeThreshold != INFINITY){
+		processContactComponents(space, dt);
+		bodies = space->bodies; // rebuilt by processContactComponents()
 	}
 	
 	// Clear out old cached arbiters and dispatch untouch functions
