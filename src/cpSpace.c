@@ -379,6 +379,7 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	if(body) cpBodyActivate(body);
 	if(body) cpBodyAddShape(body, shape);
 	
+	cpShapeCacheBB(shape);
 	addShapeRaw(shape, space->staticShapes);
 	
 	return shape;
@@ -849,9 +850,6 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 	
 	// was used last frame, but not this one
 	if(ticks >= 1 && arb->state != cpArbiterStateCached){
-		arb->contacts = NULL;
-		arb->numContacts = 0;
-		
 		arb->handler->separate(arb, space, arb->handler->data);
 		arb->state = cpArbiterStateCached;
 	}
