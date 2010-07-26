@@ -101,8 +101,8 @@ cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect an
 	joint->anchr1 = anchr1;
 	joint->anchr2 = anchr2;
 	
-	cpVect p1 = cpvadd(a->p, cpvrotate(anchr1, a->rot));
-	cpVect p2 = cpvadd(b->p, cpvrotate(anchr2, b->rot));
+	cpVect p1 = (a ? cpvadd(a->p, cpvrotate(anchr1, a->rot)) : anchr1);
+	cpVect p2 = (b ? cpvadd(b->p, cpvrotate(anchr2, b->rot)) : anchr2);
 	joint->dist = cpvlength(cpvsub(p2, p1));
 
 	joint->jnAcc = 0.0f;

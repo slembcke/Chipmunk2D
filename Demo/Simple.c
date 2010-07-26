@@ -27,19 +27,12 @@
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
-cpSpace *space;
-cpBody *staticBody;
+static cpSpace *space;
 
 // Init is called by the demo code to set up the demo.
 static cpSpace *
 init(void)
 {
-	// Create an infinite mass body to attach ground segments and other static geometry to.
-	// We won't be adding this body to the space, because we don't want it to be simulated at all.
-	// Adding bodies to the space simulates them. (fall under the influence of gravity, etc)
-	// We want the static body to stay right where it is at all times.
-	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	// Create a space, a space is a simulation world. It simulates the motions of rigid bodies,
 	// handles collisions between them, and simulates the joints between them.
 	space = cpSpaceNew();
@@ -53,9 +46,9 @@ init(void)
 	cpSpaceResizeActiveHash(space, 30.0f, 1000);
 	// Give it some gravity
 	space->gravity = cpv(0, -100);
-	
+
 	// Create A ground segment along the bottom of the screen
-	cpShape *ground = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
+	cpShape *ground = cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f);
 	// Set some parameters of the shape.
 	// For more info: http://code.google.com/p/chipmunk-physics/wiki/cpShape
 	ground->e = 1.0f; ground->u = 1.0f;
@@ -101,12 +94,11 @@ update(int ticks)
 static void
 destroy(void)
 {
-	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo Simple = {
+extern const chipmunkDemo Simple = {
 	"Simple",
 	NULL,
 	init,

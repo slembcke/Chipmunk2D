@@ -70,8 +70,7 @@ typedef struct DataforForce{
 }ForceData;
 
 // Global Varibales
-cpSpace *space;
-cpBody *staticBody;
+static cpSpace *space;
 
 
 // **** Forces ****** // 
@@ -423,18 +422,15 @@ make_mix(cpVect p, cpFloat ang, cpFloat mag,cpFloat chg)
 static cpSpace* 
 init(void)
 {
-	
-	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	cpResetShapeIdCounter();
 	space = cpSpaceNew();
 	space->iterations = 5;
 	space->gravity = cpvzero; //cpv(0,-100);
 	
 	cpSpaceResizeActiveHash(space, 30.0, 2999);
-	
+
 	// Screen border
-/*	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);
+/*shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);
 	shape->e = 1.0; shape->u = 1.0;
 	cpSpaceAddStaticShape(space, shape);
 
@@ -455,7 +451,7 @@ init(void)
 	cpSpaceAddCollisionPairFunc(space, 0, 1, NULL, NULL);
 */		
 	
-	srand(time(NULL));
+	srand((unsigned int) time(NULL));
     cpVect p;
 	cpFloat ang;
 	
@@ -492,12 +488,11 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
-	
 }
-const chipmunkDemo MagnetsElectric = {
+
+extern const chipmunkDemo MagnetsElectric = {
 	"Magnets and Electric Charges (By: Juan Pablo Carbajal)",
 	NULL,
 	init,

@@ -415,36 +415,44 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
-//#include <sys/time.h>
-//void time_trial(char index, int count)
-//{
-//	currDemo = demos[index];
-//	space = currDemo->initFunc();
-//	
-//	struct timeval start_time, end_time;
-//	gettimeofday(&start_time, NULL);
-//	
-//	for(int i=0; i<count; i++)
-//		currDemo->updateFunc(i);
-//	
-//	gettimeofday(&end_time, NULL);
-//	long millisecs = (end_time.tv_sec - start_time.tv_sec)*1000;
-//	millisecs += (end_time.tv_usec - start_time.tv_usec)/1000;
-//	
-//	currDemo->destroyFunc();
-//	
-//	printf("Time(%c) = %ldms\n", index + 'a', millisecs);
-//}
+/*
+#define TIME_TRIAL
+#include <sys/time.h>
+#include <unistd.h>
+void time_trial(int index, int count)
+{
+	currDemo = demos[index];
+	space = currDemo->initFunc();
+	
+	struct timeval start_time, end_time;
+	gettimeofday(&start_time, NULL);
+	
+	for(int i=0; i<count; i++)
+		currDemo->updateFunc(i);
+	
+	gettimeofday(&end_time, NULL);
+	long millisecs = (end_time.tv_sec - start_time.tv_sec)*1000;
+	millisecs += (end_time.tv_usec - start_time.tv_usec)/1000;
+	
+	currDemo->destroyFunc();
+	
+	printf("Time(%c) = %ldms\n", index + 'a', millisecs);
+}//*/
 
 int
 main(int argc, const char **argv)
 {
 	cpInitChipmunk();
 	
-//	for(int i=0; i<demoCount; i++)
-//		time_trial(i, 1000);
-//	time_trial('d' - 'a', 10000);
-//	exit(0);
+#ifdef TIME_TRIAL
+	sleep(1);
+	for(int i=0; i<demoCount; i++){
+		if(i == 'l' - 'a') continue;
+		time_trial(i, 1000);
+	}
+//	time_trial(0, 1000);
+	exit(0);
+#endif
 	
 	mouseBody = cpBodyNew(INFINITY, INFINITY);
 	

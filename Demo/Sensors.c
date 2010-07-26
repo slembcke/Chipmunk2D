@@ -27,8 +27,7 @@
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
-cpSpace *space;
-cpBody *staticBody;
+static cpSpace *space;
 
 enum {
 	BALL_TYPE,
@@ -48,7 +47,7 @@ static int
 blockerBegin(cpArbiter *arb, cpSpace *space, void *unused)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
-	Emitter *emitter = a->data;
+	Emitter *emitter = (Emitter *) a->data;
 	
 	emitter->blocked++;
 	
@@ -59,7 +58,7 @@ static void
 blockerSeparate(cpArbiter *arb, cpSpace *space, void *unused)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
-	Emitter *emitter = a->data;
+	Emitter *emitter = (Emitter *) a->data;
 	
 	emitter->blocked--;
 }
@@ -78,7 +77,7 @@ static int
 catcherBarBegin(cpArbiter *arb, cpSpace *space, void *unused)
 {
 	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
-	Emitter *emitter = a->data;
+	Emitter *emitter = (Emitter *) a->data;
 	
 	emitter->queue++;
 	cpSpaceAddPostStepCallback(space, (cpPostStepFunc)postStepRemove, b, NULL);
@@ -113,14 +112,12 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
 	space->iterations = 10;
 	space->gravity = cpv(0, -100);
-	
+
 	cpShape *shape;
 	
 	// Data structure for our ball emitter
@@ -131,13 +128,13 @@ init(void)
 	emitterInstance.position = cpv(0, 150);
 	
 	// Create our blocking sensor, so we know when the emitter is clear to emit another ball
-	shape = cpSpaceAddStaticShape(space, cpCircleShapeNew(staticBody, 15.0f, emitterInstance.position));
+	shape = cpSpaceAddStaticShape(space, cpCircleShapeNew(NULL, 15.0f, emitterInstance.position));
 	shape->sensor = 1;
 	shape->collision_type = BLOCKING_SENSOR_TYPE;
 	shape->data = &emitterInstance;
 	
 	// Create our catch sensor to requeue the balls when they reach the bottom of the screen
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-2000, -200), cpv(2000, -200), 15.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-2000, -200), cpv(2000, -200), 15.0f));
 	shape->sensor = 1;
 	shape->collision_type = CATCH_SENSOR_TYPE;
 	shape->data = &emitterInstance;
@@ -151,12 +148,11 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo Sensors = {
+extern const chipmunkDemo Sensors = {
 	"Sensors",
 	NULL,
 	init,

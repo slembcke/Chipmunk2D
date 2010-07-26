@@ -30,11 +30,10 @@
 
 #include "chipmunk_unsafe.h"
 
-extern cpSpace *space;
-extern cpBody *staticBody;
+static cpSpace *space;
 extern cpVect mousePoint;
 
-cpShape *querySeg = NULL;
+static cpShape *querySeg = NULL;
 
 
 static void
@@ -79,21 +78,19 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
 	space->elasticIterations = 0;
 	space->iterations = 5;
-	
+
 	cpSpaceResizeStaticHash(space, 40.0f, 999);
 	cpSpaceResizeActiveHash(space, 30.0f, 2999);
-	
+
 	cpShape *shape;
 	
 	// add a non-collidable segment as a quick and dirty way to draw the query line
-	shape = cpSegmentShapeNew(staticBody, cpvzero, cpv(100.0f, 0.0f), 4.0f);
+	shape = cpSegmentShapeNew(NULL, cpvzero, cpv(100.0f, 0.0f), 4.0f);
 	cpSpaceAddStaticShape(space, shape);
 	shape->layers = 0;
 	querySeg = shape;
@@ -110,12 +107,12 @@ init(void)
 	}
 	
 	{ // add a static segment
-		cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(0, 300), cpv(300, 0), 0.0f));
+		cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(0, 300), cpv(300, 0), 0.0f));
 	}
 	
 	{ // add a pentagon
 		cpFloat mass = 1.0f;
-		int NUM_VERTS = 5;
+		const int NUM_VERTS = 5;
 		
 		cpVect verts[NUM_VERTS];
 		for(int i=0; i<NUM_VERTS; i++){
@@ -145,12 +142,11 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo Query = {
+extern const chipmunkDemo Query = {
 	"Segment Query",
 	NULL,
 	init,

@@ -122,14 +122,14 @@ void cpBodyUpdatePosition(cpBody *body, cpFloat dt);
 static inline cpVect
 cpBodyLocal2World(cpBody *body, cpVect v)
 {
-	return cpvadd(body->p, cpvrotate(v, body->rot));
+	return (body ? cpvadd(body->p, cpvrotate(v, body->rot)) : v);
 }
 
 // Convert world to body local coordinates
 static inline cpVect
 cpBodyWorld2Local(cpBody *body, cpVect v)
 {
-	return cpvunrotate(cpvsub(v, body->p), body->rot);
+	return (body ? cpvunrotate(cpvsub(v, body->p), body->rot) : v);
 }
 
 // Apply an impulse (in world coordinates) to the body at a point relative to the center of gravity (also in world coordinates).

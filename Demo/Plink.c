@@ -27,14 +27,13 @@
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
-extern cpSpace *space;
-//extern cpBody *staticBody;
+static cpSpace *space;
 
 // Iterate over all of the bodies and reset the ones that have fallen offscreen.
 static void
 eachBody(cpBody *body, void *unused)
 {
-	if(body->p.y < -260 || fabsf(body->p.x) > 340){
+	if(body->p.y < -260 || cpfabs(body->p.x) > 340){
 		cpFloat x = rand()/(cpFloat)RAND_MAX*640 - 320;
 		body->p = cpv(x, 260);
 	}
@@ -57,8 +56,6 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-//	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
@@ -112,12 +109,11 @@ init(void)
 static void
 destroy(void)
 {
-//	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo Plink = {
+extern const chipmunkDemo Plink = {
 	"Plink",
 	NULL,
 	init,

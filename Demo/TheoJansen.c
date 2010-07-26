@@ -33,10 +33,9 @@
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
-cpSpace *space;
-cpBody *staticBody;
+static cpSpace *space;
 
-cpConstraint *motor;
+static cpConstraint *motor;
 
 static void
 update(int ticks)
@@ -89,7 +88,7 @@ make_leg(cpFloat side, cpFloat offset, cpBody *chassis, cpBody *crank, cpVect an
 	cpSpaceAddConstraint(space, cpGearJointNew(upper_leg, lower_leg, 0.0f, 1.0f));
 	
 	cpConstraint *constraint;
-	cpFloat diag = sqrtf(side*side + offset*offset);
+	cpFloat diag = cpfsqrt(side*side + offset*offset);
 	
 	constraint = cpPinJointNew(crank, upper_leg, anchor, cpv(0.0f, side));
 	cpPinJointSetDist(constraint, diag);
@@ -103,29 +102,28 @@ static cpSpace *
 init(void)
 {
 	space = cpSpaceNew();
-	staticBody = cpBodyNew(INFINITY, INFINITY);
 	
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
 	space->iterations = 20;
 	space->gravity = cpv(0,-500);
-	
+
 	cpShape *shape;
 	cpVect a, b;
 	
 	// Create segments around the edge of the screen.
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);
+	shape = cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f);
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f);
+	shape = cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f);
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
+	shape = cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f);
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	cpSpaceAddStaticShape(space, shape);
@@ -172,7 +170,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo TheoJansen = {
+extern const chipmunkDemo TheoJansen = {
 	"Theo Jansen Machine",
 	NULL,
 	init,

@@ -27,9 +27,8 @@
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
-extern cpSpace *space;
-extern cpBody *staticBody;
-cpConstraint *motor;
+static cpSpace *space;
+static cpConstraint *motor;
 
 #define numBalls 5
 static cpBody *balls[numBalls];
@@ -73,39 +72,37 @@ add_ball(cpVect pos)
 static cpSpace *
 init(void)
 {
-	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	space = cpSpaceNew();
 	space->gravity = cpv(0, -600);
-	
+
 	cpShape *shape;
 	
 	// beveling all of the line segments helps prevent things from getting stuck on cracks
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-256,16), cpv(-256,240), 2.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-256,16), cpv(-256,240), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-256,16), cpv(-192,0), 2.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-256,16), cpv(-192,0), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-192,0), cpv(-192, -64), 2.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-192,0), cpv(-192, -64), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-128,-64), cpv(-128,144), 2.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-128,-64), cpv(-128,144), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-192,80), cpv(-192,176), 2.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-192,80), cpv(-192,176), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-192,176), cpv(-128,240), 2.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-192,176), cpv(-128,240), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-128,144), cpv(192,64), 2.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-128,144), cpv(192,64), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
@@ -134,7 +131,7 @@ init(void)
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(smallGear, 80.0f, cpvzero));
 	shape->layers = 0;
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, smallGear, cpv(-160,-160), cpvzero));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(NULL, smallGear, cpv(-160,-160), cpvzero));
 
 	// add big gear
 	cpBody *bigGear = cpSpaceAddBody(space, cpBodyNew(40.0f, cpMomentForCircle(40.0f, 160, 0, cpvzero)));
@@ -144,7 +141,7 @@ init(void)
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(bigGear, 160.0f, cpvzero));
 	shape->layers = 0;
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, bigGear, cpv(80,-160), cpvzero));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(NULL, bigGear, cpv(80,-160), cpvzero));
 
 	// connect the plunger to the small gear.
 	cpSpaceAddConstraint(space, cpPinJointNew(smallGear, plunger, cpv(80,0), cpv(0,0)));
@@ -161,12 +158,12 @@ init(void)
 	cpFloat len = top - bottom;
 	cpSpaceAddShape(space, cpSegmentShapeNew(feeder, cpv(0.0f, len/2.0f), cpv(0.0f, -len/2.0f), 20.0f));
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, feeder, cpv(-224.0f, bottom), cpv(0.0f, -len/2.0f)));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(NULL, feeder, cpv(-224.0f, bottom), cpv(0.0f, -len/2.0f)));
 	cpVect anchr = cpBodyWorld2Local(feeder, cpv(-224.0f, -160.0f));
 	cpSpaceAddConstraint(space, cpPinJointNew(feeder, smallGear, anchr, cpv(0.0f, 80.0f)));
 
 	// motorize the second gear
-	motor = cpSpaceAddConstraint(space, cpSimpleMotorNew(staticBody, bigGear, 3.0f));
+	motor = cpSpaceAddConstraint(space, cpSimpleMotorNew(NULL, bigGear, 3.0f));
 
 	return space;
 }
@@ -174,12 +171,11 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo Pump = {
+extern const chipmunkDemo Pump = {
 	"Pump",
 	NULL,
 	init,

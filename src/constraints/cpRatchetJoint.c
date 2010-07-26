@@ -116,7 +116,7 @@ cpRatchetJointInit(cpRatchetJoint *joint, cpBody *a, cpBody *b, cpFloat phase, c
 	joint->phase = phase;
 	joint->ratchet = ratchet;
 	
-	joint->angle = b->a - a->a;
+	joint->angle = (b ? b->a : 0.0f) - (a ? a->a : 0.0f);
 	
 	return joint;
 }

@@ -83,7 +83,7 @@ handleSetTrans(void *obj, cpSpaceHash *hash)
 		for(int i=0; i<count; i++) cpArrayPush(hash->pooledHandles, buffer + i);
 	}
 	
-	cpHandle *hand = cpHandleInit(cpArrayPop(hash->pooledHandles), obj);
+	cpHandle *hand = cpHandleInit((cpHandle *) cpArrayPop(hash->pooledHandles), obj);
 	cpHandleRetain(hand);
 	
 	return hand;

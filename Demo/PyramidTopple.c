@@ -27,8 +27,7 @@
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
-cpSpace *space;
-cpBody *staticBody;
+static cpSpace *space;
 
 static void
 update(int ticks)
@@ -43,8 +42,6 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
@@ -52,7 +49,7 @@ init(void)
 	cpSpaceResizeActiveHash(space, 30.0f, 2999);
 	cpSpaceResizeStaticHash(space, 30.0f, 999);
 	space->gravity = cpv(0, -300);
-	
+
 	cpBody *body;
 	
 	cpShape *shape;
@@ -67,7 +64,7 @@ init(void)
 	};
 	
 	// Add a floor.
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-600,-240), cpv(600,-240), 0.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-600,-240), cpv(600,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
@@ -127,12 +124,11 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo PyramidTopple = {
+extern const chipmunkDemo PyramidTopple = {
 	"Pyramid Topple",
 	NULL,
 	init,

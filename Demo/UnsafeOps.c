@@ -29,12 +29,11 @@
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
-extern cpSpace *space;
-extern cpBody *staticBody;
+static cpSpace *space;
 
 #define NUM_CIRCLES 30
-cpShape *circles[NUM_CIRCLES];
-cpFloat circleRadius = 30.0f;
+static cpShape *circles[NUM_CIRCLES];
+static cpFloat circleRadius = 30.0f;
 
 static void
 update(int ticks)
@@ -59,8 +58,6 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
@@ -73,15 +70,15 @@ init(void)
 	cpBody *body;
 	cpShape *shape;
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
@@ -102,12 +99,11 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo UnsafeOps = {
+extern const chipmunkDemo UnsafeOps = {
 	"Unsafe Operations",
 	NULL,
 	init,

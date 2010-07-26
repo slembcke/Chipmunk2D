@@ -55,7 +55,7 @@ contactSetTrans(cpShape **shapes, cpSpace *space)
 		for(int i=0; i<count; i++) cpArrayPush(space->pooledArbiters, buffer + i);
 	}
 	
-	return cpArbiterInit(cpArrayPop(space->pooledArbiters), shapes[0], shapes[1]);
+	return cpArbiterInit((cpArbiter *) cpArrayPop(space->pooledArbiters), shapes[0], shapes[1]);
 }
 
 #pragma mark Collision Pair Function Helpers
@@ -280,7 +280,7 @@ void
 cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
 	struct{cpCollisionType a, b;} ids = {a, b};
-	cpCollisionHandler *old_handler = cpHashSetRemove(space->collFuncSet, CP_HASH_PAIR(a, b), &ids);
+	cpCollisionHandler *old_handler = (cpCollisionHandler *) cpHashSetRemove(space->collFuncSet, CP_HASH_PAIR(a, b), &ids);
 	cpfree(old_handler);
 }
 
@@ -882,7 +882,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	
 	// run the post solve callbacks
 	for(int i=0; i<arbiters->num; i++){
-		cpArbiter *arb = arbiters->arr[i];
+		cpArbiter *arb = (cpArbiter *) arbiters->arr[i];
 		
 		cpCollisionHandler *handler = arb->handler;
 		handler->postSolve(arb, space, handler->data);

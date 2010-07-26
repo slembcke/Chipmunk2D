@@ -29,10 +29,9 @@
 
 extern cpVect mousePoint;
 
-cpSpace *space;
-cpBody *staticBody;
+static cpSpace *space;
 
-cpBody *tankBody, *tankControlBody;
+static cpBody *tankBody, *tankControlBody;
 
 static void
 update(int ticks)
@@ -82,41 +81,39 @@ add_box(cpFloat size, cpFloat mass)
 static cpSpace *
 init(void)
 {
-	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
 	cpSpaceResizeActiveHash(space, 30.0f, 1000);
 	space->iterations = 10;
-	
+
 	cpShape *shape;
 		
 	// Create segments around the edge of the screen.
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	for(int i=0; i<50; i++){
 		cpBody *body = add_box(10.0, 1.0);
 		
-		cpConstraint *pivot = cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, body, cpvzero, cpvzero));
+		cpConstraint *pivot = cpSpaceAddConstraint(space, cpPivotJointNew2(NULL, body, cpvzero, cpvzero));
 		pivot->biasCoef = 0.0f; // disable joint correction
 		pivot->maxForce = 1000.0f; // emulate linear friction
 		
-		cpConstraint *gear = cpSpaceAddConstraint(space, cpGearJointNew(staticBody, body, 0.0f, 1.0f));
+		cpConstraint *gear = cpSpaceAddConstraint(space, cpGearJointNew(NULL, body, 0.0f, 1.0f));
 		gear->biasCoef = 0.0f; // disable joint correction
 		gear->maxForce = 5000.0f; // emulate angular friction
 	}
@@ -140,13 +137,12 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(staticBody);
 	cpBodyFree(tankControlBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo Tank = {
+extern const chipmunkDemo Tank = {
 	"Tank",
 	NULL,
 	init,

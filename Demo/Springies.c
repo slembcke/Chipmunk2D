@@ -28,8 +28,7 @@
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
-extern cpSpace *space;
-//extern cpBody *staticBody;
+static cpSpace *space;
 
 static cpFloat
 springForce(cpConstraint *spring, cpFloat dist)
@@ -77,8 +76,6 @@ add_bar(cpVect a, cpVect b, int group)
 static cpSpace *
 init(void)
 {
-//	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
 	space = cpSpaceNew();
 	
 	cpBody *body1  = add_bar(cpv(-240,  160), cpv(-160,   80), 1);
@@ -161,12 +158,11 @@ init(void)
 static void
 destroy(void)
 {
-//	cpBodyFree(staticBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo Springies = {
+extern const chipmunkDemo Springies = {
 	"Springies",
 	NULL,
 	init,

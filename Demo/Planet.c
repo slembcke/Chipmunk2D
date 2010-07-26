@@ -27,8 +27,8 @@
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
-cpSpace *space;
-cpBody *staticBody;
+static cpSpace *space;
+static cpBody *staticBody;
 
 static void
 update(int ticks)
@@ -118,7 +118,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-const chipmunkDemo Planet = {
+extern const chipmunkDemo Planet = {
 	"Planet",
 	NULL,
 	init,
