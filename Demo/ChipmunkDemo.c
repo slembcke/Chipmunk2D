@@ -46,7 +46,6 @@
 	#include <windows.h>
 #endif
 	#include <GL/gl.h>
-	#include <GL/glext.h>
 	#include <GL/glu.h>
 	#include <GL/glut.h>
 #endif
@@ -182,7 +181,7 @@ drawInfo()
 	maxPoints = points > maxPoints ? points : maxPoints;
 	maxConstraints = constraints > maxConstraints ? constraints : maxConstraints;
 	
-	char buffer[1000];
+	char buffer[1024];
 	const char *format = 
 		"Arbiters: %d (%d) - "
 		"Contact Points: %d (%d)\n"
@@ -199,7 +198,7 @@ drawInfo()
 		ke += body->m*cpvdot(body->v, body->v) + body->i*body->w*body->w;
 	}
 	
-	snprintf(buffer, 1000, format,
+	sprintf(buffer, format,
 		arbiters, maxArbiters,
 		points, maxPoints,
 		space->constraints->num, space->iterations + space->elasticIterations,
