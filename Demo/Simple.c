@@ -98,7 +98,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-extern const chipmunkDemo Simple = {
+chipmunkDemo Simple = {
 	"Simple",
 	NULL,
 	init,

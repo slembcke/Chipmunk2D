@@ -29,11 +29,11 @@
 
 static cpSpace *space;
 
-enum {
+enum CollisionTypes {
 	BALL_TYPE,
 	BLOCKING_SENSOR_TYPE,
 	CATCH_SENSOR_TYPE,
-} CollisionTypes;
+};
 
 typedef struct Emitter {
 	int queue;
@@ -152,7 +152,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-extern const chipmunkDemo Sensors = {
+chipmunkDemo Sensors = {
 	"Sensors",
 	NULL,
 	init,

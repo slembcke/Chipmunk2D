@@ -125,7 +125,7 @@ cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 #define CP_HASH_COEF (3344921057ul)
 #define CP_HASH_PAIR(A, B) ((cpHashValue)(A)*CP_HASH_COEF ^ (cpHashValue)(B)*CP_HASH_COEF)
 
-extern char *cpVersionString;
+extern const char *cpVersionString;
 void cpInitChipmunk(void);
 
 // Calculate the moment of inertia for a circle, r1 and r2 are the inner and outer diameters.

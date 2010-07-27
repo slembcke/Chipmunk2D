@@ -143,7 +143,7 @@ drawSpaceOptions draw_options = {
 	0, 0, 0, 2.0f, 3.0f, 0.0f,
 };
 
-extern const chipmunkDemo LogoSmash = {
+chipmunkDemo LogoSmash = {
 	"Logo Smash",
 	&draw_options,
 	init,

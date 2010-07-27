@@ -214,7 +214,7 @@ destroy(void)
 	cpArrayFree(playerInstance.groundShapes);
 }
 
-extern const chipmunkDemo Player = {
+chipmunkDemo Player = {
 	"Player",
 	NULL,
 	init,

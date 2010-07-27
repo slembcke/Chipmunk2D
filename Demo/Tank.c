@@ -142,7 +142,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-extern const chipmunkDemo Tank = {
+chipmunkDemo Tank = {
 	"Tank",
 	NULL,
 	init,

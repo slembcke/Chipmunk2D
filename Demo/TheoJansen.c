@@ -170,7 +170,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-extern const chipmunkDemo TheoJansen = {
+chipmunkDemo TheoJansen = {
 	"Theo Jansen Machine",
 	NULL,
 	init,

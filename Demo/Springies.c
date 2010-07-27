@@ -162,7 +162,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-extern const chipmunkDemo Springies = {
+chipmunkDemo Springies = {
 	"Springies",
 	NULL,
 	init,

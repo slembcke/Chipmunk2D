@@ -103,7 +103,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-extern const chipmunkDemo UnsafeOps = {
+chipmunkDemo UnsafeOps = {
 	"Unsafe Operations",
 	NULL,
 	init,

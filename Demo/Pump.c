@@ -175,7 +175,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-extern const chipmunkDemo Pump = {
+chipmunkDemo Pump = {
 	"Pump",
 	NULL,
 	init,

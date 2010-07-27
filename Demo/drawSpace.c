@@ -212,7 +212,7 @@ drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 static void
 drawPolyShape(cpBody *body, cpPolyShape *poly)
 {
-	int count = count=poly->numVerts;
+	int count = poly->numVerts;
 	glVertexPointer(2, GL_DOUBLE, 0, poly->tVerts);
 	
 	if(!poly->shape.sensor){

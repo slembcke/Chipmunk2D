@@ -146,7 +146,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-extern const chipmunkDemo Query = {
+chipmunkDemo Query = {
 	"Segment Query",
 	NULL,
 	init,

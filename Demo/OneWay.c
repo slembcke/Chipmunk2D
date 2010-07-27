@@ -122,7 +122,7 @@ destroy(void)
 	cpArrayFree(platformInstance.passThruList);
 }
 
-extern const chipmunkDemo OneWay = {
+chipmunkDemo OneWay = {
 	"One Way Platforms",
 	NULL,
 	init,

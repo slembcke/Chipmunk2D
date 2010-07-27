@@ -105,7 +105,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-extern const chipmunkDemo PyramidStack = {
+chipmunkDemo PyramidStack = {
 	"Pyramid Stack",
 	NULL,
 	init,

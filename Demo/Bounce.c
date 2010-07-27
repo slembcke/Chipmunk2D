@@ -111,7 +111,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-extern const chipmunkDemo Bounce = {
+chipmunkDemo Bounce = {
 	"Bounce",
 	NULL,
 	init,

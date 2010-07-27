@@ -492,7 +492,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-extern const chipmunkDemo MagnetsElectric = {
+chipmunkDemo MagnetsElectric = {
 	"Magnets and Electric Charges (By: Juan Pablo Carbajal)",
 	NULL,
 	init,

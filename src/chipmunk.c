@@ -43,7 +43,7 @@ cpMessage(const char *message, const char *condition, const char *file, int line
 }
 
 
-char *cpVersionString = "5.x.x";
+const char *cpVersionString = "5.x.x";
 
 void
 cpInitChipmunk(void)

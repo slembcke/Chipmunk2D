@@ -283,7 +283,7 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-extern const chipmunkDemo Joints = {
+chipmunkDemo Joints = {
 	"Joints and Constraints",
 	NULL,
 	init,
