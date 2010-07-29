@@ -1010,7 +1010,7 @@ processContactComponents(cpSpace *space, cpFloat dt)
 	cpFloat dvsq = (dv ? dv*dv : cpvdot(space->gravity, space->gravity)*dt*dt);
 	// update idling
 	for(int i=0; i<bodies->num; i++){
-		cpBody *body = bodies->arr[i];
+		cpBody *body = (cpBody*)bodies->arr[i];
 		
 		cpFloat thresh = (dvsq ? body->m*dvsq : 0.0f);
 		body->node.idleTime = (cpBodyKineticEnergy(body) > thresh ? 0.0f : body->node.idleTime + dt);
@@ -1018,7 +1018,7 @@ processContactComponents(cpSpace *space, cpFloat dt)
 	
 	// iterate edges and build forests
 	for(int i=0; i<arbiters->num; i++){
-		cpArbiter *arb = arbiters->arr[i];
+		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
 		mergeBodies(space, components, rougeBodies, arb->private_a->body, arb->private_b->body);
 	}
 	for(int j=0; j<constraints->num; j++){
@@ -1028,13 +1028,13 @@ processContactComponents(cpSpace *space, cpFloat dt)
 	
 	// iterate bodies and add components
 	for(int i=0; i<bodies->num; i++)
-		addComponent(bodies->arr[i], components);
+		addComponent((cpBody*)bodies->arr[i], components);
 	for(int i=0; i<rougeBodies->num; i++)
-		addComponent(rougeBodies->arr[i], components);
+		addComponent((cpBody*)rougeBodies->arr[i], components);
 	
 	// iterate components, copy or deactivate
 	for(int i=0; i<components->num; i++){
-		cpBody *root = components->arr[i];
+		cpBody *root = (cpBody*)components->arr[i];
 		if(componentActive(root, space->sleepTimeThreshold)){
 			cpBody *body = root, *next;
 			do {

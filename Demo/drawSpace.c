@@ -499,7 +499,7 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 		glBegin(GL_POINTS); {
 			cpArray *arbiters = space->arbiters;
 			for(int i=0; i<arbiters->num; i++){
-				cpArbiter *arb = arbiters->arr[i];
+				cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
 				
 				glColor3f(COLLISION_COLOR);
 				for(int i=0; i<arb->numContacts; i++){
