@@ -46,44 +46,36 @@ init(void)
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
-	space->iterations = 20;
+	space->iterations = 30;
 	cpSpaceResizeStaticHash(space, 40.0f, 1000);
 	cpSpaceResizeActiveHash(space, 40.0f, 1000);
 	space->gravity = cpv(0, -100);
-
+	space->sleepTimeThreshold = 0.5f;
+	
 	cpBody *body;
 	cpShape *shape;
 	
-	int num = 4;
-	cpVect verts[] = {
-		cpv(-15,-15),
-		cpv(-15, 15),
-		cpv( 15, 15),
-		cpv( 15,-15),
-	};
-	
 	// Create segments around the edge of the screen.
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	// Add lots of boxes.
 	for(int i=0; i<14; i++){
 		for(int j=0; j<=i; j++){
-			body = cpBodyNew(1.0f, cpMomentForPoly(1.0f, num, verts, cpvzero));
+			body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForBox(1.0f, 30.0f, 30.0f)));
 			body->p = cpv(j*32 - i*16, 300 - i*32);
-			cpSpaceAddBody(space, body);
-			shape = cpPolyShapeNew(body, num, verts, cpvzero);
+			
+			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 30.0f, 30.0f));
 			shape->e = 0.0f; shape->u = 0.8f;
-			cpSpaceAddShape(space, shape);
 		}
 	}
 	

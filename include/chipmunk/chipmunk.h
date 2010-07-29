@@ -107,11 +107,11 @@ cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 
 #include "cpVect.h"
 #include "cpBB.h"
-#include "cpBody.h"
 #include "cpArray.h"
 #include "cpHashSet.h"
 #include "cpSpaceHash.h"
 
+#include "cpBody.h"
 #include "cpShape.h"
 #include "cpPolyShape.h"
 

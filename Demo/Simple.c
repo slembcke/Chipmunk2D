@@ -46,8 +46,10 @@ init(void)
 	cpSpaceResizeActiveHash(space, 30.0f, 1000);
 	// Give it some gravity
 	space->gravity = cpv(0, -100);
-
+//	space->idleTimeThreshold = 0.0f;
+	
 	// Create A ground segment along the bottom of the screen
+	// By attaching it to NULL instead of a body, we make it a static shape.
 	cpShape *ground = cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f);
 	// Set some parameters of the shape.
 	// For more info: http://code.google.com/p/chipmunk-physics/wiki/cpShape
@@ -57,7 +59,7 @@ init(void)
 	// If a shape never changes position, add it as static so Chipmunk knows it only needs to
 	// calculate collision information for it once when it is added.
 	// Do not change the postion of a static shape after adding it.
-	cpSpaceAddStaticShape(space, ground);
+	cpSpaceAddShape(space, ground);
 	
 	// Add a moving circle object.
 	cpFloat radius = 15.0f;
@@ -66,7 +68,8 @@ init(void)
 	cpBody *ballBody = cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero));
 	// Set some parameters of the body:
 	// For more info: http://code.google.com/p/chipmunk-physics/wiki/cpBody
-	ballBody->p = cpv(0, -240 + radius+5);
+	ballBody->p = cpv(0, -240 + radius+50);
+	ballBody->v = cpv(0, -20);
 	// Add the body to the space so it will be simulated and move around.
 	cpSpaceAddBody(space, ballBody);
 	

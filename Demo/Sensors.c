@@ -43,7 +43,7 @@ typedef struct Emitter {
 
 static Emitter emitterInstance;
 
-static int
+static cpBool
 blockerBegin(cpArbiter *arb, cpSpace *space, void *unused)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
@@ -51,7 +51,7 @@ blockerBegin(cpArbiter *arb, cpSpace *space, void *unused)
 	
 	emitter->blocked++;
 	
-	return 0; // Return values from sensors callbacks are ignored,
+	return cpFalse; // Return values from sensors callbacks are ignored,
 }
 
 static void
@@ -73,7 +73,7 @@ postStepRemove(cpSpace *space, cpShape *shape, void *unused)
 	cpShapeFree(shape);
 }
 
-static int
+static cpBool
 catcherBarBegin(cpArbiter *arb, cpSpace *space, void *unused)
 {
 	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
@@ -82,7 +82,7 @@ catcherBarBegin(cpArbiter *arb, cpSpace *space, void *unused)
 	emitter->queue++;
 	cpSpaceAddPostStepCallback(space, (cpPostStepFunc)postStepRemove, b, NULL);
 	
-	return 0;
+	return cpFalse;
 }
 
 static cpFloat frand_unit(){return 2.0f*((cpFloat)rand()/(cpFloat)RAND_MAX) - 1.0f;}
@@ -128,13 +128,13 @@ init(void)
 	emitterInstance.position = cpv(0, 150);
 	
 	// Create our blocking sensor, so we know when the emitter is clear to emit another ball
-	shape = cpSpaceAddStaticShape(space, cpCircleShapeNew(NULL, 15.0f, emitterInstance.position));
+	shape = cpSpaceAddShape(space, cpCircleShapeNew(NULL, 15.0f, emitterInstance.position));
 	shape->sensor = 1;
 	shape->collision_type = BLOCKING_SENSOR_TYPE;
 	shape->data = &emitterInstance;
 	
 	// Create our catch sensor to requeue the balls when they reach the bottom of the screen
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-2000, -200), cpv(2000, -200), 15.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-2000, -200), cpv(2000, -200), 15.0f));
 	shape->sensor = 1;
 	shape->collision_type = CATCH_SENSOR_TYPE;
 	shape->data = &emitterInstance;

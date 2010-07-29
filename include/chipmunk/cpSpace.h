@@ -22,11 +22,11 @@
 struct cpSpace;
 
 // Number of frames that contact information should persist.
-extern int cp_contact_persistence;
+extern cpTimestamp cp_contact_persistence;
 
 // User collision handler function types.
-typedef int (*cpCollisionBeginFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
-typedef int (*cpCollisionPreSolveFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
+typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
+typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
 typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
 typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
 
@@ -44,7 +44,7 @@ typedef struct cpCollisionHandler {
 
 #define CP_MAX_CONTACTS_PER_ARBITER 6
 typedef struct cpContactBufferHeader {
-	int stamp;
+	cpTimestamp stamp;
 	struct cpContactBufferHeader *next;
 	unsigned int numContacts;
 } cpContactBufferHeader;
@@ -64,13 +64,21 @@ typedef struct cpSpace{
 	// Default damping to supply when integrating rigid body motions.
 	cpFloat damping;
 	
+	// Speed threshold for a body to be considered idle.
+	// A value of 0 (the default) means to let the space guess the threshold.
+	cpFloat idleSpeedThreshold;
+	
+	// Time a group of bodies must remain idle in order to fall asleep
+	// A value of INFINITY (the default) disables the sleeping algorithm.
+	cpFloat sleepTimeThreshold;
+	
 	// *** Internally Used Fields
 	
 	// When the space is locked, you should not add or remove objects;
-	int locked;
+	cpBool locked;
 	
 	// Time stamp. Is incremented on every call to cpSpaceStep().
-	int stamp;
+	cpTimestamp stamp;
 
 	// The static and active shape spatial hashes.
 	cpSpaceHash *staticShapes;
@@ -78,6 +86,9 @@ typedef struct cpSpace{
 	
 	// List of bodies in the system.
 	cpArray *bodies;
+	
+	// List of groups of sleeping bodies.
+	cpArray *sleepingComponents;
 	
 	// List of active arbiters for the impulse solver.
 	cpArray *arbiters, *pooledArbiters;
@@ -102,9 +113,6 @@ typedef struct cpSpace{
 	cpCollisionHandler defaultHandler;
 	
 	cpHashSet *postStepCallbacks;
-	
-	// Shared static body assigned to all joints/shapes with NULL bodies
-	cpBody staticBody;
 } cpSpace;
 
 // Basic allocation/destruction functions.
@@ -162,7 +170,7 @@ cpShape *cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, c
 
 // Segment query callback function
 typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, void *data);
-int cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
+cpBool cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
 cpShape *cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out);
 
 // BB query callback function

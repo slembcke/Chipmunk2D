@@ -27,8 +27,7 @@
 static void
 preStep(cpPivotJoint *joint, cpFloat dt, cpFloat dt_inv)
 {
-	cpBody *a = joint->constraint.a;
-	cpBody *b = joint->constraint.b;
+	CONSTRAINT_BEGIN(joint, a, b);
 	
 	joint->r1 = cpvrotate(joint->anchr1, a->rot);
 	joint->r2 = cpvrotate(joint->anchr2, b->rot);
@@ -50,8 +49,7 @@ preStep(cpPivotJoint *joint, cpFloat dt, cpFloat dt_inv)
 static void
 applyImpulse(cpPivotJoint *joint)
 {
-	cpBody *a = joint->constraint.a;
-	cpBody *b = joint->constraint.b;
+	CONSTRAINT_BEGIN(joint, a, b);
 	
 	cpVect r1 = joint->r1;
 	cpVect r2 = joint->r2;

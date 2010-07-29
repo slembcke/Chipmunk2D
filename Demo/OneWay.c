@@ -36,7 +36,7 @@ typedef struct OneWayPlatform {
 
 static OneWayPlatform platformInstance;
 
-static int
+static cpBool
 preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
@@ -44,10 +44,10 @@ preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 		
 	if(cpvdot(cpArbiterGetNormal(arb, 0), platform->n) < 0){
 		cpArbiterIgnore(arb);
-		return 0;
+		return cpFalse;
 	}
 	
-	return 1;
+	return cpTrue;
 }
 
 static void
@@ -74,20 +74,20 @@ init(void)
 	cpShape *shape;
 
 	// Create segments around the edge of the screen.
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	// Add our one way segment
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-160,-100), cpv(160,-100), 10.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-160,-100), cpv(160,-100), 10.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->collision_type = 1;
 	shape->layers = NOT_GRABABLE_MASK;

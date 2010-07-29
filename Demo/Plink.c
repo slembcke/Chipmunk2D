@@ -87,7 +87,7 @@ init(void)
 		for(int j=0; j<6; j++){
 			cpFloat stagger = (j%2)*40;
 			cpVect offset = cpv(i*80 - 320 + stagger, j*70 - 240);
-			shape = cpSpaceAddStaticShape(space, cpPolyShapeNew(NULL, 3, tris, offset));
+			shape = cpSpaceAddShape(space, cpPolyShapeNew(NULL, 3, tris, offset));
 			shape->e = 1.0f; shape->u = 1.0f;
 			shape->layers = NOT_GRABABLE_MASK;
 		}

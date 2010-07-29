@@ -32,7 +32,7 @@ static cpSpace *space;
 static void
 update(int ticks)
 {
-	int steps = 2;
+	int steps = 3;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++)
@@ -45,11 +45,12 @@ init(void)
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
-	space->iterations = 20;
+	space->iterations = 30;
 	cpSpaceResizeActiveHash(space, 30.0f, 2999);
 	cpSpaceResizeStaticHash(space, 30.0f, 999);
 	space->gravity = cpv(0, -300);
-
+	space->sleepTimeThreshold = 0.5f;
+	
 	cpBody *body;
 	
 	cpShape *shape;
@@ -64,7 +65,7 @@ init(void)
 	};
 	
 	// Add a floor.
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-600,-240), cpv(600,-240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-600,-240), cpv(600,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	

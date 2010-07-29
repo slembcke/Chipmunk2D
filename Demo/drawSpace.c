@@ -90,6 +90,25 @@ glColor_from_pointer(void *ptr)
 	glColor3ub(r, g, b);
 }
 
+static void
+glColor_for_shape(cpShape *shape, cpSpace *space)
+{
+	cpBody *body = shape->body;
+	if(body){
+		if(body->node.next){
+			GLfloat v = 0.25f;
+			glColor3f(v,v,v);
+			return;
+		} else if(body->node.idleTime > space->sleepTimeThreshold) {
+			GLfloat v = 0.9f;
+			glColor3f(v,v,v);
+			return;
+		}
+	}
+	
+	glColor_from_pointer(shape);
+}
+
 static const GLfloat circleVAR[] = {
 	 0.0000f,  1.0000f,
 	 0.2588f,  0.9659f,
@@ -121,7 +140,7 @@ static const GLfloat circleVAR[] = {
 static const int circleVAR_count = sizeof(circleVAR)/sizeof(GLfloat)/2;
 
 static void
-drawCircleShape(cpBody *body, cpCircleShape *circle)
+drawCircleShape(cpBody *body, cpCircleShape *circle, cpSpace *space)
 {
 	glVertexPointer(2, GL_FLOAT, 0, circleVAR);
 
@@ -132,7 +151,7 @@ drawCircleShape(cpBody *body, cpCircleShape *circle)
 		glScalef(circle->r, circle->r, 1.0f);
 		
 		if(!circle->shape.sensor){
-			glColor_from_pointer(circle);
+			glColor_for_shape((cpShape *)circle, space);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, circleVAR_count - 1);
 		}
 		
@@ -173,7 +192,7 @@ static const GLfloat pillVAR[] = {
 static const int pillVAR_count = sizeof(pillVAR)/sizeof(GLfloat)/3;
 
 static void
-drawSegmentShape(cpBody *body, cpSegmentShape *seg)
+drawSegmentShape(cpBody *body, cpSegmentShape *seg, cpSpace *space)
 {
 	cpVect a = seg->ta;
 	cpVect b = seg->tb;
@@ -193,7 +212,7 @@ drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 			glMultMatrixf(matrix);
 			
 			if(!seg->shape.sensor){
-				glColor_from_pointer(seg);
+				glColor_for_shape((cpShape *)seg, space);
 				glDrawArrays(GL_TRIANGLE_FAN, 0, pillVAR_count);
 			}
 			
@@ -210,7 +229,7 @@ drawSegmentShape(cpBody *body, cpSegmentShape *seg)
 }
 
 static void
-drawPolyShape(cpBody *body, cpPolyShape *poly)
+drawPolyShape(cpBody *body, cpPolyShape *poly, cpSpace *space)
 {
 	int count = poly->numVerts;
 #if CP_USE_DOUBLES
@@ -220,7 +239,7 @@ drawPolyShape(cpBody *body, cpPolyShape *poly)
 #endif
 	
 	if(!poly->shape.sensor){
-		glColor_from_pointer(poly);
+		glColor_for_shape((cpShape *)poly, space);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, count);
 	}
 	
@@ -229,20 +248,19 @@ drawPolyShape(cpBody *body, cpPolyShape *poly)
 }
 
 static void
-drawObject(void *ptr, void *unused)
+drawObject(cpShape *shape, cpSpace *space)
 {
-	cpShape *shape = (cpShape *)ptr;
-	cpBody *body = shape->body;
+	cpBody *body = cpBodyValidPointer(shape->body);
 	
 	switch(shape->klass->type){
 		case CP_CIRCLE_SHAPE:
-			drawCircleShape(body, (cpCircleShape *)shape);
+			drawCircleShape(body, (cpCircleShape *)shape, space);
 			break;
 		case CP_SEGMENT_SHAPE:
-			drawSegmentShape(body, (cpSegmentShape *)shape);
+			drawSegmentShape(body, (cpSegmentShape *)shape, space);
 			break;
 		case CP_POLY_SHAPE:
-			drawPolyShape(body, (cpPolyShape *)shape);
+			drawPolyShape(body, (cpPolyShape *)shape, space);
 			break;
 		default:
 			printf("Bad enumeration in drawObject().\n");
@@ -305,8 +323,8 @@ drawSpring(cpDampedSpring *spring, cpBody *body_a, cpBody *body_b)
 static void
 drawConstraint(cpConstraint *constraint)
 {
-	cpBody *body_a = constraint->a;
-	cpBody *body_b = constraint->b;
+	cpBody *body_a = cpBodyValidPointer(constraint->a);
+	cpBody *body_b = cpBodyValidPointer(constraint->b);
 
 	const cpConstraintClass *klass = constraint->klass;
 	if(klass == cpPinJointGetClass()){
@@ -376,26 +394,14 @@ drawConstraint(cpConstraint *constraint)
 }
 
 static void
-drawBB(void *ptr, void *unused)
+drawBB(cpShape *shape, void *unused)
 {
-	cpShape *shape = (cpShape *)ptr;
-
 	glBegin(GL_LINE_LOOP); {
 		glVertex2f(shape->bb.l, shape->bb.b);
 		glVertex2f(shape->bb.l, shape->bb.t);
 		glVertex2f(shape->bb.r, shape->bb.t);
 		glVertex2f(shape->bb.r, shape->bb.b);
 	} glEnd();
-}
-
-static void
-drawCollisions(void *ptr, void *data)
-{
-	cpArbiter *arb = (cpArbiter *)ptr;
-	for(int i=0; i<arb->numContacts; i++){
-		cpVect v = arb->contacts[i].p;
-		glVertex2f(v.x, v.y);
-	}
 }
 
 // copied from cpSpaceHash.c
@@ -436,22 +442,27 @@ drawSpatialHash(cpSpaceHash *hash)
 void
 drawSpace(cpSpace *space, drawSpaceOptions *options)
 {
-	if(options->drawHash)
+	if(options->drawHash){
+		glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
 		drawSpatialHash(space->activeShapes);
+		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+		drawSpatialHash(space->staticShapes);
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	}
+	
+	glLineWidth(options->lineThickness);
+	if(options->drawShapes){
+		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)drawObject, space);
+		cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)drawObject, space);
+	}
 	
 	glLineWidth(1.0f);
 	if(options->drawBBs){
 		glColor3f(0.3f, 0.5f, 0.3f);
-		cpSpaceHashEach(space->activeShapes, &drawBB, NULL);
-		cpSpaceHashEach(space->staticShapes, &drawBB, NULL);
+		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)drawBB, NULL);
+		cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)drawBB, NULL);
 	}
 
-	glLineWidth(options->lineThickness);
-	if(options->drawShapes){
-		cpSpaceHashEach(space->activeShapes, &drawObject, NULL);
-		cpSpaceHashEach(space->staticShapes, &drawObject, NULL);
-	}
-	
 	cpArray *constraints = space->constraints;
 
 	glColor3f(0.5f, 1.0f, 0.5f);
@@ -460,23 +471,42 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 	}
 	
 	if(options->bodyPointSize){
-		cpArray *bodies = space->bodies;
-
 		glPointSize(options->bodyPointSize);
+		
 		glBegin(GL_POINTS); {
 			glColor3f(LINE_COLOR);
+			cpArray *bodies = space->bodies;
 			for(int i=0, count = bodies->num; i<count; i++){
 				cpBody *body = (cpBody *)bodies->arr[i];
 				glVertex2f(body->p.x, body->p.y);
 			}
+			
+//			glColor3f(0.5f, 0.5f, 0.5f);
+//			cpArray *components = space->components;
+//			for(int i=0; i<components->num; i++){
+//				cpBody *root = components->arr[i];
+//				cpBody *body = root, *next;
+//				do {
+//					next = body->node.next;
+//					glVertex2f(body->p.x, body->p.y);
+//				} while((body = next) != root);
+//			}
 		} glEnd();
 	}
 
 	if(options->collisionPointSize){
 		glPointSize(options->collisionPointSize);
 		glBegin(GL_POINTS); {
-			glColor3f(COLLISION_COLOR);
-			cpArrayEach(space->arbiters, &drawCollisions, NULL);
+			cpArray *arbiters = space->arbiters;
+			for(int i=0; i<arbiters->num; i++){
+				cpArbiter *arb = arbiters->arr[i];
+				
+				glColor3f(COLLISION_COLOR);
+				for(int i=0; i<arb->numContacts; i++){
+					cpVect v = arb->contacts[i].p;
+					glVertex2f(v.x, v.y);
+				}
+			}
 		} glEnd();
 	}
 }

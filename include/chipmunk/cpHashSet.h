@@ -33,7 +33,7 @@ typedef struct cpHashSetBin {
 } cpHashSetBin;
 
 // Equality function. Returns true if ptr is equal to elt.
-typedef int (*cpHashSetEqlFunc)(void *ptr, void *elt);
+typedef cpBool (*cpHashSetEqlFunc)(void *ptr, void *elt);
 // Used by cpHashSetInsert(). Called to transform the ptr into an element.
 typedef void *(*cpHashSetTransFunc)(void *ptr, void *data);
 
@@ -77,5 +77,5 @@ typedef void (*cpHashSetIterFunc)(void *elt, void *data);
 void cpHashSetEach(cpHashSet *set, cpHashSetIterFunc func, void *data);
 
 // Iterate over a hashset, drop the element if the func returns false.
-typedef int (*cpHashSetFilterFunc)(void *elt, void *data);
+typedef cpBool (*cpHashSetFilterFunc)(void *elt, void *data);
 void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);

@@ -28,8 +28,7 @@
 static void
 preStep(cpPinJoint *joint, cpFloat dt, cpFloat dt_inv)
 {
-	cpBody *a = joint->constraint.a;
-	cpBody *b = joint->constraint.b;
+	CONSTRAINT_BEGIN(joint, a, b);
 	
 	joint->r1 = cpvrotate(joint->anchr1, a->rot);
 	joint->r2 = cpvrotate(joint->anchr2, b->rot);
@@ -56,8 +55,7 @@ preStep(cpPinJoint *joint, cpFloat dt, cpFloat dt_inv)
 static void
 applyImpulse(cpPinJoint *joint)
 {
-	cpBody *a = joint->constraint.a;
-	cpBody *b = joint->constraint.b;
+	CONSTRAINT_BEGIN(joint, a, b);
 	cpVect n = joint->n;
 
 	// compute relative velocity

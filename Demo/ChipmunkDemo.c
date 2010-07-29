@@ -424,8 +424,8 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
-/*
-#define TIME_TRIAL
+//#define TIME_TRIAL
+#ifdef TIME_TRIAL
 #include <sys/time.h>
 #include <unistd.h>
 void time_trial(int index, int count)
@@ -446,12 +446,14 @@ void time_trial(int index, int count)
 	currDemo->destroyFunc();
 	
 	printf("Time(%c) = %ldms\n", index + 'a', millisecs);
-}//*/
+}
+#endif
 
 int
 main(int argc, const char **argv)
 {
 	cpInitChipmunk();
+	cp_collision_slop = 0.2f;
 	
 #ifdef TIME_TRIAL
 	sleep(1);

@@ -119,7 +119,7 @@ init(void)
 	for(int i=0; i<30; i++)
 		add_box();
 	
-	cpShape *shape = cpSpaceAddStaticShape(space, cpCircleShapeNew(staticBody, 70.0f, cpvzero));
+	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(staticBody, 70.0f, cpvzero));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	

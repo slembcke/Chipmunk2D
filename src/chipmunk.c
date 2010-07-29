@@ -53,6 +53,7 @@ cpInitChipmunk(void)
 	printf("Compile with -DNDEBUG defined to disable debug mode and runtime assertion checks\n");
 #endif
 	
+	cpBodyInit(&cpStaticBodySingleton, INFINITY, INFINITY);
 	cpInitCollisionFuncs();
 }
 
