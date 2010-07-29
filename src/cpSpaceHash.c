@@ -347,6 +347,7 @@ query(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpaceHashQueryFu
 			// Is obj the same as other?
 			|| obj == other 
 		){
+			bin_ptr = &bin->next;
 			bin = bin->next;
 			continue;
 		}
@@ -357,6 +358,7 @@ query(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpaceHashQueryFu
 			// Stamp that the handle was checked already against this object.
 			hand->stamp = hash->stamp;
 			
+			bin_ptr = &bin->next;
 			bin = bin->next;
 		} else { // The object has been removed 
 			cpSpaceHashBin *next = bin->next;
