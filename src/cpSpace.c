@@ -834,7 +834,9 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 		cpBody *b = arb->private_body_b;
 		
 		// both bodies are either static or sleeping
-		cpBool sleepingNow = (!a|| a->node.next) && (!b|| b->node.next);
+		cpBool sleepingNow =
+			(cpBodyIsStatic(a) || cpBodyIsSleeping(a)) &&
+			(cpBodyIsStatic(b) || cpBodyIsSleeping(b));
 		
 		if(sleepingNow){
 			arb->state = cpArbiterStateSleep;
@@ -908,7 +910,7 @@ componentNodeMerge(cpBody *a_root, cpBody *b_root)
 static inline void
 componentActivate(cpBody *root)
 {
-	if(!root->node.next) return;
+	if(!cpBodyIsSleeping(root)) return;
 	
 	cpSpace *space = root->space;
 	cpAssert(space, "Trying to activate a body that was never added to a space.");
@@ -934,6 +936,7 @@ cpBodyActivate(cpBody *body)
 {
 	// Force the body to wake up even if it's not in a currently sleeping component
 	// Like a body resting on or jointed to a rouge body.
+	// STATIC_BODY_CHECK
 	if(body) body->node.idleTime = 0.0f;
 	
 	cpBody *root = componentNodeRoot(body);
@@ -944,17 +947,17 @@ static inline void
 mergeBodies(cpSpace *space, cpArray *components, cpArray *rougeBodies, cpBody *a, cpBody *b)
 {
 	// Don't merge with the static body
-	if(!a || !b) return;
+	if(cpBodyIsStatic(a) || cpBodyIsStatic(b)) return;
 	
 	cpBody *a_root = componentNodeRoot(a);
 	cpBody *b_root = componentNodeRoot(b);
 	
-	cpBody *a_next = a_root->node.next;
-	cpBody *b_next = b_root->node.next;
+	cpBool a_sleep = cpBodyIsSleeping(a_root);
+	cpBool b_sleep = cpBodyIsSleeping(b_root);
 	
-	if(a_next && b_next){
+	if(a_sleep && b_sleep){
 		return;
-	} else if(a_next || b_next){
+	} else if(a_sleep || b_sleep){
 		componentActivate(a_root);
 		componentActivate(b_root);
 	} 
@@ -972,24 +975,29 @@ componentActive(cpBody *root, cpFloat threshold)
 	cpBody *body = root, *next;
 	do {
 		next = body->node.next;
-		if(!body->space || body->node.idleTime < threshold) return cpTrue;
+		if(cpBodyIsRouge(body) || body->node.idleTime < threshold) return cpTrue;
 	} while((body = next) != root);
 	
 	return cpFalse;
 }
 
 static inline void
-addComponent(cpBody *body, cpArray *components)
+addToComponent(cpBody *body, cpArray *components)
 {
+	// Check that the body is not already added to the component list
 	if(body->node.next) return;
 	cpBody *root = componentNodeRoot(body);
 	
 	cpBody *next = root->node.next;
 	if(!next){
+		// If the root isn't part of a list yet, then it hasn't been
+		// added to the components list. Do that now.
 		cpArrayPush(components, root);
+		// Start the list
 		body->node.next = root;
 		root->node.next = body;
 	} else if(root != body) {
+		// Splice in body after the root.
 		body->node.next = next;
 		root->node.next = body;
 	}
@@ -1016,7 +1024,7 @@ processContactComponents(cpSpace *space, cpFloat dt)
 		body->node.idleTime = (cpBodyKineticEnergy(body) > thresh ? 0.0f : body->node.idleTime + dt);
 	}
 	
-	// iterate edges and build forests
+	// iterate graph edges and build forests
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
 		mergeBodies(space, components, rougeBodies, arb->private_a->body, arb->private_b->body);
@@ -1026,11 +1034,11 @@ processContactComponents(cpSpace *space, cpFloat dt)
 		mergeBodies(space, components, rougeBodies, constraint->a, constraint->b);
 	}
 	
-	// iterate bodies and add components
+	// iterate bodies and add them to their components
 	for(int i=0; i<bodies->num; i++)
-		addComponent((cpBody*)bodies->arr[i], components);
+		addToComponent((cpBody*)bodies->arr[i], components);
 	for(int i=0; i<rougeBodies->num; i++)
-		addComponent((cpBody*)rougeBodies->arr[i], components);
+		addToComponent((cpBody*)rougeBodies->arr[i], components);
 	
 	// iterate components, copy or deactivate
 	for(int i=0; i<components->num; i++){
@@ -1040,7 +1048,7 @@ processContactComponents(cpSpace *space, cpFloat dt)
 			do {
 				next = body->node.next;
 				
-				if(body->space) cpArrayPush(newBodies, body);
+				if(!cpBodyIsRouge(body)) cpArrayPush(newBodies, body);
 				body->node.next = NULL;
 				body->node.parent = NULL;
 				body->node.rank = 0;

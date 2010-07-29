@@ -30,7 +30,7 @@ void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, 
 cpBody *a_var, *b_var; { \
 	cpBody *a_temp = ((cpConstraint *)constraint)->a; a_var = cpBodyValidPointer(a_temp); \
 	cpBody *b_temp = ((cpConstraint *)constraint)->b; b_var = cpBodyValidPointer(b_temp); \
-	if((a_var->node.next || !a_temp) && (b_var->node.next || !b_temp)) return; \
+	if((cpBodyIsSleeping(a_var) || cpBodyIsStatic(a_temp)) && (cpBodyIsSleeping(b_var) || cpBodyIsStatic(b_temp))) return; \
 }
 
 static inline cpVect

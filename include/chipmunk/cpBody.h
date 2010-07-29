@@ -117,6 +117,24 @@ cpBodyValidPointer(cpBody *body)
 // Wake up a sleeping or idle body.
 void cpBodyActivate(cpBody *body);
 
+static inline cpBool
+cpBodyIsSleeping(cpBody *body)
+{
+	return (body->node.next != NULL);
+}
+
+static inline cpBool
+cpBodyIsStatic(cpBody *body)
+{
+	return (body == NULL);
+}
+
+static inline cpBool
+cpBodyIsRouge(cpBody *body)
+{
+	return (body->space == NULL);
+}
+
 
 #define CP_DefineBodyGetter(type, member, name) \
 static inline type cpBodyGet##name(cpBody *body){return body->member;}
@@ -164,14 +182,16 @@ void cpBodyUpdatePosition(cpBody *body, cpFloat dt);
 static inline cpVect
 cpBodyLocal2World(cpBody *body, cpVect v)
 {
-	return (body ? cpvadd(body->p, cpvrotate(v, body->rot)) : v);
+	body = cpBodyValidPointer(body);
+	return cpvadd(body->p, cpvrotate(v, body->rot));
 }
 
 // Convert world to body local coordinates
 static inline cpVect
 cpBodyWorld2Local(cpBody *body, cpVect v)
 {
-	return (body ? cpvunrotate(cpvsub(v, body->p), body->rot) : v);
+	body = cpBodyValidPointer(body);
+	return cpvunrotate(cpvsub(v, body->p), body->rot);
 }
 
 // Apply an impulse (in world coordinates) to the body at a point relative to the center of gravity (also in world coordinates).

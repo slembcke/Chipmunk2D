@@ -86,7 +86,7 @@ init(void)
 	space = cpSpaceNew();
 	cpSpaceResizeActiveHash(space, 30.0f, 1000);
 	space->iterations = 10;
-//	space->sleepTimeThreshold = 0.5f;
+	space->sleepTimeThreshold = 0.5f;
 	
 	cpShape *shape;
 		
