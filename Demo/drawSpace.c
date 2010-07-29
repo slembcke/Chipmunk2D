@@ -213,7 +213,11 @@ static void
 drawPolyShape(cpBody *body, cpPolyShape *poly)
 {
 	int count = poly->numVerts;
+#if CP_USE_DOUBLES
 	glVertexPointer(2, GL_DOUBLE, 0, poly->tVerts);
+#else
+	glVertexPointer(2, GL_FLOAT, 0, poly->tVerts);
+#endif
 	
 	if(!poly->shape.sensor){
 		glColor_from_pointer(poly);

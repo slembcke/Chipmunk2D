@@ -209,6 +209,20 @@ drawInfo()
 }
 
 static void
+reshape(int width, int height)
+{
+	glViewport(0, 0, width, height);
+
+	double rx = width / 2.0;
+	double ry = height / 2.0;
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-rx, rx, -ry, ry, -1.0, 1.0);
+	glTranslated(0.5, 0.5, 0.0);
+}
+
+static void
 display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -379,11 +393,6 @@ initGL(void)
 {
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-320.0f, 320.0f, -240.0f, 240.0f, -1.0f, 1.0f);
-	glTranslatef(0.5f, 0.5f, 0.0f);
-	
 	glEnableClientState(GL_VERTEX_ARRAY);
 }
 
@@ -399,6 +408,7 @@ glutStuff(int argc, const char *argv[])
 	
 	initGL();
 	
+	glutReshapeFunc(reshape);
 	glutDisplayFunc(display);
 //	glutIdleFunc(idle);
 	glutTimerFunc(SLEEP_TICKS, timercall, 0);
