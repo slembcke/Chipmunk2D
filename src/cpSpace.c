@@ -376,8 +376,10 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
-	if(body) cpBodyActivate(body);
-	if(body) cpBodyAddShape(body, shape);
+	if(body){
+		cpBodyActivate(body);
+		cpBodyAddShape(body, shape);
+	}
 	
 	cpShapeCacheBB(shape);
 	addShapeRaw(shape, space->staticShapes);
@@ -462,8 +464,10 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
-	if(body) cpBodyActivate(body);
-	if(body) cpBodyRemoveShape(body, shape);
+	if(body){
+		cpBodyActivate(body);
+		cpBodyRemoveShape(body, shape);
+	}
 	
 	removalContext context = {space, shape};
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
@@ -940,7 +944,7 @@ cpBodyActivate(cpBody *body)
 	// Force the body to wake up even if it's not in a currently sleeping component
 	// Like a body resting on or jointed to a rouge body.
 	// STATIC_BODY_CHECK
-	if(body) body->node.idleTime = 0.0f;
+	body->node.idleTime = 0.0f;
 	
 	cpBody *root = componentNodeRoot(body);
 	if(root) componentActivate(root);
