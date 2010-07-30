@@ -16,7 +16,7 @@ UNIX: A forum user was kind enough to make a set of CMake files for Chipmunk. Th
 
 Windows: There is an included MSVC project for building the library and demo application. I do not personally maintain the MSVC project. It needs someone to update it for the new include structure.
 
-Ruby: I've been using maintaining a Ruby extension for Chipmunk, but at this time is not up to date with all the latest changes. A forum member has been working on an FFI based extention, and that may be a better way to take advantage of Chipmunk from Ruby. Another forum user has offered to maintain the non-FFI version of the extension. Stay tuned.
+Ruby: I've been using maintaining a Ruby extension for Chipmunk, but at this time is not up to date with all the latest changes. It has been tested and builds under Linux and OS X using CMake however. A forum member has been working on an FFI based extention, and that may be a better way to take advantage of Chipmunk from Ruby. Another forum user has offered to maintain the non-FFI version of the extension. Stay tuned.
 
 GETTING STARTED:
 First of all, you can find the C API documentation here: http://code.google.com/p/chipmunk-physics/wiki/Documentation
