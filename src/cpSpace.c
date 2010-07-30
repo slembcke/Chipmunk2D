@@ -431,8 +431,11 @@ void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
 	cpBody *body = shape->body;
-	if(!body) cpSpaceRemoveStaticShape(space, shape);
-	
+	if(!body){
+		cpSpaceRemoveStaticShape(space, shape);
+		return;
+	}
+
 	cpAssertSpaceUnlocked(space);
 	if(body->node.next){
 		cpAssertWarn(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
@@ -459,7 +462,7 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
-	cpBodyActivate(body);
+	if(body) cpBodyActivate(body);
 	if(body) cpBodyRemoveShape(body, shape);
 	
 	removalContext context = {space, shape};
