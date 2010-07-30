@@ -120,19 +120,19 @@ void cpBodyActivate(cpBody *body);
 static inline cpBool
 cpBodyIsSleeping(cpBody *body)
 {
-	return (body->node.next != NULL);
+	return (body->node.next != ((cpBody*)0));
 }
 
 static inline cpBool
 cpBodyIsStatic(cpBody *body)
 {
-	return (body == NULL);
+	return (body == ((cpBody*)0));
 }
 
 static inline cpBool
 cpBodyIsRouge(cpBody *body)
 {
-	return (body->space == NULL);
+	return (body->space == ((struct cpSpace*)0));
 }
 
 
