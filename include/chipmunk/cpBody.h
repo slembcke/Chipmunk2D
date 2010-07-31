@@ -131,7 +131,6 @@ static inline type cpBodyGet##name(cpBody *body){return body->member;}
 static inline void \
 cpBodySet##name(cpBody *body, type value){ \
 	body->member = value; \
-	cpBodyActivate(body); \
 } \
 
 #define CP_DefineBodyProperty(type, member, name) \
