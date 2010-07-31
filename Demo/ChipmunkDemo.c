@@ -225,6 +225,12 @@ reshape(int width, int height)
 static void
 display(void)
 {
+	cpVect newPoint = cpvlerp(mousePoint_last, mousePoint, 0.25f);
+	mouseBody->p = newPoint;
+	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0f);
+	mousePoint_last = newPoint;
+	currDemo->updateFunc(ticks);
+	
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	drawSpace(space, currDemo->drawOptions ? currDemo->drawOptions : &options);
@@ -234,12 +240,6 @@ display(void)
 		
 	glutSwapBuffers();
 	ticks++;
-	
-	cpVect newPoint = cpvlerp(mousePoint_last, mousePoint, 0.25f);
-	mouseBody->p = newPoint;
-	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0f);
-	mousePoint_last = newPoint;
-	currDemo->updateFunc(ticks);
 }
 
 static char *
@@ -323,7 +323,7 @@ click(int button, int state, int x, int y)
 		if(state == GLUT_DOWN){
 			cpVect point = mouseToSpace(x, y);
 		
-			cpShape *shape = cpSpacePointQueryFirst(space, point, GRABABLE_MASK_BIT, 0);
+			cpShape *shape = cpSpacePointQueryFirst(space, point, GRABABLE_MASK_BIT, CP_NO_GROUP);
 			if(shape){
 				cpBody *body = shape->body;
 				mouseJoint = cpPivotJointNew2(mouseBody, body, cpvzero, cpBodyWorld2Local(body, point));

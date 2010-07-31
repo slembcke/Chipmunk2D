@@ -78,8 +78,8 @@ init(void)
 
 	cpShape *shape;
 	
-	// beveling all of the line segments helps prevent things from getting stuck on cracks
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-256,16), cpv(-256,240), 2.0f));
+	// beveling all of the line segments slightly helps prevent things from getting stuck on cracks
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-256,16), cpv(-256,300), 2.0f));
 	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
@@ -100,7 +100,7 @@ init(void)
 	shape->layers = NOT_GRABABLE_MASK;
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-192,176), cpv(-128,240), 2.0f));
-	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
+	shape->e = 0.0f; shape->u = 0.0f; shape->layers = 1;
 	shape->layers = NOT_GRABABLE_MASK;
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-128,144), cpv(192,64), 2.0f));

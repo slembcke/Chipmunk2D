@@ -28,9 +28,12 @@ void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, 
 // Get valid body pointers and exit early if the bodies are idle
 #define CONSTRAINT_BEGIN(constraint, a_var, b_var) \
 cpBody *a_var, *b_var; { \
-	cpBody *a_temp = ((cpConstraint *)constraint)->a; a_var = cpBodyValidPointer(a_temp); \
-	cpBody *b_temp = ((cpConstraint *)constraint)->b; b_var = cpBodyValidPointer(b_temp); \
-	if((cpBodyIsSleeping(a_var) || cpBodyIsStatic(a_temp)) && (cpBodyIsSleeping(b_var) || cpBodyIsStatic(b_temp))) return; \
+	a_var = ((cpConstraint *)constraint)->a; \
+	b_var = ((cpConstraint *)constraint)->b; \
+	if( \
+		(cpBodyIsSleeping(a_var) || cpBodyIsStatic(a_var)) && \
+		(cpBodyIsSleeping(b_var) || cpBodyIsStatic(b_var)) \
+	) return; \
 }
 
 static inline cpVect

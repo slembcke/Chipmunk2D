@@ -104,16 +104,6 @@ cpBody *cpBodyNew(cpFloat m, cpFloat i);
 void cpBodyDestroy(cpBody *body);
 void cpBodyFree(cpBody *body);
 
-// Singleton cpBody substituted instead of the NULL body
-extern cpBody cpStaticBodySingleton;
-
-// Replaces NULL bodies with a pointer to cpStaticBodySingleton.
-static inline cpBody *
-cpBodyValidPointer(cpBody *body)
-{
-	return (body ? body : &cpStaticBodySingleton);
-}
-
 // Wake up a sleeping or idle body.
 void cpBodyActivate(cpBody *body);
 
@@ -123,11 +113,9 @@ cpBodyIsSleeping(cpBody *body)
 	return (body->node.next != ((cpBody*)0));
 }
 
+// defined in cpSpace.h after the cpSpace type has been defined
 static inline cpBool
-cpBodyIsStatic(cpBody *body)
-{
-	return (body == ((cpBody*)0));
-}
+cpBodyIsStatic(cpBody *body);
 
 static inline cpBool
 cpBodyIsRouge(cpBody *body)
@@ -182,7 +170,6 @@ void cpBodyUpdatePosition(cpBody *body, cpFloat dt);
 static inline cpVect
 cpBodyLocal2World(cpBody *body, cpVect v)
 {
-	body = cpBodyValidPointer(body);
 	return cpvadd(body->p, cpvrotate(v, body->rot));
 }
 
@@ -190,7 +177,6 @@ cpBodyLocal2World(cpBody *body, cpVect v)
 static inline cpVect
 cpBodyWorld2Local(cpBody *body, cpVect v)
 {
-	body = cpBodyValidPointer(body);
 	return cpvunrotate(cpvsub(v, body->p), body->rot);
 }
 

@@ -73,7 +73,6 @@ typedef struct cpArbiter {
 	// Using CP_ARBITER_GET_SHAPES and CP_ARBITER_GET_BODIES will save you from
 	// many headaches
 	cpShape *private_a, *private_b;
-	cpBody *private_body_a, *private_body_b;
 	
 	// Calculated before calling the pre-solve collision handler
 	// Override them with custom values if you want specialized behavior

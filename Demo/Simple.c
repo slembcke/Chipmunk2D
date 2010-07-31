@@ -46,7 +46,6 @@ init(void)
 	cpSpaceResizeActiveHash(space, 30.0f, 1000);
 	// Give it some gravity
 	space->gravity = cpv(0, -100);
-//	space->idleTimeThreshold = 0.0f;
 	
 	// Create A ground segment along the bottom of the screen
 	// By attaching it to NULL instead of a body, we make it a static shape.

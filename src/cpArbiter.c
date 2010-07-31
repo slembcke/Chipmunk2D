@@ -108,9 +108,7 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 	arb->contacts = NULL;
 	
 	arb->private_a = a;
-	arb->private_body_a = cpBodyValidPointer(a->body);
 	arb->private_b = b;
-	arb->private_body_b = cpBodyValidPointer(b->body);
 	
 	arb->stamp = 0;
 	arb->state = cpArbiterStateFirstColl;
@@ -175,9 +173,7 @@ cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisio
 	
 	// For collisions between two similar primitive types, the order could have been swapped.
 	arb->private_a = a;
-	arb->private_body_a = cpBodyValidPointer(a->body);
 	arb->private_b = b;
-	arb->private_body_b = cpBodyValidPointer(b->body);
 	
 	// mark it as new if it's been cached
 	if(arb->state == cpArbiterStateCached) arb->state = cpArbiterStateFirstColl;
@@ -186,8 +182,8 @@ cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisio
 void
 cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv)
 {
-	cpBody *a = arb->private_body_a;
-	cpBody *b = arb->private_body_b;
+	cpBody *a = arb->private_a->body;
+	cpBody *b = arb->private_b->body;
 	
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];
@@ -218,8 +214,8 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb)
 	arb->u = shapea->u * shapeb->u;
 	arb->surface_vr = cpvsub(shapeb->surface_v, shapea->surface_v);
 
-	cpBody *a = arb->private_body_a;
-	cpBody *b = arb->private_body_b;
+	cpBody *a = shapea->body;
+	cpBody *b = shapeb->body;
 	
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];
@@ -230,8 +226,8 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb)
 void
 cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef)
 {
-	cpBody *a = arb->private_body_a;
-	cpBody *b = arb->private_body_b;
+	cpBody *a = arb->private_a->body;
+	cpBody *b = arb->private_b->body;
 
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];

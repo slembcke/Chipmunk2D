@@ -108,5 +108,7 @@ cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
 cpConstraint *
 cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot)
 {
-	return cpPivotJointNew2(a, b, cpBodyWorld2Local(a, pivot), cpBodyWorld2Local(b, pivot));
+	cpVect anchr1 = (a ? cpBodyWorld2Local(a, pivot) : pivot);
+	cpVect anchr2 = (b ? cpBodyWorld2Local(b, pivot) : pivot);
+	return cpPivotJointNew2(a, b, anchr1, anchr2);
 }

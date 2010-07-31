@@ -113,6 +113,8 @@ typedef struct cpSpace{
 	cpCollisionHandler defaultHandler;
 	
 	cpHashSet *postStepCallbacks;
+	
+	cpBody staticBody;
 } cpSpace;
 
 // Basic allocation/destruction functions.
@@ -125,6 +127,14 @@ void cpSpaceFree(cpSpace *space);
 
 // Convenience function. Frees all referenced entities. (bodies, shapes and constraints)
 void cpSpaceFreeChildren(cpSpace *space);
+
+// Needed to be defined after the cpSpace type was closed
+static inline cpBool
+cpBodyIsStatic(cpBody *body)
+{
+	cpSpace *space = body->space;
+	return (space != NULL && body == &space->staticBody);
+}
 
 // Collision handler management functions.
 void cpSpaceSetDefaultCollisionHandler(

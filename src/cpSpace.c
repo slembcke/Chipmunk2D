@@ -194,6 +194,9 @@ cpSpaceInit(cpSpace *space)
 	
 	space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql, (cpHashSetTransFunc)postStepFuncSetTrans);
 	
+	cpBodyInit(&space->staticBody, INFINITY, INFINITY);
+	space->staticBody.space = space;
+	
 	return space;
 }
 
@@ -355,17 +358,30 @@ cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
 	cpBody *body = shape->body;
-	if(!body) return cpSpaceAddStaticShape(space, shape);
+	if(!body || body == &space->staticBody) return cpSpaceAddStaticShape(space, shape);
 	
 	cpAssert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
 		"Cannot add the same shape more than once.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
-	if(body) cpBodyAddShape(body, shape);
+	cpBodyAddShape(body, shape);
 	addShapeRaw(shape, space->activeShapes);
 		
 	return shape;
+}
+
+static void
+activateShapesTouchingShapeHelper(cpShape *shape, void *unused)
+{
+	cpBodyActivate(shape->body);
+}
+
+static void
+activateShapesTouchingShape(cpSpace *space, cpShape *shape)
+{
+	// TODO this query should be more precise
+	cpSpaceBBQuery(space, shape->bb, CP_ALL_LAYERS, CP_NO_GROUP, activateShapesTouchingShapeHelper, NULL);
 }
 
 cpShape *
@@ -375,13 +391,10 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 		"Cannot add the same static shape more than once.");
 	cpAssertSpaceUnlocked(space);
 	
-	cpBody *body = shape->body;
-	if(body){
-		cpBodyActivate(body);
-		cpBodyAddShape(body, shape);
-	}
+	if(!shape->body) shape->body = &space->staticBody;
 	
 	cpShapeCacheBB(shape);
+	activateShapesTouchingShape(space, shape);
 	addShapeRaw(shape, space->staticShapes);
 	
 	return shape;
@@ -406,6 +419,11 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	cpAssert(!cpArrayContains(space->constraints, constraint), "Cannot add the same constraint more than once.");
 //	cpAssertSpaceUnlocked(space); This should be safe as long as its not from a constraint callback.
 	
+	if(!constraint->a) constraint->a = &space->staticBody;
+	if(!constraint->b) constraint->b = &space->staticBody;
+	
+	cpBodyActivate(constraint->a);
+	cpBodyActivate(constraint->b);
 	cpArrayPush(space->constraints, constraint);
 	
 	return constraint;
@@ -433,21 +451,16 @@ void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
 	cpBody *body = shape->body;
-	if(!body){
+	if(cpBodyIsStatic(body)){
 		cpSpaceRemoveStaticShape(space, shape);
 		return;
 	}
 
+	cpBodyActivate(body);
+	
 	cpAssertSpaceUnlocked(space);
-	if(body->node.next){
-		cpAssertWarn(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
-			"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
-		
-		cpBodyActivate(body);
-	} else {
-		cpAssertWarn(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
-			"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
-	}
+	cpAssertWarn(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
+		"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
 	
 	cpBodyRemoveShape(body, shape);
 	
@@ -460,18 +473,14 @@ void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
 	cpAssertWarn(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
-		"Cannot remove a static shape that was never added to the space. (Removed twice maybe?)");
+		"Cannot remove a static or sleeping shape that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
-	
-	cpBody *body = shape->body;
-	if(body){
-		cpBodyActivate(body);
-		cpBodyRemoveShape(body, shape);
-	}
 	
 	removalContext context = {space, shape};
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
 	removeShapeRaw(shape, space->staticShapes);
+	
+	activateShapesTouchingShape(space, shape);
 }
 
 void
@@ -493,8 +502,8 @@ cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 		"Cannot remove a constraint that was never added to the space. (Removed twice maybe?)");
 //	cpAssertSpaceUnlocked(space); Should be safe as long as its not from a constraint callback.
 	
-	if(constraint->a) cpBodyActivate(constraint->a);
-	if(constraint->a) cpBodyActivate(constraint->b);
+	cpBodyActivate(constraint->a);
+	cpBodyActivate(constraint->b);
 	cpArrayDeleteObj(space->constraints, constraint);
 }
 
@@ -837,8 +846,8 @@ static cpBool
 contactSetFilter(cpArbiter *arb, cpSpace *space)
 {
 	if(space->sleepTimeThreshold != INFINITY){
-		cpBody *a = arb->private_body_a;
-		cpBody *b = arb->private_body_b;
+		cpBody *a = arb->private_a->body;
+		cpBody *b = arb->private_b->body;
 		
 		// both bodies are either static or sleeping
 		cpBool sleepingNow =
@@ -943,7 +952,6 @@ cpBodyActivate(cpBody *body)
 {
 	// Force the body to wake up even if it's not in a currently sleeping component
 	// Like a body resting on or jointed to a rouge body.
-	// STATIC_BODY_CHECK
 	body->node.idleTime = 0.0f;
 	
 	cpBody *root = componentNodeRoot(body);
