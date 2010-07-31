@@ -250,6 +250,9 @@ cpSpaceFree(cpSpace *space)
 void
 cpSpaceFreeChildren(cpSpace *space)
 {
+	cpArray *components = space->sleepingComponents;
+	while(components->num) cpBodyActivate((cpBody *)components->arr[0]);
+	
 	cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)&shapeFreeWrap, NULL);
 	cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)&shapeFreeWrap, NULL);
 	cpArrayEach(space->bodies,           (cpArrayIter)&bodyFreeWrap,          NULL);
@@ -1085,6 +1088,7 @@ processContactComponents(cpSpace *space, cpFloat dt)
 	
 	space->bodies = newBodies;
 	cpArrayFree(bodies);
+	cpArrayFree(rougeBodies);
 	cpArrayFree(components);
 }
 
