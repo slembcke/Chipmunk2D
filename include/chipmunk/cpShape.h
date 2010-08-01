@@ -88,10 +88,10 @@ typedef struct cpShape{
 	// User defined layer bitmask for the shape.
 	cpLayers layers;
 	
+	// *** Internally Used Fields
+	
 	// Shapes form a linked list when added to space on a non-NULL body
 	struct cpShape *next;
-	
-	// *** Internally Used Fields
 	
 	// Unique id used as the hash value.
 	cpHashValue hashid;

@@ -65,11 +65,11 @@ typedef struct cpSpace{
 	cpFloat damping;
 	
 	// Speed threshold for a body to be considered idle.
-	// A value of 0 (the default) means to let the space guess the threshold.
+	// The default value of 0 means to let the space guess a good threshold based on gravity.
 	cpFloat idleSpeedThreshold;
 	
 	// Time a group of bodies must remain idle in order to fall asleep
-	// A value of INFINITY (the default) disables the sleeping algorithm.
+	// The default value of INFINITY disables the sleeping algorithm.
 	cpFloat sleepTimeThreshold;
 	
 	// *** Internally Used Fields
