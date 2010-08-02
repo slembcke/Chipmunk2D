@@ -29,7 +29,7 @@ html = <<HTML
 							
 							table td, th {
 								border: 1px black solid;
-								padding: 2px;
+								padding: 5px;
 							}
 					</style>
 		</head>
