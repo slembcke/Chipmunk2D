@@ -3,6 +3,7 @@
 TODO redo this header part
 TODO note about Chipmunk undocumented Chipmunk parts
 TODO magic globals
+TODO why a C API (talk about private APIs)
 
 h1. Chipmunk Physics 5.3.0
 
@@ -549,6 +550,10 @@ Static shapes? Chipmunk optimizes collision detection against shapes that do not
 In order to create a static shape, you need to create a cpBody with an infinite mass and moment of inertia to attach the shape to. If you don't don't use an infinite mass the body will gain velocity from colliding with other objects. This will cause it to behave strangely when colliding with other objects. You also don't want to add such a body to a space as it will gain velocity from gravity. 
 
 If you do move a body that a static shape is attached to, you *MUST* let Chipmunk know about it by calling @cpSpaceRehashStatic()@. If you don't, the precalculated collision detection data cached by the space will not get updated and collisions will be missed.
+
+h2. Sleeping
+
+TODO
 
 h2. Fields:
 
