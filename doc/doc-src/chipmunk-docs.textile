@@ -703,7 +703,12 @@ cpConstraint *cpPinJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)<
 h2. Slide Joints:
 
 <pre><code>cpSlideJoint *cpSlideJointAlloc(void)
-cpSlideJoint *cpSlideJointInit(cpSlideJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max)
+
+cpSlideJoint *cpSlideJointInit(
+	cpSlideJoint *joint, cpBody *a, cpBody *b,
+	cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max
+)
+
 cpConstraint *cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max)</code></pre>
 
  @a@ and @b@ are the two bodies to connect, @anchr1@ and @anchr2@ are the anchor points on those bodies, and @min@ and @max@ define the allowed distances of the anchor points.
@@ -734,7 +739,12 @@ cpConstraint *cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr
 h2. Groove Joint:
 
 <pre><code>cpGrooveJoint *cpGrooveJointAlloc(void)
-cpGrooveJoint *cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2)
+
+cpGrooveJoint *cpGrooveJointInit(
+	cpGrooveJoint *joint, cpBody *a, cpBody *b,
+	cpVect groove_a, cpVect groove_b, cpVect anchr2
+)
+
 cpConstraint *cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2)</code></pre>
 
  The groove goes from @groov_a@ to @groove_b@ on body @a@, and the pivot is attached to @anchr2@ on body @b@. All coordinates are body local.
@@ -747,8 +757,16 @@ cpConstraint *cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect gro
 h2. Damped Spring:
 
 <pre><code>cpDampedSpring *cpDampedSpringAlloc(void)
-cpDampedSpring *cpDampedSpringInit(cpDampedSpring *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping)
-cpConstraint *cpDampedSpringNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping)</code></pre>
+
+cpDampedSpring *cpDampedSpringInit(
+	cpDampedSpring *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2,
+	cpFloat restLength, cpFloat stiffness, cpFloat damping
+)
+
+cpConstraint *cpDampedSpringNew(
+	cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2,
+	cpFloat restLength, cpFloat stiffness, cpFloat damping
+)</code></pre>
 
  Defined much like a slide joint. @restLength@ is the distance the spring wants to be, @stiffness@ is the spring constant ("Young's modulus":http://en.wikipedia.org/wiki/Young's_modulus), and @damping@ is how soft to make the damping of the spring.
 
@@ -764,7 +782,12 @@ cpConstraint *cpDampedSpringNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anch
 h2. Damped Rotary Spring:
 
 <pre><code>cpDampedRotarySpring *cpDampedRotarySpringAlloc(void)
-cpDampedRotarySpring *cpDampedRotarySpringInit(cpDampedRotarySpring *joint, cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping)
+
+cpDampedRotarySpring *cpDampedRotarySpringInit(
+	cpDampedRotarySpring *joint, cpBody *a, cpBody *b,
+	cpFloat restAngle, cpFloat stiffness, cpFloat damping
+)
+
 cpConstraint *cpDampedRotarySpringNew(cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping)</code></pre>
 
  Like a damped spring, but works in an angular fashion. @restAngle@ is the relative angle in radians that the bodies want to have, @stiffness@ and @damping@ work basically the same as on a damped spring.
