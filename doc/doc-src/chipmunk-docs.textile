@@ -3,18 +3,29 @@
 TODO redo this header part
 TODO note about Chipmunk undocumented Chipmunk parts
 TODO magic globals
-TODO why a C API (talk about private APIs)
+TODO license
 
 h1. Chipmunk Physics 5.3.0
 
 First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. Though not yet complete, it is intended to be fast, numerically stable, and easy to use. I've put hundreds of hours of work into making Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":http://code.google.com/p/chipmunk-physics/#Donate:. You'll make an indie game developer very happy.
 
-I would like to give a Erin Catto a big thank you, as Chipmunk's impulse solver was directly inspired by his Box2D example code. (Now a full fledged physics engine all it's own: "Box2D":http://www.box2d.org/). His contact persistence idea allows for stable stacks of objects with very few iterations of the solver. My previous solver produced mushy piles of objects or required a large amount of CPU to operate stably.
+First of all, I would like to give a Erin Catto a big thank you, as Chipmunk's impulse solver was directly inspired by his Box2D example code way back in 2006. (Now a full fledged physics engine all it's own: "Box2D.org":http://www.box2d.org/). His contact persistence idea allows for stable stacks of objects with very few iterations of the solver. My previous solver produced mushy piles of objects or required a large amount of CPU to operate stably.
 
+h2. Why a C Library?
+
+A lot of people ask me why I wrote Chipmunk in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, OOC, Lua, Io, the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I wanted Chipmunk to be fast, portable, and easy to optimize. With Chipmunk weiging in at less than 7,500 lines of C code, headers and comments, I don't feel that using C has made Chipmunk difficult to develop. In fact, at times I feel it has made it easier to optimize and debug.
+
+That said, I've never developed a whole game in C and I probably never will. There are much more interesting languages to do that in than C with all sorts of nice features like garbage collection, closures and object oriented runtimes. Check out the bindings and ports page to see if you can use Chipmunk from your language of choice. TODO link
+
+Now a shameless plug for my company! If you are writing iPhone games using Chipmunk, you should check out the Objective-Chipmunk wrapper that we've developed for Chipmunk. It integrates with the Objective-C memory model and provides a number of high level APIs that make writing physics based games for the iPhone even easier. While we do charge for Objective-Chipmunk, it will almost certainly save you more time than the cost to license it.
+
+h2. Limitations of a C API:
+
+There are two major problems with Chipmunk's C API. The first is that it lacks operator overloading. Chipmunk defines vector operators as functions instead of allowing you to use operators such as *, +, and -. In practice, it's usually not a major problem for readability in practice though. The second, and bigger problem is that it's not possible to mark fields as private in C structure types. Be warned that if you are reading fields from Chipmunk structs that are not documented here, that they might change in the future without a lot of prior warning. 
 
 h2. Overview:
 
-There are 4 basic things you need to know about in order to work with Chipmunk.
+There are 4 basic objects you will use in Chipmunk.
 
 * *Rigid Bodies:* A rigid body holds the physical properties of an object. (mass, position, rotation, velocity, etc.) It does not have a shape by itself. If you’ve done physics with particles before, rigid bodies differ in that they are able to rotate.
 * *Collision Shapes:* By attaching shapes to bodies, you can define the a body’s shape. You can attach as many shapes to a single body as you need to in order to define a complex shape. Shapes contain the surface properties of an object such as how much friction or elasticity it has.
@@ -478,7 +489,7 @@ p(expl). Chipmunk keeps a counter so that every new shape is given a unique hash
 h2. Working With Circle Shapes:
 
 <pre><code>cpCircleShape *cpCircleShapeAlloc(void)
-cpCircleShape *cpCircleShapeInit(cpCircleShape *circle, cpBody *body, cpVect offset, cpFloat radius)
+cpCircleShape *cpCircleShapeInit(cpCircleShape *circle, cpBody *body, cpFloat radius, cpVect offset)
 cpShape *cpCircleShapeNew(cpBody *body, cpFloat radius, cpVect offset)</code></pre>
 
 p(expl). @body@ is the body to attach the circle to, @offset@ is the offset from the body's center of gravity in body local coordinates.
