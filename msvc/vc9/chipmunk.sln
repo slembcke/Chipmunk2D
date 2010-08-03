@@ -10,16 +10,26 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demo", "demo\demo.vcproj", 
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug DLL|Win32 = Debug DLL|Win32
 		Debug|Win32 = Debug|Win32
+		Release DLL|Win32 = Release DLL|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{49585540-F16D-48EF-8374-0C66B10BA956}.Debug DLL|Win32.ActiveCfg = Debug DLL|Win32
+		{49585540-F16D-48EF-8374-0C66B10BA956}.Debug DLL|Win32.Build.0 = Debug DLL|Win32
 		{49585540-F16D-48EF-8374-0C66B10BA956}.Debug|Win32.ActiveCfg = Debug|Win32
 		{49585540-F16D-48EF-8374-0C66B10BA956}.Debug|Win32.Build.0 = Debug|Win32
+		{49585540-F16D-48EF-8374-0C66B10BA956}.Release DLL|Win32.ActiveCfg = Release DLL|Win32
+		{49585540-F16D-48EF-8374-0C66B10BA956}.Release DLL|Win32.Build.0 = Release DLL|Win32
 		{49585540-F16D-48EF-8374-0C66B10BA956}.Release|Win32.ActiveCfg = Release|Win32
 		{49585540-F16D-48EF-8374-0C66B10BA956}.Release|Win32.Build.0 = Release|Win32
+		{974C8A5E-7C72-4968-B0FC-3F35CDE22075}.Debug DLL|Win32.ActiveCfg = Debug DLL|Win32
+		{974C8A5E-7C72-4968-B0FC-3F35CDE22075}.Debug DLL|Win32.Build.0 = Debug DLL|Win32
 		{974C8A5E-7C72-4968-B0FC-3F35CDE22075}.Debug|Win32.ActiveCfg = Debug|Win32
 		{974C8A5E-7C72-4968-B0FC-3F35CDE22075}.Debug|Win32.Build.0 = Debug|Win32
+		{974C8A5E-7C72-4968-B0FC-3F35CDE22075}.Release DLL|Win32.ActiveCfg = Release DLL|Win32
+		{974C8A5E-7C72-4968-B0FC-3F35CDE22075}.Release DLL|Win32.Build.0 = Release DLL|Win32
 		{974C8A5E-7C72-4968-B0FC-3F35CDE22075}.Release|Win32.ActiveCfg = Release|Win32
 		{974C8A5E-7C72-4968-B0FC-3F35CDE22075}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection

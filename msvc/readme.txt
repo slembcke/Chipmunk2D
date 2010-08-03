@@ -15,3 +15,9 @@ One way to do this is to set the working directory (found under Debugging
 configuration properties in Developer Studio) to "../../glut/runtime". This
 will launch the demo in that directory, enabling Windows to find the required
 DLL.
+
+The DLL/non-DLL project configurations refer not to whether Chipmunk is a
+DLL, but to whether the project is built to link with the C runtime library
+statically or at runtime. Using the DLL version results in a smaller
+executable, but you have to ship the CRT DLL (msvcr*.dll)  with your
+application if you want to guarantee that people will be able to use it.
