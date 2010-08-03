@@ -120,7 +120,7 @@ static inline cpBool
 cpBodyIsStatic(cpBody *body);
 
 static inline cpBool
-cpBodyIsRouge(cpBody *body)
+cpBodyIsRogue(cpBody *body)
 {
 	return (body->space == ((struct cpSpace*)0));
 }

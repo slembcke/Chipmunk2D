@@ -548,7 +548,7 @@ h2. What Are Iterations?
 
 Chipmunk uses an iterative solver to figure out the forces between objects in the space. What this means is that it builds a big list of all of the collisions, joints, and other constraints between the bodies and makes several passes over the list considering each one individually. The number of passes it makes is the iteration count, and each iteration makes the solution more accurate. If you use too many iterations, the physics should look nice and solid, but may use up too much CPU time. If you use too few iterations, the simulation may seem mushy or bouncy when the objects should be solid. Setting the number of iterations lets you balance between CPU usage and the accuracy of the physics.
 
-h2. Rouge Bodies:
+h2. Rogue Bodies:
 
 TODO
 

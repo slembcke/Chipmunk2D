@@ -954,7 +954,7 @@ void
 cpBodyActivate(cpBody *body)
 {
 	// Force the body to wake up even if it's not in a currently sleeping component
-	// Like a body resting on or jointed to a rouge body.
+	// Like a body resting on or jointed to a rogue body.
 	body->node.idleTime = 0.0f;
 	
 	cpBody *root = componentNodeRoot(body);
@@ -962,7 +962,7 @@ cpBodyActivate(cpBody *body)
 }
 
 static inline void
-mergeBodies(cpSpace *space, cpArray *components, cpArray *rougeBodies, cpBody *a, cpBody *b)
+mergeBodies(cpSpace *space, cpArray *components, cpArray *rogueBodies, cpBody *a, cpBody *b)
 {
 	// Don't merge with the static body
 	if(cpBodyIsStatic(a) || cpBodyIsStatic(b)) return;
@@ -980,9 +980,9 @@ mergeBodies(cpSpace *space, cpArray *components, cpArray *rougeBodies, cpBody *a
 		componentActivate(b_root);
 	} 
 	
-	// Add any rouge bodies (bodies not added to the space)
-	if(!a->space) cpArrayPush(rougeBodies, a);
-	if(!b->space) cpArrayPush(rougeBodies, b);
+	// Add any rogue bodies (bodies not added to the space)
+	if(!a->space) cpArrayPush(rogueBodies, a);
+	if(!b->space) cpArrayPush(rogueBodies, b);
 	
 	componentNodeMerge(a_root, b_root);
 }
@@ -993,7 +993,7 @@ componentActive(cpBody *root, cpFloat threshold)
 	cpBody *body = root, *next;
 	do {
 		next = body->node.next;
-		if(cpBodyIsRouge(body) || body->node.idleTime < threshold) return cpTrue;
+		if(cpBodyIsRogue(body) || body->node.idleTime < threshold) return cpTrue;
 	} while((body = next) != root);
 	
 	return cpFalse;
@@ -1027,7 +1027,7 @@ processContactComponents(cpSpace *space, cpFloat dt)
 {
 	cpArray *bodies = space->bodies;
 	cpArray *newBodies = cpArrayNew(bodies->num);
-	cpArray *rougeBodies = cpArrayNew(16);
+	cpArray *rogueBodies = cpArrayNew(16);
 	cpArray *arbiters = space->arbiters;
 	cpArray *constraints = space->constraints;
 	cpArray *components = cpArrayNew(bodies->num/8);
@@ -1045,18 +1045,18 @@ processContactComponents(cpSpace *space, cpFloat dt)
 	// iterate graph edges and build forests
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
-		mergeBodies(space, components, rougeBodies, arb->private_a->body, arb->private_b->body);
+		mergeBodies(space, components, rogueBodies, arb->private_a->body, arb->private_b->body);
 	}
 	for(int j=0; j<constraints->num; j++){
 		cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
-		mergeBodies(space, components, rougeBodies, constraint->a, constraint->b);
+		mergeBodies(space, components, rogueBodies, constraint->a, constraint->b);
 	}
 	
 	// iterate bodies and add them to their components
 	for(int i=0; i<bodies->num; i++)
 		addToComponent((cpBody*)bodies->arr[i], components);
-	for(int i=0; i<rougeBodies->num; i++)
-		addToComponent((cpBody*)rougeBodies->arr[i], components);
+	for(int i=0; i<rogueBodies->num; i++)
+		addToComponent((cpBody*)rogueBodies->arr[i], components);
 	
 	// iterate components, copy or deactivate
 	for(int i=0; i<components->num; i++){
@@ -1066,7 +1066,7 @@ processContactComponents(cpSpace *space, cpFloat dt)
 			do {
 				next = body->node.next;
 				
-				if(!cpBodyIsRouge(body)) cpArrayPush(newBodies, body);
+				if(!cpBodyIsRogue(body)) cpArrayPush(newBodies, body);
 				body->node.next = NULL;
 				body->node.parent = NULL;
 				body->node.rank = 0;
@@ -1088,7 +1088,7 @@ processContactComponents(cpSpace *space, cpFloat dt)
 	
 	space->bodies = newBodies;
 	cpArrayFree(bodies);
-	cpArrayFree(rougeBodies);
+	cpArrayFree(rogueBodies);
 	cpArrayFree(components);
 }
 
