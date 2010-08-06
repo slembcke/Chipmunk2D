@@ -133,7 +133,7 @@ static inline cpBool
 cpBodyIsStatic(cpBody *body)
 {
 	cpSpace *space = body->space;
-	return (space != NULL && body == &space->staticBody);
+	return (space != ((cpSpace*)0) && body == &space->staticBody);
 }
 
 // Collision handler management functions.
