@@ -1,0 +1,23 @@
+h1, h2 { padding: 3px; }
+h1 { background-color: #DB944D;}
+h2 { background-color: lightGrey;}
+p { margin-left: 1em; }
+p.expl { margin-left: 2em; }
+code { color: #191970 }
+
+pre {
+		background-color: #F0F0F0;
+		padding: 3px;
+		margin-left: 1em;
+}
+
+table {
+	border: 2px solid black;
+	border-collapse: collapse;
+	margin-left: 1em;
+}
+
+table td, th {
+	border: 1px black solid;
+	padding: 5px;
+}

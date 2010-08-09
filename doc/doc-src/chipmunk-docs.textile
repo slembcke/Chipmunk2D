@@ -1,6 +1,5 @@
 !images/logo1_med.png! !{float:right;}images/hms_logo.png!:http://howlingmoonsoftware.com
 
-
 * "Chipmunk Physics":#ChipmunkPhysics
 * "Chipmunk Basics":#ChipmunkBasics
 * "Chipmunk C API":#ChipmunkCAPI
@@ -38,7 +37,11 @@ There are two major problems with Chipmunk's C API. The first is that it lacks o
 
 h2. Support:
 
-The best way to get support is to visit the "Chipmunk Forums":http://www.slembcke.net/forums/viewforum.php?f=1. There are plenty of people around using Chipmunk on the just about every platform I've ever heard of. If you are working on a commercial project, Howling Moon Software (my company) is "available for contracting":http://howlingmoonsoftware.com/contracting.php.
+The best way to get support is to visit the "Chipmunk Forums":http://www.slembcke.net/forums/viewforum.php?f=1. There are plenty of people around using Chipmunk on the just about every platform I've ever heard of. If you are working on a commercial project, Howling Moon Software (my company) is "available for contracting":http://howlingmoonsoftware.com/contracting.php. We can help with implementing custom Chipmunk behaviors, as well as priority bug fixes and performance tuning.
+
+h2. Contact:
+
+If you find any bugs in Chipmunk or this document, or have a question or comment about Chipmunk you can contact me at slembcke(at)gmail(dot)com.
 
 h2. License:
 
@@ -507,7 +510,7 @@ When creating different types of shapes, you will always be given a @cpShape*@ p
 * @e@ - @cpFloat@: Elasticity of the shape. A value of 0.0 gives no bounce, while a value of 1.0 will give a "perfect" bounce. However due to inaccuracies in the simulation using 1.0 or greater is not recommended however. _See the notes at the end of the section._
 * @u@ - @cpFloat@: Friction coefficient. Chipmunk uses the Coulomb friction model, a value of 0.0 is frictionless. "Tables of friction coefficients":http://www.roymech.co.uk/Useful_Tables/Tribology/co_of_frict.htm. _See the notes at the end of the section._
 * @surface_v@ - @cpVect@: The surface velocity of the object. Useful for creating conveyor belts or players that move around. This value is only used when calculating friction, not resolving the collision.
-* @collision_type@ - @cpCollisionType@: You can assign types to Chipmunk collision shapes that trigger callbacks when objects of certain types touch. See the "callbacks section":#Callbacks or an example for more information. <!-- TODO EXAMPLE -->
+* @collision_type@ - @cpCollisionType@: You can assign types to Chipmunk collision shapes that trigger callbacks when objects of certain types touch. See the "callbacks section":#Callbacks or an "example":examples.html#CollisionCallbacks for more information.
 * @group@ - @cpCollisionGroup@: Shapes in the same non-zero group do not generate collisions. Useful when creating an object out of many shapes that you don't want to self collide. Defaults to @CP_NO_GROUP@.
 * @layers@ - @cpLayers@: Shapes only collide if they are in the same bit-planes. i.e. @(a->layers & b->layers) != 0@ By default, a shape occupies all bit-planes. "Wikipedia":http://en.wikipedia.org/wiki/Mask_(computing)#top has a nice article on bitmasks if you are unfamiliar with how to use them. Defaults to @CP_ALL_LAYERS@.
 * @data@ - @cpDataPointer@: A user definable data pointer. If you set this to point at the game object the shapes is for, then you can access your game object from Chipmunk callbacks.
@@ -1043,7 +1046,6 @@ p(expl). Remove a collision handler for a given collision type pair.
 
 p(expl). Register a default collision handler to be used when no specific collision handler is found. The space is given a default handler when created that returns true for all collisions in @begin()@ and @preSolve()@ and does nothing in the @postSolve()@ and @separate()@ callbacks.
 
-
 h2. Post-Step Callbacks:
 
 Post-step callbacks are the one place where you can break the rules about adding or removing objects from within a callback. In fact, their primary function is to help you safely remove objects from the space that you wanted to disable or destroy in a collision callback.
@@ -1058,45 +1060,9 @@ p(expl). Function type used for post step callbacks. @space@ is the space the ca
 
 p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @obj@ and @data@ will be passed to your function. Only the last callback registered for any unique value of @obj@ will be recorded. You can add post-step callbacks from outside of other callback functions, but they won't be called until @cpSpaceStep()@ is called again.
 
-h2. Callbacks Example:
+h2. Examples:
 
-TODO move to a separate file
-
-Here is a short example showing how to use collision handlers and post step callbacks together to remove an object when it touches another:
-<pre><code>static void
-postStepRemove(cpSpace *space, cpShape *shape, void *unused)
-{
-	cpSpaceRemoveBody(space, shape->body);
-	cpBodyFree(shape->body);
-	
-	cpSpaceRemoveShape(space, shape);
-	cpShapeFree(shape);
-}
-
-static int
-begin(cpArbiter *arb, cpSpace *space, void *unused)
-{
-	// Get the cpShapes involved in the collision
-	// The order will be the same as you defined in the handler definition
-	// a->collision_type will be BULLET_TYPE and b->collision_type will be MONSTER_TYPE
-	cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
-	
-	// Alternatively you can use the CP_ARBITER_GET_SHAPES() macro
-	// It defines and sets the variables for you.
-	//CP_ARBITER_GET_SHAPES(arb, a, b);
-	
-	// Add a post step callback to safely remove the object from the space
-	cpSpaceAddPostStepCallback(space, (cpPostStepFunc)postStepRemove, b, NULL);
-	
-	// The object is dead, don't process the collision further
-	return 0;
-}
-
-// Define a collision handler for bullets and monsters
-// Kill the monster by removing it's shape and body from the space as soon as it's hit by a bullet 
-cpSpaceAddCollisionHandler(space, BULLET_TYPE, MONSTER_TYPE, begin, NULL, NULL, NULL, NULL);</code></pre>
-
-For more examples, see the "One Way Platform Demo":http://code.google.com/p/chipmunk-physics/source/browse/trunk/Demo/OneWay.c, "Sensors Demo":http://code.google.com/p/chipmunk-physics/source/browse/trunk/Demo/Sensors.c, or the "Player Demo":http://code.google.com/p/chipmunk-physics/source/browse/trunk/Demo/Player.c
+See the "callback examples":examples.html#CollisionCallbacks for more information.
 
 <a name="cpArbiter" />
 
@@ -1115,7 +1081,7 @@ h2. Helper Functions:
 <pre><code>void cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
 #define CP_ARBITER_GET_SHAPES(arb, a, b) cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);</code></pre>
 
-p(expl). Get the shapes in the order that they were defined in the collision handler associated with this arbiter. If you defined the handler as @cpSpaceAddCollisionHandler(space, 1, 2, ...)@, you you will find that @a->collision_type == 1@ and @b->collision_type == 2@. The convenience macro defines and initializes the two shape variables for you. <!-- TODO see example -->
+p(expl). Get the shapes in the order that they were defined in the collision handler associated with this arbiter. If you defined the handler as @cpSpaceAddCollisionHandler(space, 1, 2, ...)@, you you will find that @a->collision_type == 1@ and @b->collision_type == 2@. The convenience macro defines and initializes the two shape variables for you. "example":examples.html#CollisionCallbacks
 
 <pre><code>int cpArbiterIsFirstContact(cpArbiter *arb)</code></pre>
 
@@ -1217,38 +1183,4 @@ p(expl). Return the absolute distance where the segment first hit the shape.
 
 h2. Examples:
 
-TODO move these to another file
-
-This is the mouse button handler function from the demo app. On mouse down, it finds the shape under the mouse if there is one and adds a joint to it so that you can drag it around.
-<pre><code>static void
-click(int button, int state, int x, int y)
-{
-	if(button == GLUT_LEFT_BUTTON){
-		if(state == GLUT_DOWN){
-			cpVect point = mouseToSpace(x, y);
-		
-			cpShape *shape = cpSpacePointQueryFirst(space, point, GRABABLE_MASK_BIT, 0);
-			if(shape){
-				cpBody *body = shape->body;
-				mouseJoint = cpPivotJointNew2(mouseBody, body, cpvzero, cpBodyWorld2Local(body, point));
-				mouseJoint->maxForce = 50000.0f;
-				mouseJoint->biasCoef = 0.15f;
-				cpSpaceAddConstraint(space, mouseJoint);
-			}
-		} else if(mouseJoint){
-			cpSpaceRemoveConstraint(space, mouseJoint);
-			cpConstraintFree(mouseJoint);
-			mouseJoint = NULL;
-		}
-	}
-}</code></pre>
-
-Shoot a laser through a space, find the first shape it hits. We want to draw particles where the laser beam enters and exits the shape.
-<pre><code>cpSegmentQueryInfo info;
-if(cpSpaceSegmentQueryFirst(space, a, b, -1, 0, &info)){
-	cpSegmentQueryInfo info2;
-	cpShapeSegmentQuery(info.shape, b, a, &info2);
-	
-	cpVect enterPoint = cpSegmentQueryHitPoint(a, b, info);
-	cpVect exitPoint = cpSegmentQueryHitPoint(b, a, info2);
-}</code></pre>
+See the "query examples":examples.html#Query for more information.

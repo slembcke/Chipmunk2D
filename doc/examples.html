@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Chipmunk Game Dynamics Documentation</title>
+		<link rel="stylesheet" type="text/css" href="stylesheet.css" />
+	</head>
+	<body>
+
+<h1>Example Code Snippets:</h1>
+
+<!-- Transformation Example -->
+<a name="Transform" />
+<h2>Getting a Transformation from a Rigid Body:</h2>
+
+<p>You can quickly and easily build a transformation matrix from a Chipmunk body. The following code is for OpenGL, but it should be trivial to modify for DirectX or affine transforms. (Note that OpenGL matrices are column-major)</p>
+
+<pre style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; ">cpVect pos = body-&gt;p;
+cpVect rot = body-&gt;rot;
+
+GLFloat matrix[<span style="color:#0000ff;">16</span>] = {
+   rot.x, rot.y, <span style="color:#0000ff;">0.0f</span>, <span style="color:#0000ff;">0.0f</span>,
+  -rot.y, rot.x, <span style="color:#0000ff;">0.0f</span>, <span style="color:#0000ff;">0.0f</span>,
+   <span style="color:#0000ff;">0.0f</span>,   <span style="color:#0000ff;">0.0f</span>, <span style="color:#0000ff;">1.0f</span>, <span style="color:#0000ff;">0.0f</span>,
+   pos.x, pos.y, <span style="color:#0000ff;">0.0f</span>, <span style="color:#0000ff;">1.0f</span>,
+};
+
+<span style="color:#003369;">glMultMatrixf</span>(matrix.farr);
+</pre>
+
+<!-- Collision Callbacks Example -->
+<a name="CollisionCallbacks" />
+<h2>Collision Callbacks:</h2>
+
+<p>This snippet demonstrates several Chipmunk collision callback features. It defines a collision handler that is called when collision shapes start touching and also a post-step callback to remove the collision shape and body.</p>
+
+<pre style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; "><strong><span style="color:#881350;">static</span></strong> <strong><span style="color:#881350;">void</span></strong>
+<span style="color:#003369;">postStepRemove</span>(cpSpace *space, cpShape *shape, <strong><span style="color:#881350;">void</span></strong> *unused)
+{
+  <span style="color:#003369;">cpSpaceRemoveBody</span>(space, shape-&gt;body);
+  <span style="color:#003369;">cpBodyFree</span>(shape-&gt;body);
+  
+  <span style="color:#003369;">cpSpaceRemoveShape</span>(space, shape);
+  <span style="color:#003369;">cpShapeFree</span>(shape);
+}
+
+<strong><span style="color:#881350;">static</span></strong> <strong><span style="color:#881350;">int</span></strong>
+<span style="color:#003369;">begin</span>(cpArbiter *arb, cpSpace *space, <strong><span style="color:#881350;">void</span></strong> *unused)
+{
+  <em><span style="color:#236e25;">// Get the cpShapes involved in the collision
+</span></em>  <em><span style="color:#236e25;">// The order will be the same as you defined in the handler definition
+</span></em>  <em><span style="color:#236e25;">// a-&gt;collision_type will be BULLET_TYPE and b-&gt;collision_type will be MONSTER_TYPE
+</span></em>  cpShape *a, *b; <span style="color:#003369;">cpArbiterGetShapes</span>(arb, &amp;a, &amp;b);
+  
+  <em><span style="color:#236e25;">// Alternatively you can use the CP_ARBITER_GET_SHAPES() macro
+</span></em>  <em><span style="color:#236e25;">// It defines and sets the variables for you.
+</span></em>  <em><span style="color:#236e25;">//CP_ARBITER_GET_SHAPES(arb, a, b);
+</span></em>  
+  <em><span style="color:#236e25;">// Add a post step callback to safely remove the body and shape from the space.
+</span></em>  <em><span style="color:#236e25;">// Calling cpSpaceRemove*() directly from a collision handler callback can cause crashes.
+</span></em>  <span style="color:#003369;">cpSpaceAddPostStepCallback</span>(space, (cpPostStepFunc)postStepRemove, b, <strong><span style="color:#881350;">NULL</span></strong>);
+  
+  <em><span style="color:#236e25;">// The object is dead, don&rsquo;t process the collision further
+</span></em>  <strong><span style="color:#881350;">return</span></strong> <span style="color:#0000ff;">0</span>;
+}
+
+<span style="color:#683821;">#define BULLET_TYPE </span><span style="color:#0000ff;">1</span><span style="color:#683821;">
+#define MONSTER_TYPE </span><span style="color:#0000ff;">2</span><span style="color:#683821;">
+</span>
+<em><span style="color:#236e25;">// Define a collision handler for bullets and monsters
+// Kill the monster by removing it&rsquo;s shape and body from the space as soon as it&rsquo;s hit by a bullet 
+</span></em><span style="color:#003369;">cpSpaceAddCollisionHandler</span>(space, BULLET_TYPE, MONSTER_TYPE, begin, <strong><span style="color:#881350;">NULL</span></strong>, <strong><span style="color:#881350;">NULL</span></strong>, <strong><span style="color:#881350;">NULL</span></strong>, <strong><span style="color:#881350;">NULL</span></strong>);</pre>
+
+<p>For more callback examples, see the <a href="http://code.google.com/p/chipmunk-physics/source/browse/trunk/Demo/OneWay.c">One Way Platform Demo</a>, <a href="http://code.google.com/p/chipmunk-physics/source/browse/trunk/Demo/Sensors.c">Sensors Demo</a>, or the <a href="http://code.google.com/p/chipmunk-physics/source/browse/trunk/Demo/Player.c">Player Demo</a>.</p>
+
+<!-- Query Examples -->
+<a name="Query" />
+<h2>Query Examples:</h2>
+
+<p>The following example is taken directly from <a href="http://code.google.com/p/chipmunk-physics/source/browse/trunk/Demo/ChipmunkDemo.c#319">ChipmunkDemo.c</a>. When the mouse is clicked, a point query is performed to see if there is a shape under the mouse. If there is, it adds a joint to the body that links it to the mouse's movement.</p>
+
+<pre style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; "><strong><span style="color:#881350;">static</span></strong> <strong><span style="color:#881350;">void</span></strong>
+<span style="color:#003369;">click</span>(<strong><span style="color:#881350;">int</span></strong> button, <strong><span style="color:#881350;">int</span></strong> state, <strong><span style="color:#881350;">int</span></strong> x, <strong><span style="color:#881350;">int</span></strong> y)
+{
+  <strong><span style="color:#881350;">if</span></strong>(button == GLUT_LEFT_BUTTON){
+    <strong><span style="color:#881350;">if</span></strong>(state == GLUT_DOWN){
+      cpVect point = <span style="color:#003369;">mouseToSpace</span>(x, y);
+    
+      cpShape *shape = <span style="color:#003369;">cpSpacePointQueryFirst</span>(space, point, GRABABLE_MASK_BIT, <span style="color:#0000ff;">0</span>);
+      <strong><span style="color:#881350;">if</span></strong>(shape){
+        cpBody *body = shape-&gt;body;
+        mouseJoint = <span style="color:#003369;">cpPivotJointNew2</span>(mouseBody, body, cpvzero, <span style="color:#003369;">cpBodyWorld2Local</span>(body, point));
+        mouseJoint-&gt;maxForce = <span style="color:#0000ff;">50000.0f</span>;
+        mouseJoint-&gt;biasCoef = <span style="color:#0000ff;">0.15f</span>;
+        <span style="color:#003369;">cpSpaceAddConstraint</span>(space, mouseJoint);
+      }
+    } <strong><span style="color:#881350;">else</span></strong> <strong><span style="color:#881350;">if</span></strong>(mouseJoint){
+      <span style="color:#003369;">cpSpaceRemoveConstraint</span>(space, mouseJoint);
+      <span style="color:#003369;">cpConstraintFree</span>(mouseJoint);
+      mouseJoint = <strong><span style="color:#881350;">NULL</span></strong>;
+    }
+  }
+}</pre>
+
+<p>Perform a segment query to see if a laser beam hits a shape. We want to draw particles at both the position where the beam enters and exits the shape.</p>
+
+<pre style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; ">cpVect a = <span style="color:#003369;">cpv</span>(...), b = <span style="color:#003369;">cpv</span>(...);
+
+cpSegmentQueryInfo info = {};
+<strong><span style="color:#881350;">if</span></strong>(<span style="color:#003369;">cpSpaceSegmentQueryFirst</span>(space, a, b, -<span style="color:#0000ff;">1</span>, <span style="color:#0000ff;">0</span>, &amp;info)){
+  cpSegmentQueryInfo info2;
+  <span style="color:#003369;">cpShapeSegmentQuery</span>(info.shape, b, a, &amp;info2);
+  
+  cpVect enterPoint = <span style="color:#003369;">cpSegmentQueryHitPoint</span>(a, b, info);
+  cpVect exitPoint = <span style="color:#003369;">cpSegmentQueryHitPoint</span>(b, a, info2);
+}</pre>
+
+	</body>
+</html>
