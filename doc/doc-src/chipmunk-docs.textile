@@ -1,8 +1,7 @@
-!images/logo1_med.png!
+!images/logo1_med.png! !{float:right;}images/hms_logo.png!:http://howlingmoonsoftware.com
 
 TODO redo this header part
-TODO note about Chipmunk undocumented Chipmunk parts
-TODO magic globals
+TODO doc magic globals
 TODO license
 
 h1. Chipmunk Physics 5.3.0
@@ -13,15 +12,15 @@ First of all, I would like to give a Erin Catto a big thank you, as Chipmunk's i
 
 h2. Why a C Library?
 
-A lot of people ask me why I wrote Chipmunk in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, OOC, Lua, Io, the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I wanted Chipmunk to be fast, portable, and easy to optimize. With Chipmunk weiging in at less than 7,500 lines of C code, headers and comments, I don't feel that using C has made Chipmunk difficult to develop. In fact, at times I feel it has made it easier to optimize and debug.
+A lot of people ask me why I wrote Chipmunk in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, OOC, Lua, Io... the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I wanted Chipmunk to be fast, portable, and easy to optimize. With Chipmunk weiging in at less than 7,500 lines of C code, headers and comments, I don't feel that using C has made Chipmunk difficult to develop. In fact, at times I feel it has made it easier to optimize and debug.
 
-That said, I've never developed a whole game in C and I probably never will. There are much more interesting languages to do that in than C with all sorts of nice features like garbage collection, closures and object oriented runtimes. Check out the bindings and ports page to see if you can use Chipmunk from your language of choice. TODO link
+That said, I've never developed a whole game in C and I probably never will. There are much more interesting languages to do that in than C with all sorts of nice features like garbage collection, closures and object oriented runtimes. Check out the "Bindings and Ports":http://code.google.com/p/chipmunk-physics/wiki/BindingsAndPorts page to see if you can use Chipmunk from your language of choice.
 
 Now a shameless plug for my company! If you are writing iPhone games using Chipmunk, you should check out the Objective-Chipmunk wrapper that we've developed for Chipmunk. It integrates with the Objective-C memory model and provides a number of high level APIs that make writing physics based games for the iPhone even easier. While we do charge for Objective-Chipmunk, it will almost certainly save you more time than the cost to license it.
 
 h2. Limitations of a C API:
 
-There are two major problems with Chipmunk's C API. The first is that it lacks operator overloading. Chipmunk defines vector operators as functions instead of allowing you to use operators such as *, +, and -. In practice, it's usually not a major problem for readability in practice though. The second, and bigger problem is that it's not possible to mark fields as private in C structure types. Be warned that if you are reading fields from Chipmunk structs that are not documented here, that they might change in the future without a lot of prior warning. 
+There are two major problems with Chipmunk's C API. The first is that it lacks operator overloading. Chipmunk defines vector operators as functions instead of allowing you to use operators such as *, +, and -. In practice, it's usually not a major problem for readability in practice though. The second, and bigger problem is that it's not possible to mark fields as private in C structure types. Be warned that if you are reading fields from Chipmunk structs that are not documented here, that they might change in the future without a lot of prior warning.
 
 h2. Overview:
 
