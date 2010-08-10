@@ -10,7 +10,7 @@ The Objective-Chipmunk directory contains an Objective-C wrapper for the Chipmun
 BUILDING:
 Mac OS X: There is an included XCode project file for building the static library and demo application. Alternatively you could use the CMake files.
 
-iPhone: If you want a native Objective-C API, check out the Objective-Chipmunk directory for the Objective-C binding and some sample code from shipping iPhone Apps. It is inexpensive to license and should save you a lot of time. Otherwise, the XCode project can build a static library with all the proper compiler settings. Additionally, if you run the iphonestatic.sh script in the macosx/ directory, it will build you a fat library compiled as release for the device and debug for the simulator. After running it, you can simply drop the Chipmunk-iPhone directory into your iPhone project!
+iPhone: If you want a native Objective-C API, check out the Objective-Chipmunk directory for the Objective-C binding and some sample code from shipping iPhone Apps. It is inexpensive to license and should save you a lot of time. Otherwise, the XCode project can build a static library with all the proper compiler settings. Alternatively, you can just run iphonestatic.command in the macosx/ directory.  It will build you a fat library compiled as release for the device and debug for the simulator. After running it, you can simply drop the Chipmunk-iPhone directory into your iPhone project!
 
 UNIXes: A forum user was kind enough to make a set of CMake files for Chipmunk. This will require you to have CMake installed. To build run 'cmake .' then 'make'. This should build a dynamic library, a static library, and the demo application.
 
