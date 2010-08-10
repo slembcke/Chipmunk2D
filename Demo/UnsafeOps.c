@@ -67,18 +67,18 @@ init(void)
 	cpSpaceResizeStaticHash(space, 40.0f, 999);
 	cpSpaceResizeActiveHash(space, 30.0f, 2999);
 	
-	cpBody *body;
+	cpBody *body, *staticBody = &space->staticBody;
 	cpShape *shape;
 	
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddStaticShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	

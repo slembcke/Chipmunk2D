@@ -52,19 +52,19 @@ init(void)
 	space->gravity = cpv(0, -100);
 	space->sleepTimeThreshold = 0.5f;
 	
-	cpBody *body;
+	cpBody *body, *staticBody = &space->staticBody;
 	cpShape *shape;
 	
 	// Create segments around the edge of the screen.
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	

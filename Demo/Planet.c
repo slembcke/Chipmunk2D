@@ -28,7 +28,7 @@
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
-static cpBody *staticBody;
+static cpBody *planetBody;
 
 static cpFloat gravityStrength = 5.0e6f;
 
@@ -42,7 +42,7 @@ update(int ticks)
 		cpSpaceStep(space, dt);
 		
 		// Update the static body spin so that it looks like it's rotating.
-		cpBodyUpdatePosition(staticBody, dt);
+		cpBodyUpdatePosition(planetBody, dt);
 	}
 }
 
@@ -107,8 +107,8 @@ add_box()
 static cpSpace *
 init(void)
 {
-	staticBody = cpBodyNew(INFINITY, INFINITY);
-	staticBody->w = 0.2f;
+	planetBody = cpBodyNew(INFINITY, INFINITY);
+	planetBody->w = 0.2f;
 	
 	cpResetShapeIdCounter();
 	
@@ -119,7 +119,7 @@ init(void)
 	for(int i=0; i<30; i++)
 		add_box();
 	
-	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(staticBody, 70.0f, cpvzero));
+	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(planetBody, 70.0f, cpvzero));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
@@ -129,7 +129,7 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(staticBody);
+	cpBodyFree(planetBody);
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
 }

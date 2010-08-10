@@ -87,10 +87,11 @@ init(void)
 	cpSpaceResizeStaticHash(space, 40.0f, 999);
 	cpSpaceResizeActiveHash(space, 30.0f, 2999);
 
+	cpBody *staticBody = &space->staticBody;
 	cpShape *shape;
 	
 	// add a non-collidable segment as a quick and dirty way to draw the query line
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpvzero, cpv(100.0f, 0.0f), 4.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpvzero, cpv(100.0f, 0.0f), 4.0f));
 	shape->layers = 0;
 	querySeg = shape;
 	
@@ -106,7 +107,7 @@ init(void)
 	}
 	
 	{ // add a static segment
-		cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(0, 300), cpv(300, 0), 0.0f));
+		cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(0, 300), cpv(300, 0), 0.0f));
 	}
 	
 	{ // add a pentagon

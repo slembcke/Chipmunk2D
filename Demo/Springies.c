@@ -77,6 +77,7 @@ static cpSpace *
 init(void)
 {
 	space = cpSpaceNew();
+	cpBody *staticBody = &space->staticBody;
 	
 	cpBody *body1  = add_bar(cpv(-240,  160), cpv(-160,   80), 1);
 	cpBody *body2  = add_bar(cpv(-160,   80), cpv( -80,  160), 1);
@@ -101,36 +102,36 @@ init(void)
 	
 	cpFloat stiff = 100.0f;
 	cpFloat damp = 0.5f;
-	cpSpaceAddConstraint(space, new_spring(NULL,  body1, cpv(-320,  240), cpv(-40, 40), 0.0f, stiff, damp));
-	cpSpaceAddConstraint(space, new_spring(NULL,  body1, cpv(-320,   80), cpv(-40, 40), 0.0f, stiff, damp));
-	cpSpaceAddConstraint(space, new_spring(NULL,  body1, cpv(-160,  240), cpv(-40, 40), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody,  body1, cpv(-320,  240), cpv(-40, 40), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody,  body1, cpv(-320,   80), cpv(-40, 40), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody,  body1, cpv(-160,  240), cpv(-40, 40), 0.0f, stiff, damp));
 
-	cpSpaceAddConstraint(space, new_spring(NULL,  body2, cpv(-160,  240), cpv( 40, 40), 0.0f, stiff, damp));
-	cpSpaceAddConstraint(space, new_spring(NULL,  body2, cpv(   0,  240), cpv( 40, 40), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody,  body2, cpv(-160,  240), cpv( 40, 40), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody,  body2, cpv(   0,  240), cpv( 40, 40), 0.0f, stiff, damp));
 
-	cpSpaceAddConstraint(space, new_spring(NULL,  body3, cpv(  80,  240), cpv(-40, 80), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody,  body3, cpv(  80,  240), cpv(-40, 80), 0.0f, stiff, damp));
 
-	cpSpaceAddConstraint(space, new_spring(NULL,  body4, cpv(  80,  240), cpv(-40,  0), 0.0f, stiff, damp));
-	cpSpaceAddConstraint(space, new_spring(NULL,  body4, cpv( 320,  240), cpv( 40,  0), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody,  body4, cpv(  80,  240), cpv(-40,  0), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody,  body4, cpv( 320,  240), cpv( 40,  0), 0.0f, stiff, damp));
 
-	cpSpaceAddConstraint(space, new_spring(NULL,  body5, cpv(-320,   80), cpv(-40, 40), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody,  body5, cpv(-320,   80), cpv(-40, 40), 0.0f, stiff, damp));
 	
-	cpSpaceAddConstraint(space, new_spring(NULL,  body9, cpv( 320,  80), cpv( 40, 40), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody,  body9, cpv( 320,  80), cpv( 40, 40), 0.0f, stiff, damp));
 
-	cpSpaceAddConstraint(space, new_spring(NULL, body10, cpv( 320,   0), cpv( 40,-40), 0.0f, stiff, damp));
-	cpSpaceAddConstraint(space, new_spring(NULL, body10, cpv( 320,-160), cpv( 40,-40), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody, body10, cpv( 320,   0), cpv( 40,-40), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody, body10, cpv( 320,-160), cpv( 40,-40), 0.0f, stiff, damp));
 
-	cpSpaceAddConstraint(space, new_spring(NULL, body11, cpv(-320,-160), cpv(-40, 40), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody, body11, cpv(-320,-160), cpv(-40, 40), 0.0f, stiff, damp));
 
-	cpSpaceAddConstraint(space, new_spring(NULL, body12, cpv(-240,-240), cpv(-40,  0), 0.0f, stiff, damp));
-	cpSpaceAddConstraint(space, new_spring(NULL, body12, cpv(   0,-240), cpv( 40,  0), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody, body12, cpv(-240,-240), cpv(-40,  0), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody, body12, cpv(   0,-240), cpv( 40,  0), 0.0f, stiff, damp));
 
-	cpSpaceAddConstraint(space, new_spring(NULL, body13, cpv(   0,-240), cpv(-40,  0), 0.0f, stiff, damp));
-	cpSpaceAddConstraint(space, new_spring(NULL, body13, cpv(  80,-240), cpv( 40,  0), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody, body13, cpv(   0,-240), cpv(-40,  0), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody, body13, cpv(  80,-240), cpv( 40,  0), 0.0f, stiff, damp));
 
-	cpSpaceAddConstraint(space, new_spring(NULL, body14, cpv(  80,-240), cpv(-40,  0), 0.0f, stiff, damp));
-	cpSpaceAddConstraint(space, new_spring(NULL, body14, cpv( 240,-240), cpv( 40,  0), 0.0f, stiff, damp));
-	cpSpaceAddConstraint(space, new_spring(NULL, body14, cpv( 320,-160), cpv( 40,  0), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody, body14, cpv(  80,-240), cpv(-40,  0), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody, body14, cpv( 240,-240), cpv( 40,  0), 0.0f, stiff, damp));
+	cpSpaceAddConstraint(space, new_spring(staticBody, body14, cpv( 320,-160), cpv( 40,  0), 0.0f, stiff, damp));
 
 	cpSpaceAddConstraint(space, new_spring( body1,  body5, cpv( 40,-40), cpv(-40, 40), 0.0f, stiff, damp));
 	cpSpaceAddConstraint(space, new_spring( body1,  body6, cpv( 40,-40), cpv( 40, 40), 0.0f, stiff, damp));

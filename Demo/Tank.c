@@ -88,33 +88,34 @@ init(void)
 	space->iterations = 10;
 	space->sleepTimeThreshold = 0.5f;
 	
+	cpBody *staticBody = &space->staticBody;
 	cpShape *shape;
 		
 	// Create segments around the edge of the screen.
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	for(int i=0; i<50; i++){
 		cpBody *body = add_box(10.0, 1.0);
 		
-		cpConstraint *pivot = cpSpaceAddConstraint(space, cpPivotJointNew2(NULL, body, cpvzero, cpvzero));
+		cpConstraint *pivot = cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, body, cpvzero, cpvzero));
 		pivot->biasCoef = 0.0f; // disable joint correction
 		pivot->maxForce = 1000.0f; // emulate linear friction
 		
-		cpConstraint *gear = cpSpaceAddConstraint(space, cpGearJointNew(NULL, body, 0.0f, 1.0f));
+		cpConstraint *gear = cpSpaceAddConstraint(space, cpGearJointNew(staticBody, body, 0.0f, 1.0f));
 		gear->biasCoef = 0.0f; // disable joint correction
 		gear->maxForce = 5000.0f; // emulate angular friction
 	}

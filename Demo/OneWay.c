@@ -70,24 +70,24 @@ init(void)
 	space->iterations = 10;
 	space->gravity = cpv(0, -100);
 
-	cpBody *body;
+	cpBody *body, *staticBody = &space->staticBody;
 	cpShape *shape;
 
 	// Create segments around the edge of the screen.
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	// Add our one way segment
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-160,-100), cpv(160,-100), 10.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-160,-100), cpv(160,-100), 10.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->collision_type = 1;
 	shape->layers = NOT_GRABABLE_MASK;

@@ -72,34 +72,35 @@ init(void)
 	cpSpaceResizeActiveHash(space, 30.0f, 1000);
 	space->iterations = 10;
 
+	cpBody *body, *staticBody = &space->staticBody;
 	cpShape *shape;
 
 	// Create segments around the edge of the screen.
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(-320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(320,-240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(NULL, cpv(-320,240), cpv(320,240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	for(int i=0; i<10; i++)
 		add_box();
 	
-	cpBody *body = cpSpaceAddBody(space, cpBodyNew(100.0f, 10000.0f));
+	body = cpSpaceAddBody(space, cpBodyNew(100.0f, 10000.0f));
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpv(-75,0), cpv(75,0), 5.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew2(body, NULL, cpvzero, cpvzero));
+	cpSpaceAddConstraint(space, cpPivotJointNew2(body, staticBody, cpvzero, cpvzero));
 	
 	return space;
 }
