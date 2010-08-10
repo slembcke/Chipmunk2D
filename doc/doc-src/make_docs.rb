@@ -15,6 +15,6 @@ html = <<HTML
 	</html>
 HTML
 
-File.open('../chipmunk-docs.html', 'w') do|f|
+File.open('../index.html', 'w') do|f|
 	f.write html
 end
