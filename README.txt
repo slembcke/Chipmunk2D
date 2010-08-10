@@ -16,7 +16,7 @@ UNIXes: A forum user was kind enough to make a set of CMake files for Chipmunk. 
 
 Windows: Visual Studio projects are included in the msvc/ directory. I do not maintain these personally, but a number of forum members have assisted with them.
 
-Ruby: I've been using maintaining a Ruby extension for Chipmunk, but at this time is not up to date with all the latest changes. It has been tested and builds under Linux and OS X using CMake however. A forum member has been working on an FFI based extention (http://github.com/erisdiscord/chipmunk-ffi), and that may be a better way to take advantage of Chipmunk from Ruby. Another forum user has offered to maintain the non-FFI version of the extension. Stay tuned.
+Ruby: I've been using maintaining a Ruby extension for Chipmunk, but at this time is not up to date with all the latest changes. It has been tested and builds under Linux and OS X using CMake however 'cmake -D BUILD_RUBY_EXT=ON .; make'. A forum member has been working on an FFI based extention (http://github.com/erisdiscord/chipmunk-ffi), and that may be a better way to take advantage of Chipmunk from Ruby. Another forum user has offered to maintain the non-FFI version of the extension. Stay tuned.
 
 GETTING STARTED:
 First of all, you can find the C API documentation in the doc/ directory.
