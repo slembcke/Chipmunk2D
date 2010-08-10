@@ -1,25 +1,25 @@
 ABOUT:
-Chipmunk is a simple, lightweight and fast 2D rigid body physics library written in C. It's licensed under the unrestrictive, OSI approved MIT license. My aim is to give 2D developers access the same quality of physics you find in newer 3D games. I hope you enjoy using Chipmunk, and please consider donating to help make it worth our time to continue to support Chipmunk with great new features.
+Chipmunk is a simple, lightweight, fast and portable 2D rigid body physics library written in C. It's licensed under the unrestrictive, OSI approved MIT license. My aim is to give 2D developers access the same quality of physics you find in newer 3D games. I hope you enjoy using Chipmunk, and please consider donating to help make it worth our time to continue to support Chipmunk with great new features.
 
 CONTRACTING:
 Howling Moon Software (my company) is available for contracting if you want to make the physics in your game really stand out. Given our unique experience with the library, we can help you use Chipmunk to it's fullest potential. Feel free to contact us through our webpage: http://howlingmoonsoftware.com/contracting.php
 
 Objective-Chipmunk:
-The Objective-Chipmunk.tgz archive contains an Objective-C wrapper for the Chipmunk Physics Library as well as some sample code from shipping iPhone Apps. Chipmunk was written in C to allow it to  The primary advantages of a native Objective-C API include integrating with the Cocoa memory management model and the Chipmunk Object protocol. The Chipmunk Object protocol unifies the basic Chipmunk types as well as making it easy to create custom composite collections of the basic types. Additionally, the wrapper adds many convenience methods for doing common setup tasks as well as helper methods that integrate it with the rest of the Cocoa Touch API. The wrapper tries to do things the Objective-C way, adding useful method variations where it makes sense to do so.
+The Objective-Chipmunk directory contains an Objective-C wrapper for the Chipmunk Physics Library as well as some sample code from shipping iPhone Apps. One reason Chipmunk was written in C was to allow easy wrapping for other languages. The primary advantages of a native Objective-C API include integrating with the Cocoa memory management model and the Chipmunk Object protocol. The Chipmunk Object protocol unifies the basic Chipmunk types as well as making it easy to create and manage custom composite collections of the basic types. Additionally, the wrapper adds many convenience methods for doing common setup tasks as well as helper methods that integrate it with the rest of the Cocoa Touch API and basic datatypes used on the iPhone. The wrapper tries to do things the Objective-C way, adding useful method variations where it makes sense to do so. If you are an iPhone developer, Objective-Chipmunk will definitely save you time.
 
 BUILDING:
-Mac OS X: There is an included XCode project file for building the static library and demo application. Alteratively you could use the CMake files.
+Mac OS X: There is an included XCode project file for building the static library and demo application. Alternatively you could use the CMake files.
 
-iPhone: If you want a native Objective-C API, check out the Objective-Chipmunk.tgz archive for the Objective-C binding and some sample code from shipping iPhone Apps. Otherwise, the XCode project can build a static library with all the proper compiler settings. Additionally, if you run the iphonestatic.sh script in the macosx/ directory, it will build you a fat library compiled as release for the device and debug for the simulator. After building that, just copy the static lib and include/chipmunk/ directory to your project.
+iPhone: If you want a native Objective-C API, check out the Objective-Chipmunk directory for the Objective-C binding and some sample code from shipping iPhone Apps. It is inexpensive to license and should save you a lot of time. Otherwise, the XCode project can build a static library with all the proper compiler settings. Additionally, if you run the iphonestatic.sh script in the macosx/ directory, it will build you a fat library compiled as release for the device and debug for the simulator. After running it, you can simply drop the Chipmunk-iPhone directory into your iPhone project!
 
-UNIX: A forum user was kind enough to make a set of CMake files for Chipmunk. This will require you to have CMake installed. To build run 'cmake .' then 'make'. This should build a dynamic library, a static library, and the demo application.
+UNIXes: A forum user was kind enough to make a set of CMake files for Chipmunk. This will require you to have CMake installed. To build run 'cmake .' then 'make'. This should build a dynamic library, a static library, and the demo application.
 
-Windows: There is an included MSVC project for building the library and demo application. I do not personally maintain the MSVC project. It needs someone to update it for the new include structure.
+Windows: Visual Studio projects are included in the msvc/ directory. I do not maintain these personally, but a number of forum members have assisted with them.
 
-Ruby: I've been using maintaining a Ruby extension for Chipmunk, but at this time is not up to date with all the latest changes. It has been tested and builds under Linux and OS X using CMake however. A forum member has been working on an FFI based extention, and that may be a better way to take advantage of Chipmunk from Ruby. Another forum user has offered to maintain the non-FFI version of the extension. Stay tuned.
+Ruby: I've been using maintaining a Ruby extension for Chipmunk, but at this time is not up to date with all the latest changes. It has been tested and builds under Linux and OS X using CMake however. A forum member has been working on an FFI based extention (http://github.com/erisdiscord/chipmunk-ffi), and that may be a better way to take advantage of Chipmunk from Ruby. Another forum user has offered to maintain the non-FFI version of the extension. Stay tuned.
 
 GETTING STARTED:
-First of all, you can find the C API documentation here: http://code.google.com/p/chipmunk-physics/wiki/Documentation
+First of all, you can find the C API documentation in the doc/ directory.
 
 A good starting point is to take a look at the included Demo application. The demos all just set up a Chipmunk simulation space and the demo app draws the graphics directly out of that. This makes it easy to see how the Chipmunk API works without worrying about the graphics code. You are free to use the demo drawing routines in your own projects, though it is certainly not the recommended way of drawing Chipmunk objects as it pokes around at the undocumented parts of Chipmunk.
 
@@ -28,6 +28,18 @@ http://www.slembcke.net/forums
 
 CONTACT:
 slembcke@gmail.com (also on Google Talk)
+
+CHANGES SINCE 5.2.0:
+ * FIX: Fixed the source so it can compile as C, C++, Objective-C, and Objective-C++.
+ * FIX: Fixed cp_contact_persistence. It was broken so that it would forget collision solutions after 1 frame instead of respecting the value set.
+ * OPTIMIZATION: Several minor optimizations have been added. Though performance should only differ by a few percent.
+ * OPTIMIZATION: Chipmunk now supports putting bodies to sleep when they become inactive.
+ * API: Elastic iterations are now deprecated as they should no longer be necessary.
+ * API: Added API elements to support body sleeping.
+ * API: Added a statically allocated static body to each space for attaching static shapes to.
+ * API: Static shapes attached to the space's static body can simply be added to the space using cpSpaceAddShape().
+ * NEW: New MSVC projects.
+ * NEW: Added boolean and time stamp types for clarity.
 
 CHANGES SINCE 5.1.0:
  * OPTIMIZATION: Chipmunk structs used within the solver are now allocated linearly in large blocks. This is much more CPU cache friendly. Programs have seen up to 50% performance improvements though 15-20% should be expected.
