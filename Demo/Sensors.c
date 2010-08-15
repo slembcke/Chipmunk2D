@@ -69,8 +69,8 @@ postStepRemove(cpSpace *space, cpShape *shape, void *unused)
 	cpSpaceRemoveBody(space, shape->body);
 	cpSpaceRemoveShape(space, shape);
 	
-	cpShapeFree(shape);
 	cpBodyFree(shape->body);
+	cpShapeFree(shape);
 }
 
 static cpBool
