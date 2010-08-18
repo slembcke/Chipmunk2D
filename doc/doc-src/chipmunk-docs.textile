@@ -17,7 +17,7 @@
 
 <a name="ChipmunkPhysics" />
 
-h1. Chipmunk Physics 5.3.0
+h1. Chipmunk Physics 5.3.2
 
 First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games on every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":http://code.google.com/p/chipmunk-physics/#Donate:. You'll make an indie game developer very happy.
 
