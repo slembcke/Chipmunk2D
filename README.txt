@@ -29,6 +29,13 @@ http://www.slembcke.net/forums
 CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
+CHANGES SINCE 5.3.0:
+ * NEW: Added a brand new tutorial for Objective-Chipmunk: SimpleObjectiveChipmunk that can be found in the Objective-Chipmunk folder.
+ * NEW: Proper API docs for Objective-Chipmunk.
+ * NEW: Updated the included Objective-Chipmunk library.
+ * FIX: Fixed a rare memory crash in the sensor demo.
+ * FIX: Fixed some warnings that users submitted.
+
 CHANGES SINCE 5.2.0:
  * FIX: Fixed the source so it can compile as C, C++, Objective-C, and Objective-C++.
  * FIX: Fixed cp_contact_persistence. It was broken so that it would forget collision solutions after 1 frame instead of respecting the value set.

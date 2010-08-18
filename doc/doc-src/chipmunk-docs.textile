@@ -711,7 +711,7 @@ h2. Notes:
 
 * When removing objects from the space, make sure you remove any other objects that reference it. For instance, when you remove a body, remove the joints and shapes attached to it.
 * The number of iterations, and the size of the time step determine the quality of the simulation. More iterations, or smaller time steps increase the quality. Keep in mind that higher quality also means higher CPU usage.
-* Because static shapes are only rehashed when you request it, it's possible to use a much higher @count@ argument to @cpHashResizeStaticHash()@ than to @cpHashResizeStaticHash()@. Doing so will use more memory but can improve performance if you have a lot of static shapes.
+* Because static shapes are only rehashed when you request it, it's possible to use a much higher @count@ argument to @cpHashResizeStaticHash()@ than to @cpSpaceResizeActiveHash()@. Doing so will use more memory but can improve performance if you have a lot of static shapes.
 
 <a name="cpConstraint" />
 
