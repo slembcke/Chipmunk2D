@@ -1195,6 +1195,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpHashSet *callbacks = space->postStepCallbacks;
 		space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql, (cpHashSetTransFunc)postStepFuncSetTrans);
 		cpHashSetEach(callbacks, (cpHashSetIterFunc)postStepCallbackSetIter, space);
+		cpHashSetFree(callbacks);
 	}
 	
 	// Increment the stamp.
