@@ -130,7 +130,7 @@ void cpSpaceFreeChildren(cpSpace *space);
 
 // Needed to be defined after the cpSpace type was closed
 static inline cpBool
-cpBodyIsStatic(cpBody *body)
+cpBodyIsStatic(const cpBody *body)
 {
 	cpSpace *space = body->space;
 	return (space != ((cpSpace*)0) && body == &space->staticBody);

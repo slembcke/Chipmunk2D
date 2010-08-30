@@ -69,7 +69,7 @@ cpConstraintActivateBodies(cpConstraint *constraint)
 
 #define CP_DefineConstraintGetter(struct, type, member, name) \
 static inline type \
-struct##Get##name(cpConstraint *constraint){ \
+struct##Get##name(const cpConstraint *constraint){ \
 	cpConstraintCheckCast(constraint, struct); \
 	return ((struct *)constraint)->member; \
 } \
