@@ -510,8 +510,6 @@ void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, c
 	a = cpvmult(a, 1.0f/hash->celldim);
 	b = cpvmult(b, 1.0f/hash->celldim);
 	
-	cpFloat dt_dx = 1.0f/cpfabs(b.x - a.x), dt_dy = 1.0f/cpfabs(b.y - a.y);
-	
 	int cell_x = floor_int(a.x), cell_y = floor_int(a.y);
 
 	cpFloat t = 0;
@@ -534,6 +532,10 @@ void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, c
 		y_inc = -1;
 		temp_v = (a.y - cpffloor(a.y));
 	}
+	
+	// Division by zero is *very* slow on ARM
+	cpFloat dx = cpfabs(b.x - a.x), dy = cpfabs(b.y - a.y);
+	cpFloat dt_dx = (dx ? 1.0f/dx : INFINITY), dt_dy = (dy ? 1.0f/dy : INFINITY);
 	
 	// fix NANs in horizontal directions
 	cpFloat next_h = (temp_h ? temp_h*dt_dx : dt_dx);
