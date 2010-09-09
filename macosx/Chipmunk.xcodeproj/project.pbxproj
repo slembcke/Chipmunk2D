@@ -459,7 +459,14 @@
 			isa = PBXProject;
 			buildConfigurationList = D3E5F01A0AA32EAC004E361B /* Build configuration list for PBXProject "Chipmunk" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = D3E5F0170AA32EAC004E361B;
 			productRefGroup = D3E5F04A0AA32FDE004E361B /* Products */;
 			projectDirPath = "";
