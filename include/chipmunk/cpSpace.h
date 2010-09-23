@@ -197,5 +197,7 @@ void cpSpaceResizeStaticHash(cpSpace *space, cpFloat dim, int count);
 void cpSpaceResizeActiveHash(cpSpace *space, cpFloat dim, int count);
 void cpSpaceRehashStatic(cpSpace *space);
 
+void cpSpaceRehashShape(cpSpace *space, cpShape *shape);
+
 // Update the space.
 void cpSpaceStep(cpSpace *space, cpFloat dt);

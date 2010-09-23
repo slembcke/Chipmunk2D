@@ -348,7 +348,7 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
 static inline void
 addShapeRaw(cpShape *shape, cpSpaceHash *hash)
 {
-	cpSpaceHashInsert(hash, shape, shape->hashid, shape->bb);
+	cpSpaceHashInsert(hash, shape, shape->hashid);
 }
 
 static inline void
@@ -734,6 +734,17 @@ cpSpaceRehashStatic(cpSpace *space)
 	cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)&updateBBCache, NULL);
 	cpSpaceHashRehash(space->staticShapes);
 }
+
+void
+cpSpaceRehashShape(cpSpace *space, cpShape *shape)
+{
+	cpShapeCacheBB(shape);
+	
+	// attempt to rehash the shape in both hashes
+	cpSpaceHashRehashObject(space->activeShapes, shape, shape->hashid);
+	cpSpaceHashRehashObject(space->staticShapes, shape, shape->hashid);
+}
+
 
 #pragma mark Collision Detection Functions
 
@@ -1201,3 +1212,18 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// Increment the stamp.
 	space->stamp++;
 }
+
+void cpSpaceSleepBody(cpSpace *space, cpBody *body){
+	body->node = (cpComponentNode){NULL, body, 0, 0.0f};
+	
+	for(cpShape *shape = body->shapesList; shape; shape = shape->next){
+		removeShapeRaw(shape, space->activeShapes);
+		
+		cpShapeCacheBB(shape);
+		addShapeRaw(shape, space->staticShapes);
+	}
+	
+	cpArrayPush(space->sleepingComponents, body);
+	cpArrayDeleteObj(space->sleepingComponents, body);
+}
+

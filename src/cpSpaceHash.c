@@ -261,17 +261,23 @@ hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 }
 
 void
-cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue hashid, cpBB bb)
+cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 {
 	cpHandle *hand = (cpHandle *)cpHashSetInsert(hash->handleSet, hashid, obj, hash);
-	hashHandle(hash, hand, bb);
+	hashHandle(hash, hand, hash->bbfunc(obj));
 }
 
 void
 cpSpaceHashRehashObject(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 {
-	cpHandle *hand = (cpHandle *)cpHashSetFind(hash->handleSet, hashid, obj);
-	hashHandle(hash, hand, hash->bbfunc(obj));
+	cpHandle *hand = (cpHandle *)cpHashSetRemove(hash->handleSet, hashid, obj);
+	
+	if(hand){
+		hand->obj = NULL;
+		cpHandleRelease(hand, hash->pooledHandles);
+		
+		cpSpaceHashInsert(hash, obj, hashid);
+	}
 }
 
 // Hashset iterator function for rehashing the spatial hash. (hash hash hash hash?)
