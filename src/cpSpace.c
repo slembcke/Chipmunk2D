@@ -603,10 +603,7 @@ segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
 		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
 		cpShapeSegmentQuery(shape, context->start, context->end, &info)
 	){
-		if(context->func){
-			context->func(shape, info.t, info.n, data);
-		}
-		
+		context->func(shape, info.t, info.n, data);
 		context->anyCollision = cpTrue;
 	}
 	
@@ -619,8 +616,7 @@ cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, c
 	segQueryContext context = {
 		start, end,
 		layers, group,
-		func,
-		cpFalse,
+		func, cpFalse,
 	};
 	
 	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
@@ -638,21 +634,17 @@ typedef struct segQueryFirstContext {
 static cpFloat
 segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo *out)
 {
-	cpSegmentQueryInfo info;// = {NULL, 1.0f, cpvzero};
+	cpSegmentQueryInfo info;
+	
 	if(
 		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
-		cpShapeSegmentQuery(shape, context->start, context->end, &info)
+		cpShapeSegmentQuery(shape, context->start, context->end, &info) &&
+		info.t < out->t
 	){
-		if(info.t < out->t){
-			out->shape = info.shape;
-			out->t = info.t;
-			out->n = info.n;
-		}
-		
-		return info.t;
+		*out = info;
 	}
 	
-	return 1.0f;
+	return out->t;
 }
 
 cpShape *
@@ -664,8 +656,6 @@ cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers laye
   } else {
 		out = &info;
 	}
-	
-	out->t = 1.0f;
 	
 	segQueryFirstContext context = {
 		start, end,
@@ -779,7 +769,7 @@ queryReject(cpShape *a, cpShape *b)
 		// Don't collide shapes attached to the same body.
 		|| a->body == b->body
 		// Don't collide objects in the same non-zero group
-		|| (a->group && b->group && a->group == b->group)
+		|| (a->group && a->group == b->group)
 		// Don't collide objects that don't share at least on layer.
 		|| !(a->layers & b->layers);
 }
