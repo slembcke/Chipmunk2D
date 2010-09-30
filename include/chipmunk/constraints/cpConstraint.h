@@ -63,6 +63,12 @@ cpConstraintActivateBodies(cpConstraint *constraint)
 	cpBody *b = constraint->b; if(b) cpBodyActivate(b);
 }
 
+static inline cpFloat
+cpConstraintGetImpulse(cpConstraint *constraint)
+{
+	return constraint->klass->getImpulse(constraint);
+}
+
 #define cpConstraintCheckCast(constraint, struct) \
 	cpAssert(constraint->klass == struct##GetClass(), "Constraint is not a "#struct);
 
