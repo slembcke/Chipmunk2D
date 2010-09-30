@@ -938,8 +938,9 @@ componentActivate(cpBody *root)
 	cpBody *body = root, *next;
 	do {
 		next = body->node.next;
-		body->node.next = NULL;
-		body->node.idleTime = 0.0f;
+		
+		cpComponentNode node = {NULL, NULL, 0, 0.0f};
+		body->node = node;
 		cpArrayPush(space->bodies, body);
 		
 		for(cpShape *shape=body->shapesList; shape; shape=shape->next){
@@ -1204,7 +1205,8 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 }
 
 void cpSpaceSleepBody(cpSpace *space, cpBody *body){
-	body->node = (cpComponentNode){NULL, body, 0, 0.0f};
+	cpComponentNode node = {NULL, body, 0, 0.0f};
+	body->node = node;
 	
 	for(cpShape *shape = body->shapesList; shape; shape = shape->next){
 		removeShapeRaw(shape, space->activeShapes);
