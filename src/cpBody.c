@@ -62,11 +62,9 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	
 	body->space = NULL;
 	body->shapesList = NULL;
-
-	body->node.parent = NULL;
-	body->node.next = NULL;
-	body->node.rank = 0;
-	body->node.idleTime = 0.0f;
+	
+	cpComponentNode node = {NULL, NULL, 0, 0.0f};
+	body->node = node;
 	
 	return body;
 }

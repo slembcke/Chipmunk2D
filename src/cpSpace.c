@@ -369,6 +369,8 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	
 	cpBodyActivate(body);
 	cpBodyAddShape(body, shape);
+	
+	cpShapeCacheBB(shape);
 	addShapeRaw(shape, space->activeShapes);
 		
 	return shape;
@@ -377,14 +379,16 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 static void
 activateShapesTouchingShapeHelper(cpShape *shape, void *unused)
 {
-	cpBodyActivate(shape->body);
+	cpBody *body = shape->body;
+	if(!cpBodyIsRogue(body)) cpBodyActivate(body);
 }
 
 static void
 activateShapesTouchingShape(cpSpace *space, cpShape *shape)
 {
 	// TODO this query should be more precise
-	cpSpaceBBQuery(space, shape->bb, CP_ALL_LAYERS, CP_NO_GROUP, activateShapesTouchingShapeHelper, NULL);
+	// Use shape queries once they are written
+	cpSpaceBBQuery(space, shape->bb, shape->layers, shape->group, activateShapesTouchingShapeHelper, NULL);
 }
 
 cpShape *
@@ -958,8 +962,7 @@ cpBodyActivate(cpBody *body)
 	// Reset the idle time even if it's not in a currently sleeping component
 	// Like a body resting on or jointed to a rogue body.
 	body->node.idleTime = 0.0f;
-	
-	if(cpBodyIsSleeping(body)) componentActivate(componentNodeRoot(body));
+	componentActivate(componentNodeRoot(body));
 }
 
 static inline void
