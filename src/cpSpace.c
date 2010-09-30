@@ -549,7 +549,9 @@ static void
 pointQueryHelper(cpVect *point, cpShape *shape, pointQueryContext *context)
 {
 	if(
-		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
+		!(shape->group && context->group == shape->group) &&
+		(context->layers&shape->layers) &&
+		!shape->sensor &&
 		cpShapePointQuery(shape, *point)
 	){
 		context->func(shape, context->data);
@@ -641,7 +643,9 @@ segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo 
 	cpSegmentQueryInfo info;
 	
 	if(
-		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
+		!(shape->group && context->group == shape->group) &&
+		(context->layers&shape->layers) &&
+		!shape->sensor &&
 		cpShapeSegmentQuery(shape, context->start, context->end, &info) &&
 		info.t < out->t
 	){
