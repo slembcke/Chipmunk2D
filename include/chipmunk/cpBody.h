@@ -106,8 +106,12 @@ cpBody *cpBodyNew(cpFloat m, cpFloat i);
 void cpBodyDestroy(cpBody *body);
 void cpBodyFree(cpBody *body);
 
-// Wake up a sleeping or idle body.
+// Wake up a sleeping or idle body. (defined in cpSpace.c)
 void cpBodyActivate(cpBody *body);
+
+// Force a body to sleep;
+void cpBodySleep(cpBody *body);
+//void cpBodySleepGroup(cpBody *body, ...);
 
 static inline cpBool
 cpBodyIsSleeping(const cpBody *body)
@@ -115,9 +119,7 @@ cpBodyIsSleeping(const cpBody *body)
 	return (body->node.next != ((cpBody*)0));
 }
 
-// defined in cpSpace.h after the cpSpace type has been defined
-static inline cpBool
-cpBodyIsStatic(const cpBody *body);
+cpBool cpBodyIsStatic(const cpBody *body);
 
 static inline cpBool
 cpBodyIsRogue(const cpBody *body)

@@ -128,14 +128,6 @@ void cpSpaceFree(cpSpace *space);
 // Convenience function. Frees all referenced entities. (bodies, shapes and constraints)
 void cpSpaceFreeChildren(cpSpace *space);
 
-// Needed to be defined after the cpSpace type was closed
-static inline cpBool
-cpBodyIsStatic(const cpBody *body)
-{
-	cpSpace *space = body->space;
-	return (space != ((cpSpace*)0) && body == &space->staticBody);
-}
-
 // Collision handler management functions.
 void cpSpaceSetDefaultCollisionHandler(
 	cpSpace *space,

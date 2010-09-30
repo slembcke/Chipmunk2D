@@ -176,3 +176,21 @@ cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat 
 	cpBodyApplyForce(a, f, r1);
 	cpBodyApplyForce(b, cpvneg(f), r2);
 }
+
+cpBool
+cpBodyIsStatic(const cpBody *body)
+{
+	cpSpace *space = body->space;
+	return (space != ((cpSpace*)0) && body == &space->staticBody);
+}
+
+void cpSpaceSleepBody(cpSpace *space, cpBody *body);
+
+void
+cpBodySleep(cpBody *body)
+{
+	if(cpBodyIsSleeping(body)) return;
+	
+	cpAssert(!cpBodyIsStatic(body) && !cpBodyIsRogue(body), "Rogue and static bodies cannot be put to sleep.");
+	cpSpaceSleepBody(body->space, body);
+}

@@ -906,11 +906,11 @@ componentNodeRoot(cpBody *body)
 {
 	cpBody *parent = body->node.parent;
 	
-	if(!parent){
-		return body;
-	} else {
+	if(parent){
 		// path compression, attaches this node directly to the root
 		return (body->node.parent = componentNodeRoot(parent));
+	} else {
+		return body;
 	}
 }
 
@@ -955,12 +955,11 @@ componentActivate(cpBody *root)
 void
 cpBodyActivate(cpBody *body)
 {
-	// Force the body to wake up even if it's not in a currently sleeping component
+	// Reset the idle time even if it's not in a currently sleeping component
 	// Like a body resting on or jointed to a rogue body.
 	body->node.idleTime = 0.0f;
 	
-	cpBody *root = componentNodeRoot(body);
-	if(root) componentActivate(root);
+	if(cpBodyIsSleeping(body)) componentActivate(componentNodeRoot(body));
 }
 
 static inline void
@@ -1204,7 +1203,8 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	space->stamp++;
 }
 
-void cpSpaceSleepBody(cpSpace *space, cpBody *body){
+void
+cpSpaceSleepBody(cpSpace *space, cpBody *body){
 	cpComponentNode node = {NULL, body, 0, 0.0f};
 	body->node = node;
 	
@@ -1216,6 +1216,6 @@ void cpSpaceSleepBody(cpSpace *space, cpBody *body){
 	}
 	
 	cpArrayPush(space->sleepingComponents, body);
-	cpArrayDeleteObj(space->sleepingComponents, body);
+	cpArrayDeleteObj(space->bodies, body);
 }
 
