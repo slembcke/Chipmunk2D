@@ -82,7 +82,6 @@ typedef struct segQueryContext {
 	cpLayers layers;
 	cpGroup group;
 	cpSpaceSegmentQueryFunc func;
-	cpBool anyCollision;
 } segQueryContext;
 
 static cpFloat
@@ -95,25 +94,22 @@ segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
 		cpShapeSegmentQuery(shape, context->start, context->end, &info)
 	){
 		context->func(shape, info.t, info.n, data);
-		context->anyCollision = cpTrue;
 	}
 	
 	return 1.0f;
 }
 
-cpBool
+void
 cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data)
 {
 	segQueryContext context = {
 		start, end,
 		layers, group,
-		func, cpFalse,
+		func,
 	};
 	
 	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
 	cpSpaceHashSegmentQuery(space->activeShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
-	
-	return context.anyCollision;
 }
 
 typedef struct segQueryFirstContext {
