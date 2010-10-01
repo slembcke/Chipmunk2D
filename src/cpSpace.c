@@ -134,8 +134,6 @@ cpSpaceInit(cpSpace *space)
 	space->pooledArbiters = cpArrayNew(0);
 	
 	space->contactBuffersHead = NULL;
-	space->contactBuffersTail = NULL;
-	
 	space->contactSet = cpHashSetNew(0, (cpHashSetEqlFunc)contactSetEql, (cpHashSetTransFunc)contactSetTrans);
 	
 	space->constraints = cpArrayNew(0);

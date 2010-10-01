@@ -94,9 +94,9 @@ typedef struct cpSpace{
 	cpArray *arbiters, *pooledArbiters;
 	
 	// Linked list ring of contact buffers.
-	// Head is the current buffer. Tail is the oldest buffer.
-	// The list points in the direction of tail->head.
-	cpContactBufferHeader *contactBuffersHead, *contactBuffersTail;
+	// Head is the newest buffer, and each buffer points to a newer buffer.
+	// Head wraps around and points to the oldest (tail) buffer.
+	cpContactBufferHeader *contactBuffersHead;
 	
 	// List of buffers to be free()ed when destroying the space.
 	cpArray *allocatedBuffers;
