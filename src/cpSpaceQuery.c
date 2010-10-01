@@ -36,9 +36,7 @@ static void
 pointQueryHelper(cpVect *point, cpShape *shape, pointQueryContext *context)
 {
 	if(
-		!(shape->group && context->group == shape->group) &&
-		(context->layers&shape->layers) &&
-		!shape->sensor &&
+		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
 		cpShapePointQuery(shape, *point)
 	){
 		context->func(shape, context->data);
@@ -56,7 +54,7 @@ cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, 
 static void
 rememberLastPointQuery(cpShape *shape, cpShape **outShape)
 {
-	(*outShape) = shape;
+	if(!shape->sensor) *outShape = shape;
 }
 
 cpShape *

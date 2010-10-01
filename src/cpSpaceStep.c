@@ -25,7 +25,7 @@
 
 #include "chipmunk.h"
 
-#pragma mark Post Step Functions
+#pragma mark Post Step Callback Functions
 
 typedef struct postStepCallback {
 	cpPostStepFunc func;
