@@ -81,8 +81,8 @@ typedef struct cpSpace{
 	cpTimestamp stamp;
 
 	// The static and active shape spatial hashes.
-	cpSpaceHash *staticShapes;
-	cpSpaceHash *activeShapes;
+	cpSpatialIndex *staticShapes;
+	cpSpatialIndex *activeShapes;
 	
 	// List of bodies in the system.
 	cpArray *bodies;

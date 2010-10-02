@@ -452,15 +452,15 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 	
 	glLineWidth(options->lineThickness);
 	if(options->drawShapes){
-		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)drawObject, space);
-		cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)drawObject, space);
+		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)drawObject, space);
+		cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIterator)drawObject, space);
 	}
 	
 	glLineWidth(1.0f);
 	if(options->drawBBs){
 		glColor3f(0.3f, 0.5f, 0.3f);
-		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)drawBB, NULL);
-		cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)drawBB, NULL);
+		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)drawBB, NULL);
+		cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIterator)drawBB, NULL);
 	}
 
 	cpArray *constraints = space->constraints;

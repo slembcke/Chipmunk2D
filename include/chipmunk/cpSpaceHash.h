@@ -43,6 +43,8 @@ typedef struct cpSpaceHashBin{
 typedef cpBB (*cpSpaceHashBBFunc)(void *obj);
 
 typedef struct cpSpaceHash{
+	cpSpatialIndex spatialIndex;
+	
 	// Number of cells in the table.
 	int numcells;
 	// Dimentions of the cells.

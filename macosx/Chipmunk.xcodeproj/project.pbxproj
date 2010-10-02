@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D309AAED1256F8E500F8F9F0 /* cpSpatialIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = D309AAEC1256F8E500F8F9F0 /* cpSpatialIndex.h */; };
+		D309AAEE1256F8E500F8F9F0 /* cpSpatialIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = D309AAEC1256F8E500F8F9F0 /* cpSpatialIndex.h */; };
+		D309AAF01256F8F700F8F9F0 /* cpSpatialIndex.c in Sources */ = {isa = PBXBuildFile; fileRef = D309AAEF1256F8F700F8F9F0 /* cpSpatialIndex.c */; };
 		D3102B171119FD3000E77771 /* Tank.c in Sources */ = {isa = PBXBuildFile; fileRef = D3102B161119FD3000E77771 /* Tank.c */; };
 		D31402950E9DD07E00EF79DB /* Springies.c in Sources */ = {isa = PBXBuildFile; fileRef = D31402940E9DD07E00EF79DB /* Springies.c */; };
 		D31847750FC458FD00E30B0D /* Query.c in Sources */ = {isa = PBXBuildFile; fileRef = D31847740FC458FD00E30B0D /* Query.c */; };
@@ -117,6 +120,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D309AAEC1256F8E500F8F9F0 /* cpSpatialIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpSpatialIndex.h; sourceTree = "<group>"; };
+		D309AAEF1256F8F700F8F9F0 /* cpSpatialIndex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpSpatialIndex.c; sourceTree = "<group>"; };
 		D30CE25D0B52535500427129 /* cpHashSet.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpHashSet.c; sourceTree = "<group>"; };
 		D30CE25E0B52535500427129 /* cpHashSet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpHashSet.h; path = ../include/chipmunk/cpHashSet.h; sourceTree = "<group>"; };
 		D3102B161119FD3000E77771 /* Tank.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tank.c; sourceTree = "<group>"; };
@@ -196,7 +201,7 @@
 		D3E5F2DC0AAA562B004E361B /* cpArray.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpArray.h; path = ../include/chipmunk/cpArray.h; sourceTree = "<group>"; };
 		D3E5F2DD0AAA562B004E361B /* cpArray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpArray.c; sourceTree = "<group>"; };
 		D3E5F2DE0AAA562B004E361B /* cpSpaceHash.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpSpaceHash.h; path = ../include/chipmunk/cpSpaceHash.h; sourceTree = "<group>"; };
-		D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpSpaceHash.c; sourceTree = "<group>"; };
+		D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = cpSpaceHash.c; path = ../src/cpSpaceHash.c; sourceTree = "<group>"; };
 		D3EDBC240ED935F40027D943 /* MagnetsElectric.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MagnetsElectric.c; sourceTree = "<group>"; };
 		D3FBA1A60E9B1E0400950BCC /* drawSpace.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = drawSpace.c; sourceTree = "<group>"; };
 		D3FBA1B80E9B1F6300950BCC /* drawSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = drawSpace.h; sourceTree = "<group>"; };
@@ -230,6 +235,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D309AAEA1256F88000F8F9F0 /* Spatial Indexing */ = {
+			isa = PBXGroup;
+			children = (
+				D309AAEC1256F8E500F8F9F0 /* cpSpatialIndex.h */,
+				D309AAEF1256F8F700F8F9F0 /* cpSpatialIndex.c */,
+				D3E5F2DE0AAA562B004E361B /* cpSpaceHash.h */,
+				D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */,
+			);
+			name = "Spatial Indexing";
+			sourceTree = "<group>";
+		};
 		D34E9E5A12557FBF002C0FE5 /* Space */ = {
 			isa = PBXGroup;
 			children = (
@@ -245,8 +261,6 @@
 		D37E24570AAAA48800BB4C50 /* Collision */ = {
 			isa = PBXGroup;
 			children = (
-				D3E5F2DE0AAA562B004E361B /* cpSpaceHash.h */,
-				D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */,
 				D3E5F0C10AA75CA9004E361B /* cpArbiter.h */,
 				D3E5F0C20AA75CA9004E361B /* cpArbiter.c */,
 				D37E22FC0AAA63B800BB4C50 /* cpShape.h */,
@@ -334,6 +348,7 @@
 				D3E5F2F30AAA575E004E361B /* Basics */,
 				D3E5F0DD0AAA2273004E361B /* cpBody.h */,
 				D3E5F0DE0AAA2273004E361B /* cpBody.c */,
+				D309AAEA1256F88000F8F9F0 /* Spatial Indexing */,
 				D37E24570AAAA48800BB4C50 /* Collision */,
 				D3800E0E0E9815FC00A3D7FA /* constraints */,
 				D34E9E5A12557FBF002C0FE5 /* Space */,
@@ -407,6 +422,7 @@
 				D37BB8F10EAB06B600C70958 /* cpSimpleMotor.h in Headers */,
 				D35420C00F4E1FD70017F4F7 /* chipmunk_unsafe.h in Headers */,
 				D36D87841012D63600DB5078 /* cpRatchetJoint.h in Headers */,
+				D309AAED1256F8E500F8F9F0 /* cpSpatialIndex.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -414,6 +430,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D309AAEE1256F8E500F8F9F0 /* cpSpatialIndex.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -601,6 +618,7 @@
 				D329CC9C10BADC7200909DB1 /* Sensors.c in Sources */,
 				D3238F8210C1B5ED00C4BDC2 /* Joints.c in Sources */,
 				D3102B171119FD3000E77771 /* Tank.c in Sources */,
+				D309AAF01256F8F700F8F9F0 /* cpSpatialIndex.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

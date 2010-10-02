@@ -85,9 +85,38 @@ handleSetTrans(void *obj, cpSpaceHash *hash)
 	return hand;
 }
 
+static int
+cpSpaceHashCount(cpSpaceHash *hash)
+{
+	return hash->handleSet->entries;
+}
+
+//static int
+//cpSpaceHashContains(cpSpaceHash *hash, void *obj)
+//{
+//	return cpHashSetFind(hash->handleSet, <#cpHashValue hash#>, obj);
+//}
+
+static cpSpatialIndexClass klass = {
+	(cpSpatialIndexDestroyFunc)cpSpaceHashDestroy,
+	
+	(cpSpatialIndexCountFunc)cpSpaceHashCount,
+	(cpSpatialIndexEachFunc)cpSpaceHashEach,
+//	(cpSpatialIndexContainsFunc)cpSpaceHashContains,
+	
+	(cpSpatialIndexInsertFunc)cpSpaceHashInsert,
+	(cpSpatialIndexRemoveFunc)cpSpaceHashRemove,
+	
+	(cpSpatialIndexPointQueryFunc)cpSpaceHashPointQuery,
+	(cpSpatialIndexQueryFunc)cpSpaceHashQuery,
+	(cpSpatialIndexReindexQueryFunc)cpSpaceHashQueryRehash,
+};
+
 cpSpaceHash*
 cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpaceHashBBFunc bbfunc)
 {
+	hash->spatialIndex.klass = &klass;
+	
 	cpSpaceHashAllocTable(hash, next_prime(numcells));
 	hash->celldim = celldim;
 	hash->bbfunc = bbfunc;

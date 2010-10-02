@@ -213,7 +213,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 static void
 active2staticIter(cpShape *shape, cpSpace *space)
 {
-	cpSpaceHashQuery(space->staticShapes, shape, shape->bb, (cpSpaceHashQueryFunc)queryFunc, space);
+	cpSpatialIndexQuery(space->staticShapes, shape, shape->bb, (cpSpatialIndexQueryCallback)queryFunc, space);
 }
 
 // Hashset filter func to throw away old arbiters.
@@ -294,13 +294,13 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	}
 	
 	// Pre-cache BBoxes and shape data.
-	cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)updateBBCache, NULL);
+	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)updateBBCache, NULL);
 	
 	// Collide!
 	cpSpacePushFreshContactBuffer(space);
-	if(space->staticShapes->handleSet->entries)
-		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)active2staticIter, space);
-	cpSpaceHashQueryRehash(space->activeShapes, (cpSpaceHashQueryFunc)queryFunc, space);
+	if(cpSpatialIndexCount(space->staticShapes))
+		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)active2staticIter, space);
+	cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryCallback)queryFunc, space);
 	
 	// If body sleeping is enabled, do that now.
 	if(space->sleepTimeThreshold != INFINITY){
