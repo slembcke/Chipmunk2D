@@ -174,5 +174,14 @@
     <ClCompile Include="..\..\..\src\constraints\cpSlideJoint.c">
       <Filter>src\constraints</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\cpSpaceComponent.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpSpaceQuery.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpSpaceStep.c">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
