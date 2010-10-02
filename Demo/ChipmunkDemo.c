@@ -424,7 +424,7 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
-//#define TIME_TRIAL
+#define TIME_TRIAL
 #ifdef TIME_TRIAL
 #include <sys/time.h>
 #include <unistd.h>

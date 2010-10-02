@@ -120,8 +120,8 @@ cpSpaceInit(cpSpace *space)
 	space->locked = 0;
 	space->stamp = 0;
 
-	space->staticShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpaceHashBBFunc)shapeBBFunc);
-	space->activeShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpaceHashBBFunc)shapeBBFunc);
+	space->staticShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
+	space->activeShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
 	
 	space->allocatedBuffers = cpArrayNew(0);
 	
@@ -461,7 +461,7 @@ cpSpaceResizeStaticHash(cpSpace *space, cpFloat dim, int count)
 {
 // TODO spatial hash specific
 	cpSpaceHashResize((cpSpaceHash *)space->staticShapes, dim, count);
-	cpSpaceHashRehash((cpSpaceHash *)space->staticShapes);
+	cpSpatialIndexReindex(space->staticShapes);
 }
 
 void
@@ -474,9 +474,8 @@ cpSpaceResizeActiveHash(cpSpace *space, cpFloat dim, int count)
 void 
 cpSpaceRehashStatic(cpSpace *space)
 {
-// TODO spatial hash specific
 	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIterator)&updateBBCache, NULL);
-	cpSpaceHashRehash((cpSpaceHash *)space->staticShapes);
+	cpSpatialIndexReindex(space->staticShapes);
 }
 
 void
@@ -485,7 +484,6 @@ cpSpaceRehashShape(cpSpace *space, cpShape *shape)
 	cpShapeCacheBB(shape);
 	
 	// attempt to rehash the shape in both hashes
-// TODO spatial hash specific
-	cpSpaceHashRehashObject((cpSpaceHash *)space->activeShapes, shape, shape->hashid);
-	cpSpaceHashRehashObject((cpSpaceHash *)space->staticShapes, shape, shape->hashid);
+	cpSpatialIndexReindexObject(space->activeShapes, shape, shape->hashid);
+	cpSpatialIndexReindexObject(space->staticShapes, shape, shape->hashid);
 }

@@ -5,7 +5,9 @@
 void
 cpSpatialIndexFree(cpSpatialIndex *index)
 {
-	cpSpatialIndexDestroy(index);
-	cpfree(index);
+	if(index){
+		cpSpatialIndexDestroy(index);
+		cpfree(index);
+	}
 }
 

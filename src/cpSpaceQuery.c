@@ -84,33 +84,32 @@ typedef struct segQueryContext {
 	cpSpaceSegmentQueryFunc func;
 } segQueryContext;
 
-//static cpFloat
-//segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
-//{
-//	cpSegmentQueryInfo info;
-//	
-//	if(
-//		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
-//		cpShapeSegmentQuery(shape, context->start, context->end, &info)
-//	){
-//		context->func(shape, info.t, info.n, data);
-//	}
-//	
-//	return 1.0f;
-//}
+static cpFloat
+segQueryFunc(segQueryContext *context, cpShape *shape, void *data)
+{
+	cpSegmentQueryInfo info;
+	
+	if(
+		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
+		cpShapeSegmentQuery(shape, context->start, context->end, &info)
+	){
+		context->func(shape, info.t, info.n, data);
+	}
+	
+	return 1.0f;
+}
 
 void
 cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data)
 {
-//	segQueryContext context = {
-//		start, end,
-//		layers, group,
-//		func,
-//	};
-//	
-// TODO segment query
-//	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
-//	cpSpaceHashSegmentQuery(space->activeShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
+	segQueryContext context = {
+		start, end,
+		layers, group,
+		func,
+	};
+	
+	cpSpatialIndexSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryCallback)segQueryFunc, data);
+	cpSpatialIndexSegmentQuery(space->activeShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryCallback)segQueryFunc, data);
 }
 
 typedef struct segQueryFirstContext {
@@ -119,23 +118,22 @@ typedef struct segQueryFirstContext {
 	cpGroup group;
 } segQueryFirstContext;
 
-//static cpFloat
-//segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo *out)
-//{
-//	cpSegmentQueryInfo info;
-//	
-//	if(
-//		!(shape->group && context->group == shape->group) &&
-//		(context->layers&shape->layers) &&
-//		!shape->sensor &&
-//		cpShapeSegmentQuery(shape, context->start, context->end, &info) &&
-//		info.t < out->t
-//	){
-//		*out = info;
-//	}
-//	
-//	return out->t;
-//}
+static cpFloat
+segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo *out)
+{
+	cpSegmentQueryInfo info;
+	
+	if(
+		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
+		!shape->sensor &&
+		cpShapeSegmentQuery(shape, context->start, context->end, &info) &&
+		info.t < out->t
+	){
+		*out = info;
+	}
+	
+	return out->t;
+}
 
 cpShape *
 cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out)
@@ -147,14 +145,13 @@ cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers laye
 		out = &info;
 	}
 	
-//	segQueryFirstContext context = {
-//		start, end,
-//		layers, group
-//	};
-//	
-// TODO segment query
-//	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFirst, out);
-//	cpSpaceHashSegmentQuery(space->activeShapes, &context, start, end, out->t, (cpSpaceHashSegmentQueryFunc)segQueryFirst, out);
+	segQueryFirstContext context = {
+		start, end,
+		layers, group
+	};
+	
+	cpSpatialIndexSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryCallback)segQueryFirst, out);
+	cpSpatialIndexSegmentQuery(space->activeShapes, &context, start, end, out->t, (cpSpatialIndexSegmentQueryCallback)segQueryFirst, out);
 	
 	return out->shape;
 }
