@@ -72,37 +72,37 @@ cpSpaceHash *cpSpaceHashAlloc(void);
 cpSpaceHash *cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int cells, cpSpaceHashBBFunc bbfunc);
 cpSpaceHash *cpSpaceHashNew(cpFloat celldim, int cells, cpSpaceHashBBFunc bbfunc);
 
-void cpSpaceHashDestroy(cpSpaceHash *hash);
-void cpSpaceHashFree(cpSpaceHash *hash);
+//void cpSpaceHashDestroy(cpSpaceHash *hash);
+//void cpSpaceHashFree(cpSpaceHash *hash);
 
 // Resize the hashtable. (Does not rehash! You must call cpSpaceHashRehash() if needed.)
 void cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells);
 
-// Add an object to the hash.
-void cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue id);
-// Remove an object from the hash.
-void cpSpaceHashRemove(cpSpaceHash *hash, void *obj, cpHashValue id);
-
-// Iterator function
-typedef void (*cpSpaceHashIterator)(void *obj, void *data);
-// Iterate over the objects in the hash.
-void cpSpaceHashEach(cpSpaceHash *hash, cpSpaceHashIterator func, void *data);
+//// Add an object to the hash.
+//void cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue id);
+//// Remove an object from the hash.
+//void cpSpaceHashRemove(cpSpaceHash *hash, void *obj, cpHashValue id);
+//
+//// Iterator function
+//typedef void (*cpSpaceHashIterator)(void *obj, void *data);
+//// Iterate over the objects in the hash.
+//void cpSpaceHashEach(cpSpaceHash *hash, cpSpaceHashIterator func, void *data);
 
 // Rehash the contents of the hash.
 void cpSpaceHashRehash(cpSpaceHash *hash);
 // Rehash only a specific object.
 void cpSpaceHashRehashObject(cpSpaceHash *hash, void *obj, cpHashValue id);
 
-// Query callback.
-typedef void (*cpSpaceHashQueryFunc)(void *obj1, void *obj2, void *data);
-// Point query the hash. A reference to the query point is passed as obj1 to the query callback.
-void cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpaceHashQueryFunc func, void *data);
-// Query the hash for a given BBox.
-void cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc func, void *data);
-// Run a query for the object, then insert it. (Optimized case)
-void cpSpaceHashQueryInsert(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc func, void *data);
-// Rehashes while querying for each object. (Optimized case) 
-void cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpaceHashQueryFunc func, void *data);
+//// Query callback.
+//typedef void (*cpSpaceHashQueryFunc)(void *obj1, void *obj2, void *data);
+//// Point query the hash. A reference to the query point is passed as obj1 to the query callback.
+//void cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpaceHashQueryFunc func, void *data);
+//// Query the hash for a given BBox.
+//void cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc func, void *data);
+//// Run a query for the object, then insert it. (Optimized case)
+//void cpSpaceHashQueryInsert(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc func, void *data);
+//// Rehashes while querying for each object. (Optimized case) 
+//void cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpaceHashQueryFunc func, void *data);
 
 // Segment Query callback.
 // Return value is uesd for early exits of the query.

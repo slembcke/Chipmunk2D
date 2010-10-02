@@ -301,9 +301,8 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	cpBody *body = shape->body;
 	if(!body || body == &space->staticBody) return cpSpaceAddStaticShape(space, shape);
 	
-	// TODO index contains
-//	cpAssert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
-//		"Cannot add the same shape more than once.");
+	cpAssert(!cpSpatialIndexContains(space->activeShapes, shape, shape->hashid),
+		"Cannot add the same shape more than once.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
@@ -333,9 +332,8 @@ activateShapesTouchingShape(cpSpace *space, cpShape *shape)
 cpShape *
 cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
-// TODO index contains
-//	cpAssert(!cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
-//		"Cannot add the same static shape more than once.");
+	cpAssert(!cpSpatialIndexContains(space->staticShapes, shape, shape->hashid),
+		"Cannot add the same static shape more than once.");
 	cpAssertSpaceUnlocked(space);
 	
 	if(!shape->body) shape->body = &space->staticBody;
@@ -405,9 +403,8 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 
 	cpBodyActivate(body);
 	
-	//TODO index contains
-//	cpAssertWarn(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
-//		"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
+	cpAssert(!cpSpatialIndexContains(space->activeShapes, shape, shape->hashid),
+		"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyRemoveShape(body, shape);
@@ -420,9 +417,8 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
-// TODO index contains
-//	cpAssertWarn(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
-//		"Cannot remove a static or sleeping shape that was never added to the space. (Removed twice maybe?)");
+	cpAssert(!cpSpatialIndexContains(space->staticShapes, shape, shape->hashid),
+		"Cannot remove a static or sleeping shape that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	removalContext context = {space, shape};
@@ -479,7 +475,7 @@ void
 cpSpaceRehashStatic(cpSpace *space)
 {
 // TODO spatial hash specific
-	cpSpaceHashEach((cpSpaceHash *)space->staticShapes, (cpSpaceHashIterator)&updateBBCache, NULL);
+	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIterator)&updateBBCache, NULL);
 	cpSpaceHashRehash((cpSpaceHash *)space->staticShapes);
 }
 

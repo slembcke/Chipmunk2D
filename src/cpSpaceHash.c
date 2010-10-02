@@ -91,45 +91,10 @@ cpSpaceHashCount(cpSpaceHash *hash)
 	return hash->handleSet->entries;
 }
 
-//static int
-//cpSpaceHashContains(cpSpaceHash *hash, void *obj)
-//{
-//	return cpHashSetFind(hash->handleSet, <#cpHashValue hash#>, obj);
-//}
-
-static cpSpatialIndexClass klass = {
-	(cpSpatialIndexDestroyFunc)cpSpaceHashDestroy,
-	
-	(cpSpatialIndexCountFunc)cpSpaceHashCount,
-	(cpSpatialIndexEachFunc)cpSpaceHashEach,
-//	(cpSpatialIndexContainsFunc)cpSpaceHashContains,
-	
-	(cpSpatialIndexInsertFunc)cpSpaceHashInsert,
-	(cpSpatialIndexRemoveFunc)cpSpaceHashRemove,
-	
-	(cpSpatialIndexPointQueryFunc)cpSpaceHashPointQuery,
-	(cpSpatialIndexQueryFunc)cpSpaceHashQuery,
-	(cpSpatialIndexReindexQueryFunc)cpSpaceHashQueryRehash,
-};
-
-cpSpaceHash*
-cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpaceHashBBFunc bbfunc)
+static int
+cpSpaceHashContains(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 {
-	hash->spatialIndex.klass = &klass;
-	
-	cpSpaceHashAllocTable(hash, next_prime(numcells));
-	hash->celldim = celldim;
-	hash->bbfunc = bbfunc;
-	
-	hash->handleSet = cpHashSetNew(0, (cpHashSetEqlFunc)handleSetEql, (cpHashSetTransFunc)handleSetTrans);
-	hash->pooledHandles = cpArrayNew(0);
-	
-	hash->pooledBins = NULL;
-	hash->allocatedBuffers = cpArrayNew(0);
-	
-	hash->stamp = 1;
-	
-	return hash;
+	return (cpBool)cpHashSetFind(hash->handleSet, hashid, obj);
 }
 
 cpSpaceHash*
@@ -185,14 +150,14 @@ cpSpaceHashDestroy(cpSpaceHash *hash)
 	cpfree(hash->table);
 }
 
-void
-cpSpaceHashFree(cpSpaceHash *hash)
-{
-	if(hash){
-		cpSpaceHashDestroy(hash);
-		cpfree(hash);
-	}
-}
+//void
+//cpSpaceHashFree(cpSpaceHash *hash)
+//{
+//	if(hash){
+//		cpSpaceHashDestroy(hash);
+//		cpfree(hash);
+//	}
+//}
 
 void
 cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells)
@@ -325,7 +290,7 @@ cpSpaceHashRemove(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 }
 
 typedef struct eachPair {
-	cpSpaceHashIterator func;
+	cpSpatialIndexIterator func;
 	void *data;
 } eachPair;
 
@@ -333,7 +298,7 @@ static void eachHelper(cpHandle *hand, eachPair *pair){pair->func(hand->obj, pai
 
 // Iterate over the objects in the spatial hash.
 void
-cpSpaceHashEach(cpSpaceHash *hash, cpSpaceHashIterator func, void *data)
+cpSpaceHashEach(cpSpaceHash *hash, cpSpatialIndexIterator func, void *data)
 {
 	eachPair pair = {func, data};
 	cpHashSetEach(hash->handleSet, (cpHashSetIterFunc)eachHelper, &pair);
@@ -363,7 +328,7 @@ removeOrphanedHandles(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr)
 
 // Calls the callback function for the objects in a given chain.
 static inline void
-query(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpaceHashQueryFunc func, void *data)
+query(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpatialIndexQueryCallback func, void *data)
 {
 	restart:
 	for(cpSpaceHashBin *bin = *bin_ptr; bin; bin = bin->next){
@@ -385,7 +350,7 @@ query(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpaceHashQueryFu
 }
 
 void
-cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpaceHashQueryFunc func, void *data)
+cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpatialIndexQueryCallback func, void *data)
 {
 	cpFloat dim = hash->celldim;
 	int idx = hash_func(floor_int(point.x/dim), floor_int(point.y/dim), hash->numcells);  // Fix by ShiftZ
@@ -395,7 +360,7 @@ cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpaceHashQueryFunc func
 }
 
 void
-cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc func, void *data)
+cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
 {
 	// Get the dimensions in cell coordinates.
 	cpFloat dim = hash->celldim;
@@ -420,7 +385,7 @@ cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc fun
 // Similar to struct eachPair above.
 typedef struct queryRehashPair {
 	cpSpaceHash *hash;
-	cpSpaceHashQueryFunc func;
+	cpSpatialIndexQueryCallback func;
 	void *data;
 } queryRehashPair;
 
@@ -433,7 +398,7 @@ handleQueryRehashHelper(void *elt, void *data)
 	// Unpack the user callback data.
 	queryRehashPair *pair = (queryRehashPair *)data;
 	cpSpaceHash *hash = pair->hash;
-	cpSpaceHashQueryFunc func = pair->func;
+	cpSpatialIndexQueryCallback func = pair->func;
 
 	cpFloat dim = hash->celldim;
 	int n = hash->numcells;
@@ -470,7 +435,7 @@ handleQueryRehashHelper(void *elt, void *data)
 }
 
 void
-cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpaceHashQueryFunc func, void *data)
+cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpatialIndexQueryCallback func, void *data)
 {
 	clearHash(hash);
 	
@@ -562,3 +527,39 @@ void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, c
 	
 	hash->stamp++;
 }
+
+static cpSpatialIndexClass klass = {
+	(cpSpatialIndexDestroyFunc)cpSpaceHashDestroy,
+	
+	(cpSpatialIndexCountFunc)cpSpaceHashCount,
+	(cpSpatialIndexEachFunc)cpSpaceHashEach,
+	(cpSpatialIndexContainsFunc)cpSpaceHashContains,
+	
+	(cpSpatialIndexInsertFunc)cpSpaceHashInsert,
+	(cpSpatialIndexRemoveFunc)cpSpaceHashRemove,
+	
+	(cpSpatialIndexPointQueryFunc)cpSpaceHashPointQuery,
+	(cpSpatialIndexQueryFunc)cpSpaceHashQuery,
+	(cpSpatialIndexReindexQueryFunc)cpSpaceHashQueryRehash,
+};
+
+cpSpaceHash*
+cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpaceHashBBFunc bbfunc)
+{
+	hash->spatialIndex.klass = &klass;
+	
+	cpSpaceHashAllocTable(hash, next_prime(numcells));
+	hash->celldim = celldim;
+	hash->bbfunc = bbfunc;
+	
+	hash->handleSet = cpHashSetNew(0, (cpHashSetEqlFunc)handleSetEql, (cpHashSetTransFunc)handleSetTrans);
+	hash->pooledHandles = cpArrayNew(0);
+	
+	hash->pooledBins = NULL;
+	hash->allocatedBuffers = cpArrayNew(0);
+	
+	hash->stamp = 1;
+	
+	return hash;
+}
+

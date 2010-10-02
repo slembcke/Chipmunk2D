@@ -183,6 +183,6 @@ void
 cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryFunc func, void *data)
 {
 	bbQueryContext context = {layers, group, func, data};
-	cpSpatialIndexQuery(space->activeShapes, &bb, bb, (cpSpaceHashQueryFunc)bbQueryHelper, &context);
-	cpSpatialIndexQuery(space->staticShapes, &bb, bb, (cpSpaceHashQueryFunc)bbQueryHelper, &context);
+	cpSpatialIndexQuery(space->activeShapes, &bb, bb, (cpSpatialIndexQueryCallback)bbQueryHelper, &context);
+	cpSpatialIndexQuery(space->staticShapes, &bb, bb, (cpSpatialIndexQueryCallback)bbQueryHelper, &context);
 }
