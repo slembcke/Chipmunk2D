@@ -196,8 +196,13 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 		cpArrayPush(space->arbiters, arb);
 	} else {
 		cpSpacePopContacts(space, numContacts);
+		
 		arb->contacts = NULL;
 		arb->numContacts = 0;
+		
+		// Normally arbiters are set as used after calling the post-step callback.
+		// However, post-step callbacks are not called for sensors or arbiters rejected from pre-solve.
+		if(arb->state != cpArbiterStateIgnore) arb->state = cpArbiterStateNormal;
 	}
 	
 	// Time stamp the arbiter so we know it was used recently.
