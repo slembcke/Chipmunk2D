@@ -27,7 +27,7 @@ typedef void (*cpSpatialIndexRemoveFunc)(cpSpatialIndex *index, void *obj, cpHas
 typedef void (*cpSpatialIndexReindexFunc)(cpSpatialIndex *index);
 typedef void (*cpSpatialIndexReindexObjectFunc)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
 
-typedef	void (*cpSpatialIndexPointQueryFunc)(cpSpatialIndex *index, cpVect point, cpSpatialIndexQueryCallback func, void *data);
+typedef void (*cpSpatialIndexPointQueryFunc)(cpSpatialIndex *index, cpVect point, cpSpatialIndexQueryCallback func, void *data);
 typedef void (*cpSpatialIndexSegmentQueryFunc)(cpSpatialIndex *index, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryCallback func, void *data);
 typedef void (*cpSpatialIndexQueryFunc)(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data);
 typedef void (*cpSpatialIndexReindexQueryFunc)(cpSpatialIndex *index, cpSpatialIndexQueryCallback func, void *data);

@@ -71,7 +71,7 @@ handleSetTrans(void *obj, cpSpaceHash *hash)
 
 #pragma mark Memory Management Functions
 
-cpSpaceHash*
+cpSpaceHash *
 cpSpaceHashAlloc(void)
 {
 	return (cpSpaceHash *)cpcalloc(1, sizeof(cpSpaceHash));
@@ -89,7 +89,7 @@ cpSpaceHashAllocTable(cpSpaceHash *hash, int numcells)
 
 static cpSpatialIndexClass klass;
 
-cpSpaceHash*
+cpSpaceHash *
 cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndexBBFunc bbfunc)
 {
 	hash->spatialIndex.klass = &klass;
@@ -109,7 +109,7 @@ cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndex
 	return hash;
 }
 
-cpSpaceHash*
+cpSpaceHash *
 cpSpaceHashNew(cpFloat celldim, int cells, cpSpatialIndexBBFunc bbfunc)
 {
 	return cpSpaceHashInit(cpSpaceHashAlloc(), celldim, cells, bbfunc);
@@ -298,7 +298,7 @@ cpSpaceHashEach(cpSpaceHash *hash, cpSpatialIndexIterator func, void *data)
 	cpHashSetEach(hash->handleSet, (cpHashSetIterFunc)eachHelper, &pair);
 }
 
-static inline void
+static void
 removeOrphanedHandles(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr)
 {
 	cpSpaceHashBin *bin = *bin_ptr;
@@ -528,6 +528,11 @@ cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpFloa
 void
 cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells)
 {
+	if(hash->spatialIndex.klass != &klass){
+		cpAssertWarn(cpFalse, "Ignoring cpSpaceHashResize() call to non-cpSpaceHash spatial index.");
+		return;
+	}
+	
 	// Clear the hash to release the old handle locks.
 	clearHash(hash);
 	

@@ -120,8 +120,10 @@ cpSpaceInit(cpSpace *space)
 	space->locked = 0;
 	space->stamp = 0;
 
-	space->staticShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
-	space->activeShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
+//	space->staticShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
+//	space->activeShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
+	space->staticShapes = (cpSpatialIndex *)cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc);
+	space->activeShapes = (cpSpatialIndex *)cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc);
 	
 	space->allocatedBuffers = cpArrayNew(0);
 	

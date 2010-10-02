@@ -76,6 +76,7 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 
 #include "cpSpatialIndex.h"
 #include "cpSpaceHash.h"
+#include "cpBBTree.h"
 
 #include "cpBody.h"
 #include "cpShape.h"

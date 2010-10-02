@@ -10,6 +10,9 @@
 		D309AAED1256F8E500F8F9F0 /* cpSpatialIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = D309AAEC1256F8E500F8F9F0 /* cpSpatialIndex.h */; };
 		D309AAEE1256F8E500F8F9F0 /* cpSpatialIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = D309AAEC1256F8E500F8F9F0 /* cpSpatialIndex.h */; };
 		D309AAF01256F8F700F8F9F0 /* cpSpatialIndex.c in Sources */ = {isa = PBXBuildFile; fileRef = D309AAEF1256F8F700F8F9F0 /* cpSpatialIndex.c */; };
+		D309ACBF125723D400F8F9F0 /* cpBBTree.h in Headers */ = {isa = PBXBuildFile; fileRef = D309ACBE125723D400F8F9F0 /* cpBBTree.h */; };
+		D309ACC0125723D400F8F9F0 /* cpBBTree.h in Headers */ = {isa = PBXBuildFile; fileRef = D309ACBE125723D400F8F9F0 /* cpBBTree.h */; };
+		D309ACC2125723DD00F8F9F0 /* cpBBTree.c in Sources */ = {isa = PBXBuildFile; fileRef = D309ACC1125723DD00F8F9F0 /* cpBBTree.c */; };
 		D3102B171119FD3000E77771 /* Tank.c in Sources */ = {isa = PBXBuildFile; fileRef = D3102B161119FD3000E77771 /* Tank.c */; };
 		D31402950E9DD07E00EF79DB /* Springies.c in Sources */ = {isa = PBXBuildFile; fileRef = D31402940E9DD07E00EF79DB /* Springies.c */; };
 		D31847750FC458FD00E30B0D /* Query.c in Sources */ = {isa = PBXBuildFile; fileRef = D31847740FC458FD00E30B0D /* Query.c */; };
@@ -122,6 +125,8 @@
 /* Begin PBXFileReference section */
 		D309AAEC1256F8E500F8F9F0 /* cpSpatialIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpSpatialIndex.h; sourceTree = "<group>"; };
 		D309AAEF1256F8F700F8F9F0 /* cpSpatialIndex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpSpatialIndex.c; sourceTree = "<group>"; };
+		D309ACBE125723D400F8F9F0 /* cpBBTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpBBTree.h; sourceTree = "<group>"; };
+		D309ACC1125723DD00F8F9F0 /* cpBBTree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpBBTree.c; sourceTree = "<group>"; };
 		D30CE25D0B52535500427129 /* cpHashSet.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpHashSet.c; sourceTree = "<group>"; };
 		D30CE25E0B52535500427129 /* cpHashSet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpHashSet.h; path = ../include/chipmunk/cpHashSet.h; sourceTree = "<group>"; };
 		D3102B161119FD3000E77771 /* Tank.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tank.c; sourceTree = "<group>"; };
@@ -242,6 +247,8 @@
 				D309AAEF1256F8F700F8F9F0 /* cpSpatialIndex.c */,
 				D3E5F2DE0AAA562B004E361B /* cpSpaceHash.h */,
 				D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */,
+				D309ACBE125723D400F8F9F0 /* cpBBTree.h */,
+				D309ACC1125723DD00F8F9F0 /* cpBBTree.c */,
 			);
 			name = "Spatial Indexing";
 			sourceTree = "<group>";
@@ -423,6 +430,7 @@
 				D35420C00F4E1FD70017F4F7 /* chipmunk_unsafe.h in Headers */,
 				D36D87841012D63600DB5078 /* cpRatchetJoint.h in Headers */,
 				D309AAED1256F8E500F8F9F0 /* cpSpatialIndex.h in Headers */,
+				D309ACBF125723D400F8F9F0 /* cpBBTree.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -431,6 +439,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D309AAEE1256F8E500F8F9F0 /* cpSpatialIndex.h in Headers */,
+				D309ACC0125723D400F8F9F0 /* cpBBTree.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -619,6 +628,7 @@
 				D3238F8210C1B5ED00C4BDC2 /* Joints.c in Sources */,
 				D3102B171119FD3000E77771 /* Tank.c in Sources */,
 				D309AAF01256F8F700F8F9F0 /* cpSpatialIndex.c in Sources */,
+				D309ACC2125723DD00F8F9F0 /* cpBBTree.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -642,7 +652,6 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				INSTALL_PATH = /usr/local/lib;
-				OTHER_CFLAGS = "-ffast-math";
 				PREBINDING = NO;
 				PRODUCT_NAME = Chipmunk;
 				ZERO_LINK = YES;
@@ -694,10 +703,6 @@
 				GCC_THUMB_SUPPORT = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
-				OTHER_CFLAGS = (
-					"-DNDEBUG",
-					"-ffast-math",
-				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "Chipmunk-iPhone";
 				SDKROOT = iphonesimulator4.0;
@@ -713,6 +718,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = ../include/chipmunk;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "-ffast-math";
 				SDKROOT = macosx10.6;
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -732,7 +738,10 @@
 				GCC_OPTIMIZATION_LEVEL = s;
 				HEADER_SEARCH_PATHS = ../include/chipmunk;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "-DNDEBUG";
+				OTHER_CFLAGS = (
+					"-ffast-math",
+					"-DNDEBUG",
+				);
 				SDKROOT = macosx10.6;
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -786,7 +795,6 @@
 				INFOPLIST_FILE = "main-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
-				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
