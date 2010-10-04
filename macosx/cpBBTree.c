@@ -76,12 +76,25 @@ cpBBTreeNodeInsert(cpBBTreeNode *node, cpBBTreeNode *insert)
 	node->bb = cpBBmerge(node->bb, insert->bb);
 }
 
+static void
+cpBBTreeNodeQuery(cpBBTreeNode *node, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
+{
+	if(cpBBintersects(bb, node->bb)){
+		if(cpBBTreeNodeIsLeaf(node)){
+			func(obj, node->obj, data);
+		} else {
+			cpBBTreeNodeQuery(node->a, obj, bb, func, data);
+			cpBBTreeNodeQuery(node->b, obj, bb, func, data);
+		}
+	}
+}
+
 static int imax(int a, int b){return (a > b ? a : b);}
 
 static int
 cpBBTreeNodeDepth(cpBBTreeNode *node)
 {
-	return (cpBBTreeNodeIsLeaf(node) ? 1 : 1 + imax(cpBBTreeNodeDepth(node->a), cpBBTreeNodeDepth(node->a)));
+	return (cpBBTreeNodeIsLeaf(node) ? 1 : 1 + imax(cpBBTreeNodeDepth(node->a), cpBBTreeNodeDepth(node->b)));
 }
 
 #pragma mark Memory Management Functions
@@ -113,9 +126,21 @@ cpBBTreeNew(cpSpatialIndexBBFunc bbfunc)
 }
 
 static void
+freeSubTree(cpBBTreeNode *node)
+{
+	if(!cpBBTreeNodeIsLeaf(node)){
+		freeSubTree(node->a);
+		freeSubTree(node->b);
+	}
+	
+	cpfree(node);
+}
+
+static void
 cpBBTreeDestroy(cpBBTree *tree)
 {
-	// do nothing so far
+	cpArrayFree(tree->objs);
+	if(tree->root) freeSubTree(tree->root);
 }
 
 #pragma mark Insert/Remove
@@ -123,6 +148,7 @@ cpBBTreeDestroy(cpBBTree *tree)
 static void
 cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
+	cpArrayPush(tree->objs, obj);
 	cpBBTreeNode *node = cpBBTreeNodeNewLeaf(obj, tree->bbfunc(obj));
 	
 	if(tree->root == NULL){
@@ -147,13 +173,29 @@ cpBBTreeContains(cpBBTree *tree, void *obj, cpHashValue hashid)
 #pragma mark Reindex
 
 static void
-cpBBTreeReindexFunc(cpBBTree *tree)
+cpBBTreeReindex(cpBBTree *tree)
 {
-	cpAssertWarn(cpFalse, "TODO Not implemented");
+	if(tree->root) freeSubTree(tree->root);
+	tree->root = NULL;
+	
+	cpArray *objs = tree->objs;
+	for(int i=0; i<objs->num; i++){
+		void *obj = objs->arr[i];
+		
+		cpBBTreeNode *node = cpBBTreeNodeNewLeaf(obj, tree->bbfunc(obj));
+		
+		if(tree->root == NULL){
+			tree->root = node;
+		} else {
+			cpBBTreeNodeInsert(tree->root, node);
+		}
+	}
+	
+//	printf("tree depth %d\n", cpBBTreeDepth(tree));
 }
 
 static int
-cpBBTreeReindexObjectFunc(cpBBTree *tree, void *obj, cpHashValue hashid)
+cpBBTreeReindexObject(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
 	cpAssert(cpFalse, "TODO Not implemented");
 	return cpTrue;
@@ -162,36 +204,54 @@ cpBBTreeReindexObjectFunc(cpBBTree *tree, void *obj, cpHashValue hashid)
 #pragma mark Query
 
 static void
-cpBBTreePointQueryFunc(cpBBTree *tree, cpVect point, cpSpatialIndexQueryCallback func, void *data)
+cpBBTreePointQuery(cpBBTree *tree, cpVect point, cpSpatialIndexQueryCallback func, void *data)
 {
 	cpAssert(cpFalse, "TODO Not implemented");
 }
 
 static void
-cpBBTreeSegmentQueryFunc(cpBBTree *tree, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryCallback func, void *data)
+cpBBTreeSegmentQuery(cpBBTree *tree, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryCallback func, void *data)
 {
 	cpAssert(cpFalse, "TODO Not implemented");
 }
 
 static void
-cpBBTreeQueryFunc(cpBBTree *tree, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
+cpBBTreeQuery(cpBBTree *tree, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
 {
-	cpAssert(cpFalse, "TODO Not implemented");
+	if(tree->root) cpBBTreeNodeQuery(tree->root, obj, bb, func, data);
 }
-
-static void
-cpBBTreeReindexQueryFunc(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *data)
-{
-	cpAssert(cpFalse, "TODO Not implemented");
-}
-
-#pragma mark Misc
 
 static int
 cpBBTreeDepth(cpBBTree *tree)
 {
 	return (tree->root ? cpBBTreeNodeDepth(tree->root) : 0);
 }
+
+static void
+cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *data)
+{
+	if(tree->root) freeSubTree(tree->root);
+	tree->root = NULL;
+	
+	cpArray *objs = tree->objs;
+	for(int i=0; i<objs->num; i++){
+		void *obj = objs->arr[i];
+		
+		cpBBTreeQuery(tree, obj, tree->bbfunc(obj), func, data);
+		
+		cpBBTreeNode *node = cpBBTreeNodeNewLeaf(obj, tree->bbfunc(obj));
+		
+		if(tree->root == NULL){
+			tree->root = node;
+		} else {
+			cpBBTreeNodeInsert(tree->root, node);
+		}
+	}
+	
+	printf("tree depth % 5d for % 5d objects\n", cpBBTreeDepth(tree), tree->objs->num);
+}
+
+#pragma mark Misc
 
 static int
 cpBBTreeCount(cpBBTree *tree)
@@ -216,11 +276,11 @@ static cpSpatialIndexClass klass = {
 	(cpSpatialIndexInsertFunc)cpBBTreeInsert,
 	(cpSpatialIndexRemoveFunc)cpBBTreeRemove,
 	
-	(cpSpatialIndexReindexFunc)cpBBTreeReindexFunc,
-	(cpSpatialIndexReindexObjectFunc)cpBBTreeReindexObjectFunc,
+	(cpSpatialIndexReindexFunc)cpBBTreeReindex,
+	(cpSpatialIndexReindexObjectFunc)cpBBTreeReindexObject,
 	
-	(cpSpatialIndexPointQueryFunc)cpBBTreePointQueryFunc,
-	(cpSpatialIndexSegmentQueryFunc)cpBBTreeSegmentQueryFunc,
-	(cpSpatialIndexQueryFunc)cpBBTreeQueryFunc,
-	(cpSpatialIndexReindexQueryFunc)cpBBTreeReindexQueryFunc,
+	(cpSpatialIndexPointQueryFunc)cpBBTreePointQuery,
+	(cpSpatialIndexSegmentQueryFunc)cpBBTreeSegmentQuery,
+	(cpSpatialIndexQueryFunc)cpBBTreeQuery,
+	(cpSpatialIndexReindexQueryFunc)cpBBTreeReindexQuery,
 };
