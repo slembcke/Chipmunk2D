@@ -73,7 +73,7 @@ componentActivate(cpBody *root)
 		
 		for(cpShape *shape=body->shapesList; shape; shape=shape->next){
 			cpSpaceHashRemove(space->staticShapes, shape, shape->hashid);
-			cpSpaceHashInsert(space->activeShapes, shape, shape->hashid);
+			cpSpaceHashInsert(space->activeShapes, shape, shape->hashid, shape->bb);
 		}
 	} while((body = next) != root);
 	
@@ -206,7 +206,7 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 				
 				for(cpShape *shape = body->shapesList; shape; shape = shape->next){
 					cpSpaceHashRemove(space->activeShapes, shape, shape->hashid);
-					cpSpaceHashInsert(space->staticShapes, shape, shape->hashid);
+					cpSpaceHashInsert(space->staticShapes, shape, shape->hashid, shape->bb);
 				}
 			} while((body = next) != root);
 			
@@ -229,7 +229,7 @@ cpSpaceSleepBody(cpSpace *space, cpBody *body){
 		cpSpaceHashRemove(space->activeShapes, shape, shape->hashid);
 		
 		cpShapeCacheBB(shape);
-		cpSpaceHashInsert(space->staticShapes, shape, shape->hashid);
+		cpSpaceHashInsert(space->staticShapes, shape, shape->hashid, shape->bb);
 	}
 	
 	cpArrayPush(space->sleepingComponents, body);

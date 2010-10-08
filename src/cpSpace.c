@@ -309,7 +309,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	cpBodyAddShape(body, shape);
 	
 	cpShapeCacheBB(shape);
-	cpSpaceHashInsert(space->activeShapes, shape, shape->hashid);
+	cpSpaceHashInsert(space->activeShapes, shape, shape->hashid, shape->bb);
 		
 	return shape;
 }
@@ -317,8 +317,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 static void
 activateShapesTouchingShapeHelper(cpShape *shape, void *unused)
 {
-	cpBody *body = shape->body;
-	if(!cpBodyIsRogue(body)) cpBodyActivate(body);
+	cpBodyActivate(shape->body);
 }
 
 static void
@@ -340,7 +339,7 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	
 	cpShapeCacheBB(shape);
 	activateShapesTouchingShape(space, shape);
-	cpSpaceHashInsert(space->staticShapes, shape, shape->hashid);
+	cpSpaceHashInsert(space->staticShapes, shape, shape->hashid, shape->bb);
 	
 	return shape;
 }

@@ -71,15 +71,15 @@ typedef struct cpBody{
 	// Used for fast vector rotation using cpvrotate().
 	cpVect rot;
 	
-	// *** Other Fields
-	
-	// Maximum velocities this body can move at after integrating velocity
-	cpFloat v_limit, w_limit;
-	
 	// *** User Definable Fields
 	
 	// User defined data pointer.
 	cpDataPointer data;
+	
+	// *** Other Fields
+	
+	// Maximum velocities this body can move at after integrating velocity
+	cpFloat v_limit, w_limit;
 	
 	// *** Internally Used Fields
 	
@@ -134,6 +134,7 @@ static inline type cpBodyGet##name(const cpBody *body){return body->member;}
 #define CP_DefineBodySetter(type, member, name) \
 static inline void \
 cpBodySet##name(cpBody *body, const type value){ \
+	cpBodyActivate(body); \
 	body->member = value; \
 } \
 

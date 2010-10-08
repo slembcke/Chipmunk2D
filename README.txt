@@ -29,6 +29,20 @@ http://www.slembcke.net/forums
 CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
+Changes Since 5.3.1:
+* FIX: Collision begin callbacks were being called continuously for sensors or collisions rejected from the pre-solve callback.
+* FIX: Plugged a nasty memory leak when adding post-step callbacks.
+* FIX: Shapes were being added to the spatial hash using an uninitialized bounding box in some cases.
+* FIX: Perfectly aligned circle shapes now push each other apart.
+* FIX: cpBody setter functions now call cpBodyActivate().
+* API: cpSpaceSegmentQuery() no longer returns a boolean. Use cpSpaceSegmentQueryFirst() instead as it's more efficient.
+* NEW: cpSpaceRehashShape() Rehash an individual shape, active or static.
+* NEW: cpBodySleep() Force a body to fall asleep immediately.
+* NEW: cpConstraintGetImpulse() Return the most recent impulse applied by a constraint.
+* NEW: Added setter functions for the groove joint endpoints.
+* MISC: A number of other minor optimizations and fixes.
+
+
 CHANGES SINCE 5.3.0:
  * NEW: Added a brand new tutorial for Objective-Chipmunk: SimpleObjectiveChipmunk that can be found in the Objective-Chipmunk folder.
  * NEW: Proper API docs for Objective-Chipmunk.
