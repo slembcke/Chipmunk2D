@@ -15,7 +15,7 @@ system("rsync -r /tmp/Objective-Chipmunk-#{VERS}/html/ slembcke.net:files.slembc
 open("|ssh slembcke.net 'cd files.slembcke.net/chipmunk/release; sh'", 'w+') do|ssh|
 	ssh.puts "rm ChipmunkLatest-Docs; ln -s Chipmunk-5.x/Chipmunk-#{VERS}-Docs/ ChipmunkLatest-Docs"
 	ssh.puts "rm Objective-ChipmunkLatest-Docs; ln -s Chipmunk-5.x/Objective-Chipmunk-#{VERS}-Docs/ Objective-ChipmunkLatest-Docs"
-	ssh.puts "rm ChipmunkLatest.tgz; ln -s Chipmunk-5.x/Chipmunk-#{VERS}.tgz/ ChipmunkLatest"
+	ssh.puts "rm ChipmunkLatest.tgz; ln -s Chipmunk-5.x/Chipmunk-#{VERS}.tgz/ ChipmunkLatest.tgz"
 end
 
 puts
