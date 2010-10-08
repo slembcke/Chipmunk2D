@@ -62,6 +62,7 @@ componentActivate(cpBody *root)
 	
 	cpSpace *space = root->space;
 	cpAssert(space, "Trying to activate a body that was never added to a space.");
+	cpAssert(!space->locked, "Bodies can not be awakened during a query or a call to cpSpaceSte(). Put these calls into a post-step callback.");
 	
 	cpBody *body = root, *next;
 	do {
@@ -222,6 +223,8 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 
 void
 cpSpaceSleepBody(cpSpace *space, cpBody *body){
+	cpAssert(!space->locked, "Bodies can not be put to sleep during a query or a call to cpSpaceSte(). Put these calls into a post-step callback.");
+	
 	cpComponentNode node = {NULL, body, 0, 0.0f};
 	body->node = node;
 	

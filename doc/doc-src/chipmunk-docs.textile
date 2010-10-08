@@ -496,11 +496,11 @@ p(expl). Returns true if @body@ is sleeping.
 
 <pre><code>void cpBodySleep(cpBody *body)</code></pre>
 
-p(expl). Force @body@ to sleep immediately. Make sure the body is fully set up before you call this. Adding this body or any shapes attached to it, or modifying any of the body's properties will reactivate it. This is useful if you want an object to be inactive until something hits it such as a pile of boxes you want the player to plow through or a stalactite hanging from a cave ceiling.
+p(expl). Force @body@ to sleep immediately. Make sure the body is fully set up before you call this. Adding this body or any shapes attached to it, or modifying any of the body's properties will reactivate it. This is useful if you want an object to be inactive until something hits it such as a pile of boxes you want the player to plow through or a stalactite hanging from a cave ceiling. This function must not be called from a collision handler callback. Use a post-step callback instead.
 
 <pre><code>void cpBodyActivate(cpBody *body)</code></pre>
 
-p(expl). Wake @body@ up so that it starts actively simulating again if it's sleeping, or reset the idle timer if it's active.
+p(expl). Wake @body@ up so that it starts actively simulating again if it's sleeping, or reset the idle timer if it's active. This function must not be called from a collision handler callback. Use a post-step callback instead.
 
 h2. Misc Functions:
 
@@ -529,6 +529,8 @@ There are currently 3 collision shape types:
 * *Circles*: Fastest and simplest collision shape.
 * *Line segments*: Meant mainly as a static shape. They can be attached to moving bodies, but they don't currently generate collisions with other line segments. Can be beveled in order to give them a thickness.
 * *Convex polygons*: Slowest, but most flexible collision shape.
+
+You can add multiple shapes to a body. This should give you the flexibility to make any shape you want as well providing different areas of the same object with different friction, elasticity or callback values.
 
 h2. Fields:
 
@@ -1169,11 +1171,11 @@ void cpSpacePointQuery(
 	cpSpacePointQueryFunc func, void *data
 )</code></pre>
 
-p(expl). Query @space@ at @point@ filtering out matches with the given @layers@ and @group@. @func@ is called for each shape found along with the @data@ argument passed to @cpSpacePointQuery()@.
+p(expl). Query @space@ at @point@ filtering out matches with the given @layers@ and @group@. @func@ is called for each shape found along with the @data@ argument passed to @cpSpacePointQuery()@. Sensor shapes are included.
 
 <pre><code>cpShape *cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpGroup group)</code></pre>
 
-p(expl). Query @space@ at @point@ and return the first shape found matching the given @layers@ and @group@. Returns @NULL@ if no shape was found.
+p(expl). Query @space@ at @point@ and return the first shape found matching the given @layers@ and @group@. Returns @NULL@ if no shape was found.  Sensor shapes are ignored.
 
 h2. Segment Queries:
 
@@ -1193,13 +1195,13 @@ p(expl). Check if the line segment from @a@ to @b@ intersects the shape. @info@ 
 
 <pre><code>typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, void *data)
 
-cpBool cpSpaceSegmentQuery(
+void cpSpaceSegmentQuery(
 	cpSpace *space, cpVect start, cpVect end,
 	cpLayers layers, cpGroup group,
 	cpSpaceSegmentQueryFunc func, void *data
 )</code></pre>
 
-p(expl).  Query @space@ along the line segment from @start@ to @end@ filtering out matches with the given @layers@ and @group@. @func@ is called with the normalized distance along the line and surface normal for each shape found along with the @data@ argument passed to @cpSpacePointQuery()@.
+p(expl).  Query @space@ along the line segment from @start@ to @end@ filtering out matches with the given @layers@ and @group@. @func@ is called with the normalized distance along the line and surface normal for each shape found along with the @data@ argument passed to @cpSpacePointQuery()@.  Sensor shapes are included.
 
 <pre><code>cpShape *cpSpaceSegmentQueryFirst(
 	cpSpace *space, cpVect start, cpVect end,
@@ -1207,7 +1209,7 @@ p(expl).  Query @space@ along the line segment from @start@ to @end@ filtering o
 	cpSegmentQueryInfo *info
 )</code></pre>
 
-p(expl). Query @space@ along the line segment from @start@ to @end@ filtering out matches with the given @layers@ and @group@. Only the first shape encountered is returned and the search is short circuited. Returns @NULL@ if no shape was found. The info struct pointed to by @info@ will be initialized with the raycast info unless @info@ is NULL.
+p(expl). Query @space@ along the line segment from @start@ to @end@ filtering out matches with the given @layers@ and @group@. Only the first shape encountered is returned and the search is short circuited. Returns @NULL@ if no shape was found. The info struct pointed to by @info@ will be initialized with the raycast info unless @info@ is NULL. Sensor shapes are ignored.
 
 h3. Segment Query Helper Functions:
 

@@ -269,8 +269,8 @@ cpSpaceSetDefaultCollisionHandler(
 
 #define cpAssertSpaceUnlocked(space) \
 	cpAssert(!space->locked, \
-		"This addition/removal cannot be done safely during a call to cpSpaceStep(). " \
-		"Put these calls into a Post Step Callback." \
+		"This addition/removal cannot be done safely during a call to cpSpaceStep() or during a query. " \
+		"Put these calls into a post-step callback." \
 	);
 
 static void

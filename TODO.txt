@@ -1,14 +1,5 @@
-doc cpSpaceSegmentQuery returns void
-doc joint impulse getters
-doc multiple collision shapes
-doc first queries ignoring sensors
-doc setter functinos wake things up
-update msvc project files
-update Obj-Chipmunk API
-update FFI
 shape queries
-add assertion for cpBodyActivate() while space is locked
-lock space during queries
+add data field to cpSpace
 
 http://www.slembcke.net/forums/viewtopic.php?f=1&t=1188&view=unread#unread
 
