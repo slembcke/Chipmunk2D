@@ -500,7 +500,7 @@ p(expl). Force @body@ to sleep immediately. Make sure the body is fully set up b
 
 <pre><code>void cpBodyActivate(cpBody *body)</code></pre>
 
-p(expl). Wake @body@ up so that it starts actively simulating again.
+p(expl). Wake @body@ up so that it starts actively simulating again if it's sleeping, or reset the idle timer if it's active.
 
 h2. Misc Functions:
 

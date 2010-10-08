@@ -37,6 +37,7 @@ CHANGES SINCE 5.3.1:
 * FIX: Shapes were being added to the spatial hash using an uninitialized bounding box in some cases.
 * FIX: Perfectly aligned circle shapes now push each other apart.
 * FIX: cpBody setter functions now call cpBodyActivate().
+* FIX: Collision handler targets are released in Objective-Chipmunk when they are no longer needed instead of waiting for the space to be deallocated.
 * API: cpSpaceSegmentQuery() no longer returns a boolean. Use cpSpaceSegmentQueryFirst() instead as it's more efficient.
 * NEW: cpSpaceRehashShape() Rehash an individual shape, active or static.
 * NEW: cpBodySleep() Force a body to fall asleep immediately.

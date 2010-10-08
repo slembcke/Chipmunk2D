@@ -1,0 +1,31 @@
+doc cpSpaceSegmentQuery returns void
+doc joint impulse getters
+doc multiple collision shapes
+doc first queries ignoring sensors
+doc setter functinos wake things up
+update msvc project files
+update Obj-Chipmunk API
+update FFI
+shape queries
+add assertion for cpBodyActivate() while space is locked
+lock space during queries
+
+http://www.slembcke.net/forums/viewtopic.php?f=1&t=1188&view=unread#unread
+
+Major TODO Items:
+Doxygen! (mark private/public parts of API)
+Static rogue bodies?
+generic spatial indexing
+	* free
+	* count
+	* each
+	* contains
+	* add
+	* remove
+	* query
+	* point query
+	* segment query
+	* reindex
+	* reindex object
+	* active reindex
+	* resize (hash only)
