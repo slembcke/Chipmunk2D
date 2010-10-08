@@ -38,14 +38,12 @@ circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpF
 	if(distsq >= mindist*mindist) return 0;
 	
 	cpFloat dist = cpfsqrt(distsq);
-	// To avoid singularities, do nothing in the case of dist = 0.
-	cpFloat non_zero_dist = (dist ? dist : INFINITY);
 
 	// Allocate and initialize the contact.
 	cpContactInit(
 		con,
-		cpvadd(p1, cpvmult(delta, 0.5f + (r1 - 0.5f*mindist)/non_zero_dist)),
-		cpvmult(delta, 1.0f/non_zero_dist),
+		cpvadd(p1, cpvmult(delta, 0.5f + (r1 - 0.5f*mindist)/(dist ? dist : INFINITY))),
+		(dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f)),
 		dist - mindist,
 		0
 	);
