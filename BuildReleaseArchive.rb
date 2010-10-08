@@ -14,7 +14,7 @@ system("cd ../Objective-Chipmunk; ruby BuildReleaseArchive.rb #{VERS}")
 # Export, clean, and prepare
 system("rm -rf #{DIR}")
 system("svn export . #{DIR}")
-system("cd #{DIR}; rm BuildReleaseArchive.rb TODO.txt ReleaseChecklist.txt")
+system("cd #{DIR}; rm BuildReleaseArchive.rb TODO.txt ReleaseChecklist.txt UploadArchive.rb")
 system("mkdir -p #{DIR}/Objective-Chipmunk/")
 
 # Build docs
@@ -33,5 +33,4 @@ system("svn export ../SimpleObjectiveChipmunk #{DIR}/Objective-Chipmunk/SimpleOb
 
 system("tar -C /tmp -czf Chipmunk-#{VERS}.tgz Chipmunk-#{VERS}/")
 
-puts "Make sure to update version numbers in these files now (and the Objective-Chipmunk Doxyfile):"
-Kernel.system('egrep -Irn "5\.3(\..)+" . | egrep -v "\.svn"')
+system("open #{DIR}")
