@@ -84,6 +84,7 @@ struct##Get##name(const cpConstraint *constraint){ \
 static inline void \
 struct##Set##name(cpConstraint *constraint, type value){ \
 	cpConstraintCheckCast(constraint, struct); \
+	cpConstraintActivateBodies(constraint); \
 	((struct *)constraint)->member = value; \
 } \
 

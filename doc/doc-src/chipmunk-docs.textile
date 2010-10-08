@@ -19,7 +19,7 @@
 
 h1. Chipmunk Physics 5.3.2
 
-First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games on every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":http://code.google.com/p/chipmunk-physics/#Donate:. You'll make an indie game developer very happy.
+First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games on every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
 
 First of all, I would like to give a Erin Catto a big thank you, as Chipmunk's impulse solver was directly inspired by his Box2D example code way back in 2006. (Now a full fledged physics engine all it's own: "Box2D.org":http://www.box2d.org/). His contact persistence idea allows for stable stacks of objects with very few iterations of the solver. My previous solver produced mushy piles of objects or required a large amount of CPU to operate stably.
 
@@ -379,6 +379,8 @@ h2. Fields:
 
 Using the standard single letter names used in physics equations for these values probably wasn't the best idea in the long run. For me at least, it made things easier as the equations in the code looked more like the written equations I was used to. The getter/setter functions listed below may help save your sanity however.
 
+When changing any of a body's properties, you should also call @cpBodyActivate()@ to make sure that it is not stuck sleeping when you've changed a property that should make it move again. The @cpBodySet*()@ functions do this for you automatically.
+
 *Note:* @m@, @i@, and @a@ *must* be set using setter functions. The body holds on to cached values based on them.
 
 h2. Memory Management Functions:
@@ -483,6 +485,34 @@ p(expl). Zero both the forces and torques accumulated on @body@.
 <pre><code>void cpBodyApplyForce(cpBody *body, cpVect f, cpVect r)</code></pre>
 
 p(expl). Apply (accumulate) the force @f@ on @body@ at a *relative offset (important!)* @r@ from the center of gravity. Both @r@ and @f@ are in world coordinates.
+
+h2. Sleeping Functions:
+
+See Chipmunk Spaces":#cpSpace for more information on Chipmunk's sleeping feature.
+
+<pre><code>cpBool cpBodyIsSleeping(const cpBody *body)</code></pre>
+
+p(expl). Returns true if @body@ is sleeping.
+
+<pre><code>void cpBodySleep(cpBody *body)</code></pre>
+
+p(expl). Force @body@ to sleep immediately. Make sure the body is fully set up before you call this. Adding this body or any shapes attached to it, or modifying any of the body's properties will reactivate it. This is useful if you want an object to be inactive until something hits it such as a pile of boxes you want the player to plow through or a stalactite hanging from a cave ceiling.
+
+<pre><code>void cpBodyActivate(cpBody *body)</code></pre>
+
+p(expl). Wake @body@ up so that it starts actively simulating again.
+
+h2. Misc Functions:
+
+<pre><code>cpBool cpBodyIsStatic(const cpBody *body)</code></pre>
+
+p(expl). Returns true if @body@ is a static body for a space. (cpSpace.staticBody)
+
+<pre><code>cpBool cpBodyIsRogue(const cpBody *body)</code></pre>
+
+p(expl). Returns true if @body@ has never been added to a space.
+
+
 
 h2. Notes:
 
@@ -763,6 +793,12 @@ void cpConstraintFree(cpConstraint *constraint)</code></pre>
 
 p(expl). @Destroy@ and @Free@ functions are shared by all joint types. Allocation and initialization functions are specific to each joint type.
 
+h2. Misc Functions:
+
+<pre><code>cpFloat cpConstraintGetImpulse(cpConstraint *constraint)</code></pre>
+
+p(expl). Get the most recent impulse that @constraint@ applied. To convert this to a force, divide by the timestep passed to @cpSpaceStep()@.
+
 <a name="ConstraintTypes" />
 
 h1. Constraint Types:
@@ -835,6 +871,8 @@ p(expl). The groove goes from @groov_a@ to @groove_b@ on body @a@, and the pivot
 
 |_. Name |_. Type |
 | Anchr2 | cpVect |
+| GrooveA | cpVect |
+| GrooveB | cpVect |
 
 h2. Damped Spring:
 

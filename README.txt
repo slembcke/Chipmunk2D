@@ -23,13 +23,15 @@ First of all, you can find the C API documentation in the doc/ directory.
 
 A good starting point is to take a look at the included Demo application. The demos all just set up a Chipmunk simulation space and the demo app draws the graphics directly out of that. This makes it easy to see how the Chipmunk API works without worrying about the graphics code. You are free to use the demo drawing routines in your own projects, though it is certainly not the recommended way of drawing Chipmunk objects as it pokes around at the undocumented parts of Chipmunk.
 
+If you are looking at Objective-Chipmunk for the iPhone, we have a number of example projects and tutorials in the Objective-Chipmunk directory.
+
 FORUM:
 http://www.slembcke.net/forums
 
 CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
-Changes Since 5.3.1:
+CHANGES SINCE 5.3.1:
 * FIX: Collision begin callbacks were being called continuously for sensors or collisions rejected from the pre-solve callback.
 * FIX: Plugged a nasty memory leak when adding post-step callbacks.
 * FIX: Shapes were being added to the spatial hash using an uninitialized bounding box in some cases.
@@ -41,7 +43,6 @@ Changes Since 5.3.1:
 * NEW: cpConstraintGetImpulse() Return the most recent impulse applied by a constraint.
 * NEW: Added setter functions for the groove joint endpoints.
 * MISC: A number of other minor optimizations and fixes.
-
 
 CHANGES SINCE 5.3.0:
  * NEW: Added a brand new tutorial for Objective-Chipmunk: SimpleObjectiveChipmunk that can be found in the Objective-Chipmunk folder.
