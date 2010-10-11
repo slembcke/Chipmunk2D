@@ -110,8 +110,8 @@ mergeBodies(cpSpace *space, cpArray *components, cpArray *rogueBodies, cpBody *a
 	} 
 	
 	// Add any rogue bodies (bodies not added to the space)
-	if(!a->space) cpArrayPush(rogueBodies, a);
-	if(!b->space) cpArrayPush(rogueBodies, b);
+	if(cpBodyIsRogue(a)) cpArrayPush(rogueBodies, a);
+	if(cpBodyIsRogue(b)) cpArrayPush(rogueBodies, b);
 	
 	componentNodeMerge(a_root, b_root);
 }
