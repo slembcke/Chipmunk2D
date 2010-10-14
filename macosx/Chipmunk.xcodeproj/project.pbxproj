@@ -719,7 +719,7 @@
 				HEADER_SEARCH_PATHS = ../include/chipmunk;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "-ffast-math";
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx10.5;
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-W",
@@ -742,7 +742,7 @@
 					"-ffast-math",
 					"-DNDEBUG",
 				);
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx10.5;
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-W",

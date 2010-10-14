@@ -30,6 +30,8 @@
 	beyond simple shape drawing and is very dependent on implementation details
 	about Chipmunk which may change with little to no warning.
 */
+
+//#define TIME_TRIAL
  
 #include <stdlib.h>
 #include <stdio.h>
@@ -424,7 +426,6 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
-//#define TIME_TRIAL
 #ifdef TIME_TRIAL
 #include <sys/time.h>
 #include <unistd.h>
@@ -459,6 +460,8 @@ main(int argc, const char **argv)
 	sleep(1);
 	for(int i=0; i<demoCount; i++){
 		if(i == 'l' - 'a') continue;
+		if(i == 'q' - 'a') continue;
+		if(i == 'n' - 'a') continue;
 		time_trial(i, 1000);
 	}
 //	time_trial(0, 1000);

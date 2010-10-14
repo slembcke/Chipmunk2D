@@ -1,7 +1,7 @@
 typedef struct cpBBTreeNode {
 	void *obj;
 	cpBB bb;
-	struct cpBBTreeNode *a, *b;
+	struct cpBBTreeNode *a, *b, *parent;
 } cpBBTreeNode;
 
 typedef struct cpBBTree {

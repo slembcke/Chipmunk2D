@@ -11,6 +11,20 @@ cpBBTreeNodeIsLeaf(cpBBTreeNode *node)
 	return (node->obj != NULL);
 }
 
+static inline void
+cpBBTreeNodeSetA(cpBBTreeNode *node, cpBBTreeNode *value)
+{
+	node->a = value;
+	value->parent = node;
+}
+
+static inline void
+cpBBTreeNodeSetB(cpBBTreeNode *node, cpBBTreeNode *value)
+{
+	node->b = value;
+	value->parent = node;
+}
+
 static cpBBTreeNode *
 cpBBTreeNodeAlloc(void)
 {
@@ -24,7 +38,7 @@ cpBBTreeNodeNewLeaf(void *obj, cpBB bb)
 	node->obj = obj;
 	node->bb = bb;
 	
-	node->a = node->b = NULL;
+	node->a = node->b = node->parent = NULL;
 	
 	return node;
 }
@@ -35,8 +49,8 @@ cpBBTreeNodeInit(cpBBTreeNode *node, cpBBTreeNode *a, cpBBTreeNode *b)
 	node->obj = NULL;
 	node->bb = cpBBmerge(a->bb, b->bb);
 	
-	node->a = a;
-	node->b = b;
+	cpBBTreeNodeSetA(node, a);
+	cpBBTreeNodeSetB(node, b);
 	
 	return node;
 }
@@ -53,27 +67,24 @@ cpBBArea(cpBB bb)
 	return (bb.r - bb.l)*(bb.t - bb.b);
 }
 
-static void
+static cpBBTreeNode *
 cpBBTreeNodeInsert(cpBBTreeNode *node, cpBBTreeNode *insert)
 {
 	if(cpBBTreeNodeIsLeaf(node)){
-		cpBBTreeNodeInit(node, cpBBTreeNodeNewLeaf(node->obj, node->bb), insert);
+		return cpBBTreeNodeInit(cpBBTreeNodeAlloc(), insert, node);
 	} else {
 		cpFloat area_a = cpBBArea(node->a->bb) + cpBBMergedArea(node->b->bb, insert->bb);
 		cpFloat area_b = cpBBArea(node->b->bb) + cpBBMergedArea(node->a->bb, insert->bb);
-		cpFloat area_i = cpBBArea(insert->bb) + cpBBArea(node->bb);
 		
-		if(area_a < area_b && area_a < area_i){
-			cpBBTreeNodeInsert(node->b, insert);
-		} else if(area_b < area_i){
-			cpBBTreeNodeInsert(node->a, insert);
+		if(area_a < area_b){
+			cpBBTreeNodeSetB(node, cpBBTreeNodeInsert(node->b, insert));
 		} else {
-			cpBBTreeNodeInsert(node->a, node->b);
-			node->b = insert;
+			cpBBTreeNodeSetA(node, cpBBTreeNodeInsert(node->a, insert));
 		}
+		
+		node->bb = cpBBmerge(node->bb, insert->bb);
+		return node;
 	}
-	
-	node->bb = cpBBmerge(node->bb, insert->bb);
 }
 
 static void
@@ -151,11 +162,7 @@ cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 	cpArrayPush(tree->objs, obj);
 	cpBBTreeNode *node = cpBBTreeNodeNewLeaf(obj, tree->bbfunc(obj));
 	
-	if(tree->root == NULL){
-		tree->root = node;
-	} else {
-		cpBBTreeNodeInsert(tree->root, node);
-	}
+	tree->root = (tree->root ? cpBBTreeNodeInsert(tree->root, node) : node);
 }
 
 static void
@@ -183,12 +190,7 @@ cpBBTreeReindex(cpBBTree *tree)
 		void *obj = objs->arr[i];
 		
 		cpBBTreeNode *node = cpBBTreeNodeNewLeaf(obj, tree->bbfunc(obj));
-		
-		if(tree->root == NULL){
-			tree->root = node;
-		} else {
-			cpBBTreeNodeInsert(tree->root, node);
-		}
+		tree->root = (tree->root ? cpBBTreeNodeInsert(tree->root, node) : node);
 	}
 	
 //	printf("tree depth %d\n", cpBBTreeDepth(tree));
@@ -240,15 +242,10 @@ cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *dat
 		cpBBTreeQuery(tree, obj, tree->bbfunc(obj), func, data);
 		
 		cpBBTreeNode *node = cpBBTreeNodeNewLeaf(obj, tree->bbfunc(obj));
-		
-		if(tree->root == NULL){
-			tree->root = node;
-		} else {
-			cpBBTreeNodeInsert(tree->root, node);
-		}
+		tree->root = (tree->root ? cpBBTreeNodeInsert(tree->root, node) : node);
 	}
 	
-	printf("tree depth % 5d for % 5d objects\n", cpBBTreeDepth(tree), tree->objs->num);
+//	printf("tree depth % 5d for % 5d objects\n", cpBBTreeDepth(tree), tree->objs->num);
 }
 
 #pragma mark Misc
