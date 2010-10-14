@@ -284,18 +284,18 @@ cpSpaceHashRemove(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 	}
 }
 
-typedef struct eachPair {
+typedef struct eachContext {
 	cpSpatialIndexIterator func;
 	void *data;
-} eachPair;
+} eachContext;
 
-static void eachHelper(cpHandle *hand, eachPair *pair){pair->func(hand->obj, pair->data);}
+static void eachHelper(cpHandle *hand, eachContext *context){context->func(hand->obj, context->data);}
 
 static void
 cpSpaceHashEach(cpSpaceHash *hash, cpSpatialIndexIterator func, void *data)
 {
-	eachPair pair = {func, data};
-	cpHashSetEach(hash->handleSet, (cpHashSetIterFunc)eachHelper, &pair);
+	eachContext context = {func, data};
+	cpHashSetEach(hash->handleSet, (cpHashSetIterFunc)eachHelper, &context);
 }
 
 static void
@@ -377,22 +377,19 @@ cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpatialIndexQueryCallb
 }
 
 // Similar to struct eachPair above.
-typedef struct queryRehashPair {
+typedef struct queryRehashContext {
 	cpSpaceHash *hash;
 	cpSpatialIndexQueryCallback func;
 	void *data;
-} queryRehashPair;
+} queryRehashContext;
 
 // Hashset iterator func used with cpSpaceHashQueryRehash().
 static void
-handleQueryRehashHelper(void *elt, void *data)
+handleQueryRehashHelper(cpHandle *hand, queryRehashContext *context)
 {
-	cpHandle *hand = (cpHandle *)elt;
-	
-	// Unpack the user callback data.
-	queryRehashPair *pair = (queryRehashPair *)data;
-	cpSpaceHash *hash = pair->hash;
-	cpSpatialIndexQueryCallback func = pair->func;
+	cpSpaceHash *hash = context->hash;
+	cpSpatialIndexQueryCallback func = context->func;
+	void *data = context->data;
 
 	cpFloat dim = hash->celldim;
 	int n = hash->numcells;
@@ -415,7 +412,7 @@ handleQueryRehashHelper(void *elt, void *data)
 			if(containsHandle(bin, hand)) continue;
 			
 			cpHandleRetain(hand); // this MUST be done first in case the object is removed in func()
-			query(hash, &bin, obj, func, pair->data);
+			query(hash, &bin, obj, func, data);
 			
 			cpSpaceHashBin *newBin = getEmptyBin(hash);
 			newBin->handle = hand;
@@ -433,8 +430,8 @@ cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpatialIndexQueryCallback func, void
 {
 	clearHash(hash);
 	
-	queryRehashPair pair = {hash, func, data};
-	cpHashSetEach(hash->handleSet, &handleQueryRehashHelper, &pair);
+	queryRehashContext context = {hash, func, data};
+	cpHashSetEach(hash->handleSet, (cpHashSetIterFunc)handleQueryRehashHelper, &context);
 }
 
 static inline cpFloat

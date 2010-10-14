@@ -1,8 +1,4 @@
-typedef struct cpBBTreeNode {
-	void *obj;
-	cpBB bb;
-	struct cpBBTreeNode *a, *b, *parent;
-} cpBBTreeNode;
+struct cpBBTreeNode;
 
 typedef struct cpBBTree {
 	cpSpatialIndex spatialIndex;
@@ -10,8 +6,8 @@ typedef struct cpBBTree {
 	// TODO move to spatial index
 	cpSpatialIndexBBFunc bbfunc;
 	
-	cpArray *objs;
-	cpBBTreeNode *root;
+	cpHashSet *leaves;
+	struct cpBBTreeNode *root;
 } cpBBTree;
 
 cpBBTree *cpBBTreeAlloc(void);

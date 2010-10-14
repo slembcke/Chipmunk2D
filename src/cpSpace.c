@@ -87,7 +87,7 @@ static void nothing(cpArbiter *arb, cpSpace *space, void *data){}
 static cpBB shapeBBFunc(cpShape *shape){return shape->bb;}
 
 // Iterator functions for destructors.
-static void             freeWrap(void         *ptr, void *unused){            cpfree(ptr);}
+static void             freeWrap(void         *ptr, void *unused){          cpfree(ptr);}
 static void        shapeFreeWrap(cpShape      *ptr, void *unused){     cpShapeFree(ptr);}
 static void         bodyFreeWrap(cpBody       *ptr, void *unused){      cpBodyFree(ptr);}
 static void   constraintFreeWrap(cpConstraint *ptr, void *unused){cpConstraintFree(ptr);}

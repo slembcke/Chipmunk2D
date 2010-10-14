@@ -5,6 +5,12 @@
 
 #pragma mark Node Functions
 
+typedef struct cpBBTreeNode {
+	void *obj;
+	cpBB bb;
+	struct cpBBTreeNode *a, *b, *parent;
+} cpBBTreeNode;
+
 static inline cpBool
 cpBBTreeNodeIsLeaf(cpBBTreeNode *node)
 {
@@ -118,13 +124,23 @@ cpBBTreeAlloc(void)
 
 static cpSpatialIndexClass klass;
 
+static int leafSetEql(void *obj, cpBBTreeNode *node){return (obj == node->obj);}
+
+static void *
+leafSetTrans(void *obj, cpBBTree *tree)
+{
+	return cpBBTreeNodeNewLeaf(obj, tree->bbfunc(obj));
+}
+
+
+
 cpBBTree *
 cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc)
 {
 	tree->spatialIndex.klass = &klass;
 	
 	tree->bbfunc = bbfunc;
-	tree->objs = cpArrayNew(0);
+	tree->leaves = cpHashSetNew(0, (cpHashSetEqlFunc)leafSetEql, (cpHashSetTransFunc)leafSetTrans);
 	tree->root = NULL;
 	
 	return tree;
@@ -142,27 +158,30 @@ freeSubTree(cpBBTreeNode *node)
 	if(!cpBBTreeNodeIsLeaf(node)){
 		freeSubTree(node->a);
 		freeSubTree(node->b);
+		cpfree(node);
 	}
-	
-	cpfree(node);
 }
 
 static void
 cpBBTreeDestroy(cpBBTree *tree)
 {
-	cpArrayFree(tree->objs);
+	cpHashSetFree(tree->leaves);
 	if(tree->root) freeSubTree(tree->root);
 }
 
 #pragma mark Insert/Remove
 
+static inline void
+insertLeaf(cpBBTreeNode *node, cpBBTree *tree)
+{
+	tree->root = (tree->root ? cpBBTreeNodeInsert(tree->root, node) : node);
+}
+
 static void
 cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
-	cpArrayPush(tree->objs, obj);
-	cpBBTreeNode *node = cpBBTreeNodeNewLeaf(obj, tree->bbfunc(obj));
-	
-	tree->root = (tree->root ? cpBBTreeNodeInsert(tree->root, node) : node);
+	cpBBTreeNode *node = cpHashSetInsert(tree->leaves, hashid, obj, tree);
+	insertLeaf(node, tree);
 }
 
 static void
@@ -171,13 +190,15 @@ cpBBTreeRemove(cpBBTree *tree, void *obj, cpHashValue hashid)
 	cpAssert(cpFalse, "TODO Not implemented");
 }
 
-static int
+static cpBool
 cpBBTreeContains(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
-	return cpArrayContains(tree->objs, obj);
+	return (cpHashSetFind(tree->leaves, hashid, obj) != NULL);
 }
 
 #pragma mark Reindex
+
+
 
 static void
 cpBBTreeReindex(cpBBTree *tree)
@@ -185,13 +206,7 @@ cpBBTreeReindex(cpBBTree *tree)
 	if(tree->root) freeSubTree(tree->root);
 	tree->root = NULL;
 	
-	cpArray *objs = tree->objs;
-	for(int i=0; i<objs->num; i++){
-		void *obj = objs->arr[i];
-		
-		cpBBTreeNode *node = cpBBTreeNodeNewLeaf(obj, tree->bbfunc(obj));
-		tree->root = (tree->root ? cpBBTreeNodeInsert(tree->root, node) : node);
-	}
+	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)insertLeaf, tree);
 	
 //	printf("tree depth %d\n", cpBBTreeDepth(tree));
 }
@@ -229,21 +244,32 @@ cpBBTreeDepth(cpBBTree *tree)
 	return (tree->root ? cpBBTreeNodeDepth(tree->root) : 0);
 }
 
+typedef struct queryInsertContext {
+	cpBBTree *tree;
+	cpSpatialIndexQueryCallback func;
+	void *data;
+} queryInsertContext;
+
+
+static void
+queryInsertLeafHelper(cpBBTreeNode *node, queryInsertContext *context)
+{
+	cpBBTree *tree = context->tree;
+	void *obj = node->obj;
+	
+	cpBB bb = node->bb = tree->bbfunc(obj);
+	cpBBTreeQuery(tree, obj, bb, context->func, context->data);
+	insertLeaf(node, tree);
+}
+
 static void
 cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *data)
 {
 	if(tree->root) freeSubTree(tree->root);
 	tree->root = NULL;
 	
-	cpArray *objs = tree->objs;
-	for(int i=0; i<objs->num; i++){
-		void *obj = objs->arr[i];
-		
-		cpBBTreeQuery(tree, obj, tree->bbfunc(obj), func, data);
-		
-		cpBBTreeNode *node = cpBBTreeNodeNewLeaf(obj, tree->bbfunc(obj));
-		tree->root = (tree->root ? cpBBTreeNodeInsert(tree->root, node) : node);
-	}
+	queryInsertContext context = {tree, func, data};
+	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)queryInsertLeafHelper, &context);
 	
 //	printf("tree depth % 5d for % 5d objects\n", cpBBTreeDepth(tree), tree->objs->num);
 }
@@ -253,14 +279,21 @@ cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *dat
 static int
 cpBBTreeCount(cpBBTree *tree)
 {
-	return tree->objs->num;
+	return tree->leaves->entries;
 }
+
+typedef struct eachContext {
+	cpSpatialIndexIterator func;
+	void *data;
+} eachContext;
+
+static void eachHelper(cpHandle *hand, eachContext *context){context->func(hand->obj, context->data);}
 
 static void
 cpBBTreeEach(cpBBTree *tree, cpSpatialIndexIterator func, void *data)
 {
-	cpArray *objs = tree->objs;
-	for(int i=0; i<objs->num; i++) func(objs->arr[i], data);
+	eachContext context = {func, data};
+	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)eachHelper, &context);
 }
 
 static cpSpatialIndexClass klass = {
