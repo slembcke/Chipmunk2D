@@ -106,6 +106,23 @@ cpBBTreeNodeQuery(cpBBTreeNode *node, void *obj, cpBB bb, cpSpatialIndexQueryCal
 	}
 }
 
+static inline cpBBTreeNode *
+cpBBTreeNodeOther(cpBBTreeNode *node, cpBBTreeNode *child)
+{
+	return (node->a == child ? node->b : node->a);
+}
+
+static inline void
+cpBBTreeNodeReplaceChild(cpBBTreeNode *node, cpBBTreeNode *child, cpBBTreeNode *value)
+{
+	if(node->a == child){
+		cpBBTreeNodeSetA(node, value);
+	} else {
+		cpBBTreeNodeSetB(node, value);
+	}
+	// contract the bounding box
+}
+
 static int imax(int a, int b){return (a > b ? a : b);}
 
 static int
@@ -184,45 +201,11 @@ cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 	insertLeaf(node, tree);
 }
 
-/*
-  def remove(label)
-    node = @leaves.delete(label)
-  end
-  
-  def remove_leaf(node)
-    @root = nil if node == @root
-    
-    parent = node.parent
-    if(parent == @root)
-      @root = @root.other(node)
-    else
-      parent.parent.replace(parent, parent.other(node))
-    end
-  end
-*/
-
-static inline cpBBTreeNode *
-cpBBTreeNodeOther(cpBBTreeNode *node, cpBBTreeNode *child)
-{
-	return (node->a == child ? node->b : node->a);
-}
-
-static inline void
-cpBBTreeNodeReplaceChild(cpBBTreeNode *node, cpBBTreeNode *child, cpBBTreeNode *value)
-{
-	if(node->a == child){
-		cpBBTreeNodeSetA(node, value);
-	} else {
-		cpBBTreeNodeSetB(node, value);
-	}
-	// contract the bounding box
-}
-
 static void
 cpBBTreeRemove(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
 	cpBBTreeNode *root = tree->root;
-	cpBBTreeNode *node = cpHashSetFind(tree->leaves, hashid, obj);
+	cpBBTreeNode *node = cpHashSetRemove(tree->leaves, hashid, obj);
 	
 	if(node == root){
 		tree->root = NULL;
@@ -234,6 +217,8 @@ cpBBTreeRemove(cpBBTree *tree, void *obj, cpHashValue hashid)
 			cpBBTreeNodeReplaceChild(parent->parent, parent, cpBBTreeNodeOther(parent, node));
 		}
 	}
+	
+	cpfree(node);
 }
 
 static cpBool
@@ -269,7 +254,7 @@ cpBBTreeReindexObject(cpBBTree *tree, void *obj, cpHashValue hashid)
 static void
 cpBBTreePointQuery(cpBBTree *tree, cpVect point, cpSpatialIndexQueryCallback func, void *data)
 {
-	cpAssert(cpFalse, "TODO Not implemented");
+	if(tree->root) cpBBTreeNodeQuery(tree->root, &point, cpBBNew(point.x, point.y, point.x, point.y), func, data);
 }
 
 static void

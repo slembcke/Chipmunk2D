@@ -460,7 +460,6 @@ main(int argc, const char **argv)
 	sleep(1);
 	for(int i=0; i<demoCount; i++){
 		if(i == 'l' - 'a') continue;
-		if(i == 'q' - 'a') continue;
 		if(i == 'n' - 'a') continue;
 		time_trial(i, 1000);
 	}

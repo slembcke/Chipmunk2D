@@ -120,10 +120,13 @@ cpSpaceInit(cpSpace *space)
 	space->locked = 0;
 	space->stamp = 0;
 
-//	space->staticShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
-//	space->activeShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
-	space->staticShapes = (cpSpatialIndex *)cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc);
-	space->activeShapes = (cpSpatialIndex *)cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc);
+	if(cpTrue){
+		space->staticShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
+		space->activeShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
+	} else {
+		space->staticShapes = (cpSpatialIndex *)cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc);
+		space->activeShapes = (cpSpatialIndex *)cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc);
+	}
 	
 	space->allocatedBuffers = cpArrayNew(0);
 	
@@ -405,7 +408,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 
 	cpBodyActivate(body);
 	
-	cpAssert(!cpSpatialIndexContains(space->activeShapes, shape, shape->hashid),
+	cpAssert(cpSpatialIndexContains(space->activeShapes, shape, shape->hashid),
 		"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
@@ -419,7 +422,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
-	cpAssert(!cpSpatialIndexContains(space->staticShapes, shape, shape->hashid),
+	cpAssert(cpSpatialIndexContains(space->staticShapes, shape, shape->hashid),
 		"Cannot remove a static or sleeping shape that was never added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
