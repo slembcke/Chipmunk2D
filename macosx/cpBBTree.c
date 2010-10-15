@@ -184,10 +184,56 @@ cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 	insertLeaf(node, tree);
 }
 
+/*
+  def remove(label)
+    node = @leaves.delete(label)
+  end
+  
+  def remove_leaf(node)
+    @root = nil if node == @root
+    
+    parent = node.parent
+    if(parent == @root)
+      @root = @root.other(node)
+    else
+      parent.parent.replace(parent, parent.other(node))
+    end
+  end
+*/
+
+static inline cpBBTreeNode *
+cpBBTreeNodeOther(cpBBTreeNode *node, cpBBTreeNode *child)
+{
+	return (node->a == child ? node->b : node->a);
+}
+
+static inline void
+cpBBTreeNodeReplaceChild(cpBBTreeNode *node, cpBBTreeNode *child, cpBBTreeNode *value)
+{
+	if(node->a == child){
+		cpBBTreeNodeSetA(node, value);
+	} else {
+		cpBBTreeNodeSetB(node, value);
+	}
+	// contract the bounding box
+}
+
 static void
 cpBBTreeRemove(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
-	cpAssert(cpFalse, "TODO Not implemented");
+	cpBBTreeNode *root = tree->root;
+	cpBBTreeNode *node = cpHashSetFind(tree->leaves, hashid, obj);
+	
+	if(node == root){
+		tree->root = NULL;
+	} else {
+		cpBBTreeNode *parent = node->parent;
+		if(parent == root){
+			tree->root = cpBBTreeNodeOther(root, node);
+		} else {
+			cpBBTreeNodeReplaceChild(parent->parent, parent, cpBBTreeNodeOther(parent, node));
+		}
+	}
 }
 
 static cpBool
