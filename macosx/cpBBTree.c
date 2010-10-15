@@ -230,11 +230,13 @@ freeSubTree(cpBBTree *tree, cpBBTreeNode *node)
 	}
 }
 
+static void freeWrap(void *ptr, void *unused){cpfree(ptr);}
+
 static void
 cpBBTreeDestroy(cpBBTree *tree)
 {
 	cpHashSetFree(tree->leaves);
-	if(tree->root) freeSubTree(tree, tree->root);
+	cpArrayEach(tree->allocatedBuffers, freeWrap, NULL);
 }
 
 #pragma mark Insert/Remove
@@ -345,16 +347,40 @@ queryInsertLeafHelper(cpBBTreeNode *node, queryInsertContext *context)
 	insertLeaf(node, tree);
 }
 
+static cpBBTreeNode *
+queryInsertRebuild(cpBBTree *tree, cpBBTreeNode *node, cpBBTreeNode *root, cpSpatialIndexQueryCallback func, void *data)
+{
+	if(cpBBTreeNodeIsLeaf(node)){
+		void *obj = node->obj;
+		cpBB bb = node->bb = tree->bbfunc(obj);
+		
+		if(root){
+			cpBBTreeNodeQuery(root, obj, bb, func, data);
+			return cpBBTreeNodeInsert(tree, root, node);
+		} else {
+			return node;
+		}
+	} else {
+		root = queryInsertRebuild(tree, node->b, root, func, data);
+		root = queryInsertRebuild(tree, node->a, root, func, data);
+		recycleNode(tree, node);
+		return root;
+	}
+}
+
 static void
 cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *data)
 {
-	if(tree->root) freeSubTree(tree, tree->root);
-	tree->root = NULL;
+//	if(tree->root) freeSubTree(tree, tree->root);
+//	tree->root = NULL;
+//	
+//	queryInsertContext context = {tree, func, data};
+//	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)queryInsertLeafHelper, &context);
 	
-	queryInsertContext context = {tree, func, data};
-	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)queryInsertLeafHelper, &context);
+	if(tree->root)
+		tree->root = queryInsertRebuild(tree, tree->root, NULL, func, data);
 	
-//	printf("tree depth % 5d for % 5d objects\n", cpBBTreeDepth(tree), tree->objs->num);
+//	printf("tree depth % 5d for % 5d objects\n", cpBBTreeDepth(tree), tree->leaves->entries);
 }
 
 #pragma mark Misc
