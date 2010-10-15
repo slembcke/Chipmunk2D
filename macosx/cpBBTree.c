@@ -77,6 +77,7 @@ cpBBTreeNodeInit(cpBBTreeNode *node, cpBBTreeNode *a, cpBBTreeNode *b)
 {
 	node->obj = NULL;
 	node->bb = cpBBmerge(a->bb, b->bb);
+	node->parent = NULL;
 	
 	cpBBTreeNodeSetA(node, a);
 	cpBBTreeNodeSetB(node, b);
@@ -125,12 +126,27 @@ cpBBTreeNodeInsert(cpBBTree *tree, cpBBTreeNode *node, cpBBTreeNode *insert)
 static void
 cpBBTreeNodeQuery(cpBBTreeNode *node, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
 {
-	if(cpBBintersects(bb, node->bb)){
-		if(cpBBTreeNodeIsLeaf(node)){
-			func(obj, node->obj, data);
-		} else {
-			cpBBTreeNodeQuery(node->a, obj, bb, func, data);
-			cpBBTreeNodeQuery(node->b, obj, bb, func, data);
+//	if(cpBBintersects(bb, node->bb)){
+//		if(cpBBTreeNodeIsLeaf(node)){
+//			func(obj, node->obj, data);
+//		} else {
+//			cpBBTreeNodeQuery(node->a, obj, bb, func, data);
+//			cpBBTreeNodeQuery(node->b, obj, bb, func, data);
+//		}
+//	}
+	
+	cpBBTreeNode *nodeStack[200];
+	nodeStack[0] = node;
+	int top = 1;
+	while(top){
+		cpBBTreeNode *node = nodeStack[--top];
+		if(cpBBintersects(bb, node->bb)){
+			if(cpBBTreeNodeIsLeaf(node)){
+				func(obj, node->obj, data);
+			} else {
+				nodeStack[top++] = node->b;
+				nodeStack[top++] = node->a;
+			}
 		}
 	}
 }
@@ -149,7 +165,10 @@ cpBBTreeNodeReplaceChild(cpBBTreeNode *node, cpBBTreeNode *child, cpBBTreeNode *
 	} else {
 		cpBBTreeNodeSetB(node, value);
 	}
-	// contract the bounding box
+	
+	for(; node; node = node->parent){
+		node->bb = cpBBmerge(node->a->bb, node->b->bb);
+	}
 }
 
 static int imax(int a, int b){return (a > b ? a : b);}
@@ -245,6 +264,7 @@ cpBBTreeRemove(cpBBTree *tree, void *obj, cpHashValue hashid)
 		cpBBTreeNode *parent = node->parent;
 		if(parent == root){
 			tree->root = cpBBTreeNodeOther(root, node);
+			tree->root->parent = NULL;
 		} else {
 			cpBBTreeNodeReplaceChild(parent->parent, parent, cpBBTreeNodeOther(parent, node));
 		}
