@@ -8,6 +8,9 @@ typedef struct cpBBTree {
 	
 	cpHashSet *leaves;
 	struct cpBBTreeNode *root;
+	
+	struct cpBBTreeNode *pooledNodes;
+	cpArray *allocatedBuffers;
 } cpBBTree;
 
 cpBBTree *cpBBTreeAlloc(void);

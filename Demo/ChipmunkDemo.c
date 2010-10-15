@@ -31,7 +31,7 @@
 	about Chipmunk which may change with little to no warning.
 */
 
-//#define TIME_TRIAL
+#define TIME_TRIAL
  
 #include <stdlib.h>
 #include <stdio.h>

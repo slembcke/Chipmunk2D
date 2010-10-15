@@ -11,10 +11,51 @@ typedef struct cpBBTreeNode {
 	struct cpBBTreeNode *a, *b, *parent;
 } cpBBTreeNode;
 
-static inline cpBool
-cpBBTreeNodeIsLeaf(cpBBTreeNode *node)
+//static cpBBTreeNode *
+//cpBBTreeNodeAlloc(void)
+//{
+//	return (cpBBTreeNode *)cpcalloc(1, sizeof(cpBBTreeNode));
+//}
+
+static inline void
+recycleNode(cpBBTree *tree, cpBBTreeNode *node)
 {
-	return (node->obj != NULL);
+	node->parent = tree->pooledNodes;
+	tree->pooledNodes = node;
+}
+
+static cpBBTreeNode *
+getFreeNode(cpBBTree *tree)
+{
+	cpBBTreeNode *node = tree->pooledNodes;
+	
+	if(node){
+		tree->pooledNodes = node->parent;
+		return node;
+	} else {
+		// Pool is exhausted, make more
+		int count = CP_BUFFER_BYTES/sizeof(cpBBTreeNode);
+		cpAssert(count, "Buffer size is too small.");
+		
+		cpBBTreeNode *buffer = (cpBBTreeNode *)cpmalloc(CP_BUFFER_BYTES);
+		cpArrayPush(tree->allocatedBuffers, buffer);
+		
+		// push all but the first one, return the first instead
+		for(int i=1; i<count; i++) recycleNode(tree, buffer + i);
+		return buffer;
+	}
+}
+
+static cpBBTreeNode *
+cpBBTreeNodeNewLeaf(cpBBTree *tree, void *obj, cpBB bb)
+{
+	cpBBTreeNode *node = getFreeNode(tree);
+	node->obj = obj;
+	node->bb = bb;
+	
+	node->a = node->b = node->parent = NULL;
+	
+	return node;
 }
 
 static inline void
@@ -32,24 +73,6 @@ cpBBTreeNodeSetB(cpBBTreeNode *node, cpBBTreeNode *value)
 }
 
 static cpBBTreeNode *
-cpBBTreeNodeAlloc(void)
-{
-	return (cpBBTreeNode *)cpcalloc(1, sizeof(cpBBTreeNode));
-}
-
-static cpBBTreeNode *
-cpBBTreeNodeNewLeaf(void *obj, cpBB bb)
-{
-	cpBBTreeNode *node = cpBBTreeNodeAlloc();
-	node->obj = obj;
-	node->bb = bb;
-	
-	node->a = node->b = node->parent = NULL;
-	
-	return node;
-}
-
-static cpBBTreeNode *
 cpBBTreeNodeInit(cpBBTreeNode *node, cpBBTreeNode *a, cpBBTreeNode *b)
 {
 	node->obj = NULL;
@@ -59,6 +82,12 @@ cpBBTreeNodeInit(cpBBTreeNode *node, cpBBTreeNode *a, cpBBTreeNode *b)
 	cpBBTreeNodeSetB(node, b);
 	
 	return node;
+}
+
+static inline cpBool
+cpBBTreeNodeIsLeaf(cpBBTreeNode *node)
+{
+	return (node->obj != NULL);
 }
 
 static cpFloat inline
@@ -74,18 +103,18 @@ cpBBArea(cpBB bb)
 }
 
 static cpBBTreeNode *
-cpBBTreeNodeInsert(cpBBTreeNode *node, cpBBTreeNode *insert)
+cpBBTreeNodeInsert(cpBBTree *tree, cpBBTreeNode *node, cpBBTreeNode *insert)
 {
 	if(cpBBTreeNodeIsLeaf(node)){
-		return cpBBTreeNodeInit(cpBBTreeNodeAlloc(), insert, node);
+		return cpBBTreeNodeInit(getFreeNode(tree), insert, node);
 	} else {
 		cpFloat area_a = cpBBArea(node->a->bb) + cpBBMergedArea(node->b->bb, insert->bb);
 		cpFloat area_b = cpBBArea(node->b->bb) + cpBBMergedArea(node->a->bb, insert->bb);
 		
 		if(area_a < area_b){
-			cpBBTreeNodeSetB(node, cpBBTreeNodeInsert(node->b, insert));
+			cpBBTreeNodeSetB(node, cpBBTreeNodeInsert(tree, node->b, insert));
 		} else {
-			cpBBTreeNodeSetA(node, cpBBTreeNodeInsert(node->a, insert));
+			cpBBTreeNodeSetA(node, cpBBTreeNodeInsert(tree, node->a, insert));
 		}
 		
 		node->bb = cpBBmerge(node->bb, insert->bb);
@@ -146,7 +175,7 @@ static int leafSetEql(void *obj, cpBBTreeNode *node){return (obj == node->obj);}
 static void *
 leafSetTrans(void *obj, cpBBTree *tree)
 {
-	return cpBBTreeNodeNewLeaf(obj, tree->bbfunc(obj));
+	return cpBBTreeNodeNewLeaf(tree, obj, tree->bbfunc(obj));
 }
 
 
@@ -160,6 +189,9 @@ cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc)
 	tree->leaves = cpHashSetNew(0, (cpHashSetEqlFunc)leafSetEql, (cpHashSetTransFunc)leafSetTrans);
 	tree->root = NULL;
 	
+	tree->pooledNodes = NULL;
+	tree->allocatedBuffers = cpArrayNew(0);
+	
 	return tree;
 }
 
@@ -170,12 +202,12 @@ cpBBTreeNew(cpSpatialIndexBBFunc bbfunc)
 }
 
 static void
-freeSubTree(cpBBTreeNode *node)
+freeSubTree(cpBBTree *tree, cpBBTreeNode *node)
 {
 	if(!cpBBTreeNodeIsLeaf(node)){
-		freeSubTree(node->a);
-		freeSubTree(node->b);
-		cpfree(node);
+		freeSubTree(tree, node->a);
+		freeSubTree(tree, node->b);
+		recycleNode(tree, node);
 	}
 }
 
@@ -183,7 +215,7 @@ static void
 cpBBTreeDestroy(cpBBTree *tree)
 {
 	cpHashSetFree(tree->leaves);
-	if(tree->root) freeSubTree(tree->root);
+	if(tree->root) freeSubTree(tree, tree->root);
 }
 
 #pragma mark Insert/Remove
@@ -191,7 +223,7 @@ cpBBTreeDestroy(cpBBTree *tree)
 static inline void
 insertLeaf(cpBBTreeNode *node, cpBBTree *tree)
 {
-	tree->root = (tree->root ? cpBBTreeNodeInsert(tree->root, node) : node);
+	tree->root = (tree->root ? cpBBTreeNodeInsert(tree, tree->root, node) : node);
 }
 
 static void
@@ -218,7 +250,7 @@ cpBBTreeRemove(cpBBTree *tree, void *obj, cpHashValue hashid)
 		}
 	}
 	
-	cpfree(node);
+	recycleNode(tree, node);
 }
 
 static cpBool
@@ -234,7 +266,7 @@ cpBBTreeContains(cpBBTree *tree, void *obj, cpHashValue hashid)
 static void
 cpBBTreeReindex(cpBBTree *tree)
 {
-	if(tree->root) freeSubTree(tree->root);
+	if(tree->root) freeSubTree(tree, tree->root);
 	tree->root = NULL;
 	
 	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)insertLeaf, tree);
@@ -296,7 +328,7 @@ queryInsertLeafHelper(cpBBTreeNode *node, queryInsertContext *context)
 static void
 cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *data)
 {
-	if(tree->root) freeSubTree(tree->root);
+	if(tree->root) freeSubTree(tree, tree->root);
 	tree->root = NULL;
 	
 	queryInsertContext context = {tree, func, data};
