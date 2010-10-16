@@ -3,6 +3,8 @@
 
 #include "chipmunk.h"
 
+static cpSpatialIndexClass klass;
+
 #pragma mark Node Functions
 
 typedef struct cpBBTreeNode {
@@ -10,12 +12,6 @@ typedef struct cpBBTreeNode {
 	cpBB bb;
 	struct cpBBTreeNode *a, *b, *parent;
 } cpBBTreeNode;
-
-//static cpBBTreeNode *
-//cpBBTreeNodeAlloc(void)
-//{
-//	return (cpBBTreeNode *)cpcalloc(1, sizeof(cpBBTreeNode));
-//}
 
 static inline void
 recycleNode(cpBBTree *tree, cpBBTreeNode *node)
@@ -126,27 +122,12 @@ cpBBTreeNodeInsert(cpBBTree *tree, cpBBTreeNode *node, cpBBTreeNode *insert)
 static void
 cpBBTreeNodeQuery(cpBBTreeNode *node, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
 {
-//	if(cpBBintersects(bb, node->bb)){
-//		if(cpBBTreeNodeIsLeaf(node)){
-//			func(obj, node->obj, data);
-//		} else {
-//			cpBBTreeNodeQuery(node->a, obj, bb, func, data);
-//			cpBBTreeNodeQuery(node->b, obj, bb, func, data);
-//		}
-//	}
-	
-	cpBBTreeNode *nodeStack[200];
-	nodeStack[0] = node;
-	int top = 1;
-	while(top){
-		cpBBTreeNode *node = nodeStack[--top];
-		if(cpBBintersects(bb, node->bb)){
-			if(cpBBTreeNodeIsLeaf(node)){
-				func(obj, node->obj, data);
-			} else {
-				nodeStack[top++] = node->b;
-				nodeStack[top++] = node->a;
-			}
+	if(cpBBintersects(bb, node->bb)){
+		if(cpBBTreeNodeIsLeaf(node)){
+			func(obj, node->obj, data);
+		} else {
+			cpBBTreeNodeQuery(node->a, obj, bb, func, data);
+			cpBBTreeNodeQuery(node->b, obj, bb, func, data);
 		}
 	}
 }
@@ -171,13 +152,13 @@ cpBBTreeNodeReplaceChild(cpBBTreeNode *node, cpBBTreeNode *child, cpBBTreeNode *
 	}
 }
 
-static int imax(int a, int b){return (a > b ? a : b);}
-
-static int
-cpBBTreeNodeDepth(cpBBTreeNode *node)
-{
-	return (cpBBTreeNodeIsLeaf(node) ? 1 : 1 + imax(cpBBTreeNodeDepth(node->a), cpBBTreeNodeDepth(node->b)));
-}
+//static int imax(int a, int b){return (a > b ? a : b);}
+//
+//static int
+//cpBBTreeNodeDepth(cpBBTreeNode *node)
+//{
+//	return (cpBBTreeNodeIsLeaf(node) ? 1 : 1 + imax(cpBBTreeNodeDepth(node->a), cpBBTreeNodeDepth(node->b)));
+//}
 
 #pragma mark Memory Management Functions
 
@@ -186,8 +167,6 @@ cpBBTreeAlloc(void)
 {
 	return (cpBBTree *)cpcalloc(1, sizeof(cpBBTree));
 }
-
-static cpSpatialIndexClass klass;
 
 static int leafSetEql(void *obj, cpBBTreeNode *node){return (obj == node->obj);}
 
@@ -283,8 +262,6 @@ cpBBTreeContains(cpBBTree *tree, void *obj, cpHashValue hashid)
 
 #pragma mark Reindex
 
-
-
 static void
 cpBBTreeReindex(cpBBTree *tree)
 {
@@ -323,11 +300,11 @@ cpBBTreeQuery(cpBBTree *tree, void *obj, cpBB bb, cpSpatialIndexQueryCallback fu
 	if(tree->root) cpBBTreeNodeQuery(tree->root, obj, bb, func, data);
 }
 
-static int
-cpBBTreeDepth(cpBBTree *tree)
-{
-	return (tree->root ? cpBBTreeNodeDepth(tree->root) : 0);
-}
+//static int
+//cpBBTreeDepth(cpBBTree *tree)
+//{
+//	return (tree->root ? cpBBTreeNodeDepth(tree->root) : 0);
+//}
 
 typedef struct queryInsertContext {
 	cpBBTree *tree;
@@ -347,60 +324,14 @@ queryInsertLeafHelper(cpBBTreeNode *node, queryInsertContext *context)
 	insertLeaf(node, tree);
 }
 
-static int bitIndex = 0;
-static unsigned char bits[128] = {
-	0x62, 0x58, 0xE2, 0xDF, 0x20, 0x38, 0xCB, 0x0D, 0x56, 0x8B, 0xAC, 0xD2, 0x99, 0x85, 0x99, 0xB0,
-	0x65, 0x4B, 0x86, 0x90, 0x1B, 0xCC, 0x04, 0x03, 0x69, 0x8A, 0xD4, 0xC5, 0x4E, 0x65, 0x24, 0x54,
-	0x29, 0xD2, 0x31, 0x47, 0x3E, 0x9C, 0xD1, 0x28, 0xAA, 0xE7, 0xDD, 0xF4, 0xAD, 0xDA, 0xEF, 0x50,
-	0x41, 0x8D, 0xEA, 0x2B, 0xAD, 0x8D, 0x6D, 0xE7, 0xC0, 0x75, 0x8A, 0xCF, 0xC4, 0x83, 0xE5, 0xD4,
-	0xFD, 0x83, 0x0E, 0x45, 0x1D, 0xC3, 0xF4, 0xFD, 0xF2, 0xF1, 0xEC, 0x5E, 0x45, 0x2E, 0xF4, 0x10,
-	0x39, 0x4E, 0x44, 0xD3, 0x0E, 0xCA, 0xB1, 0xEA, 0x4E, 0x00, 0x1C, 0x82, 0x75, 0xAD, 0x78, 0xCF,
-	0xAB, 0xEE, 0x84, 0x6D, 0x11, 0xF5, 0xBE, 0x09, 0x6F, 0x67, 0xFB, 0xEC, 0x8B, 0x21, 0x4B, 0x5F,
-	0x50, 0x5E, 0x3B, 0x5A, 0x49, 0xD4, 0xF5, 0x87, 0x8F, 0x9B, 0x54, 0x4E, 0xC0, 0x66, 0x98, 0x8E,
-};
-
-static cpBBTreeNode *
-queryInsertRebuild(cpBBTree *tree, cpBBTreeNode *node, cpBBTreeNode *root, cpSpatialIndexQueryCallback func, void *data)
-{
-	if(cpBBTreeNodeIsLeaf(node)){
-		void *obj = node->obj;
-		cpBB bb = node->bb = tree->bbfunc(obj);
-		
-		if(root){
-			cpBBTreeNodeQuery(root, obj, bb, func, data);
-			return cpBBTreeNodeInsert(tree, root, node);
-		} else {
-			return node;
-		}
-	} else {
-		int bit = (bits[bitIndex>>3] >> (bitIndex&7)) & 1;
-//		printf("%d - %d\n", bitIndex, bit);
-		bitIndex = (bitIndex + 1)&1023;
-		
-		if(bit){
-			root = queryInsertRebuild(tree, node->a, root, func, data);
-			root = queryInsertRebuild(tree, node->b, root, func, data);
-		} else {
-			root = queryInsertRebuild(tree, node->b, root, func, data);
-			root = queryInsertRebuild(tree, node->a, root, func, data);
-		}
-		
-		recycleNode(tree, node);
-		return root;
-	}
-}
-
 static void
 cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *data)
 {
-//	if(tree->root) freeSubTree(tree, tree->root);
-//	tree->root = NULL;
-//	
-//	queryInsertContext context = {tree, func, data};
-//	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)queryInsertLeafHelper, &context);
+	if(tree->root) freeSubTree(tree, tree->root);
+	tree->root = NULL;
 	
-	if(tree->root)
-		tree->root = queryInsertRebuild(tree, tree->root, NULL, func, data);
+	queryInsertContext context = {tree, func, data};
+	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)queryInsertLeafHelper, &context);
 	
 //	int height = cpBBTreeDepth(tree);
 //	int count = tree->leaves->entries;
