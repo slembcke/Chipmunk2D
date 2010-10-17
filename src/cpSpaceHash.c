@@ -245,7 +245,7 @@ hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 }
 
 static void
-cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue hashid)
+cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue hashid, cpBB _deprecated_unused)
 {
 	cpHandle *hand = (cpHandle *)cpHashSetInsert(hash->handleSet, hashid, obj, hash);
 	hashHandle(hash, hand, hash->bbfunc(obj));
@@ -260,7 +260,7 @@ cpSpaceHashRehashObject(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 		hand->obj = NULL;
 		cpHandleRelease(hand, hash->pooledHandles);
 		
-		cpSpaceHashInsert(hash, obj, hashid);
+		cpSpaceHashInsert(hash, obj, hashid, cpBBNew(0.0f, 0.0f, 0.0f, 0.0f));
 	}
 }
 

@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C++ Express 2008
+# Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "chipmunk", "chipmunk\chipmunk.vcproj", "{49585540-F16D-48EF-8374-0C66B10BA956}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demo", "demo\demo.vcproj", "{974C8A5E-7C72-4968-B0FC-3F35CDE22075}"

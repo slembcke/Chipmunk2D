@@ -283,6 +283,8 @@ static inline cpBool inUnitRange(cpFloat t){return (0.0f < t && t < 1.0f);}
 static void
 cpSegmentShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
+	// TODO this function could be optimized better.
+	
 	cpSegmentShape *seg = (cpSegmentShape *)shape;
 	cpVect n = seg->tn;
 	// flip n if a is behind the axis
@@ -302,7 +304,7 @@ cpSegmentShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInf
 			cpFloat dtMin = -cpvcross(seg->tn, seg->ta);
 			cpFloat dtMax = -cpvcross(seg->tn, seg->tb);
 			
-			if(dtMin < dt && dt < dtMax){ // TODO this if looks suspiciously unneeded
+			if(dtMin < dt && dt < dtMax){
 				info->shape = shape;
 				info->t = t;
 				info->n = n;

@@ -1,0 +1,19 @@
+Release process:
+* Review diffs and write changelog
+* Make sure Objective-Chipmunk and FFI API is up to date
+* Make sure docs are up to date.
+* Make sure MSVC projects are up to date.
+
+* Update version numbers: egrep -Irn "5\.3(\..)+" . | egrep -v "\.svn"
+* Make a new release tag
+* Make a release announcement to forums that seem to care:
+	* chipmunk
+	* cocos2d
+	* idg
+	* tigsource
+	* toucharcade
+	* gamedev
+
+
+https://chipmunk-physics.googlecode.com/svn/tags/Chipmunk-5.3.1
+https://chipmunk-physics.googlecode.com/svn/trunk

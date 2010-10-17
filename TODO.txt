@@ -1,0 +1,22 @@
+shape queries
+add data field to cpSpace
+
+http://www.slembcke.net/forums/viewtopic.php?f=1&t=1188&view=unread#unread
+
+Major TODO Items:
+Doxygen! (mark private/public parts of API)
+Static rogue bodies?
+generic spatial indexing
+	* free
+	* count
+	* each
+	* contains
+	* add
+	* remove
+	* query
+	* point query
+	* segment query
+	* reindex
+	* reindex object
+	* active reindex
+	* resize (hash only)

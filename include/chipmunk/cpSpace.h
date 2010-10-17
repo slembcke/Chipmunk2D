@@ -96,7 +96,7 @@ typedef struct cpSpace{
 	// Linked list ring of contact buffers.
 	// Head is the newest buffer, and each buffer points to a newer buffer.
 	// Head wraps around and points to the oldest (tail) buffer.
-	cpContactBufferHeader *contactBuffersHead;
+	cpContactBufferHeader *contactBuffersHead, *_contactBuffersTail;
 	
 	// List of buffers to be free()ed when destroying the space.
 	cpArray *allocatedBuffers;

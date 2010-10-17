@@ -47,8 +47,11 @@ void
 cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data)
 {
 	pointQueryContext context = {layers, group, func, data};
-	cpSpatialIndexPointQuery(space->activeShapes, point, (cpSpatialIndexQueryCallback)pointQueryHelper, &context);
-	cpSpatialIndexPointQuery(space->staticShapes, point, (cpSpatialIndexQueryCallback)pointQueryHelper, &context);
+	
+	cpBool locked = space->locked; space->locked = cpTrue; {
+    cpSpatialIndexPointQuery(space->activeShapes, point, (cpSpatialIndexQueryCallback)pointQueryHelper, &context);
+    cpSpatialIndexPointQuery(space->staticShapes, point, (cpSpatialIndexQueryCallback)pointQueryHelper, &context);
+	} space->locked = locked;
 }
 
 static void
@@ -66,6 +69,8 @@ cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpGroup gr
 	return shape;
 }
 
+
+// TODO probably should deprecate this
 void
 cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data)
 {
@@ -108,8 +113,10 @@ cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, c
 		func,
 	};
 	
-	cpSpatialIndexSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryCallback)segQueryFunc, data);
-	cpSpatialIndexSegmentQuery(space->activeShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryCallback)segQueryFunc, data);
+	cpBool locked = space->locked; space->locked = cpTrue; {
+    cpSpatialIndexSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryCallback)segQueryFunc, data);
+    cpSpatialIndexSegmentQuery(space->activeShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryCallback)segQueryFunc, data);
+	} space->locked = locked;
 }
 
 typedef struct segQueryFirstContext {
@@ -180,6 +187,9 @@ void
 cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryFunc func, void *data)
 {
 	bbQueryContext context = {layers, group, func, data};
-	cpSpatialIndexQuery(space->activeShapes, &bb, bb, (cpSpatialIndexQueryCallback)bbQueryHelper, &context);
-	cpSpatialIndexQuery(space->staticShapes, &bb, bb, (cpSpatialIndexQueryCallback)bbQueryHelper, &context);
+	
+	cpBool locked = space->locked; space->locked = cpTrue; {
+    cpSpatialIndexQuery(space->activeShapes, &bb, bb, (cpSpatialIndexQueryCallback)bbQueryHelper, &context);
+    cpSpatialIndexQuery(space->staticShapes, &bb, bb, (cpSpatialIndexQueryCallback)bbQueryHelper, &context);
+	} space->locked = locked;
 }
