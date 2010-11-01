@@ -176,6 +176,7 @@
 		D3BC99AC0AB381AF0025A2C0 /* cpPolyShape.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpPolyShape.h; path = ../include/chipmunk/cpPolyShape.h; sourceTree = "<group>"; };
 		D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = ChipmunkDemo.c; sourceTree = "<group>"; };
 		D3C3787A11063B1B003EF1D9 /* libChipmunk-iPhone.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libChipmunk-iPhone.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3C517841279B38300C2AFEB /* TODO.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = TODO.txt; path = ../TODO.txt; sourceTree = SOURCE_ROOT; };
 		D3CCDF460AE35D920080442F /* LogoSmash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LogoSmash.c; sourceTree = "<group>"; };
 		D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemo.h; sourceTree = "<group>"; };
 		D3E5F0260AA32F15004E361B /* cpVect.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpVect.c; sourceTree = "<group>"; };
@@ -325,6 +326,7 @@
 		D3E5F0170AA32EAC004E361B = {
 			isa = PBXGroup;
 			children = (
+				D3C517841279B38300C2AFEB /* TODO.txt */,
 				D3CCDF5B0AE35DA00080442F /* Demo */,
 				D3E5F0C40AA75CC3004E361B /* chipmunk.h */,
 				D39F478A0FD4AB4E00B244CA /* chipmunk_types.h */,

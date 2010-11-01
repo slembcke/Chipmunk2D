@@ -20,7 +20,6 @@
  */
  
 #include <stdlib.h>
-#include <stdio.h>
 
 #include "chipmunk.h"
 #include "chipmunk_unsafe.h"

@@ -6,6 +6,8 @@ http://www.slembcke.net/forums/viewtopic.php?f=1&t=1188&view=unread#unread
 Major TODO Items:
 Doxygen! (mark private/public parts of API)
 Static rogue bodies?
+Fix units for cpSpace.damping
+Fix units for damped springs
 generic spatial indexing
 	* free
 	* count
