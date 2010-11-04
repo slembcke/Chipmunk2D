@@ -104,6 +104,13 @@ cpArbiterAlloc(void)
 cpArbiter*
 cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 {
+	arb->handler = NULL;
+	arb->swappedColl = cpFalse;
+	
+	arb->e = 0.0f;
+	arb->u = 0.0f;
+	arb->surface_vr = cpvzero;
+	
 	arb->numContacts = 0;
 	arb->contacts = NULL;
 	
@@ -157,8 +164,6 @@ cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisio
 				}
 			}
 		}
-
-//		cpfree(arb->contacts);
 	}
 	
 	arb->contacts = contacts;

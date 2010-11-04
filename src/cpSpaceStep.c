@@ -178,7 +178,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	cpShape *shape_pair[] = {a, b};
 	cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
 	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->contactSet, arbHashID, shape_pair, space);
-	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b); // retains the contacts array
+	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b);
 	
 	// Call the begin function first if it's the first step
 	if(arb->state == cpArbiterStateFirstColl && !handler->begin(arb, space, handler->data)){
