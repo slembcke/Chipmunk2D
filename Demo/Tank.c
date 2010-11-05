@@ -41,17 +41,17 @@ update(int ticks)
 	
 	for(int i=0; i<steps; i++){
 		// turn the control body based on the angle relative to the actual body
-		cpVect mouseDelta = cpvsub(mousePoint, tankBody->p);
-		cpFloat turn = cpvtoangle(cpvunrotate(tankBody->rot, mouseDelta));
-		cpBodySetAngle(tankControlBody, tankBody->a - turn);
-		
-		// drive the tank towards the mouse
-		if(cpvnear(mousePoint, tankBody->p, 30.0)){
-			tankControlBody->v = cpvzero; // stop
-		} else {
-			cpFloat direction = (cpvdot(mouseDelta, tankBody->rot) > 0.0 ? 1.0 : -1.0);
-			tankControlBody->v = cpvrotate(tankBody->rot, cpv(30.0f*direction, 0.0f));
-		}
+//		cpVect mouseDelta = cpvsub(mousePoint, tankBody->p);
+//		cpFloat turn = cpvtoangle(cpvunrotate(tankBody->rot, mouseDelta));
+//		cpBodySetAngle(tankControlBody, tankBody->a - turn);
+//		
+//		// drive the tank towards the mouse
+//		if(cpvnear(mousePoint, tankBody->p, 30.0)){
+//			tankControlBody->v = cpvzero; // stop
+//		} else {
+//			cpFloat direction = (cpvdot(mouseDelta, tankBody->rot) > 0.0 ? 1.0 : -1.0);
+//			tankControlBody->v = cpvrotate(tankBody->rot, cpv(30.0f*direction, 0.0f));
+//		}
 		
 		cpSpaceStep(space, dt);
 	}

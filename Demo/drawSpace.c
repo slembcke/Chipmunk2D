@@ -30,9 +30,10 @@
 	#include "OpenGL/glu.h"
 	#include <GLUT/glut.h>
 #else
-#ifdef WIN32
-	#include <windows.h>
-#endif
+	#ifdef WIN32
+		#include <windows.h>
+	#endif
+	
 	#include <GL/gl.h>
 	#include <GL/glu.h>
 	#include <GL/glut.h>
@@ -443,11 +444,12 @@ void
 drawSpace(cpSpace *space, drawSpaceOptions *options)
 {
 	if(options->drawHash){
-		glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
-		drawSpatialHash(space->activeShapes);
-		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
-		drawSpatialHash(space->staticShapes);
-		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+//		glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
+//		drawSpatialHash(space->activeShapes);
+//		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+//		drawSpatialHash(space->staticShapes);
+//		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		cpBBTreeRenderDebug(space->activeShapes);
 	}
 	
 	glLineWidth(options->lineThickness);

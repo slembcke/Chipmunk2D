@@ -378,3 +378,47 @@ static cpSpatialIndexClass klass = {
 	(cpSpatialIndexQueryFunc)cpBBTreeQuery,
 	(cpSpatialIndexReindexQueryFunc)cpBBTreeReindexQuery,
 };
+
+#include "OpenGL/gl.h"
+#include "OpenGL/glu.h"
+#include <GLUT/glut.h>
+
+static void
+cpBBTreeNodeRender(cpBBTreeNode *node, int depth)
+{
+	cpBB bb = node->bb;
+	
+	GLfloat v = depth/10.0f;
+//	glColor3f(v,v,v);
+//	glRectf(bb.l, bb.b, bb.r, bb.t);
+	
+	glColor3f(1,0,0);
+	glBegin(GL_LINES); {
+		glVertex2f(bb.l, bb.b);
+		glVertex2f(bb.l, bb.t);
+		
+		glVertex2f(bb.l, bb.t);
+		glVertex2f(bb.r, bb.t);
+		
+		glVertex2f(bb.r, bb.t);
+		glVertex2f(bb.r, bb.b);
+		
+		glVertex2f(bb.r, bb.b);
+		glVertex2f(bb.l, bb.b);
+	}; glEnd();
+	
+	if(!cpBBTreeNodeIsLeaf(node) && depth <= 10){
+		cpBBTreeNodeRender(node->a, depth + 1);
+		cpBBTreeNodeRender(node->b, depth + 1);
+	}
+}
+
+void
+cpBBTreeRenderDebug(cpBBTree *tree){
+	if(tree->spatialIndex.klass != &klass){
+		cpAssertWarn(cpFalse, "Ignoring cpBBTreeRenderDebug() call to non-tree spatial index.");
+		return;
+	}
+	
+	if(tree->root) cpBBTreeNodeRender(tree->root, 0);
+}

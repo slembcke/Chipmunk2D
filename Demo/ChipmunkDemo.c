@@ -44,9 +44,10 @@
 	#include "OpenGL/glu.h"
 	#include <GLUT/glut.h>
 #else
-#ifdef WIN32
-	#include <windows.h>
-#endif
+	#ifdef WIN32
+		#include <windows.h>
+	#endif
+	
 	#include <GL/gl.h>
 	#include <GL/glu.h>
 	#include <GL/glut.h>
@@ -104,7 +105,7 @@ static chipmunkDemo *demos[] = {
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
-static const int firstDemoIndex = 'c' - 'a';
+static const int firstDemoIndex = 's' - 'a';
 
 static int ticks = 0;
 static cpSpace *space;

@@ -16,3 +16,5 @@ typedef struct cpBBTree {
 cpBBTree *cpBBTreeAlloc(void);
 cpBBTree *cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc);
 cpBBTree *cpBBTreeNew(cpSpatialIndexBBFunc bbfunc);
+
+void cpBBTreeRenderDebug(cpBBTree *tree);
