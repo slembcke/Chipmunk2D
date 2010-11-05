@@ -132,7 +132,7 @@ init(void)
 	gear->biasCoef = 1.0f; // limit angular correction rate
 	gear->maxBias = 1.0f; // limit angular correction rate
 	gear->maxForce = 500000.0f; // emulate angular friction
-		
+	
 	return space;
 }
 
