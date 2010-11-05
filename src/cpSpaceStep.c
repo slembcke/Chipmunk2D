@@ -23,7 +23,7 @@
 //#include <stdio.h>
 #include <math.h>
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 
 #pragma mark Post Step Callback Functions
 
@@ -221,8 +221,8 @@ static cpBool
 contactSetFilter(cpArbiter *arb, cpSpace *space)
 {
 	if(space->sleepTimeThreshold != INFINITY){
-		cpBody *a = arb->private_a->body;
-		cpBody *b = arb->private_b->body;
+		cpBody *a = arb->a->body;
+		cpBody *b = arb->b->body;
 		
 		// both bodies are either static or sleeping
 		cpBool sleepingNow =

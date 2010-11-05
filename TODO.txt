@@ -1,13 +1,13 @@
 shape queries
-add data field to cpSpace
-
-http://www.slembcke.net/forums/viewtopic.php?f=1&t=1188&view=unread#unread
-
-Major TODO Items:
-Doxygen! (mark private/public parts of API)
 Static rogue bodies?
-Fix units for cpSpace.damping
+group sleeping of objects
+activate shapes touching shape
+
+6.0:
+add data field to cpSpace
+Doxygen! (mark private/public parts of API)
 Fix units for damped springs
+breakable joints?
 generic spatial indexing
 	* free
 	* count

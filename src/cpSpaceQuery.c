@@ -21,7 +21,7 @@
  
 #include <stdlib.h>
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 
 #pragma mark Point Query Functions
 

@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <float.h>
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 
 // initialized in cpInitChipmunk()
 cpBody cpStaticBodySingleton;

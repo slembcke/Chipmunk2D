@@ -26,6 +26,16 @@
 extern "C" {
 #endif
 
+#ifndef CP_ALLOW_PRIVATE_ACCESS
+	#define CP_ALLOW_PRIVATE_ACCESS 1
+#endif
+
+#if CP_ALLOW_PRIVATE_ACCESS == 1
+	#define CP_PRIVATE(symbol) symbol
+#else
+	#define CP_PRIVATE(symbol) symbol##_private
+#endif
+
 void cpMessage(const char *message, const char *condition, const char *file, int line, int isError);
 #ifdef NDEBUG
 	#define	cpAssertWarn(condition, message)
@@ -61,7 +71,7 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 	#endif
 #endif
 
-// Maximum allocated size for various Chipmunk buffer sizes
+// Maximum allocated size for various Chipmunk buffers
 #define CP_BUFFER_BYTES (32*1024)
 
 #define cpmalloc malloc

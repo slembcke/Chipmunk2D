@@ -24,7 +24,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 
 cpTimestamp cp_contact_persistence = 3;
 
@@ -37,7 +37,7 @@ contactSetEql(cpShape **shapes, cpArbiter *arb)
 	cpShape *a = shapes[0];
 	cpShape *b = shapes[1];
 	
-	return ((a == arb->private_a && b == arb->private_b) || (b == arb->private_a && a == arb->private_b));
+	return ((a == arb->a && b == arb->b) || (b == arb->a && a == arb->b));
 }
 
 // Transformation function for contactSet.
@@ -382,7 +382,7 @@ typedef struct removalContext {
 static cpBool
 contactSetFilterRemovedShape(cpArbiter *arb, removalContext *context)
 {
-	if(context->shape == arb->private_a || context->shape == arb->private_b){
+	if(context->shape == arb->a || context->shape == arb->b){
 		arb->handler->separate(arb, context->space, arb->handler->data);
 		cpArrayPush(context->space->pooledArbiters, arb);
 		return cpFalse;

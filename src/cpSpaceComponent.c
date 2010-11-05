@@ -21,7 +21,7 @@
  
 #include <stdlib.h>
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 
 #pragma mark Sleeping Functions
 
@@ -174,7 +174,7 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 	// iterate graph edges and build forests
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
-		mergeBodies(space, components, rogueBodies, arb->private_a->body, arb->private_b->body);
+		mergeBodies(space, components, rogueBodies, arb->a->body, arb->b->body);
 	}
 	for(int j=0; j<constraints->num; j++){
 		cpConstraint *constraint = (cpConstraint *)constraints->arr[j];

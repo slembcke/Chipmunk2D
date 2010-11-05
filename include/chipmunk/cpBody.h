@@ -84,18 +84,18 @@ typedef struct cpBody{
 	// *** Internally Used Fields
 	
 	// Velocity bias values used when solving penetrations and correcting constraints.
-	cpVect v_bias;
-	cpFloat w_bias;
+	CP_PRIVATE(cpVect v_bias);
+	CP_PRIVATE(cpFloat w_bias);
 	
 	// Space this body has been added to
-	struct cpSpace *space;
+	CP_PRIVATE(struct cpSpace *space);
 	
 	// Pointer to the shape list.
 	// Shapes form a linked list using cpShape.next when added to a space.
-	struct cpShape *shapesList;
+	CP_PRIVATE(struct cpShape *shapesList);
 	
 	// Used by cpSpaceStep() to store contact graph information.
-	cpComponentNode node;
+	CP_PRIVATE(cpComponentNode node);
 } cpBody;
 
 // Basic allocation/destruction functions
@@ -116,7 +116,7 @@ void cpBodySleep(cpBody *body);
 static inline cpBool
 cpBodyIsSleeping(const cpBody *body)
 {
-	return (body->node.next != ((cpBody*)0));
+	return (CP_PRIVATE(body->node).next != ((cpBody*)0));
 }
 
 cpBool cpBodyIsStatic(const cpBody *body);
@@ -124,7 +124,7 @@ cpBool cpBodyIsStatic(const cpBody *body);
 static inline cpBool
 cpBodyIsRogue(const cpBody *body)
 {
-	return (body->space == ((struct cpSpace*)0));
+	return (body->CP_PRIVATE(space) == ((struct cpSpace*)0));
 }
 
 
