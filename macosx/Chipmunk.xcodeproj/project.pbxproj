@@ -505,6 +505,7 @@
 			isa = PBXProject;
 			buildConfigurationList = D3E5F01A0AA32EAC004E361B /* Build configuration list for PBXProject "Chipmunk" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				English,
@@ -736,7 +737,7 @@
 		D3E5F01C0AA32EAC004E361B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DEBUGGING_SYMBOLS = full;

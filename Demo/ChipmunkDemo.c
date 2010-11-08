@@ -105,7 +105,7 @@ static chipmunkDemo *demos[] = {
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
-static const int firstDemoIndex = 'a' - 'a';
+static const int firstDemoIndex = 'g' - 'a';
 
 static int ticks = 0;
 static cpSpace *space;

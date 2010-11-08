@@ -45,7 +45,7 @@ getFreeNode(cpBBTree *tree)
 static inline cpBB
 cpBBinflate(cpBB bb)
 {
-	cpFloat coef = 0.9f;
+	cpFloat coef = 0.1f;
 	cpFloat x = (bb.r - bb.l)*coef;
 	cpFloat y = (bb.t - bb.b)*coef;
 	
@@ -55,7 +55,7 @@ cpBBinflate(cpBB bb)
 static inline cpBB
 cpBBinflateV(cpBB bb, cpVect v)
 {
-	cpFloat coef = 0.9f;
+	cpFloat coef = 0.1f;
 	cpFloat x = (bb.r - bb.l)*coef;
 	cpFloat y = (bb.t - bb.b)*coef;
 	
