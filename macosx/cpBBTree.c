@@ -45,11 +45,23 @@ getFreeNode(cpBBTree *tree)
 static inline cpBB
 cpBBinflate(cpBB bb)
 {
-	cpFloat coef = 0.1f;
+	cpFloat coef = 0.9f;
 	cpFloat x = (bb.r - bb.l)*coef;
 	cpFloat y = (bb.t - bb.b)*coef;
 	
 	return cpBBNew(bb.l - x, bb.b - y, bb.r + x, bb.t + y);
+}
+
+static inline cpBB
+cpBBinflateV(cpBB bb, cpVect v)
+{
+	cpFloat coef = 0.9f;
+	cpFloat x = (bb.r - bb.l)*coef;
+	cpFloat y = (bb.t - bb.b)*coef;
+	
+	v = cpvmult(v, 0.1f);
+	
+	return cpBBNew(bb.l + cpfmin(-x, v.x), bb.b + cpfmin(-y, v.y), bb.r + cpfmax(x, v.x), bb.t + cpfmax(y, v.y));
 }
 
 static cpBBTreeNode *
@@ -57,7 +69,7 @@ cpBBTreeNodeNewLeaf(cpBBTree *tree, void *obj, cpBB bb)
 {
 	cpBBTreeNode *node = getFreeNode(tree);
 	node->obj = obj;
-	node->bb = cpBBinflate(bb);
+	node->bb = bb;//cpBBinflate(bb);
 	
 	node->a = node->b = node->parent = NULL;
 	
@@ -150,24 +162,32 @@ cpBBTreeNodeOther(cpBBTreeNode *node, cpBBTreeNode *child)
 	return (node->a == child ? node->b : node->a);
 }
 
+//static inline void
+//subtreeBBPropagate(cpBBTreeNode *subtree, cpBBTreeNode *node)
+//{
+//	cpBBTreeNode *cond = subtree->parent;
+//	for(; node != cond; node = node->parent){
+//		node->bb = cpBBmerge(node->a->bb, node->b->bb);
+//	}
+//	
+////	while(TRUE){
+////		node->bb = cpBBmerge(node->a->bb, node->b->bb);
+////		if(node == subtree) break;
+////		
+////		node = node->parent;
+////	}
+//}
+
 static inline void
-subtreeBBPropagate(cpBBTreeNode *subtree, cpBBTreeNode *node)
+bbPropagate(cpBBTreeNode *node)
 {
-	cpBBTreeNode *cond = subtree->parent;
-	for(; node != cond; node = node->parent){
+	for(; node; node = node->parent){
 		node->bb = cpBBmerge(node->a->bb, node->b->bb);
 	}
-	
-//	while(TRUE){
-//		node->bb = cpBBmerge(node->a->bb, node->b->bb);
-//		if(node == subtree) break;
-//		
-//		node = node->parent;
-//	}
 }
 
 static inline void
-subtreeReplaceChild(cpBBTreeNode *subtree, cpBBTreeNode *parent, cpBBTreeNode *child, cpBBTreeNode *value)
+nodeReplaceChild(cpBBTreeNode *parent, cpBBTreeNode *child, cpBBTreeNode *value)
 {
 	cpAssert(!cpBBTreeNodeIsLeaf(parent), "Cannot replace child of a leaf.");
 	cpAssert(child == parent->a || child == parent->b, "Node is not a child of parent.");
@@ -178,7 +198,8 @@ subtreeReplaceChild(cpBBTreeNode *subtree, cpBBTreeNode *parent, cpBBTreeNode *c
 		cpBBTreeNodeSetB(parent, value);
 	}
 	
-	subtreeBBPropagate(subtree, parent);
+//	subtreeBBPropagate(subtree, parent);
+	bbPropagate(parent);
 }
 
 //static int imax(int a, int b){return (a > b ? a : b);}
@@ -275,7 +296,7 @@ subtreeRemove(cpBBTreeNode *subtree, cpBBTreeNode *leaf, cpBBTree *tree)
 			other->parent = subtree->parent;
 			return other;
 		} else {
-			subtreeReplaceChild(subtree, parent->parent, parent, cpBBTreeNodeOther(parent, leaf));
+			nodeReplaceChild(parent->parent, parent, cpBBTreeNodeOther(parent, leaf));
 			return subtree;
 		}
 	}
@@ -299,40 +320,23 @@ cpBBTreeContains(cpBBTree *tree, void *obj, cpHashValue hashid)
 #pragma mark Reindex
 
 static void
-cpBBTreeUpdateLeaf(cpBBTree *tree, cpBBTreeNode *leaf, cpBB bb)
+updateLeaf(cpBBTreeNode *leaf, cpBBTree *tree)
 {
 	cpBBTreeNode *root = tree->root;
+	cpBB bb = tree->bbfunc(leaf->obj);
 	
 	if(!cpBBcontainsBB(leaf->bb, bb)){
-		leaf->bb = cpBBinflate(bb);
-		cpBBTreeNode *parent = leaf->parent;
-		if(!parent) return;
+		leaf->bb = cpBBinflateV(bb, ((cpShape *)(leaf->obj))->body->v);
 		
-		cpBBTreeNode *ancestor = parent, *child = leaf;
-		while(!cpBBcontainsBB(ancestor->bb, bb) && ancestor != root){
-			child = ancestor;
-			ancestor = ancestor->parent;
-		}
-		
-		if(ancestor != parent){
-			subtreeRemove(ancestor, leaf, tree);
-			subtreeInsert(ancestor, leaf, tree);
-		}
-		
-		subtreeBBPropagate(root, parent);
+		root = subtreeRemove(root, leaf, tree);
+		tree->root = subtreeInsert(root, leaf, tree);
 	}
-}
-
-static void
-updateLeafHelper(cpBBTreeNode *leaf, cpBBTree *tree)
-{
-	cpBBTreeUpdateLeaf(tree, leaf, tree->bbfunc(leaf->obj));
 }
 
 static void
 cpBBTreeReindex(cpBBTree *tree)
 {
-	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)updateLeafHelper, tree);
+	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)updateLeaf, tree);
 	
 //	cpAssert(cpFalse, "FAIL");
 //	if(tree->root) freeSubTree(tree, tree->root);
@@ -425,7 +429,7 @@ queryHelper(cpBBTreeNode *leaf, queryContext *context)
 static void
 cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *data)
 {
-	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)updateLeafHelper, tree);
+	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)updateLeaf, tree);
 	
 	queryContext context = {func, data};
 	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)queryHelper, &context);
@@ -569,6 +573,11 @@ partitionNodes(cpBBTree *tree, cpBBTreeNode **nodes, int count)
 void
 cpBBTreeOptimize(cpBBTree *tree)
 {
+	if(tree->spatialIndex.klass != &klass){
+		cpAssertWarn(cpFalse, "Ignoring cpBBTreeOptimize() call to non-tree spatial index.");
+		return;
+	}
+	
 	cpBBTreeNode *root = tree->root;
 	if(!root) return;
 	
@@ -596,7 +605,7 @@ cpBBTreeNodeRender(cpBBTreeNode *node, int depth)
 	
 	cpBB bb = node->bb;
 	
-	GLfloat v = depth/3.0f;
+	GLfloat v = depth/2.0f;
 //	glColor3f(v,v,v);
 //	glRectf(bb.l, bb.b, bb.r, bb.t);
 	
