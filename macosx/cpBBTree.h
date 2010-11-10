@@ -1,5 +1,5 @@
 struct cpBBTreeNode;
-struct pairLink;
+struct cpBBTreePair;
 
 typedef cpVect (*cpBBTreeVelocityFunc)(void *obj);
 
@@ -11,7 +11,7 @@ typedef struct cpBBTree {
 	struct cpBBTreeNode *root;
 	
 	struct cpBBTreeNode *pooledNodes;
-	struct pairLink *pooledLinks;
+	struct cpBBTreePair *pooledPairs;
 	cpArray *allocatedBuffers;
 	
 	cpTimestamp stamp;
