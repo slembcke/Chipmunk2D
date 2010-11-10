@@ -55,6 +55,7 @@ getFreeNode(cpBBTree *tree)
 	} else {
 		// Pool is exhausted, make more
 		int count = CP_BUFFER_BYTES/sizeof(cpBBTreeNode);
+//		printf("allocating %d nodes for tree %p\n", count, tree);
 		cpAssert(count, "Buffer size is too small.");
 		
 		cpBBTreeNode *buffer = (cpBBTreeNode *)cpmalloc(CP_BUFFER_BYTES);
@@ -84,6 +85,7 @@ getFreePair(cpBBTree *tree)
 	} else {
 		// Pool is exhausted, make more
 		int count = CP_BUFFER_BYTES/sizeof(cpBBTreePair);
+//		printf("allocating %d pairs for tree %p\n", count, tree);
 		cpAssert(count, "Buffer size is too small.");
 		
 		cpBBTreePair *buffer = (cpBBTreePair *)cpmalloc(CP_BUFFER_BYTES);
@@ -321,7 +323,47 @@ static void
 cpBBTreeDestroy(cpBBTree *tree)
 {
 	cpHashSetFree(tree->leaves);
+	
 	cpArrayEach(tree->allocatedBuffers, freeWrap, NULL);
+	cpArrayFree(tree->allocatedBuffers);
+}
+
+static void
+removeThread(pairThread *thread)
+{
+	cpBBTreeNode *leaf = thread->leaf;
+	cpBBTreePair *next = thread->next, *prev = thread->prev;
+	
+	if(next){
+		if(next->a.leaf == leaf) next->a.prev = prev; else next->b.prev = prev;
+	}
+	
+	if(prev){
+		if(prev->a.leaf == leaf) prev->a.next = next; else prev->b.next = next;
+	} else {
+		leaf->node.leafData.pairs = next;
+	}
+}
+
+static void
+clearPairs(cpBBTreeNode *leaf, cpBBTree *tree)
+{
+	cpBBTreePair *pair = leaf->node.leafData.pairs;
+	leaf->node.leafData.pairs = NULL;
+	
+	while(pair){
+		if(pair->a.leaf == leaf){
+			cpBBTreePair *next = pair->a.next;
+			removeThread(&pair->b);
+			recyclePair(tree, pair);
+			pair = next;
+		} else {
+			cpBBTreePair *next = pair->b.next;
+			removeThread(&pair->a);
+			recyclePair(tree, pair);
+			pair = next;
+		}
+	}
 }
 
 #pragma mark Insert/Remove
@@ -352,6 +394,7 @@ subtreeRemove(cpBBTreeNode *subtree, cpBBTreeNode *leaf, cpBBTree *tree)
 		if(parent == subtree){
 			cpBBTreeNode *other = cpBBTreeNodeOther(subtree, leaf);
 			other->parent = subtree->parent;
+			recycleNode(tree, subtree);
 			return other;
 		} else {
 			nodeReplaceChild(parent->parent, parent, cpBBTreeNodeOther(parent, leaf), tree);
@@ -366,6 +409,7 @@ cpBBTreeRemove(cpBBTree *tree, void *obj, cpHashValue hashid)
 	cpBBTreeNode *leaf = cpHashSetRemove(tree->leaves, hashid, obj);
 	
 	tree->root = subtreeRemove(tree->root, leaf, tree);
+	clearPairs(leaf, tree);
 	recycleNode(tree, leaf);
 }
 
@@ -433,44 +477,6 @@ static void
 cpBBTreeQuery(cpBBTree *tree, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
 {
 	if(tree->root) cpBBTreeNodeQuery(tree->root, obj, bb, func, data);
-}
-
-static void
-removeThread(pairThread *thread)
-{
-	cpBBTreeNode *leaf = thread->leaf;
-	cpBBTreePair *next = thread->next, *prev = thread->prev;
-	
-	if(next){
-		if(next->a.leaf == leaf) next->a.prev = prev; else next->b.prev = prev;
-	}
-	
-	if(prev){
-		if(prev->a.leaf == leaf) prev->a.next = next; else prev->b.next = next;
-	} else {
-		leaf->node.leafData.pairs = next;
-	}
-}
-
-static void
-clearPairs(cpBBTreeNode *leaf, cpBBTree *tree)
-{
-	cpBBTreePair *pair = leaf->node.leafData.pairs;
-	leaf->node.leafData.pairs = NULL;
-	
-	while(pair){
-		if(pair->a.leaf == leaf){
-			cpBBTreePair *next = pair->a.next;
-			removeThread(&pair->b);
-			recyclePair(tree, pair);
-			pair = next;
-		} else {
-			cpBBTreePair *next = pair->b.next;
-			removeThread(&pair->a);
-			recyclePair(tree, pair);
-			pair = next;
-		}
-	}
 }
 
 static void
@@ -556,6 +562,8 @@ traverseMark(cpBBTreeNode *subtree, traverseContext *context)
 		traverseMark(subtree->node.children.b, context);
 	}
 }
+
+int debugCounter = 0;
 
 void
 cpBBTreeReindexCollide(cpBBTree *tree, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data)

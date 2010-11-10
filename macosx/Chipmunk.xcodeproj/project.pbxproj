@@ -123,10 +123,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		D309AAEC1256F8E500F8F9F0 /* cpSpatialIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpSpatialIndex.h; sourceTree = "<group>"; };
-		D309AAEF1256F8F700F8F9F0 /* cpSpatialIndex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpSpatialIndex.c; sourceTree = "<group>"; };
-		D309ACBE125723D400F8F9F0 /* cpBBTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpBBTree.h; sourceTree = "<group>"; };
-		D309ACC1125723DD00F8F9F0 /* cpBBTree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpBBTree.c; sourceTree = "<group>"; };
+		D309AAEC1256F8E500F8F9F0 /* cpSpatialIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpSpatialIndex.h; path = ../include/chipmunk/cpSpatialIndex.h; sourceTree = "<group>"; };
+		D309AAEF1256F8F700F8F9F0 /* cpSpatialIndex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpSpatialIndex.c; path = ../src/cpSpatialIndex.c; sourceTree = "<group>"; };
+		D309ACBE125723D400F8F9F0 /* cpBBTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpBBTree.h; path = ../include/chipmunk/cpBBTree.h; sourceTree = "<group>"; };
+		D309ACC1125723DD00F8F9F0 /* cpBBTree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpBBTree.c; path = ../src/cpBBTree.c; sourceTree = "<group>"; };
 		D30CE25D0B52535500427129 /* cpHashSet.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpHashSet.c; sourceTree = "<group>"; };
 		D30CE25E0B52535500427129 /* cpHashSet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpHashSet.h; path = ../include/chipmunk/cpHashSet.h; sourceTree = "<group>"; };
 		D3102B161119FD3000E77771 /* Tank.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tank.c; sourceTree = "<group>"; };

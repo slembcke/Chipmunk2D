@@ -31,7 +31,7 @@
 	about Chipmunk which may change with little to no warning.
 */
 
-//#define TIME_TRIAL
+#define TIME_TRIAL
  
 #include <stdlib.h>
 #include <stdio.h>
@@ -466,8 +466,6 @@ main(int argc, const char **argv)
 	cp_collision_slop = 0.2f;
 	
 #ifdef TIME_TRIAL
-//	time_trial('d'-'a', 10000);
-//	exit(0);
 	sleep(1);
 	for(int i=0; i<demoCount; i++){
 		if(i == 'l' - 'a') continue;
