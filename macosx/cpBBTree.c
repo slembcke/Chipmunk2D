@@ -7,13 +7,37 @@ static cpSpatialIndexClass klass;
 
 #pragma mark Node Functions
 
+struct cpBBTreeNode;
+struct pairLink;
+
 typedef struct cpBBTreeNode {
 	void *obj;
 	cpBB bb;
-	struct cpBBTreeNode *a, *b, *parent;
+	struct cpBBTreeNode *parent;
+	
+	union {
+		struct {
+			struct cpBBTreeNode *a, *b;
+		} children;
+		
+		struct {
+			cpTimestamp stamp;
+			struct pairLink *pairs;
+		} leafData;
+	};
 } cpBBTreeNode;
 
-static inline void
+typedef struct pairThread {
+	struct pairLink *prev;
+	struct cpBBTreeNode *leaf;
+	struct pairLink *next;
+} pairThread;
+
+typedef struct pairLink {
+	pairThread a, b;
+} pairLink;
+
+static void
 recycleNode(cpBBTree *tree, cpBBTreeNode *node)
 {
 	node->parent = tree->pooledNodes;
@@ -42,24 +66,70 @@ getFreeNode(cpBBTree *tree)
 	}
 }
 
-static inline cpBB
-cpBBinflate(cpBB bb)
+//static void
+//checkLink(pairLink *link)
+//{
+//	return;
+//	{
+//		int count = CP_BUFFER_BYTES/sizeof(pairLink);
+//		for(int i=0; i<count; i++){
+//			cpAssert(pooledLinks[i].a.next != link, "");
+//			cpAssert(pooledLinks[i].b.next != link, "");
+//			
+//			cpAssert(pooledLinks[i].a.prev != link, "");
+//			cpAssert(pooledLinks[i].b.prev != link, "");
+//		}
+//	}
+//	
+//	{
+//		int count = CP_BUFFER_BYTES/sizeof(pairLink);
+//		for(int i=0; i<count; i++){
+//			cpAssert(pooledNodes[i].leafData.pairs != link, "");
+//		}
+//	}
+//}
+
+static void
+recycleLink(cpBBTree *tree, pairLink *link)
 {
-	cpFloat coef = 0.1f;
-	cpFloat x = (bb.r - bb.l)*coef;
-	cpFloat y = (bb.t - bb.b)*coef;
+//	printf("recycled and zeroed %p\n", link);
+//	bzero(link, sizeof(pairLink));
 	
-	return cpBBNew(bb.l - x, bb.b - y, bb.r + x, bb.t + y);
+	link->a.next = tree->pooledLinks;
+	tree->pooledLinks = link;
+}
+
+static pairLink *
+getFreeLink(cpBBTree *tree)
+{
+	pairLink *link = tree->pooledLinks;
+	
+	if(link){
+		tree->pooledLinks = link->a.next;
+		return link;
+	} else {
+		// Pool is exhausted, make more
+		int count = CP_BUFFER_BYTES/sizeof(pairLink);
+		cpAssert(count, "Buffer size is too small.");
+		
+		pairLink *buffer = (pairLink *)cpmalloc(CP_BUFFER_BYTES);
+//		cpArrayPush(tree->allocatedBuffers, buffer);
+		
+		// push all but the first one, return the first instead
+		for(int i=1; i<count; i++) recycleLink(tree, buffer + i);
+		return buffer;
+	}
 }
 
 static inline cpBB
-cpBBinflateV(cpBB bb, cpVect v)
+shapeExtrudedBBFunc(cpShape *shape)
 {
+	cpBB bb = shape->bb;
+	cpVect v = cpvmult(shape->body->v, 0.1f);
+	
 	cpFloat coef = 0.1f;
 	cpFloat x = (bb.r - bb.l)*coef;
 	cpFloat y = (bb.t - bb.b)*coef;
-	
-	v = cpvmult(v, 0.1f);
 	
 	return cpBBNew(bb.l + cpfmin(-x, v.x), bb.b + cpfmin(-y, v.y), bb.r + cpfmax(x, v.x), bb.t + cpfmax(y, v.y));
 }
@@ -69,9 +139,11 @@ cpBBTreeNodeNewLeaf(cpBBTree *tree, void *obj, cpBB bb)
 {
 	cpBBTreeNode *node = getFreeNode(tree);
 	node->obj = obj;
-	node->bb = bb;//cpBBinflate(bb);
+	node->bb = shapeExtrudedBBFunc(obj);
 	
-	node->a = node->b = node->parent = NULL;
+	node->parent = NULL;
+	node->leafData.stamp = 0;
+	node->leafData.pairs = NULL;
 	
 	return node;
 }
@@ -79,14 +151,16 @@ cpBBTreeNodeNewLeaf(cpBBTree *tree, void *obj, cpBB bb)
 static inline void
 cpBBTreeNodeSetA(cpBBTreeNode *node, cpBBTreeNode *value)
 {
-	node->a = value;
+//	if(node->children.a) recycleNode(tree, node->children.a);
+	node->children.a = value;
 	value->parent = node;
 }
 
 static inline void
 cpBBTreeNodeSetB(cpBBTreeNode *node, cpBBTreeNode *value)
 {
-	node->b = value;
+//	if(node->children.a) recycleNode(tree, node->children.b);
+	node->children.b = value;
 	value->parent = node;
 }
 
@@ -129,13 +203,13 @@ subtreeInsert(cpBBTreeNode *subtree, cpBBTreeNode *leaf, cpBBTree *tree)
 	} else if(cpBBTreeNodeIsLeaf(subtree)){
 		return cpBBTreeNodeInit(getFreeNode(tree), leaf, subtree);
 	} else {
-		cpFloat area_a = cpBBArea(subtree->a->bb) + cpBBMergedArea(subtree->b->bb, leaf->bb);
-		cpFloat area_b = cpBBArea(subtree->b->bb) + cpBBMergedArea(subtree->a->bb, leaf->bb);
+		cpFloat area_a = cpBBArea(subtree->children.a->bb) + cpBBMergedArea(subtree->children.b->bb, leaf->bb);
+		cpFloat area_b = cpBBArea(subtree->children.b->bb) + cpBBMergedArea(subtree->children.a->bb, leaf->bb);
 		
 		if(area_a < area_b){
-			cpBBTreeNodeSetB(subtree, subtreeInsert(subtree->b, leaf, tree));
+			cpBBTreeNodeSetB(subtree, subtreeInsert(subtree->children.b, leaf, tree));
 		} else {
-			cpBBTreeNodeSetA(subtree, subtreeInsert(subtree->a, leaf, tree));
+			cpBBTreeNodeSetA(subtree, subtreeInsert(subtree->children.a, leaf, tree));
 		}
 		
 		subtree->bb = cpBBmerge(subtree->bb, leaf->bb);
@@ -150,8 +224,8 @@ cpBBTreeNodeQuery(cpBBTreeNode *node, void *obj, cpBB bb, cpSpatialIndexQueryCal
 		if(cpBBTreeNodeIsLeaf(node)){
 			func(obj, node->obj, data);
 		} else {
-			cpBBTreeNodeQuery(node->a, obj, bb, func, data);
-			cpBBTreeNodeQuery(node->b, obj, bb, func, data);
+			cpBBTreeNodeQuery(node->children.a, obj, bb, func, data);
+			cpBBTreeNodeQuery(node->children.b, obj, bb, func, data);
 		}
 	}
 }
@@ -159,42 +233,28 @@ cpBBTreeNodeQuery(cpBBTreeNode *node, void *obj, cpBB bb, cpSpatialIndexQueryCal
 static inline cpBBTreeNode *
 cpBBTreeNodeOther(cpBBTreeNode *node, cpBBTreeNode *child)
 {
-	return (node->a == child ? node->b : node->a);
+	return (node->children.a == child ? node->children.b : node->children.a);
 }
-
-//static inline void
-//subtreeBBPropagate(cpBBTreeNode *subtree, cpBBTreeNode *node)
-//{
-//	cpBBTreeNode *cond = subtree->parent;
-//	for(; node != cond; node = node->parent){
-//		node->bb = cpBBmerge(node->a->bb, node->b->bb);
-//	}
-//	
-////	while(TRUE){
-////		node->bb = cpBBmerge(node->a->bb, node->b->bb);
-////		if(node == subtree) break;
-////		
-////		node = node->parent;
-////	}
-//}
 
 static inline void
 bbPropagate(cpBBTreeNode *node)
 {
 	for(; node; node = node->parent){
-		node->bb = cpBBmerge(node->a->bb, node->b->bb);
+		node->bb = cpBBmerge(node->children.a->bb, node->children.b->bb);
 	}
 }
 
 static inline void
-nodeReplaceChild(cpBBTreeNode *parent, cpBBTreeNode *child, cpBBTreeNode *value)
+nodeReplaceChild(cpBBTreeNode *parent, cpBBTreeNode *child, cpBBTreeNode *value, cpBBTree *tree)
 {
 	cpAssert(!cpBBTreeNodeIsLeaf(parent), "Cannot replace child of a leaf.");
-	cpAssert(child == parent->a || child == parent->b, "Node is not a child of parent.");
+	cpAssert(child == parent->children.a || child == parent->children.b, "Node is not a child of parent.");
 	
-	if(parent->a == child){
+	if(parent->children.a == child){
+		recycleNode(tree, parent->children.a);
 		cpBBTreeNodeSetA(parent, value);
 	} else {
+		recycleNode(tree, parent->children.b);
 		cpBBTreeNodeSetB(parent, value);
 	}
 	
@@ -240,6 +300,8 @@ cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc)
 	tree->pooledNodes = NULL;
 	tree->allocatedBuffers = cpArrayNew(0);
 	
+	tree->stamp = 0;
+	
 	return tree;
 }
 
@@ -253,8 +315,8 @@ static void
 freeSubTree(cpBBTree *tree, cpBBTreeNode *node)
 {
 	if(!cpBBTreeNodeIsLeaf(node)){
-		freeSubTree(tree, node->a);
-		freeSubTree(tree, node->b);
+		freeSubTree(tree, node->children.a);
+		freeSubTree(tree, node->children.b);
 		recycleNode(tree, node);
 	}
 }
@@ -282,6 +344,8 @@ cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
 	cpBBTreeNode *leaf = cpHashSetInsert(tree->leaves, hashid, obj, tree);
 	insertLeaf(leaf, tree);
+	
+	leaf->leafData.stamp = tree->stamp;
 }
 
 static inline cpBBTreeNode *
@@ -296,7 +360,7 @@ subtreeRemove(cpBBTreeNode *subtree, cpBBTreeNode *leaf, cpBBTree *tree)
 			other->parent = subtree->parent;
 			return other;
 		} else {
-			nodeReplaceChild(parent->parent, parent, cpBBTreeNodeOther(parent, leaf));
+			nodeReplaceChild(parent->parent, parent, cpBBTreeNodeOther(parent, leaf), tree);
 			return subtree;
 		}
 	}
@@ -326,10 +390,12 @@ updateLeaf(cpBBTreeNode *leaf, cpBBTree *tree)
 	cpBB bb = tree->bbfunc(leaf->obj);
 	
 	if(!cpBBcontainsBB(leaf->bb, bb)){
-		leaf->bb = cpBBinflateV(bb, ((cpShape *)(leaf->obj))->body->v);
+		leaf->bb = shapeExtrudedBBFunc(leaf->obj);
 		
 		root = subtreeRemove(root, leaf, tree);
 		tree->root = subtreeInsert(root, leaf, tree);
+		
+		leaf->leafData.stamp = tree->stamp;
 	}
 }
 
@@ -375,40 +441,6 @@ cpBBTreeQuery(cpBBTree *tree, void *obj, cpBB bb, cpSpatialIndexQueryCallback fu
 	if(tree->root) cpBBTreeNodeQuery(tree->root, obj, bb, func, data);
 }
 
-//static int
-//cpBBTreeDepth(cpBBTree *tree)
-//{
-//	return (tree->root ? cpBBTreeNodeDepth(tree->root) : 0);
-//}
-
-//typedef struct queryInsertContext {
-//	cpBBTree *tree;
-//	cpSpatialIndexQueryCallback func;
-//	void *data;
-//} queryInsertContext;
-
-//static void
-//selfCollideSubtrees(cpBBTreeNode *a, cpBBTreeNode *b, cpSpatialIndexQueryCallback func, void *data)
-//{
-//	cpBool a_leaf = cpBBTreeNodeIsLeaf(a), b_leaf = cpBBTreeNodeIsLeaf(b);
-//	
-//	if(a_leaf && b_leaf){
-//		func(a, b, data);
-//	} else if(a_leaf){
-//		cpBBTreeNodeQuery(b, a->obj, a->bb, func, data);
-//	} else if(b_leaf){
-//		cpBBTreeNodeQuery(a, b->obj, b->bb, func, data);
-//	} else {
-//		selfCollideSubtrees(a->a, a->b, func, data);
-//		selfCollideSubtrees(b->a, b->b, func, data);
-//		
-//		if(cpBBintersects(a->bb, b->bb)) {
-//			selfCollideSubtrees(b->a, a, func, data);
-//			selfCollideSubtrees(b->b, a, func, data);
-//		}
-//	}
-//}
-
 typedef struct queryContext {
 	cpSpatialIndexQueryCallback func;
 	void *data;
@@ -422,22 +454,167 @@ queryHelper(cpBBTreeNode *leaf, queryContext *context)
 	
 	for(cpBBTreeNode *node=leaf; node->parent; node=node->parent){
 		cpBBTreeNode *parent = node->parent;
-		if(node == parent->a) cpBBTreeNodeQuery(parent->b, obj, bb, context->func, context->data);
+		if(node == parent->children.a) cpBBTreeNodeQuery(parent->children.b, obj, bb, context->func, context->data);
 	}
 }
+
+static void
+removeThread(pairThread *thread)
+{
+	cpBBTreeNode *leaf = thread->leaf;
+	pairLink *next = thread->next;
+	pairLink *prev = thread->prev;
+	
+	if(next){
+		if(next->a.leaf == leaf){
+			next->a.prev = prev;
+		} else {
+			next->b.prev = prev;
+		}
+	}
+	
+	if(prev){
+		if(prev->a.leaf == leaf){
+			prev->a.next = next;
+		} else {
+			prev->b.next = next;
+		}
+	} else {
+		leaf->leafData.pairs = next;
+	}
+}
+
+static void
+clearLinks(cpBBTreeNode *leaf, cpBBTree *tree)
+{
+	pairLink *link = leaf->leafData.pairs;
+//	if(link) printf("clear links for %p\n", leaf);
+
+	leaf->leafData.pairs = NULL;
+	
+	while(link){
+//		printf("unlink %p and %p with %p\n", link->a.leaf, link->b.leaf, link);
+		if(link->a.leaf == leaf){
+			pairLink *next = link->a.next;
+			removeThread(&link->b);
+			recycleLink(tree, link);
+			link = next;
+		} else {
+			pairLink *next = link->b.next;
+			removeThread(&link->a);
+			recycleLink(tree, link);
+			link = next;
+		}
+	}
+}
+
+static void
+insertLink(cpBBTreeNode *a, cpBBTreeNode *b, cpBBTree *tree)
+{
+	pairLink *nextA = a->leafData.pairs;
+	pairLink *nextB = b->leafData.pairs;
+	pairLink *link = getFreeLink(tree);
+//	printf("link   %p and %p with %p\n", a, b, link);
+	
+	if(nextA){
+		if(nextA->a.leaf == a){
+			nextA->a.prev = link;
+		} else {
+			nextA->b.prev = link;
+		}
+	}
+	
+	if(nextB){
+		if(nextB->a.leaf == b){
+			nextB->a.prev = link;
+		} else {
+			nextB->b.prev = link;
+		}
+	}
+	
+	(*link) = (pairLink){
+		{NULL, a, nextA},
+		{NULL, b, nextB},
+	};
+	
+	a->leafData.pairs = b->leafData.pairs = link;
+}
+
+typedef struct traverseContext {
+	cpBBTree *tree;
+	cpSpatialIndexQueryCallback func;
+	void *data;
+} traverseContext;
+
+static void
+traverseMarkQuery(cpBBTreeNode *subtree, cpBBTreeNode *leaf, cpBool left, traverseContext *context)
+{
+	if(cpBBintersects(leaf->bb, subtree->bb)){
+		if(cpBBTreeNodeIsLeaf(subtree)){
+			if(left){
+				insertLink(leaf, subtree, context->tree);
+			} else {
+				insertLink(subtree, leaf, context->tree);
+				context->func(leaf->obj, subtree->obj, context->data);
+			}
+		} else {
+			traverseMarkQuery(subtree->children.a, leaf, left, context);
+			traverseMarkQuery(subtree->children.b, leaf, left, context);
+		}
+	}
+}
+
+static void
+traverseMarkLeaf(cpBBTreeNode *leaf, traverseContext *context)
+{
+	cpBBTree *tree = context->tree;
+	if(leaf->leafData.stamp == tree->stamp){
+		clearLinks(leaf, tree);
+		
+		for(cpBBTreeNode *node = leaf; node->parent; node = node->parent){
+			if(node == node->parent->children.a){
+				traverseMarkQuery(node->parent->children.b, leaf, cpTrue, context);
+			} else {
+				traverseMarkQuery(node->parent->children.a, leaf, cpFalse, context);
+			}
+		}
+	} else {
+		// iterate links and callback node is right
+		pairLink *link = leaf->leafData.pairs;
+		while(link){
+			if(leaf == link->b.leaf){
+				context->func(leaf->obj, link->a.leaf->obj, context->data);
+				link = link->b.next;
+			} else {
+				link = link->a.next;
+			}
+		}
+	}
+}
+
+static void
+traverseMark(cpBBTreeNode *subtree, traverseContext *context)
+{
+	if(cpBBTreeNodeIsLeaf(subtree)){
+		traverseMarkLeaf(subtree, context);
+	} else {
+		traverseMark(subtree->children.a, context);
+		traverseMark(subtree->children.b, context);
+	}
+}
+
 
 static void
 cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *data)
 {
 	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)updateLeaf, tree);
 	
-	queryContext context = {func, data};
-	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)queryHelper, &context);
+	traverseContext context = {tree, func, data};
+	traverseMark(tree->root, &context);
+	tree->stamp++;
 	
-//	cpBBTreeNode *root = tree->root;
-//	if(root && !cpBBTreeNodeIsLeaf(root)){
-//		selfCollideSubtrees(tree->root->a, tree->root->b, func, data);
-//	}
+//	queryContext context = {func, data};
+//	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)queryHelper, &context);
 	
 //	int height = cpBBTreeDepth(tree);
 //	int count = tree->leaves->entries;
@@ -570,6 +747,25 @@ partitionNodes(cpBBTree *tree, cpBBTreeNode **nodes, int count)
 	);
 }
 
+//static void
+//cpBBTreeOptimizeIncremental(cpBBTree *tree, int passes)
+//{
+//	for(int i=0; i<passes; i++){
+//		cpBBTreeNode *root = tree->root;
+//		cpBBTreeNode *node = root;
+//		int bit = 0;
+//		unsigned int path = tree->opath;
+//		
+//		while(!cpBBTreeNodeIsLeaf(node)){
+//			node = (path&(1<<bit) ? node->a : node->b);
+//			bit = (bit + 1)&(sizeof(unsigned int)*8 - 1);
+//		}
+//		
+//		root = subtreeRemove(root, node, tree);
+//		tree->root = subtreeInsert(root, node, tree);
+//	}
+//}
+
 void
 cpBBTreeOptimize(cpBBTree *tree)
 {
@@ -599,8 +795,8 @@ static void
 cpBBTreeNodeRender(cpBBTreeNode *node, int depth)
 {
 	if(!cpBBTreeNodeIsLeaf(node) && depth <= 10){
-		cpBBTreeNodeRender(node->a, depth + 1);
-		cpBBTreeNodeRender(node->b, depth + 1);
+		cpBBTreeNodeRender(node->children.a, depth + 1);
+		cpBBTreeNodeRender(node->children.b, depth + 1);
 	}
 	
 	cpBB bb = node->bb;

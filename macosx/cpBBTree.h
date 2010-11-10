@@ -1,4 +1,5 @@
 struct cpBBTreeNode;
+struct pairLink;
 
 typedef struct cpBBTree {
 	cpSpatialIndex spatialIndex;
@@ -10,7 +11,12 @@ typedef struct cpBBTree {
 	struct cpBBTreeNode *root;
 	
 	struct cpBBTreeNode *pooledNodes;
+	struct pairLink *pooledLinks;
 	cpArray *allocatedBuffers;
+	
+	cpTimestamp stamp;
+	
+//	unsigned int opath;
 } cpBBTree;
 
 cpBBTree *cpBBTreeAlloc(void);

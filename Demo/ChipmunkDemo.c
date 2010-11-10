@@ -125,7 +125,7 @@ int key_right = 0;
 cpVect arrowDirection = {};
 
 drawSpaceOptions options = {
-	0,
+	1,
 	0,
 	1,
 	4.0f,
@@ -441,6 +441,7 @@ void time_trial(int index, int count)
 	space = currDemo->initFunc();
 	
 	cpBBTreeOptimize(space->activeShapes);
+	cpBBTreeOptimize(space->staticShapes);
 	
 	struct timeval start_time, end_time;
 	gettimeofday(&start_time, NULL);
@@ -465,6 +466,8 @@ main(int argc, const char **argv)
 	cp_collision_slop = 0.2f;
 	
 #ifdef TIME_TRIAL
+//	time_trial('d'-'a', 10000);
+//	exit(0);
 	sleep(1);
 	for(int i=0; i<demoCount; i++){
 		if(i == 'l' - 'a') continue;
