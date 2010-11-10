@@ -405,40 +405,8 @@ drawBB(cpShape *shape, void *unused)
 	} glEnd();
 }
 
-// copied from cpSpaceHash.c
-static inline cpHashValue
-hash_func(cpHashValue x, cpHashValue y, cpHashValue n)
-{
-	return (x*1640531513ul ^ y*2654435789ul) % n;
-}
-
-static void
-drawSpatialHash(cpSpaceHash *hash)
-{
-	cpBB bb = cpBBNew(-320, -240, 320, 240);
-	
-	cpFloat dim = hash->celldim;
-	int n = hash->numcells;
-	
-	int l = (int)floor(bb.l/dim);
-	int r = (int)floor(bb.r/dim);
-	int b = (int)floor(bb.b/dim);
-	int t = (int)floor(bb.t/dim);
-	
-	for(int i=l; i<=r; i++){
-		for(int j=b; j<=t; j++){
-			int cell_count = 0;
-			
-			int index = hash_func(i,j,n);
-			for(cpSpaceHashBin *bin = hash->table[index]; bin; bin = bin->next)
-				cell_count++;
-			
-			GLfloat v = 1.0f - (GLfloat)cell_count/10.0f;
-			glColor3f(v,v,v);
-			glRectf(i*dim, j*dim, (i + 1)*dim, (j + 1)*dim);
-		}
-	}
-}
+void cpBBTreeRenderDebug(cpSpatialIndex *index);
+void cpSpaceHashRenderDebug(cpSpatialIndex *index);
 
 void
 drawSpace(cpSpace *space, drawSpaceOptions *options)

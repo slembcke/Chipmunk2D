@@ -569,3 +569,44 @@ static cpSpatialIndexClass klass = {
 	(cpSpatialIndexQueryFunc)cpSpaceHashQuery,
 	(cpSpatialIndexReindexCollideFunc)cpSpaceHashReindexCollide,
 };
+
+#define CP_BBTREE_DEBUG_DRAW
+#ifdef CP_BBTREE_DEBUG_DRAW
+#include "OpenGL/gl.h"
+#include "OpenGL/glu.h"
+#include <GLUT/glut.h>
+
+void
+cpSpaceHashRenderDebug(cpSpatialIndex *index)
+{
+	if(index->klass != &klass){
+		cpAssertWarn(cpFalse, "Ignoring cpSpaceHashRenderDebug() call to non-spatial hash spatial index.");
+		return;
+	}
+	
+	cpSpaceHash *hash = (cpSpaceHash *)index;
+	cpBB bb = cpBBNew(-320, -240, 320, 240);
+	
+	cpFloat dim = hash->celldim;
+	int n = hash->numcells;
+	
+	int l = (int)floor(bb.l/dim);
+	int r = (int)floor(bb.r/dim);
+	int b = (int)floor(bb.b/dim);
+	int t = (int)floor(bb.t/dim);
+	
+	for(int i=l; i<=r; i++){
+		for(int j=b; j<=t; j++){
+			int cell_count = 0;
+			
+			int index = hash_func(i,j,n);
+			for(cpSpaceHashBin *bin = hash->table[index]; bin; bin = bin->next)
+				cell_count++;
+			
+			GLfloat v = 1.0f - (GLfloat)cell_count/10.0f;
+			glColor3f(v,v,v);
+			glRectf(i*dim, j*dim, (i + 1)*dim, (j + 1)*dim);
+		}
+	}
+}
+#endif

@@ -22,5 +22,4 @@ cpBBTree *cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc);
 cpBBTree *cpBBTreeNew(cpSpatialIndexBBFunc bbfunc);
 
 void cpBBTreeOptimize(cpSpatialIndex *index);
-void cpBBTreeRenderDebug(cpSpatialIndex *index);
 void cpBBTreeSetVelocityFunc(cpSpatialIndex *index, cpBBTreeVelocityFunc func);
