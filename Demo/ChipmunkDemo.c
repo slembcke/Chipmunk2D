@@ -31,7 +31,7 @@
 	about Chipmunk which may change with little to no warning.
 */
 
-#define TIME_TRIAL
+//#define TIME_TRIAL
  
 #include <stdlib.h>
 #include <stdio.h>
@@ -105,7 +105,7 @@ static chipmunkDemo *demos[] = {
 };
 static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
-static const int firstDemoIndex = 'g' - 'a';
+static const int firstDemoIndex = 'b' - 'a';
 
 static int ticks = 0;
 static cpSpace *space;

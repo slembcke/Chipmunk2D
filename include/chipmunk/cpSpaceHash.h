@@ -47,9 +47,6 @@ typedef struct cpSpaceHash{
 	// Dimentions of the cells.
 	cpFloat celldim;
 	
-	// BBox callback.
-	cpSpatialIndexBBFunc bbfunc;
-
 	// Hashset of the handles and the recycled ones.
 	cpHashSet *handleSet;
 	cpArray *pooledHandles;

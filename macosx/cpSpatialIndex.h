@@ -13,6 +13,8 @@ struct cpSpatialIndexClass;
 
 typedef struct cpSpatialIndex {
 	struct cpSpatialIndexClass *klass;
+	
+	cpSpatialIndexBBFunc bbfunc;
 } cpSpatialIndex;
 
 typedef void (*cpSpatialIndexDestroyFunc)(cpSpatialIndex *index);
@@ -30,7 +32,7 @@ typedef void (*cpSpatialIndexReindexObjectFunc)(cpSpatialIndex *index, void *obj
 typedef void (*cpSpatialIndexPointQueryFunc)(cpSpatialIndex *index, cpVect point, cpSpatialIndexQueryCallback func, void *data);
 typedef void (*cpSpatialIndexSegmentQueryFunc)(cpSpatialIndex *index, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryCallback func, void *data);
 typedef void (*cpSpatialIndexQueryFunc)(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data);
-typedef void (*cpSpatialIndexReindexQueryFunc)(cpSpatialIndex *index, cpSpatialIndexQueryCallback func, void *data);
+typedef void (*cpSpatialIndexReindexCollideFunc)(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data);
 
 typedef struct cpSpatialIndexClass {
 	cpSpatialIndexDestroyFunc destroy;
@@ -48,11 +50,12 @@ typedef struct cpSpatialIndexClass {
 	cpSpatialIndexPointQueryFunc pointQuery;
 	cpSpatialIndexSegmentQueryFunc segmentQuery;
 	cpSpatialIndexQueryFunc query;
-	cpSpatialIndexReindexQueryFunc reindexQuery;
+	cpSpatialIndexReindexCollideFunc reindexCollide;
 } cpSpatialIndexClass;
 
 
 void cpSpatialIndexFree(cpSpatialIndex *index);
+void cpSpatialIndexCollideStatic(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data);
 
 static inline void
 cpSpatialIndexDestroy(cpSpatialIndex *index)
@@ -124,7 +127,7 @@ cpSpatialIndexQuery(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQue
 }
 
 static inline void
-cpSpatialIndexReindexQuery(cpSpatialIndex *index, cpSpatialIndexQueryCallback func, void *data)
+cpSpatialIndexReindexCollide(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data)
 {
-	index->klass->reindexQuery(index, func, data);
+	dynamicIndex->klass->reindexCollide(dynamicIndex, staticIndex, func, data);
 }

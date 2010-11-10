@@ -209,13 +209,6 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	arb->stamp = space->stamp;
 }
 
-// Iterator for active/static hash collisions.
-static void
-active2staticIter(cpShape *shape, cpSpace *space)
-{
-	cpSpatialIndexQuery(space->staticShapes, shape, shape->bb, (cpSpatialIndexQueryCallback)queryFunc, space);
-}
-
 // Hashset filter func to throw away old arbiters.
 static cpBool
 contactSetFilter(cpArbiter *arb, cpSpace *space)
@@ -298,9 +291,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	
 	// Collide!
 	cpSpacePushFreshContactBuffer(space);
-	if(cpSpatialIndexCount(space->staticShapes))
-		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)active2staticIter, space);
-	cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryCallback)queryFunc, space);
+	cpSpatialIndexReindexCollide(space->activeShapes, space->staticShapes, (cpSpatialIndexQueryCallback)queryFunc, space);
 	
 	space->locked = cpFalse;
 	

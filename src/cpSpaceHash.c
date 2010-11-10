@@ -96,7 +96,7 @@ cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndex
 	
 	cpSpaceHashAllocTable(hash, next_prime(numcells));
 	hash->celldim = celldim;
-	hash->bbfunc = bbfunc;
+	hash->spatialIndex.bbfunc = bbfunc;
 	
 	hash->handleSet = cpHashSetNew(0, (cpHashSetEqlFunc)handleSetEql, (cpHashSetTransFunc)handleSetTrans);
 	hash->pooledHandles = cpArrayNew(0);
@@ -248,7 +248,7 @@ static void
 cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue hashid, cpBB _deprecated_unused)
 {
 	cpHandle *hand = (cpHandle *)cpHashSetInsert(hash->handleSet, hashid, obj, hash);
-	hashHandle(hash, hand, hash->bbfunc(obj));
+	hashHandle(hash, hand, hash->spatialIndex.bbfunc(obj));
 }
 
 static void
@@ -264,7 +264,7 @@ cpSpaceHashRehashObject(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 	}
 }
 
-static void handleRehashHelper(cpHandle *hand, cpSpaceHash *hash){hashHandle(hash, hand, hash->bbfunc(hand->obj));}
+static void handleRehashHelper(cpHandle *hand, cpSpaceHash *hash){hashHandle(hash, hand, hash->spatialIndex.bbfunc(hand->obj));}
 
 static void
 cpSpaceHashRehash(cpSpaceHash *hash)
@@ -395,7 +395,7 @@ handleQueryRehashHelper(cpHandle *hand, queryRehashContext *context)
 	int n = hash->numcells;
 
 	void *obj = hand->obj;
-	cpBB bb = hash->bbfunc(obj);
+	cpBB bb = hash->spatialIndex.bbfunc(obj);
 
 	int l = floor_int(bb.l/dim);
 	int r = floor_int(bb.r/dim);
@@ -426,12 +426,14 @@ handleQueryRehashHelper(cpHandle *hand, queryRehashContext *context)
 }
 
 static void
-cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpatialIndexQueryCallback func, void *data)
+cpSpaceHashReindexCollide(cpSpaceHash *hash, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data)
 {
 	clearHash(hash);
 	
 	queryRehashContext context = {hash, func, data};
 	cpHashSetEach(hash->handleSet, (cpHashSetIterFunc)handleQueryRehashHelper, &context);
+	
+	cpSpatialIndexCollideStatic((cpSpatialIndex *)hash, staticIndex, func, data);
 }
 
 static inline cpFloat
@@ -565,5 +567,5 @@ static cpSpatialIndexClass klass = {
 	(cpSpatialIndexPointQueryFunc)cpSpaceHashPointQuery,
 	(cpSpatialIndexSegmentQueryFunc)cpSpaceHashSegmentQuery,
 	(cpSpatialIndexQueryFunc)cpSpaceHashQuery,
-	(cpSpatialIndexReindexQueryFunc)cpSpaceHashQueryRehash,
+	(cpSpatialIndexReindexCollideFunc)cpSpaceHashReindexCollide,
 };

@@ -283,7 +283,7 @@ static int leafSetEql(void *obj, cpBBTreeNode *node){return (obj == node->obj);}
 static void *
 leafSetTrans(void *obj, cpBBTree *tree)
 {
-	return cpBBTreeNodeNewLeaf(tree, obj, tree->bbfunc(obj));
+	return cpBBTreeNodeNewLeaf(tree, obj, tree->spatialIndex.bbfunc(obj));
 }
 
 
@@ -293,7 +293,7 @@ cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc)
 {
 	tree->spatialIndex.klass = &klass;
 	
-	tree->bbfunc = bbfunc;
+	tree->spatialIndex.bbfunc = bbfunc;
 	tree->leaves = cpHashSetNew(0, (cpHashSetEqlFunc)leafSetEql, (cpHashSetTransFunc)leafSetTrans);
 	tree->root = NULL;
 	
@@ -387,7 +387,7 @@ static void
 updateLeaf(cpBBTreeNode *leaf, cpBBTree *tree)
 {
 	cpBBTreeNode *root = tree->root;
-	cpBB bb = tree->bbfunc(leaf->obj);
+	cpBB bb = tree->spatialIndex.bbfunc(leaf->obj);
 	
 	if(!cpBBcontainsBB(leaf->bb, bb)){
 		leaf->bb = shapeExtrudedBBFunc(leaf->obj);
@@ -462,23 +462,14 @@ static void
 removeThread(pairThread *thread)
 {
 	cpBBTreeNode *leaf = thread->leaf;
-	pairLink *next = thread->next;
-	pairLink *prev = thread->prev;
+	pairLink *next = thread->next, *prev = thread->prev;
 	
 	if(next){
-		if(next->a.leaf == leaf){
-			next->a.prev = prev;
-		} else {
-			next->b.prev = prev;
-		}
+		if(next->a.leaf == leaf) next->a.prev = prev; else next->b.prev = prev;
 	}
 	
 	if(prev){
-		if(prev->a.leaf == leaf){
-			prev->a.next = next;
-		} else {
-			prev->b.next = next;
-		}
+		if(prev->a.leaf == leaf) prev->a.next = next; else prev->b.next = next;
 	} else {
 		leaf->leafData.pairs = next;
 	}
@@ -488,12 +479,9 @@ static void
 clearLinks(cpBBTreeNode *leaf, cpBBTree *tree)
 {
 	pairLink *link = leaf->leafData.pairs;
-//	if(link) printf("clear links for %p\n", leaf);
-
 	leaf->leafData.pairs = NULL;
 	
 	while(link){
-//		printf("unlink %p and %p with %p\n", link->a.leaf, link->b.leaf, link);
 		if(link->a.leaf == leaf){
 			pairLink *next = link->a.next;
 			removeThread(&link->b);
@@ -511,37 +499,24 @@ clearLinks(cpBBTreeNode *leaf, cpBBTree *tree)
 static void
 insertLink(cpBBTreeNode *a, cpBBTreeNode *b, cpBBTree *tree)
 {
-	pairLink *nextA = a->leafData.pairs;
-	pairLink *nextB = b->leafData.pairs;
 	pairLink *link = getFreeLink(tree);
-//	printf("link   %p and %p with %p\n", a, b, link);
+	pairLink *nextA = a->leafData.pairs, *nextB = b->leafData.pairs;
 	
 	if(nextA){
-		if(nextA->a.leaf == a){
-			nextA->a.prev = link;
-		} else {
-			nextA->b.prev = link;
-		}
+		if(nextA->a.leaf == a) nextA->a.prev = link; else nextA->b.prev = link;
 	}
 	
 	if(nextB){
-		if(nextB->a.leaf == b){
-			nextB->a.prev = link;
-		} else {
-			nextB->b.prev = link;
-		}
+		if(nextB->a.leaf == b) nextB->a.prev = link; else nextB->b.prev = link;
 	}
 	
-	(*link) = (pairLink){
-		{NULL, a, nextA},
-		{NULL, b, nextB},
-	};
-	
+	(*link) = (pairLink){{NULL, a, nextA},{NULL, b, nextB}};
 	a->leafData.pairs = b->leafData.pairs = link;
 }
 
 typedef struct traverseContext {
 	cpBBTree *tree;
+	cpBBTreeNode *staticRoot;
 	cpSpatialIndexQueryCallback func;
 	void *data;
 } traverseContext;
@@ -571,6 +546,9 @@ traverseMarkLeaf(cpBBTreeNode *leaf, traverseContext *context)
 	if(leaf->leafData.stamp == tree->stamp){
 		clearLinks(leaf, tree);
 		
+		cpBBTreeNode *staticRoot = context->staticRoot;
+		if(staticRoot) traverseMarkQuery(staticRoot, leaf, cpFalse, context);
+		
 		for(cpBBTreeNode *node = leaf; node->parent; node = node->parent){
 			if(node == node->parent->children.a){
 				traverseMarkQuery(node->parent->children.b, leaf, cpTrue, context);
@@ -579,7 +557,6 @@ traverseMarkLeaf(cpBBTreeNode *leaf, traverseContext *context)
 			}
 		}
 	} else {
-		// iterate links and callback node is right
 		pairLink *link = leaf->leafData.pairs;
 		while(link){
 			if(leaf == link->b.leaf){
@@ -609,7 +586,7 @@ cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *dat
 {
 	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)updateLeaf, tree);
 	
-	traverseContext context = {tree, func, data};
+	traverseContext context = {tree, NULL, func, data};
 	traverseMark(tree->root, &context);
 	tree->stamp++;
 	
@@ -619,6 +596,19 @@ cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *dat
 //	int height = cpBBTreeDepth(tree);
 //	int count = tree->leaves->entries;
 //	printf("tree depth % 5d for % 5d objects optimal % 5.2f\n", height, count, height/(log(count) + 1.0f));
+}
+
+void
+cpBBTreeReindexCollide(cpBBTree *tree, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data)
+{
+	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)updateLeaf, tree);
+	
+	cpBBTree *staticTree = (staticIndex->klass == &klass ? (cpBBTree *)staticIndex : NULL);
+	traverseContext context = {tree, (staticTree ? staticTree->root : NULL), func, data};
+	traverseMark(tree->root, &context);
+	tree->stamp++;
+	
+	if(!staticTree) cpSpatialIndexCollideStatic((cpSpatialIndex *)tree, staticIndex, func, data);
 }
 
 #pragma mark Misc
@@ -659,7 +649,7 @@ static cpSpatialIndexClass klass = {
 	(cpSpatialIndexPointQueryFunc)cpBBTreePointQuery,
 	(cpSpatialIndexSegmentQueryFunc)cpBBTreeSegmentQuery,
 	(cpSpatialIndexQueryFunc)cpBBTreeQuery,
-	(cpSpatialIndexReindexQueryFunc)cpBBTreeReindexQuery,
+	(cpSpatialIndexReindexCollideFunc)cpBBTreeReindexCollide,
 };
 
 static int
@@ -688,7 +678,6 @@ partitionNodes(cpBBTree *tree, cpBBTreeNode **nodes, int count)
 		return cpBBTreeNodeInit(getFreeNode(tree), nodes[0], nodes[1]);
 	}
 	
-	
 	// Find the AABB for these nodes
 	cpBB bb = nodes[0]->bb;
 	for(int i=1; i<count; i++) bb = cpBBmerge(bb, nodes[i]->bb);
@@ -715,11 +704,7 @@ partitionNodes(cpBBTree *tree, cpBBTreeNode **nodes, int count)
 	
 	// Generate the child BBs
 	cpBB a = bb, b = bb;
-	if(splitWidth){
-		a.r = b.l = split;
-	} else {
-		a.t = b.b = split;
-	}
+	if(splitWidth) a.r = b.l = split; else a.t = b.b = split;
 	
 	// Partition the nodes
 	int right = count;
@@ -787,6 +772,8 @@ cpBBTreeOptimize(cpBBTree *tree)
 	tree->root = partitionNodes(tree, nodes, count);
 }
 
+#define CP_BBTREE_DEBUG_DRAW
+#ifdef CP_BBTREE_DEBUG_DRAW
 #include "OpenGL/gl.h"
 #include "OpenGL/glu.h"
 #include <GLUT/glut.h>
@@ -830,3 +817,4 @@ cpBBTreeRenderDebug(cpBBTree *tree){
 	
 	if(tree->root) cpBBTreeNodeRender(tree->root, 0);
 }
+#endif

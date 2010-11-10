@@ -4,9 +4,6 @@ struct pairLink;
 typedef struct cpBBTree {
 	cpSpatialIndex spatialIndex;
 	
-	// TODO move to spatial index
-	cpSpatialIndexBBFunc bbfunc;
-	
 	cpHashSet *leaves;
 	struct cpBBTreeNode *root;
 	
