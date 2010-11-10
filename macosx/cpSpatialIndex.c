@@ -27,7 +27,9 @@ dynamicToStaticIter(void *obj, dynamicToStaticContext *context)
 void
 cpSpatialIndexCollideStatic(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data)
 {
-	dynamicToStaticContext context = {dynamicIndex->bbfunc, staticIndex, func, data};
-	cpSpatialIndexEach(dynamicIndex, (cpSpatialIndexIterator)dynamicToStaticIter, &context);
+	if(cpSpatialIndexCount(staticIndex) > 0){
+		dynamicToStaticContext context = {dynamicIndex->bbfunc, staticIndex, func, data};
+		cpSpatialIndexEach(dynamicIndex, (cpSpatialIndexIterator)dynamicToStaticIter, &context);
+	}
 }
 

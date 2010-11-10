@@ -66,35 +66,9 @@ getFreeNode(cpBBTree *tree)
 	}
 }
 
-//static void
-//checkLink(pairLink *link)
-//{
-//	return;
-//	{
-//		int count = CP_BUFFER_BYTES/sizeof(pairLink);
-//		for(int i=0; i<count; i++){
-//			cpAssert(pooledLinks[i].a.next != link, "");
-//			cpAssert(pooledLinks[i].b.next != link, "");
-//			
-//			cpAssert(pooledLinks[i].a.prev != link, "");
-//			cpAssert(pooledLinks[i].b.prev != link, "");
-//		}
-//	}
-//	
-//	{
-//		int count = CP_BUFFER_BYTES/sizeof(pairLink);
-//		for(int i=0; i<count; i++){
-//			cpAssert(pooledNodes[i].leafData.pairs != link, "");
-//		}
-//	}
-//}
-
 static void
 recycleLink(cpBBTree *tree, pairLink *link)
 {
-//	printf("recycled and zeroed %p\n", link);
-//	bzero(link, sizeof(pairLink));
-	
 	link->a.next = tree->pooledLinks;
 	tree->pooledLinks = link;
 }
@@ -113,7 +87,7 @@ getFreeLink(cpBBTree *tree)
 		cpAssert(count, "Buffer size is too small.");
 		
 		pairLink *buffer = (pairLink *)cpmalloc(CP_BUFFER_BYTES);
-//		cpArrayPush(tree->allocatedBuffers, buffer);
+		cpArrayPush(tree->allocatedBuffers, buffer);
 		
 		// push all but the first one, return the first instead
 		for(int i=1; i<count; i++) recycleLink(tree, buffer + i);
@@ -151,7 +125,6 @@ cpBBTreeNodeNewLeaf(cpBBTree *tree, void *obj, cpBB bb)
 static inline void
 cpBBTreeNodeSetA(cpBBTreeNode *node, cpBBTreeNode *value)
 {
-//	if(node->children.a) recycleNode(tree, node->children.a);
 	node->children.a = value;
 	value->parent = node;
 }
@@ -159,7 +132,6 @@ cpBBTreeNodeSetA(cpBBTreeNode *node, cpBBTreeNode *value)
 static inline void
 cpBBTreeNodeSetB(cpBBTreeNode *node, cpBBTreeNode *value)
 {
-//	if(node->children.a) recycleNode(tree, node->children.b);
 	node->children.b = value;
 	value->parent = node;
 }
@@ -237,14 +209,6 @@ cpBBTreeNodeOther(cpBBTreeNode *node, cpBBTreeNode *child)
 }
 
 static inline void
-bbPropagate(cpBBTreeNode *node)
-{
-	for(; node; node = node->parent){
-		node->bb = cpBBmerge(node->children.a->bb, node->children.b->bb);
-	}
-}
-
-static inline void
 nodeReplaceChild(cpBBTreeNode *parent, cpBBTreeNode *child, cpBBTreeNode *value, cpBBTree *tree)
 {
 	cpAssert(!cpBBTreeNodeIsLeaf(parent), "Cannot replace child of a leaf.");
@@ -258,8 +222,9 @@ nodeReplaceChild(cpBBTreeNode *parent, cpBBTreeNode *child, cpBBTreeNode *value,
 		cpBBTreeNodeSetB(parent, value);
 	}
 	
-//	subtreeBBPropagate(subtree, parent);
-	bbPropagate(parent);
+	for(cpBBTreeNode *node=parent; node; node = node->parent){
+		node->bb = cpBBmerge(node->children.a->bb, node->children.b->bb);
+	}
 }
 
 //static int imax(int a, int b){return (a > b ? a : b);}
@@ -312,11 +277,11 @@ cpBBTreeNew(cpSpatialIndexBBFunc bbfunc)
 }
 
 static void
-freeSubTree(cpBBTree *tree, cpBBTreeNode *node)
+recycleSubtree(cpBBTree *tree, cpBBTreeNode *node)
 {
 	if(!cpBBTreeNodeIsLeaf(node)){
-		freeSubTree(tree, node->children.a);
-		freeSubTree(tree, node->children.b);
+		recycleSubtree(tree, node->children.a);
+		recycleSubtree(tree, node->children.b);
 		recycleNode(tree, node);
 	}
 }
@@ -439,23 +404,6 @@ static void
 cpBBTreeQuery(cpBBTree *tree, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
 {
 	if(tree->root) cpBBTreeNodeQuery(tree->root, obj, bb, func, data);
-}
-
-typedef struct queryContext {
-	cpSpatialIndexQueryCallback func;
-	void *data;
-} queryContext;
-
-static void
-queryHelper(cpBBTreeNode *leaf, queryContext *context)
-{
-	cpBB bb = leaf->bb;
-	void *obj = leaf->obj;
-	
-	for(cpBBTreeNode *node=leaf; node->parent; node=node->parent){
-		cpBBTreeNode *parent = node->parent;
-		if(node == parent->children.a) cpBBTreeNodeQuery(parent->children.b, obj, bb, context->func, context->data);
-	}
 }
 
 static void
@@ -589,9 +537,6 @@ cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *dat
 	traverseContext context = {tree, NULL, func, data};
 	traverseMark(tree->root, &context);
 	tree->stamp++;
-	
-//	queryContext context = {func, data};
-//	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)queryHelper, &context);
 	
 //	int height = cpBBTreeDepth(tree);
 //	int count = tree->leaves->entries;
@@ -768,7 +713,7 @@ cpBBTreeOptimize(cpBBTree *tree)
 	
 	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)fillNodeArray, &cursor);
 	
-	freeSubTree(tree, root);
+	recycleSubtree(tree, root);
 	tree->root = partitionNodes(tree, nodes, count);
 }
 
