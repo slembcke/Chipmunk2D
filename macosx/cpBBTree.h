@@ -1,8 +1,11 @@
 struct cpBBTreeNode;
 struct pairLink;
 
+typedef cpVect (*cpBBTreeVelocityFunc)(void *obj);
+
 typedef struct cpBBTree {
 	cpSpatialIndex spatialIndex;
+	cpBBTreeVelocityFunc velocityFunc;
 	
 	cpHashSet *leaves;
 	struct cpBBTreeNode *root;
@@ -12,12 +15,12 @@ typedef struct cpBBTree {
 	cpArray *allocatedBuffers;
 	
 	cpTimestamp stamp;
-	
-//	unsigned int opath;
 } cpBBTree;
 
 cpBBTree *cpBBTreeAlloc(void);
 cpBBTree *cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc);
 cpBBTree *cpBBTreeNew(cpSpatialIndexBBFunc bbfunc);
 
-void cpBBTreeRenderDebug(cpBBTree *tree);
+void cpBBTreeOptimize(cpSpatialIndex *index);
+void cpBBTreeRenderDebug(cpSpatialIndex *index);
+void cpBBTreeSetVelocityFunc(cpSpatialIndex *index, cpBBTreeVelocityFunc func);

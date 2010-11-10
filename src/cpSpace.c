@@ -85,7 +85,7 @@ static void nothing(cpArbiter *arb, cpSpace *space, void *data){}
 
 // BBfunc callback for the spatial hash.
 static cpBB shapeBBFunc(cpShape *shape){return shape->bb;}
-
+static cpVect shapeVelocityFunc(cpShape *shape){return shape->body->v;}
 
 // Iterator functions for destructors.
 static void             freeWrap(void         *ptr, void *unused){          cpfree(ptr);}
@@ -121,12 +121,13 @@ cpSpaceInit(cpSpace *space)
 	space->locked = 0;
 	space->stamp = 0;
 
-	if(1){
+	if(0){
 		space->staticShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
 		space->activeShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
 	} else {
 		space->staticShapes = (cpSpatialIndex *)cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc);
 		space->activeShapes = (cpSpatialIndex *)cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc);
+		cpBBTreeSetVelocityFunc(space->activeShapes, (cpBBTreeVelocityFunc)shapeVelocityFunc);
 	}
 	
 	space->allocatedBuffers = cpArrayNew(0);

@@ -96,16 +96,35 @@ getFreeLink(cpBBTree *tree)
 }
 
 static inline cpBB
-shapeExtrudedBBFunc(cpShape *shape)
+shapeExtrudedBBFunc(cpBB bb, cpVect v)//cpShape *shape)
 {
-	cpBB bb = shape->bb;
-	cpVect v = cpvmult(shape->body->v, 0.1f);
+//	cpBB bb = shape->bb;
+//	cpVect v = cpvmult(shape->body->v, 0.1f);
 	
 	cpFloat coef = 0.1f;
 	cpFloat x = (bb.r - bb.l)*coef;
 	cpFloat y = (bb.t - bb.b)*coef;
 	
+	v = cpvmult(v, 0.1f);
 	return cpBBNew(bb.l + cpfmin(-x, v.x), bb.b + cpfmin(-y, v.y), bb.r + cpfmax(x, v.x), bb.t + cpfmax(y, v.y));
+}
+
+static inline cpBB
+bbForObj(cpBBTree *tree, void *obj)
+{
+	cpBB bb = tree->spatialIndex.bbfunc(obj);
+	
+	cpBBTreeVelocityFunc velocityFunc = tree->velocityFunc;
+	if(velocityFunc){
+		cpFloat coef = 0.1f;
+		cpFloat x = (bb.r - bb.l)*coef;
+		cpFloat y = (bb.t - bb.b)*coef;
+		
+		cpVect v = cpvmult(velocityFunc(obj), 0.1f);
+		return cpBBNew(bb.l + cpfmin(-x, v.x), bb.b + cpfmin(-y, v.y), bb.r + cpfmax(x, v.x), bb.t + cpfmax(y, v.y));
+	} else {
+		return bb;
+	}
 }
 
 static cpBBTreeNode *
@@ -113,7 +132,7 @@ cpBBTreeNodeNewLeaf(cpBBTree *tree, void *obj, cpBB bb)
 {
 	cpBBTreeNode *node = getFreeNode(tree);
 	node->obj = obj;
-	node->bb = shapeExtrudedBBFunc(obj);
+	node->bb = bbForObj(tree, obj);
 	
 	node->parent = NULL;
 	node->leafData.stamp = 0;
@@ -251,12 +270,11 @@ leafSetTrans(void *obj, cpBBTree *tree)
 	return cpBBTreeNodeNewLeaf(tree, obj, tree->spatialIndex.bbfunc(obj));
 }
 
-
-
 cpBBTree *
 cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc)
 {
 	tree->spatialIndex.klass = &klass;
+	tree->velocityFunc = NULL;
 	
 	tree->spatialIndex.bbfunc = bbfunc;
 	tree->leaves = cpHashSetNew(0, (cpHashSetEqlFunc)leafSetEql, (cpHashSetTransFunc)leafSetTrans);
@@ -268,6 +286,17 @@ cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc)
 	tree->stamp = 0;
 	
 	return tree;
+}
+
+void
+cpBBTreeSetVelocityFunc(cpSpatialIndex *index, cpBBTreeVelocityFunc func)
+{
+	if(index->klass != &klass){
+		cpAssertWarn(cpFalse, "Ignoring cpBBTreeSetVelocityFunc() call to non-tree spatial index.");
+		return;
+	}
+	
+	((cpBBTree *)index)->velocityFunc = func;
 }
 
 cpBBTree *
@@ -355,7 +384,7 @@ updateLeaf(cpBBTreeNode *leaf, cpBBTree *tree)
 	cpBB bb = tree->spatialIndex.bbfunc(leaf->obj);
 	
 	if(!cpBBcontainsBB(leaf->bb, bb)){
-		leaf->bb = shapeExtrudedBBFunc(leaf->obj);
+		leaf->bb = bbForObj(tree, leaf->obj);
 		
 		root = subtreeRemove(root, leaf, tree);
 		tree->root = subtreeInsert(root, leaf, tree);
@@ -528,21 +557,6 @@ traverseMark(cpBBTreeNode *subtree, traverseContext *context)
 	}
 }
 
-
-static void
-cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *data)
-{
-	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)updateLeaf, tree);
-	
-	traverseContext context = {tree, NULL, func, data};
-	traverseMark(tree->root, &context);
-	tree->stamp++;
-	
-//	int height = cpBBTreeDepth(tree);
-//	int count = tree->leaves->entries;
-//	printf("tree depth % 5d for % 5d objects optimal % 5.2f\n", height, count, height/(log(count) + 1.0f));
-}
-
 void
 cpBBTreeReindexCollide(cpBBTree *tree, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data)
 {
@@ -697,13 +711,14 @@ partitionNodes(cpBBTree *tree, cpBBTreeNode **nodes, int count)
 //}
 
 void
-cpBBTreeOptimize(cpBBTree *tree)
+cpBBTreeOptimize(cpSpatialIndex *index)
 {
-	if(tree->spatialIndex.klass != &klass){
+	if(index->klass != &klass){
 		cpAssertWarn(cpFalse, "Ignoring cpBBTreeOptimize() call to non-tree spatial index.");
 		return;
 	}
 	
+	cpBBTree *tree = (cpBBTree *)index;
 	cpBBTreeNode *root = tree->root;
 	if(!root) return;
 	
@@ -754,12 +769,13 @@ cpBBTreeNodeRender(cpBBTreeNode *node, int depth)
 }
 
 void
-cpBBTreeRenderDebug(cpBBTree *tree){
-	if(tree->spatialIndex.klass != &klass){
+cpBBTreeRenderDebug(cpSpatialIndex *index){
+	if(index->klass != &klass){
 		cpAssertWarn(cpFalse, "Ignoring cpBBTreeRenderDebug() call to non-tree spatial index.");
 		return;
 	}
 	
+	cpBBTree *tree = (cpBBTree *)index;
 	if(tree->root) cpBBTreeNodeRender(tree->root, 0);
 }
 #endif
