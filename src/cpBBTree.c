@@ -176,17 +176,23 @@ cpBBTreeNodeIsLeaf(cpBBTreeNode *node)
 	return (node->obj != NULL);
 }
 
-static cpFloat inline
+static inline cpFloat
 cpBBMergedArea(cpBB a, cpBB b)
 {
 	return (cpfmax(a.r, b.r) - cpfmin(a.l, b.l))*(cpfmax(a.t, b.t) - cpfmin(a.b, b.b));
 }
 
-static cpFloat inline
+static inline cpFloat
 cpBBArea(cpBB bb)
 {
 	return (bb.r - bb.l)*(bb.t - bb.b);
 }
+
+//static inline cpFloat
+//cpBBProximity(cpBB a, cpBB b)
+//{
+//	return cpfabs(a.l + a.r - b.l - b.r) + cpfabs(a.b + b.t - b.b - b.t);
+//}
 
 static cpBBTreeNode *
 subtreeInsert(cpBBTreeNode *subtree, cpBBTreeNode *leaf, cpBBTree *tree)
@@ -196,10 +202,13 @@ subtreeInsert(cpBBTreeNode *subtree, cpBBTreeNode *leaf, cpBBTree *tree)
 	} else if(cpBBTreeNodeIsLeaf(subtree)){
 		return cpBBTreeNodeInit(getFreeNode(tree), leaf, subtree);
 	} else {
-		cpFloat area_a = cpBBArea(subtree->a->bb) + cpBBMergedArea(subtree->b->bb, leaf->bb);
-		cpFloat area_b = cpBBArea(subtree->b->bb) + cpBBMergedArea(subtree->a->bb, leaf->bb);
+		cpFloat cost_a = cpBBArea(subtree->b->bb) + cpBBMergedArea(subtree->a->bb, leaf->bb);
+		cpFloat cost_b = cpBBArea(subtree->a->bb) + cpBBMergedArea(subtree->b->bb, leaf->bb);
 		
-		if(area_a < area_b){
+//		cpFloat cost_a = cpBBProximity(subtree->a->bb, leaf->bb);
+//		cpFloat cost_b = cpBBProximity(subtree->b->bb, leaf->bb);
+		
+		if(cost_b < cost_a){
 			cpBBTreeNodeSetB(subtree, subtreeInsert(subtree->b, leaf, tree));
 		} else {
 			cpBBTreeNodeSetA(subtree, subtreeInsert(subtree->a, leaf, tree));
@@ -286,6 +295,7 @@ cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc)
 	tree->allocatedBuffers = cpArrayNew(0);
 	
 	tree->stamp = 0;
+//	tree->opath = 0;
 	
 	return tree;
 }
@@ -563,11 +573,13 @@ traverseMark(cpBBTreeNode *subtree, traverseContext *context)
 	}
 }
 
-int debugCounter = 0;
+//static void cpBBTreeOptimizeIncremental(cpBBTree *tree, int passes);
 
 void
 cpBBTreeReindexCollide(cpBBTree *tree, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data)
 {
+//	cpBBTreeOptimizeIncremental(tree, 2);
+	
 	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)updateLeaf, tree);
 	
 	cpBBTree *staticTree = (staticIndex->klass == &klass ? (cpBBTree *)staticIndex : NULL);
@@ -678,6 +690,7 @@ partitionNodes(cpBBTree *tree, cpBBTreeNode **nodes, int count)
 	for(int left=0; left < right;){
 		cpBBTreeNode *node = nodes[left];
 		if(cpBBMergedArea(node->bb, b) < cpBBMergedArea(node->bb, a)){
+//		if(cpBBProximity(node->bb, b) < cpBBProximity(node->bb, a)){
 			right--;
 			nodes[left] = nodes[right];
 			nodes[right] = node;

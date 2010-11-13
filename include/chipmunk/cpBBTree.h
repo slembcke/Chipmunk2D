@@ -15,6 +15,7 @@ typedef struct cpBBTree {
 	cpArray *allocatedBuffers;
 	
 	cpTimestamp stamp;
+//	unsigned int opath;
 } cpBBTree;
 
 cpBBTree *cpBBTreeAlloc(void);
