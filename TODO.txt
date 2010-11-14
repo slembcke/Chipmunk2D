@@ -2,12 +2,20 @@ shape queries
 Static rogue bodies?
 group sleeping of objects
 activate shapes touching shape
+Better accuracy for variable timestepping
+poly moment functions
 
 6.0:
-add data field to cpSpace
+Add data field to cpSpace
 Doxygen! (mark private/public parts of API)
 Fix units for damped springs
-breakable joints?
+Breakable joints?
+Separate impulse application for joints
+Remove elastic iterations
+breakable object support functions
+constraint callbacks
+touch joint (Objective-Chipmunk)
+
 generic spatial indexing
 	* free
 	* count

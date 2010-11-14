@@ -383,7 +383,10 @@ static cpBool
 contactSetFilterRemovedShape(cpArbiter *arb, removalContext *context)
 {
 	if(context->shape == arb->a || context->shape == arb->b){
-		arb->handler->separate(arb, context->space, arb->handler->data);
+		if(arb->state != cpArbiterStateCached){
+			arb->handler->separate(arb, context->space, arb->handler->data);
+		}
+		
 		cpArrayPush(context->space->pooledArbiters, arb);
 		return cpFalse;
 	}
