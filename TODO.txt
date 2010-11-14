@@ -4,6 +4,9 @@ group sleeping of objects
 activate shapes touching shape
 Better accuracy for variable timestepping
 poly moment functions
+Fix static lib build scripts
+Encourage static linking
+Fill out cpArbiter API
 
 6.0:
 Add data field to cpSpace
