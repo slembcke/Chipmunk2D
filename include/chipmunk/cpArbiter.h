@@ -51,8 +51,10 @@ typedef struct cpContact {
 cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash);
 
 // Sum the contact impulses. (Can be used after cpSpaceStep() returns)
-cpVect cpContactsSumImpulses(cpContact *contacts, int numContacts);
-cpVect cpContactsSumImpulsesWithFriction(cpContact *contacts, int numContacts);
+cpVect CP_PRIVATE(cpContactsSumImpulses)(cpContact *contacts, int numContacts);
+cpVect CP_PRIVATE(cpContactsSumImpulsesWithFriction)(cpContact *contacts, int numContacts);
+
+#define CP_MAX_CONTACTS_PER_ARBITER 6
 
 typedef enum cpArbiterState {
 	cpArbiterStateNormal,
@@ -92,16 +94,16 @@ typedef struct cpArbiter {
 } cpArbiter;
 
 // Arbiters are allocated in large buffers by the space and don't require a destroy function
-cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
+cpArbiter* CP_PRIVATE(cpArbiterInit)(cpArbiter *arb, cpShape *a, cpShape *b);
 
 // These functions are all intended to be used internally.
 // Inject new contact points into the arbiter while preserving contact history.
-void cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
+void CP_PRIVATE(cpArbiterUpdate)(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
 // Precalculate values used by the solver.
-void cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv);
-void cpArbiterApplyCachedImpulse(cpArbiter *arb);
+void CP_PRIVATE(cpArbiterPreStep)(cpArbiter *arb, cpFloat dt_inv);
+void CP_PRIVATE(cpArbiterApplyCachedImpulse)(cpArbiter *arb);
 // Run an iteration of the solver on the arbiter.
-void cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef);
+void CP_PRIVATE(cpArbiterApplyImpulse)(cpArbiter *arb, cpFloat eCoef);
 
 // Arbiter Helper Functions
 cpVect cpArbiterTotalImpulse(cpArbiter *arb);
@@ -135,6 +137,12 @@ cpArbiterIsFirstContact(const cpArbiter *arb)
 	return arb->CP_PRIVATE(state) == cpArbiterStateFirstColl;
 }
 
+static inline int
+cpArbiterGetCount(const cpArbiter *arb)
+{
+	return arb->CP_PRIVATE(numContacts);
+}
+
 static inline cpVect
 cpArbiterGetNormal(const cpArbiter *arb, int i)
 {
@@ -146,4 +154,35 @@ static inline cpVect
 cpArbiterGetPoint(const cpArbiter *arb, int i)
 {
 	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
+}
+
+static inline cpFloat
+cpArbiteGetDepth(const cpArbiter *arb, int i)
+{
+	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
+}
+
+typedef struct cpContactPointSet {
+	int count;
+	
+	struct {
+		cpVect point, normal;
+		cpFloat dist;
+	} points[CP_MAX_CONTACTS_PER_ARBITER];
+} cpContactPointSet;
+
+static inline cpContactPointSet
+cpArbiterGetContactPointSet(const cpArbiter *arb)
+{
+	cpContactPointSet set;
+	set.count = cpArbiterGetCount(arb);
+	
+	int i;
+	for(i=0; i<set.count; i++){
+		set.points[i].point = arb->CP_PRIVATE(contacts)[i].p;
+		set.points[i].normal = arb->CP_PRIVATE(contacts)[i].p;
+		set.points[i].dist = arb->CP_PRIVATE(contacts)[i].dist;
+	}
+	
+	return set;
 }

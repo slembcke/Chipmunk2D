@@ -42,7 +42,6 @@ typedef struct cpCollisionHandler {
 	void *data;
 } cpCollisionHandler;
 
-#define CP_MAX_CONTACTS_PER_ARBITER 6
 typedef struct cpContactBufferHeader {
 	cpTimestamp stamp;
 	struct cpContactBufferHeader *next;
@@ -182,7 +181,7 @@ typedef void (*cpSpaceBBQueryFunc)(cpShape *shape, void *data);
 void cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryFunc func, void *data);
 
 // Shape query callback function
-typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContact *contacts, int numContacts, void *data);
+typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points, void *data);
 //cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
 
 
