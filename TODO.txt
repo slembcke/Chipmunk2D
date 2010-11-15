@@ -1,4 +1,5 @@
 shape queries
+Fill out cpArbiter API
 
 Static rogue bodies?
 group sleeping of objects
@@ -7,7 +8,6 @@ Better accuracy for variable timestepping
 poly moment functions
 Fix static lib build scripts
 Encourage static linking
-Fill out cpArbiter API
 
 6.0:
 Add data field to cpSpace
@@ -19,18 +19,3 @@ Remove elastic iterations
 breakable object support functions
 constraint callbacks
 touch joint (Objective-Chipmunk)
-
-generic spatial indexing
-	* free
-	* count
-	* each
-	* contains
-	* add
-	* remove
-	* query
-	* point query
-	* segment query
-	* reindex
-	* reindex object
-	* active reindex
-	* resize (hash only)
