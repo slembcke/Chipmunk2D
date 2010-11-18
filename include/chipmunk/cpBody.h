@@ -119,13 +119,19 @@ cpBodyIsSleeping(const cpBody *body)
 	return (CP_PRIVATE(body->node).next != ((cpBody*)0));
 }
 
-cpBool cpBodyIsStatic(const cpBody *body);
+static inline cpBool
+cpBodyIsStatic(const cpBody *body)
+{
+	return CP_PRIVATE(body->node).idleTime == INFINITY;
+}
 
 static inline cpBool
 cpBodyIsRogue(const cpBody *body)
 {
 	return (body->CP_PRIVATE(space) == ((struct cpSpace*)0));
 }
+
+void cpBodyMakeStaticRogue(cpBody *body);
 
 
 #define CP_DefineBodyGetter(type, member, name) \

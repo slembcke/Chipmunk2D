@@ -146,6 +146,7 @@ cpSpaceInit(cpSpace *space)
 	
 	cpBodyInit(&space->staticBody, INFINITY, INFINITY);
 	space->staticBody.space = space;
+	space->staticBody.node.idleTime = INFINITY;
 	
 	return space;
 }

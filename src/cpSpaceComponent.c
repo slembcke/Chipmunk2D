@@ -68,9 +68,10 @@ componentActivate(cpBody *root)
 	do {
 		next = body->node.next;
 		
-		cpComponentNode node = {NULL, NULL, 0, 0.0f};
+		cpFloat idleTime = (cpBodyIsStatic(body) ? INFINITY : 0.0f);
+		cpComponentNode node = {NULL, NULL, 0, idleTime};
 		body->node = node;
-		cpArrayPush(space->bodies, body);
+		if(!cpBodyIsRogue(body)) cpArrayPush(space->bodies, body);
 		
 		for(cpShape *shape=body->shapesList; shape; shape=shape->next){
 			cpSpaceHashRemove(space->staticShapes, shape, shape->hashid);
@@ -86,7 +87,7 @@ cpBodyActivate(cpBody *body)
 {
 	// Reset the idle time even if it's not in a currently sleeping component
 	// Like a body resting on or jointed to a rogue body.
-	body->node.idleTime = 0.0f;
+	if(!cpBodyIsStatic(body)) body->node.idleTime = 0.0f;
 	componentActivate(componentNodeRoot(body));
 }
 
@@ -122,7 +123,7 @@ componentActive(cpBody *root, cpFloat threshold)
 	cpBody *body = root, *next;
 	do {
 		next = body->node.next;
-		if(cpBodyIsRogue(body) || body->node.idleTime < threshold) return cpTrue;
+		if(body->node.idleTime < threshold) return cpTrue;
 	} while((body = next) != root);
 	
 	return cpFalse;

@@ -175,11 +175,11 @@ cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat 
 	cpBodyApplyForce(b, cpvneg(f), r2);
 }
 
-cpBool
-cpBodyIsStatic(const cpBody *body)
+void
+cpBodyMakeStaticRogue(cpBody *body)
 {
-	cpSpace *space = body->space;
-	return (space != ((cpSpace*)0) && body == &space->staticBody);
+	// TODO add assertions here?
+	body->node.idleTime = INFINITY;
 }
 
 void cpSpaceSleepBody(cpSpace *space, cpBody *body);
