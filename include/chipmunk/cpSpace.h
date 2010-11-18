@@ -182,7 +182,10 @@ void cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpS
 
 // Shape query callback function
 typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points, void *data);
-//cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
+cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
+
+
+void cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape);
 
 
 // Iterator function for iterating the bodies in a space.

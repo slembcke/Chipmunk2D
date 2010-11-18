@@ -315,20 +315,6 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	return shape;
 }
 
-static void
-activateShapesTouchingShapeHelper(cpShape *shape, void *unused)
-{
-	cpBodyActivate(shape->body);
-}
-
-static void
-activateShapesTouchingShape(cpSpace *space, cpShape *shape)
-{
-	// TODO this query should be more precise
-	// Use shape queries once they are written
-	cpSpaceBBQuery(space, shape->bb, shape->layers, shape->group, activateShapesTouchingShapeHelper, NULL);
-}
-
 cpShape *
 cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
@@ -339,7 +325,7 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	if(!shape->body) shape->body = &space->staticBody;
 	
 	cpShapeCacheBB(shape);
-	activateShapesTouchingShape(space, shape);
+	cpSpaceActivateShapesTouchingShape(space, shape);
 	cpSpaceHashInsert(space->staticShapes, shape, shape->hashid, shape->bb);
 	
 	return shape;
@@ -428,7 +414,7 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
 	cpSpaceHashRemove(space->staticShapes, shape, shape->hashid);
 	
-	activateShapesTouchingShape(space, shape);
+	cpSpaceActivateShapesTouchingShape(space, shape);
 }
 
 void

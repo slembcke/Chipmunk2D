@@ -260,3 +260,24 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 	
 	cpArrayDeleteObj(space->bodies, body);
 }
+
+static void
+activateTouchingHelper(cpShape *shape, cpContactPointSet *points, cpArray **bodies){
+	if(*bodies == NULL) (*bodies) = cpArrayNew(0);
+	cpArrayPush(*bodies, shape->body);
+}
+
+void
+cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape){
+	cpArray *bodies = NULL;
+	cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)activateTouchingHelper, &bodies);
+	
+	if(bodies){
+		for(int i=0; i<bodies->num; i++){
+			cpBody *body = (cpBody *)bodies->arr[i];
+			cpBodyActivate(body);
+		}
+	}
+}
+
+
