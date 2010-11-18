@@ -223,11 +223,20 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 }
 
 void
-cpSpaceSleepBody(cpSpace *space, cpBody *body){
-	cpAssert(!space->locked, "Bodies can not be put to sleep during a query or a call to cpSpaceSte(). Put these calls into a post-step callback.");
+cpBodySleep(cpBody *body)
+{
+	cpBodySleepWithGroup(body, NULL);
+}
+
+void
+cpBodySleepWithGroup(cpBody *body, cpBody *group){
+	cpAssert(!cpBodyIsStatic(body) && !cpBodyIsRogue(body), "Rogue and static bodies cannot be put to sleep.");
 	
-	cpComponentNode node = {NULL, body, 0, 0.0f};
-	body->node = node;
+	cpSpace *space = body->space;
+	cpAssert(!space->locked, "Bodies can not be put to sleep during a query or a call to cpSpaceSte(). Put these calls into a post-step callback.");
+	cpAssert(!group || cpBodyIsSleeping(group), "Cannot use a non-sleeping body as a group identifier.");
+	
+	if(cpBodyIsSleeping(body)) return;
 	
 	for(cpShape *shape = body->shapesList; shape; shape = shape->next){
 		cpSpaceHashRemove(space->activeShapes, shape, shape->hashid);
@@ -236,6 +245,18 @@ cpSpaceSleepBody(cpSpace *space, cpBody *body){
 		cpSpaceHashInsert(space->staticShapes, shape, shape->hashid, shape->bb);
 	}
 	
-	cpArrayPush(space->sleepingComponents, body);
+	if(group){
+		cpBody *root = componentNodeRoot(group);
+		
+		cpComponentNode node = {root, root->node.next, 0, 0.0f};
+		body->node = node;
+		root->node.next = body;
+	} else {
+		cpComponentNode node = {NULL, body, 0, 0.0f};
+		body->node = node;
+		
+		cpArrayPush(space->sleepingComponents, body);
+	}
+	
 	cpArrayDeleteObj(space->bodies, body);
 }

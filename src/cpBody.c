@@ -181,14 +181,3 @@ cpBodyMakeStaticRogue(cpBody *body)
 	// TODO add assertions here?
 	body->node.idleTime = INFINITY;
 }
-
-void cpSpaceSleepBody(cpSpace *space, cpBody *body);
-
-void
-cpBodySleep(cpBody *body)
-{
-	if(cpBodyIsSleeping(body)) return;
-	
-	cpAssert(!cpBodyIsStatic(body) && !cpBodyIsRogue(body), "Rogue and static bodies cannot be put to sleep.");
-	cpSpaceSleepBody(body->space, body);
-}

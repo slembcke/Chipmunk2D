@@ -110,8 +110,9 @@ void cpBodyFree(cpBody *body);
 void cpBodyActivate(cpBody *body);
 
 // Force a body to sleep;
+// defined in cpSpaceComponent.c
 void cpBodySleep(cpBody *body);
-//void cpBodySleepGroup(cpBody *body, ...);
+void cpBodySleepWithGroup(cpBody *body, cpBody *group);
 
 static inline cpBool
 cpBodyIsSleeping(const cpBody *body)
