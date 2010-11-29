@@ -69,7 +69,7 @@ typedef struct cpContactBuffer {
 static cpContactBufferHeader *
 cpSpaceAllocContactBuffer(cpSpace *space)
 {
-	cpContactBuffer *buffer = (cpContactBuffer *)malloc(sizeof(cpContactBuffer));
+	cpContactBuffer *buffer = (cpContactBuffer *)cpmalloc(sizeof(cpContactBuffer));
 	cpArrayPush(space->allocatedBuffers, buffer);
 	return (cpContactBufferHeader *)buffer;
 }
