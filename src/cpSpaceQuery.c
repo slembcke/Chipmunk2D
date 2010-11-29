@@ -228,14 +228,16 @@ shapeQueryHelper(cpShape *a, cpShape *b, shapeQueryContext *context)
 	if(numContacts){
 		context->anyCollision = cpTrue;
 		
-		cpContactPointSet set = {numContacts, {}};
-		for(int i=0; i<set.count; i++){
-			set.points[i].point = contacts[i].p;
-			set.points[i].normal = contacts[i].p;
-			set.points[i].dist = contacts[i].dist;
+		if(context->func){
+			cpContactPointSet set = {numContacts, {}};
+			for(int i=0; i<set.count; i++){
+				set.points[i].point = contacts[i].p;
+				set.points[i].normal = contacts[i].p;
+				set.points[i].dist = contacts[i].dist;
+			}
+			
+			context->func(b, &set, context->data);
 		}
-		
-		if(context->func) context->func(b, &set, context->data);
 	}
 }
 
