@@ -21,6 +21,7 @@
  
 #include <stdlib.h>
 #include <float.h>
+#include <stdarg.h>
 
 #include "chipmunk_private.h"
 

@@ -21,6 +21,7 @@
  
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "chipmunk.h"
 
@@ -59,7 +60,7 @@ cpInitChipmunk(void)
 cpFloat
 cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset)
 {
-	return (1.0f/2.0f)*m*(r1*r1 + r2*r2) + m*cpvdot(offset, offset);
+	return m*(0.5f*(r1*r1 + r2*r2) + cpvlengthsq(offset));
 }
 
 cpFloat
@@ -74,7 +75,7 @@ cpMomentForSegment(cpFloat m, cpVect a, cpVect b)
 	cpFloat length = cpvlength(cpvsub(b, a));
 	cpVect offset = cpvmult(cpvadd(a, b), 1.0f/2.0f);
 	
-	return m*length*length/12.0f + m*cpvdot(offset, offset);
+	return m*(length*length/12.0f + cpvlengthsq(offset));
 }
 
 cpFloat
@@ -84,7 +85,7 @@ cpAreaForSegment(cpVect a, cpVect b, cpFloat r)
 }
 
 cpFloat
-cpMomentForPoly(cpFloat m, const int numVerts, cpVect *verts, cpVect offset)
+cpMomentForPoly(cpFloat m, const int numVerts, const cpVect *verts, cpVect offset)
 {
 	cpFloat sum1 = 0.0f;
 	cpFloat sum2 = 0.0f;
@@ -103,7 +104,7 @@ cpMomentForPoly(cpFloat m, const int numVerts, cpVect *verts, cpVect offset)
 }
 
 cpFloat
-cpAreaForPoly(const int numVerts, cpVect *verts)
+cpAreaForPoly(const int numVerts, const cpVect *verts)
 {
 	cpFloat area = 0.0f;
 	for(int i=0; i<numVerts; i++){
@@ -114,21 +115,30 @@ cpAreaForPoly(const int numVerts, cpVect *verts)
 }
 
 cpVect
-cpCentroidForPoly(const int numVerts, cpVect *verts)
+cpCentroidForPoly(const int numVerts, const cpVect *verts)
 {
-	cpVect sum = cpvzero;
-	cpFloat area = 0.0f;
+	cpFloat sum = 0.0f;
+	cpVect vsum = cpvzero;
 	
 	for(int i=0; i<numVerts; i++){
 		cpVect v1 = verts[i];
 		cpVect v2 = verts[(i+1)%numVerts];
 		cpFloat cross = cpvcross(v1, v2);
 		
-		area += cross;
-		sum = cpvadd(sum, cpvmult(cpvadd(v1, v2), cross));
+		sum += cross;
+		vsum = cpvadd(vsum, cpvmult(cpvadd(v1, v2), cross));
 	}
 	
-	return cpvmult(sum, 1.0f/3.0f);
+	return cpvmult(vsum, 1.0f/(3.0f*sum));
+}
+
+void
+cpRecenterPoly(const int numVerts, cpVect *verts){
+	cpVect centroid = cpCentroidForPoly(numVerts, verts);
+	
+	for(int i=0; i<numVerts; i++){
+		verts[i] = cpvsub(verts[i], centroid);
+	}
 }
 
 cpFloat
@@ -136,12 +146,5 @@ cpMomentForBox(cpFloat m, cpFloat width, cpFloat height)
 {
 	return m*(width*width + height*height)/12.0f;
 }
-
-cpFloat
-cpAreaForBox(cpFloat width, cpFloat height)
-{
-	return width*height;
-}
-
 
 #include "chipmunk_ffi.h"

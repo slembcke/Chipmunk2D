@@ -50,7 +50,7 @@ cpPolyShape *cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFl
 cpShape *cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height);
 
 // Check that a set of vertexes has a correct winding and that they are convex
-cpBool cpPolyValidate(cpVect *verts, int numVerts);
+cpBool cpPolyValidate(const cpVect *verts, int numVerts);
 
 int cpPolyShapeGetNumVerts(cpShape *shape);
 cpVect cpPolyShapeGetVert(cpShape *shape, int idx);

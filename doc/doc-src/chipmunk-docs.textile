@@ -408,13 +408,28 @@ p(expl). Calculate the moment of inertia for a line segment. The endpoints @a@ a
 
 <pre><code>cpFloat cpMomentForPoly(cpFloat m, int numVerts, cpVect *verts, cpVect offset)</code></pre>
 
-p(expl). Calculate the moment of inertia for a solid polygon shape
-
-<!-- TODO need extra poly func here -->
+p(expl). Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
 
 <pre><code>cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height)</code></pre>
 
 p(expl). Calculate the moment of inertia for a solid box centered on the body.
+
+h2. Area Helper Functions:
+
+Use the following functions to get the area for common Chipmunk shapes if you want to approximate masses.
+
+<pre><code>cpFloat cpAreaForCircle(cpFloat r1, cpFloat r2)</code></pre>
+
+p(expl). Area of a hollow circle.
+
+<pre><code>cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat r)</code></pre>
+
+p(expl). Area of a beveled segment. (Will always be zero if radius is zero)
+
+<pre><code>cpFloat cpAreaForPoly(const int numVerts, const cpVect *verts)</code></pre>
+
+p(expl). Signed area of a polygon shape. Returns a negative number for polygons with a backwards winding.
+
 
 h2. Setters for Linked Values:
 
@@ -494,9 +509,19 @@ See Chipmunk Spaces":#cpSpace for more information on Chipmunk's sleeping featur
 
 p(expl). Returns true if @body@ is sleeping.
 
+<pre><code>void cpBodySleepWithGroup(cpBody *body, cpBody *group)</code></pre>
+
+p(expl). When objects in Chipmunk sleep, they sleep as a group of all objects that are touching or jointed together. When an object is woken up, all of the objects in it's group are woken up. Calling cpBodySleepWithGroup() forces a body to fall asleep immediately. If @group@ is @NULL@, a new group will be created. If group is another sleeping body, it will be added to that body's group. It is an error to specify a non-sleeping body for @group@. Make sure everything is set up before calling this method. Calling a setter function or adding/removing a shape or constraint will cause the body to be woken up again. Also, this function must not be called from a collision handler or query callback. Use a post-step callback instead.
+
+An example of how this could be used is to set up a piles of boxes that a player can knock over. Creating the piles and letting them fall asleep normally would work, but it means that all of the boxes would need to be simulated until they fell asleep. This could be slow if you had a lot of piles. Instead you can force them to sleep and start the game with the boxes already sleeping.
+
+Another example would be collapsing platforms. You could create a sleeping object that is suspended in the air. As soon as the player comes along to jump on it, it wakes up and starts falling. In this case, it would be impossible to have the platform fall asleep naturally.
+
+<!-- TODO example needed here -->
+
 <pre><code>void cpBodySleep(cpBody *body)</code></pre>
 
-p(expl). Force @body@ to sleep immediately. Make sure the body is fully set up before you call this. Adding this body or any shapes attached to it, or modifying any of the body's properties will reactivate it. This is useful if you want an object to be inactive until something hits it such as a pile of boxes you want the player to plow through or a stalactite hanging from a cave ceiling. This function must not be called from a collision handler callback. Use a post-step callback instead.
+p(expl). Equivalent to calling @cpBodySleepWithGroup(body, NULL)@. It forces @body@ to fall asleep and creates a new group for it.
 
 <pre><code>void cpBodyActivate(cpBody *body)</code></pre>
 
@@ -506,12 +531,19 @@ h2. Misc Functions:
 
 <pre><code>cpBool cpBodyIsStatic(const cpBody *body)</code></pre>
 
-p(expl). Returns true if @body@ is a static body for a space. (cpSpace.staticBody)
+p(expl). Returns true if @body@ is a static body. (cpSpace.staticBody or a static rogue body)
 
 <pre><code>cpBool cpBodyIsRogue(const cpBody *body)</code></pre>
 
-p(expl). Returns true if @body@ has never been added to a space.
+p(expl). Returns true if @body@ has never been added to a space. Though shapes attached to this body may still be added to a space. For more information on rogue and static bodies, see "Chipmunk Spaces":#cpSpace.
 
+<pre><code>cpBool cpBodyIsSleeping(const cpBody *body)</code></pre>
+
+p(expl). 
+
+<pre><code>void cpBodyMakeStaticRogue(cpBody *body)</code></pre>
+
+p(expl). Mark a rogue body as static. For more information on rogue and static bodies, see "Chipmunk Spaces":#cpSpace.
 
 
 h2. Notes:
@@ -625,6 +657,16 @@ cpVect cpPolyShapeGetVert(cpShape *shape, int index)</code></pre>
 
 p(expl). Getters for poly shape properties. Passing a non-poly shape or an index that does not exist will throw an assertion.
 
+h2. Poly Shape Helper Functions:
+
+<pre><code>cpVect cpCentroidForPoly(const int numVerts, const cpVect *verts)</code></pre>
+
+p(expl). Calculate the centroid for a polygon.
+
+<pre><code>void cpRecenterPoly(const int numVerts, cpVect *verts)</code></pre>
+
+p(expl). Center a polygon to (0,0). Subtracts the centroid from each vertex.
+
 h2. Modifying cpShapes:
 
 The short answer is that you can't because the changes would be only picked up as a change to the position of the shape's surface, but not it's velocity. The long answer is that you can using the "unsafe" API as long as you realize that doing so will not result in realistic physical behavior. These extra functions are define in a separate header @chipmunk_unsafe.h@.
@@ -646,21 +688,21 @@ h2. What Are Iterations, and Why Should I care?
 
 Chipmunk uses an iterative solver to figure out the forces between objects in the space. What this means is that it builds a big list of all of the collisions, joints, and other constraints between the bodies and makes several passes over the list considering each one individually. The number of passes it makes is the iteration count, and each iteration makes the solution more accurate. If you use too many iterations, the physics should look nice and solid, but may use up too much CPU time. If you use too few iterations, the simulation may seem mushy or bouncy when the objects should be solid. Setting the number of iterations lets you balance between CPU usage and the accuracy of the physics. Chipmunk's default of 10 iterations is sufficient for most simple games.
 
-h2. Rogue Bodies:
+h2. Rogue and Static Bodies:
 
-Rogue bodies are bodies that have not been added to the space, but are referenced from shapes or joints. Rogue bodies are a common way of controlling moving elements in Chipmunk such as platforms. As long as the body's velocity matches the changes to it's position, there is no problem with doing this. Most games will not need rogue bodies.
+Rogue bodies are bodies that have not been added to the space, but are referenced from shapes or joints. Rogue bodies are a common way of controlling moving elements in Chipmunk such as platforms. As long as the body's velocity matches the changes to it's position, there is no problem with doing this. Most games will not need rogue bodies however.
 
-In previous versions, Chipmunk also used infinite mass rogue bodies to attach static shapes to. Creating and maintaining your own body for this is no longer necessary as each space has it's own body for attaching static shapes to. It is also not recommended to do this as it does not work with the sleeping feature. Anything touching or jointed to a rogue body is forbidden from sleeping.
+In previous versions, Chipmunk used infinite mass rogue bodies to attach static shapes to. Creating and maintaining your own body for this is no longer necessary as each space has it's own body for attaching static shapes to. This body is marked as being a _static body_. A static body allows other objects resting on or jointed to it to fall asleep even though it does not fall asleep itself. Rouge bodies can be marked as static bodies using @cpBodyMakeStaticRogue()@. Objects resting on or jointed to non-static rogue bodies can never fall asleep. This is because Chipmunk assumes that non-static rogue bodies can be moved at any time.
 
 h2. Static Shapes:
 
-Chipmunk optimizes collision detection against shapes that do not move. Chipmunk doesn't automatically know if shapes should be static or not. There are two ways to let a Chipmunk space know that a shape is static. The first is to use the space's static body when creating the shape. When you call @cpSpaceAddShape()@ on such a shape, it will be added as an optimized static shape. Calling @cpSpaceRemoveShape()@ will remove the shape. If you want a shape attached to an infinite mass rogue body to be treated as static, you will have to add and remove it's shape's using @cpSpaceAddStaticShape()@ and @cpSpaceRemoveStaticShape()@ explicitly as Chipmunk has no way to know if the rogue body is meant to be static or not.
+Chipmunk optimizes collision detection against shapes that do not move. There are two ways to let a Chipmunk space know that a shape is static. The first is to attach the shape to a static body. When you call @cpSpaceAddShape()@ on such a shape, it will be added as an optimized static shape. Calling @cpSpaceRemoveShape()@ will remove the shape. Secondly, if for some reason you want to attach a static shape to a non-static rogue body, you can call @cpSpaceAddStaticShape()@ and @cpSpaceRemoveStaticShape()@ explicitly. 
 
-Because static shapes aren't updated automatically, you must let Chipmunk know that it needs to update the static shapes using @cpSpaceRehashStatic()@ whenever you move a static shape. If you find yourself moving static shapes attached to rogue bodies often, you should add the shapes normally using @cpSpaceAddShape()@ instead.
+Because static shapes aren't updated automatically, you must let Chipmunk know that it needs to update the static shapes using @cpSpaceRehashStatic()@ if you ever move a static shape. If you find yourself moving static shapes attached to rogue bodies often, you should probably be adding the shapes normally using @cpSpaceAddShape()@ instead.
 
 h2. Sleeping
 
-New in Chipmunk 5.3 is the ability of spaces to disable entire groups of objects that have stopped moving to save CPU time as well as battery life. In order to use this feature you must do 2 things. The first is that you *must* use the space's static body to attach your static shapes to. Because the space controls this body directly, it knows that it won't move unexpectedly and that means that it is safe to allow things to fall asleep when they are touching it. The second part is much easier, you need to choose a threshold value for @cpSpace.sleepTimeThreshold@ and optionally @cpSpace.idleSpeedThreshold@.
+New in Chipmunk 5.3 is the ability of spaces to disable entire groups of objects that have stopped moving to save CPU time as well as battery life. In order to use this feature you must do 2 things. The first is that you must attach all your static geometry to static bodies. Objects cannot fall asleep if they are touching a non-static rogue body even if it's shapes were added as static shapes. The second is that you must enable sleeping explicitly by choosing a time threshold value for @cpSpace.sleepTimeThreshold@. If you do not set @cpSpace.idleSpeedThreshold@ explicitly, a value will be chosen automatically based on the current amount of gravity.
 
 h2. Fields:
 
@@ -699,6 +741,12 @@ void cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 void cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)</code></pre>
 
 p(expl). These functions add and remove shapes, bodies and constraints from @space@. See the section on Static Shapes above for an explanation of what a static shape is and how it differs from a normal shape. Also, you cannot call the any of these functions from within a callback other than a post-step callback (which is different than a post-solve callback!). Attempting to add or remove objects from the space while @cpSpaceStep()@ is still executing will throw an assertion. See the "callbacks section":#Callbacks for more information.
+
+h2. Misc:
+
+<pre><code>void cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape)</code></pre>
+
+p(expl). Perform a query for all shapes touching @shape@ and call @cpBodyActivate()@ on them. This is useful when you need to move a shape explicitly. Waking shapes touching the moved shape prevents objects from sleeping when the floor is moved or something similar. You only need to do this when changing the shape of an existing shape or moving a static shape. Most other methods of moving a shape automatically would wake up other touching objects.
 
 h2. Spatial Hash Management Functions:
 
