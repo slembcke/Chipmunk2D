@@ -27,7 +27,7 @@ typedef void (*demoDestroyFunc)(void);
 
 typedef struct chipmunkDemo {
 	const char *name;
-
+ 
 	drawSpaceOptions *drawOptions;
 	
 	demoInitFunc initFunc;

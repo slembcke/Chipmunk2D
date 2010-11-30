@@ -82,6 +82,7 @@ cpShapeFree(cpShape *shape)
 	}
 }
 
+// TODO this function should really take a position and rotation explicitly and be renamed
 cpBB
 cpShapeCacheBB(cpShape *shape)
 {
