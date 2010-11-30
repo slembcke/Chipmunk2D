@@ -63,6 +63,12 @@ cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset)
 }
 
 cpFloat
+cpAreaForCircle(cpFloat r1, cpFloat r2)
+{
+	return 2.0f*M_PI*cpfabs(r1*r1 - r2*r2);
+}
+
+cpFloat
 cpMomentForSegment(cpFloat m, cpVect a, cpVect b)
 {
 	cpFloat length = cpvlength(cpvsub(b, a));
@@ -72,17 +78,19 @@ cpMomentForSegment(cpFloat m, cpVect a, cpVect b)
 }
 
 cpFloat
+cpAreaForSegment(cpVect a, cpVect b, cpFloat r)
+{
+	return 2.0f*r*(M_PI*r + cpvdist(a, b));
+}
+
+cpFloat
 cpMomentForPoly(cpFloat m, const int numVerts, cpVect *verts, cpVect offset)
 {
-	cpVect *tVerts = (cpVect *)cpcalloc(numVerts, sizeof(cpVect));
-	for(int i=0; i<numVerts; i++)
-		tVerts[i] = cpvadd(verts[i], offset);
-	
 	cpFloat sum1 = 0.0f;
 	cpFloat sum2 = 0.0f;
 	for(int i=0; i<numVerts; i++){
-		cpVect v1 = tVerts[i];
-		cpVect v2 = tVerts[(i+1)%numVerts];
+		cpVect v1 = cpvadd(verts[i], offset);
+		cpVect v2 = cpvadd(verts[(i+1)%numVerts], offset);
 		
 		cpFloat a = cpvcross(v2, v1);
 		cpFloat b = cpvdot(v1, v1) + cpvdot(v1, v2) + cpvdot(v2, v2);
@@ -91,14 +99,48 @@ cpMomentForPoly(cpFloat m, const int numVerts, cpVect *verts, cpVect offset)
 		sum2 += a;
 	}
 	
-	cpfree(tVerts);
 	return (m*sum1)/(6.0f*sum2);
+}
+
+cpFloat
+cpAreaForPoly(const int numVerts, cpVect *verts)
+{
+	cpFloat area = 0.0f;
+	for(int i=0; i<numVerts; i++){
+		area += cpvcross(verts[i], verts[(i+1)%numVerts]);
+	}
+	
+	return area/2.0f;
+}
+
+cpVect
+cpCentroidForPoly(const int numVerts, cpVect *verts)
+{
+	cpVect sum = cpvzero;
+	cpFloat area = 0.0f;
+	
+	for(int i=0; i<numVerts; i++){
+		cpVect v1 = verts[i];
+		cpVect v2 = verts[(i+1)%numVerts];
+		cpFloat cross = cpvcross(v1, v2);
+		
+		area += cross;
+		sum = cpvadd(sum, cpvmult(cpvadd(v1, v2), cross));
+	}
+	
+	return cpvmult(sum, 1.0f/3.0f);
 }
 
 cpFloat
 cpMomentForBox(cpFloat m, cpFloat width, cpFloat height)
 {
 	return m*(width*width + height*height)/12.0f;
+}
+
+cpFloat
+cpAreaForBox(cpFloat width, cpFloat height)
+{
+	return width*height;
 }
 
 
