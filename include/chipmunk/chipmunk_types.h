@@ -2,7 +2,11 @@
    #import "TargetConditionals.h"
 #endif
 
-#if (defined CP_USE_CGPOINTS) || (defined TARGET_OS_IPHONE)
+#if (defined TARGET_OS_IPHONE) && (!defined CP_USE_CGPOINTS)
+	#define CP_USE_CGPOINTS
+#endif
+
+#ifdef CP_USE_CGPOINTS
 	#if TARGET_OS_IPHONE
 		#import <CoreGraphics/CGGeometry.h>
 	#elif TARGET_OS_MAC
@@ -85,7 +89,7 @@ cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 
 // CGPoints are structurally the same, and allow
 // easy interoperability with other Cocoa libraries
-#ifdef CHIPMUNK_USE_CGPOINTS
+#ifdef CP_USE_CGPOINTS
 	typedef CGPoint cpVect;
 #else
 	typedef struct cpVect{cpFloat x,y;} cpVect;

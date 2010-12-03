@@ -137,9 +137,18 @@ static const cpShapeClass polyClass = {
 };
 
 cpBool
-cpPolyValidate(const cpVect *verts, int numVerts)
+cpPolyValidate(cpVect *verts, int numVerts)
 {
-	return (cpAreaForPoly(numVerts, verts) > 0.0f);
+	for(int i=0; i<numVerts; i++){
+		cpVect a = verts[i];
+		cpVect b = verts[(i+1)%numVerts];
+		cpVect c = verts[(i+2)%numVerts];
+		
+		if(cpvcross(cpvsub(b, a), cpvsub(c, b)) > 0.0f)
+			return cpFalse;
+	}
+	
+	return cpTrue;
 }
 
 int
