@@ -68,7 +68,7 @@ componentActivate(cpBody *root)
 	do {
 		next = body->node.next;
 		
-		cpFloat idleTime = (cpBodyIsStatic(body) ? INFINITY : 0.0f);
+		cpFloat idleTime = (cpBodyIsStatic(body) ? (cpFloat)INFINITY : 0.0f);
 		cpComponentNode node = {NULL, NULL, 0, idleTime};
 		body->node = node;
 		if(!cpBodyIsRogue(body)) cpArrayPush(space->bodies, body);

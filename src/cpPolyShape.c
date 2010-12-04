@@ -137,7 +137,7 @@ static const cpShapeClass polyClass = {
 };
 
 cpBool
-cpPolyValidate(cpVect *verts, int numVerts)
+cpPolyValidate(const cpVect *verts, const int numVerts)
 {
 	for(int i=0; i<numVerts; i++){
 		cpVect a = verts[i];

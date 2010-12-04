@@ -180,5 +180,5 @@ void
 cpBodyMakeStaticRogue(cpBody *body)
 {
 	// TODO add assertions here?
-	body->node.idleTime = INFINITY;
+	body->node.idleTime = (cpFloat)INFINITY;
 }
