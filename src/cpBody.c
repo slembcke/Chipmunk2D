@@ -76,6 +76,21 @@ cpBodyNew(cpFloat m, cpFloat i)
 	return cpBodyInit(cpBodyAlloc(), m, i);
 }
 
+cpBody *
+cpBodyInitStatic(cpBody *body)
+{
+	cpBodyInit(body, (cpFloat)INFINITY, (cpFloat)INFINITY);
+	body->node.idleTime = (cpFloat)INFINITY;
+	
+	return body;
+}
+
+cpBody *
+cpBodyNewStatic()
+{
+	return cpBodyInitStatic(cpBodyAlloc());
+}
+
 void cpBodyDestroy(cpBody *body){}
 
 void
@@ -174,11 +189,4 @@ cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat 
 	cpVect f = cpvmult(n, f_spring + f_damp);
 	cpBodyApplyForce(a, f, r1);
 	cpBodyApplyForce(b, cpvneg(f), r2);
-}
-
-void
-cpBodyMakeStaticRogue(cpBody *body)
-{
-	// TODO add assertions here?
-	body->node.idleTime = (cpFloat)INFINITY;
 }

@@ -1,16 +1,8 @@
-shape queries
-Fill out cpArbiter API
-
-Static rogue bodies?
-group sleeping of objects
-activate shapes touching shape
-Better accuracy for variable timestepping
-poly moment functions
 Fix static lib build scripts
-Encourage static linking
+Encourage static linking in docs
+Add data field to cpSpace
 
 6.0:
-Add data field to cpSpace
 Doxygen! (mark private/public parts of API)
 Fix units for damped springs
 Breakable joints?
@@ -19,3 +11,6 @@ Remove elastic iterations
 breakable object support functions
 constraint callbacks
 touch joint (Objective-Chipmunk)
+per body damping and gravity coefs?
+cpShapeCacheBB needs an overhaul
+Better accuracy for variable timestepping?

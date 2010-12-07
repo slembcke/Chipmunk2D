@@ -385,14 +385,26 @@ When changing any of a body's properties, you should also call @cpBodyActivate()
 
 h2. Memory Management Functions:
 
-<pre><code>cpBody *cpBodyAlloc(void);
-cpBody *cpBodyInit(cpBody *body, cpFloat m, cpFloat i);
-cpBody *cpBodyNew(cpFloat m, cpFloat i);
+<pre><code>cpBody *cpBodyAlloc(void)
+cpBody *cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
+cpBody *cpBodyNew(cpFloat m, cpFloat i)
 
-void cpBodyDestroy(cpBody *body);
-void cpBodyFree(cpBody *body);</code></pre>
+void cpBodyDestroy(cpBody *body)
+void cpBodyFree(cpBody *body)</code></pre>
 
 p(expl). Standard set of Chipmunk memory management functions. @m@ and @i@ are the mass and moment of inertia for the body. Guessing the mass for a body is usually fine, but guessing a moment of inertia can lead to a very poor simulation.
+
+h2. Creating Additional Static Bodies:
+
+While every @cpSpace@:#cpSpace has a built in static body that you can use, it can be convenient to make your own as well. One potential use is in a level editor. By attaching chunks of your level to static bodies, you can still move and rotate the chunks independently of each other. Then all you have to do is call @cpSpaceRehashStatic()@ to rebuild the static collision detection data when you are done.
+
+For more information on rogue and static bodies, see "Chipmunk Spaces":#cpSpace.
+
+<pre><code>cpBody *cpBodyAlloc(void);
+cpBody *cpBodyInitStatic(cpBody *body)
+cpBody *cpBodyNewStatic()</code></pre>
+
+p(expl). Create additional static bodies with infinite mass and moment of inertia.
 
 h2. Moment of Inertia Helper Functions:
 
@@ -539,11 +551,7 @@ p(expl). Returns true if @body@ has never been added to a space. Though shapes a
 
 <pre><code>cpBool cpBodyIsSleeping(const cpBody *body)</code></pre>
 
-p(expl). 
-
-<pre><code>void cpBodyMakeStaticRogue(cpBody *body)</code></pre>
-
-p(expl). Mark a rogue body as static. For more information on rogue and static bodies, see "Chipmunk Spaces":#cpSpace.
+p(expl). Returns true if @body@ is sleeping.
 
 
 h2. Notes:
@@ -692,13 +700,17 @@ h2. Rogue and Static Bodies:
 
 Rogue bodies are bodies that have not been added to the space, but are referenced from shapes or joints. Rogue bodies are a common way of controlling moving elements in Chipmunk such as platforms. As long as the body's velocity matches the changes to it's position, there is no problem with doing this. Most games will not need rogue bodies however.
 
-In previous versions, Chipmunk used infinite mass rogue bodies to attach static shapes to. Creating and maintaining your own body for this is no longer necessary as each space has it's own body for attaching static shapes to. This body is marked as being a _static body_. A static body allows other objects resting on or jointed to it to fall asleep even though it does not fall asleep itself. Rouge bodies can be marked as static bodies using @cpBodyMakeStaticRogue()@. Objects resting on or jointed to non-static rogue bodies can never fall asleep. This is because Chipmunk assumes that non-static rogue bodies can be moved at any time.
+In previous versions, Chipmunk used infinite mass rogue bodies to attach static shapes to. Creating and maintaining your own body for this is no longer necessary as each space has it's own body for attaching static shapes to. This body is marked as being a _static body_. A static body allows other objects resting on or jointed to it to fall asleep even though it does not fall asleep itself. Additional static bodies can be created using @cpBodyNewStatic()@ or @cpBodyInitStatic()@. Objects resting on or jointed to rogue bodies can never fall asleep. This is because the purpose of rogue bodies are to allow the programmer to move or modify them at any time. Without knowing when they will move, Chipmunk has to assume that objects cannot fall asleep when touching them.
 
 h2. Static Shapes:
 
-Chipmunk optimizes collision detection against shapes that do not move. There are two ways to let a Chipmunk space know that a shape is static. The first is to attach the shape to a static body. When you call @cpSpaceAddShape()@ on such a shape, it will be added as an optimized static shape. Calling @cpSpaceRemoveShape()@ will remove the shape. Secondly, if for some reason you want to attach a static shape to a non-static rogue body, you can call @cpSpaceAddStaticShape()@ and @cpSpaceRemoveStaticShape()@ explicitly. 
+Chipmunk optimizes collision detection against shapes that do not move. There are two ways that Chipmunk knows a shape is static.
 
-Because static shapes aren't updated automatically, you must let Chipmunk know that it needs to update the static shapes using @cpSpaceRehashStatic()@ if you ever move a static shape. If you find yourself moving static shapes attached to rogue bodies often, you should probably be adding the shapes normally using @cpSpaceAddShape()@ instead.
+The first is automatic. When adding or removing shapes attached to static bodies, Chipmunk knows to handle them specially and you just use the same functions as adding regular dynamic shapes, @cpSpaceAddShape()@ and @cpSpaceRemoveShape()@.
+
+The second way is to explicitly tag shapes as static using @cpSpaceAddStaticShape()@. This is rarely needed, but say for instance that you have a rogue body that seldomly moves. In this case, adding a shape attached to it as a static shape and updating it only when the body moves can increase performance. Shapes added this way must be removed by calling @cpSpaceRemoveStaticShape()@.
+
+Because static shapes aren't updated automatically, you must let Chipmunk know that it needs to update the static shapes. You can update all of the static shapes at once using @cpSpaceRehashStatic()@ or individual shapes using @cpSpaceRehashShape()@. If you find yourself rehashing static bodies often, you should be adding them normally using @cpSpaceAddShape()@ instead.
 
 h2. Sleeping
 
@@ -781,11 +793,17 @@ Notice the dark grey cells meaning that many objects are mapped onto them.
 
 p(expl). Rehashes the shapes in the static spatial hash. You must call this if you move any static shapes or Chipmunk won't update their collision detection data.
 
+<pre><code>void cpSpaceRehashShape(cpSpace *space, cpShape *shape)</code></pre>
+
+p(expl). Update an individual static shape that has moved.
+
+
 h2. Simulating the Space:
 
 <pre><code>void cpSpaceStep(cpSpace *space, cpFloat dt)</code></pre>
 
 p(expl). Update the space for the given time step. Using a fixed time step is _highly_ recommended. Doing so will increase the efficiency of the contact persistence, requiring an order of magnitude fewer iterations and CPU usage.
+
 
 h2. Notes:
 

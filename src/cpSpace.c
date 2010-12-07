@@ -144,9 +144,7 @@ cpSpaceInit(cpSpace *space)
 	
 	space->postStepCallbacks = NULL;
 	
-	cpBodyInit(&space->staticBody, INFINITY, INFINITY);
-	space->staticBody.space = space;
-	space->staticBody.node.idleTime = INFINITY;
+	cpBodyInitStatic(&space->staticBody);
 	
 	return space;
 }
@@ -334,7 +332,7 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 cpBody *
 cpSpaceAddBody(cpSpace *space, cpBody *body)
 {
-	cpAssertWarn(body->m != INFINITY, "Did you really mean to add an infinite mass body to the space?");
+	cpAssertWarn(!cpBodyIsStatic(body), "Static bodies cannot be added to a space as they are not meant to be simulated.");
 	cpAssert(!body->space, "Cannot add a body to a more than one space or to the same space twice.");
 //	cpAssertSpaceUnlocked(space); This should be safe as long as it's not from an integration callback
 	
@@ -394,7 +392,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 	
 	cpAssertSpaceUnlocked(space);
 	cpAssertWarn(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
-		"Cannot remove a shape that was never added to the space. (Removed twice maybe?)");
+		"Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
 	
 	cpBodyRemoveShape(body, shape);
 	
@@ -407,7 +405,7 @@ void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
 	cpAssertWarn(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
-		"Cannot remove a static or sleeping shape that was never added to the space. (Removed twice maybe?)");
+		"Cannot remove a static or sleeping shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	removalContext context = {space, shape};
@@ -421,7 +419,7 @@ void
 cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 {
 	cpAssertWarn(body->space == space,
-		"Cannot remove a body that was never added to the space. (Removed twice maybe?)");
+		"Cannot remove a body that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
@@ -433,7 +431,7 @@ void
 cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 {
 	cpAssertWarn(cpArrayContains(space->constraints, constraint),
-		"Cannot remove a constraint that was never added to the space. (Removed twice maybe?)");
+		"Cannot remove a constraint that was not added to the space. (Removed twice maybe?)");
 //	cpAssertSpaceUnlocked(space); Should be safe as long as its not from a constraint callback.
 	
 	cpBodyActivate(constraint->a);

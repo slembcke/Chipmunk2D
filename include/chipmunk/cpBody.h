@@ -103,6 +103,9 @@ cpBody *cpBodyAlloc(void);
 cpBody *cpBodyInit(cpBody *body, cpFloat m, cpFloat i);
 cpBody *cpBodyNew(cpFloat m, cpFloat i);
 
+cpBody *cpBodyInitStatic(cpBody *body);
+cpBody *cpBodyNewStatic();
+
 void cpBodyDestroy(cpBody *body);
 void cpBodyFree(cpBody *body);
 
@@ -131,8 +134,6 @@ cpBodyIsRogue(const cpBody *body)
 {
 	return (body->CP_PRIVATE(space) == ((struct cpSpace*)0));
 }
-
-void cpBodyMakeStaticRogue(cpBody *body);
 
 
 #define CP_DefineBodyGetter(type, member, name) \

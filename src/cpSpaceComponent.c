@@ -233,6 +233,7 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 	cpAssert(!cpBodyIsStatic(body) && !cpBodyIsRogue(body), "Rogue and static bodies cannot be put to sleep.");
 	
 	cpSpace *space = body->space;
+	cpAssert(space, "Cannot put a body to sleep that has not been added to a space.");
 	cpAssert(!space->locked, "Bodies can not be put to sleep during a query or a call to cpSpaceSte(). Put these calls into a post-step callback.");
 	cpAssert(!group || cpBodyIsSleeping(group), "Cannot use a non-sleeping body as a group identifier.");
 	
