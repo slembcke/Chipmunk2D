@@ -3,7 +3,7 @@ raise("No version number!") unless VERS
 
 def system(command)
 	puts command
-#	Kernel.system(command)
+	Kernel.system(command)
 end
 
 DIR = "/tmp/Chipmunk-#{VERS}"
