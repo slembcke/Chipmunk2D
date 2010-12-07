@@ -31,6 +31,20 @@ http://www.slembcke.net/forums
 CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
+CHANGES SINCE 5.3.2:
+* API: Added cpArbiteGetCount() to return the number of contact points.
+* API: Added helper functions for calculating areas of Chipmunk shapes as well as calculating polygon centroids and centering polygons on their centroid.
+* API: Shape queries. Query a shape to test for collisions if it were to be inserted into a space.
+* API: cpBodyInitStatic() and cpBodyNewStatic() for creating additional static (rogue) bodies.
+* API: cpBodySleepWithGroup() to allow you to create groups of sleeping objects that are woken up together.
+* API: Added overloaded *, +, - and == operators for C++ users.
+* API: Added cpSpaceActivateShapesTouchingShape() to query for and activate any shapes touching a given shape. Useful if you ever need to move a static body.
+* FIX: Fixed an extremely rare memory bug in the collision cache.
+* FIX: Fixed a memory leak in Objective-Chipmunk that could cause ChipmunkSpace objects to be leaked.
+* MISC: C struct fields and function that are considered private have been explicitly marked as such. Defining CP_ALLOW_PRIVATE_ACCESS to 0 in Chipmunk.h will let you test which parts of the private API that you are using and give me feedback about how to build proper APIs in Chipmunk 6 for what you are trying to do.
+* MISC: Allow CGPoints to be used as cpVect on Mac OS X as well as iOS.
+
+
 CHANGES SINCE 5.3.1:
 * FIX: Collision begin callbacks were being called continuously for sensors or collisions rejected from the pre-solve callback.
 * FIX: Plugged a nasty memory leak when adding post-step callbacks.

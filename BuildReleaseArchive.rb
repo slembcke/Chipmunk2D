@@ -30,6 +30,7 @@ system("cp -R ../Objective-Chipmunk/Readme.rtf #{DIR}/Objective-Chipmunk/Objecti
 system("svn export ../iPhoneChipmunk #{DIR}/Objective-Chipmunk/iPhoneChipmunk")
 system("svn export ../iPhoneSnap #{DIR}/Objective-Chipmunk/iPhoneSnap")
 system("svn export ../SimpleObjectiveChipmunk #{DIR}/Objective-Chipmunk/SimpleObjectiveChipmunk")
+system("find #{DIR} -name '*.psd' -print0 | xargs -0 rm")
 
 system("tar -C /tmp -czf Chipmunk-#{VERS}.tgz Chipmunk-#{VERS}/")
 

@@ -663,7 +663,7 @@
 				OTHER_CFLAGS = "-ffast-math";
 				PREBINDING = NO;
 				PRODUCT_NAME = "Chipmunk-iPhone";
-				SDKROOT = iphonesimulator4.1;
+				SDKROOT = iphoneos;
 			};
 			name = Debug;
 		};

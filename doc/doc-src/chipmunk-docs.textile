@@ -1180,7 +1180,7 @@ Originally arbiters were going to be an internal data type that Chipmunk used th
 
 h2. Memory Management:
 
-You should never need to create an arbiter, nor will you ever need to free one as they are handled by the space. More importantly, _because_ they are managed by the space you should never store a reference to an arbiter as you don't know when they will be destroyed. Use them within the callback where they are given to you and then forget about them or copy out the information you need from them.
+You should never need to create an arbiter, nor will you ever need to free one as they are handled by the space. More importantly, because they are managed by the space you should never store a reference to an arbiter as you don't know when they will be destroyed. Use them within the callback where they are given to you and then forget about them or copy out the information you need.
 
 h2. Helper Functions:
 
@@ -1193,6 +1193,32 @@ p(expl). Get the shapes in the order that they were defined in the collision han
 
 p(expl). Returns true if this is the first step that the shapes touched. You can use this from @preSolve()@ and @postSolve()@ callbacks to know if a collision between two shapes is new without needing to flag a boolean in your begin callback.
 
+<pre><code>typedef struct cpContactPointSet {
+	int count;
+	
+	struct {
+		cpVect point, normal;
+		cpFloat dist;
+	} points[CP_MAX_CONTACTS_PER_ARBITER];
+} cpContactPointSet;
+
+static inline cpContactPointSet
+cpArbiterGetContactPointSet(const cpArbiter *arb)</code></pre>
+
+p(expl). Returns a @cpContactPointSet@ structure. This is the new and preferred API for working with contact points instead of the @cpArbiterGet*()@ functions as it is faster and slightly simpler.
+
+<pre><code>cpContactPointSet set = cpArbiterGetContactPointSet(arbiter);
+for(int i=0; i<set.count; i++){
+	// get and work with the collision point normal and penetration distance:
+	set.points[i].point
+	set.points[i].normal
+	set.points[i].dist
+}</code></pre>
+
+<pre><code>cpVect cpArbiterGetCount(cpArbiter *arb)</code></pre>
+
+p(expl). Returns the number of contact points in this arbiter.
+
 <pre><code>cpVect cpArbiterGetNormal(cpArbiter *arb, int i)</code></pre>
 
 p(expl). Returns the collision normal for the i'th contact point, flipping it if necessary. *Note:* Currently due to how Chipmunk's collision detection is implemented, the collision normals will be the same for all collision points. You can simply do @cpArbiterGetNormal(arb, 0)@ and not have to check each contact point. *Note:* calling this function from the @separate()@ callback is undefined.
@@ -1200,6 +1226,11 @@ p(expl). Returns the collision normal for the i'th contact point, flipping it if
 <pre><code>cpVect cpArbiterGetPoint(cpArbiter *arb, int i)</code></pre>
 
 p(expl). Returns the position of the i'th collision point. *Note:* calling this function from the @separate()@ callback is undefined.
+
+<pre><code>cpVect cpArbiterGetDepth(cpArbiter *arb, int i)</code></pre>
+
+p(expl). Returns the penetration depth of the i'th collision point.
+
 
 <pre><code>cpVect cpArbiterTotalImpulse(cpArbiter *arb);
 cpVect cpArbiterTotalImpulseWithFriction(cpArbiter *arb);</code></pre>
