@@ -30,8 +30,6 @@
 	beyond simple shape drawing and is very dependent on implementation details
 	about Chipmunk which may change with little to no warning.
 */
-
-//#define TIME_TRIAL
  
 #include <stdlib.h>
 #include <stdio.h>
@@ -44,10 +42,9 @@
 	#include "OpenGL/glu.h"
 	#include <GLUT/glut.h>
 #else
-	#ifdef WIN32
-		#include <windows.h>
-	#endif
-	
+#ifdef WIN32
+	#include <windows.h>
+#endif
 	#include <GL/gl.h>
 	#include <GL/glu.h>
 	#include <GL/glut.h>
@@ -263,8 +260,6 @@ demoTitle(chipmunkDemo *demo)
 static void
 runDemo(chipmunkDemo *demo)
 {
-	srand(45073);
-	
 	if(currDemo)
 		currDemo->destroyFunc();
 		
@@ -277,8 +272,6 @@ runDemo(chipmunkDemo *demo)
 	maxConstraints = 0;
 	space = currDemo->initFunc();
 
-	cpBBTreeOptimize(space->activeShapes);
-	
 	glutSetWindowTitle(demoTitle(currDemo));
 }
 
@@ -441,17 +434,14 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
+//#define TIME_TRIAL
 #ifdef TIME_TRIAL
 #include <sys/time.h>
 #include <unistd.h>
 void time_trial(int index, int count)
 {
-	srand(45073);
 	currDemo = demos[index];
 	space = currDemo->initFunc();
-	
-	cpBBTreeOptimize(space->activeShapes);
-	cpBBTreeOptimize(space->staticShapes);
 	
 	struct timeval start_time, end_time;
 	gettimeofday(&start_time, NULL);
@@ -479,7 +469,6 @@ main(int argc, const char **argv)
 	sleep(1);
 	for(int i=0; i<demoCount; i++){
 		if(i == 'l' - 'a') continue;
-		if(i == 'n' - 'a') continue;
 		time_trial(i, 1000);
 	}
 //	time_trial(0, 1000);

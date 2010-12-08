@@ -209,6 +209,13 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	arb->stamp = space->stamp;
 }
 
+// Iterator for active/static hash collisions.
+static void
+active2staticIter(cpShape *shape, cpSpace *space)
+{
+	cpSpaceHashQuery(space->staticShapes, shape, shape->bb, (cpSpaceHashQueryFunc)queryFunc, space);
+}
+
 // Hashset filter func to throw away old arbiters.
 static cpBool
 contactSetFilter(cpArbiter *arb, cpSpace *space)
@@ -285,21 +292,23 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	}
 	
 	// Pre-cache BBoxes and shape data.
-	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)updateBBCache, NULL);
+	cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)updateBBCache, NULL);
 	
 	space->locked = cpTrue;
 	
 	// Collide!
 	cpSpacePushFreshContactBuffer(space);
-	cpSpatialIndexReindexCollide(space->activeShapes, space->staticShapes, (cpSpatialIndexQueryCallback)queryFunc, space);
+	if(space->staticShapes->handleSet->entries)
+		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)active2staticIter, space);
+	cpSpaceHashQueryRehash(space->activeShapes, (cpSpaceHashQueryFunc)queryFunc, space);
 	
 	space->locked = cpFalse;
 	
 	// If body sleeping is enabled, do that now.
-//	if(space->sleepTimeThreshold != INFINITY){
-//		cpSpaceProcessComponents(space, dt);
-//		bodies = space->bodies; // rebuilt by processContactComponents()
-//	}
+	if(space->sleepTimeThreshold != INFINITY){
+		cpSpaceProcessComponents(space, dt);
+		bodies = space->bodies; // rebuilt by processContactComponents()
+	}
 	
 	// Clear out old cached arbiters and dispatch untouch functions
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilter, space);

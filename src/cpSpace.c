@@ -85,10 +85,9 @@ static void nothing(cpArbiter *arb, cpSpace *space, void *data){}
 
 // BBfunc callback for the spatial hash.
 static cpBB shapeBBFunc(cpShape *shape){return shape->bb;}
-static cpVect shapeVelocityFunc(cpShape *shape){return shape->body->v;}
 
 // Iterator functions for destructors.
-static void             freeWrap(void         *ptr, void *unused){          cpfree(ptr);}
+static void             freeWrap(void         *ptr, void *unused){            cpfree(ptr);}
 static void        shapeFreeWrap(cpShape      *ptr, void *unused){     cpShapeFree(ptr);}
 static void         bodyFreeWrap(cpBody       *ptr, void *unused){      cpBodyFree(ptr);}
 static void   constraintFreeWrap(cpConstraint *ptr, void *unused){cpConstraintFree(ptr);}
@@ -121,14 +120,8 @@ cpSpaceInit(cpSpace *space)
 	space->locked = 0;
 	space->stamp = 0;
 
-	if(0){
-		space->staticShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
-		space->activeShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
-	} else {
-		space->staticShapes = (cpSpatialIndex *)cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc);
-		space->activeShapes = (cpSpatialIndex *)cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc);
-		cpBBTreeSetVelocityFunc(space->activeShapes, (cpBBTreeVelocityFunc)shapeVelocityFunc);
-	}
+	space->staticShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpaceHashBBFunc)shapeBBFunc);
+	space->activeShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpaceHashBBFunc)shapeBBFunc);
 	
 	space->allocatedBuffers = cpArrayNew(0);
 	
@@ -165,8 +158,8 @@ cpSpaceNew(void)
 void
 cpSpaceDestroy(cpSpace *space)
 {
-	cpSpatialIndexFree(space->staticShapes);
-	cpSpatialIndexFree(space->activeShapes);
+	cpSpaceHashFree(space->staticShapes);
+	cpSpaceHashFree(space->activeShapes);
 	
 	cpArrayFree(space->bodies);
 	cpArrayFree(space->sleepingComponents);
@@ -209,8 +202,8 @@ cpSpaceFreeChildren(cpSpace *space)
 	cpArray *components = space->sleepingComponents;
 	while(components->num) cpBodyActivate((cpBody *)components->arr[0]);
 	
-	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIterator)&shapeFreeWrap, NULL);
-	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)&shapeFreeWrap, NULL);
+	cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)&shapeFreeWrap, NULL);
+	cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)&shapeFreeWrap, NULL);
 	cpArrayEach(space->bodies,           (cpArrayIter)&bodyFreeWrap,          NULL);
 	cpArrayEach(space->constraints,      (cpArrayIter)&constraintFreeWrap,    NULL);
 }
@@ -307,7 +300,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	cpBody *body = shape->body;
 	if(!body || body == &space->staticBody) return cpSpaceAddStaticShape(space, shape);
 	
-	cpAssert(!cpSpatialIndexContains(space->activeShapes, shape, shape->hashid),
+	cpAssert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
 		"Cannot add the same shape more than once.");
 	cpAssertSpaceUnlocked(space);
 	
@@ -315,7 +308,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	cpBodyAddShape(body, shape);
 	
 	cpShapeCacheBB(shape);
-	cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
+	cpSpaceHashInsert(space->activeShapes, shape, shape->hashid, shape->bb);
 		
 	return shape;
 }
@@ -323,7 +316,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 cpShape *
 cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
-	cpAssert(!cpSpatialIndexContains(space->staticShapes, shape, shape->hashid),
+	cpAssert(!cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
 		"Cannot add the same static shape more than once.");
 	cpAssertSpaceUnlocked(space);
 	
@@ -331,7 +324,7 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	
 	cpShapeCacheBB(shape);
 	cpSpaceActivateShapesTouchingShape(space, shape);
-	cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
+	cpSpaceHashInsert(space->staticShapes, shape, shape->hashid, shape->bb);
 	
 	return shape;
 }
@@ -397,27 +390,27 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 
 	cpBodyActivate(body);
 	
-	cpAssert(cpSpatialIndexContains(space->activeShapes, shape, shape->hashid),
-		"Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
+	cpAssertWarn(cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
+		"Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
 	
 	cpBodyRemoveShape(body, shape);
 	
 	removalContext context = {space, shape};
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
-	cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
+	cpSpaceHashRemove(space->activeShapes, shape, shape->hashid);
 }
 
 void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
-	cpAssert(cpSpatialIndexContains(space->staticShapes, shape, shape->hashid),
+	cpAssertWarn(cpHashSetFind(space->staticShapes->handleSet, shape->hashid, shape),
 		"Cannot remove a static or sleeping shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	removalContext context = {space, shape};
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
-	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
+	cpSpaceHashRemove(space->staticShapes, shape, shape->hashid);
 	
 	cpSpaceActivateShapesTouchingShape(space, shape);
 }
@@ -453,23 +446,21 @@ static void updateBBCache(cpShape *shape, void *unused){cpShapeCacheBB(shape);}
 void
 cpSpaceResizeStaticHash(cpSpace *space, cpFloat dim, int count)
 {
-// TODO spatial hash specific
-	cpSpaceHashResize((cpSpaceHash *)space->staticShapes, dim, count);
-	cpSpatialIndexReindex(space->staticShapes);
+	cpSpaceHashResize(space->staticShapes, dim, count);
+	cpSpaceHashRehash(space->staticShapes);
 }
 
 void
 cpSpaceResizeActiveHash(cpSpace *space, cpFloat dim, int count)
 {
-// TODO spatial hash specific
-	cpSpaceHashResize((cpSpaceHash *)space->activeShapes, dim, count);
+	cpSpaceHashResize(space->activeShapes, dim, count);
 }
 
 void 
 cpSpaceRehashStatic(cpSpace *space)
 {
-	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIterator)&updateBBCache, NULL);
-	cpSpatialIndexReindex(space->staticShapes);
+	cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)&updateBBCache, NULL);
+	cpSpaceHashRehash(space->staticShapes);
 }
 
 void
@@ -478,6 +469,6 @@ cpSpaceRehashShape(cpSpace *space, cpShape *shape)
 	cpShapeCacheBB(shape);
 	
 	// attempt to rehash the shape in both hashes
-	cpSpatialIndexReindexObject(space->activeShapes, shape, shape->hashid);
-	cpSpatialIndexReindexObject(space->staticShapes, shape, shape->hashid);
+	cpSpaceHashRehashObject(space->activeShapes, shape, shape->hashid);
+	cpSpaceHashRehashObject(space->staticShapes, shape, shape->hashid);
 }

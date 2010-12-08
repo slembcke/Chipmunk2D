@@ -74,8 +74,8 @@ componentActivate(cpBody *root)
 		if(!cpBodyIsRogue(body)) cpArrayPush(space->bodies, body);
 		
 		for(cpShape *shape=body->shapesList; shape; shape=shape->next){
-			cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
-			cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
+			cpSpaceHashRemove(space->staticShapes, shape, shape->hashid);
+			cpSpaceHashInsert(space->activeShapes, shape, shape->hashid, shape->bb);
 		}
 	} while((body = next) != root);
 	
@@ -207,8 +207,8 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 				next = body->node.next;
 				
 				for(cpShape *shape = body->shapesList; shape; shape = shape->next){
-					cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
-					cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
+					cpSpaceHashRemove(space->activeShapes, shape, shape->hashid);
+					cpSpaceHashInsert(space->staticShapes, shape, shape->hashid, shape->bb);
 				}
 			} while((body = next) != root);
 			
@@ -240,10 +240,10 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 	if(cpBodyIsSleeping(body)) return;
 	
 	for(cpShape *shape = body->shapesList; shape; shape = shape->next){
-		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
+		cpSpaceHashRemove(space->activeShapes, shape, shape->hashid);
 		
 		cpShapeCacheBB(shape);
-		cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
+		cpSpaceHashInsert(space->staticShapes, shape, shape->hashid, shape->bb);
 	}
 	
 	if(group){

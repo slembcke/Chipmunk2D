@@ -80,8 +80,8 @@ typedef struct cpSpace{
 	CP_PRIVATE(cpTimestamp stamp);
 
 	// The static and active shape spatial hashes.
-	CP_PRIVATE(cpSpatialIndex *staticShapes);
-	CP_PRIVATE(cpSpatialIndex *activeShapes);
+	CP_PRIVATE(cpSpaceHash *staticShapes);
+	CP_PRIVATE(cpSpaceHash *activeShapes);
 	
 	// List of bodies in the system.
 	CP_PRIVATE(cpArray *bodies);
@@ -97,6 +97,7 @@ typedef struct cpSpace{
 	// Head is the newest buffer, and each buffer points to a newer buffer.
 	// Head wraps around and points to the oldest (tail) buffer.
 	CP_PRIVATE(cpContactBufferHeader *contactBuffersHead);
+	CP_PRIVATE(cpContactBufferHeader *_contactBuffersTail_Deprecated);
 	
 	// List of buffers to be free()ed when destroying the space.
 	CP_PRIVATE(cpArray *allocatedBuffers);
