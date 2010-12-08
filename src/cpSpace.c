@@ -298,7 +298,7 @@ cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
 	cpBody *body = shape->body;
-	if(!body || body == &space->staticBody) return cpSpaceAddStaticShape(space, shape);
+	if(!body || cpBodyIsStatic(body)) return cpSpaceAddStaticShape(space, shape);
 	
 	cpAssert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
 		"Cannot add the same shape more than once.");
