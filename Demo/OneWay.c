@@ -20,7 +20,6 @@
  */
  
 #include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
 
 #include "chipmunk.h"
@@ -31,7 +30,6 @@ static cpSpace *space;
 
 typedef struct OneWayPlatform {
 	cpVect n; // direction objects may pass through
-	cpArray *passThruList; // list of objects passing through
 } OneWayPlatform;
 
 static OneWayPlatform platformInstance;
@@ -94,7 +92,6 @@ init(void)
 	
 	// We'll use the data pointer for the OneWayPlatform struct
 	platformInstance.n = cpv(0, 1); // let objects pass upwards
-	platformInstance.passThruList = cpArrayNew(0);
 	shape->data = &platformInstance;
 	
 	
@@ -118,8 +115,6 @@ destroy(void)
 {
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
-	
-	cpArrayFree(platformInstance.passThruList);
 }
 
 chipmunkDemo OneWay = {

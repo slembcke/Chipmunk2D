@@ -19,8 +19,10 @@
  * SOFTWARE.
  */
 
+//TODO delete this header?
+
 // Collides two cpShape structures.
 // Returns the number of contact points added to arr
 // which should be at least CP_MAX_CONTACTS_PER_ARBITER in length.
 // This function is very lonely in this header :(
-int cpCollideShapes(cpShape *a, cpShape *b, cpContact *arr);
+int cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr);

@@ -6,7 +6,7 @@
 #include <time.h>
 #include <string.h>
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 

@@ -81,7 +81,6 @@ extern chipmunkDemo Tank;
 
 static chipmunkDemo *demos[] = {
 	&LogoSmash,
-	&Simple,
 	&PyramidStack,
 	&Plink,
 	&Tumble,
@@ -104,6 +103,8 @@ static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
 static chipmunkDemo *currDemo = NULL;
 static const int firstDemoIndex = 'a' - 'a';
 
+static int paused = 0;
+static int step = 0;
 static int ticks = 0;
 static cpSpace *space;
 
@@ -229,13 +230,18 @@ display(void)
 	mouseBody->p = newPoint;
 	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0f);
 	mousePoint_last = newPoint;
-	currDemo->updateFunc(ticks);
-	
+  if(!paused || step > 0){
+    currDemo->updateFunc(ticks);
+    step = (step > 1 ? step - 1 : 0);
+  }
+  
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	drawSpace(space, currDemo->drawOptions ? currDemo->drawOptions : &options);
-	drawInstructions();
-	drawInfo();
+	if(!paused){
+    drawInstructions();
+    drawInfo();
+  }
 	drawString(-300, -210, messageString);
 		
 	glutSwapBuffers();
@@ -278,6 +284,10 @@ keyboard(unsigned char key, int x, int y)
 		runDemo(demos[index]);
 	} else if(key == '\r'){
 		runDemo(currDemo);
+  } else if(key == '`'){
+		paused = !paused;
+  } else if(key == '1'){
+		step += 1;
 	} else if(key == '-'){
 		options.drawHash = !options.drawHash;
 	} else if(key == '='){

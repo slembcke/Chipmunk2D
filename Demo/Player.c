@@ -20,10 +20,9 @@
  */
  
 #include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 

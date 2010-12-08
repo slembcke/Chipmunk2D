@@ -42,7 +42,6 @@ typedef struct cpCollisionHandler {
 	void *data;
 } cpCollisionHandler;
 
-#define CP_MAX_CONTACTS_PER_ARBITER 6
 typedef struct cpContactBufferHeader {
 	cpTimestamp stamp;
 	struct cpContactBufferHeader *next;
@@ -75,44 +74,46 @@ typedef struct cpSpace{
 	// *** Internally Used Fields
 	
 	// When the space is locked, you should not add or remove objects;
-	cpBool locked;
+	CP_PRIVATE(cpBool locked);
 	
 	// Time stamp. Is incremented on every call to cpSpaceStep().
-	cpTimestamp stamp;
+	CP_PRIVATE(cpTimestamp stamp);
 
 	// The static and active shape spatial hashes.
-	cpSpaceHash *staticShapes;
-	cpSpaceHash *activeShapes;
+	CP_PRIVATE(cpSpaceHash *staticShapes);
+	CP_PRIVATE(cpSpaceHash *activeShapes);
 	
 	// List of bodies in the system.
-	cpArray *bodies;
+	CP_PRIVATE(cpArray *bodies);
 	
 	// List of groups of sleeping bodies.
-	cpArray *sleepingComponents;
+	CP_PRIVATE(cpArray *sleepingComponents);
 	
 	// List of active arbiters for the impulse solver.
-	cpArray *arbiters, *pooledArbiters;
+	CP_PRIVATE(cpArray *arbiters);
+	CP_PRIVATE(cpArray *pooledArbiters);
 	
 	// Linked list ring of contact buffers.
-	// Head is the current buffer. Tail is the oldest buffer.
-	// The list points in the direction of tail->head.
-	cpContactBufferHeader *contactBuffersHead, *contactBuffersTail;
+	// Head is the newest buffer, and each buffer points to a newer buffer.
+	// Head wraps around and points to the oldest (tail) buffer.
+	CP_PRIVATE(cpContactBufferHeader *contactBuffersHead);
+	CP_PRIVATE(cpContactBufferHeader *_contactBuffersTail_Deprecated);
 	
 	// List of buffers to be free()ed when destroying the space.
-	cpArray *allocatedBuffers;
+	CP_PRIVATE(cpArray *allocatedBuffers);
 	
 	// Persistant contact set.
-	cpHashSet *contactSet;
+	CP_PRIVATE(cpHashSet *contactSet);
 	
 	// List of constraints in the system.
-	cpArray *constraints;
+	CP_PRIVATE(cpArray *constraints);
 	
 	// Set of collisionpair functions.
-	cpHashSet *collFuncSet;
+	CP_PRIVATE(cpHashSet *collFuncSet);
 	// Default collision handler.
-	cpCollisionHandler defaultHandler;
+	CP_PRIVATE(cpCollisionHandler defaultHandler);
 	
-	cpHashSet *postStepCallbacks;
+	CP_PRIVATE(cpHashSet *postStepCallbacks);
 	
 	cpBody staticBody;
 } cpSpace;
@@ -127,14 +128,6 @@ void cpSpaceFree(cpSpace *space);
 
 // Convenience function. Frees all referenced entities. (bodies, shapes and constraints)
 void cpSpaceFreeChildren(cpSpace *space);
-
-// Needed to be defined after the cpSpace type was closed
-static inline cpBool
-cpBodyIsStatic(cpBody *body)
-{
-	cpSpace *space = body->space;
-	return (space != ((cpSpace*)0) && body == &space->staticBody);
-}
 
 // Collision handler management functions.
 void cpSpaceSetDefaultCollisionHandler(
@@ -180,12 +173,19 @@ cpShape *cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, c
 
 // Segment query callback function
 typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, void *data);
-cpBool cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
+void cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
 cpShape *cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out);
 
 // BB query callback function
 typedef void (*cpSpaceBBQueryFunc)(cpShape *shape, void *data);
 void cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryFunc func, void *data);
+
+// Shape query callback function
+typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points, void *data);
+cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
+
+
+void cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape);
 
 
 // Iterator function for iterating the bodies in a space.
@@ -196,6 +196,8 @@ void cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data);
 void cpSpaceResizeStaticHash(cpSpace *space, cpFloat dim, int count);
 void cpSpaceResizeActiveHash(cpSpace *space, cpFloat dim, int count);
 void cpSpaceRehashStatic(cpSpace *space);
+
+void cpSpaceRehashShape(cpSpace *space, cpShape *shape);
 
 // Update the space.
 void cpSpaceStep(cpSpace *space, cpFloat dt);

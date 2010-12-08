@@ -7,12 +7,14 @@ Howling Moon Software (my company) is available for contracting if you want to m
 Objective-Chipmunk:
 The Objective-Chipmunk directory contains an Objective-C wrapper for the Chipmunk Physics Library as well as some sample code from shipping iPhone Apps. One reason Chipmunk was written in C was to allow easy wrapping for other languages. The primary advantages of a native Objective-C API include integrating with the Cocoa memory management model and the Chipmunk Object protocol. The Chipmunk Object protocol unifies the basic Chipmunk types as well as making it easy to create and manage custom composite collections of the basic types. Additionally, the wrapper adds many convenience methods for doing common setup tasks as well as helper methods that integrate it with the rest of the Cocoa Touch API and basic datatypes used on the iPhone. The wrapper tries to do things the Objective-C way, adding useful method variations where it makes sense to do so. If you are an iPhone developer, Objective-Chipmunk will definitely save you time.
 
+To try Objective-Chipmunk in your own projects see Objective-Chipmunk/Objective-Chipmunk/Readme.rtf.
+
 BUILDING:
-Mac OS X: There is an included XCode project file for building the static library and demo application. Alternatively you could use the CMake files.
+Mac OS X: There is an included XCode project file for building the static library and demo application. Alternatively you could use the CMake files. A Mac OS X version of Objective-Chipmunk is available for free upon request. We don't do regular builds as few people seem interested in it.
 
 iPhone: If you want a native Objective-C API, check out the Objective-Chipmunk directory for the Objective-C binding and some sample code from shipping iPhone Apps. It is inexpensive to license and should save you a lot of time. Otherwise, the XCode project can build a static library with all the proper compiler settings. Alternatively, you can just run iphonestatic.command in the macosx/ directory.  It will build you a fat library compiled as release for the device and debug for the simulator. After running it, you can simply drop the Chipmunk-iPhone directory into your iPhone project!
 
-UNIXes: A forum user was kind enough to make a set of CMake files for Chipmunk. This will require you to have CMake installed. To build run 'cmake .' then 'make'. This should build a dynamic library, a static library, and the demo application.
+UNIXes: A forum user was kind enough to make a set of CMake files for Chipmunk. This will require you to have CMake installed. To build run 'cmake .' then 'make'. This should build a dynamic library, a static library, and the demo application. A number of people have had build errors on Ubuntu due to not having GLUT or libxmu installed.
 
 Windows: Visual Studio projects are included in the msvc/ directory. I do not maintain these personally, but a number of forum members have assisted with them.
 
@@ -23,11 +25,41 @@ First of all, you can find the C API documentation in the doc/ directory.
 
 A good starting point is to take a look at the included Demo application. The demos all just set up a Chipmunk simulation space and the demo app draws the graphics directly out of that. This makes it easy to see how the Chipmunk API works without worrying about the graphics code. You are free to use the demo drawing routines in your own projects, though it is certainly not the recommended way of drawing Chipmunk objects as it pokes around at the undocumented parts of Chipmunk.
 
+If you are looking at Objective-Chipmunk for the iPhone, we have a number of example projects and tutorials in the Objective-Chipmunk directory.
+
 FORUM:
 http://www.slembcke.net/forums
 
 CONTACT:
 slembcke@gmail.com (also on Google Talk)
+
+CHANGES SINCE 5.3.2:
+* API: Added cpArbiteGetCount() to return the number of contact points.
+* API: Added helper functions for calculating areas of Chipmunk shapes as well as calculating polygon centroids and centering polygons on their centroid.
+* API: Shape queries. Query a shape to test for collisions if it were to be inserted into a space.
+* API: cpBodyInitStatic() and cpBodyNewStatic() for creating additional static (rogue) bodies.
+* API: cpBodySleepWithGroup() to allow you to create groups of sleeping objects that are woken up together.
+* API: Added overloaded *, +, - and == operators for C++ users.
+* API: Added cpSpaceActivateShapesTouchingShape() to query for and activate any shapes touching a given shape. Useful if you ever need to move a static body.
+* FIX: Fixed an extremely rare memory bug in the collision cache.
+* FIX: Fixed a memory leak in Objective-Chipmunk that could cause ChipmunkSpace objects to be leaked.
+* MISC: C struct fields and function that are considered private have been explicitly marked as such. Defining CP_ALLOW_PRIVATE_ACCESS to 0 in Chipmunk.h will let you test which parts of the private API that you are using and give me feedback about how to build proper APIs in Chipmunk 6 for what you are trying to do.
+* MISC: Allow CGPoints to be used as cpVect on Mac OS X as well as iOS.
+
+
+CHANGES SINCE 5.3.1:
+* FIX: Collision begin callbacks were being called continuously for sensors or collisions rejected from the pre-solve callback.
+* FIX: Plugged a nasty memory leak when adding post-step callbacks.
+* FIX: Shapes were being added to the spatial hash using an uninitialized bounding box in some cases.
+* FIX: Perfectly aligned circle shapes now push each other apart.
+* FIX: cpBody setter functions now call cpBodyActivate().
+* FIX: Collision handler targets are released in Objective-Chipmunk when they are no longer needed instead of waiting for the space to be deallocated.
+* API: cpSpaceSegmentQuery() no longer returns a boolean. Use cpSpaceSegmentQueryFirst() instead as it's more efficient.
+* NEW: cpSpaceRehashShape() Rehash an individual shape, active or static.
+* NEW: cpBodySleep() Force a body to fall asleep immediately.
+* NEW: cpConstraintGetImpulse() Return the most recent impulse applied by a constraint.
+* NEW: Added setter functions for the groove joint endpoints.
+* MISC: A number of other minor optimizations and fixes.
 
 CHANGES SINCE 5.3.0:
  * NEW: Added a brand new tutorial for Objective-Chipmunk: SimpleObjectiveChipmunk that can be found in the Objective-Chipmunk folder.

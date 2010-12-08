@@ -21,8 +21,9 @@
  
 #include <stdlib.h>
 #include <float.h>
+#include <stdarg.h>
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 
 // initialized in cpInitChipmunk()
 cpBody cpStaticBodySingleton;
@@ -62,11 +63,9 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	
 	body->space = NULL;
 	body->shapesList = NULL;
-
-	body->node.parent = NULL;
-	body->node.next = NULL;
-	body->node.rank = 0;
-	body->node.idleTime = 0.0f;
+	
+	cpComponentNode node = {NULL, NULL, 0, 0.0f};
+	body->node = node;
 	
 	return body;
 }
@@ -75,6 +74,21 @@ cpBody*
 cpBodyNew(cpFloat m, cpFloat i)
 {
 	return cpBodyInit(cpBodyAlloc(), m, i);
+}
+
+cpBody *
+cpBodyInitStatic(cpBody *body)
+{
+	cpBodyInit(body, (cpFloat)INFINITY, (cpFloat)INFINITY);
+	body->node.idleTime = (cpFloat)INFINITY;
+	
+	return body;
+}
+
+cpBody *
+cpBodyNewStatic()
+{
+	return cpBodyInitStatic(cpBodyAlloc());
 }
 
 void cpBodyDestroy(cpBody *body){}
