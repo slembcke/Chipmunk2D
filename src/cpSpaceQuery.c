@@ -49,8 +49,8 @@ cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, 
 	pointQueryContext context = {layers, group, func, data};
 	
 	cpBool locked = space->locked; space->locked = cpTrue; {
-		cpSpaceHashPointQuery(space->activeShapes, point, (cpSpaceHashQueryFunc)pointQueryHelper, &context);
-		cpSpaceHashPointQuery(space->staticShapes, point, (cpSpaceHashQueryFunc)pointQueryHelper, &context);
+    cpSpatialIndexPointQuery(space->activeShapes, point, (cpSpatialIndexQueryCallback)pointQueryHelper, &context);
+    cpSpatialIndexPointQuery(space->staticShapes, point, (cpSpatialIndexQueryCallback)pointQueryHelper, &context);
 	} space->locked = locked;
 }
 
@@ -114,8 +114,8 @@ cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, c
 	};
 	
 	cpBool locked = space->locked; space->locked = cpTrue; {
-		cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
-		cpSpaceHashSegmentQuery(space->activeShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFunc, data);
+    cpSpatialIndexSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryCallback)segQueryFunc, data);
+    cpSpatialIndexSegmentQuery(space->activeShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryCallback)segQueryFunc, data);
 	} space->locked = locked;
 }
 
@@ -131,8 +131,7 @@ segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo 
 	cpSegmentQueryInfo info;
 	
 	if(
-		!(shape->group && context->group == shape->group) &&
-		(context->layers&shape->layers) &&
+		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
 		!shape->sensor &&
 		cpShapeSegmentQuery(shape, context->start, context->end, &info) &&
 		info.t < out->t
@@ -158,8 +157,8 @@ cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers laye
 		layers, group
 	};
 	
-	cpSpaceHashSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpaceHashSegmentQueryFunc)segQueryFirst, out);
-	cpSpaceHashSegmentQuery(space->activeShapes, &context, start, end, out->t, (cpSpaceHashSegmentQueryFunc)segQueryFirst, out);
+	cpSpatialIndexSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryCallback)segQueryFirst, out);
+	cpSpatialIndexSegmentQuery(space->activeShapes, &context, start, end, out->t, (cpSpatialIndexSegmentQueryCallback)segQueryFirst, out);
 	
 	return out->shape;
 }
@@ -190,8 +189,8 @@ cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceB
 	bbQueryContext context = {layers, group, func, data};
 	
 	cpBool locked = space->locked; space->locked = cpTrue; {
-		cpSpaceHashQuery(space->activeShapes, &bb, bb, (cpSpaceHashQueryFunc)bbQueryHelper, &context);
-		cpSpaceHashQuery(space->staticShapes, &bb, bb, (cpSpaceHashQueryFunc)bbQueryHelper, &context);
+    cpSpatialIndexQuery(space->activeShapes, &bb, bb, (cpSpatialIndexQueryCallback)bbQueryHelper, &context);
+    cpSpatialIndexQuery(space->staticShapes, &bb, bb, (cpSpatialIndexQueryCallback)bbQueryHelper, &context);
 	} space->locked = locked;
 }
 
@@ -248,8 +247,8 @@ cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, vo
 	shapeQueryContext context = {func, data, cpFalse};
 	
 	cpBool locked = space->locked; space->locked = cpTrue; {
-		cpSpaceHashQuery(space->activeShapes, shape, bb, (cpSpaceHashQueryFunc)shapeQueryHelper, &context);
-		cpSpaceHashQuery(space->staticShapes, shape, bb, (cpSpaceHashQueryFunc)shapeQueryHelper, &context);
+    cpSpatialIndexQuery(space->activeShapes, &bb, bb, (cpSpatialIndexQueryCallback)shapeQueryHelper, &context);
+    cpSpatialIndexQuery(space->staticShapes, &bb, bb, (cpSpatialIndexQueryCallback)shapeQueryHelper, &context);
 	} space->locked = locked;
 	
 	return context.anyCollision;

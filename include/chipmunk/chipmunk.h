@@ -83,7 +83,10 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 #include "cpBB.h"
 #include "cpArray.h"
 #include "cpHashSet.h"
+
+#include "cpSpatialIndex.h"
 #include "cpSpaceHash.h"
+#include "cpBBTree.h"
 
 #include "cpBody.h"
 #include "cpShape.h"

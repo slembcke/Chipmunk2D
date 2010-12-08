@@ -30,9 +30,10 @@
 	#include "OpenGL/glu.h"
 	#include <GLUT/glut.h>
 #else
-#ifdef WIN32
-	#include <windows.h>
-#endif
+	#ifdef WIN32
+		#include <windows.h>
+	#endif
+	
 	#include <GL/gl.h>
 	#include <GL/glu.h>
 	#include <GL/glut.h>
@@ -404,63 +405,32 @@ drawBB(cpShape *shape, void *unused)
 	} glEnd();
 }
 
-// copied from cpSpaceHash.c
-static inline cpHashValue
-hash_func(cpHashValue x, cpHashValue y, cpHashValue n)
-{
-	return (x*1640531513ul ^ y*2654435789ul) % n;
-}
-
-static void
-drawSpatialHash(cpSpaceHash *hash)
-{
-	cpBB bb = cpBBNew(-320, -240, 320, 240);
-	
-	cpFloat dim = hash->celldim;
-	int n = hash->numcells;
-	
-	int l = (int)floor(bb.l/dim);
-	int r = (int)floor(bb.r/dim);
-	int b = (int)floor(bb.b/dim);
-	int t = (int)floor(bb.t/dim);
-	
-	for(int i=l; i<=r; i++){
-		for(int j=b; j<=t; j++){
-			int cell_count = 0;
-			
-			int index = hash_func(i,j,n);
-			for(cpSpaceHashBin *bin = hash->table[index]; bin; bin = bin->next)
-				cell_count++;
-			
-			GLfloat v = 1.0f - (GLfloat)cell_count/10.0f;
-			glColor3f(v,v,v);
-			glRectf(i*dim, j*dim, (i + 1)*dim, (j + 1)*dim);
-		}
-	}
-}
+void cpBBTreeRenderDebug(cpSpatialIndex *index);
+void cpSpaceHashRenderDebug(cpSpatialIndex *index);
 
 void
 drawSpace(cpSpace *space, drawSpaceOptions *options)
 {
 	if(options->drawHash){
-		glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
-		drawSpatialHash(space->activeShapes);
-		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
-		drawSpatialHash(space->staticShapes);
-		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+//		glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
+//		drawSpatialHash(space->activeShapes);
+//		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+//		drawSpatialHash(space->staticShapes);
+//		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		cpBBTreeRenderDebug(space->activeShapes);
 	}
 	
 	glLineWidth(options->lineThickness);
 	if(options->drawShapes){
-		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)drawObject, space);
-		cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)drawObject, space);
+		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)drawObject, space);
+		cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIterator)drawObject, space);
 	}
 	
 	glLineWidth(1.0f);
 	if(options->drawBBs){
 		glColor3f(0.3f, 0.5f, 0.3f);
-		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)drawBB, NULL);
-		cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)drawBB, NULL);
+		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)drawBB, NULL);
+		cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIterator)drawBB, NULL);
 	}
 
 	cpArray *constraints = space->constraints;

@@ -39,18 +39,14 @@ typedef struct cpSpaceHashBin{
 	struct cpSpaceHashBin *next;
 } cpSpaceHashBin;
 
-// BBox callback. Called whenever the hash needs a bounding box from an object.
-typedef cpBB (*cpSpaceHashBBFunc)(void *obj);
-
 typedef struct cpSpaceHash{
+	cpSpatialIndex spatialIndex;
+	
 	// Number of cells in the table.
 	CP_PRIVATE(int numcells);
 	// Dimentions of the cells.
 	CP_PRIVATE(cpFloat celldim);
 	
-	// BBox callback.
-	CP_PRIVATE(cpSpaceHashBBFunc bbfunc);
-
 	// Hashset of the handles and the recycled ones.
 	CP_PRIVATE(cpHashSet *handleSet);
 	CP_PRIVATE(cpArray *pooledHandles);
@@ -68,43 +64,8 @@ typedef struct cpSpaceHash{
 
 //Basic allocation/destruction functions.
 cpSpaceHash *cpSpaceHashAlloc(void);
-cpSpaceHash *cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int cells, cpSpaceHashBBFunc bbfunc);
-cpSpaceHash *cpSpaceHashNew(cpFloat celldim, int cells, cpSpaceHashBBFunc bbfunc);
-
-void cpSpaceHashDestroy(cpSpaceHash *hash);
-void cpSpaceHashFree(cpSpaceHash *hash);
+cpSpaceHash *cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int cells, cpSpatialIndexBBFunc bbfunc);
+cpSpaceHash *cpSpaceHashNew(cpFloat celldim, int cells, cpSpatialIndexBBFunc bbfunc);
 
 // Resize the hashtable. (Does not rehash! You must call cpSpaceHashRehash() if needed.)
 void cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells);
-
-// Add an object to the hash.
-void cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue id, cpBB _deprecated_ignored);
-// Remove an object from the hash.
-void cpSpaceHashRemove(cpSpaceHash *hash, void *obj, cpHashValue id);
-
-// Iterator function
-typedef void (*cpSpaceHashIterator)(void *obj, void *data);
-// Iterate over the objects in the hash.
-void cpSpaceHashEach(cpSpaceHash *hash, cpSpaceHashIterator func, void *data);
-
-// Rehash the contents of the hash.
-void cpSpaceHashRehash(cpSpaceHash *hash);
-// Rehash only a specific object.
-void cpSpaceHashRehashObject(cpSpaceHash *hash, void *obj, cpHashValue id);
-
-// Query callback.
-typedef void (*cpSpaceHashQueryFunc)(void *obj1, void *obj2, void *data);
-// Point query the hash. A reference to the query point is passed as obj1 to the query callback.
-void cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpaceHashQueryFunc func, void *data);
-// Query the hash for a given BBox.
-void cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc func, void *data);
-// Run a query for the object, then insert it. (Optimized case)
-void cpSpaceHashQueryInsert(cpSpaceHash *hash, void *obj, cpBB bb, cpSpaceHashQueryFunc func, void *data);
-// Rehashes while querying for each object. (Optimized case) 
-void cpSpaceHashQueryRehash(cpSpaceHash *hash, cpSpaceHashQueryFunc func, void *data);
-
-// Segment Query callback.
-// Return value is uesd for early exits of the query.
-// If while traversing the grid, the raytrace function detects that an entire grid cell is beyond the hit point, it will stop the trace.
-typedef cpFloat (*cpSpaceHashSegmentQueryFunc)(void *obj1, void *obj2, void *data);
-void cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpaceHashSegmentQueryFunc func, void *data);

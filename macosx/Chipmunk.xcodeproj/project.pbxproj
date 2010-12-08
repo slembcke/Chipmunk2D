@@ -65,6 +65,14 @@
 		D38011630E984FA400A3D7FA /* cpDampedSpring.h in Headers */ = {isa = PBXBuildFile; fileRef = D38011600E984FA400A3D7FA /* cpDampedSpring.h */; };
 		D38687D30BAFC695008B7008 /* libChipmunk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D34963BB0B56CAA300CAD239 /* libChipmunk.a */; };
 		D393275C0EA02C710026F6A2 /* Pump.c in Sources */ = {isa = PBXBuildFile; fileRef = D393275B0EA02C710026F6A2 /* Pump.c */; };
+		D3AA477512AF0F8900E27AAB /* cpBBTree.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AA477312AF0F8900E27AAB /* cpBBTree.c */; };
+		D3AA477612AF0F8900E27AAB /* cpSpatialIndex.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AA477412AF0F8900E27AAB /* cpSpatialIndex.c */; };
+		D3AA477712AF0F8900E27AAB /* cpBBTree.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AA477312AF0F8900E27AAB /* cpBBTree.c */; };
+		D3AA477812AF0F8900E27AAB /* cpSpatialIndex.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AA477412AF0F8900E27AAB /* cpSpatialIndex.c */; };
+		D3AA477B12AF0F9B00E27AAB /* cpBBTree.h in Headers */ = {isa = PBXBuildFile; fileRef = D3AA477912AF0F9B00E27AAB /* cpBBTree.h */; };
+		D3AA477C12AF0F9B00E27AAB /* cpSpatialIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = D3AA477A12AF0F9B00E27AAB /* cpSpatialIndex.h */; };
+		D3AA477D12AF0F9B00E27AAB /* cpBBTree.h in Headers */ = {isa = PBXBuildFile; fileRef = D3AA477912AF0F9B00E27AAB /* cpBBTree.h */; };
+		D3AA477E12AF0F9B00E27AAB /* cpSpatialIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = D3AA477A12AF0F9B00E27AAB /* cpSpatialIndex.h */; };
 		D3BACF8310B5DF8900376394 /* OneWay.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BACF8210B5DF8900376394 /* OneWay.c */; };
 		D3BAD65810B8B52900376394 /* Player.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAD0C710B61AAD00376394 /* Player.c */; };
 		D3BAF9C50E9C4F250039DD5C /* PyramidStack.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAF9C40E9C4F250039DD5C /* PyramidStack.c */; };
@@ -163,6 +171,10 @@
 		D38011600E984FA400A3D7FA /* cpDampedSpring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpDampedSpring.h; path = ../../include/chipmunk/constraints/cpDampedSpring.h; sourceTree = "<group>"; };
 		D393275B0EA02C710026F6A2 /* Pump.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Pump.c; sourceTree = "<group>"; };
 		D39F478A0FD4AB4E00B244CA /* chipmunk_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_types.h; path = ../include/chipmunk/chipmunk_types.h; sourceTree = SOURCE_ROOT; };
+		D3AA477312AF0F8900E27AAB /* cpBBTree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpBBTree.c; sourceTree = "<group>"; };
+		D3AA477412AF0F8900E27AAB /* cpSpatialIndex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpSpatialIndex.c; sourceTree = "<group>"; };
+		D3AA477912AF0F9B00E27AAB /* cpBBTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpBBTree.h; path = ../include/chipmunk/cpBBTree.h; sourceTree = SOURCE_ROOT; };
+		D3AA477A12AF0F9B00E27AAB /* cpSpatialIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpSpatialIndex.h; path = ../include/chipmunk/cpSpatialIndex.h; sourceTree = SOURCE_ROOT; };
 		D3B718E00AB2BC8900B500C9 /* chipmunk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chipmunk.c; path = ../src/chipmunk.c; sourceTree = "<group>"; };
 		D3BACF8210B5DF8900376394 /* OneWay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = OneWay.c; sourceTree = "<group>"; };
 		D3BAD0C710B61AAD00376394 /* Player.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Player.c; sourceTree = "<group>"; };
@@ -247,8 +259,12 @@
 		D37E24570AAAA48800BB4C50 /* Collision */ = {
 			isa = PBXGroup;
 			children = (
+				D3AA477A12AF0F9B00E27AAB /* cpSpatialIndex.h */,
+				D3AA477412AF0F8900E27AAB /* cpSpatialIndex.c */,
 				D3E5F2DE0AAA562B004E361B /* cpSpaceHash.h */,
 				D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */,
+				D3AA477912AF0F9B00E27AAB /* cpBBTree.h */,
+				D3AA477312AF0F8900E27AAB /* cpBBTree.c */,
 				D3E5F0C10AA75CA9004E361B /* cpArbiter.h */,
 				D3E5F0C20AA75CA9004E361B /* cpArbiter.c */,
 				D37E22FC0AAA63B800BB4C50 /* cpShape.h */,
@@ -411,6 +427,8 @@
 				D37BB8F10EAB06B600C70958 /* cpSimpleMotor.h in Headers */,
 				D35420C00F4E1FD70017F4F7 /* chipmunk_unsafe.h in Headers */,
 				D36D87841012D63600DB5078 /* cpRatchetJoint.h in Headers */,
+				D3AA477B12AF0F9B00E27AAB /* cpBBTree.h in Headers */,
+				D3AA477C12AF0F9B00E27AAB /* cpSpatialIndex.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,6 +436,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D3AA477D12AF0F9B00E27AAB /* cpBBTree.h in Headers */,
+				D3AA477E12AF0F9B00E27AAB /* cpSpatialIndex.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -544,6 +564,8 @@
 				D36D87831012D63600DB5078 /* cpRatchetJoint.c in Sources */,
 				D34E9E97125581DD002C0FE5 /* cpSpaceComponent.c in Sources */,
 				D34E9EA312558A7C002C0FE5 /* cpSpaceStep.c in Sources */,
+				D3AA477512AF0F8900E27AAB /* cpBBTree.c in Sources */,
+				D3AA477612AF0F8900E27AAB /* cpSpatialIndex.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -577,6 +599,8 @@
 				D3C3790B11063C57003EF1D9 /* cpRatchetJoint.c in Sources */,
 				D34E9E98125581DD002C0FE5 /* cpSpaceComponent.c in Sources */,
 				D34E9EA412558A7C002C0FE5 /* cpSpaceStep.c in Sources */,
+				D3AA477712AF0F8900E27AAB /* cpBBTree.c in Sources */,
+				D3AA477812AF0F8900E27AAB /* cpSpatialIndex.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
