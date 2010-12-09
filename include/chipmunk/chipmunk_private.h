@@ -68,3 +68,59 @@ void cpHashSetEach(cpHashSet *set, cpHashSetIterFunc func, void *data);
 
 typedef cpBool (*cpHashSetFilterFunc)(void *elt, void *data);
 void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);
+
+#pragma mark Arbiters
+
+cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash);
+cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
+
+void cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
+void cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv);
+void cpArbiterApplyCachedImpulse(cpArbiter *arb);
+void cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef);
+
+#pragma mark Collision Functions
+
+int cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr);
+
+static inline cpFloat
+cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
+{
+	cpVect *verts = poly->CP_PRIVATE(tVerts);
+	cpFloat min = cpvdot(n, verts[0]);
+	
+	int i;
+	for(i=1; i<poly->CP_PRIVATE(numVerts); i++)
+		min = cpfmin(min, cpvdot(n, verts[i]));
+	
+	return min - d;
+}
+
+static inline cpBool
+cpPolyShapeContainsVert(const cpPolyShape *poly, const cpVect v)
+{
+	cpPolyShapeAxis *axes = poly->CP_PRIVATE(tAxes);
+	
+	int i;
+	for(i=0; i<poly->CP_PRIVATE(numVerts); i++){
+		cpFloat dist = cpvdot(axes[i].n, v) - axes[i].d;
+		if(dist > 0.0f) return cpFalse;
+	}
+	
+	return cpTrue;
+}
+
+static inline cpBool
+cpPolyShapeContainsVertPartial(const cpPolyShape *poly, const cpVect v, const cpVect n)
+{
+	cpPolyShapeAxis *axes = poly->CP_PRIVATE(tAxes);
+	
+	int i;
+	for(i=0; i<poly->CP_PRIVATE(numVerts); i++){
+		if(cpvdot(axes[i].n, n) < 0.0f) continue;
+		cpFloat dist = cpvdot(axes[i].n, v) - axes[i].d;
+		if(dist > 0.0f) return cpFalse;
+	}
+	
+	return cpTrue;
+}

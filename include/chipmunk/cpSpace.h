@@ -19,16 +19,16 @@
  * SOFTWARE.
  */
 
-struct cpSpace;
+typedef struct cpSpace cpSpace;
 
 // Number of frames that contact information should persist.
 extern cpTimestamp cp_contact_persistence;
 
 // User collision handler function types.
-typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
-typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
-typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
-typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, struct cpSpace *space, void *data);
+typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, void *data);
+typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
+typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
+typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data);
 
 // Structure for holding collision pair function information.
 // Used internally.
@@ -48,7 +48,7 @@ typedef struct cpContactBufferHeader {
 	unsigned int numContacts;
 } cpContactBufferHeader;
 
-typedef struct cpSpace{
+struct cpSpace {
 	// *** User definable fields
 	
 	// Number of iterations to use in the impulse solver to solve contacts.
@@ -115,7 +115,7 @@ typedef struct cpSpace{
 	CP_PRIVATE(cpHashSet *postStepCallbacks);
 	
 	cpBody staticBody;
-} cpSpace;
+};
 
 // Basic allocation/destruction functions.
 cpSpace* cpSpaceAlloc(void);

@@ -444,6 +444,18 @@ cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 	cpArrayDeleteObj(space->constraints, constraint);
 }
 
+#pragma mark Iteration
+
+// TODO copy fix from 5.x
+void
+cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data)
+{
+	cpArray *bodies = space->bodies;
+	
+	for(int i=0; i<bodies->num; i++)
+		func((cpBody *)bodies->arr[i], data);
+}
+
 #pragma mark Spatial Hash Management
 
 static void updateBBCache(cpShape *shape, void *unused){cpShapeCacheBB(shape);}

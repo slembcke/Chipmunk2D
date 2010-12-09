@@ -159,9 +159,6 @@ CP_DeclareShapeGetter(cpSegmentShape, cpFloat, Radius);
 // For determinism, you can reset the shape id counter.
 void cpResetShapeIdCounter(void);
 
-// Directed segment queries against individual shapes.
-void cpSegmentQueryInfoPrint(cpSegmentQueryInfo *info);
-
 cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
 
 static inline cpVect

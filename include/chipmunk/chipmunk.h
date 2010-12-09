@@ -91,9 +91,7 @@ typedef struct cpHashSet cpHashSet;
 #include "cpShape.h"
 #include "cpPolyShape.h"
 
-#include "cpArbiter.h"
-#include "cpCollision.h"
-	
+#include "cpArbiter.h"	
 #include "constraints/cpConstraint.h"
 
 #include "cpSpace.h"

@@ -19,13 +19,10 @@
  * SOFTWARE.
  */
  
- struct cpArbiter;
- struct cpSpace;
- struct cpCollisionHandler;
-
-// Determines how fast penetrations resolve themselves.
+// Determines how fast penetrations resolve themselves expressed as a percentage per step. Defaults to 0.1.
 extern cpFloat cp_bias_coef;
-// Amount of allowed penetration. Used to reduce vibrating contacts.
+
+// Amount of allowed penetration. Used to reduce oscillating contacts and keep the collision cache warm. Defaults to 0.1.
 extern cpFloat cp_collision_slop;
 
 // Data structure for contact points.
@@ -47,14 +44,7 @@ typedef struct cpContact {
 	CP_PRIVATE(cpHashValue hash);
 } cpContact;
 
-// Contacts are always allocated in groups.
-cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash);
-
-// Sum the contact impulses. (Can be used after cpSpaceStep() returns)
-cpVect CP_PRIVATE(cpContactsSumImpulses)(cpContact *contacts, int numContacts);
-cpVect CP_PRIVATE(cpContactsSumImpulsesWithFriction)(cpContact *contacts, int numContacts);
-
-#define CP_MAX_CONTACTS_PER_ARBITER 6
+#define CP_MAX_CONTACTS_PER_ARBITER 4
 
 typedef enum cpArbiterState {
 	cpArbiterStateNormal,
@@ -72,8 +62,6 @@ typedef struct cpArbiter {
 	
 	// The two shapes and bodies involved in the collision.
 	// These variables are NOT in the order defined by the collision handler.
-	// Using CP_ARBITER_GET_SHAPES and CP_ARBITER_GET_BODIES will save you from
-	// many headaches
 	cpShape CP_PRIVATE(*a), CP_PRIVATE(*b);
 	
 	// Calculated before calling the pre-solve collision handler
@@ -92,18 +80,6 @@ typedef struct cpArbiter {
 	CP_PRIVATE(cpBool swappedColl);
 	CP_PRIVATE(cpArbiterState state);
 } cpArbiter;
-
-// Arbiters are allocated in large buffers by the space and don't require a destroy function
-cpArbiter* CP_PRIVATE(cpArbiterInit)(cpArbiter *arb, cpShape *a, cpShape *b);
-
-// These functions are all intended to be used internally.
-// Inject new contact points into the arbiter while preserving contact history.
-void CP_PRIVATE(cpArbiterUpdate)(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
-// Precalculate values used by the solver.
-void CP_PRIVATE(cpArbiterPreStep)(cpArbiter *arb, cpFloat dt_inv);
-void CP_PRIVATE(cpArbiterApplyCachedImpulse)(cpArbiter *arb);
-// Run an iteration of the solver on the arbiter.
-void CP_PRIVATE(cpArbiterApplyImpulse)(cpArbiter *arb, cpFloat eCoef);
 
 // Arbiter Helper Functions
 cpVect cpArbiterTotalImpulse(cpArbiter *arb);

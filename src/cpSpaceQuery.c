@@ -70,16 +70,6 @@ cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpGroup gr
 }
 
 
-// TODO probably should deprecate this
-void
-cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data)
-{
-	cpArray *bodies = space->bodies;
-	
-	for(int i=0; i<bodies->num; i++)
-		func((cpBody *)bodies->arr[i], data);
-}
-
 #pragma mark Segment Query Functions
 
 typedef struct segQueryContext {

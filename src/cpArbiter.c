@@ -92,13 +92,7 @@ cpContactsEstimateCrushingImpulse(cpContact *contacts, int numContacts)
 void
 cpArbiterIgnore(cpArbiter *arb)
 {
-	arb->state = cpArbiterStateIgnore;
-}
-
-cpArbiter*
-cpArbiterAlloc(void)
-{
-	return (cpArbiter *)cpcalloc(1, sizeof(cpArbiter));
+	arb->state = cpArbiterStateIgnore;
 }
 
 cpArbiter*
@@ -121,27 +115,6 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 	arb->state = cpArbiterStateFirstColl;
 	
 	return arb;
-}
-
-cpArbiter*
-cpArbiterNew(cpShape *a, cpShape *b)
-{
-	return cpArbiterInit(cpArbiterAlloc(), a, b);
-}
-
-void
-cpArbiterDestroy(cpArbiter *arb)
-{
-//	if(arb->contacts) cpfree(arb->contacts);
-}
-
-void
-cpArbiterFree(cpArbiter *arb)
-{
-	if(arb){
-		cpArbiterDestroy(arb);
-		cpfree(arb);
-	}
 }
 
 void
