@@ -237,8 +237,8 @@ cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, vo
 	shapeQueryContext context = {func, data, cpFalse};
 	
 	cpBool locked = space->locked; space->locked = cpTrue; {
-    cpSpatialIndexQuery(space->activeShapes, &bb, bb, (cpSpatialIndexQueryCallback)shapeQueryHelper, &context);
-    cpSpatialIndexQuery(space->staticShapes, &bb, bb, (cpSpatialIndexQueryCallback)shapeQueryHelper, &context);
+    cpSpatialIndexQuery(space->activeShapes, shape, bb, (cpSpatialIndexQueryCallback)shapeQueryHelper, &context);
+    cpSpatialIndexQuery(space->staticShapes, shape, bb, (cpSpatialIndexQueryCallback)shapeQueryHelper, &context);
 	} space->locked = locked;
 	
 	return context.anyCollision;

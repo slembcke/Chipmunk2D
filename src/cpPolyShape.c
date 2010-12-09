@@ -30,14 +30,26 @@ cpPolyShapeAlloc(void)
 	return (cpPolyShape *)cpcalloc(1, sizeof(cpPolyShape));
 }
 
-static void
+static cpBB
 cpPolyShapeTransformVerts(cpPolyShape *poly, cpVect p, cpVect rot)
 {
 	cpVect *src = poly->verts;
 	cpVect *dst = poly->tVerts;
 	
-	for(int i=0; i<poly->numVerts; i++)
-		dst[i] = cpvadd(p, cpvrotate(src[i], rot));
+	cpFloat l = INFINITY, r = -INFINITY;
+	cpFloat b = INFINITY, t = -INFINITY;
+	
+	for(int i=0; i<poly->numVerts; i++){
+		cpVect v = cpvadd(p, cpvrotate(src[i], rot));
+		
+		dst[i] = v;
+		l = cpfmin(l, v.x);
+		r = cpfmax(r, v.x);
+		b = cpfmin(b, v.y);
+		t = cpfmax(t, v.y);
+	}
+	
+	return cpBBNew(l, b, r, t);
 }
 
 static void
@@ -58,27 +70,10 @@ cpPolyShapeCacheData(cpShape *shape, cpVect p, cpVect rot)
 {
 	cpPolyShape *poly = (cpPolyShape *)shape;
 	
-	cpFloat l, b, r, t;
-	
 	cpPolyShapeTransformAxes(poly, p, rot);
-	cpPolyShapeTransformVerts(poly, p, rot);
+	cpBB bb = shape->bb = cpPolyShapeTransformVerts(poly, p, rot);
 	
-	cpVect *verts = poly->tVerts;
-	l = r = verts[0].x;
-	b = t = verts[0].y;
-	
-	// TODO do as part of cpPolyShapeTransformVerts?
-	for(int i=1; i<poly->numVerts; i++){
-		cpVect v = verts[i];
-		
-		l = cpfmin(l, v.x);
-		r = cpfmax(r, v.x);
-		
-		b = cpfmin(b, v.y);
-		t = cpfmax(t, v.y);
-	}
-	
-	return cpBBNew(l, b, r, t);
+	return bb;
 }
 
 static void

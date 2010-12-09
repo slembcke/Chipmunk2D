@@ -20,8 +20,8 @@
  */
  
 // Forward declarations required for defining other structs.
-struct cpShape;
-struct cpShapeClass;
+typedef struct cpShape cpShape;
+typedef struct cpShapeClass cpShapeClass;
 
 typedef struct cpSegmentQueryInfo {
 	struct cpShape *shape; // shape that was hit, NULL if no collision
@@ -38,7 +38,7 @@ typedef enum cpShapeType{
 } cpShapeType;
 
 // Shape class. Holds function pointers and type data.
-typedef struct cpShapeClass {
+struct cpShapeClass {
 	cpShapeType type;
 	
 	// Called by cpShapeCacheBB().
@@ -51,10 +51,10 @@ typedef struct cpShapeClass {
 	
 	// called by cpShapeSegmentQuery()
 	 void (*segmentQuery)(struct cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
-} cpShapeClass;
+};
 
 // Basic shape struct that the others inherit from.
-typedef struct cpShape{
+struct cpShape {
 	// The "class" of a shape as defined above 
 	CP_PRIVATE(const cpShapeClass *klass);
 	
@@ -95,7 +95,7 @@ typedef struct cpShape{
 	
 	// Unique id used as the hash value.
 	CP_PRIVATE(cpHashValue hashid);
-} cpShape;
+};
 
 // Low level shape initialization func.
 cpShape* cpShapeInit(cpShape *shape, const struct cpShapeClass *klass, cpBody *body);

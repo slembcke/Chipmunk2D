@@ -110,8 +110,6 @@ cpSpace*
 cpSpaceInit(cpSpace *space)
 {
 	space->iterations = DEFAULT_ITERATIONS;
-	space->elasticIterations = DEFAULT_ELASTIC_ITERATIONS;
-//	space->sleepTicks = 300;
 	
 	space->gravity = cpvzero;
 	space->damping = 1.0f;
@@ -119,7 +117,7 @@ cpSpaceInit(cpSpace *space)
 	space->locked = 0;
 	space->stamp = 0;
 
-	if(0){
+	if(1){
 		space->staticShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
 		space->activeShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
 	} else {
@@ -351,7 +349,7 @@ cpConstraint *
 cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
 	cpAssert(!cpArrayContains(space->constraints, constraint), "Cannot add the same constraint more than once.");
-//	cpAssertSpaceUnlocked(space); This should be safe as long as its not from a constraint callback.
+	cpAssertSpaceUnlocked(space);
 	
 	if(!constraint->a) constraint->a = &space->staticBody;
 	if(!constraint->b) constraint->b = &space->staticBody;
@@ -437,7 +435,7 @@ cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 {
 	cpAssertWarn(cpArrayContains(space->constraints, constraint),
 		"Cannot remove a constraint that was not added to the space. (Removed twice maybe?)");
-//	cpAssertSpaceUnlocked(space); Should be safe as long as its not from a constraint callback.
+	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(constraint->a);
 	cpBodyActivate(constraint->b);

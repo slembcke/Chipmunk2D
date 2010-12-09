@@ -464,15 +464,6 @@ static void
 cpBBTreeReindex(cpBBTree *tree)
 {
 	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)updateLeaf, tree);
-	
-//	cpAssert(cpFalse, "FAIL");
-//	if(tree->root) freeSubTree(tree, tree->root);
-//	tree->root = NULL;
-//	
-//	// TODO must fix this to assign root and update BBs!
-//	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)insertLeaf, tree);
-	
-//	printf("tree depth %d\n", cpBBTreeDepth(tree));
 }
 
 static int

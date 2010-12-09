@@ -31,7 +31,7 @@
 	about Chipmunk which may change with little to no warning.
 */
 
-//#define TIME_TRIAL
+#define TIME_TRIAL
  
 #include <stdlib.h>
 #include <stdio.h>
@@ -84,6 +84,7 @@ extern chipmunkDemo Tank;
 
 static chipmunkDemo *demos[] = {
 	&LogoSmash,
+	&Simple,
 	&PyramidStack,
 	&Plink,
 	&Tumble,
@@ -179,7 +180,7 @@ drawInfo()
 	for(int i=0; i<arbiters; i++)
 		points += ((cpArbiter *)(space->arbiters->arr[i]))->numContacts;
 	
-	int constraints = (space->constraints->num + points)*(space->iterations + space->elasticIterations);
+	int constraints = (space->constraints->num + points)*space->iterations;
 	
 	maxArbiters = arbiters > maxArbiters ? arbiters : maxArbiters;
 	maxPoints = points > maxPoints ? points : maxPoints;
@@ -205,7 +206,7 @@ drawInfo()
 	sprintf(buffer, format,
 		arbiters, maxArbiters,
 		points, maxPoints,
-		space->constraints->num, space->iterations + space->elasticIterations,
+		space->constraints->num, space->iterations,
 		constraints, maxConstraints, (ke < 1e-10f ? 0.0f : ke)
 	);
 	

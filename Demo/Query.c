@@ -81,7 +81,6 @@ init(void)
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
-	space->elasticIterations = 0;
 	space->iterations = 5;
 
 	cpSpaceResizeStaticHash(space, 40.0f, 999);

@@ -77,7 +77,7 @@ cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
 void cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
 void cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv);
 void cpArbiterApplyCachedImpulse(cpArbiter *arb);
-void cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef);
+void cpArbiterApplyImpulse(cpArbiter *arb);
 
 #pragma mark Collision Functions
 

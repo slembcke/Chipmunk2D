@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-// TODO: Comment me!
+// TODO: refactoring needed here
 	
 extern cpFloat cp_constraint_bias_coef;
 

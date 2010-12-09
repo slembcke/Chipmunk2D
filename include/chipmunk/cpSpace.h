@@ -54,9 +54,6 @@ struct cpSpace {
 	// Number of iterations to use in the impulse solver to solve contacts.
 	int iterations;
 	
-	// Number of iterations to use in the impulse solver to solve elastic collisions.
-	int elasticIterations;
-	
 	// Default gravity to supply when integrating rigid body motions.
 	cpVect gravity;
 	

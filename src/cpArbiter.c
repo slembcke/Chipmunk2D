@@ -202,7 +202,7 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb)
 }
 
 void
-cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef)
+cpArbiterApplyImpulse(cpArbiter *arb)
 {
 	cpBody *a = arb->a->body;
 	cpBody *b = arb->b->body;
@@ -232,7 +232,7 @@ cpArbiterApplyImpulse(cpArbiter *arb, cpFloat eCoef)
 		cpFloat vrn = cpvdot(vr, n);
 		
 		// Calculate and clamp the normal impulse.
-		cpFloat jn = -(con->bounce*eCoef + vrn)*con->nMass;
+		cpFloat jn = -(con->bounce + vrn)*con->nMass;
 		cpFloat jnOld = con->jnAcc;
 		con->jnAcc = cpfmax(jnOld + jn, 0.0f);
 		jn = con->jnAcc - jnOld;
