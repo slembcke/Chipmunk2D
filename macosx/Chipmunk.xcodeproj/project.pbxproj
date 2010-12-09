@@ -16,11 +16,8 @@
 		D34963C10B56CBA900CAD239 /* chipmunk.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0C40AA75CC3004E361B /* chipmunk.h */; };
 		D34963C20B56CBA900CAD239 /* cpVect.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0270AA32F16004E361B /* cpVect.h */; };
 		D34963C30B56CBA900CAD239 /* cpBB.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F2D90AAA5622004E361B /* cpBB.h */; };
-		D34963C40B56CBA900CAD239 /* cpArray.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F2DC0AAA562B004E361B /* cpArray.h */; };
 		D34963C50B56CBA900CAD239 /* prime.h in Headers */ = {isa = PBXBuildFile; fileRef = D353B6480B059C5F0038D274 /* prime.h */; };
-		D34963C60B56CBA900CAD239 /* cpHashSet.h in Headers */ = {isa = PBXBuildFile; fileRef = D30CE25E0B52535500427129 /* cpHashSet.h */; };
 		D34963C70B56CBA900CAD239 /* cpBody.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0DD0AAA2273004E361B /* cpBody.h */; };
-		D34963C80B56CBA900CAD239 /* cpSpaceHash.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F2DE0AAA562B004E361B /* cpSpaceHash.h */; };
 		D34963C90B56CBA900CAD239 /* cpArbiter.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0C10AA75CA9004E361B /* cpArbiter.h */; };
 		D34963CA0B56CBA900CAD239 /* cpPolyShape.h in Headers */ = {isa = PBXBuildFile; fileRef = D3BC99AC0AB381AF0025A2C0 /* cpPolyShape.h */; };
 		D34963CB0B56CBA900CAD239 /* cpShape.h in Headers */ = {isa = PBXBuildFile; fileRef = D37E22FC0AAA63B800BB4C50 /* cpShape.h */; };
@@ -69,9 +66,7 @@
 		D3AA477612AF0F8900E27AAB /* cpSpatialIndex.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AA477412AF0F8900E27AAB /* cpSpatialIndex.c */; };
 		D3AA477712AF0F8900E27AAB /* cpBBTree.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AA477312AF0F8900E27AAB /* cpBBTree.c */; };
 		D3AA477812AF0F8900E27AAB /* cpSpatialIndex.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AA477412AF0F8900E27AAB /* cpSpatialIndex.c */; };
-		D3AA477B12AF0F9B00E27AAB /* cpBBTree.h in Headers */ = {isa = PBXBuildFile; fileRef = D3AA477912AF0F9B00E27AAB /* cpBBTree.h */; };
 		D3AA477C12AF0F9B00E27AAB /* cpSpatialIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = D3AA477A12AF0F9B00E27AAB /* cpSpatialIndex.h */; };
-		D3AA477D12AF0F9B00E27AAB /* cpBBTree.h in Headers */ = {isa = PBXBuildFile; fileRef = D3AA477912AF0F9B00E27AAB /* cpBBTree.h */; };
 		D3AA477E12AF0F9B00E27AAB /* cpSpatialIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = D3AA477A12AF0F9B00E27AAB /* cpSpatialIndex.h */; };
 		D3BACF8310B5DF8900376394 /* OneWay.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BACF8210B5DF8900376394 /* OneWay.c */; };
 		D3BAD65810B8B52900376394 /* Player.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAD0C710B61AAD00376394 /* Player.c */; };
@@ -126,7 +121,6 @@
 
 /* Begin PBXFileReference section */
 		D30CE25D0B52535500427129 /* cpHashSet.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpHashSet.c; sourceTree = "<group>"; };
-		D30CE25E0B52535500427129 /* cpHashSet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpHashSet.h; path = ../include/chipmunk/cpHashSet.h; sourceTree = "<group>"; };
 		D3102B161119FD3000E77771 /* Tank.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tank.c; sourceTree = "<group>"; };
 		D31402940E9DD07E00EF79DB /* Springies.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Springies.c; sourceTree = "<group>"; };
 		D31847740FC458FD00E30B0D /* Query.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Query.c; sourceTree = "<group>"; };
@@ -173,7 +167,6 @@
 		D39F478A0FD4AB4E00B244CA /* chipmunk_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_types.h; path = ../include/chipmunk/chipmunk_types.h; sourceTree = SOURCE_ROOT; };
 		D3AA477312AF0F8900E27AAB /* cpBBTree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpBBTree.c; sourceTree = "<group>"; };
 		D3AA477412AF0F8900E27AAB /* cpSpatialIndex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpSpatialIndex.c; sourceTree = "<group>"; };
-		D3AA477912AF0F9B00E27AAB /* cpBBTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpBBTree.h; path = ../include/chipmunk/cpBBTree.h; sourceTree = SOURCE_ROOT; };
 		D3AA477A12AF0F9B00E27AAB /* cpSpatialIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpSpatialIndex.h; path = ../include/chipmunk/cpSpatialIndex.h; sourceTree = SOURCE_ROOT; };
 		D3B718E00AB2BC8900B500C9 /* chipmunk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chipmunk.c; path = ../src/chipmunk.c; sourceTree = "<group>"; };
 		D3BACF8210B5DF8900376394 /* OneWay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = OneWay.c; sourceTree = "<group>"; };
@@ -207,9 +200,7 @@
 		D3E5F2CF0AAA5589004E361B /* cpSpace.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpSpace.c; path = ../src/cpSpace.c; sourceTree = "<group>"; };
 		D3E5F2D90AAA5622004E361B /* cpBB.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpBB.h; path = ../include/chipmunk/cpBB.h; sourceTree = "<group>"; };
 		D3E5F2DA0AAA5622004E361B /* cpBB.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpBB.c; sourceTree = "<group>"; };
-		D3E5F2DC0AAA562B004E361B /* cpArray.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpArray.h; path = ../include/chipmunk/cpArray.h; sourceTree = "<group>"; };
 		D3E5F2DD0AAA562B004E361B /* cpArray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpArray.c; sourceTree = "<group>"; };
-		D3E5F2DE0AAA562B004E361B /* cpSpaceHash.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpSpaceHash.h; path = ../include/chipmunk/cpSpaceHash.h; sourceTree = "<group>"; };
 		D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpSpaceHash.c; sourceTree = "<group>"; };
 		D3EDBC240ED935F40027D943 /* MagnetsElectric.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MagnetsElectric.c; sourceTree = "<group>"; };
 		D3FBA1A60E9B1E0400950BCC /* drawSpace.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = drawSpace.c; sourceTree = "<group>"; };
@@ -261,9 +252,7 @@
 			children = (
 				D3AA477A12AF0F9B00E27AAB /* cpSpatialIndex.h */,
 				D3AA477412AF0F8900E27AAB /* cpSpatialIndex.c */,
-				D3E5F2DE0AAA562B004E361B /* cpSpaceHash.h */,
 				D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */,
-				D3AA477912AF0F9B00E27AAB /* cpBBTree.h */,
 				D3AA477312AF0F8900E27AAB /* cpBBTree.c */,
 				D3E5F0C10AA75CA9004E361B /* cpArbiter.h */,
 				D3E5F0C20AA75CA9004E361B /* cpArbiter.c */,
@@ -385,14 +374,12 @@
 		D3E5F2F30AAA575E004E361B /* Basics */ = {
 			isa = PBXGroup;
 			children = (
+				D353B6480B059C5F0038D274 /* prime.h */,
 				D3E5F0270AA32F16004E361B /* cpVect.h */,
 				D3E5F0260AA32F15004E361B /* cpVect.c */,
 				D3E5F2D90AAA5622004E361B /* cpBB.h */,
 				D3E5F2DA0AAA5622004E361B /* cpBB.c */,
-				D3E5F2DC0AAA562B004E361B /* cpArray.h */,
 				D3E5F2DD0AAA562B004E361B /* cpArray.c */,
-				D353B6480B059C5F0038D274 /* prime.h */,
-				D30CE25E0B52535500427129 /* cpHashSet.h */,
 				D30CE25D0B52535500427129 /* cpHashSet.c */,
 			);
 			name = Basics;
@@ -409,11 +396,8 @@
 				D34963C10B56CBA900CAD239 /* chipmunk.h in Headers */,
 				D34963C20B56CBA900CAD239 /* cpVect.h in Headers */,
 				D34963C30B56CBA900CAD239 /* cpBB.h in Headers */,
-				D34963C40B56CBA900CAD239 /* cpArray.h in Headers */,
 				D34963C50B56CBA900CAD239 /* prime.h in Headers */,
-				D34963C60B56CBA900CAD239 /* cpHashSet.h in Headers */,
 				D34963C70B56CBA900CAD239 /* cpBody.h in Headers */,
-				D34963C80B56CBA900CAD239 /* cpSpaceHash.h in Headers */,
 				D34963C90B56CBA900CAD239 /* cpArbiter.h in Headers */,
 				D34963CA0B56CBA900CAD239 /* cpPolyShape.h in Headers */,
 				D34963CB0B56CBA900CAD239 /* cpShape.h in Headers */,
@@ -427,7 +411,6 @@
 				D37BB8F10EAB06B600C70958 /* cpSimpleMotor.h in Headers */,
 				D35420C00F4E1FD70017F4F7 /* chipmunk_unsafe.h in Headers */,
 				D36D87841012D63600DB5078 /* cpRatchetJoint.h in Headers */,
-				D3AA477B12AF0F9B00E27AAB /* cpBBTree.h in Headers */,
 				D3AA477C12AF0F9B00E27AAB /* cpSpatialIndex.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -436,7 +419,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3AA477D12AF0F9B00E27AAB /* cpBBTree.h in Headers */,
 				D3AA477E12AF0F9B00E27AAB /* cpSpatialIndex.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

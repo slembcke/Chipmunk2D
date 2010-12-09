@@ -162,31 +162,3 @@ cpBodyApplyForce(cpBody *body, cpVect force, cpVect r)
 	body->f = cpvadd(body->f, force);
 	body->t += cpvcross(r, force);
 }
-
-void
-cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat rlen, cpFloat k, cpFloat dmp, cpFloat dt)
-{
-	// Calculate the world space anchor coordinates.
-	cpVect r1 = cpvrotate(anchr1, a->rot);
-	cpVect r2 = cpvrotate(anchr2, b->rot);
-	
-	cpVect delta = cpvsub(cpvadd(b->p, r2), cpvadd(a->p, r1));
-	cpFloat dist = cpvlength(delta);
-	cpVect n = dist ? cpvmult(delta, 1.0f/dist) : cpvzero;
-	
-	cpFloat f_spring = (dist - rlen)*k;
-
-	// Calculate the world relative velocities of the anchor points.
-	cpVect v1 = cpvadd(a->v, cpvmult(cpvperp(r1), a->w));
-	cpVect v2 = cpvadd(b->v, cpvmult(cpvperp(r2), b->w));
-	
-	// Calculate the damping force.
-	// This really should be in the impulse solver and can produce problems when using large damping values.
-	cpFloat vrn = cpvdot(cpvsub(v2, v1), n);
-	cpFloat f_damp = vrn*cpfmin(dmp, 1.0f/(dt*(a->m_inv + b->m_inv)));
-	
-	// Apply!
-	cpVect f = cpvmult(n, f_spring + f_damp);
-	cpBodyApplyForce(a, f, r1);
-	cpBodyApplyForce(b, cpvneg(f), r2);
-}

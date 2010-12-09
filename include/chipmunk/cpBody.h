@@ -213,7 +213,3 @@ cpBodyKineticEnergy(const cpBody *body)
 	cpFloat wsq = body->w*body->w;
 	return (vsq ? vsq*body->m : 0.0f) + (wsq ? wsq*body->i : 0.0f);
 }
-
-// Apply a damped spring force between two bodies.
-// Warning: Large damping values can be unstable. Use a cpDampedSpring constraint for this instead.
-void cpApplyDampedSpring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat rlen, cpFloat k, cpFloat dmp, cpFloat dt);

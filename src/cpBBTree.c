@@ -1,31 +1,46 @@
 #include "stdlib.h"
 #include "stdio.h"
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 
 static cpSpatialIndexClass klass;
 
+typedef struct cpBBTreeNode cpBBTreeNode;
+typedef struct cpBBTreePair cpBBTreePair;
+
+struct cpBBTree {
+	cpSpatialIndex spatialIndex;
+	cpBBTreeVelocityFunc velocityFunc;
+	
+	cpHashSet *leaves;
+	cpBBTreeNode *root;
+	
+	cpBBTreeNode *pooledNodes;
+	cpBBTreePair *pooledPairs;
+	cpArray *allocatedBuffers;
+	
+	cpTimestamp stamp;
+};
+
+
 #pragma mark Node Functions
 
-struct cpBBTreeNode;
-struct cpBBTreePair;
-
-typedef struct cpBBTreeNode {
+struct cpBBTreeNode {
 	void *obj;
 	cpBB bb;
-	struct cpBBTreeNode *parent;
+	cpBBTreeNode *parent;
 	
 	union {
 		struct {
-			struct cpBBTreeNode *a, *b;
+			cpBBTreeNode *a, *b;
 		};
 		
 		struct {
 			cpTimestamp stamp;
-			struct cpBBTreePair *pairs;
+			cpBBTreePair *pairs;
 		};
 	};
-} cpBBTreeNode;
+};
 
 typedef struct pairThread {
 	struct cpBBTreePair *prev;
@@ -33,9 +48,9 @@ typedef struct pairThread {
 	struct cpBBTreePair *next;
 } pairThread;
 
-typedef struct cpBBTreePair {
+struct cpBBTreePair {
 	pairThread a, b;
-} cpBBTreePair;
+};
 
 static void
 recycleNode(cpBBTree *tree, cpBBTreeNode *node)
@@ -288,7 +303,7 @@ cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc)
 	tree->velocityFunc = NULL;
 	
 	tree->spatialIndex.bbfunc = bbfunc;
-	tree->leaves = cpHashSetNew(0, (cpHashSetEqlFunc)leafSetEql, (cpHashSetTransFunc)leafSetTrans);
+	tree->leaves = cpHashSetNew(0, (cpHashSetEqlFunc)leafSetEql, (cpHashSetTransFunc)leafSetTrans, NULL);
 	tree->root = NULL;
 	
 	tree->pooledNodes = NULL;
@@ -327,14 +342,12 @@ recycleSubtree(cpBBTree *tree, cpBBTreeNode *node)
 	}
 }
 
-static void freeWrap(void *ptr, void *unused){cpfree(ptr);}
-
 static void
 cpBBTreeDestroy(cpBBTree *tree)
 {
 	cpHashSetFree(tree->leaves);
 	
-	cpArrayEach(tree->allocatedBuffers, freeWrap, NULL);
+	cpArrayFreeEach(tree->allocatedBuffers, cpfree);
 	cpArrayFree(tree->allocatedBuffers);
 }
 
@@ -595,7 +608,7 @@ cpBBTreeReindexCollide(cpBBTree *tree, cpSpatialIndex *staticIndex, cpSpatialInd
 static int
 cpBBTreeCount(cpBBTree *tree)
 {
-	return tree->leaves->entries;
+	return cpHashSetCount(tree->leaves);
 }
 
 typedef struct eachContext {

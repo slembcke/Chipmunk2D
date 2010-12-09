@@ -19,8 +19,6 @@
  * SOFTWARE.
  */
 
-
-
 /* This header defines a number of "unsafe" operations on Chipmunk objects.
  * In this case "unsafe" is referring to operations which may reduce the
  * physical accuracy or numerical stability of the simulation, but will not

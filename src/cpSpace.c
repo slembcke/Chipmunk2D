@@ -90,8 +90,6 @@ static cpVect shapeVelocityFunc(cpShape *shape){return shape->body->v;}
 // Iterator functions for destructors.
 static void             freeWrap(void         *ptr, void *unused){          cpfree(ptr);}
 static void        shapeFreeWrap(cpShape      *ptr, void *unused){     cpShapeFree(ptr);}
-static void         bodyFreeWrap(cpBody       *ptr, void *unused){      cpBodyFree(ptr);}
-static void   constraintFreeWrap(cpConstraint *ptr, void *unused){cpConstraintFree(ptr);}
 
 #pragma mark Memory Management Functions
 
@@ -141,13 +139,12 @@ cpSpaceInit(cpSpace *space)
 	space->pooledArbiters = cpArrayNew(0);
 	
 	space->contactBuffersHead = NULL;
-	space->contactSet = cpHashSetNew(0, (cpHashSetEqlFunc)contactSetEql, (cpHashSetTransFunc)contactSetTrans);
+	space->contactSet = cpHashSetNew(0, (cpHashSetEqlFunc)contactSetEql, (cpHashSetTransFunc)contactSetTrans, NULL);
 	
 	space->constraints = cpArrayNew(0);
 	
 	space->defaultHandler = defaultHandler;
-	space->collFuncSet = cpHashSetNew(0, (cpHashSetEqlFunc)collFuncSetEql, (cpHashSetTransFunc)collFuncSetTrans);
-	space->collFuncSet->default_value = &space->defaultHandler;
+	space->collFuncSet = cpHashSetNew(0, (cpHashSetEqlFunc)collFuncSetEql, (cpHashSetTransFunc)collFuncSetTrans, &space->defaultHandler);
 	
 	space->postStepCallbacks = NULL;
 	
@@ -179,7 +176,7 @@ cpSpaceDestroy(cpSpace *space)
 	cpArrayFree(space->pooledArbiters);
 	
 	if(space->allocatedBuffers){
-		cpArrayEach(space->allocatedBuffers, freeWrap, NULL);
+		cpArrayFreeEach(space->allocatedBuffers, cpfree);
 		cpArrayFree(space->allocatedBuffers);
 	}
 	
@@ -211,8 +208,9 @@ cpSpaceFreeChildren(cpSpace *space)
 	
 	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIterator)&shapeFreeWrap, NULL);
 	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)&shapeFreeWrap, NULL);
-	cpArrayEach(space->bodies,           (cpArrayIter)&bodyFreeWrap,          NULL);
-	cpArrayEach(space->constraints,      (cpArrayIter)&constraintFreeWrap,    NULL);
+	
+	cpArrayFreeEach(space->bodies, (void (*)(void*))cpBodyFree);
+	cpArrayFreeEach(space->constraints, (void (*)(void*))cpConstraintFree);
 }
 
 #pragma mark Collision Handler Function Management

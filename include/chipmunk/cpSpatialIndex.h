@@ -1,7 +1,4 @@
-// TODO define types
-//typedef enum cpSpatialIndexType {
-//	
-//} cpSpatialIndexType;
+#pragma mark Spatial Index
 
 typedef cpBB (*cpSpatialIndexBBFunc)(void *obj);
 typedef void (*cpSpatialIndexIterator)(void *obj, void *data);
@@ -16,6 +13,32 @@ typedef struct cpSpatialIndex {
 	
 	cpSpatialIndexBBFunc bbfunc;
 } cpSpatialIndex;
+
+
+#pragma mark Spatial Hash
+
+typedef struct cpSpaceHash cpSpaceHash;
+
+cpSpaceHash *cpSpaceHashAlloc(void);
+cpSpaceHash *cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndexBBFunc bbfunc);
+cpSpaceHash *cpSpaceHashNew(cpFloat celldim, int cells, cpSpatialIndexBBFunc bbfunc);
+
+void cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells);
+
+#pragma mark AABB Tree
+
+typedef struct cpBBTree cpBBTree;
+
+cpBBTree *cpBBTreeAlloc(void);
+cpBBTree *cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc);
+cpBBTree *cpBBTreeNew(cpSpatialIndexBBFunc bbfunc);
+
+void cpBBTreeOptimize(cpSpatialIndex *index);
+
+typedef cpVect (*cpBBTreeVelocityFunc)(void *obj);
+void cpBBTreeSetVelocityFunc(cpSpatialIndex *index, cpBBTreeVelocityFunc func);
+
+#pragma mark Spatial Index Implementation
 
 typedef void (*cpSpatialIndexDestroyFunc)(cpSpatialIndex *index);
 

@@ -25,10 +25,6 @@
 #include "chipmunk_private.h"
 
 
-//#define CP_ARRAY_INCREMENT 10
-
-// NOTE: cpArray is rarely used and will probably go away.
-
 cpArray*
 cpArrayAlloc(void)
 {
@@ -92,7 +88,7 @@ cpArrayPop(cpArray *arr)
 	return value;
 }
 
-void
+static void
 cpArrayDeleteIndex(cpArray *arr, int idx)
 {
 	arr->num--;
@@ -127,10 +123,9 @@ cpArrayAppend(cpArray *arr, cpArray *other)
 }
 
 void
-cpArrayEach(cpArray *arr, cpArrayIter iterFunc, void *data)
+cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*))
 {
-	for(int i=0; i<arr->num; i++)
-		iterFunc(arr->arr[i], data);
+	for(int i=0; i<arr->num; i++) freeFunc(arr->arr[i]);
 }
 
 cpBool

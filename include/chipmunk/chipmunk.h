@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 #ifndef CP_ALLOW_PRIVATE_ACCESS
-	#define CP_ALLOW_PRIVATE_ACCESS 1
+	#define CP_ALLOW_PRIVATE_ACCESS 0
 #endif
 
 #if CP_ALLOW_PRIVATE_ACCESS == 1
@@ -52,6 +52,7 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 #include "chipmunk_types.h"
 	
 #ifndef INFINITY
+	//TODO use C++ infinity
 	#ifdef _MSC_VER
 		union MSVC_EVIL_FLOAT_HACK
 		{
@@ -81,12 +82,10 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 
 #include "cpVect.h"
 #include "cpBB.h"
-#include "cpArray.h"
-#include "cpHashSet.h"
+typedef struct cpArray cpArray;
+typedef struct cpHashSet cpHashSet;
 
 #include "cpSpatialIndex.h"
-#include "cpSpaceHash.h"
-#include "cpBBTree.h"
 
 #include "cpBody.h"
 #include "cpShape.h"
