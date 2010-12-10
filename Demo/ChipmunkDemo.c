@@ -31,7 +31,7 @@
 	about Chipmunk which may change with little to no warning.
 */
 
-#define TIME_TRIAL
+//#define TIME_TRIAL
  
 #include <stdlib.h>
 #include <stdio.h>
@@ -450,10 +450,7 @@ void time_trial(int index, int count)
 	srand(45073);
 	currDemo = demos[index];
 	space = currDemo->initFunc();
-	
-	cpBBTreeOptimize(space->activeShapes);
-	cpBBTreeOptimize(space->staticShapes);
-	
+		
 	struct timeval start_time, end_time;
 	gettimeofday(&start_time, NULL);
 	

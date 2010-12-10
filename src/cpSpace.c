@@ -117,7 +117,7 @@ cpSpaceInit(cpSpace *space)
 	space->locked = 0;
 	space->stamp = 0;
 
-	if(1){
+	if(0){
 		space->staticShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
 		space->activeShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
 	} else {
