@@ -1156,13 +1156,15 @@ h2. Post-Step Callbacks:
 
 Post-step callbacks are the one place where you can break the rules about adding or removing objects from within a callback. In fact, their primary function is to help you safely remove objects from the space that you wanted to disable or destroy in a collision callback.
 
-Post step callbacks are registered as a function and a pointer that is used as a key. You can only register one post step callback per key. This prevents you from accidentally removing an object more than once. For instance, say that you get a collision callback between a bullet and object A. You want to destroy both the bullet and object A, so you register a post-step callback to safely remove them from your game. Then you get a second collision callback between the bullet and object B. You register a post-step callback to remove object B, and a second post-step callback to remove the bullet. Because you can only register one callback per key, the post-step callback for the bullet will only be called once and you can't accidentally try to remove it twice.
+Post step callbacks are registered as a function and a pointer that is used as a key. You can only register one post step callback per key. This prevents you from accidentally removing an object more than once. For instance, say that you get a collision callback between a bullet and object A. You want to destroy both the bullet and object A, so you register a post-step callback to safely remove them from your game. Then you get a second collision callback between the bullet and object B. You register a post-step callback to remove object B, and a second post-step callback to remove the bullet. Because you can only register one callback per key, the post-step callback for the bullet will only be called once and you can't accidentally register to have it removed twice.
 
-<pre><code>typedef void (*cpPostStepFunc)(cpSpace *space, void *obj, void *data)</code></pre>
+Note: Additional callbacks registered to the same key are ignored even if they use a different callback function or data pointer.
+
+<pre><code>typedef void (*cpPostStepFunc)(cpSpace *space, void *key, void *data)</code></pre>
 
 p(expl). Function type used for post step callbacks. @space@ is the space the callback was registered on, @obj@ is the pointer value you supplied as the key, and @data@ is a user definable pointer you can use to pass in as a context value.
 
-<pre><code>void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)</code></pre>
+<pre><code>void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data)</code></pre>
 
 p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @obj@ and @data@ will be passed to your function. Only the last callback registered for any unique value of @obj@ will be recorded. You can add post-step callbacks from outside of other callback functions, but they won't be called until @cpSpaceStep()@ is called again.
 

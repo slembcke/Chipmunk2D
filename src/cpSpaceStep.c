@@ -27,21 +27,21 @@
 
 #pragma mark Post Step Callback Functions
 
-typedef struct postStepCallback {
+typedef struct PostStepCallback {
 	cpPostStepFunc func;
-	void *obj;
-	void *data;
-} postStepCallback;
+	cpDataPointer *obj;
+	cpDataPointer *data;
+} PostStepCallback;
 
 static cpBool
-postStepFuncSetEql(postStepCallback *a, postStepCallback *b){
+postStepFuncSetEql(PostStepCallback *a, PostStepCallback *b){
 	return a->obj == b->obj;
 }
 
 static void *
-postStepFuncSetTrans(postStepCallback *callback, void *ignored)
+postStepFuncSetTrans(PostStepCallback *callback, void *ignored)
 {
-	postStepCallback *value = (postStepCallback *)cpmalloc(sizeof(postStepCallback));
+	PostStepCallback *value = (PostStepCallback *)cpmalloc(sizeof(PostStepCallback));
 	(*value) = (*callback);
 	
 	return value;
@@ -54,8 +54,20 @@ cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void 
 		space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql, (cpHashSetTransFunc)postStepFuncSetTrans);
 	}
 	
-	postStepCallback callback = {func, obj, data};
+	PostStepCallback callback = {func, obj, data};
 	cpHashSetInsert(space->postStepCallbacks, (cpHashValue)(size_t)obj, &callback, NULL);
+}
+
+void *
+cpSpaceGetPostStepData(cpSpace *space, void *obj)
+{
+	if(space->postStepCallbacks){
+		PostStepCallback query = {NULL, obj, NULL};
+		PostStepCallback *callback = cpHashSetFind(space->postStepCallbacks, (cpHashValue)(size_t)obj, &query);
+		return (callback ? callback->data : NULL);
+	} else {
+		return NULL;
+	}
 }
 
 #pragma mark Contact Buffer Functions
@@ -260,7 +272,7 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 
 // Hashset filter func to call and throw away post step callbacks.
 static void
-postStepCallbackSetIter(postStepCallback *callback, cpSpace *space)
+postStepCallbackSetIter(PostStepCallback *callback, cpSpace *space)
 {
 	callback->func(space, callback->obj, callback->data);
 	cpfree(callback);

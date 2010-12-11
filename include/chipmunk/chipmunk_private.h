@@ -22,6 +22,8 @@
 #define CP_ALLOW_PRIVATE_ACCESS 1
 #include "chipmunk.h"
 
+void *cpSpaceGetPostStepData(cpSpace *space, void *obj);
+
 void cpSpaceActivateBody(cpSpace *space, cpBody *body);
 
 static inline void
