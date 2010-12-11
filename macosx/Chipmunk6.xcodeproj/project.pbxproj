@@ -479,7 +479,7 @@
 /* Begin PBXProject section */
 		D3E5F0190AA32EAC004E361B /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = D3E5F01A0AA32EAC004E361B /* Build configuration list for PBXProject "Chipmunk" */;
+			buildConfigurationList = D3E5F01A0AA32EAC004E361B /* Build configuration list for PBXProject "Chipmunk6" */;
 			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -806,7 +806,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D3E5F01A0AA32EAC004E361B /* Build configuration list for PBXProject "Chipmunk" */ = {
+		D3E5F01A0AA32EAC004E361B /* Build configuration list for PBXProject "Chipmunk6" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D3E5F01B0AA32EAC004E361B /* Debug */,

@@ -287,13 +287,13 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// Pre-cache BBoxes and shape data.
 	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)updateBBCache, NULL);
 	
-	space->locked = cpTrue;
+	cpSpaceLock(space);
 	
 	// Collide!
 	cpSpacePushFreshContactBuffer(space);
 	cpSpatialIndexReindexCollide(space->activeShapes, space->staticShapes, (cpSpatialIndexQueryCallback)queryFunc, space);
 	
-	space->locked = cpFalse;
+	cpSpaceUnlock(space);
 	
 	// If body sleeping is enabled, do that now.
 	if(space->sleepTimeThreshold != INFINITY){
@@ -336,7 +336,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		}
 	}
 	
-	space->locked = cpTrue;
+	cpSpaceLock(space);
 	
 	// run the post solve callbacks
 	for(int i=0; i<arbiters->num; i++){
@@ -348,7 +348,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		arb->state = cpArbiterStateNormal;
 	}
 	
-	space->locked = cpFalse;
+	cpSpaceUnlock(space);
 	
 	// Run the post step callbacks
 	// Loop because post step callbacks may create more post step callbacks

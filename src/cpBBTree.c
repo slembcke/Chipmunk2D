@@ -47,8 +47,6 @@ typedef struct Thread {
 
 struct Pair { Thread a, b; };
 
-
-
 #pragma mark Misc Functions
 
 static inline cpFloat
@@ -119,7 +117,7 @@ PairFromPool(cpBBTree *tree)
 }
 
 static void
-ThreadRemove(Thread *thread)
+ThreadUnlink(Thread *thread)
 {
 	Node *leaf = thread->leaf;
 	Pair *next = thread->next, *prev = thread->prev;
@@ -144,12 +142,12 @@ PairsClear(Node *leaf, cpBBTree *tree)
 	while(pair){
 		if(pair->a.leaf == leaf){
 			Pair *next = pair->a.next;
-			ThreadRemove(&pair->b);
+			ThreadUnlink(&pair->b);
 			PairRecycle(tree, pair);
 			pair = next;
 		} else {
 			Pair *next = pair->b.next;
-			ThreadRemove(&pair->a);
+			ThreadUnlink(&pair->a);
 			PairRecycle(tree, pair);
 			pair = next;
 		}
@@ -624,13 +622,7 @@ static cpSpatialIndexClass klass = {
 
 static int
 cpfcompare(const cpFloat *a, const cpFloat *b){
-	if(*a < *b){
-		return -1;
-	} else if(*b < *a){
-		return 1;
-	} else {
-		return 0;
-	}
+	return (*a < *b ? -1 : (*b < *a ? 1 : 0));
 }
 
 static void
@@ -762,8 +754,9 @@ NodeRender(Node *node, int depth)
 	
 	cpBB bb = node->bb;
 	
-	GLfloat v = depth/2.0f;	
-	glColor3f(1.0f - v, v, 0.0f);
+//	GLfloat v = depth/2.0f;	
+//	glColor3f(1.0f - v, v, 0.0f);
+	glLineWidth(cpfmax(5.0f - depth, 1.0f));
 	glBegin(GL_LINES); {
 		glVertex2f(bb.l, bb.b);
 		glVertex2f(bb.l, bb.t);

@@ -124,3 +124,29 @@ cpPolyShapeContainsVertPartial(const cpPolyShape *poly, const cpVect v, const cp
 	
 	return cpTrue;
 }
+
+#pragma mark Space Functions
+
+void cpSpaceActivateBody(cpSpace *space, cpBody *body);
+
+static inline void
+cpSpaceLock(cpSpace *space)
+{
+	space->locked++;
+}
+
+static inline void
+cpSpaceUnlock(cpSpace *space)
+{
+	space->locked--;
+	cpAssert(space->locked >= 0, "Internal error:Space lock underflow.");
+	
+	if(!space->locked){
+		cpArray *waking = space->rousedBodies;
+		for(int i=0, count=waking->num; i<count; i++){
+			cpSpaceActivateBody(space, (cpBody *)waking->arr[i]);
+		}
+		
+		waking->num = 0;
+	}
+}
