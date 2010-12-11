@@ -127,6 +127,8 @@ cpSpaceInit(cpSpace *space)
 	
 	space->bodies = cpArrayNew(0);
 	space->sleepingComponents = cpArrayNew(0);
+	space->rousedBodies = cpArrayNew(0);
+	
 	space->sleepTimeThreshold = INFINITY;
 	space->idleSpeedThreshold = 0.0f;
 	
@@ -163,6 +165,7 @@ cpSpaceDestroy(cpSpace *space)
 	
 	cpArrayFree(space->bodies);
 	cpArrayFree(space->sleepingComponents);
+	cpArrayFree(space->rousedBodies);
 	
 	cpArrayFree(space->constraints);
 	
