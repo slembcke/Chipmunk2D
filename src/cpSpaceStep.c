@@ -55,7 +55,7 @@ cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void 
 	}
 	
 	postStepCallback callback = {func, obj, data};
-	cpHashSetInsert(space->postStepCallbacks, (cpHashValue)obj, &callback, NULL);
+	cpHashSetInsert(space->postStepCallbacks, (cpHashValue)(size_t)obj, &callback, NULL);
 }
 
 #pragma mark Contact Buffer Functions
@@ -176,7 +176,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	// Get an arbiter from space->contactSet for the two shapes.
 	// This is where the persistant contact magic comes from.
 	cpShape *shape_pair[] = {a, b};
-	cpHashValue arbHashID = CP_HASH_PAIR((cpHashValue)a, (cpHashValue)b);
+	cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
 	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->contactSet, arbHashID, shape_pair, space);
 	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b);
 	
@@ -276,7 +276,6 @@ void
 cpSpaceStep(cpSpace *space, cpFloat dt)
 {
 	if(!dt) return; // don't step if the timestep is 0!
-	
 	cpFloat dt_inv = 1.0f/dt;
 
 	cpArray *bodies = space->bodies;
