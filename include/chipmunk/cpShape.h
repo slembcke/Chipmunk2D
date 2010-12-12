@@ -105,6 +105,7 @@ void cpShapeFree(cpShape *shape);
 
 // Cache the BBox of the shape.
 cpBB cpShapeCacheBB(cpShape *shape);
+cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot);
 
 // Test if a point lies within a shape.
 cpBool cpShapePointQuery(cpShape *shape, cpVect p);

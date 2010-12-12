@@ -82,14 +82,17 @@ cpShapeFree(cpShape *shape)
 	}
 }
 
-// TODO this function should really take a position and rotation explicitly and be renamed
 cpBB
 cpShapeCacheBB(cpShape *shape)
 {
 	cpBody *body = shape->body;
-	
-	shape->bb = shape->klass->cacheData(shape, body->p, body->rot);
-	return shape->bb;
+	return cpShapeUpdate(shape, body->p, body->rot);
+}
+
+cpBB
+cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot)
+{
+	return (shape->bb = shape->klass->cacheData(shape, pos, rot));
 }
 
 cpBool

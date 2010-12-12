@@ -64,7 +64,8 @@ update(int ticks)
 	}
 	
 	cpSegmentShapeSetEndpoints(querySeg, start, lineEnd);
-	cpShapeCacheBB(querySeg); // force it to update it's collision detection data so it will draw
+	// force it to update it's collision detection data so it will draw
+	cpShapeUpdate(querySeg, cpvzero, cpv(1.0f, 0.0f));
 	
 	// normal other stuff.
 	int steps = 1;

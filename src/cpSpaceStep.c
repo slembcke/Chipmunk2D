@@ -251,7 +251,12 @@ postStepCallbackSetIter(postStepCallback *callback, cpSpace *space)
 
 void cpSpaceProcessComponents(cpSpace *space, cpFloat dt);
 
-static void updateBBCache(cpShape *shape, void *unused){cpShapeCacheBB(shape);}
+static void
+updateBBCache(cpShape *shape, void *unused)
+{
+	cpBody *body = shape->body;
+	cpShapeUpdate(shape, body->p, body->rot);
+}
 
 void
 cpSpaceStep(cpSpace *space, cpFloat dt)

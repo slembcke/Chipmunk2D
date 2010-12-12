@@ -233,7 +233,8 @@ shapeQueryHelper(cpShape *a, cpShape *b, shapeQueryContext *context)
 cpBool
 cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data)
 {
-	cpBB bb = cpShapeCacheBB(shape);
+	cpBody *body = shape->body;
+	cpBB bb = (body ? cpShapeUpdate(shape, body->p, body->rot) : shape->bb);
 	shapeQueryContext context = {func, data, cpFalse};
 	
 	cpSpaceLock(space); {

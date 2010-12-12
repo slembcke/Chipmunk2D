@@ -332,7 +332,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	// Push onto the head of the body's shape list
 	shape->next = body->shapeList; body->shapeList = shape;
 	
-	cpShapeCacheBB(shape);
+	cpShapeUpdate(shape, body->p, body->rot);
 	cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
 		
 	return shape;
@@ -345,7 +345,8 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 		"Cannot add the same static shape more than once.");
 	cpAssertSpaceUnlocked(space);
 	
-	cpShapeCacheBB(shape);
+	cpBody *body = shape->body;
+	cpShapeUpdate(shape, body->p, body->rot);
 	cpSpaceActivateShapesTouchingShape(space, shape);
 	cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
 	
@@ -498,7 +499,12 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data)
 
 #pragma mark Spatial Hash Management
 
-static void updateBBCache(cpShape *shape, void *unused){cpShapeCacheBB(shape);}
+static void
+updateBBCache(cpShape *shape, void *unused)
+{
+	cpBody *body = shape->body;
+	cpShapeUpdate(shape, body->p, body->rot);
+}
 
 void
 cpSpaceResizeStaticHash(cpSpace *space, cpFloat dim, int count)
@@ -525,7 +531,8 @@ cpSpaceRehashStatic(cpSpace *space)
 void
 cpSpaceRehashShape(cpSpace *space, cpShape *shape)
 {
-	cpShapeCacheBB(shape);
+	cpBody *body = shape->body;
+	cpShapeUpdate(shape, body->p, body->rot);
 	
 	// attempt to rehash the shape in both hashes
 	cpSpatialIndexReindexObject(space->activeShapes, shape, shape->hashid);

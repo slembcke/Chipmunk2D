@@ -280,7 +280,7 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 	
 	if(cpBodyIsSleeping(body)) return;
 	
-	for(cpShape *shape = body->shapeList; shape; shape = shape->next) cpShapeCacheBB(shape);
+	for(cpShape *shape = body->shapeList; shape; shape = shape->next) cpShapeUpdate(shape, body->p, body->rot);
 	cpSpaceDeactivateBody(space, body);
 	
 	if(group){
