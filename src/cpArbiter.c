@@ -111,6 +111,9 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 	arb->a = a;
 	arb->b = b;
 	
+	arb->nextA = NULL;
+	arb->nextB = NULL;
+	
 	arb->stamp = 0;
 	arb->state = cpArbiterStateFirstColl;
 	

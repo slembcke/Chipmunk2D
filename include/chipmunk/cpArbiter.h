@@ -80,6 +80,7 @@ struct cpArbiter {
 	// The two shapes and bodies involved in the collision.
 	// These variables are NOT in the order defined by the collision handler.
 	cpShape CP_PRIVATE(*a), CP_PRIVATE(*b);
+	cpArbiter CP_PRIVATE(*nextA), CP_PRIVATE(*nextB);
 	
 	// Calculated before calling the pre-solve collision handler
 	// Override them with custom values if you want specialized behavior

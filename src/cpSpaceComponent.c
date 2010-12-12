@@ -67,6 +67,11 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 			cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
 			cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
 		}
+		
+		for(cpArbiter *arb = body->arbiterList; arb; arb = (arb->a->body == body ? arb->nextA : arb->nextB)){
+			cpSpaceCollideShapes(arb->a, arb->b, space);
+			cpArrayPush(space->pooledArbiters, arb);
+		}
 	}
 }
 
@@ -76,6 +81,14 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 	for(cpShape *shape = body->shapesList; shape; shape = shape->next){
 		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
 		cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
+	}
+	
+	for(cpArbiter *arb = body->arbiterList; arb; arb = (arb->a->body == body ? arb->nextA : arb->nextB)){
+		cpShape *a = arb->a, *b = arb->b;
+		cpShape *shape_pair[] = {a, b};
+		cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
+		cpHashSetRemove(space->contactSet, arbHashID, shape_pair);
+		// TODO save solver values
 	}
 }
 
@@ -181,19 +194,27 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 	cpFloat dv = space->idleSpeedThreshold;
 	cpFloat dvsq = (dv ? dv*dv : cpvdot(space->gravity, space->gravity)*dt*dt);
 	
-	// update idling
+	// update idling and reset arbiter lists
 	for(int i=0; i<bodies->num; i++){
 		cpBody *body = (cpBody*)bodies->arr[i];
 		
 		cpFloat thresh = (dvsq ? body->m*dvsq : 0.0f);
 		body->node.idleTime = (cpBodyKineticEnergy(body) > thresh ? 0.0f : body->node.idleTime + dt);
+		
+		body->arbiterList = NULL;
 	}
 	
 	// iterate graph edges and build forests
-	for(int i=0; i<arbiters->num; i++){
+	for(int i=0, count=arbiters->num; i<count; i++){
 		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
 		mergeBodies(space, components, rogueBodies, arb->a->body, arb->b->body);
+		
+		// Push arbiter connectivity onto bodies
+		cpBody *a = arb->a->body, *b = arb->b->body;
+		arb->nextA = a->arbiterList; a->arbiterList = arb;
+		arb->nextB = b->arbiterList; b->arbiterList = arb;
 	}
+	
 	for(int j=0; j<constraints->num; j++){
 		cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
 		mergeBodies(space, components, rogueBodies, constraint->a, constraint->b);
