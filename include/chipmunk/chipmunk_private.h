@@ -89,9 +89,9 @@ cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
 	cpVect *verts = poly->CP_PRIVATE(tVerts);
 	cpFloat min = cpvdot(n, verts[0]);
 	
-	int i;
-	for(i=1; i<poly->CP_PRIVATE(numVerts); i++)
+	for(int i=1; i<poly->CP_PRIVATE(numVerts); i++){
 		min = cpfmin(min, cpvdot(n, verts[i]));
+	}
 	
 	return min - d;
 }
@@ -101,8 +101,7 @@ cpPolyShapeContainsVert(const cpPolyShape *poly, const cpVect v)
 {
 	cpPolyShapeAxis *axes = poly->CP_PRIVATE(tAxes);
 	
-	int i;
-	for(i=0; i<poly->CP_PRIVATE(numVerts); i++){
+	for(int i=0; i<poly->CP_PRIVATE(numVerts); i++){
 		cpFloat dist = cpvdot(axes[i].n, v) - axes[i].d;
 		if(dist > 0.0f) return cpFalse;
 	}
@@ -115,8 +114,7 @@ cpPolyShapeContainsVertPartial(const cpPolyShape *poly, const cpVect v, const cp
 {
 	cpPolyShapeAxis *axes = poly->CP_PRIVATE(tAxes);
 	
-	int i;
-	for(i=0; i<poly->CP_PRIVATE(numVerts); i++){
+	for(int i=0; i<poly->CP_PRIVATE(numVerts); i++){
 		if(cpvdot(axes[i].n, n) < 0.0f) continue;
 		cpFloat dist = cpvdot(axes[i].n, v) - axes[i].d;
 		if(dist > 0.0f) return cpFalse;
@@ -127,26 +125,7 @@ cpPolyShapeContainsVertPartial(const cpPolyShape *poly, const cpVect v, const cp
 
 #pragma mark Space Functions
 
+void cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space);
 void cpSpaceActivateBody(cpSpace *space, cpBody *body);
-
-static inline void
-cpSpaceLock(cpSpace *space)
-{
-	space->locked++;
-}
-
-static inline void
-cpSpaceUnlock(cpSpace *space)
-{
-	space->locked--;
-	cpAssert(space->locked >= 0, "Internal error:Space lock underflow.");
-	
-	if(!space->locked){
-		cpArray *waking = space->rousedBodies;
-		for(int i=0, count=waking->num; i<count; i++){
-			cpSpaceActivateBody(space, (cpBody *)waking->arr[i]);
-		}
-		
-		waking->num = 0;
-	}
-}
+void cpSpaceLock(cpSpace *space);
+void cpSpaceUnlock(cpSpace *space);

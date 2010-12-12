@@ -60,6 +60,12 @@ cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void 
 
 #pragma mark Contact Buffer Functions
 
+struct cpContactBufferHeader {
+	cpTimestamp stamp;
+	cpContactBufferHeader *next;
+	unsigned int numContacts;
+};
+
 #define CP_CONTACTS_BUFFER_SIZE ((CP_BUFFER_BYTES - sizeof(cpContactBufferHeader))/sizeof(cpContact))
 typedef struct cpContactBuffer {
 	cpContactBufferHeader header;
@@ -134,7 +140,7 @@ cpSpacePopContacts(cpSpace *space, int count){
 static inline cpBool
 queryReject(cpShape *a, cpShape *b)
 {
-	return
+	return (
 		// BBoxes must overlap
 		!cpBBintersects(a->bb, b->bb)
 		// Don't collide shapes attached to the same body.
@@ -142,20 +148,21 @@ queryReject(cpShape *a, cpShape *b)
 		// Don't collide objects in the same non-zero group
 		|| (a->group && a->group == b->group)
 		// Don't collide objects that don't share at least on layer.
-		|| !(a->layers & b->layers);
+		|| !(a->layers & b->layers)
+	);
 }
 
 // Callback from the spatial hash.
-static void
-queryFunc(cpShape *a, cpShape *b, cpSpace *space)
+void
+cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space)
 {
 	// Reject any of the simple cases
 	if(queryReject(a,b)) return;
 	
 	// Find the collision pair function for the shapes.
-	struct{cpCollisionType a, b;} ids = {a->collision_type, b->collision_type};
+	cpCollisionType types[] = {a->collision_type, b->collision_type};
 	cpHashValue collHashID = CP_HASH_PAIR(a->collision_type, b->collision_type);
-	cpCollisionHandler *handler = (cpCollisionHandler *)cpHashSetFind(space->collFuncSet, collHashID, &ids);
+	cpCollisionHandler *handler = (cpCollisionHandler *)cpHashSetFind(space->collFuncSet, collHashID, types);
 	
 	cpBool sensor = a->sensor || b->sensor;
 	if(sensor && handler == &space->defaultHandler) return;
@@ -278,7 +285,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// Empty the arbiter list.
 	space->arbiters->num = 0;
 
-	// Integrate positions.
+	// Integrate positions and reset the arbiter list
 	for(int i=0; i<bodies->num; i++){
 		cpBody *body = (cpBody *)bodies->arr[i];
 		body->position_func(body, dt);
@@ -287,12 +294,11 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// Pre-cache BBoxes and shape data.
 	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)updateBBCache, NULL);
 	
-	cpSpaceLock(space);
 	
 	// Collide!
+	cpSpaceLock(space);
 	cpSpacePushFreshContactBuffer(space);
-	cpSpatialIndexReindexCollide(space->activeShapes, space->staticShapes, (cpSpatialIndexQueryCallback)queryFunc, space);
-	
+	cpSpatialIndexReindexCollide(space->activeShapes, space->staticShapes, (cpSpatialIndexQueryCallback)cpSpaceCollideShapes, space);
 	cpSpaceUnlock(space);
 	
 	// If body sleeping is enabled, do that now.
@@ -336,9 +342,9 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		}
 	}
 	
-	cpSpaceLock(space);
 	
 	// run the post solve callbacks
+	cpSpaceLock(space);
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiter *arb = (cpArbiter *) arbiters->arr[i];
 		
@@ -347,7 +353,6 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		
 		arb->state = cpArbiterStateNormal;
 	}
-	
 	cpSpaceUnlock(space);
 	
 	// Run the post step callbacks

@@ -80,11 +80,19 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 #define cprealloc realloc
 #define cpfree free
 
-#include "cpVect.h"
-#include "cpBB.h"
 typedef struct cpArray cpArray;
 typedef struct cpHashSet cpHashSet;
 
+typedef struct cpBody cpBody;
+typedef struct cpShape cpShape;
+typedef struct cpConstraint cpConstraint;
+
+typedef struct cpArbiter cpArbiter;
+
+typedef struct cpSpace cpSpace;
+
+#include "cpVect.h"
+#include "cpBB.h"
 #include "cpSpatialIndex.h"
 
 #include "cpBody.h"

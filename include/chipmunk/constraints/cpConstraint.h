@@ -23,22 +23,21 @@
 	
 extern cpFloat cp_constraint_bias_coef;
 
-struct cpConstraintClass;
-struct cpConstraint;
+typedef struct cpConstraintClass cpConstraintClass;
 
-typedef void (*cpConstraintPreStepFunction)(struct cpConstraint *constraint, cpFloat dt, cpFloat dt_inv);
-typedef void (*cpConstraintApplyImpulseFunction)(struct cpConstraint *constraint);
-typedef cpFloat (*cpConstraintGetImpulseFunction)(struct cpConstraint *constraint);
+typedef void (*cpConstraintPreStepFunction)(cpConstraint *constraint, cpFloat dt, cpFloat dt_inv);
+typedef void (*cpConstraintApplyImpulseFunction)(cpConstraint *constraint);
+typedef cpFloat (*cpConstraintGetImpulseFunction)(cpConstraint *constraint);
 
-typedef struct cpConstraintClass {
+struct cpConstraintClass {
 	cpConstraintPreStepFunction preStep;
 	cpConstraintApplyImpulseFunction applyImpulse;
 	cpConstraintGetImpulseFunction getImpulse;
-} cpConstraintClass;
+};
 
 
 
-typedef struct cpConstraint {
+struct cpConstraint {
 	CP_PRIVATE(const cpConstraintClass *klass);
 	
 	cpBody *a, *b;
@@ -47,11 +46,7 @@ typedef struct cpConstraint {
 	cpFloat maxBias;
 	
 	cpDataPointer data;
-} cpConstraint;
-
-#ifdef CP_USE_DEPRECATED_API_4
-typedef cpConstraint cpJoint;
-#endif
+};
 
 void cpConstraintDestroy(cpConstraint *constraint);
 void cpConstraintFree(cpConstraint *constraint);

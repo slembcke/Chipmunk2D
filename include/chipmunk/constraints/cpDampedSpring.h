@@ -19,13 +19,13 @@
  * SOFTWARE.
  */
 
-struct cpDampedSpring;
+typedef struct cpDampedSpring cpDampedSpring;
 
-typedef cpFloat (*cpDampedSpringForceFunc)(struct cpConstraint *spring, cpFloat dist);
+typedef cpFloat (*cpDampedSpringForceFunc)(cpConstraint *spring, cpFloat dist);
 
 const cpConstraintClass *cpDampedSpringGetClass();
 
-typedef struct cpDampedSpring {
+struct cpDampedSpring {
 	cpConstraint constraint;
 	cpVect anchr1, anchr2;
 	cpFloat restLength;
@@ -39,7 +39,7 @@ typedef struct cpDampedSpring {
 	cpVect r1, r2;
 	cpFloat nMass;
 	cpVect n;
-} cpDampedSpring;
+};
 
 cpDampedSpring *cpDampedSpringAlloc(void);
 cpDampedSpring *cpDampedSpringInit(cpDampedSpring *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping);

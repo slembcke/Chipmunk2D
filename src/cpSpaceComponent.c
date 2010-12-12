@@ -70,6 +70,15 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 	}
 }
 
+static void
+cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
+{
+	for(cpShape *shape = body->shapesList; shape; shape = shape->next){
+		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
+		cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
+	}
+}
+
 static inline void
 componentActivate(cpBody *root)
 {
@@ -110,6 +119,7 @@ mergeBodies(cpSpace *space, cpArray *components, cpArray *rogueBodies, cpBody *a
 	cpBool b_sleep = cpBodyIsSleeping(b_root);
 	
 	if(a_sleep && b_sleep){
+		// TODO can be removed after constraints are properly slept
 		return;
 	} else if(a_sleep || b_sleep){
 		componentActivate(a_root);
@@ -209,11 +219,7 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 			cpBody *body = root, *next;
 			do {
 				next = body->node.next;
-				
-				for(cpShape *shape = body->shapesList; shape; shape = shape->next){
-					cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
-					cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
-				}
+				cpSpaceDeactivateBody(space, body);
 			} while((body = next) != root);
 			
 			cpArrayPush(space->sleepingComponents, root);
@@ -243,11 +249,8 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 	
 	if(cpBodyIsSleeping(body)) return;
 	
-	for(cpShape *shape = body->shapesList; shape; shape = shape->next){
-		cpShapeCacheBB(shape);
-		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
-		cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
-	}
+	for(cpShape *shape = body->shapesList; shape; shape = shape->next) cpShapeCacheBB(shape);
+	cpSpaceDeactivateBody(space, body);
 	
 	if(group){
 		cpBody *root = componentNodeRoot(group);

@@ -20,7 +20,7 @@
  */
 
 // Axis structure used by cpPolyShape.
-typedef struct cpPolyShapeAxis{
+typedef struct cpPolyShapeAxis {
 	// normal
 	cpVect n;
 	// distance from origin
@@ -28,7 +28,7 @@ typedef struct cpPolyShapeAxis{
 } cpPolyShapeAxis;
 
 // Convex polygon shape structure.
-typedef struct cpPolyShape{
+typedef struct cpPolyShape {
 	CP_PRIVATE(cpShape shape);
 	
 	// Vertex and axis lists.

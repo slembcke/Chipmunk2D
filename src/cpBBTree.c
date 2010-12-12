@@ -40,9 +40,9 @@ struct Node {
 };
 
 typedef struct Thread {
-	struct Pair *prev;
-	struct Node *leaf;
-	struct Pair *next;
+	Pair *prev;
+	Node *leaf;
+	Pair *next;
 } Thread;
 
 struct Pair { Thread a, b; };

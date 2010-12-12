@@ -19,12 +19,8 @@
  * SOFTWARE.
  */
 
-struct cpBody;
-struct cpShape;
-struct cpSpace;
-
-typedef void (*cpBodyVelocityFunc)(struct cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);
-typedef void (*cpBodyPositionFunc)(struct cpBody *body, cpFloat dt);
+typedef void (*cpBodyVelocityFunc)(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);
+typedef void (*cpBodyPositionFunc)(cpBody *body, cpFloat dt);
 
 extern cpBodyVelocityFunc cpBodyUpdateVelocityDefault;
 extern cpBodyPositionFunc cpBodyUpdatePositionDefault;
@@ -33,13 +29,13 @@ extern cpBodyPositionFunc cpBodyUpdatePositionDefault;
 // when putting groups of objects to sleep.
 // No interesting user accessible fields.
 typedef struct cpComponentNode {
-	struct cpBody *parent;
-	struct cpBody *next;
+	cpBody *parent;
+	cpBody *next;
 	int rank;
 	cpFloat idleTime;
 } cpComponentNode;
 
-typedef struct cpBody{
+struct cpBody {
 	// *** Integration Functions.
 
 	// Function that is called to integrate the body's velocity. (Defaults to cpBodyUpdateVelocity)
@@ -88,15 +84,15 @@ typedef struct cpBody{
 	CP_PRIVATE(cpFloat w_bias);
 	
 	// Space this body has been added to
-	CP_PRIVATE(struct cpSpace *space);
+	CP_PRIVATE(cpSpace *space);
 	
 	// Pointer to the shape list.
 	// Shapes form a linked list using cpShape.next when added to a space.
-	CP_PRIVATE(struct cpShape *shapesList);
+	CP_PRIVATE(cpShape *shapesList);
 	
 	// Used by cpSpaceStep() to store contact graph information.
 	CP_PRIVATE(cpComponentNode node);
-} cpBody;
+};
 
 // Basic allocation/destruction functions
 cpBody *cpBodyAlloc(void);
@@ -132,7 +128,7 @@ cpBodyIsStatic(const cpBody *body)
 static inline cpBool
 cpBodyIsRogue(const cpBody *body)
 {
-	return (body->CP_PRIVATE(space) == ((struct cpSpace*)0));
+	return (body->CP_PRIVATE(space) == ((cpSpace*)0));
 }
 
 

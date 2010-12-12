@@ -175,7 +175,7 @@ cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data)
 	while(bin && !set->eql(ptr, bin->elt))
 		bin = bin->next;
 	
-	// Create it necessary.
+	// Create it if necessary.
 	if(!bin){
 		bin = getUnusedBin(set);
 		bin->hash = hash;
@@ -185,10 +185,7 @@ cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data)
 		set->table[idx] = bin;
 		
 		set->entries++;
-		
-		// Resize the set if it's full.
-		if(setIsFull(set))
-			cpHashSetResize(set);
+		if(setIsFull(set)) cpHashSetResize(set);
 	}
 	
 	return bin->elt;
@@ -210,15 +207,14 @@ cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 	
 	// Remove it if it exists.
 	if(bin){
-		// Fix the previous linked list pointer
+		// Update the previous linked list pointer
 		(*prev_ptr) = bin->next;
 		set->entries--;
 		
-		void *return_value = bin->elt;
-		
+		void *elt = bin->elt;
 		recycleBin(set, bin);
 		
-		return return_value;
+		return elt;
 	}
 	
 	return NULL;

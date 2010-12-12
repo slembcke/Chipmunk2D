@@ -25,6 +25,23 @@ extern cpFloat cp_bias_coef;
 // Amount of allowed penetration. Used to reduce oscillating contacts and keep the collision cache warm. Defaults to 0.1.
 extern cpFloat cp_collision_slop;
 
+// User collision handler function types.
+typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, void *data);
+typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
+typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
+typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data);
+
+// Structure for holding collision handler function callback information.
+typedef struct cpCollisionHandler {
+	cpCollisionType a;
+	cpCollisionType b;
+	cpCollisionBeginFunc begin;
+	cpCollisionPreSolveFunc preSolve;
+	cpCollisionPostSolveFunc postSolve;
+	cpCollisionSeparateFunc separate;
+	void *data;
+} cpCollisionHandler;
+
 // Data structure for contact points.
 typedef struct cpContact {
 	// Contact point and normal.
@@ -55,7 +72,7 @@ typedef enum cpArbiterState {
 } cpArbiterState;
 
 // Data structure for tracking collisions between shapes.
-typedef struct cpArbiter {
+struct cpArbiter {
 	// Information on the contact points between the objects.
 	CP_PRIVATE(int numContacts);
 	CP_PRIVATE(cpContact *contacts);
@@ -74,12 +91,12 @@ typedef struct cpArbiter {
 	// Time stamp of the arbiter. (from cpSpace)
 	CP_PRIVATE(cpTimestamp stamp);
 	
-	CP_PRIVATE(struct cpCollisionHandler *handler);
+	CP_PRIVATE(cpCollisionHandler *handler);
 	
 	// Are the shapes swapped in relation to the collision handler?
 	CP_PRIVATE(cpBool swappedColl);
 	CP_PRIVATE(cpArbiterState state);
-} cpArbiter;
+};
 
 // Arbiter Helper Functions
 cpVect cpArbiterTotalImpulse(cpArbiter *arb);

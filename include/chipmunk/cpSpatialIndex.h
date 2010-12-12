@@ -6,10 +6,10 @@ typedef void (*cpSpatialIndexQueryCallback)(void *obj1, void *obj2, void *data);
 typedef cpFloat (*cpSpatialIndexSegmentQueryCallback)(void *obj1, void *obj2, void *data);
 
 
-struct cpSpatialIndexClass;
+typedef struct cpSpatialIndexClass cpSpatialIndexClass;
 
 typedef struct cpSpatialIndex {
-	struct cpSpatialIndexClass *klass;
+	cpSpatialIndexClass *klass;
 	
 	cpSpatialIndexBBFunc bbfunc;
 } cpSpatialIndex;
@@ -57,7 +57,7 @@ typedef void (*cpSpatialIndexSegmentQueryFunc)(cpSpatialIndex *index, void *obj,
 typedef void (*cpSpatialIndexQueryFunc)(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data);
 typedef void (*cpSpatialIndexReindexCollideFunc)(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data);
 
-typedef struct cpSpatialIndexClass {
+struct cpSpatialIndexClass {
 	cpSpatialIndexDestroyFunc destroy;
 	
 	cpSpatialIndexCountFunc count;
@@ -74,7 +74,7 @@ typedef struct cpSpatialIndexClass {
 	cpSpatialIndexSegmentQueryFunc segmentQuery;
 	cpSpatialIndexQueryFunc query;
 	cpSpatialIndexReindexCollideFunc reindexCollide;
-} cpSpatialIndexClass;
+};
 
 
 void cpSpatialIndexFree(cpSpatialIndex *index);

@@ -98,7 +98,7 @@ handleSetTrans(void *obj, cpSpaceHash *hash)
 
 struct cpSpaceHashBin {
 	cpHandle *handle;
-	struct cpSpaceHashBin *next;
+	cpSpaceHashBin *next;
 };
 
 static inline void

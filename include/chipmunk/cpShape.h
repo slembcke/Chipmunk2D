@@ -20,11 +20,10 @@
  */
  
 // Forward declarations required for defining other structs.
-typedef struct cpShape cpShape;
 typedef struct cpShapeClass cpShapeClass;
 
 typedef struct cpSegmentQueryInfo {
-	struct cpShape *shape; // shape that was hit, NULL if no collision
+	cpShape *shape; // shape that was hit, NULL if no collision
 	cpFloat t; // Distance along query segment, will always be in the range [0, 1].
 	cpVect n; // normal of hit surface
 } cpSegmentQueryInfo;
@@ -42,15 +41,15 @@ struct cpShapeClass {
 	cpShapeType type;
 	
 	// Called by cpShapeCacheBB().
-	cpBB (*cacheData)(struct cpShape *shape, cpVect p, cpVect rot);
+	cpBB (*cacheData)(cpShape *shape, cpVect p, cpVect rot);
 	// Called to by cpShapeDestroy().
-	void (*destroy)(struct cpShape *shape);
+	void (*destroy)(cpShape *shape);
 	
 	// called by cpShapePointQuery().
-	cpBool (*pointQuery)(struct cpShape *shape, cpVect p);
+	cpBool (*pointQuery)(cpShape *shape, cpVect p);
 	
 	// called by cpShapeSegmentQuery()
-	 void (*segmentQuery)(struct cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+	 void (*segmentQuery)(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
 };
 
 // Basic shape struct that the others inherit from.
@@ -91,14 +90,14 @@ struct cpShape {
 	// *** Internally Used Fields
 	
 	// Shapes form a linked list when added to space on a non-NULL body
-	CP_PRIVATE(struct cpShape *next);
+	CP_PRIVATE(cpShape *next);
 	
 	// Unique id used as the hash value.
 	CP_PRIVATE(cpHashValue hashid);
 };
 
 // Low level shape initialization func.
-cpShape* cpShapeInit(cpShape *shape, const struct cpShapeClass *klass, cpBody *body);
+cpShape* cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body);
 
 // Basic destructor functions. (allocation functions are not shared)
 void cpShapeDestroy(cpShape *shape);
@@ -113,7 +112,7 @@ cpBool cpShapePointQuery(cpShape *shape, cpVect p);
 #define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(cpShape *shape)
 
 // Circle shape structure.
-typedef struct cpCircleShape{
+typedef struct cpCircleShape {
 	CP_PRIVATE(cpShape shape);
 	
 	// Center in body space coordinates
@@ -134,7 +133,7 @@ CP_DeclareShapeGetter(cpCircleShape, cpVect, Offset);
 CP_DeclareShapeGetter(cpCircleShape, cpFloat, Radius);
 
 // Segment shape structure.
-typedef struct cpSegmentShape{
+typedef struct cpSegmentShape {
 	CP_PRIVATE(cpShape shape);
 	
 	// Endpoints and normal of the segment. (body space coordinates)

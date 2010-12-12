@@ -55,7 +55,7 @@ contactSetTrans(cpShape **shapes, cpSpace *space)
 		for(int i=0; i<count; i++) cpArrayPush(space->pooledArbiters, buffer + i);
 	}
 	
-	return cpArbiterInit((cpArbiter *) cpArrayPop(space->pooledArbiters), shapes[0], shapes[1]);
+	return cpArbiterInit((cpArbiter *)cpArrayPop(space->pooledArbiters), shapes[0], shapes[1]);
 }
 
 #pragma mark Collision Pair Function Helpers
@@ -90,6 +90,29 @@ static cpVect shapeVelocityFunc(cpShape *shape){return shape->body->v;}
 // Iterator functions for destructors.
 static void             freeWrap(void         *ptr, void *unused){          cpfree(ptr);}
 static void        shapeFreeWrap(cpShape      *ptr, void *unused){     cpShapeFree(ptr);}
+
+void
+cpSpaceLock(cpSpace *space)
+{
+	space->locked++;
+}
+
+void
+cpSpaceUnlock(cpSpace *space)
+{
+	space->locked--;
+	cpAssert(space->locked >= 0, "Internal error:Space lock underflow.");
+	
+	if(!space->locked){
+		cpArray *waking = space->rousedBodies;
+		for(int i=0, count=waking->num; i<count; i++){
+			cpSpaceActivateBody(space, (cpBody *)waking->arr[i]);
+		}
+		
+		waking->num = 0;
+	}
+}
+
 
 #pragma mark Memory Management Functions
 
@@ -245,7 +268,7 @@ cpSpaceAddCollisionHandler(
 void
 cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
-	struct{cpCollisionType a, b;} ids = {a, b};
+	struct { cpCollisionType a, b; } ids = {a, b};
 	cpCollisionHandler *old_handler = (cpCollisionHandler *) cpHashSetRemove(space->collFuncSet, CP_HASH_PAIR(a, b), &ids);
 	cpfree(old_handler);
 }

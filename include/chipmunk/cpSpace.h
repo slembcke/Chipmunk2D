@@ -19,34 +19,10 @@
  * SOFTWARE.
  */
 
-typedef struct cpSpace cpSpace;
-
 // Number of frames that contact information should persist.
 extern cpTimestamp cp_contact_persistence;
 
-// User collision handler function types.
-typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, void *data);
-typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
-typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
-typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data);
-
-// Structure for holding collision pair function information.
-// Used internally.
-typedef struct cpCollisionHandler {
-	cpCollisionType a;
-	cpCollisionType b;
-	cpCollisionBeginFunc begin;
-	cpCollisionPreSolveFunc preSolve;
-	cpCollisionPostSolveFunc postSolve;
-	cpCollisionSeparateFunc separate;
-	void *data;
-} cpCollisionHandler;
-
-typedef struct cpContactBufferHeader {
-	cpTimestamp stamp;
-	struct cpContactBufferHeader *next;
-	unsigned int numContacts;
-} cpContactBufferHeader;
+typedef struct cpContactBufferHeader cpContactBufferHeader;
 
 struct cpSpace {
 	// *** User definable fields
