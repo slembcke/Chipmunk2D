@@ -141,10 +141,7 @@ mergeBodies(cpSpace *space, cpArray *components, cpArray *rogueBodies, cpBody *a
 	cpBool a_sleep = cpBodyIsSleeping(a_root);
 	cpBool b_sleep = cpBodyIsSleeping(b_root);
 	
-	if(a_sleep && b_sleep){
-		// TODO can be removed after constraints are properly slept
-		return;
-	} else if(a_sleep || b_sleep){
+	if(a_sleep || b_sleep){
 		componentActivate(a_root);
 		componentActivate(b_root);
 	} 
@@ -237,8 +234,8 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 	// iterate components, copy or deactivate
 	for(int i=0; i<components->num; i++){
 		cpBody *root = (cpBody*)components->arr[i];
+		cpBody *body = root, *next = NULL;
 		if(componentActive(root, space->sleepTimeThreshold)){
-			cpBody *body = root, *next;
 			do {
 				next = body->node.next;
 				
@@ -247,7 +244,6 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 				body->node = node;
 			} while((body = next) != root);
 		} else {
-			cpBody *body = root, *next;
 			do {
 				next = body->node.next;
 				cpSpaceDeactivateBody(space, body);
