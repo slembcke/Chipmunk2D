@@ -70,13 +70,17 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 		}
 		
 		for(cpArbiter *arb = body->arbiterList; arb; arb = (arb->a->body == body ? arb->nextA : arb->nextB)){
-			cpSpaceCollideShapes(arb->a, arb->b, space);
-			cpArrayPush(space->pooledArbiters, arb);
-			// TODO restore solver values
+			cpBody *other = arb->a->body;
+			if(other == body || cpBodyIsStatic(other)){
+				cpSpaceCollideShapes(arb->a, arb->b, space);
+				cpArrayPush(space->pooledArbiters, arb);
+				// TODO restore solver values
+			}
 		}
 		
 		for(cpConstraint *c = body->constraintList; c; c = (c->a == body ? c->nextA : c->nextB)){
-			if(c->a == body || cpBodyIsStatic(c->a)) cpArrayPush(space->constraints, c);
+			cpBody *other = c->a;
+			if(other == body || cpBodyIsStatic(other)) cpArrayPush(space->constraints, c);
 		}
 	}
 }
@@ -90,15 +94,19 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 	}
 	
 	for(cpArbiter *arb = body->arbiterList; arb; arb = (arb->a->body == body ? arb->nextA : arb->nextB)){
-		cpShape *a = arb->a, *b = arb->b;
-		cpShape *shape_pair[] = {a, b};
-		cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
-		cpHashSetRemove(space->contactSet, arbHashID, shape_pair);
-		// TODO save solver values
+		cpBody *other = arb->a->body;
+		if(other == body || cpBodyIsStatic(other)){
+			cpShape *a = arb->a, *b = arb->b;
+			cpShape *shape_pair[] = {a, b};
+			cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
+			cpHashSetRemove(space->contactSet, arbHashID, shape_pair);
+			// TODO save solver values
+		}
 	}
 		
 	for(cpConstraint *c = body->constraintList; c; c = (c->a == body ? c->nextA : c->nextB)){
-		if(c->a == body || cpBodyIsStatic(c->a)) cpArrayDeleteObj(space->constraints, c);
+		cpBody *other = c->a;
+		if(other == body || cpBodyIsStatic(other)) cpArrayDeleteObj(space->constraints, c);
 	}
 }
 

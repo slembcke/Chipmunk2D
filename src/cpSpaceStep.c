@@ -308,7 +308,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	}
 
 	// Integrate velocities.
-	cpFloat damping = cpfpow(1.0f/space->damping, -dt);
+	cpFloat damping = cpfpow(space->damping, dt);
 	for(int i=0; i<bodies->num; i++){
 		cpBody *body = (cpBody *)bodies->arr[i];
 		body->velocity_func(body, space->gravity, damping, dt);
