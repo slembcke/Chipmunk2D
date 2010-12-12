@@ -67,7 +67,6 @@ typedef enum cpArbiterState {
 	cpArbiterStateNormal,
 	cpArbiterStateFirstColl,
 	cpArbiterStateIgnore,
-	cpArbiterStateSleep,
 	cpArbiterStateCached,
 } cpArbiterState;
 

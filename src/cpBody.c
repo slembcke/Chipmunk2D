@@ -62,7 +62,9 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->w_limit = (cpFloat)INFINITY;
 	
 	body->space = NULL;
-	body->shapesList = NULL;
+	body->shapeList = NULL;
+	body->arbiterList = NULL;
+	body->constraintList = NULL;
 	
 	cpComponentNode node = {NULL, NULL, 0, 0.0f};
 	body->node = node;

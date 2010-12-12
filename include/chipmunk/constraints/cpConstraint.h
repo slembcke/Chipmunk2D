@@ -41,6 +41,8 @@ struct cpConstraint {
 	CP_PRIVATE(const cpConstraintClass *klass);
 	
 	cpBody *a, *b;
+	cpConstraint CP_PRIVATE(*nextA), CP_PRIVATE(*nextB);
+	
 	cpFloat maxForce;
 	cpFloat biasCoef;
 	cpFloat maxBias;

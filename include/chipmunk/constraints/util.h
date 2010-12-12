@@ -30,10 +30,6 @@ void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, 
 cpBody *a_var, *b_var; { \
 	a_var = ((cpConstraint *)constraint)->a; \
 	b_var = ((cpConstraint *)constraint)->b; \
-	if( \
-		(cpBodyIsSleeping(a_var) || cpBodyIsStatic(a_var)) && \
-		(cpBodyIsSleeping(b_var) || cpBodyIsStatic(b_var)) \
-	) return; \
 }
 
 static inline cpVect

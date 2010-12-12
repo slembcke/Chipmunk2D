@@ -303,17 +303,10 @@ cpSpaceSetDefaultCollisionHandler(
 	);
 
 static void
-cpBodyAddShape(cpBody *body, cpShape *shape)
-{
-	shape->next = shape->body->shapesList;
-	shape->body->shapesList = shape;
-}
-
-static void
 cpBodyRemoveShape(cpBody *body, cpShape *shape)
 {
-	cpShape **prev_ptr = &body->shapesList;
-	cpShape *node = body->shapesList;
+	cpShape **prev_ptr = &body->shapeList;
+	cpShape *node = body->shapeList;
 	
 	while(node && node != shape){
 		prev_ptr = &node->next;
@@ -335,7 +328,9 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
-	cpBodyAddShape(body, shape);
+	
+	// Push onto the head of the body's shape list
+	shape->next = body->shapeList; body->shapeList = shape;
 	
 	cpShapeCacheBB(shape);
 	cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
@@ -370,6 +365,23 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 	return body;
 }
 
+static void
+cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint)
+{
+	cpConstraint **prev_ptr = &body->constraintList;
+	cpConstraint *node = body->constraintList;
+	
+	while(node && node != constraint){
+		prev_ptr = (node->a == body ? &node->nextA : &node->nextB);
+		node = *prev_ptr;
+	}
+	
+	cpAssert(node, "Attempted to remove a constraint from a body it was never attached to.");
+	(*prev_ptr) = (node->a == body ? node->nextA : node->nextB);
+}
+
+
+
 cpConstraint *
 cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
@@ -379,6 +391,11 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	cpBodyActivate(constraint->a);
 	cpBodyActivate(constraint->b);
 	cpArrayPush(space->constraints, constraint);
+	
+	// Push onto the heads of the bodies' constraint lists
+	cpBody *a = constraint->a, *b = constraint->b;
+	constraint->nextA = a->constraintList; a->constraintList = constraint;
+	constraint->nextB = b->constraintList; b->constraintList = constraint;
 	
 	return constraint;
 }
@@ -462,6 +479,9 @@ cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 	cpBodyActivate(constraint->a);
 	cpBodyActivate(constraint->b);
 	cpArrayDeleteObj(space->constraints, constraint);
+	
+	cpBodyRemoveConstraint(constraint->a, constraint);
+	cpBodyRemoveConstraint(constraint->b, constraint);
 }
 
 #pragma mark Iteration

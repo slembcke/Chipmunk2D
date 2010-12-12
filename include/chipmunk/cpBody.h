@@ -88,8 +88,9 @@ struct cpBody {
 	
 	// Pointer to the shape list.
 	// Shapes form a linked list using cpShape.next when added to a space.
-	CP_PRIVATE(cpShape *shapesList);
+	CP_PRIVATE(cpShape *shapeList);
 	CP_PRIVATE(cpArbiter *arbiterList);
+	CP_PRIVATE(cpConstraint *constraintList);
 	
 	// Used by cpSpaceStep() to store contact graph information.
 	CP_PRIVATE(cpComponentNode node);

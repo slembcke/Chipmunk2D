@@ -45,8 +45,12 @@ void
 cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b)
 {
 	constraint->klass = klass;
+	
 	constraint->a = a;
 	constraint->b = b;
+	
+	constraint->nextA = NULL;
+	constraint->nextB = NULL;
 	
 	constraint->maxForce = (cpFloat)INFINITY;
 	constraint->biasCoef = cp_constraint_bias_coef;

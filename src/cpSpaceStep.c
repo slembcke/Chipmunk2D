@@ -220,25 +220,6 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space)
 static cpBool
 contactSetFilter(cpArbiter *arb, cpSpace *space)
 {
-	if(space->sleepTimeThreshold != INFINITY){
-		cpBody *a = arb->a->body;
-		cpBody *b = arb->b->body;
-		
-		// both bodies are either static or sleeping
-		cpBool sleepingNow =
-			(cpBodyIsStatic(a) || cpBodyIsSleeping(a)) &&
-			(cpBodyIsStatic(b) || cpBodyIsSleeping(b));
-		
-		if(sleepingNow){
-			arb->state = cpArbiterStateSleep;
-			return cpTrue;
-		} else if(arb->state == cpArbiterStateSleep){
-			// wake up the arbiter and continue as normal
-			arb->state = cpArbiterStateNormal;
-			// TODO is it possible that cpArbiterStateIgnore should be set here instead?
-		}
-	}
-	
 	cpTimestamp ticks = space->stamp - arb->stamp;
 	
 	// was used last frame, but not this one

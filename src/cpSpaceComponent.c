@@ -20,6 +20,7 @@
  */
  
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "chipmunk_private.h"
 
@@ -63,7 +64,7 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 		cpArrayPush(space->rousedBodies, body);
 	} else {
 		cpArrayPush(space->bodies, body);
-		for(cpShape *shape=body->shapesList; shape; shape=shape->next){
+		for(cpShape *shape=body->shapeList; shape; shape=shape->next){
 			cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
 			cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
 		}
@@ -71,6 +72,11 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 		for(cpArbiter *arb = body->arbiterList; arb; arb = (arb->a->body == body ? arb->nextA : arb->nextB)){
 			cpSpaceCollideShapes(arb->a, arb->b, space);
 			cpArrayPush(space->pooledArbiters, arb);
+			// TODO restore solver values
+		}
+		
+		for(cpConstraint *c = body->constraintList; c; c = (c->a == body ? c->nextA : c->nextB)){
+			if(c->a == body || cpBodyIsStatic(c->a)) cpArrayPush(space->constraints, c);
 		}
 	}
 }
@@ -78,7 +84,7 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 static void
 cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 {
-	for(cpShape *shape = body->shapesList; shape; shape = shape->next){
+	for(cpShape *shape = body->shapeList; shape; shape = shape->next){
 		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
 		cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
 	}
@@ -89,6 +95,10 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 		cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
 		cpHashSetRemove(space->contactSet, arbHashID, shape_pair);
 		// TODO save solver values
+	}
+		
+	for(cpConstraint *c = body->constraintList; c; c = (c->a == body ? c->nextA : c->nextB)){
+		if(c->a == body || cpBodyIsStatic(c->a)) cpArrayDeleteObj(space->constraints, c);
 	}
 }
 
@@ -270,7 +280,7 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 	
 	if(cpBodyIsSleeping(body)) return;
 	
-	for(cpShape *shape = body->shapesList; shape; shape = shape->next) cpShapeCacheBB(shape);
+	for(cpShape *shape = body->shapeList; shape; shape = shape->next) cpShapeCacheBB(shape);
 	cpSpaceDeactivateBody(space, body);
 	
 	if(group){
@@ -299,5 +309,3 @@ cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape){
 	cpArray *bodies = NULL;
 	cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)activateTouchingHelper, &bodies);
 }
-
-

@@ -35,10 +35,8 @@ cpArray*
 cpArrayInit(cpArray *arr, int size)
 {
 	arr->num = 0;
-	
-	size = (size ? size : 4);
-	arr->max = size;
-	arr->arr = (void **)cpmalloc(size*sizeof(void**));
+	arr->max = (size ? size : 4);
+	arr->arr = (void **)cpmalloc(arr->max*sizeof(void**));
 	
 	return arr;
 }
@@ -88,39 +86,43 @@ cpArrayPop(cpArray *arr)
 	return value;
 }
 
-static void
-cpArrayDeleteIndex(cpArray *arr, int idx)
-{
-	arr->num--;
-	
-	arr->arr[idx] = arr->arr[arr->num];
-	arr->arr[arr->num] = NULL;
-}
+//static void
+//cpArrayDeleteIndex(cpArray *arr, int idx)
+//{
+//	arr->num--;
+//	
+//	arr->arr[idx] = arr->arr[arr->num];
+//	arr->arr[arr->num] = NULL;
+//}
 
 void
 cpArrayDeleteObj(cpArray *arr, void *obj)
 {
 	for(int i=0; i<arr->num; i++){
 		if(arr->arr[i] == obj){
-			cpArrayDeleteIndex(arr, i);
+			arr->num--;
+			
+			arr->arr[i] = arr->arr[arr->num];
+			arr->arr[arr->num] = NULL;
+			
 			return;
 		}
 	}
 }
 
-void
-cpArrayAppend(cpArray *arr, cpArray *other)
-{
-	void *tail = &arr->arr[arr->num];
-	
-	arr->num += other->num;
-	if(arr->num >= arr->max){
-		arr->max = arr->num;
-		arr->arr = (void **)cprealloc(arr->arr, arr->max*sizeof(void**));
-	}
-	
-	memcpy(tail, other->arr, other->num*sizeof(void**));
-}
+//void
+//cpArrayAppend(cpArray *arr, cpArray *other)
+//{
+//	void *tail = &arr->arr[arr->num];
+//	
+//	arr->num += other->num;
+//	if(arr->num >= arr->max){
+//		arr->max = arr->num;
+//		arr->arr = (void **)cprealloc(arr->arr, arr->max*sizeof(void**));
+//	}
+//	
+//	memcpy(tail, other->arr, other->num*sizeof(void**));
+//}
 
 void
 cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*))
