@@ -64,7 +64,7 @@ init(void)
 	};
 	
 	// Add a floor.
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(&space->staticBody, cpv(-600,-240), cpv(600,-240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpv(-600,-240), cpv(600,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	

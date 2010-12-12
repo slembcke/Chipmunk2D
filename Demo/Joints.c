@@ -120,7 +120,7 @@ init(void)
 	space->gravity = cpv(0, -100);
 	space->sleepTimeThreshold = 0.5f;
 	
-	cpBody *staticBody = &space->staticBody;
+	cpBody *staticBody = space->staticBody;
 	cpShape *shape;
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));

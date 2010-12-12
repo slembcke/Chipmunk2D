@@ -86,7 +86,7 @@ init(void)
 	cpSpaceResizeStaticHash(space, 40.0f, 999);
 	cpSpaceResizeActiveHash(space, 30.0f, 2999);
 
-	cpBody *staticBody = &space->staticBody;
+	cpBody *staticBody = space->staticBody;
 	cpShape *shape;
 	
 	// add a non-collidable segment as a quick and dirty way to draw the query line

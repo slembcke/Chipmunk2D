@@ -76,7 +76,7 @@ static cpSpace *
 init(void)
 {
 	space = cpSpaceNew();
-	cpBody *staticBody = &space->staticBody;
+	cpBody *staticBody = space->staticBody;
 	
 	cpBody *body1  = add_bar(cpv(-240,  160), cpv(-160,   80), 1);
 	cpBody *body2  = add_bar(cpv(-160,   80), cpv( -80,  160), 1);

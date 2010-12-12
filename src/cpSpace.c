@@ -148,7 +148,8 @@ cpSpaceInit(cpSpace *space)
 	
 	space->postStepCallbacks = NULL;
 	
-	cpBodyInitStatic(&space->staticBody);
+	cpBodyInitStatic(&space->_staticBody);
+	space->staticBody = &space->_staticBody;
 	
 	return space;
 }
@@ -304,7 +305,7 @@ cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
 	cpBody *body = shape->body;
-	if(!body || body == &space->staticBody) return cpSpaceAddStaticShape(space, shape);
+	if(cpBodyIsStatic(body)) return cpSpaceAddStaticShape(space, shape);
 	
 	cpAssert(!cpSpatialIndexContains(space->activeShapes, shape, shape->hashid),
 		"Cannot add the same shape more than once.");
@@ -325,8 +326,6 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	cpAssert(!cpSpatialIndexContains(space->staticShapes, shape, shape->hashid),
 		"Cannot add the same static shape more than once.");
 	cpAssertSpaceUnlocked(space);
-	
-	if(!shape->body) shape->body = &space->staticBody;
 	
 	cpShapeCacheBB(shape);
 	cpSpaceActivateShapesTouchingShape(space, shape);
@@ -353,9 +352,6 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
 	cpAssert(!cpArrayContains(space->constraints, constraint), "Cannot add the same constraint more than once.");
 	cpAssertSpaceUnlocked(space);
-	
-	if(!constraint->a) constraint->a = &space->staticBody;
-	if(!constraint->b) constraint->b = &space->staticBody;
 	
 	cpBodyActivate(constraint->a);
 	cpBodyActivate(constraint->b);

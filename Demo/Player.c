@@ -142,7 +142,7 @@ init(void)
 	space->iterations = 10;
 	space->gravity = cpv(0, -1500);
 
-	cpBody *body, *staticBody = &space->staticBody;
+	cpBody *body, *staticBody = space->staticBody;
 	cpShape *shape;
 	
 	// Create segments around the edge of the screen.

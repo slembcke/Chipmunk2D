@@ -114,7 +114,10 @@ struct cpSpace {
 	
 	CP_PRIVATE(cpHashSet *postStepCallbacks);
 	
-	cpBody staticBody;
+	CP_PRIVATE(cpBody _staticBody);
+	
+	cpDataPointer data;
+	cpBody *staticBody;
 };
 
 // Basic allocation/destruction functions.

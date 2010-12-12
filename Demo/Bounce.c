@@ -71,7 +71,7 @@ init(void)
 	cpSpaceResizeActiveHash(space, 30.0f, 1000);
 	space->iterations = 10;
 
-	cpBody *body, *staticBody = &space->staticBody;
+	cpBody *body, *staticBody = space->staticBody;
 	cpShape *shape;
 
 	// Create segments around the edge of the screen.

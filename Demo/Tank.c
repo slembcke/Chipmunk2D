@@ -87,7 +87,7 @@ init(void)
 	space->iterations = 10;
 	space->sleepTimeThreshold = 0.5f;
 	
-	cpBody *staticBody = &space->staticBody;
+	cpBody *staticBody = space->staticBody;
 	cpShape *shape;
 		
 	// Create segments around the edge of the screen.

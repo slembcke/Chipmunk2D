@@ -117,7 +117,7 @@ init(void)
 	space->iterations = 10;
 	space->gravity = cpv(0, -100);
 	
-	cpBody *staticBody = &space->staticBody;
+	cpBody *staticBody = space->staticBody;
 	cpShape *shape;
 	
 	// Data structure for our ball emitter

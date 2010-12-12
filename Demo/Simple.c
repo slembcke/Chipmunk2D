@@ -48,7 +48,7 @@ init(void)
 	
 	// Create A ground segment along the bottom of the screen
 	// By attaching it to &space->staticBody instead of a body, we make it a static shape.
-	cpShape *ground = cpSegmentShapeNew(&space->staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
+	cpShape *ground = cpSegmentShapeNew(space->staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
 	// Set some parameters of the shape.
 	// For more info: http://code.google.com/p/chipmunk-physics/wiki/cpShape
 	ground->e = 1.0f; ground->u = 1.0f;

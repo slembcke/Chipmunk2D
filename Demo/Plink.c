@@ -64,7 +64,7 @@ init(void)
 	cpSpaceResizeStaticHash(space, 40.0f, 999);
 	cpSpaceResizeActiveHash(space, 30.0f, 2999);
 	
-	cpBody *body, *staticBody = &space->staticBody;
+	cpBody *body, *staticBody = space->staticBody;
 	cpShape *shape;
 	
 	// Create vertexes for a pentagon shape.

@@ -75,7 +75,7 @@ init(void)
 	space = cpSpaceNew();
 	space->gravity = cpv(0, -600);
 	
-	cpBody *staticBody = &space->staticBody;
+	cpBody *staticBody = space->staticBody;
 	cpShape *shape;
 	
 	// beveling all of the line segments slightly helps prevent things from getting stuck on cracks

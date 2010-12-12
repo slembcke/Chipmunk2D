@@ -108,7 +108,7 @@ init(void)
 	space->iterations = 20;
 	space->gravity = cpv(0,-500);
 	
-	cpBody *staticBody = &space->staticBody;
+	cpBody *staticBody = space->staticBody;
 	cpShape *shape;
 	cpVect a, b;
 	
