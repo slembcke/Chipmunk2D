@@ -1,16 +1,13 @@
-Fix static lib build scripts
-Encourage static linking in docs
-Add data field to cpSpace
-
-6.0:
 Doxygen! (mark private/public parts of API)
 Fix units for damped springs
 Breakable joints?
 Separate impulse application for joints
-Remove elastic iterations
 breakable object support functions
 constraint callbacks
 touch joint (Objective-Chipmunk)
 per body damping and gravity coefs?
-cpShapeCacheBB needs an overhaul
 Better accuracy for variable timestepping?
+
+Notes:
+* don't push arbiters to rogue bodies, and don't push constraints or arbiters to static ones
+* Need to copy the arbiter contact list instead of re-calling collision

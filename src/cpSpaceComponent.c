@@ -21,6 +21,7 @@
  
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "chipmunk_private.h"
 
@@ -72,9 +73,11 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 		for(cpArbiter *arb = body->arbiterList; arb; arb = (arb->a->body == body ? arb->nextA : arb->nextB)){
 			cpBody *other = arb->a->body;
 			if(other == body || cpBodyIsStatic(other)){
+				// TODO restore solver values instead
 				cpSpaceCollideShapes(arb->a, arb->b, space);
+				
+				cpfree(arb->contacts);
 				cpArrayPush(space->pooledArbiters, arb);
-				// TODO restore solver values
 			}
 		}
 		
@@ -100,7 +103,12 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 			cpShape *shape_pair[] = {a, b};
 			cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
 			cpHashSetRemove(space->contactSet, arbHashID, shape_pair);
-			// TODO save solver values
+			
+			// Save contact values
+			size_t bytes = arb->numContacts*sizeof(cpContact);
+			cpContact *contacts = (cpContact *)cpmalloc(bytes);
+			memcpy(contacts, arb->contacts, bytes);
+			arb->contacts = contacts;
 		}
 	}
 		
