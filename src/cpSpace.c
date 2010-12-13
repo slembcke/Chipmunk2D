@@ -20,7 +20,7 @@
  */
  
 #include <stdlib.h>
-//#include <stdio.h>
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
 
@@ -38,24 +38,6 @@ contactSetEql(cpShape **shapes, cpArbiter *arb)
 	cpShape *b = shapes[1];
 	
 	return ((a == arb->a && b == arb->b) || (b == arb->a && a == arb->b));
-}
-
-// Transformation function for contactSet.
-static void *
-contactSetTrans(cpShape **shapes, cpSpace *space)
-{
-	if(space->pooledArbiters->num == 0){
-		// arbiter pool is exhausted, make more
-		int count = CP_BUFFER_BYTES/sizeof(cpArbiter);
-		cpAssert(count, "Buffer size too small.");
-		
-		cpArbiter *buffer = (cpArbiter *)cpmalloc(CP_BUFFER_BYTES);
-		cpArrayPush(space->allocatedBuffers, buffer);
-		
-		for(int i=0; i<count; i++) cpArrayPush(space->pooledArbiters, buffer + i);
-	}
-	
-	return cpArbiterInit((cpArbiter *)cpArrayPop(space->pooledArbiters), shapes[0], shapes[1]);
 }
 
 #pragma mark Collision Pair Function Helpers
@@ -162,12 +144,12 @@ cpSpaceInit(cpSpace *space)
 	space->pooledArbiters = cpArrayNew(0);
 	
 	space->contactBuffersHead = NULL;
-	space->contactSet = cpHashSetNew(0, (cpHashSetEqlFunc)contactSetEql, (cpHashSetTransFunc)contactSetTrans, NULL);
+	space->contactSet = cpHashSetNew(0, (cpHashSetEqlFunc)contactSetEql, NULL);
 	
 	space->constraints = cpArrayNew(0);
 	
 	space->defaultHandler = defaultHandler;
-	space->collFuncSet = cpHashSetNew(0, (cpHashSetEqlFunc)collFuncSetEql, (cpHashSetTransFunc)collFuncSetTrans, &space->defaultHandler);
+	space->collFuncSet = cpHashSetNew(0, (cpHashSetEqlFunc)collFuncSetEql, &space->defaultHandler);
 	
 	space->postStepCallbacks = NULL;
 	
@@ -262,7 +244,7 @@ cpSpaceAddCollisionHandler(
 		data
 	};
 	
-	cpHashSetInsert(space->collFuncSet, CP_HASH_PAIR(a, b), &handler, NULL);
+	cpHashSetInsert(space->collFuncSet, CP_HASH_PAIR(a, b), &handler, NULL, (cpHashSetTransFunc)collFuncSetTrans);
 }
 
 void

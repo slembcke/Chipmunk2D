@@ -35,8 +35,6 @@ struct cpHashSet {
 	int entries, size;
 	
 	cpHashSetEqlFunc eql;
-	cpHashSetTransFunc trans;
-	
 	void *default_value;
 	
 	cpHashSetBin **table;
@@ -70,14 +68,12 @@ cpHashSetAlloc(void)
 }
 
 cpHashSet *
-cpHashSetInit(cpHashSet *set, int size, cpHashSetEqlFunc eqlFunc, cpHashSetTransFunc trans, void *default_value)
+cpHashSetInit(cpHashSet *set, int size, cpHashSetEqlFunc eqlFunc, void *default_value)
 {
 	set->size = next_prime(size);
 	set->entries = 0;
 	
 	set->eql = eqlFunc;
-	set->trans = trans;
-	
 	set->default_value = default_value;
 	
 	set->table = (cpHashSetBin **)cpcalloc(set->size, sizeof(cpHashSetBin *));
@@ -89,9 +85,9 @@ cpHashSetInit(cpHashSet *set, int size, cpHashSetEqlFunc eqlFunc, cpHashSetTrans
 }
 
 cpHashSet *
-cpHashSetNew(int size, cpHashSetEqlFunc eqlFunc, cpHashSetTransFunc trans, void *default_value)
+cpHashSetNew(int size, cpHashSetEqlFunc eqlFunc, void *default_value)
 {
-	return cpHashSetInit(cpHashSetAlloc(), size, eqlFunc, trans, default_value);
+	return cpHashSetInit(cpHashSetAlloc(), size, eqlFunc, default_value);
 }
 
 static int
@@ -166,7 +162,7 @@ cpHashSetCount(cpHashSet *set)
 }
 
 void *
-cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data)
+cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data, cpHashSetTransFunc trans)
 {
 	int idx = hash%set->size;
 	
@@ -179,7 +175,7 @@ cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data)
 	if(!bin){
 		bin = getUnusedBin(set);
 		bin->hash = hash;
-		bin->elt = set->trans(ptr, data);
+		bin->elt = (trans ? trans(ptr, data) : data);
 		
 		bin->next = set->table[idx];
 		set->table[idx] = bin;

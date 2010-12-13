@@ -20,7 +20,7 @@
  */
  
 #include <stdlib.h>
-//#include <stdio.h>
+#include <stdio.h>
 #include <math.h>
 
 #include "chipmunk_private.h"
@@ -51,11 +51,11 @@ void
 cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)
 {
 	if(!space->postStepCallbacks){
-		space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql, (cpHashSetTransFunc)postStepFuncSetTrans, NULL);
+		space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql, NULL);
 	}
 	
 	postStepCallback callback = {func, obj, data};
-	cpHashSetInsert(space->postStepCallbacks, (cpHashValue)(size_t)obj, &callback, NULL);
+	cpHashSetInsert(space->postStepCallbacks, (cpHashValue)(size_t)obj, &callback, NULL, (cpHashSetTransFunc)postStepFuncSetTrans);
 }
 
 #pragma mark Contact Buffer Functions
@@ -112,7 +112,7 @@ cpSpacePushFreshContactBuffer(cpSpace *space)
 }
 
 
-static cpContact *
+cpContact *
 cpContactBufferGetArray(cpSpace *space)
 {
 	if(space->contactBuffersHead->numContacts + CP_MAX_CONTACTS_PER_ARBITER > CP_CONTACTS_BUFFER_SIZE){
@@ -124,9 +124,10 @@ cpContactBufferGetArray(cpSpace *space)
 	return ((cpContactBuffer *)head)->contacts + head->numContacts;
 }
 
-static inline void
-cpSpacePushContacts(cpSpace *space, int count){
-	cpAssert(count <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error, too many contact point overflow!");
+void
+cpSpacePushContacts(cpSpace *space, int count)
+{
+	cpAssert(count <= CP_MAX_CONTACTS_PER_ARBITER, "Internal Error:contact buffer overflow!");
 	space->contactBuffersHead->numContacts += count;
 }
 
@@ -136,6 +137,23 @@ cpSpacePopContacts(cpSpace *space, int count){
 }
 
 #pragma mark Collision Detection Functions
+
+static void *
+contactSetTrans(cpShape **shapes, cpSpace *space)
+{
+	if(space->pooledArbiters->num == 0){
+		// arbiter pool is exhausted, make more
+		int count = CP_BUFFER_BYTES/sizeof(cpArbiter);
+		cpAssert(count, "Buffer size too small.");
+		
+		cpArbiter *buffer = (cpArbiter *)cpmalloc(CP_BUFFER_BYTES);
+		cpArrayPush(space->allocatedBuffers, buffer);
+		
+		for(int i=0; i<count; i++) cpArrayPush(space->pooledArbiters, buffer + i);
+	}
+	
+	return cpArbiterInit((cpArbiter *)cpArrayPop(space->pooledArbiters), shapes[0], shapes[1]);
+}
 
 static inline cpBool
 queryReject(cpShape *a, cpShape *b)
@@ -184,7 +202,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space)
 	// This is where the persistant contact magic comes from.
 	cpShape *shape_pair[] = {a, b};
 	cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
-	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->contactSet, arbHashID, shape_pair, space);
+	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->contactSet, arbHashID, shape_pair, space, (cpHashSetTransFunc)contactSetTrans);
 	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b);
 	
 	// Call the begin function first if it's the first step
@@ -262,7 +280,6 @@ void
 cpSpaceStep(cpSpace *space, cpFloat dt)
 {
 	if(!dt) return; // don't step if the timestep is 0!
-	
 	cpFloat dt_inv = 1.0f/dt;
 
 	cpArray *bodies = space->bodies;
@@ -271,7 +288,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// Empty the arbiter list.
 	space->arbiters->num = 0;
 
-	// Integrate positions and reset the arbiter list
+	// Integrate positions
 	for(int i=0; i<bodies->num; i++){
 		cpBody *body = (cpBody *)bodies->arr[i];
 		body->position_func(body, dt);
@@ -293,7 +310,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		bodies = space->bodies; // rebuilt by processContactComponents()
 	}
 	
-	// Clear out old cached arbiters and dispatch untouch functions
+	// Clear out old cached arbiters and call separate callbacks
 	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilter, space);
 
 	// Prestep the arbiters.

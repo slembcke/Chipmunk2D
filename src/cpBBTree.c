@@ -392,7 +392,7 @@ cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc)
 	tree->velocityFunc = NULL;
 	
 	tree->spatialIndex.bbfunc = bbfunc;
-	tree->leaves = cpHashSetNew(0, (cpHashSetEqlFunc)leafSetEql, (cpHashSetTransFunc)leafSetTrans, NULL);
+	tree->leaves = cpHashSetNew(0, (cpHashSetEqlFunc)leafSetEql, NULL);
 	tree->root = NULL;
 	
 	tree->pooledNodes = NULL;
@@ -434,7 +434,7 @@ cpBBTreeDestroy(cpBBTree *tree)
 static void
 cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
-	Node *leaf = cpHashSetInsert(tree->leaves, hashid, obj, tree);
+	Node *leaf = cpHashSetInsert(tree->leaves, hashid, obj, tree, (cpHashSetTransFunc)leafSetTrans);
 	
 	Node *root = tree->root;
 	tree->root = (root ? SubtreeInsert(root, leaf, tree) : leaf);

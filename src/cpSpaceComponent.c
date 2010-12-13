@@ -71,13 +71,21 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 		}
 		
 		for(cpArbiter *arb = body->arbiterList; arb; arb = (arb->a->body == body ? arb->nextA : arb->nextB)){
-			cpBody *other = arb->a->body;
-			if(other == body || cpBodyIsStatic(other)){
-				// TODO restore solver values instead
-				cpSpaceCollideShapes(arb->a, arb->b, space);
+			if(body == arb->a->body || cpBodyIsStatic(arb->a->body)){
+				int numContacts = arb->numContacts;
+				cpContact *contacts = arb->contacts;
 				
-				cpfree(arb->contacts);
-				cpArrayPush(space->pooledArbiters, arb);
+				// Restore contact values back to the space's contact buffer memory
+				arb->contacts = cpContactBufferGetArray(space);
+				memcpy(arb->contacts, contacts, numContacts*sizeof(cpContact));
+				cpSpacePushContacts(space, numContacts);
+				
+				cpShape *a = arb->a, *b = arb->b;
+				cpShape *shape_pair[] = {a, b};
+				cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
+				cpHashSetInsert(space->contactSet, arbHashID, shape_pair, arb, NULL);
+				
+				cpfree(contacts);
 			}
 		}
 		
@@ -97,14 +105,14 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 	}
 	
 	for(cpArbiter *arb = body->arbiterList; arb; arb = (arb->a->body == body ? arb->nextA : arb->nextB)){
-		cpBody *other = arb->a->body;
-		if(other == body || cpBodyIsStatic(other)){
+		if(body == arb->a->body || cpBodyIsStatic(arb->a->body)){
 			cpShape *a = arb->a, *b = arb->b;
 			cpShape *shape_pair[] = {a, b};
 			cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
 			cpHashSetRemove(space->contactSet, arbHashID, shape_pair);
+			cpArrayDeleteObj(space->arbiters, arb);
 			
-			// Save contact values
+			// Save contact values to a new block of memory so they won't time out
 			size_t bytes = arb->numContacts*sizeof(cpContact);
 			cpContact *contacts = (cpContact *)cpmalloc(bytes);
 			memcpy(contacts, arb->contacts, bytes);
@@ -203,6 +211,15 @@ addToComponent(cpBody *body, cpArray *components)
 	}
 }
 
+static inline void
+cpBodyPushArbiter(cpBody *body, cpArbiter *arb)
+{
+	if(!cpBodyIsStatic(body) && !cpBodyIsRogue(body)){
+		arb->nextA = body->arbiterList;
+		body->arbiterList = arb;
+	}
+}
+
 // TODO this function needs more commenting.
 void
 cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
@@ -233,9 +250,8 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		mergeBodies(space, components, rogueBodies, arb->a->body, arb->b->body);
 		
 		// Push arbiter connectivity onto bodies
-		cpBody *a = arb->a->body, *b = arb->b->body;
-		arb->nextA = a->arbiterList; a->arbiterList = arb;
-		arb->nextB = b->arbiterList; b->arbiterList = arb;
+		cpBodyPushArbiter(arb->a->body, arb);
+		cpBodyPushArbiter(arb->b->body, arb);
 	}
 	
 	for(int j=0; j<constraints->num; j++){

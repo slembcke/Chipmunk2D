@@ -182,7 +182,7 @@ cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndex
 	hash->celldim = celldim;
 	hash->spatialIndex.bbfunc = bbfunc;
 	
-	hash->handleSet = cpHashSetNew(0, (cpHashSetEqlFunc)handleSetEql, (cpHashSetTransFunc)handleSetTrans, NULL);
+	hash->handleSet = cpHashSetNew(0, (cpHashSetEqlFunc)handleSetEql, NULL);
 	hash->pooledHandles = cpArrayNew(0);
 	
 	hash->pooledBins = NULL;
@@ -276,7 +276,7 @@ hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 static void
 cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 {
-	cpHandle *hand = (cpHandle *)cpHashSetInsert(hash->handleSet, hashid, obj, hash);
+	cpHandle *hand = (cpHandle *)cpHashSetInsert(hash->handleSet, hashid, obj, hash, (cpHashSetTransFunc)handleSetTrans);
 	hashHandle(hash, hand, hash->spatialIndex.bbfunc(obj));
 }
 

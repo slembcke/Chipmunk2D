@@ -52,14 +52,14 @@ typedef void *(*cpHashSetTransFunc)(void *ptr, void *data);
 
 // TODO get rid of reference versions?
 cpHashSet *cpHashSetAlloc(void);
-cpHashSet *cpHashSetInit(cpHashSet *set, int size, cpHashSetEqlFunc eqlFunc, cpHashSetTransFunc trans, void *defaultValue);
-cpHashSet *cpHashSetNew(int size, cpHashSetEqlFunc eqlFunc, cpHashSetTransFunc trans, void *defaultValue);
+cpHashSet *cpHashSetInit(cpHashSet *set, int size, cpHashSetEqlFunc eqlFunc, void *defaultValue);
+cpHashSet *cpHashSetNew(int size, cpHashSetEqlFunc eqlFunc, void *defaultValue);
 
 void cpHashSetDestroy(cpHashSet *set);
 void cpHashSetFree(cpHashSet *set);
 
 int cpHashSetCount(cpHashSet *set);
-void *cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data);
+void *cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data, cpHashSetTransFunc trans);
 void *cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr);
 void *cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr);
 
@@ -125,6 +125,8 @@ cpPolyShapeContainsVertPartial(const cpPolyShape *poly, const cpVect v, const cp
 
 #pragma mark Space Functions
 
+cpContact *cpContactBufferGetArray(cpSpace *space);
+void cpSpacePushContacts(cpSpace *space, int count);
 void cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space);
 void cpSpaceActivateBody(cpSpace *space, cpBody *body);
 void cpSpaceLock(cpSpace *space);
