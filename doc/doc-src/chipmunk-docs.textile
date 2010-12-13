@@ -33,7 +33,7 @@ If you are writing iPhone games using Chipmunk, you should check out the Objecti
 
 h2. Limitations of a C API:
 
-There are two major problems with Chipmunk's C API. The first is that it lacks operator overloading. Chipmunk defines vector operators as functions instead of allowing you to use operators such as *, +, and -. (However Chipmunk 5.3.3 and up does provide overloaded operators if you are using C++) In practice, it's usually not a major problem for readability. The second, and bigger problem is that it's not possible to mark fields as private in C structure types. Be warned that if you are reading fields from Chipmunk structs that are not documented here, that they might change in the future without a lot of prior warning.
+There are two problems with C APIs. The first is that they lack operator overloading. Chipmunk defines vector operators as functions instead of allowing you to use inline operators such as *, +, and -. In practice, it's usually not a major problem for readability, but a little annoying. Chipmunk does provide overloaded operators if you are using C++. Another problem is that there is no way to mark struct field or functions as "private" in C. To get around this, I created the @CP_PRIVATE()@ macro, if you see a struct field or function defined using CP_PRIVATE it means that you shouldn't be using it as it's name or meaning might change in future versions without warning. In Chipmunk 6, it will be a hard error to access these fields or functions unless you import the _chipmunk_private.h_ header.
 
 h2. Support:
 
@@ -537,7 +537,7 @@ p(expl). Equivalent to calling @cpBodySleepWithGroup(body, NULL)@. It forces @bo
 
 <pre><code>void cpBodyActivate(cpBody *body)</code></pre>
 
-p(expl). Wake @body@ up so that it starts actively simulating again if it's sleeping, or reset the idle timer if it's active. This function must not be called from a collision handler callback. Use a post-step callback instead.
+p(expl). Wake @body@ up so that it starts actively simulating again if it's sleeping, or reset the idle timer if it's active. In Chipmunk 5.3.4 and up, you can call this function from a collision or query callback. In previous versions this was an error.
 
 h2. Misc Functions:
 
