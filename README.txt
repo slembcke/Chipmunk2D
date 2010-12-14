@@ -33,6 +33,13 @@ http://www.slembcke.net/forums
 CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
+CHANGES SINCE 5.3.3:
+* FIX: cpBodyActivate() can now be called from collision and query callbacks. This way you can use the setter functions to change properties without indirectly calling cpBodyActivate() and causing an assertion.
+* FIX: cpArbiterGetContactPointSet() was returning the collision points for the normals.
+* FIX: cpSpaceEachBody() now includes sleeping bodies.
+* FIX: Shapes attached to static rogue bodies created with cpBodyNewStatic() are added as static shapes.
+* MISC: Applied a user patch to update the MSVC project and add a .def file.
+
 CHANGES SINCE 5.3.2:
 * API: Added cpArbiteGetCount() to return the number of contact points.
 * API: Added helper functions for calculating areas of Chipmunk shapes as well as calculating polygon centroids and centering polygons on their centroid.
