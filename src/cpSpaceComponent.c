@@ -154,10 +154,19 @@ cpBodyActivate(cpBody *body)
 }
 
 static inline void
-mergeBodies(cpSpace *space, cpArray *components, cpArray *rogueBodies, cpBody *a, cpBody *b)
+mergeBodies(cpSpace *space, cpArray *components, cpBody *a, cpBody *b)
 {
-	// Ignore connections to static bodies
-	if(cpBodyIsStatic(a) || cpBodyIsStatic(b)) return;
+	// Ignore connections to static bodies.
+	// also ignore connections to rogue bodies, but reset the idle counter.
+	if(cpBodyIsStatic(a) || cpBodyIsStatic(b)){
+		return;
+	} else if(cpBodyIsRogue(a)){
+		b->node.idleTime = 0.0f;
+		return;
+	} else if(cpBodyIsRogue(b)){
+		a->node.idleTime = 0.0f;
+		return;
+	}
 	
 	cpBody *a_root = componentNodeRoot(a);
 	cpBody *b_root = componentNodeRoot(b);
@@ -169,10 +178,6 @@ mergeBodies(cpSpace *space, cpArray *components, cpArray *rogueBodies, cpBody *a
 		componentActivate(a_root);
 		componentActivate(b_root);
 	} 
-	
-	// Add any rogue bodies found to the list and reset the idle time of anything they touch.
-	if(cpBodyIsRogue(a)){ cpArrayPush(rogueBodies, a); b->node.idleTime = 0.0f; }
-	if(cpBodyIsRogue(b)){ cpArrayPush(rogueBodies, b); a->node.idleTime = 0.0f; }
 	
 	componentNodeMerge(a_root, b_root);
 }
@@ -226,7 +231,6 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 {
 	cpArray *bodies = space->bodies;
 	cpArray *newBodies = cpArrayNew(bodies->num);
-	cpArray *rogueBodies = cpArrayNew(16);
 	cpArray *arbiters = space->arbiters;
 	cpArray *constraints = space->constraints;
 	cpArray *components = cpArrayNew(space->sleepingComponents->num);
@@ -247,7 +251,7 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 	// iterate graph edges and build forests
 	for(int i=0, count=arbiters->num; i<count; i++){
 		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
-		mergeBodies(space, components, rogueBodies, arb->a->body, arb->b->body);
+		mergeBodies(space, components, arb->a->body, arb->b->body);
 		
 		// Push arbiter connectivity onto bodies
 		cpBodyPushArbiter(arb->a->body, arb);
@@ -256,12 +260,11 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 	
 	for(int j=0; j<constraints->num; j++){
 		cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
-		mergeBodies(space, components, rogueBodies, constraint->a, constraint->b);
+		mergeBodies(space, components, constraint->a, constraint->b);
 	}
 	
 	// iterate bodies and add them to their components
 	for(int i=0; i<bodies->num; i++) addToComponent((cpBody*)bodies->arr[i], components);
-	for(int i=0; i<rogueBodies->num; i++) addToComponent((cpBody*)rogueBodies->arr[i], components);
 	
 	// iterate components, copy or deactivate
 	for(int i=0; i<components->num; i++){
@@ -287,7 +290,6 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 	
 	space->bodies = newBodies;
 	cpArrayFree(bodies);
-	cpArrayFree(rogueBodies);
 	cpArrayFree(components);
 }
 
