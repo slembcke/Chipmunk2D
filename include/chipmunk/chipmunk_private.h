@@ -44,6 +44,16 @@ cpBool cpArrayContains(cpArray *arr, void *ptr);
 
 void cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*));
 
+#pragma mark Foreach loops
+
+#define CP_BODY_FOREACH_CONSTRAINT(body, var)\
+	for(cpConstraint *var = body->constraintList; var; var = (var->a == body ? var->nextA : var->nextB))
+
+#define CP_BODY_FOREACH_ARBITER(body, var)\
+	for(cpArbiter *var = body->arbiterList; var; var = (var->a->body == body ? var->nextA : var->nextB))
+
+#define CP_BODY_FOREACH_SHAPE(body, var)\
+	for(cpShape *var = body->shapeList; var; var = var->next)
 
 #pragma mark cpHashSet
 

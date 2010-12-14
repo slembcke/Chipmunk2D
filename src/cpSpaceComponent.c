@@ -65,13 +65,14 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 		cpArrayPush(space->rousedBodies, body);
 	} else {
 		cpArrayPush(space->bodies, body);
-		for(cpShape *shape=body->shapeList; shape; shape=shape->next){
+		CP_BODY_FOREACH_SHAPE(body, shape){
 			cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
 			cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
 		}
 		
-		for(cpArbiter *arb = body->arbiterList; arb; arb = (arb->a->body == body ? arb->nextA : arb->nextB)){
-			if(body == arb->a->body || cpBodyIsStatic(arb->a->body)){
+		CP_BODY_FOREACH_ARBITER(body, arb){
+			cpBody *bodyA = arb->a->body;
+			if(body == bodyA || cpBodyIsStatic(bodyA)){
 				int numContacts = arb->numContacts;
 				cpContact *contacts = arb->contacts;
 				
@@ -89,9 +90,9 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 			}
 		}
 		
-		for(cpConstraint *c = body->constraintList; c; c = (c->a == body ? c->nextA : c->nextB)){
-			cpBody *other = c->a;
-			if(other == body || cpBodyIsStatic(other)) cpArrayPush(space->constraints, c);
+		CP_BODY_FOREACH_CONSTRAINT(body, constraint){
+			cpBody *bodyA = constraint->a;
+			if(body == bodyA || cpBodyIsStatic(bodyA)) cpArrayPush(space->constraints, constraint);
 		}
 	}
 }
@@ -99,13 +100,14 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 static void
 cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 {
-	for(cpShape *shape = body->shapeList; shape; shape = shape->next){
+	CP_BODY_FOREACH_SHAPE(body, shape){
 		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
 		cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
 	}
 	
-	for(cpArbiter *arb = body->arbiterList; arb; arb = (arb->a->body == body ? arb->nextA : arb->nextB)){
-		if(body == arb->a->body || cpBodyIsStatic(arb->a->body)){
+	CP_BODY_FOREACH_ARBITER(body, arb){
+		cpBody *bodyA = arb->a->body;
+		if(body == bodyA || cpBodyIsStatic(bodyA)){
 			cpShape *a = arb->a, *b = arb->b;
 			cpShape *shape_pair[] = {a, b};
 			cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
@@ -120,9 +122,9 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 		}
 	}
 		
-	for(cpConstraint *c = body->constraintList; c; c = (c->a == body ? c->nextA : c->nextB)){
-		cpBody *other = c->a;
-		if(other == body || cpBodyIsStatic(other)) cpArrayDeleteObj(space->constraints, c);
+	CP_BODY_FOREACH_CONSTRAINT(body, constraint){
+		cpBody *bodyA = constraint->a;
+		if(body == bodyA || cpBodyIsStatic(bodyA)) cpArrayDeleteObj(space->constraints, constraint);
 	}
 }
 
@@ -310,7 +312,7 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 	
 	if(cpBodyIsSleeping(body)) return;
 	
-	for(cpShape *shape = body->shapeList; shape; shape = shape->next) cpShapeUpdate(shape, body->p, body->rot);
+	CP_BODY_FOREACH_SHAPE(body, shape) cpShapeUpdate(shape, body->p, body->rot);
 	cpSpaceDeactivateBody(space, body);
 	
 	if(group){
