@@ -29,8 +29,8 @@
 
 typedef struct PostStepCallback {
 	cpPostStepFunc func;
-	cpDataPointer *obj;
-	cpDataPointer *data;
+	void *obj;
+	void *data;
 } PostStepCallback;
 
 static cpBool
@@ -63,7 +63,7 @@ cpSpaceGetPostStepData(cpSpace *space, void *obj)
 {
 	if(space->postStepCallbacks){
 		PostStepCallback query = {NULL, obj, NULL};
-		PostStepCallback *callback = cpHashSetFind(space->postStepCallbacks, (cpHashValue)(size_t)obj, &query);
+		PostStepCallback *callback = (PostStepCallback *)cpHashSetFind(space->postStepCallbacks, (cpHashValue)(size_t)obj, &query);
 		return (callback ? callback->data : NULL);
 	} else {
 		return NULL;

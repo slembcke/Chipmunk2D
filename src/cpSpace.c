@@ -487,7 +487,7 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data)
 	
 	cpArray *components = space->sleepingComponents;
 	for(int i=0; i<components->num; i++){
-		cpBody *root = components->arr[i];
+		cpBody *root = (cpBody *)components->arr[i];
 		cpBody *body = root, *next;
 		do {
 			next = body->node.next;
