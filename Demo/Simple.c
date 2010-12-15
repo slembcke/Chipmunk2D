@@ -47,6 +47,8 @@ init(void)
 	space->gravity = cpv(0, -100);
 	space->sleepTimeThreshold = 0.5f;
 	
+	cpBody *rogue = cpBodyNew(INFINITY, INFINITY);
+	
 	// Create A ground segment along the bottom of the screen
 	// By attaching it to &space->staticBody instead of a body, we make it a static shape.
 	cpShape *ground = cpSegmentShapeNew(space->staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);

@@ -96,7 +96,7 @@ glColor_for_shape(cpShape *shape, cpSpace *space)
 {
 	cpBody *body = shape->body;
 	if(body){
-		if(body->node.next){
+		if(cpBodyIsSleeping(body)){
 			GLfloat v = 0.25f;
 			glColor3f(v,v,v);
 			return;

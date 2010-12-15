@@ -66,7 +66,7 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->arbiterList = NULL;
 	body->constraintList = NULL;
 	
-	cpComponentNode node = {NULL, NULL, 0, 0.0f};
+	cpComponentNode node = {NULL, NULL, 0.0f};
 	body->node = node;
 	
 	return body;

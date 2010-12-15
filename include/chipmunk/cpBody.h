@@ -29,9 +29,8 @@ extern cpBodyPositionFunc cpBodyUpdatePositionDefault;
 // when putting groups of objects to sleep.
 // No interesting user accessible fields.
 typedef struct cpComponentNode {
-	cpBody *parent;
+	cpBody *root;
 	cpBody *next;
-	int rank;
 	cpFloat idleTime;
 } cpComponentNode;
 
@@ -118,7 +117,7 @@ void cpBodySleepWithGroup(cpBody *body, cpBody *group);
 static inline cpBool
 cpBodyIsSleeping(const cpBody *body)
 {
-	return (CP_PRIVATE(body->node).next != ((cpBody*)0));
+	return (CP_PRIVATE(body->node).root != ((cpBody*)0));
 }
 
 static inline cpBool
