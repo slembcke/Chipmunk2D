@@ -85,6 +85,8 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 				cpShape *shape_pair[] = {a, b};
 				cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
 				cpHashSetInsert(space->contactSet, arbHashID, shape_pair, arb, NULL);
+				cpArrayPush(space->arbiters, arb);
+				arb->stamp = space->stamp;
 				
 				cpfree(contacts);
 			}
