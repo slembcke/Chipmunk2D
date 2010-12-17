@@ -136,6 +136,10 @@ cpPolyShapeContainsVertPartial(const cpPolyShape *poly, const cpVect v, const cp
 	return cpTrue;
 }
 
+#pragma mark Spatial Index Functions
+
+cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *klass, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+
 #pragma mark Space Functions
 
 cpContact *cpContactBufferGetArray(cpSpace *space);

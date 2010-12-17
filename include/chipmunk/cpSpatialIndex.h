@@ -7,12 +7,15 @@ typedef cpFloat (*cpSpatialIndexSegmentQueryCallback)(void *obj1, void *obj2, vo
 
 
 typedef struct cpSpatialIndexClass cpSpatialIndexClass;
+typedef struct cpSpatialIndex cpSpatialIndex;
 
-typedef struct cpSpatialIndex {
+struct cpSpatialIndex {
 	cpSpatialIndexClass *klass;
 	
 	cpSpatialIndexBBFunc bbfunc;
-} cpSpatialIndex;
+	
+	cpSpatialIndex *staticIndex, *dynamicIndex;
+};
 
 
 #pragma mark Spatial Hash
@@ -20,8 +23,8 @@ typedef struct cpSpatialIndex {
 typedef struct cpSpaceHash cpSpaceHash;
 
 cpSpaceHash *cpSpaceHashAlloc(void);
-cpSpaceHash *cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndexBBFunc bbfunc);
-cpSpaceHash *cpSpaceHashNew(cpFloat celldim, int cells, cpSpatialIndexBBFunc bbfunc);
+cpSpatialIndex *cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+cpSpatialIndex *cpSpaceHashNew(cpFloat celldim, int cells, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
 
 void cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells);
 
@@ -30,8 +33,8 @@ void cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells);
 typedef struct cpBBTree cpBBTree;
 
 cpBBTree *cpBBTreeAlloc(void);
-cpBBTree *cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc);
-cpBBTree *cpBBTreeNew(cpSpatialIndexBBFunc bbfunc);
+cpSpatialIndex *cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+cpSpatialIndex *cpBBTreeNew(cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
 
 void cpBBTreeOptimize(cpSpatialIndex *index);
 
@@ -55,7 +58,7 @@ typedef void (*cpSpatialIndexReindexObjectFunc)(cpSpatialIndex *index, void *obj
 typedef void (*cpSpatialIndexPointQueryFunc)(cpSpatialIndex *index, cpVect point, cpSpatialIndexQueryCallback func, void *data);
 typedef void (*cpSpatialIndexSegmentQueryFunc)(cpSpatialIndex *index, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryCallback func, void *data);
 typedef void (*cpSpatialIndexQueryFunc)(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data);
-typedef void (*cpSpatialIndexReindexCollideFunc)(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data);
+typedef void (*cpSpatialIndexReindexCollideFunc)(cpSpatialIndex *index, cpSpatialIndexQueryCallback func, void *data);
 
 struct cpSpatialIndexClass {
 	cpSpatialIndexDestroyFunc destroy;
@@ -150,7 +153,7 @@ cpSpatialIndexQuery(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQue
 }
 
 static inline void
-cpSpatialIndexReindexCollide(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data)
+cpSpatialIndexReindexCollide(cpSpatialIndex *index, cpSpatialIndexQueryCallback func, void *data)
 {
-	dynamicIndex->klass->reindexCollide(dynamicIndex, staticIndex, func, data);
+	index->klass->reindexCollide(index, func, data);
 }

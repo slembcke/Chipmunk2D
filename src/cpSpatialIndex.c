@@ -18,6 +18,21 @@ typedef struct dynamicToStaticContext {
 	void *data;
 } dynamicToStaticContext;
 
+cpSpatialIndex *
+cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *klass, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex)
+{
+	index->klass = klass;
+	index->bbfunc = bbfunc;
+	index->staticIndex = staticIndex;
+	
+	if(staticIndex){
+		cpAssert(!staticIndex->dynamicIndex, "This static index is already is already associated with a dynamic index.");
+		staticIndex->dynamicIndex = index;
+	}
+	
+	return index;
+}
+
 static void
 dynamicToStaticIter(void *obj, dynamicToStaticContext *context)
 {

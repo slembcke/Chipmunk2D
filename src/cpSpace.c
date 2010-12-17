@@ -122,12 +122,12 @@ cpSpaceInit(cpSpace *space)
 	space->locked = 0;
 	space->stamp = 0;
 
-	if(1){
-		space->staticShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
-		space->activeShapes = (cpSpatialIndex *)cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc);
+	if(0){
+		space->staticShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc, NULL);
+		space->activeShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc, space->staticShapes);
 	} else {
-		space->staticShapes = (cpSpatialIndex *)cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc);
-		space->activeShapes = (cpSpatialIndex *)cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc);
+		space->staticShapes = cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc, NULL);
+		space->activeShapes = cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc, space->staticShapes);
 		cpBBTreeSetVelocityFunc(space->activeShapes, (cpBBTreeVelocityFunc)shapeVelocityFunc);
 	}
 	

@@ -173,14 +173,13 @@ cpSpaceHashAllocTable(cpSpaceHash *hash, int numcells)
 
 static cpSpatialIndexClass klass;
 
-cpSpaceHash *
-cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndexBBFunc bbfunc)
+cpSpatialIndex *
+cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex)
 {
-	hash->spatialIndex.klass = &klass;
+	cpSpatialIndexInit((cpSpatialIndex *)hash, &klass, bbfunc, staticIndex);
 	
 	cpSpaceHashAllocTable(hash, next_prime(numcells));
 	hash->celldim = celldim;
-	hash->spatialIndex.bbfunc = bbfunc;
 	
 	hash->handleSet = cpHashSetNew(0, (cpHashSetEqlFunc)handleSetEql, NULL);
 	hash->pooledHandles = cpArrayNew(0);
@@ -190,13 +189,13 @@ cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndex
 	
 	hash->stamp = 1;
 	
-	return hash;
+	return (cpSpatialIndex *)hash;
 }
 
-cpSpaceHash *
-cpSpaceHashNew(cpFloat celldim, int cells, cpSpatialIndexBBFunc bbfunc)
+cpSpatialIndex *
+cpSpaceHashNew(cpFloat celldim, int cells, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex)
 {
-	return cpSpaceHashInit(cpSpaceHashAlloc(), celldim, cells, bbfunc);
+	return cpSpaceHashInit(cpSpaceHashAlloc(), celldim, cells, bbfunc, staticIndex);
 }
 
 static void
@@ -460,14 +459,14 @@ queryRehash_helper(cpHandle *hand, queryRehashContext *context)
 }
 
 static void
-cpSpaceHashReindexCollide(cpSpaceHash *hash, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data)
+cpSpaceHashReindexCollide(cpSpaceHash *hash, cpSpatialIndexQueryCallback func, void *data)
 {
 	clearTable(hash);
 	
 	queryRehashContext context = {hash, func, data};
 	cpHashSetEach(hash->handleSet, (cpHashSetIterFunc)queryRehash_helper, &context);
 	
-	cpSpatialIndexCollideStatic((cpSpatialIndex *)hash, staticIndex, func, data);
+	cpSpatialIndexCollideStatic((cpSpatialIndex *)hash, hash->spatialIndex.staticIndex, func, data);
 }
 
 static inline cpFloat
