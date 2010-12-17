@@ -544,8 +544,8 @@ cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 		cpBBTree *dynamicTree = GetTree(dynamicIndex);
 		Node *dynamicRoot = dynamicTree->root;
 		if(dynamicRoot){
-			MarkContext context = {dynamicTree, NULL, VoidQueryCallback, NULL};
-			MarkLeafQuery(dynamicRoot, leaf, cpFalse, &context);
+			MarkContext context = {dynamicTree, NULL, NULL, NULL};
+			MarkLeafQuery(dynamicRoot, leaf, cpTrue, &context);
 		}
 	} else {
 		Node *staticRoot = GetRootIfTree(tree->spatialIndex.staticIndex);
