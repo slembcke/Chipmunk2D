@@ -362,39 +362,6 @@ SubtreeRemove(Node *subtree, Node *leaf, cpBBTree *tree)
 	}
 }
 
-#pragma mark Leaf Functions
-
-static Node *
-LeafNew(cpBBTree *tree, void *obj, cpBB bb)
-{
-	Node *node = NodeFromPool(tree);
-	node->obj = obj;
-	node->bb = GetBB(tree, obj);
-	
-	node->parent = NULL;
-	node->stamp = 0;
-	node->pairs = NULL;
-	
-	return node;
-}
-
-static void
-LeafUpdate(Node *leaf, cpBBTree *tree)
-{
-	Node *root = tree->root;
-	cpBB bb = tree->spatialIndex.bbfunc(leaf->obj);
-	
-	if(!cpBBcontainsBB(leaf->bb, bb)){
-		leaf->bb = GetBB(tree, leaf->obj);
-		
-		root = SubtreeRemove(root, leaf, tree);
-		tree->root = SubtreeInsert(root, leaf, tree);
-		
-		PairsClear(leaf, tree);
-		leaf->stamp = GetStamp(tree);
-	}
-}
-
 #pragma mark Marking Functions
 
 typedef struct MarkContext {
@@ -458,6 +425,63 @@ MarkSubtree(Node *subtree, MarkContext *context)
 	} else {
 		MarkSubtree(subtree->a, context);
 		MarkSubtree(subtree->b, context);
+	}
+}
+
+#pragma mark Leaf Functions
+
+static Node *
+LeafNew(cpBBTree *tree, void *obj, cpBB bb)
+{
+	Node *node = NodeFromPool(tree);
+	node->obj = obj;
+	node->bb = GetBB(tree, obj);
+	
+	node->parent = NULL;
+	node->stamp = 0;
+	node->pairs = NULL;
+	
+	return node;
+}
+
+static cpBool
+LeafUpdate(Node *leaf, cpBBTree *tree)
+{
+	Node *root = tree->root;
+	cpBB bb = tree->spatialIndex.bbfunc(leaf->obj);
+	
+	if(!cpBBcontainsBB(leaf->bb, bb)){
+		leaf->bb = GetBB(tree, leaf->obj);
+		
+		root = SubtreeRemove(root, leaf, tree);
+		tree->root = SubtreeInsert(root, leaf, tree);
+		
+		PairsClear(leaf, tree);
+		leaf->stamp = GetStamp(tree);
+		
+		return cpTrue;
+	}
+	
+	return cpFalse;
+}
+
+static void VoidQueryCallback(void *obj1, void *obj2, void *data){}
+
+static void
+LeafAddPairs(Node *leaf, cpBBTree *tree)
+{
+	cpSpatialIndex *dynamicIndex = tree->spatialIndex.dynamicIndex;
+	if(dynamicIndex){
+		cpBBTree *dynamicTree = GetTree(dynamicIndex);
+		Node *dynamicRoot = dynamicTree->root;
+		if(dynamicRoot){
+			MarkContext context = {dynamicTree, NULL, NULL, NULL};
+			MarkLeafQuery(dynamicRoot, leaf, cpTrue, &context);
+		}
+	} else {
+		Node *staticRoot = GetRootIfTree(tree->spatialIndex.staticIndex);
+		MarkContext context = {tree, staticRoot, VoidQueryCallback, NULL};
+		MarkLeaf(leaf, &context);
 	}
 }
 
@@ -527,8 +551,6 @@ cpBBTreeDestroy(cpBBTree *tree)
 
 #pragma mark Insert/Remove
 
-static void VoidQueryCallback(void *obj1, void *obj2, void *data){}
-
 static void
 cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
@@ -538,21 +560,7 @@ cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 	tree->root = SubtreeInsert(root, leaf, tree);
 	
 	leaf->stamp = GetStamp(tree);
-	
-	cpSpatialIndex *dynamicIndex = tree->spatialIndex.dynamicIndex;
-	if(dynamicIndex){
-		cpBBTree *dynamicTree = GetTree(dynamicIndex);
-		Node *dynamicRoot = dynamicTree->root;
-		if(dynamicRoot){
-			MarkContext context = {dynamicTree, NULL, NULL, NULL};
-			MarkLeafQuery(dynamicRoot, leaf, cpTrue, &context);
-		}
-	} else {
-		Node *staticRoot = GetRootIfTree(tree->spatialIndex.staticIndex);
-		MarkContext context = {tree, staticRoot, VoidQueryCallback, NULL};
-		MarkLeaf(leaf, &context);
-	}
-	
+	LeafAddPairs(leaf, tree);
 	IncrementStamp(tree);
 }
 
@@ -575,24 +583,35 @@ cpBBTreeContains(cpBBTree *tree, void *obj, cpHashValue hashid)
 #pragma mark Reindex
 
 static void
-cpBBTreeReindex(cpBBTree *tree)
+cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *data)
 {
-//	cpAssert(cpFalse, "TODO Not implemented");
+	if(!tree->root) return;
+	
+	// LeafUpdate() may modify tree->root. Don't cache it.
 	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)LeafUpdate, tree);
 	
-	// TODO mark collisions	
+	cpSpatialIndex *staticIndex = tree->spatialIndex.staticIndex;
+	Node *staticRoot = (staticIndex && staticIndex->klass == &klass ? ((cpBBTree *)staticIndex)->root : NULL);
+	
+	MarkContext context = {tree, staticRoot, func, data};
+	MarkSubtree(tree->root, &context);
+	if(staticIndex && !staticRoot) cpSpatialIndexCollideStatic((cpSpatialIndex *)tree, staticIndex, func, data);
+	
 	IncrementStamp(tree);
+}
+
+static void
+cpBBTreeReindex(cpBBTree *tree)
+{
+	cpBBTreeReindexQuery(tree, VoidQueryCallback, NULL);
 }
 
 static void
 cpBBTreeReindexObject(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
-	cpAssert(cpFalse, "TODO Not implemented");
-	
 	Node *leaf = (Node *)cpHashSetFind(tree->leaves, hashid, obj);
 	if(leaf){
-		LeafUpdate(leaf, tree);
-		// TODO do some sort of traversal to remark collisions here
+		if(LeafUpdate(leaf, tree)) LeafAddPairs(leaf, tree);
 		IncrementStamp(tree);
 	}
 }
@@ -615,24 +634,6 @@ static void
 cpBBTreeQuery(cpBBTree *tree, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
 {
 	if(tree->root) SubtreeQuery(tree->root, obj, bb, func, data);
-}
-
-void
-cpBBTreeReindexCollide(cpBBTree *tree, cpSpatialIndexQueryCallback func, void *data)
-{
-	if(!tree->root) return;
-	
-	// LeafUpdate() may modify tree->root. Don't cache it.
-	cpHashSetEach(tree->leaves, (cpHashSetIterFunc)LeafUpdate, tree);
-	
-	cpSpatialIndex *staticIndex = tree->spatialIndex.staticIndex;
-	Node *staticRoot = (staticIndex && staticIndex->klass == &klass ? ((cpBBTree *)staticIndex)->root : NULL);
-	
-	MarkContext context = {tree, staticRoot, func, data};
-	MarkSubtree(tree->root, &context);
-	if(staticIndex && !staticRoot) cpSpatialIndexCollideStatic((cpSpatialIndex *)tree, staticIndex, func, data);
-	
-	IncrementStamp(tree);
 }
 
 #pragma mark Misc
@@ -669,11 +670,11 @@ static cpSpatialIndexClass klass = {
 	
 	(cpSpatialIndexReindexFunc)cpBBTreeReindex,
 	(cpSpatialIndexReindexObjectFunc)cpBBTreeReindexObject,
+	(cpSpatialIndexReindexQueryFunc)cpBBTreeReindexQuery,
 	
 	(cpSpatialIndexPointQueryFunc)cpBBTreePointQuery,
 	(cpSpatialIndexSegmentQueryFunc)cpBBTreeSegmentQuery,
 	(cpSpatialIndexQueryFunc)cpBBTreeQuery,
-	(cpSpatialIndexReindexCollideFunc)cpBBTreeReindexCollide,
 };
 
 #pragma mark Tree Optimization

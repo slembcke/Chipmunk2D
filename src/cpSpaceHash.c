@@ -459,7 +459,7 @@ queryRehash_helper(cpHandle *hand, queryRehashContext *context)
 }
 
 static void
-cpSpaceHashReindexCollide(cpSpaceHash *hash, cpSpatialIndexQueryCallback func, void *data)
+cpSpaceHashReindexQuery(cpSpaceHash *hash, cpSpatialIndexQueryCallback func, void *data)
 {
 	clearTable(hash);
 	
@@ -595,11 +595,11 @@ static cpSpatialIndexClass klass = {
 	
 	(cpSpatialIndexReindexFunc)cpSpaceHashRehash,
 	(cpSpatialIndexReindexObjectFunc)cpSpaceHashRehashObject,
+	(cpSpatialIndexReindexQueryFunc)cpSpaceHashReindexQuery,
 	
 	(cpSpatialIndexPointQueryFunc)cpSpaceHashPointQuery,
 	(cpSpatialIndexSegmentQueryFunc)cpSpaceHashSegmentQuery,
 	(cpSpatialIndexQueryFunc)cpSpaceHashQuery,
-	(cpSpatialIndexReindexCollideFunc)cpSpaceHashReindexCollide,
 };
 
 #pragma mark Debug Drawing

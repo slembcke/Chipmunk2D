@@ -278,8 +278,6 @@ runDemo(chipmunkDemo *demo)
 	maxConstraints = 0;
 	space = currDemo->initFunc();
 
-	cpBBTreeOptimize(space->activeShapes);
-	
 	glutSetWindowTitle(demoTitle(currDemo));
 }
 

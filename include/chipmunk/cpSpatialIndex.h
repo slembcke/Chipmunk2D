@@ -54,11 +54,11 @@ typedef void (*cpSpatialIndexRemoveFunc)(cpSpatialIndex *index, void *obj, cpHas
 
 typedef void (*cpSpatialIndexReindexFunc)(cpSpatialIndex *index);
 typedef void (*cpSpatialIndexReindexObjectFunc)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+typedef void (*cpSpatialIndexReindexQueryFunc)(cpSpatialIndex *index, cpSpatialIndexQueryCallback func, void *data);
 
 typedef void (*cpSpatialIndexPointQueryFunc)(cpSpatialIndex *index, cpVect point, cpSpatialIndexQueryCallback func, void *data);
 typedef void (*cpSpatialIndexSegmentQueryFunc)(cpSpatialIndex *index, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryCallback func, void *data);
 typedef void (*cpSpatialIndexQueryFunc)(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data);
-typedef void (*cpSpatialIndexReindexCollideFunc)(cpSpatialIndex *index, cpSpatialIndexQueryCallback func, void *data);
 
 struct cpSpatialIndexClass {
 	cpSpatialIndexDestroyFunc destroy;
@@ -72,11 +72,11 @@ struct cpSpatialIndexClass {
 	
 	cpSpatialIndexReindexFunc reindex;
 	cpSpatialIndexReindexObjectFunc reindexObject;
+	cpSpatialIndexReindexQueryFunc reindexQuery;
 	
 	cpSpatialIndexPointQueryFunc pointQuery;
 	cpSpatialIndexSegmentQueryFunc segmentQuery;
 	cpSpatialIndexQueryFunc query;
-	cpSpatialIndexReindexCollideFunc reindexCollide;
 };
 
 
@@ -153,7 +153,7 @@ cpSpatialIndexQuery(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQue
 }
 
 static inline void
-cpSpatialIndexReindexCollide(cpSpatialIndex *index, cpSpatialIndexQueryCallback func, void *data)
+cpSpatialIndexReindexQuery(cpSpatialIndex *index, cpSpatialIndexQueryCallback func, void *data)
 {
-	index->klass->reindexCollide(index, func, data);
+	index->klass->reindexQuery(index, func, data);
 }

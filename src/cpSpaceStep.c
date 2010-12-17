@@ -301,7 +301,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// Collide!
 	cpSpaceLock(space);
 	cpSpacePushFreshContactBuffer(space);
-	cpSpatialIndexReindexCollide(space->activeShapes, (cpSpatialIndexQueryCallback)cpSpaceCollideShapes, space);
+	cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryCallback)cpSpaceCollideShapes, space);
 	cpSpaceUnlock(space);
 	
 	// If body sleeping is enabled, do that now.
