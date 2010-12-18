@@ -70,6 +70,33 @@ cpBBexpand(const cpBB bb, const cpVect v){
 	);
 }
 
+static inline cpFloat
+cpBBArea(cpBB bb)
+{
+	return (bb.r - bb.l)*(bb.t - bb.b);
+}
+
+static inline cpFloat
+cpBBMergedArea(cpBB a, cpBB b)
+{
+	return (cpfmax(a.r, b.r) - cpfmin(a.l, b.l))*(cpfmax(a.t, b.t) - cpfmin(a.b, b.b));
+}
+
+static inline cpBool
+cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)
+{
+	cpBB seg_bb = cpBBNew(cpfmin(a.x, b.x), cpfmin(a.y, b.y), cpfmax(a.x, b.x), cpfmax(a.y, b.y));
+	if(cpBBintersects(bb, seg_bb)){
+		cpVect axis = cpv(b.y - a.y, a.x - b.x);
+		cpVect offset = cpv((a.x + b.x - bb.r - bb.l), (a.y + b.y - bb.t - bb.b));
+		cpVect extents = cpv(bb.r - bb.l, bb.t - bb.b);
+		
+		return (cpfabs(cpvdot(axis, offset)) < cpfabs(axis.x*extents.x) + cpfabs(axis.y*extents.y));
+	}
+	
+	return cpFalse;
+}
+
 cpVect cpBBClampVect(const cpBB bb, const cpVect v); // clamps the vector to lie within the bbox
 // TODO edge case issue
 cpVect cpBBWrapVect(const cpBB bb, const cpVect v); // wrap a vector to a bbox

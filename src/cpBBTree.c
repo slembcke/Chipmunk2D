@@ -49,18 +49,6 @@ struct Pair { Thread a, b; };
 
 #pragma mark Misc Functions
 
-static inline cpFloat
-cpBBMergedArea(cpBB a, cpBB b)
-{
-	return (cpfmax(a.r, b.r) - cpfmin(a.l, b.l))*(cpfmax(a.t, b.t) - cpfmin(a.b, b.b));
-}
-
-static inline cpFloat
-cpBBArea(cpBB bb)
-{
-	return (bb.r - bb.l)*(bb.t - bb.b);
-}
-
 //static inline cpFloat
 //cpBBProximity(cpBB a, cpBB b)
 //{
@@ -321,14 +309,27 @@ SubtreeInsert(Node *subtree, Node *leaf, cpBBTree *tree)
 }
 
 static void
-SubtreeQuery(Node *node, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
+SubtreeQuery(Node *subtree, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
 {
-	if(cpBBintersects(bb, node->bb)){
-		if(NodeIsLeaf(node)){
-			func(obj, node->obj, data);
+	if(cpBBintersects(subtree->bb, bb)){
+		if(NodeIsLeaf(subtree)){
+			func(obj, subtree->obj, data);
 		} else {
-			SubtreeQuery(node->a, obj, bb, func, data);
-			SubtreeQuery(node->b, obj, bb, func, data);
+			SubtreeQuery(subtree->a, obj, bb, func, data);
+			SubtreeQuery(subtree->b, obj, bb, func, data);
+		}
+	}
+}
+
+static void
+SubtreeSegmentQuery(Node *subtree, void *obj, cpVect a, cpVect b, cpSpatialIndexSegmentQueryCallback func, void *data)
+{
+	if(cpBBIntersectsSegment(subtree->bb, a, b)){
+		if(NodeIsLeaf(subtree)){
+			func(obj, subtree->obj, data);
+		} else {
+			SubtreeSegmentQuery(subtree->a, obj, a, b, func, data);
+			SubtreeSegmentQuery(subtree->b, obj, a, b, func, data);
 		}
 	}
 }
@@ -621,13 +622,15 @@ cpBBTreeReindexObject(cpBBTree *tree, void *obj, cpHashValue hashid)
 static void
 cpBBTreePointQuery(cpBBTree *tree, cpVect point, cpSpatialIndexQueryCallback func, void *data)
 {
-	if(tree->root) SubtreeQuery(tree->root, &point, cpBBNew(point.x, point.y, point.x, point.y), func, data);
+	Node *root = tree->root;
+	if(root) SubtreeQuery(root, &point, cpBBNew(point.x, point.y, point.x, point.y), func, data);
 }
 
 static void
 cpBBTreeSegmentQuery(cpBBTree *tree, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryCallback func, void *data)
 {
-	cpAssert(cpFalse, "TODO Not implemented");
+	Node *root = tree->root;
+	if(root) SubtreeSegmentQuery(root, obj, a, b, func, data);
 }
 
 static void
