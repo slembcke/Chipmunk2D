@@ -170,7 +170,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	cpCollisionHandler *handler = (cpCollisionHandler *)cpHashSetFind(space->collFuncSet, collHashID, &ids);
 	
 	cpBool sensor = a->sensor || b->sensor;
-	if(sensor && handler == &space->defaultHandler) return;
+	if(sensor && handler == &cpSpaceDefaultHandler) return;
 	
 	// Shape 'a' should have the lower shape type. (required by cpCollideShapes() )
 	if(a->klass->type > b->klass->type){
