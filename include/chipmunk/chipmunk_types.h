@@ -131,7 +131,7 @@ typedef unsigned int cpHashValue;
 #endif
 
 #ifdef CP_LAYERS_TYPE
-	typedef CP_GROUP_TYPE cpLayers;
+	typedef CP_LAYERS_TYPE cpLayers;
 #else
 	typedef unsigned int cpLayers;
 #endif
