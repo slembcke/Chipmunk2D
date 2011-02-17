@@ -1237,7 +1237,7 @@ p(expl). Returns the penetration depth of the i'th collision point.
 <pre><code>cpVect cpArbiterTotalImpulse(cpArbiter *arb);
 cpVect cpArbiterTotalImpulseWithFriction(cpArbiter *arb);</code></pre>
 
-p(expl). Returns the impulse that was applied this step to resolve the collision. These functions should only be called from a @postStep()@ callback, otherwise the result is undefined. *Note:* If you are using the deprecated elastic iterations setting on your space, it will cause you to get incorrect results. Elastic iterations should no longer be needed, and you should be able to safely turn them off.
+p(expl). Returns the impulse that was applied this step to resolve the collision. These functions should only be called from a @postStep()@ or @postSolve()@ callback, otherwise the result is undefined. *Note:* If you are using the deprecated elastic iterations setting on your space, it will cause you to get incorrect results. Elastic iterations should no longer be needed, and you should be able to safely turn them off.
 
 h2. Fields:
 
