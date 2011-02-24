@@ -407,12 +407,12 @@ void time_trial(int index, int count)
 		currDemo->updateFunc(i);
 	
 	gettimeofday(&end_time, NULL);
-	long millisecs = (end_time.tv_sec - start_time.tv_sec)*1000;
-	millisecs += (end_time.tv_usec - start_time.tv_usec)/1000;
+	double millisecs = (end_time.tv_sec - start_time.tv_sec)*1000.0;
+	millisecs += (end_time.tv_usec - start_time.tv_usec)/1000.0;
 	
 	currDemo->destroyFunc();
 	
-	printf("Time(%c) = %ldms (%s)\n", index + 'a', millisecs, currDemo->name);
+	printf("Time(%c) = %.2fms (%s)\n", index + 'a', millisecs, currDemo->name);
 }
 
 extern chipmunkDemo LogoSmash;
