@@ -50,6 +50,21 @@ static void add_box(int i, cpFloat size){
 	shape->e = 0.0f; shape->u = 0.9f;
 }
 
+static void add_hexagon(int i, cpFloat radius){
+	cpVect hexagon[6] = {};
+	for(int i=0; i<6; i++){
+		float angle = -M_PI*2.0f*i/6.0f;
+		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
+	}
+	
+	cpFloat mass = radius*radius;
+	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 6, hexagon, cpvzero)));
+	body->p = cpvmult(frand_unit_circle(), 180.0f);
+	
+	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpvzero));
+	shape->e = 0.0f; shape->u = 0.9f;
+}
+
 
 static void setupSpace_simpleTerrain(){
 	space = cpSpaceNew();
@@ -109,6 +124,27 @@ static cpSpace *init_SimpleTerrainBoxes_100(){
 	return space;
 }
 
+static cpSpace *init_SimpleTerrainHexagons_1000(){
+	setupSpace_simpleTerrain();
+	for(int i=0; i<1000; i++) add_hexagon(i, 5.0f);
+	
+	return space;
+}
+
+static cpSpace *init_SimpleTerrainHexagons_500(){
+	setupSpace_simpleTerrain();
+	for(int i=0; i<500; i++) add_hexagon(i, 5.0f);
+	
+	return space;
+}
+
+static cpSpace *init_SimpleTerrainHexagons_100(){
+	setupSpace_simpleTerrain();
+	for(int i=0; i<100; i++) add_hexagon(i, 5.0f);
+	
+	return space;
+}
+
 
 // SimpleTerrain variable sized objects
 static float rand_size(){
@@ -129,6 +165,14 @@ static cpSpace *init_SimpleTerrainVBoxes_500(){
 	
 	return space;
 }
+
+static cpSpace *init_SimpleTerrainVHexagons_500(){
+	setupSpace_simpleTerrain();
+	for(int i=0; i<500; i++) add_hexagon(i, 5.0f*rand_size());
+	
+	return space;
+}
+
 
 // ComplexTerrain
 static cpVect complex_terrain_verts[] = {
@@ -177,6 +221,38 @@ static cpSpace *init_ComplexTerrainCircles_1000(){
 		body->p = cpvadd(cpvmult(frand_unit_circle(), 180.0f), cpv(0.0f, 300.0f));
 		
 		cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
+		shape->e = 0.0f; shape->u = 0.0f;
+	}
+	
+	return space;
+}
+
+static cpSpace *init_ComplexTerrainHexagons_1000(){
+	space = cpSpaceNew();
+	space->iterations = 10;
+	cpSpaceResizeStaticHash(space, 10.0f, 1000);
+	cpSpaceResizeActiveHash(space, 10.0f, 5000);
+	space->gravity = cpv(0, -100);
+	
+	cpVect offset = cpv(-320, -240);
+	for(int i=0; i<(complex_terrain_count - 1); i++){
+		cpVect a = complex_terrain_verts[i], b = complex_terrain_verts[i+1];
+		cpSpaceAddShape(space, cpSegmentShapeNew(&space->staticBody, cpvadd(a, offset), cpvadd(b, offset), 0.0f));
+	}
+	
+	cpFloat radius = 5.0f;
+	cpVect hexagon[6] = {};
+	for(int i=0; i<6; i++){
+		float angle = -M_PI*2.0f*i/6.0f;
+		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
+	}
+	
+	for(int i=0; i<1000; i++){
+		cpFloat mass = radius*radius;
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 6, hexagon, cpvzero)));
+		body->p = cpvadd(cpvmult(frand_unit_circle(), 180.0f), cpv(0.0f, 300.0f));
+		
+		cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpvzero));
 		shape->e = 0.0f; shape->u = 0.0f;
 	}
 	
@@ -259,11 +335,43 @@ static cpSpace *init_BouncyTerrainCircles_500(){
 	return space;
 }
 
+static cpSpace *init_BouncyTerrainHexagons_500(){
+	space = cpSpaceNew();
+	space->iterations = 10;
+	cpSpaceResizeStaticHash(space, 10.0f, 1000);
+	cpSpaceResizeActiveHash(space, 10.0f, 5000);
+	
+	cpVect offset = cpv(-320, -240);
+	for(int i=0; i<(bouncy_terrain_count - 1); i++){
+		cpVect a = bouncy_terrain_verts[i], b = bouncy_terrain_verts[i+1];
+		cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(&space->staticBody, cpvadd(a, offset), cpvadd(b, offset), 0.0f));
+		shape->e = 1.0f;
+	}
+	
+	cpFloat radius = 5.0f;
+	cpVect hexagon[6] = {};
+	for(int i=0; i<6; i++){
+		float angle = -M_PI*2.0f*i/6.0f;
+		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
+	}
+	
+	for(int i=0; i<400; i++){
+		cpFloat mass = radius*radius;
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 6, hexagon, cpvzero)));
+		body->p = cpvadd(cpvmult(frand_unit_circle(), 130.0f), cpvzero);
+		body->v = cpvmult(frand_unit_circle(), 50.0f);
+		
+		cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpvzero));
+		shape->e = 1.0f;
+	}
+	
+	return space;
+}
+
 
 // No collisions
 
 static cpBool NoCollide_begin(cpArbiter *arb, cpSpace *space, void *data){
-	printf("collision!\n");
 	abort();
 	
 	return cpTrue;
@@ -273,8 +381,8 @@ static cpBool NoCollide_begin(cpArbiter *arb, cpSpace *space, void *data){
 static cpSpace *init_NoCollide(){
 	space = cpSpaceNew();
 	space->iterations = 10;
-	cpSpaceResizeStaticHash(space, 10.0f, 1000);
-	cpSpaceResizeActiveHash(space, 10.0f, 5000);
+	cpSpaceResizeStaticHash(space, 10.0f, 5000);
+	cpSpaceResizeActiveHash(space, 10.0f, 1000);
 	
 	cpSpaceAddCollisionHandler(space, 2, 2, NoCollide_begin, NULL, NULL, NULL, NULL);
 	
@@ -327,7 +435,7 @@ static void destroy(void){
 	cpSpaceFree(space);
 }
 
-#define BENCH(n) {"Bench: " #n, NULL, init_##n, update, destroy}
+#define BENCH(n) {"benchmark - " #n, NULL, init_##n, update, destroy}
 chipmunkDemo bench_list[] = {
 	BENCH(SimpleTerrainCircles_1000),
 	BENCH(SimpleTerrainCircles_500),
@@ -335,10 +443,16 @@ chipmunkDemo bench_list[] = {
 	BENCH(SimpleTerrainBoxes_1000),
 	BENCH(SimpleTerrainBoxes_500),
 	BENCH(SimpleTerrainBoxes_100),
+	BENCH(SimpleTerrainHexagons_1000),
+	BENCH(SimpleTerrainHexagons_500),
+	BENCH(SimpleTerrainHexagons_100),
 	BENCH(SimpleTerrainVCircles_500),
 	BENCH(SimpleTerrainVBoxes_500),
+	BENCH(SimpleTerrainVHexagons_500),
 	BENCH(ComplexTerrainCircles_1000),
+	BENCH(ComplexTerrainHexagons_1000),
 	BENCH(BouncyTerrainCircles_500),
+	BENCH(BouncyTerrainHexagons_500),
 	BENCH(NoCollide),
 };
 
