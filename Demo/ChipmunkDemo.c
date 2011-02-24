@@ -56,50 +56,8 @@
 
 #define SLEEP_TICKS 16
 
-//extern chipmunkDemo Test;
-extern chipmunkDemo LogoSmash;
-extern chipmunkDemo Simple;
-extern chipmunkDemo PyramidStack;
-extern chipmunkDemo Plink;
-extern chipmunkDemo Tumble;
-extern chipmunkDemo PyramidTopple;
-extern chipmunkDemo Bounce;
-extern chipmunkDemo Planet;
-extern chipmunkDemo Springies;
-extern chipmunkDemo Pump;
-extern chipmunkDemo TheoJansen;
-extern chipmunkDemo MagnetsElectric;
-extern chipmunkDemo UnsafeOps;
-extern chipmunkDemo Query;
-extern chipmunkDemo OneWay;
-extern chipmunkDemo Player;
-extern chipmunkDemo Sensors;
-extern chipmunkDemo Joints;
-extern chipmunkDemo Tank;
-
-//extern chipmunkDemo Test;
-
-static chipmunkDemo *demos[] = {
-	&LogoSmash,
-	&PyramidStack,
-	&Plink,
-	&Tumble,
-	&PyramidTopple,
-	&Bounce,
-	&Planet,
-	&Springies,
-	&Pump,
-	&TheoJansen,
-	&MagnetsElectric,
-	&UnsafeOps,
-	&Query,
-	&OneWay,
-	&Player,
-	&Sensors,
-	&Joints,
-	&Tank,
-};
-static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
+static chipmunkDemo *demos;
+static int demoCount = 0;
 static chipmunkDemo *currDemo = NULL;
 static const int firstDemoIndex = 'a' - 'a';
 
@@ -281,7 +239,7 @@ keyboard(unsigned char key, int x, int y)
 	int index = key - 'a';
 	
 	if(0 <= index && index < demoCount){
-		runDemo(demos[index]);
+		runDemo(&demos[index]);
 	} else if(key == '\r'){
 		runDemo(currDemo);
   } else if(key == '`'){
@@ -414,7 +372,7 @@ glutStuff(int argc, const char *argv[])
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	
 	glutInitWindowSize(640, 480);
-	glutCreateWindow(demoTitle(demos[firstDemoIndex]));
+	glutCreateWindow(demoTitle(&demos[firstDemoIndex]));
 	
 	initGL();
 	
@@ -434,13 +392,12 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
-//#define TIME_TRIAL
-#ifdef TIME_TRIAL
+// TODO need to make a Windows compatible version here
 #include <sys/time.h>
 #include <unistd.h>
 void time_trial(int index, int count)
 {
-	currDemo = demos[index];
+	currDemo = &demos[index];
 	space = currDemo->initFunc();
 	
 	struct timeval start_time, end_time;
@@ -455,32 +412,84 @@ void time_trial(int index, int count)
 	
 	currDemo->destroyFunc();
 	
-	printf("Time(%c) = %ldms\n", index + 'a', millisecs);
+	printf("Time(%c) = %ldms (%s)\n", index + 'a', millisecs, currDemo->name);
 }
-#endif
+
+extern chipmunkDemo LogoSmash;
+extern chipmunkDemo Simple;
+extern chipmunkDemo PyramidStack;
+extern chipmunkDemo Plink;
+extern chipmunkDemo Tumble;
+extern chipmunkDemo PyramidTopple;
+extern chipmunkDemo Bounce;
+extern chipmunkDemo Planet;
+extern chipmunkDemo Springies;
+extern chipmunkDemo Pump;
+extern chipmunkDemo TheoJansen;
+extern chipmunkDemo MagnetsElectric;
+extern chipmunkDemo UnsafeOps;
+extern chipmunkDemo Query;
+extern chipmunkDemo OneWay;
+extern chipmunkDemo Player;
+extern chipmunkDemo Sensors;
+extern chipmunkDemo Joints;
+extern chipmunkDemo Tank;
+
+extern chipmunkDemo bench_list[];
+extern int bench_count;
 
 int
 main(int argc, const char **argv)
 {
+	chipmunkDemo demo_list[] = {
+		LogoSmash,
+		PyramidStack,
+		Plink,
+		Tumble,
+		PyramidTopple,
+		Bounce,
+		Planet,
+		Springies,
+		Pump,
+		TheoJansen,
+		MagnetsElectric,
+		UnsafeOps,
+		Query,
+		OneWay,
+		Player,
+		Sensors,
+		Joints,
+		Tank,
+	};
+	
+	demos = demo_list;
+	demoCount = sizeof(demo_list)/sizeof(chipmunkDemo);
+	int trial = 0;
+	
+	for(int i=0; i<argc; i++){
+		if(strcmp(argv[i], "-bench") == 0){
+			demos = bench_list;
+			demoCount = bench_count;
+		} else if(strcmp(argv[i], "-trial") == 0){
+			trial = 1;
+		}
+	}
+	
 	cpInitChipmunk();
 	cp_collision_slop = 0.2f;
 	
-#ifdef TIME_TRIAL
-	sleep(1);
-	for(int i=0; i<demoCount; i++){
-		if(i == 'l' - 'a') continue;
-		time_trial(i, 1000);
+	if(trial){
+		sleep(1);
+		for(int i=0; i<demoCount; i++) time_trial(i, 1000);
+		exit(0);
+	} else {
+		mouseBody = cpBodyNew(INFINITY, INFINITY);
+		
+		glutStuff(argc, argv);
+		
+		runDemo(&demos[firstDemoIndex]);
+		glutMainLoop();
 	}
-//	time_trial(0, 1000);
-	exit(0);
-#endif
-	
-	mouseBody = cpBodyNew(INFINITY, INFINITY);
-	
-	glutStuff(argc, argv);
-	
-	runDemo(demos[firstDemoIndex]);
-	glutMainLoop();
 
 	return 0;
 }

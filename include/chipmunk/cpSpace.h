@@ -42,7 +42,7 @@ typedef struct cpCollisionHandler {
 	void *data;
 } cpCollisionHandler;
 
-cpCollisionHandler cpSpaceDefaultHandler;
+extern cpCollisionHandler cpSpaceDefaultHandler;
 
 typedef struct cpContactBufferHeader {
 	cpTimestamp stamp;
