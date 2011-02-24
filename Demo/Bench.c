@@ -425,6 +425,12 @@ static cpSpace *init_NoCollide(){
 }
 
 
+// TODO ideas:
+// addition/removal
+// Memory usage? (too small to matter?)
+// http://forums.tigsource.com/index.php?topic=18077.msg518578#msg518578
+
+
 // Build benchmark list
 static void update(int ticks){
 	cpSpaceStep(space, 1.0f/60.0f);
