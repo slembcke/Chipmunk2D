@@ -53,7 +53,7 @@ static void add_box(int i, cpFloat size){
 static void add_hexagon(int i, cpFloat radius){
 	cpVect hexagon[6] = {};
 	for(int i=0; i<6; i++){
-		float angle = -M_PI*2.0f*i/6.0f;
+		float angle = -(float)M_PI*2.0f*i/6.0f;
 		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
 	}
 	
@@ -148,7 +148,7 @@ static cpSpace *init_SimpleTerrainHexagons_100(){
 
 // SimpleTerrain variable sized objects
 static float rand_size(){
-	return pow(1.5, cpflerp(-1.5, 3.5, frand()));
+	return (float)pow(1.5, cpflerp(-1.5, 3.5, frand()));
 }
 
 static cpSpace *init_SimpleTerrainVCircles_200(){
@@ -242,7 +242,7 @@ static cpSpace *init_ComplexTerrainHexagons_1000(){
 	cpFloat radius = 5.0f;
 	cpVect hexagon[6] = {};
 	for(int i=0; i<6; i++){
-		float angle = -M_PI*2.0f*i/6.0f;
+		float angle = -(float)M_PI*2.0f*i/6.0f;
 		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
 	}
 	
@@ -350,7 +350,7 @@ static cpSpace *init_BouncyTerrainHexagons_500(){
 	cpFloat radius = 5.0f;
 	cpVect hexagon[6] = {};
 	for(int i=0; i<6; i++){
-		float angle = -M_PI*2.0f*i/6.0f;
+		float angle = -(float)M_PI*2.0f*i/6.0f;
 		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
 	}
 	

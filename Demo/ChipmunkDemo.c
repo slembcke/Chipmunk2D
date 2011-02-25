@@ -394,6 +394,14 @@ glutStuff(int argc, const char *argv[])
 
 #ifdef WIN32
 
+static double GetMilliseconds(){
+	__int64 count, freq;
+	QueryPerformanceCounter((LARGE_INTEGER*)&count);
+	QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+
+	return 1000.0*(double)count/(double)freq;
+}
+
 #else
 
 #include <sys/time.h>
@@ -490,7 +498,7 @@ main(int argc, const char **argv)
 	cp_collision_slop = 0.2f;
 	
 	if(trial){
-		sleep(1);
+//		sleep(1);
 		for(int i=0; i<demoCount; i++) time_trial(i, 1000);
 		exit(0);
 	} else {
