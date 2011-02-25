@@ -22,6 +22,8 @@
 // Number of frames that contact information should persist.
 extern cpTimestamp cp_contact_persistence;
 
+extern cpCollisionHandler cpSpaceDefaultHandler;
+
 typedef struct cpContactBufferHeader cpContactBufferHeader;
 
 struct cpSpace {

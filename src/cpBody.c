@@ -37,7 +37,7 @@ cpBodyAlloc(void)
 cpBodyVelocityFunc cpBodyUpdateVelocityDefault = cpBodyUpdateVelocity;
 cpBodyPositionFunc cpBodyUpdatePositionDefault = cpBodyUpdatePosition;
 
-cpBody*
+cpBody *
 cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 {
 	body->velocity_func = cpBodyUpdateVelocityDefault;

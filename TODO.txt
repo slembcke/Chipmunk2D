@@ -7,6 +7,8 @@ constraint callbacks
 touch joint (Objective-Chipmunk)
 per body damping and gravity coefs?
 Better accuracy for variable timestepping?
+Functions to check if space contains shapes, bodies, constraints?
+Building bodies from shape collections.
 
 Notes:
 * don't push arbiters to rogue bodies, and don't push constraints or arbiters to static ones

@@ -109,7 +109,7 @@ cpSpaceAlloc(void)
 #define DEFAULT_ITERATIONS 10
 #define DEFAULT_ELASTIC_ITERATIONS 0
 
-cpCollisionHandler defaultHandler = {0, 0, alwaysCollide, alwaysCollide, nothing, nothing, NULL};
+cpCollisionHandler cpSpaceDefaultHandler = {0, 0, alwaysCollide, alwaysCollide, nothing, nothing, NULL};
 
 cpSpace*
 cpSpaceInit(cpSpace *space)
@@ -148,8 +148,9 @@ cpSpaceInit(cpSpace *space)
 	
 	space->constraints = cpArrayNew(0);
 	
-	space->defaultHandler = defaultHandler;
+	space->defaultHandler = cpSpaceDefaultHandler;
 	space->collFuncSet = cpHashSetNew(0, (cpHashSetEqlFunc)collFuncSetEql, &space->defaultHandler);
+	// TODO space->collFuncSet->default_value = &cpSpaceDefaultHandler;
 	
 	space->postStepCallbacks = NULL;
 	
@@ -274,6 +275,7 @@ cpSpaceSetDefaultCollisionHandler(
 	};
 	
 	space->defaultHandler = handler;
+	// TODO space->collFuncSet->default_value = &space->defaultHandler;
 }
 
 #pragma mark Body, Shape, and Joint Management

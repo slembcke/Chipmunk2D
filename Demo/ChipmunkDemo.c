@@ -30,8 +30,6 @@
 	beyond simple shape drawing and is very dependent on implementation details
 	about Chipmunk which may change with little to no warning.
 */
-
-//#define TIME_TRIAL
  
 #include <stdlib.h>
 #include <stdio.h>
@@ -44,10 +42,9 @@
 	#include "OpenGL/glu.h"
 	#include <GLUT/glut.h>
 #else
-	#ifdef WIN32
-		#include <windows.h>
-	#endif
-	
+#ifdef WIN32
+	#include <windows.h>
+#endif
 	#include <GL/gl.h>
 	#include <GL/glu.h>
 	#include <GL/glut.h>
@@ -59,51 +56,8 @@
 
 #define SLEEP_TICKS 16
 
-//extern chipmunkDemo Test;
-extern chipmunkDemo LogoSmash;
-extern chipmunkDemo Simple;
-extern chipmunkDemo PyramidStack;
-extern chipmunkDemo Plink;
-extern chipmunkDemo Tumble;
-extern chipmunkDemo PyramidTopple;
-extern chipmunkDemo Bounce;
-extern chipmunkDemo Planet;
-extern chipmunkDemo Springies;
-extern chipmunkDemo Pump;
-extern chipmunkDemo TheoJansen;
-extern chipmunkDemo MagnetsElectric;
-extern chipmunkDemo UnsafeOps;
-extern chipmunkDemo Query;
-extern chipmunkDemo OneWay;
-extern chipmunkDemo Player;
-extern chipmunkDemo Sensors;
-extern chipmunkDemo Joints;
-extern chipmunkDemo Tank;
-
-//extern chipmunkDemo Test;
-
-static chipmunkDemo *demos[] = {
-	&LogoSmash,
-	&Simple,
-	&PyramidStack,
-	&Plink,
-	&Tumble,
-	&PyramidTopple,
-	&Bounce,
-	&Planet,
-	&Springies,
-	&Pump,
-	&TheoJansen,
-	&MagnetsElectric,
-	&UnsafeOps,
-	&Query,
-	&OneWay,
-	&Player,
-	&Sensors,
-	&Joints,
-	&Tank,
-};
-static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
+static chipmunkDemo *demos;
+static int demoCount = 0;
 static chipmunkDemo *currDemo = NULL;
 static const int firstDemoIndex = 'a' - 'a';
 
@@ -287,7 +241,7 @@ keyboard(unsigned char key, int x, int y)
 	int index = key - 'a';
 	
 	if(0 <= index && index < demoCount){
-		runDemo(demos[index]);
+		runDemo(&demos[index]);
 	} else if(key == '\r'){
 		runDemo(currDemo);
   } else if(key == '`'){
@@ -420,7 +374,7 @@ glutStuff(int argc, const char *argv[])
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	
 	glutInitWindowSize(640, 480);
-	glutCreateWindow(demoTitle(demos[firstDemoIndex]));
+	glutCreateWindow(demoTitle(&demos[firstDemoIndex]));
 	
 	initGL();
 	
@@ -440,15 +394,16 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
-#ifdef TIME_TRIAL
+// TODO need to make a Windows compatible version here
 #include <sys/time.h>
 #include <unistd.h>
 void time_trial(int index, int count)
 {
 	srand(45073);
-	currDemo = demos[index];
+	
+	currDemo = &demos[index];
 	space = currDemo->initFunc();
-		
+	
 	struct timeval start_time, end_time;
 	gettimeofday(&start_time, NULL);
 	
@@ -456,38 +411,89 @@ void time_trial(int index, int count)
 		currDemo->updateFunc(i);
 	
 	gettimeofday(&end_time, NULL);
-	long millisecs = (end_time.tv_sec - start_time.tv_sec)*1000;
-	millisecs += (end_time.tv_usec - start_time.tv_usec)/1000;
+	double millisecs = (end_time.tv_sec - start_time.tv_sec)*1000.0;
+	millisecs += (end_time.tv_usec - start_time.tv_usec)/1000.0;
 	
 	currDemo->destroyFunc();
 	
-	printf("Time(%c) = %ldms\n", index + 'a', millisecs);
+	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', millisecs, currDemo->name);
 }
-#endif
+
+extern chipmunkDemo LogoSmash;
+extern chipmunkDemo Simple;
+extern chipmunkDemo PyramidStack;
+extern chipmunkDemo Plink;
+extern chipmunkDemo Tumble;
+extern chipmunkDemo PyramidTopple;
+extern chipmunkDemo Bounce;
+extern chipmunkDemo Planet;
+extern chipmunkDemo Springies;
+extern chipmunkDemo Pump;
+extern chipmunkDemo TheoJansen;
+extern chipmunkDemo MagnetsElectric;
+extern chipmunkDemo UnsafeOps;
+extern chipmunkDemo Query;
+extern chipmunkDemo OneWay;
+extern chipmunkDemo Player;
+extern chipmunkDemo Sensors;
+extern chipmunkDemo Joints;
+extern chipmunkDemo Tank;
+
+extern chipmunkDemo bench_list[];
+extern int bench_count;
 
 int
 main(int argc, const char **argv)
 {
+	chipmunkDemo demo_list[] = {
+		LogoSmash,
+		PyramidStack,
+		Plink,
+		Tumble,
+		PyramidTopple,
+		Bounce,
+		Planet,
+		Springies,
+		Pump,
+		TheoJansen,
+		MagnetsElectric,
+		UnsafeOps,
+		Query,
+		OneWay,
+		Player,
+		Sensors,
+		Joints,
+		Tank,
+	};
+	
+	demos = demo_list;
+	demoCount = sizeof(demo_list)/sizeof(chipmunkDemo);
+	int trial = 0;
+	
+	for(int i=0; i<argc; i++){
+		if(strcmp(argv[i], "-bench") == 0){
+			demos = bench_list;
+			demoCount = bench_count;
+		} else if(strcmp(argv[i], "-trial") == 0){
+			trial = 1;
+		}
+	}
+	
 	cpInitChipmunk();
 	cp_collision_slop = 0.2f;
 	
-#ifdef TIME_TRIAL
-	sleep(1);
-	for(int i=0; i<demoCount; i++){
-		if(i == 'l' - 'a') continue;
-		if(i == 'n' - 'a') continue;
-		time_trial(i, 1000);
+	if(trial){
+		sleep(1);
+		for(int i=0; i<demoCount; i++) time_trial(i, 1000);
+		exit(0);
+	} else {
+		mouseBody = cpBodyNew(INFINITY, INFINITY);
+		
+		glutStuff(argc, argv);
+		
+		runDemo(&demos[firstDemoIndex]);
+		glutMainLoop();
 	}
-//	time_trial(0, 1000);
-	exit(0);
-#endif
-	
-	mouseBody = cpBodyNew(INFINITY, INFINITY);
-	
-	glutStuff(argc, argv);
-	
-	runDemo(demos[firstDemoIndex]);
-	glutMainLoop();
 
 	return 0;
 }
