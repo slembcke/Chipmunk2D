@@ -392,27 +392,38 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
-// TODO need to make a Windows compatible version here
+#ifdef WIN32
+
+#else
+
 #include <sys/time.h>
 #include <unistd.h>
+
+static double GetMilliseconds(){
+	struct timeval time;
+	gettimeofday(&time, NULL);
+	
+	return (time.tv_sec*1000.0 + time.tv_usec/1000.0);
+}
+
+#endif
+
+// TODO need to make a Windows compatible version here
 void time_trial(int index, int count)
 {
 	currDemo = &demos[index];
 	space = currDemo->initFunc();
 	
-	struct timeval start_time, end_time;
-	gettimeofday(&start_time, NULL);
+	double start_time = GetMilliseconds();
 	
 	for(int i=0; i<count; i++)
 		currDemo->updateFunc(i);
 	
-	gettimeofday(&end_time, NULL);
-	double millisecs = (end_time.tv_sec - start_time.tv_sec)*1000.0;
-	millisecs += (end_time.tv_usec - start_time.tv_usec)/1000.0;
+	double end_time = GetMilliseconds();
 	
 	currDemo->destroyFunc();
 	
-	printf("Time(%c) = %.2fms (%s)\n", index + 'a', millisecs, currDemo->name);
+	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, currDemo->name);
 }
 
 extern chipmunkDemo LogoSmash;

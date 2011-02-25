@@ -148,27 +148,26 @@ static cpSpace *init_SimpleTerrainHexagons_100(){
 
 // SimpleTerrain variable sized objects
 static float rand_size(){
-	float unit = frand()*2.0f - 1.0f;
-	return pow(1.5f, unit*2.0f);
+	return pow(1.5, cpflerp(-1.5, 3.5, frand()));
 }
 
-static cpSpace *init_SimpleTerrainVCircles_500(){
+static cpSpace *init_SimpleTerrainVCircles_200(){
 	setupSpace_simpleTerrain();
-	for(int i=0; i<500; i++) add_circle(i, 5.0f*rand_size());
+	for(int i=0; i<200; i++) add_circle(i, 5.0f*rand_size());
 	
 	return space;
 }
 
-static cpSpace *init_SimpleTerrainVBoxes_500(){
+static cpSpace *init_SimpleTerrainVBoxes_200(){
 	setupSpace_simpleTerrain();
-	for(int i=0; i<500; i++) add_box(i, 10.0f*rand_size());
+	for(int i=0; i<200; i++) add_box(i, 8.0f*rand_size());
 	
 	return space;
 }
 
-static cpSpace *init_SimpleTerrainVHexagons_500(){
+static cpSpace *init_SimpleTerrainVHexagons_200(){
 	setupSpace_simpleTerrain();
-	for(int i=0; i<500; i++) add_hexagon(i, 5.0f*rand_size());
+	for(int i=0; i<200; i++) add_hexagon(i, 5.0f*rand_size());
 	
 	return space;
 }
@@ -386,7 +385,7 @@ static cpSpace *init_NoCollide(){
 	
 	cpSpaceAddCollisionHandler(space, 2, 2, NoCollide_begin, NULL, NULL, NULL, NULL);
 	
-	float radius = 4.0f;
+	float radius = 4.5f;
 	
 	cpSpaceAddShape(space, cpSegmentShapeNew(&space->staticBody, cpv(-330-radius, -250-radius), cpv( 330+radius, -250-radius), 0.0f))->e = 1.0f;
 	cpSpaceAddShape(space, cpSegmentShapeNew(&space->staticBody, cpv( 330+radius,  250+radius), cpv( 330+radius, -250-radius), 0.0f))->e = 1.0f;
@@ -452,9 +451,9 @@ chipmunkDemo bench_list[] = {
 	BENCH(SimpleTerrainHexagons_1000),
 	BENCH(SimpleTerrainHexagons_500),
 	BENCH(SimpleTerrainHexagons_100),
-	BENCH(SimpleTerrainVCircles_500),
-	BENCH(SimpleTerrainVBoxes_500),
-	BENCH(SimpleTerrainVHexagons_500),
+	BENCH(SimpleTerrainVCircles_200),
+	BENCH(SimpleTerrainVBoxes_200),
+	BENCH(SimpleTerrainVHexagons_200),
 	BENCH(ComplexTerrainCircles_1000),
 	BENCH(ComplexTerrainHexagons_1000),
 	BENCH(BouncyTerrainCircles_500),
