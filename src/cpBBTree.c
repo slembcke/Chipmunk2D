@@ -174,8 +174,12 @@ PairsClear(Node *leaf, cpBBTree *tree)
 static void
 PairInsert(Node *a, Node *b, cpBBTree *tree)
 {
-	Pair *pair = PairFromPool(tree);
 	Pair *nextA = a->pairs, *nextB = b->pairs;
+	Pair *pair = PairFromPool(tree);
+	Pair temp = {{NULL, a, nextA},{NULL, b, nextB}};
+	
+	a->pairs = b->pairs = pair;
+	*pair = temp;
 	
 	if(nextA){
 		if(nextA->a.leaf == a) nextA->a.prev = pair; else nextA->b.prev = pair;
@@ -184,9 +188,6 @@ PairInsert(Node *a, Node *b, cpBBTree *tree)
 	if(nextB){
 		if(nextB->a.leaf == b) nextB->a.prev = pair; else nextB->b.prev = pair;
 	}
-	
-	(*pair) = (Pair){{NULL, a, nextA},{NULL, b, nextB}};
-	a->pairs = b->pairs = pair;
 }
 
 
@@ -321,6 +322,8 @@ SubtreeQuery(Node *subtree, void *obj, cpBB bb, cpSpatialIndexQueryCallback func
 	}
 }
 
+
+// TODO Needs early exit optimization for ray queries
 static void
 SubtreeSegmentQuery(Node *subtree, void *obj, cpVect a, cpVect b, cpSpatialIndexSegmentQueryCallback func, void *data)
 {
