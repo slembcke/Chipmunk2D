@@ -307,7 +307,6 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// If body sleeping is enabled, do that now.
 	if(space->sleepTimeThreshold != INFINITY){
 		cpSpaceProcessComponents(space, dt);
-//		bodies = space->bodies; // rebuilt by processContactComponents()
 	}
 	
 	// Clear out old cached arbiters and call separate callbacks

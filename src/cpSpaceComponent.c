@@ -59,9 +59,6 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 				cpArrayPush(space->arbiters, arb);
 				arb->stamp = space->stamp;
 				
-				arb->stamp = space->stamp;
-				cpArrayPush(space->arbiters, arb);
-				
 				cpfree(contacts);
 			}
 		}
@@ -243,11 +240,10 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		
 		i++;
 		
-		// Only sleeping bodies retain their component node root pointer.
+		// Only sleeping bodies retain their component node pointers.
 		body->node.root = NULL;
+		body->node.next = NULL;
 	}
-	
-	// TODO reorder contacts to take advantage of "shock propagation"?
 }
 
 void
