@@ -113,7 +113,7 @@ ComponentActivate(cpBody *root)
 	cpAssert(!cpBodyIsRogue(root), "Internal Error: ComponentActivate() called on a rogue body.");
 	
 	cpSpace *space = root->space;
-	CP_BODY_FOREACH_GROUP(root, body){
+	CP_BODY_FOREACH_COMPONENT(root, body){
 		body->node.root = NULL;
 		cpSpaceActivateBody(space, body);
 	}
@@ -143,7 +143,7 @@ cpBodyActivate(cpBody *body)
 static inline cpBool
 ComponentActive(cpBody *root, cpFloat threshold)
 {
-	CP_BODY_FOREACH_GROUP(root, body){
+	CP_BODY_FOREACH_COMPONENT(root, body){
 		if(body->node.idleTime < threshold) return cpTrue;
 	}
 	
@@ -151,16 +151,17 @@ ComponentActive(cpBody *root, cpFloat threshold)
 }
 
 static inline void
-DepthFirstSearch(cpBody *root, cpBody *body)
+FloodFillComponent(cpBody *root, cpBody *body)
 {
 	if(!cpBodyIsStatic(body) && !cpBodyIsRogue(body)){
 		cpBody *other_root = body->node.root;
 		if(other_root == NULL){
 			ComponentAdd(root, body);
-			CP_BODY_FOREACH_ARBITER(body, arb) DepthFirstSearch(root, (body == arb->a->body ? arb->b->body : arb->a->body));
-			CP_BODY_FOREACH_CONSTRAINT(body, constraint) DepthFirstSearch(root, (body == constraint->a ? constraint->b : constraint->a));
-		} else if(other_root != root){
-			cpAssert(cpFalse, "Uh oh. This shouldn't happen?");
+			CP_BODY_FOREACH_ARBITER(body, arb) FloodFillComponent(root, (body == arb->a->body ? arb->b->body : arb->a->body));
+			CP_BODY_FOREACH_CONSTRAINT(body, constraint) FloodFillComponent(root, (body == constraint->a ? constraint->b : constraint->a));
+		} else {
+			// TODO can probably remove this at some point.
+			cpAssert(other_root == root, "Uh oh. This shouldn't happen?");
 		}
 	}
 }
@@ -179,12 +180,11 @@ cpBodyPushArbiter(cpBody *body, cpArbiter *arb)
 	}
 }
 
-// TODO this function needs more commenting.
 void
 cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 {
 	cpFloat dv = space->idleSpeedThreshold;
-	cpFloat dvsq = (dv ? dv*dv : cpvlengthsq(space->gravity)*dt*dt);
+	cpFloat dvsq = (dv ? dv*dv : cpvlengthsq(space->gravity)*dt*dt); // is dt^2 a bug?
 	
 	// update idling and reset arbiter list and component nodes
 	cpArray *bodies = space->bodies;
@@ -212,6 +212,7 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		cpBodyPushArbiter(b, arb);
 	}
 	
+	// Bodies are awoken when adding constraints, is this redundant?
 	cpArray *constraints = space->constraints;
 	for(int i=0; i<constraints->num; i++){
 		cpConstraint *constraint = constraints->arr[i];
@@ -221,25 +222,32 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		if(cpBodyIsSleeping(b) || (cpBodyIsRogue(a) && !cpBodyIsStatic(a))) cpBodyActivate(b);
 	}
 	
+	// Generate components and deactivate sleeping ones
 	for(int i=0; i<bodies->num;){
 		cpBody *body = (cpBody*)bodies->arr[i];
 		
 		if(body->node.root == NULL){
-			DepthFirstSearch(body, body);
+			// Body not in a component.
+			// Perform a flood fill to find and mark the component in the contact graph.
+			FloodFillComponent(body, body);
 			
 			if(!ComponentActive(body, space->sleepTimeThreshold)){
 				cpArrayPush(space->sleepingComponents, body);
-				CP_BODY_FOREACH_GROUP(body, other) cpSpaceDeactivateBody(space, other);
+				CP_BODY_FOREACH_COMPONENT(body, other) cpSpaceDeactivateBody(space, other);
 				
 				// cpSpaceDeactivateBody() removed the current body from the list.
-				// Skip the index increment and don't reset the root pointer.
+				// Skip incrementing the index counter.
 				continue;
 			}
 		}
 		
 		i++;
+		
+		// Only sleeping bodies retain their component node root pointer.
 		body->node.root = NULL;
 	}
+	
+	// TODO reorder contacts to take advantage of "shock propagation"?
 }
 
 void

@@ -55,7 +55,7 @@ void cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*));
 #define CP_BODY_FOREACH_SHAPE(body, var)\
 	for(cpShape *var = body->shapeList; var; var = var->next)
 
-#define CP_BODY_FOREACH_GROUP(root, var)\
+#define CP_BODY_FOREACH_COMPONENT(root, var)\
 	for(cpBody *var = root; var; var = var->node.next)
 
 #pragma mark cpHashSet

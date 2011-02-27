@@ -36,8 +36,8 @@ cpPolyShapeTransformVerts(cpPolyShape *poly, cpVect p, cpVect rot)
 	cpVect *src = poly->verts;
 	cpVect *dst = poly->tVerts;
 	
-	cpFloat l = INFINITY, r = -INFINITY;
-	cpFloat b = INFINITY, t = -INFINITY;
+	cpFloat l = (cpFloat)INFINITY, r = -(cpFloat)INFINITY;
+	cpFloat b = (cpFloat)INFINITY, t = -(cpFloat)INFINITY;
 	
 	for(int i=0; i<poly->numVerts; i++){
 		cpVect v = cpvadd(p, cpvrotate(src[i], rot));

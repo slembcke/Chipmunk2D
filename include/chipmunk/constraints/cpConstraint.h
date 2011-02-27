@@ -19,8 +19,6 @@
  * SOFTWARE.
  */
 
-// TODO: refactoring needed here
-	
 extern cpFloat cp_constraint_bias_coef;
 
 typedef struct cpConstraintClass cpConstraintClass;

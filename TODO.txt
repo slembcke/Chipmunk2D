@@ -5,7 +5,8 @@ Separate impulse application for joints
 breakable object support functions
 constraint callbacks
 touch joint (Objective-Chipmunk)
-per body damping and gravity coefs?
+Per body damping and gravity coefs?
+Per body iterations and timestep?
 Better accuracy for variable timestepping?
 Functions to check if space contains shapes, bodies, constraints?
 Building bodies from shape collections.
