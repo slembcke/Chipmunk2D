@@ -42,7 +42,7 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 		}
 		
 		CP_BODY_FOREACH_ARBITER(body, arb){
-			cpBody *bodyA = arb->a->body;
+			cpBody *bodyA = arb->body_a;
 			if(body == bodyA || cpBodyIsStatic(bodyA)){
 				int numContacts = arb->numContacts;
 				cpContact *contacts = arb->contacts;
@@ -81,7 +81,7 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 	}
 	
 	CP_BODY_FOREACH_ARBITER(body, arb){
-		cpBody *bodyA = arb->a->body;
+		cpBody *bodyA = arb->body_a;
 		if(body == bodyA || cpBodyIsStatic(bodyA)){
 			cpShape *a = arb->a, *b = arb->b;
 			cpShape *shape_pair[] = {a, b};
@@ -154,7 +154,7 @@ FloodFillComponent(cpBody *root, cpBody *body)
 		cpBody *other_root = body->node.root;
 		if(other_root == NULL){
 			ComponentAdd(root, body);
-			CP_BODY_FOREACH_ARBITER(body, arb) FloodFillComponent(root, (body == arb->a->body ? arb->b->body : arb->a->body));
+			CP_BODY_FOREACH_ARBITER(body, arb) FloodFillComponent(root, (body == arb->body_a ? arb->body_b : arb->body_a));
 			CP_BODY_FOREACH_CONSTRAINT(body, constraint) FloodFillComponent(root, (body == constraint->a ? constraint->b : constraint->a));
 		} else {
 			// TODO can probably remove this at some point.
@@ -167,7 +167,7 @@ static inline void
 cpBodyPushArbiter(cpBody *body, cpArbiter *arb)
 {
 	if(!cpBodyIsStatic(body) && !cpBodyIsRogue(body)){
-		if(body == arb->a->body){
+		if(body == arb->body_a){
 			arb->nextA = body->arbiterList;
 		} else {
 			arb->nextB = body->arbiterList;
@@ -200,7 +200,7 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 	cpArray *arbiters = space->arbiters;
 	for(int i=0, count=arbiters->num; i<count; i++){
 		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
-		cpBody *a = arb->a->body, *b = arb->b->body;
+		cpBody *a = arb->body_a, *b = arb->body_b;
 		
 		if(cpBodyIsSleeping(a) || (cpBodyIsRogue(b) && !cpBodyIsStatic(b))) cpBodyActivate(a);
 		if(cpBodyIsSleeping(b) || (cpBodyIsRogue(a) && !cpBodyIsStatic(a))) cpBodyActivate(b);

@@ -46,6 +46,9 @@ struct cpSpace {
 	// The default value of INFINITY disables the sleeping algorithm.
 	cpFloat sleepTimeThreshold;
 	
+	cpFloat collisionSlop;
+	cpFloat collisionBias;
+	
 	// *** Internally Used Fields
 	
 	// When the space lock count is non zero you cannot add or remove objects
@@ -53,6 +56,7 @@ struct cpSpace {
 	
 	// Time stamp. Is incremented on every call to cpSpaceStep().
 	CP_PRIVATE(cpTimestamp stamp);
+	CP_PRIVATE(cpFloat prev_dt);
 
 	// The static and active shape spatial hashes.
 	CP_PRIVATE(cpSpatialIndex *staticShapes);
@@ -129,7 +133,7 @@ void cpSpaceAddCollisionHandler(
 );
 void cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
 
-// Add and remove entities from the system.
+// Add and remove objects from the system.
 cpShape *cpSpaceAddShape(cpSpace *space, cpShape *shape);
 cpShape *cpSpaceAddStaticShape(cpSpace *space, cpShape *shape);
 cpBody *cpSpaceAddBody(cpSpace *space, cpBody *body);
@@ -139,6 +143,11 @@ void cpSpaceRemoveShape(cpSpace *space, cpShape *shape);
 void cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape);
 void cpSpaceRemoveBody(cpSpace *space, cpBody *body);
 void cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint);
+
+// Test if an object is in the space
+cpBool cpSpaceContainsShape(cpSpace *space, cpShape *shape);
+cpBool cpSpaceContainsBody(cpSpace *space, cpBody *body);
+cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint);
 
 // Post Step function definition
 typedef void (*cpPostStepFunc)(cpSpace *space, void *obj, void *data);

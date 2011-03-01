@@ -210,3 +210,9 @@ cpBodyKineticEnergy(const cpBody *body)
 	cpFloat wsq = body->w*body->w;
 	return (vsq ? vsq*body->m : 0.0f) + (wsq ? wsq*body->i : 0.0f);
 }
+
+typedef void (*cpBodyArbiterIterator)(cpBody *body, cpArbiter *arbiter, void *data);
+void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIterator func, void *data);
+
+cpBool cpBodyIsGrounded(cpBody *body);
+cpBool cpBodyIsGroundedTolerance(cpBody *body, cpVect normal, cpFloat tolerance);

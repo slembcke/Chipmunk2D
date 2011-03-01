@@ -88,8 +88,8 @@ cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHas
 cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
 
 void cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
-void cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv);
-void cpArbiterApplyCachedImpulse(cpArbiter *arb);
+void cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv, cpFloat bias, cpFloat slop);
+void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
 void cpArbiterApplyImpulse(cpArbiter *arb);
 
 #pragma mark Collision Functions

@@ -18,14 +18,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
+
 #include <stdlib.h>
 
 #include "chipmunk_private.h"
 #include "constraints/util.h"
 
-cpFloat cp_bias_coef = 0.1f;
-cpFloat cp_collision_slop = 0.1f;
+cpFloat cp_collision_slop = 0.1;
+cpFloat cp_bias_coef = 0.1;
 
 cpContact*
 cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash)
@@ -108,8 +108,8 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 	arb->numContacts = 0;
 	arb->contacts = NULL;
 	
-	arb->a = a;
-	arb->b = b;
+	arb->a = a; arb->body_a = a->body;
+	arb->b = b; arb->body_b = b->body;
 	
 	arb->nextA = NULL;
 	arb->nextB = NULL;
@@ -153,18 +153,18 @@ cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisio
 	arb->surface_vr = cpvsub(a->surface_v, b->surface_v);
 	
 	// For collisions between two similar primitive types, the order could have been swapped.
-	arb->a = a;
-	arb->b = b;
+	arb->a = a; arb->body_a = a->body;
+	arb->b = b; arb->body_b = b->body;
 	
 	// mark it as new if it's been cached
 	if(arb->state == cpArbiterStateCached) arb->state = cpArbiterStateFirstColl;
 }
 
 void
-cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv)
+cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv, cpFloat slop, cpFloat bias)
 {
-	cpBody *a = arb->a->body;
-	cpBody *b = arb->b->body;
+	cpBody *a = arb->body_a;
+	cpBody *b = arb->body_b;
 	
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];
@@ -178,7 +178,7 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv)
 		con->tMass = 1.0f/k_scalar(a, b, con->r1, con->r2, cpvperp(con->n));
 				
 		// Calculate the target bias velocity.
-		con->bias = -cp_bias_coef*dt_inv*cpfmin(0.0f, con->dist + cp_collision_slop);
+		con->bias = -bias*dt_inv*cpfmin(0.0f, con->dist + slop);
 		con->jBias = 0.0f;
 		
 		// Calculate the target bounce velocity.
@@ -187,28 +187,25 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv)
 }
 
 void
-cpArbiterApplyCachedImpulse(cpArbiter *arb)
+cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef)
 {
-	cpShape *shapea = arb->a;
-	cpShape *shapeb = arb->b;
-		
-	arb->u = shapea->u * shapeb->u;
-	arb->surface_vr = cpvsub(shapeb->surface_v, shapea->surface_v);
-
-	cpBody *a = shapea->body;
-	cpBody *b = shapeb->body;
+	if(cpArbiterIsFirstContact(arb)) return;
+	
+	cpBody *a = arb->body_a;
+	cpBody *b = arb->body_b;
 	
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];
-		apply_impulses(a, b, con->r1, con->r2, cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc)));
+		cpVect j = cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc));
+		apply_impulses(a, b, con->r1, con->r2, cpvmult(j, dt_coef));
 	}
 }
 
 void
 cpArbiterApplyImpulse(cpArbiter *arb)
 {
-	cpBody *a = arb->a->body;
-	cpBody *b = arb->b->body;
+	cpBody *a = arb->body_a;
+	cpBody *b = arb->body_b;
 
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];

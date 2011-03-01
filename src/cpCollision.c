@@ -279,10 +279,10 @@ seg2poly(const cpShape *shape1, const cpShape *shape2, cpContact *arr)
 		cpContactInit(nextContactPoint(arr, &num), va, poly_n, poly_min, CP_HASH_PAIR(seg->shape.hashid, 0));
 	if(cpPolyShapeContainsVert(poly, vb))
 		cpContactInit(nextContactPoint(arr, &num), vb, poly_n, poly_min, CP_HASH_PAIR(seg->shape.hashid, 1));
-
+	
 	// Floating point precision problems here.
 	// This will have to do for now.
-	poly_min -= cp_collision_slop;
+//	poly_min -= cp_collision_slop; // TODO is this needed anymore?
 	if(minNorm >= poly_min || minNeg >= poly_min) {
 		if(minNorm > minNeg)
 			findPointsBehindSeg(arr, &num, seg, poly, minNorm, 1.0f);

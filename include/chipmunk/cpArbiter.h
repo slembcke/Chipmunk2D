@@ -18,12 +18,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
+
 // Determines how fast penetrations resolve themselves expressed as a percentage per step. Defaults to 0.1.
 extern cpFloat cp_bias_coef;
 
 // Amount of allowed penetration. Used to reduce oscillating contacts and keep the collision cache warm. Defaults to 0.1.
 extern cpFloat cp_collision_slop;
+
 
 // User collision handler function types.
 typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, void *data);
@@ -79,6 +80,7 @@ struct cpArbiter {
 	// The two shapes and bodies involved in the collision.
 	// These variables are NOT in the order defined by the collision handler.
 	cpShape CP_PRIVATE(*a), CP_PRIVATE(*b);
+	cpBody CP_PRIVATE(*body_a), CP_PRIVATE(*body_b);
 	cpArbiter CP_PRIVATE(*nextA), CP_PRIVATE(*nextB);
 	
 	// Calculated before calling the pre-solve collision handler

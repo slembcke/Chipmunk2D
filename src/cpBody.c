@@ -21,7 +21,7 @@
  
 #include <stdlib.h>
 #include <float.h>
-#include <stdarg.h>
+#include <math.h>
 
 #include "chipmunk_private.h"
 
@@ -135,6 +135,7 @@ cpBodySlew(cpBody *body, cpVect pos, cpFloat dt)
 void
 cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
+	// TODO per body damping and gravity coefs
 	body->v = cpvclamp(cpvadd(cpvmult(body->v, damping), cpvmult(cpvadd(gravity, cpvmult(body->f, body->m_inv)), dt)), body->v_limit);
 	
 	cpFloat w_limit = body->w_limit;
@@ -163,4 +164,26 @@ cpBodyApplyForce(cpBody *body, cpVect force, cpVect r)
 {
 	body->f = cpvadd(body->f, force);
 	body->t += cpvcross(r, force);
+}
+
+void
+cpBodyEachArbiter(cpBody *body, cpBodyArbiterIterator func, void *data)
+{
+	CP_BODY_FOREACH_ARBITER(body, arb) func(body, arb, data);
+}
+
+cpBool
+cpBodyIsGroundedTolerance(cpBody *body, cpVect n, cpFloat tol)
+{
+	CP_BODY_FOREACH_ARBITER(body, arb){
+		if(cpvdot(arb->contacts[0].n, n) < tol) return cpTrue;
+	}
+	
+	return cpFalse;
+}
+
+cpBool
+cpBodyIsGrounded(cpBody *body)
+{
+	return cpBodyIsGroundedTolerance(body, cpv(0.0f, 1.0f), 0.0f);
 }
