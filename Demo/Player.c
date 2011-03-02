@@ -32,58 +32,9 @@ static cpSpace *space;
 typedef struct PlayerStruct {
 	cpFloat u;
 	cpShape *shape;
-	cpVect groundNormal;
-	cpArray *groundShapes;
 } PlayerStruct;
 
 PlayerStruct playerInstance;
-
-static cpBool
-begin(cpArbiter *arb, cpSpace *space, void *ignore)
-{
-	CP_ARBITER_GET_SHAPES(arb, a, b);
-	PlayerStruct *player = (PlayerStruct *)a->data;
-	
-	cpVect n = cpvneg(cpArbiterGetNormal(arb, 0));
-	if(n.y > 0.0f){
-		cpArrayPush(player->groundShapes, b);
-	}
-	
-	return cpTrue;
-}
-
-static cpBool
-preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
-{
-	CP_ARBITER_GET_SHAPES(arb, a, b);
-	PlayerStruct *player = (PlayerStruct *)a->data;
-	
-	if(cpArbiterIsFirstContact(arb)){
-		a->u = player->u;
-		
-		// pick the most upright jump normal each frame
-		cpVect n = cpvneg(cpArbiterGetNormal(arb, 0));
-		if(n.y >= player->groundNormal.y){
-			player->groundNormal = n;
-		}
-	}
-	
-	return cpTrue;
-}
-
-static void
-separate(cpArbiter *arb, cpSpace *space, void *ignore)
-{
-	CP_ARBITER_GET_SHAPES(arb, a, b);
-	PlayerStruct *player = (PlayerStruct *)a->data;
-	
-	cpArrayDeleteObj(player->groundShapes, b);
-	
-	if(player->groundShapes->num == 0){
-		a->u = 0.0f;
-		player->groundNormal = cpvzero;
-	}
-}
 
 static void
 playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
@@ -93,6 +44,14 @@ playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 	body->v.x = cpfclamp(body->v.x, -400, 400);
 }
 
+static void
+SelectPlayerGroundNormal(cpBody *body, cpArbiter *arb, cpVect *groundNormal){
+	cpVect n = cpArbiterGetNormal(arb, 0);
+	
+	if(n.y > groundNormal->y){
+		*groundNormal = n;
+	}
+}
 
 static void
 update(int ticks)
@@ -102,9 +61,12 @@ update(int ticks)
 	
 	cpBody *body = playerInstance.shape->body;
 	
-	cpVect groundNormal = playerInstance.groundNormal;
+	cpVect groundNormal = cpvzero;
+	cpBodyEachArbiter(body, SelectPlayerGroundNormal, &groundNormal);
+	sprintf(messageString, "Ground normal %s\n", cpvstr(groundNormal));
+	
 	if(groundNormal.y > 0.0f){
-		playerInstance.shape->surface_v = cpvmult(cpvperp(groundNormal), 400.0f*arrowDirection.x);
+		playerInstance.shape->surface_v = cpv(400.0f*arrowDirection.x, 0.0f);//cpvmult(cpvperp(groundNormal), 400.0f*arrowDirection.x);
 		if(arrowDirection.x) cpBodyActivate(body);
 	} else {
 		playerInstance.shape->surface_v = cpvzero;
@@ -117,7 +79,7 @@ update(int ticks)
 		cpBodyActivate(body);
 	}
 	
-	if(playerInstance.groundShapes->num == 0){
+	if(cpvlengthsq(groundNormal)){
 		cpFloat air_accel = body->v.x + arrowDirection.x*(2000.0f);
 		body->f.x = body->m*air_accel;
 //		body->v.x = cpflerpconst(body->v.x, 400.0f*arrowDirection.x, 2000.0f/60.0f);
@@ -141,6 +103,7 @@ init(void)
 	space = cpSpaceNew();
 	space->iterations = 10;
 	space->gravity = cpv(0, -1500);
+	space->sleepTimeThreshold = 999999;
 
 	cpBody *body, *staticBody = space->staticBody;
 	cpShape *shape;
@@ -199,10 +162,7 @@ init(void)
 	
 	playerInstance.u = shape->u;
 	playerInstance.shape = shape;
-	playerInstance.groundShapes = cpArrayNew(0);
 	shape->data = &playerInstance;
-	
-	cpSpaceAddCollisionHandler(space, 1, 2, begin, preSolve, NULL, separate, NULL);
 	
 	return space;
 }
@@ -212,8 +172,6 @@ destroy(void)
 {
 	cpSpaceFreeChildren(space);
 	cpSpaceFree(space);
-	
-	cpArrayFree(playerInstance.groundShapes);
 }
 
 chipmunkDemo Player = {
