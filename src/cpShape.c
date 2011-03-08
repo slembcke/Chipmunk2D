@@ -233,7 +233,7 @@ cpSegmentShapeCacheData(cpShape *shape, cpVect p, cpVect rot)
 
 static cpBool
 cpSegmentShapePointQuery(cpShape *shape, cpVect p){
-	if(!cpBBcontainsVect(shape->bb, p)) return cpFalse;
+	if(!cpBBContainsVect(shape->bb, p)) return cpFalse;
 	
 	cpSegmentShape *seg = (cpSegmentShape *)shape;
 	

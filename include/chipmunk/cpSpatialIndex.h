@@ -1,9 +1,9 @@
 #pragma mark Spatial Index
 
 typedef cpBB (*cpSpatialIndexBBFunc)(void *obj);
-typedef void (*cpSpatialIndexIterator)(void *obj, void *data);
-typedef void (*cpSpatialIndexQueryCallback)(void *obj1, void *obj2, void *data);
-typedef cpFloat (*cpSpatialIndexSegmentQueryCallback)(void *obj1, void *obj2, void *data);
+typedef void (*cpSpatialIndexIteratorFunc)(void *obj, void *data);
+typedef void (*cpSpatialIndexQueryFunc)(void *obj1, void *obj2, void *data);
+typedef cpFloat (*cpSpatialIndexSegmentQueryFunc)(void *obj1, void *obj2, void *data);
 
 
 typedef struct cpSpatialIndexClass cpSpatialIndexClass;
@@ -43,45 +43,45 @@ void cpBBTreeSetVelocityFunc(cpSpatialIndex *index, cpBBTreeVelocityFunc func);
 
 #pragma mark Spatial Index Implementation
 
-typedef void (*cpSpatialIndexDestroyFunc)(cpSpatialIndex *index);
+typedef void (*cpSpatialIndexDestroyImpl)(cpSpatialIndex *index);
 
-typedef int (*cpSpatialIndexCountFunc)(cpSpatialIndex *index);
-typedef void (*cpSpatialIndexEachFunc)(cpSpatialIndex *index, cpSpatialIndexIterator func, void *data);
+typedef int (*cpSpatialIndexCountImpl)(cpSpatialIndex *index);
+typedef void (*cpSpatialIndexEachImpl)(cpSpatialIndex *index, cpSpatialIndexIteratorFunc func, void *data);
 
-typedef cpBool (*cpSpatialIndexContainsFunc)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
-typedef void (*cpSpatialIndexInsertFunc)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
-typedef void (*cpSpatialIndexRemoveFunc)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+typedef cpBool (*cpSpatialIndexContainsImpl)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+typedef void (*cpSpatialIndexInsertImpl)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+typedef void (*cpSpatialIndexRemoveImpl)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
 
-typedef void (*cpSpatialIndexReindexFunc)(cpSpatialIndex *index);
-typedef void (*cpSpatialIndexReindexObjectFunc)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
-typedef void (*cpSpatialIndexReindexQueryFunc)(cpSpatialIndex *index, cpSpatialIndexQueryCallback func, void *data);
+typedef void (*cpSpatialIndexReindexImpl)(cpSpatialIndex *index);
+typedef void (*cpSpatialIndexReindexObjectImpl)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+typedef void (*cpSpatialIndexReindexQueryImpl)(cpSpatialIndex *index, cpSpatialIndexQueryFunc func, void *data);
 
-typedef void (*cpSpatialIndexPointQueryFunc)(cpSpatialIndex *index, cpVect point, cpSpatialIndexQueryCallback func, void *data);
-typedef void (*cpSpatialIndexSegmentQueryFunc)(cpSpatialIndex *index, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryCallback func, void *data);
-typedef void (*cpSpatialIndexQueryFunc)(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data);
+typedef void (*cpSpatialIndexPointQueryImpl)(cpSpatialIndex *index, cpVect point, cpSpatialIndexQueryFunc func, void *data);
+typedef void (*cpSpatialIndexSegmentQueryImpl)(cpSpatialIndex *index, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryFunc func, void *data);
+typedef void (*cpSpatialIndexQueryImpl)(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, void *data);
 
 struct cpSpatialIndexClass {
-	cpSpatialIndexDestroyFunc destroy;
+	cpSpatialIndexDestroyImpl destroy;
 	
-	cpSpatialIndexCountFunc count;
-	cpSpatialIndexEachFunc each;
+	cpSpatialIndexCountImpl count;
+	cpSpatialIndexEachImpl each;
 	
-	cpSpatialIndexContainsFunc contains;
-	cpSpatialIndexInsertFunc insert;
-	cpSpatialIndexRemoveFunc remove;
+	cpSpatialIndexContainsImpl contains;
+	cpSpatialIndexInsertImpl insert;
+	cpSpatialIndexRemoveImpl remove;
 	
-	cpSpatialIndexReindexFunc reindex;
-	cpSpatialIndexReindexObjectFunc reindexObject;
-	cpSpatialIndexReindexQueryFunc reindexQuery;
+	cpSpatialIndexReindexImpl reindex;
+	cpSpatialIndexReindexObjectImpl reindexObject;
+	cpSpatialIndexReindexQueryImpl reindexQuery;
 	
-	cpSpatialIndexPointQueryFunc pointQuery;
-	cpSpatialIndexSegmentQueryFunc segmentQuery;
-	cpSpatialIndexQueryFunc query;
+	cpSpatialIndexPointQueryImpl pointQuery;
+	cpSpatialIndexSegmentQueryImpl segmentQuery;
+	cpSpatialIndexQueryImpl query;
 };
 
 
 void cpSpatialIndexFree(cpSpatialIndex *index);
-void cpSpatialIndexCollideStatic(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data);
+void cpSpatialIndexCollideStatic(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryFunc func, void *data);
 
 static inline void
 cpSpatialIndexDestroy(cpSpatialIndex *index)
@@ -96,7 +96,7 @@ cpSpatialIndexCount(cpSpatialIndex *index)
 }
 
 static inline void
-cpSpatialIndexEach(cpSpatialIndex *index, cpSpatialIndexIterator func, void *data)
+cpSpatialIndexEach(cpSpatialIndex *index, cpSpatialIndexIteratorFunc func, void *data)
 {
 	index->klass->each(index, func, data);
 }
@@ -133,27 +133,27 @@ cpSpatialIndexReindexObject(cpSpatialIndex *index, void *obj, cpHashValue hashid
 
 // TODO make sure to doc the callback type, a pointer to the point is passed as obj1
 static inline	void
-cpSpatialIndexPointQuery(cpSpatialIndex *index, cpVect point, cpSpatialIndexQueryCallback func, void *data)
+cpSpatialIndexPointQuery(cpSpatialIndex *index, cpVect point, cpSpatialIndexQueryFunc func, void *data)
 {
 	index->klass->pointQuery(index, point, func, data);
 }
 
 // TODO make sure to doc the callback type
 static inline void
-cpSpatialIndexSegmentQuery(cpSpatialIndex *index, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryCallback func, void *data)
+cpSpatialIndexSegmentQuery(cpSpatialIndex *index, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryFunc func, void *data)
 {
 	index->klass->segmentQuery(index, obj, a, b, t_exit, func, data);
 }
 
 
 static inline void
-cpSpatialIndexQuery(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
+cpSpatialIndexQuery(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, void *data)
 {
 	index->klass->query(index, obj, bb, func, data);
 }
 
 static inline void
-cpSpatialIndexReindexQuery(cpSpatialIndex *index, cpSpatialIndexQueryCallback func, void *data)
+cpSpatialIndexReindexQuery(cpSpatialIndex *index, cpSpatialIndexQueryFunc func, void *data)
 {
 	index->klass->reindexQuery(index, func, data);
 }

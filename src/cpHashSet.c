@@ -228,7 +228,7 @@ cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr)
 }
 
 void
-cpHashSetEach(cpHashSet *set, cpHashSetIterFunc func, void *data)
+cpHashSetEach(cpHashSet *set, cpHashSetIteratorFunc func, void *data)
 {
 	for(int i=0; i<set->size; i++){
 		cpHashSetBin *bin = set->table[i];

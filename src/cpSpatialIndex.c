@@ -14,7 +14,7 @@ cpSpatialIndexFree(cpSpatialIndex *index)
 typedef struct dynamicToStaticContext {
 	cpSpatialIndexBBFunc bbfunc;
 	cpSpatialIndex *staticIndex;
-	cpSpatialIndexQueryCallback queryFunc;
+	cpSpatialIndexQueryFunc queryFunc;
 	void *data;
 } dynamicToStaticContext;
 
@@ -40,11 +40,11 @@ dynamicToStaticIter(void *obj, dynamicToStaticContext *context)
 }
 
 void
-cpSpatialIndexCollideStatic(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryCallback func, void *data)
+cpSpatialIndexCollideStatic(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryFunc func, void *data)
 {
 	if(cpSpatialIndexCount(staticIndex) > 0){
 		dynamicToStaticContext context = {dynamicIndex->bbfunc, staticIndex, func, data};
-		cpSpatialIndexEach(dynamicIndex, (cpSpatialIndexIterator)dynamicToStaticIter, &context);
+		cpSpatialIndexEach(dynamicIndex, (cpSpatialIndexIteratorFunc)dynamicToStaticIter, &context);
 	}
 }
 

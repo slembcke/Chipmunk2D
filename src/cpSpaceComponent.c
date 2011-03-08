@@ -181,7 +181,7 @@ void
 cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 {
 	cpFloat dv = space->idleSpeedThreshold;
-	cpFloat dvsq = (dv ? dv*dv : cpvlengthsq(space->gravity)*dt*dt); // is dt^2 a bug?
+	cpFloat dvsq = (dv ? dv*dv : cpvlengthsq(space->gravity)*dt*dt);
 	
 	// update idling and reset arbiter list and component nodes
 	cpArray *bodies = space->bodies;

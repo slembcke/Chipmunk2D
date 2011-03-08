@@ -76,8 +76,8 @@ void *cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data, c
 void *cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr);
 void *cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr);
 
-typedef void (*cpHashSetIterFunc)(void *elt, void *data);
-void cpHashSetEach(cpHashSet *set, cpHashSetIterFunc func, void *data);
+typedef void (*cpHashSetIteratorFunc)(void *elt, void *data);
+void cpHashSetEach(cpHashSet *set, cpHashSetIteratorFunc func, void *data);
 
 typedef cpBool (*cpHashSetFilterFunc)(void *elt, void *data);
 void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);

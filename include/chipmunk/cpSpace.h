@@ -178,8 +178,8 @@ void cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape);
 
 
 // Iterator function for iterating the bodies in a space.
-typedef void (*cpSpaceBodyIterator)(cpBody *body, void *data);
-void cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data);
+typedef void (*cpSpaceBodyIteratorFunc)(cpBody *body, void *data);
+void cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data);
 
 // Spatial hash management functions.
 void cpSpaceResizeStaticHash(cpSpace *space, cpFloat dim, int count);

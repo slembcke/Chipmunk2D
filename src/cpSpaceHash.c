@@ -302,7 +302,7 @@ static void
 cpSpaceHashRehash(cpSpaceHash *hash)
 {
 	clearTable(hash);
-	cpHashSetEach(hash->handleSet, (cpHashSetIterFunc)rehash_helper, hash);
+	cpHashSetEach(hash->handleSet, (cpHashSetIteratorFunc)rehash_helper, hash);
 }
 
 static void
@@ -317,17 +317,17 @@ cpSpaceHashRemove(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 }
 
 typedef struct eachContext {
-	cpSpatialIndexIterator func;
+	cpSpatialIndexIteratorFunc func;
 	void *data;
 } eachContext;
 
 static void eachHelper(cpHandle *hand, eachContext *context){context->func(hand->obj, context->data);}
 
 static void
-cpSpaceHashEach(cpSpaceHash *hash, cpSpatialIndexIterator func, void *data)
+cpSpaceHashEach(cpSpaceHash *hash, cpSpatialIndexIteratorFunc func, void *data)
 {
 	eachContext context = {func, data};
-	cpHashSetEach(hash->handleSet, (cpHashSetIterFunc)eachHelper, &context);
+	cpHashSetEach(hash->handleSet, (cpHashSetIteratorFunc)eachHelper, &context);
 }
 
 static void
@@ -355,7 +355,7 @@ remove_orphaned_handles(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr)
 #pragma mark Query Functions
 
 static inline void
-query_helper(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpatialIndexQueryCallback func, void *data)
+query_helper(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpatialIndexQueryFunc func, void *data)
 {
 	restart:
 	for(cpSpaceHashBin *bin = *bin_ptr; bin; bin = bin->next){
@@ -377,7 +377,7 @@ query_helper(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpatialIn
 }
 
 static void
-cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpatialIndexQueryCallback func, void *data)
+cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpatialIndexQueryFunc func, void *data)
 {
 	cpFloat dim = hash->celldim;
 	int idx = hash_func(floor_int(point.x/dim), floor_int(point.y/dim), hash->numcells);  // Fix by ShiftZ
@@ -387,7 +387,7 @@ cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpatialIndexQueryCallba
 }
 
 static void
-cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpatialIndexQueryCallback func, void *data)
+cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, void *data)
 {
 	// Get the dimensions in cell coordinates.
 	cpFloat dim = hash->celldim;
@@ -412,7 +412,7 @@ cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpatialIndexQueryCallb
 // Similar to struct eachPair above.
 typedef struct queryRehashContext {
 	cpSpaceHash *hash;
-	cpSpatialIndexQueryCallback func;
+	cpSpatialIndexQueryFunc func;
 	void *data;
 } queryRehashContext;
 
@@ -421,7 +421,7 @@ static void
 queryRehash_helper(cpHandle *hand, queryRehashContext *context)
 {
 	cpSpaceHash *hash = context->hash;
-	cpSpatialIndexQueryCallback func = context->func;
+	cpSpatialIndexQueryFunc func = context->func;
 	void *data = context->data;
 
 	cpFloat dim = hash->celldim;
@@ -459,18 +459,18 @@ queryRehash_helper(cpHandle *hand, queryRehashContext *context)
 }
 
 static void
-cpSpaceHashReindexQuery(cpSpaceHash *hash, cpSpatialIndexQueryCallback func, void *data)
+cpSpaceHashReindexQuery(cpSpaceHash *hash, cpSpatialIndexQueryFunc func, void *data)
 {
 	clearTable(hash);
 	
 	queryRehashContext context = {hash, func, data};
-	cpHashSetEach(hash->handleSet, (cpHashSetIterFunc)queryRehash_helper, &context);
+	cpHashSetEach(hash->handleSet, (cpHashSetIteratorFunc)queryRehash_helper, &context);
 	
 	cpSpatialIndexCollideStatic((cpSpatialIndex *)hash, hash->spatialIndex.staticIndex, func, data);
 }
 
 static inline cpFloat
-segmentQuery_helper(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpatialIndexSegmentQueryCallback func, void *data)
+segmentQuery_helper(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpatialIndexSegmentQueryFunc func, void *data)
 {
 	cpFloat t = 1.0f;
 	 
@@ -498,7 +498,7 @@ segmentQuery_helper(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSp
 
 // modified from http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
 void
-cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryCallback func, void *data)
+cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryFunc func, void *data)
 {
 	a = cpvmult(a, 1.0f/hash->celldim);
 	b = cpvmult(b, 1.0f/hash->celldim);
@@ -584,22 +584,22 @@ cpSpaceHashContains(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 }
 
 static cpSpatialIndexClass klass = {
-	(cpSpatialIndexDestroyFunc)cpSpaceHashDestroy,
+	(cpSpatialIndexDestroyImpl)cpSpaceHashDestroy,
 	
-	(cpSpatialIndexCountFunc)cpSpaceHashCount,
-	(cpSpatialIndexEachFunc)cpSpaceHashEach,
-	(cpSpatialIndexContainsFunc)cpSpaceHashContains,
+	(cpSpatialIndexCountImpl)cpSpaceHashCount,
+	(cpSpatialIndexEachImpl)cpSpaceHashEach,
+	(cpSpatialIndexContainsImpl)cpSpaceHashContains,
 	
-	(cpSpatialIndexInsertFunc)cpSpaceHashInsert,
-	(cpSpatialIndexRemoveFunc)cpSpaceHashRemove,
+	(cpSpatialIndexInsertImpl)cpSpaceHashInsert,
+	(cpSpatialIndexRemoveImpl)cpSpaceHashRemove,
 	
-	(cpSpatialIndexReindexFunc)cpSpaceHashRehash,
-	(cpSpatialIndexReindexObjectFunc)cpSpaceHashRehashObject,
-	(cpSpatialIndexReindexQueryFunc)cpSpaceHashReindexQuery,
+	(cpSpatialIndexReindexImpl)cpSpaceHashRehash,
+	(cpSpatialIndexReindexObjectImpl)cpSpaceHashRehashObject,
+	(cpSpatialIndexReindexQueryImpl)cpSpaceHashReindexQuery,
 	
-	(cpSpatialIndexPointQueryFunc)cpSpaceHashPointQuery,
-	(cpSpatialIndexSegmentQueryFunc)cpSpaceHashSegmentQuery,
-	(cpSpatialIndexQueryFunc)cpSpaceHashQuery,
+	(cpSpatialIndexPointQueryImpl)cpSpaceHashPointQuery,
+	(cpSpatialIndexSegmentQueryImpl)cpSpaceHashSegmentQuery,
+	(cpSpatialIndexQueryImpl)cpSpaceHashQuery,
 };
 
 #pragma mark Debug Drawing

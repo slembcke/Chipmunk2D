@@ -90,7 +90,7 @@ cpPolyShapeDestroy(cpShape *shape)
 
 static cpBool
 cpPolyShapePointQuery(cpShape *shape, cpVect p){
-	return cpBBcontainsVect(shape->bb, p) && cpPolyShapeContainsVert((cpPolyShape *)shape, p);
+	return cpBBContainsVect(shape->bb, p) && cpPolyShapeContainsVert((cpPolyShape *)shape, p);
 }
 
 static void

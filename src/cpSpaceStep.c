@@ -160,7 +160,7 @@ queryReject(cpShape *a, cpShape *b)
 {
 	return (
 		// BBoxes must overlap
-		!cpBBintersects(a->bb, b->bb)
+		!cpBBIntersects(a->bb, b->bb)
 		// Don't collide shapes attached to the same body.
 		|| a->body == b->body
 		// Don't collide objects in the same non-zero group
@@ -302,8 +302,8 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// Find colliding pairs.
 	cpSpaceLock(space);
 	cpSpacePushFreshContactBuffer(space);
-	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)updateBBCache, NULL);
-	cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryCallback)cpSpaceCollideShapes, space);
+	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)updateBBCache, NULL);
+	cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryFunc)cpSpaceCollideShapes, space);
 	cpSpaceUnlock(space);
 	
 	// If body sleeping is enabled, do that now.
@@ -373,7 +373,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpHashSet *callbacks = space->postStepCallbacks;
 		space->postStepCallbacks = NULL;
 		
-		cpHashSetEach(callbacks, (cpHashSetIterFunc)postStepCallbackSetIter, space);
+		cpHashSetEach(callbacks, (cpHashSetIteratorFunc)postStepCallbackSetIter, space);
 		cpHashSetFree(callbacks);
 	}
 	

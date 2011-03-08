@@ -167,7 +167,7 @@ cpBodyApplyForce(cpBody *body, cpVect force, cpVect r)
 }
 
 void
-cpBodyEachArbiter(cpBody *body, cpBodyArbiterIterator func, void *data)
+cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 {
 	CP_BODY_FOREACH_ARBITER(body, arb) func(body, arb, data);
 }

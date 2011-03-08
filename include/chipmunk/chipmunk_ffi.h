@@ -35,11 +35,11 @@ MAKE_REF(cpvdistsq);
 MAKE_REF(cpvnear);
 
 MAKE_REF(cpBBNew);
-MAKE_REF(cpBBintersects);
-MAKE_REF(cpBBcontainsBB);
-MAKE_REF(cpBBcontainsVect);
-MAKE_REF(cpBBmerge);
-MAKE_REF(cpBBexpand);
+MAKE_REF(cpBBIntersects);
+MAKE_REF(cpBBContainsBB);
+MAKE_REF(cpBBContainsVect);
+MAKE_REF(cpBBMerge);
+MAKE_REF(cpBBExpand);
 
 MAKE_REF(cpBodyWorld2Local);
 MAKE_REF(cpBodyLocal2World);

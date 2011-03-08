@@ -217,8 +217,8 @@ cpSpaceFreeChildren(cpSpace *space)
 	cpArray *components = space->sleepingComponents;
 	while(components->num) cpBodyActivate((cpBody *)components->arr[0]);
 	
-	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIterator)&shapeFreeWrap, NULL);
-	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIterator)&shapeFreeWrap, NULL);
+	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)&shapeFreeWrap, NULL);
+	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)&shapeFreeWrap, NULL);
 	
 	cpArrayFreeEach(space->bodies, (void (*)(void*))cpBodyFree);
 	cpArrayFreeEach(space->constraints, (void (*)(void*))cpConstraintFree);
@@ -494,14 +494,20 @@ cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)
 
 #pragma mark Iteration
 
-// TODO copy fix from 5.x
 void
-cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data)
+cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 {
 	cpArray *bodies = space->bodies;
 	
-	for(int i=0; i<bodies->num; i++)
+	for(int i=0; i<bodies->num; i++){
 		func((cpBody *)bodies->arr[i], data);
+	}
+	
+	cpArray *components = space->sleepingComponents;
+	for(int i=0; i<components->num; i++){
+		cpBody *root = (cpBody *)components->arr[i];
+		CP_BODY_FOREACH_COMPONENT(root, body) func(body, data);
+	}
 }
 
 #pragma mark Spatial Hash Management
@@ -531,7 +537,7 @@ cpSpaceResizeActiveHash(cpSpace *space, cpFloat dim, int count)
 void 
 cpSpaceRehashStatic(cpSpace *space)
 {
-	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIterator)&updateBBCache, NULL);
+	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)&updateBBCache, NULL);
 	cpSpatialIndexReindex(space->staticShapes);
 }
 

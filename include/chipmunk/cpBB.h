@@ -33,25 +33,25 @@ cpBBNew(const cpFloat l, const cpFloat b,
 }
 
 static inline cpBool
-cpBBintersects(const cpBB a, const cpBB b)
+cpBBIntersects(const cpBB a, const cpBB b)
 {
 	return (a.l <= b.r && b.l <= a.r && a.b <= b.t && b.b <= a.t);
 }
 
 static inline cpBool
-cpBBcontainsBB(const cpBB bb, const cpBB other)
+cpBBContainsBB(const cpBB bb, const cpBB other)
 {
 	return (bb.l <= other.l && bb.r >= other.r && bb.b <= other.b && bb.t >= other.t);
 }
 
 static inline cpBool
-cpBBcontainsVect(const cpBB bb, const cpVect v)
+cpBBContainsVect(const cpBB bb, const cpVect v)
 {
 	return (bb.l <= v.x && bb.r >= v.x && bb.b <= v.y && bb.t >= v.y);
 }
 
 static inline cpBB
-cpBBmerge(const cpBB a, const cpBB b){
+cpBBMerge(const cpBB a, const cpBB b){
 	return cpBBNew(
 		cpfmin(a.l, b.l),
 		cpfmin(a.b, b.b),
@@ -61,7 +61,7 @@ cpBBmerge(const cpBB a, const cpBB b){
 }
 
 static inline cpBB
-cpBBexpand(const cpBB bb, const cpVect v){
+cpBBExpand(const cpBB bb, const cpVect v){
 	return cpBBNew(
 		cpfmin(bb.l, v.x),
 		cpfmin(bb.b, v.y),
@@ -86,7 +86,7 @@ static inline cpBool
 cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)
 {
 	cpBB seg_bb = cpBBNew(cpfmin(a.x, b.x), cpfmin(a.y, b.y), cpfmax(a.x, b.x), cpfmax(a.y, b.y));
-	if(cpBBintersects(bb, seg_bb)){
+	if(cpBBIntersects(bb, seg_bb)){
 		cpVect axis = cpv(b.y - a.y, a.x - b.x);
 		cpVect offset = cpv((a.x + b.x - bb.r - bb.l), (a.y + b.y - bb.t - bb.b));
 		cpVect extents = cpv(bb.r - bb.l, bb.t - bb.b);

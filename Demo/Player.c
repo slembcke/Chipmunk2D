@@ -62,8 +62,7 @@ update(int ticks)
 	cpBody *body = playerInstance.shape->body;
 	
 	cpVect groundNormal = cpvzero;
-	cpBodyEachArbiter(body, SelectPlayerGroundNormal, &groundNormal);
-	sprintf(messageString, "Ground normal %s\n", cpvstr(groundNormal));
+	cpBodyEachArbiter(body, (cpBodyArbiterIteratorFunc)SelectPlayerGroundNormal, &groundNormal);
 	
 	if(groundNormal.y > 0.0f){
 		playerInstance.shape->surface_v = cpv(400.0f*arrowDirection.x, 0.0f);//cpvmult(cpvperp(groundNormal), 400.0f*arrowDirection.x);
