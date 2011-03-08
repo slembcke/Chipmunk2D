@@ -213,6 +213,3 @@ cpBodyKineticEnergy(const cpBody *body)
 
 typedef void (*cpBodyArbiterIteratorFunc)(cpBody *body, cpArbiter *arbiter, void *data);
 void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data);
-
-cpBool cpBodyIsGrounded(cpBody *body);
-cpBool cpBodyIsGroundedTolerance(cpBody *body, cpVect normal, cpFloat tolerance);

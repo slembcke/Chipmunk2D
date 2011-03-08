@@ -171,19 +171,3 @@ cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 {
 	CP_BODY_FOREACH_ARBITER(body, arb) func(body, arb, data);
 }
-
-cpBool
-cpBodyIsGroundedTolerance(cpBody *body, cpVect n, cpFloat tol)
-{
-	CP_BODY_FOREACH_ARBITER(body, arb){
-		if(cpvdot(arb->contacts[0].n, n) < tol) return cpTrue;
-	}
-	
-	return cpFalse;
-}
-
-cpBool
-cpBodyIsGrounded(cpBody *body)
-{
-	return cpBodyIsGroundedTolerance(body, cpv(0.0f, 1.0f), 0.0f);
-}
