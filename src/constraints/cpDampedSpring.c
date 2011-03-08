@@ -31,7 +31,7 @@ defaultSpringForce(cpDampedSpring *spring, cpFloat dist){
 }
 
 static void
-preStep(cpDampedSpring *spring, cpFloat dt, cpFloat dt_inv)
+preStep(cpDampedSpring *spring, cpFloat dt)
 {
 	CONSTRAINT_BEGIN(spring, a, b);
 	

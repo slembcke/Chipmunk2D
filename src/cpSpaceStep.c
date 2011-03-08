@@ -279,8 +279,7 @@ updateBBCache(cpShape *shape, void *unused)
 void
 cpSpaceStep(cpSpace *space, cpFloat dt)
 {
-	if(!dt) return; // don't step if the timestep is 0!
-	cpFloat dt_inv = 1.0f/dt;
+	if(dt == 0.0f) return; // don't step if the timestep is 0!
 
 	cpArray *bodies = space->bodies;
 	cpArray *constraints = space->constraints;
@@ -320,12 +319,12 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// 1.0f - cpfpow(error after 1s, dt);
 	cpFloat bias = space->collisionBias;
 	for(int i=0; i<arbiters->num; i++){
-		cpArbiterPreStep((cpArbiter *)arbiters->arr[i], dt_inv, slop, bias);
+		cpArbiterPreStep((cpArbiter *)arbiters->arr[i], dt, slop, bias);
 	}
 
 	for(int i=0; i<constraints->num; i++){
 		cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
-		constraint->klass->preStep(constraint, dt, dt_inv);
+		constraint->klass->preStep(constraint, dt);
 	}
 
 	// Integrate velocities.

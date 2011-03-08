@@ -23,7 +23,7 @@ extern cpFloat cp_constraint_bias_coef;
 
 typedef struct cpConstraintClass cpConstraintClass;
 
-typedef void (*cpConstraintPreStepFunction)(cpConstraint *constraint, cpFloat dt, cpFloat dt_inv);
+typedef void (*cpConstraintPreStepFunction)(cpConstraint *constraint, cpFloat dt);
 typedef void (*cpConstraintApplyImpulseFunction)(cpConstraint *constraint);
 typedef cpFloat (*cpConstraintGetImpulseFunction)(cpConstraint *constraint);
 

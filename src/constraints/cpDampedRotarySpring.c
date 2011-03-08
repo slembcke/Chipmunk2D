@@ -31,7 +31,7 @@ defaultSpringTorque(cpDampedRotarySpring *spring, cpFloat relativeAngle){
 }
 
 static void
-preStep(cpDampedRotarySpring *spring, cpFloat dt, cpFloat dt_inv)
+preStep(cpDampedRotarySpring *spring, cpFloat dt)
 {
 	CONSTRAINT_BEGIN(spring, a, b);
 	

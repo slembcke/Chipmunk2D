@@ -161,7 +161,7 @@ cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisio
 }
 
 void
-cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv, cpFloat slop, cpFloat bias)
+cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat slop, cpFloat bias)
 {
 	cpBody *a = arb->body_a;
 	cpBody *b = arb->body_b;
@@ -178,7 +178,8 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt_inv, cpFloat slop, cpFloat bias)
 		con->tMass = 1.0f/k_scalar(a, b, con->r1, con->r2, cpvperp(con->n));
 				
 		// Calculate the target bias velocity.
-		con->bias = -bias*dt_inv*cpfmin(0.0f, con->dist + slop);
+		con->bias = -bias*cpfmin(0.0f, con->dist + slop)/dt
+		;
 		con->jBias = 0.0f;
 		
 		// Calculate the target bounce velocity.

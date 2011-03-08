@@ -26,7 +26,7 @@
 #include "constraints/util.h"
 
 static void
-preStep(cpPinJoint *joint, cpFloat dt, cpFloat dt_inv)
+preStep(cpPinJoint *joint, cpFloat dt)
 {
 	CONSTRAINT_BEGIN(joint, a, b);
 	
@@ -42,7 +42,7 @@ preStep(cpPinJoint *joint, cpFloat dt, cpFloat dt_inv)
 	
 	// calculate bias velocity
 	cpFloat maxBias = joint->constraint.maxBias;
-	joint->bias = cpfclamp(-joint->constraint.biasCoef*dt_inv*(dist - joint->dist), -maxBias, maxBias);
+	joint->bias = cpfclamp(-joint->constraint.biasCoef*(dist - joint->dist)/dt, -maxBias, maxBias);
 	
 	// compute max impulse
 	joint->jnMax = J_MAX(joint, dt);

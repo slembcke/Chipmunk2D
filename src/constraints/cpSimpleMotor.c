@@ -25,7 +25,7 @@
 #include "constraints/util.h"
 
 static void
-preStep(cpSimpleMotor *joint, cpFloat dt, cpFloat dt_inv)
+preStep(cpSimpleMotor *joint, cpFloat dt)
 {
 	CONSTRAINT_BEGIN(joint, a, b);
 	
