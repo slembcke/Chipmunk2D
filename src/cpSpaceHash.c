@@ -181,7 +181,8 @@ cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndex
 	cpSpaceHashAllocTable(hash, next_prime(numcells));
 	hash->celldim = celldim;
 	
-	hash->handleSet = cpHashSetNew(0, (cpHashSetEqlFunc)handleSetEql, NULL);
+	hash->handleSet = cpHashSetNew(0, (cpHashSetEqlFunc)handleSetEql);
+	
 	hash->pooledHandles = cpArrayNew(0);
 	
 	hash->pooledBins = NULL;

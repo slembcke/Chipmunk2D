@@ -44,7 +44,7 @@ update(int ticks)
 		
 		// Because the box was added as a static shape and we moved it
 		// we need to manually rehash the static spatial hash.
-		cpSpaceRehashStatic(space);
+		cpSpaceReindexStatic(space);
 	}
 }
 
@@ -56,8 +56,6 @@ init(void)
 	cpResetShapeIdCounter();
 	
 	space = cpSpaceNew();
-	cpSpaceResizeActiveHash(space, 40.0f, 999);
-	cpSpaceResizeStaticHash(space, 40.0f, 99);
 	space->gravity = cpv(0, -600);
 	
 	cpBody *body;
@@ -98,7 +96,7 @@ init(void)
 	// Because staticBody is never added to the space, we will need to
 	// update it ourselves. (see above).
 	// NOTE: Normally you would want to add the segments as normal and not static shapes.
-	// I'm just doing it to demonstrate the cpSpaceRehashStatic() function.
+	// I'm just doing it to demonstrate the cpSpaceReindexStatic() function.
 	staticBody->w = 0.4f;
 	
 	// Add the bricks.

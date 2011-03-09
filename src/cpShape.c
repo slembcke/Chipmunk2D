@@ -266,8 +266,6 @@ static inline cpBool inUnitRange(cpFloat t){return (0.0f < t && t < 1.0f);}
 static void
 cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
-	// TODO this function could be optimized better.
-	
 	cpVect n = seg->tn;
 	// flip n if a is behind the axis
 	if(cpvdot(a, n) < cpvdot(seg->ta, n))

@@ -427,8 +427,6 @@ init(void)
 	space->iterations = 5;
 	space->gravity = cpvzero; //cpv(0,-100);
 	
-	cpSpaceResizeActiveHash(space, 30.0, 2999);
-
 	// Screen border
 /*	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);
 	shape->e = 1.0; shape->u = 1.0;

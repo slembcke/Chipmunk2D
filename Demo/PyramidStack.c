@@ -46,8 +46,6 @@ init(void)
 	
 	space = cpSpaceNew();
 	space->iterations = 30;
-	cpSpaceResizeStaticHash(space, 40.0f, 1000);
-	cpSpaceResizeActiveHash(space, 40.0f, 1000);
 	space->gravity = cpv(0, -100);
 	space->sleepTimeThreshold = 0.5f;
 	

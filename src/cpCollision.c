@@ -283,6 +283,7 @@ seg2poly(const cpShape *shape1, const cpShape *shape2, cpContact *arr)
 	// Floating point precision problems here.
 	// This will have to do for now.
 //	poly_min -= cp_collision_slop; // TODO is this needed anymore?
+	
 	if(minNorm >= poly_min || minNeg >= poly_min) {
 		if(minNorm > minNeg)
 			findPointsBehindSeg(arr, &num, seg, poly, minNorm, 1.0f);

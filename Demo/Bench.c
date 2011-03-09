@@ -69,8 +69,6 @@ static void add_hexagon(int i, cpFloat radius){
 static void setupSpace_simpleTerrain(){
 	space = cpSpaceNew();
 	space->iterations = 10;
-	cpSpaceResizeStaticHash(space, 10.0f, 1000);
-	cpSpaceResizeActiveHash(space, 10.0f, 5000);
 	space->gravity = cpv(0, -100);
 	
 	cpVect offset = cpv(-320, -240);
@@ -203,8 +201,6 @@ static int complex_terrain_count = sizeof(complex_terrain_verts)/sizeof(cpVect);
 static cpSpace *init_ComplexTerrainCircles_1000(){
 	space = cpSpaceNew();
 	space->iterations = 10;
-	cpSpaceResizeStaticHash(space, 10.0f, 1000);
-	cpSpaceResizeActiveHash(space, 10.0f, 5000);
 	space->gravity = cpv(0, -100);
 	
 	cpVect offset = cpv(-320, -240);
@@ -229,8 +225,6 @@ static cpSpace *init_ComplexTerrainCircles_1000(){
 static cpSpace *init_ComplexTerrainHexagons_1000(){
 	space = cpSpaceNew();
 	space->iterations = 10;
-	cpSpaceResizeStaticHash(space, 10.0f, 1000);
-	cpSpaceResizeActiveHash(space, 10.0f, 5000);
 	space->gravity = cpv(0, -100);
 	
 	cpVect offset = cpv(-320, -240);
@@ -310,8 +304,6 @@ static int bouncy_terrain_count = sizeof(bouncy_terrain_verts)/sizeof(cpVect);
 static cpSpace *init_BouncyTerrainCircles_500(){
 	space = cpSpaceNew();
 	space->iterations = 10;
-	cpSpaceResizeStaticHash(space, 10.0f, 1000);
-	cpSpaceResizeActiveHash(space, 10.0f, 5000);
 	
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(bouncy_terrain_count - 1); i++){
@@ -337,8 +329,6 @@ static cpSpace *init_BouncyTerrainCircles_500(){
 static cpSpace *init_BouncyTerrainHexagons_500(){
 	space = cpSpaceNew();
 	space->iterations = 10;
-	cpSpaceResizeStaticHash(space, 10.0f, 1000);
-	cpSpaceResizeActiveHash(space, 10.0f, 5000);
 	
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(bouncy_terrain_count - 1); i++){
@@ -380,8 +370,6 @@ static cpBool NoCollide_begin(cpArbiter *arb, cpSpace *space, void *data){
 static cpSpace *init_NoCollide(){
 	space = cpSpaceNew();
 	space->iterations = 10;
-	cpSpaceResizeStaticHash(space, 10.0f, 5000);
-	cpSpaceResizeActiveHash(space, 10.0f, 1000);
 	
 	cpSpaceAddCollisionHandler(space, 2, 2, NoCollide_begin, NULL, NULL, NULL, NULL);
 	

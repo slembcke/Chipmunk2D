@@ -62,19 +62,15 @@ cpHashSetFree(cpHashSet *set)
 }
 
 cpHashSet *
-cpHashSetAlloc(void)
+cpHashSetNew(int size, cpHashSetEqlFunc eqlFunc)
 {
-	return (cpHashSet *)cpcalloc(1, sizeof(cpHashSet));
-}
-
-cpHashSet *
-cpHashSetInit(cpHashSet *set, int size, cpHashSetEqlFunc eqlFunc, void *default_value)
-{
+	cpHashSet *set = (cpHashSet *)cpcalloc(1, sizeof(cpHashSet));
+	
 	set->size = next_prime(size);
 	set->entries = 0;
 	
 	set->eql = eqlFunc;
-	set->default_value = default_value;
+	set->default_value = NULL;
 	
 	set->table = (cpHashSetBin **)cpcalloc(set->size, sizeof(cpHashSetBin *));
 	set->pooledBins = NULL;
@@ -84,10 +80,10 @@ cpHashSetInit(cpHashSet *set, int size, cpHashSetEqlFunc eqlFunc, void *default_
 	return set;
 }
 
-cpHashSet *
-cpHashSetNew(int size, cpHashSetEqlFunc eqlFunc, void *default_value)
+void
+cpHashSetSetDefaultValue(cpHashSet *set, void *default_value)
 {
-	return cpHashSetInit(cpHashSetAlloc(), size, eqlFunc, default_value);
+	set->default_value = default_value;
 }
 
 static int

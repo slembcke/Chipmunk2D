@@ -25,26 +25,16 @@
 #include "chipmunk_private.h"
 
 
-cpArray*
-cpArrayAlloc(void)
+cpArray *
+cpArrayNew(int size)
 {
-	return (cpArray *)cpcalloc(1, sizeof(cpArray));
-}
-
-cpArray*
-cpArrayInit(cpArray *arr, int size)
-{
+	cpArray *arr = (cpArray *)cpcalloc(1, sizeof(cpArray));
+	
 	arr->num = 0;
 	arr->max = (size ? size : 4);
 	arr->arr = (void **)cpmalloc(arr->max*sizeof(void**));
 	
 	return arr;
-}
-
-cpArray*
-cpArrayNew(int size)
-{
-	return cpArrayInit(cpArrayAlloc(), size);
 }
 
 void

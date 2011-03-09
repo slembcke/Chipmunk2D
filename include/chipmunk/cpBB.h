@@ -19,7 +19,6 @@
  * SOFTWARE.
  */
 
-// TODO fix naming
 typedef struct cpBB{
 	cpFloat l, b, r ,t;
 } cpBB;

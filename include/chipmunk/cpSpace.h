@@ -68,7 +68,7 @@ struct cpSpace {
 	// List of groups of sleeping bodies.
 	CP_PRIVATE(cpArray *sleepingComponents);
 	
-	// List of bodies that have been flagged to be awoken.
+	// List of bodies to awake when unlocking the space.
 	CP_PRIVATE(cpArray *rousedBodies);
 	
 	// List of active arbiters for the impulse solver.
@@ -84,13 +84,13 @@ struct cpSpace {
 	CP_PRIVATE(cpArray *allocatedBuffers);
 	
 	// Persistant contact set.
-	CP_PRIVATE(cpHashSet *contactSet);
+	CP_PRIVATE(cpHashSet *cachedArbiters);
 	
 	// List of constraints in the system.
 	CP_PRIVATE(cpArray *constraints);
 	
 	// Set of collisionpair functions.
-	CP_PRIVATE(cpHashSet *collFuncSet);
+	CP_PRIVATE(cpHashSet *collisionHandlers);
 	// Default collision handler.
 	CP_PRIVATE(cpCollisionHandler defaultHandler);
 	
@@ -181,12 +181,10 @@ void cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape);
 typedef void (*cpSpaceBodyIteratorFunc)(cpBody *body, void *data);
 void cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data);
 
-// Spatial hash management functions.
-void cpSpaceResizeStaticHash(cpSpace *space, cpFloat dim, int count);
-void cpSpaceResizeActiveHash(cpSpace *space, cpFloat dim, int count);
-void cpSpaceRehashStatic(cpSpace *space);
+void cpSpaceReindexStatic(cpSpace *space);
+void cpSpaceReindexShape(cpSpace *space, cpShape *shape);
 
-void cpSpaceRehashShape(cpSpace *space, cpShape *shape);
+void cpSpaceUseSpatialHash(cpSpace *space, cpFloat dim, int count);
 
 // Update the space.
 void cpSpaceStep(cpSpace *space, cpFloat dt);

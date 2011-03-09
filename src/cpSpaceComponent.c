@@ -55,7 +55,7 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 				cpShape *a = arb->a, *b = arb->b;
 				cpShape *shape_pair[] = {a, b};
 				cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
-				cpHashSetInsert(space->contactSet, arbHashID, shape_pair, arb, NULL);
+				cpHashSetInsert(space->cachedArbiters, arbHashID, shape_pair, arb, NULL);
 				cpArrayPush(space->arbiters, arb);
 				arb->stamp = space->stamp;
 				
@@ -86,7 +86,7 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 			cpShape *a = arb->a, *b = arb->b;
 			cpShape *shape_pair[] = {a, b};
 			cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
-			cpHashSetRemove(space->contactSet, arbHashID, shape_pair);
+			cpHashSetRemove(space->cachedArbiters, arbHashID, shape_pair);
 			cpArrayDeleteObj(space->arbiters, arb);
 			
 			// Save contact values to a new block of memory so they won't time out

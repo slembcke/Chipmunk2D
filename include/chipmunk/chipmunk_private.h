@@ -29,9 +29,6 @@ struct cpArray {
 	void **arr;
 };
 
-// TODO get rid of reference versions?
-cpArray *cpArrayAlloc(void);
-cpArray *cpArrayInit(cpArray *arr, int size);
 cpArray *cpArrayNew(int size);
 
 void cpArrayDestroy(cpArray *arr);
@@ -63,10 +60,8 @@ void cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*));
 typedef cpBool (*cpHashSetEqlFunc)(void *ptr, void *elt);
 typedef void *(*cpHashSetTransFunc)(void *ptr, void *data);
 
-// TODO get rid of reference versions?
-cpHashSet *cpHashSetAlloc(void);
-cpHashSet *cpHashSetInit(cpHashSet *set, int size, cpHashSetEqlFunc eqlFunc, void *defaultValue);
-cpHashSet *cpHashSetNew(int size, cpHashSetEqlFunc eqlFunc, void *defaultValue);
+cpHashSet *cpHashSetNew(int size, cpHashSetEqlFunc eqlFunc);
+void cpHashSetSetDefaultValue(cpHashSet *set, void *default_value);
 
 void cpHashSetDestroy(cpHashSet *set);
 void cpHashSetFree(cpHashSet *set);

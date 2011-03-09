@@ -101,9 +101,12 @@ static cpSpace *
 init(void)
 {
 	space = cpSpaceNew();
-	cpSpaceResizeActiveHash(space, 2.0f, 10000);
-	cpSpaceResizeStaticHash(space, 2.0f, 10000);
 	space->iterations = 1;
+	
+	// The space will contain a very large number of similary sized objects.
+	// This is the perfect candidate for using the spatial hash.
+	// Generally you will never need to do this.
+	cpSpaceUseSpatialHash(space, 2.0f, 10000);
 	
 	cpBody *body;
 	cpShape *shape;

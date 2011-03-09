@@ -51,7 +51,7 @@ void
 cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)
 {
 	if(!space->postStepCallbacks){
-		space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql, NULL);
+		space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql);
 	}
 	
 	postStepCallback callback = {func, obj, data};
@@ -139,7 +139,7 @@ cpSpacePopContacts(cpSpace *space, int count){
 #pragma mark Collision Detection Functions
 
 static void *
-contactSetTrans(cpShape **shapes, cpSpace *space)
+arbiterSetTrans(cpShape **shapes, cpSpace *space)
 {
 	if(space->pooledArbiters->num == 0){
 		// arbiter pool is exhausted, make more
@@ -180,7 +180,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space)
 	// Find the collision pair function for the shapes.
 	cpCollisionType types[] = {a->collision_type, b->collision_type};
 	cpHashValue collHashID = CP_HASH_PAIR(a->collision_type, b->collision_type);
-	cpCollisionHandler *handler = (cpCollisionHandler *)cpHashSetFind(space->collFuncSet, collHashID, types);
+	cpCollisionHandler *handler = (cpCollisionHandler *)cpHashSetFind(space->collisionHandlers, collHashID, types);
 	
 	cpBool sensor = a->sensor || b->sensor;
 	if(sensor && handler == &cpSpaceDefaultHandler) return;
@@ -198,11 +198,11 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space)
 	if(!numContacts) return; // Shapes are not colliding.
 	cpSpacePushContacts(space, numContacts);
 	
-	// Get an arbiter from space->contactSet for the two shapes.
+	// Get an arbiter from space->arbiterSet for the two shapes.
 	// This is where the persistant contact magic comes from.
 	cpShape *shape_pair[] = {a, b};
 	cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
-	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->contactSet, arbHashID, shape_pair, space, (cpHashSetTransFunc)contactSetTrans);
+	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->cachedArbiters, arbHashID, shape_pair, space, (cpHashSetTransFunc)arbiterSetTrans);
 	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b);
 	
 	// Call the begin function first if it's the first step
@@ -236,7 +236,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space)
 
 // Hashset filter func to throw away old arbiters.
 static cpBool
-contactSetFilter(cpArbiter *arb, cpSpace *space)
+arbiterSetFilter(cpArbiter *arb, cpSpace *space)
 {
 	cpTimestamp ticks = space->stamp - arb->stamp;
 	
@@ -311,7 +311,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	}
 	
 	// Clear out old cached arbiters and call separate callbacks
-	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilter, space);
+	cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilter, space);
 
 	// Prestep the arbiters and constraints.
 	cpFloat slop = space->collisionSlop;

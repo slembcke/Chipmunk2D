@@ -60,10 +60,7 @@ init(void)
 	space = cpSpaceNew();
 	space->iterations = 5;
 	space->gravity = cpv(0, -100);
-	
-	cpSpaceResizeStaticHash(space, 40.0f, 999);
-	cpSpaceResizeActiveHash(space, 30.0f, 2999);
-	
+		
 	cpBody *body, *staticBody = space->staticBody;
 	cpShape *shape;
 	

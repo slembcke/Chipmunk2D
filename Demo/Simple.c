@@ -39,10 +39,6 @@ init(void)
 	// Lets set some parameters of the space:
 	// More iterations make the simulation more accurate but slower
 	space->iterations = 10;
-	// These parameters tune the efficiency of the collision detection.
-	// For more info: http://code.google.com/p/chipmunk-physics/wiki/cpSpace
-	cpSpaceResizeStaticHash(space, 30.0f, 1000);
-	cpSpaceResizeActiveHash(space, 30.0f, 1000);
 	// Give it some gravity
 	space->gravity = cpv(0, -100);
 	space->sleepTimeThreshold = 0.5f;

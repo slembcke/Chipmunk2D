@@ -516,7 +516,7 @@ cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *static
 	
 	tree->velocityFunc = NULL;
 	
-	tree->leaves = cpHashSetNew(0, (cpHashSetEqlFunc)leafSetEql, NULL);
+	tree->leaves = cpHashSetNew(0, (cpHashSetEqlFunc)leafSetEql);
 	tree->root = NULL;
 	
 	tree->pooledNodes = NULL;

@@ -30,9 +30,9 @@ cpTimestamp cp_contact_persistence = 3;
 
 #pragma mark Contact Set Helpers
 
-// Equal function for contactSet.
+// Equal function for arbiterSet.
 static cpBool
-contactSetEql(cpShape **shapes, cpArbiter *arb)
+arbiterSetEql(cpShape **shapes, cpArbiter *arb)
 {
 	cpShape *a = shapes[0];
 	cpShape *b = shapes[1];
@@ -40,18 +40,18 @@ contactSetEql(cpShape **shapes, cpArbiter *arb)
 	return ((a == arb->a && b == arb->b) || (b == arb->a && a == arb->b));
 }
 
-#pragma mark Collision Pair Function Helpers
+#pragma mark Collision Handler Set HelperFunctions
 
-// Equals function for collFuncSet.
+// Equals function for collisionHandlers.
 static cpBool
-collFuncSetEql(cpCollisionHandler *check, cpCollisionHandler *pair)
+handlerSetEql(cpCollisionHandler *check, cpCollisionHandler *pair)
 {
 	return ((check->a == pair->a && check->b == pair->b) || (check->b == pair->a && check->a == pair->b));
 }
 
-// Transformation function for collFuncSet.
+// Transformation function for collisionHandlers.
 static void *
-collFuncSetTrans(cpCollisionHandler *handler, void *unused)
+handlerSetTrans(cpCollisionHandler *handler, void *unused)
 {
 	cpCollisionHandler *copy = (cpCollisionHandler *)cpmalloc(sizeof(cpCollisionHandler));
 	(*copy) = (*handler);
@@ -125,14 +125,9 @@ cpSpaceInit(cpSpace *space)
 	space->locked = 0;
 	space->stamp = 0;
 
-	if(0){
-		space->staticShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc, NULL);
-		space->activeShapes = cpSpaceHashNew(DEFAULT_DIM_SIZE, DEFAULT_COUNT, (cpSpatialIndexBBFunc)shapeBBFunc, space->staticShapes);
-	} else {
-		space->staticShapes = cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc, NULL);
-		space->activeShapes = cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc, space->staticShapes);
-		cpBBTreeSetVelocityFunc(space->activeShapes, (cpBBTreeVelocityFunc)shapeVelocityFunc);
-	}
+	space->staticShapes = cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc, NULL);
+	space->activeShapes = cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc, space->staticShapes);
+	cpBBTreeSetVelocityFunc(space->activeShapes, (cpBBTreeVelocityFunc)shapeVelocityFunc);
 	
 	space->allocatedBuffers = cpArrayNew(0);
 	
@@ -147,13 +142,13 @@ cpSpaceInit(cpSpace *space)
 	space->pooledArbiters = cpArrayNew(0);
 	
 	space->contactBuffersHead = NULL;
-	space->contactSet = cpHashSetNew(0, (cpHashSetEqlFunc)contactSetEql, NULL);
+	space->cachedArbiters = cpHashSetNew(0, (cpHashSetEqlFunc)arbiterSetEql);
 	
 	space->constraints = cpArrayNew(0);
 	
 	space->defaultHandler = cpSpaceDefaultHandler;
-	space->collFuncSet = cpHashSetNew(0, (cpHashSetEqlFunc)collFuncSetEql, &space->defaultHandler);
-	// TODO space->collFuncSet->default_value = &cpSpaceDefaultHandler;
+	space->collisionHandlers = cpHashSetNew(0, (cpHashSetEqlFunc)handlerSetEql);
+	cpHashSetSetDefaultValue(space->collisionHandlers, &cpSpaceDefaultHandler);
 	
 	space->postStepCallbacks = NULL;
 	
@@ -181,7 +176,7 @@ cpSpaceDestroy(cpSpace *space)
 	
 	cpArrayFree(space->constraints);
 	
-	cpHashSetFree(space->contactSet);
+	cpHashSetFree(space->cachedArbiters);
 	
 	cpArrayFree(space->arbiters);
 	cpArrayFree(space->pooledArbiters);
@@ -196,9 +191,9 @@ cpSpaceDestroy(cpSpace *space)
 		cpHashSetFree(space->postStepCallbacks);
 	}
 	
-	if(space->collFuncSet){
-		cpHashSetEach(space->collFuncSet, freeWrap, NULL);
-		cpHashSetFree(space->collFuncSet);
+	if(space->collisionHandlers){
+		cpHashSetEach(space->collisionHandlers, freeWrap, NULL);
+		cpHashSetFree(space->collisionHandlers);
 	}
 }
 
@@ -248,14 +243,14 @@ cpSpaceAddCollisionHandler(
 		data
 	};
 	
-	cpHashSetInsert(space->collFuncSet, CP_HASH_PAIR(a, b), &handler, NULL, (cpHashSetTransFunc)collFuncSetTrans);
+	cpHashSetInsert(space->collisionHandlers, CP_HASH_PAIR(a, b), &handler, NULL, (cpHashSetTransFunc)handlerSetTrans);
 }
 
 void
 cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
 	struct { cpCollisionType a, b; } ids = {a, b};
-	cpCollisionHandler *old_handler = (cpCollisionHandler *) cpHashSetRemove(space->collFuncSet, CP_HASH_PAIR(a, b), &ids);
+	cpCollisionHandler *old_handler = (cpCollisionHandler *) cpHashSetRemove(space->collisionHandlers, CP_HASH_PAIR(a, b), &ids);
 	cpfree(old_handler);
 }
 
@@ -278,7 +273,7 @@ cpSpaceSetDefaultCollisionHandler(
 	};
 	
 	space->defaultHandler = handler;
-	// TODO space->collFuncSet->default_value = &space->defaultHandler;
+	cpHashSetSetDefaultValue(space->collisionHandlers, &space->defaultHandler);
 }
 
 #pragma mark Body, Shape, and Joint Management
@@ -397,7 +392,7 @@ typedef struct removalContext {
 
 // Hashset filter func to throw away old arbiters.
 static cpBool
-contactSetFilterRemovedShape(cpArbiter *arb, removalContext *context)
+arbiterSetFilterRemovedShape(cpArbiter *arb, removalContext *context)
 {
 	if(context->shape == arb->a || context->shape == arb->b){
 		if(arb->state != cpArbiterStateCached){
@@ -429,7 +424,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 	cpBodyRemoveShape(body, shape);
 	
 	removalContext context = {space, shape};
-	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
+	cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
 	cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
 }
 
@@ -441,7 +436,7 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	removalContext context = {space, shape};
-	cpHashSetFilter(space->contactSet, (cpHashSetFilterFunc)contactSetFilterRemovedShape, &context);
+	cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
 	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
 	
 	cpSpaceActivateShapesTouchingShape(space, shape);
@@ -510,7 +505,7 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 	}
 }
 
-#pragma mark Spatial Hash Management
+#pragma mark Spatial Index Management
 
 static void
 updateBBCache(cpShape *shape, void *unused)
@@ -519,30 +514,15 @@ updateBBCache(cpShape *shape, void *unused)
 	cpShapeUpdate(shape, body->p, body->rot);
 }
 
-void
-cpSpaceResizeStaticHash(cpSpace *space, cpFloat dim, int count)
-{
-// TODO spatial hash specific
-	cpSpaceHashResize((cpSpaceHash *)space->staticShapes, dim, count);
-	cpSpatialIndexReindex(space->staticShapes);
-}
-
-void
-cpSpaceResizeActiveHash(cpSpace *space, cpFloat dim, int count)
-{
-// TODO spatial hash specific
-	cpSpaceHashResize((cpSpaceHash *)space->activeShapes, dim, count);
-}
-
 void 
-cpSpaceRehashStatic(cpSpace *space)
+cpSpaceReindexStatic(cpSpace *space)
 {
 	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)&updateBBCache, NULL);
 	cpSpatialIndexReindex(space->staticShapes);
 }
 
 void
-cpSpaceRehashShape(cpSpace *space, cpShape *shape)
+cpSpaceReindexShape(cpSpace *space, cpShape *shape)
 {
 	cpBody *body = shape->body;
 	cpShapeUpdate(shape, body->p, body->rot);
@@ -550,4 +530,26 @@ cpSpaceRehashShape(cpSpace *space, cpShape *shape)
 	// attempt to rehash the shape in both hashes
 	cpSpatialIndexReindexObject(space->activeShapes, shape, shape->hashid);
 	cpSpatialIndexReindexObject(space->staticShapes, shape, shape->hashid);
+}
+
+static void
+copyShapes(cpShape *shape, cpSpatialIndex *index)
+{
+	cpSpatialIndexInsert(index, shape, shape->hashid);
+}
+
+void
+cpSpaceUseSpatialHash(cpSpace *space, cpFloat dim, int count)
+{
+	cpSpatialIndex *staticShapes = cpSpaceHashNew(dim, count, (cpSpatialIndexBBFunc)shapeBBFunc, NULL);
+	cpSpatialIndex *activeShapes = cpSpaceHashNew(dim, count, (cpSpatialIndexBBFunc)shapeBBFunc, staticShapes);
+	
+	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)copyShapes, staticShapes);
+	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)copyShapes, activeShapes);
+	
+	cpSpatialIndexFree(space->staticShapes);
+	cpSpatialIndexFree(space->activeShapes);
+	
+	space->staticShapes = staticShapes;
+	space->activeShapes = activeShapes;
 }
