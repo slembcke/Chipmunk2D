@@ -5,8 +5,9 @@ Building bodies from shape collections.
 
 Better accuracy for variable timestepping?
   - dt independent collision bias?
-  - dt independent joint biasing? (ugh)
+  - dt independent joint biasing?
 
+Future features to think about:
 Per body iterations and timestep?
 Per body damping and gravity coefs?
 breakable object support functions?

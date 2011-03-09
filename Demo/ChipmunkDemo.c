@@ -61,8 +61,8 @@ static int demoCount = 0;
 static chipmunkDemo *currDemo = NULL;
 static const int firstDemoIndex = 'a' - 'a';
 
-static int paused = 0;
-static int step = 0;
+static cpBool paused = cpFalse;
+static cpBool step = cpFalse;
 static int ticks = 0;
 static cpSpace *space;
 
@@ -146,7 +146,7 @@ drawInfo()
 		"Contact Points: %d (%d)\n"
 		"Other Constraints: %d, Iterations: %d\n"
 		"Constraints x Iterations: %d (%d)\n"
-		"KE:% 5.2e";
+		"Seconds:% 5.2f, KE:% 5.2e";
 	
 	cpArray *bodies = space->bodies;
 	cpFloat ke = 0.0f;
@@ -161,7 +161,8 @@ drawInfo()
 		arbiters, maxArbiters,
 		points, maxPoints,
 		space->constraints->num, space->iterations,
-		constraints, maxConstraints, (ke < 1e-10f ? 0.0f : ke)
+		constraints, maxConstraints,
+		ticks/60.0f, (ke < 1e-10f ? 0.0f : ke)
 	);
 	
 	drawString(0, 220, buffer);
@@ -185,14 +186,17 @@ reshape(int width, int height)
 static void
 display(void)
 {
-	cpVect newPoint = cpvlerp(mousePoint_last, mousePoint, 0.25f);
-	mouseBody->p = newPoint;
-	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0f);
-	mousePoint_last = newPoint;
-  if(!paused || step > 0){
-    currDemo->updateFunc(ticks);
-    step = (step > 1 ? step - 1 : 0);
-  }
+	if(!paused || step){
+		cpVect newPoint = cpvlerp(mousePoint_last, mousePoint, 0.25f);
+		mouseBody->p = newPoint;
+		mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0f);
+		mousePoint_last = newPoint;
+		
+		currDemo->updateFunc(ticks);
+		
+		ticks++;
+		step = cpFalse;
+	}
   
 	glClear(GL_COLOR_BUFFER_BIT);
 	
@@ -202,7 +206,6 @@ display(void)
 	drawString(-300, -210, messageString);
 		
 	glutSwapBuffers();
-	ticks++;
 }
 
 static char *
@@ -246,7 +249,7 @@ keyboard(unsigned char key, int x, int y)
   } else if(key == '`'){
 		paused = !paused;
   } else if(key == '1'){
-		step += 1;
+		step = cpTrue;
 	} else if(key == '-'){
 		options.drawHash = !options.drawHash;
 	} else if(key == '='){
