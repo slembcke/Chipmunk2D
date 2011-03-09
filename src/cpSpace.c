@@ -130,7 +130,7 @@ cpSpaceInit(cpSpace *space)
 	space->stamp = 0;
 
 	space->staticShapes = cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc, NULL);
-	space->activeShapes = cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc, space->staticShapes);
+	space->activeShapes = cpSweep1DNew((cpSpatialIndexBBFunc)shapeBBFunc, space->staticShapes);
 	cpBBTreeSetVelocityFunc(space->activeShapes, (cpBBTreeVelocityFunc)shapeVelocityFunc);
 	
 	space->allocatedBuffers = cpArrayNew(0);

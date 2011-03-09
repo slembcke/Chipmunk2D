@@ -138,10 +138,21 @@ cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *k
 #pragma mark Space Functions
 
 extern cpCollisionHandler cpDefaultCollisionHandler;
+void cpSpaceProcessComponents(cpSpace *space, cpFloat dt);
 
+void cpSpacePushFreshContactBuffer(cpSpace *space);
 cpContact *cpContactBufferGetArray(cpSpace *space);
 void cpSpacePushContacts(cpSpace *space, int count);
-void cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space);
+void cpSpacePopContacts(cpSpace *space, int count);
+
+typedef struct cpPostStepCallback cpPostStepCallback;
+void cpSpacePostStepCallbackSetIter(cpPostStepCallback *callback, cpSpace *space);
+
+cpBool cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space);
+void *cpSpaceArbiterSetTrans(cpShape **shapes, cpSpace *space);
+void cpShapeUpdateFunc(cpShape *shape, void *unused);
+
+//void cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space);
 void cpSpaceActivateBody(cpSpace *space, cpBody *body);
 void cpSpaceLock(cpSpace *space);
 void cpSpaceUnlock(cpSpace *space);
