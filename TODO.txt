@@ -7,6 +7,10 @@ Better accuracy for variable timestepping?
   - dt independent collision bias?
   - dt independent joint biasing?
 
+Quickhull?
+Concave decomposition?
+
+
 Future features to think about:
 Per body iterations and timestep?
 Per body damping and gravity coefs?

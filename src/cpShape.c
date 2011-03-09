@@ -203,7 +203,7 @@ cpSegmentShapeCacheData(cpSegmentShape *seg, cpVect p, cpVect rot)
 	seg->tb = cpvadd(p, cpvrotate(seg->b, rot));
 	seg->tn = cpvrotate(seg->n, rot);
 	
-	cpFloat l,r,s,t;
+	cpFloat l,r,b,t;
 	
 	if(seg->ta.x < seg->tb.x){
 		l = seg->ta.x;
@@ -214,15 +214,15 @@ cpSegmentShapeCacheData(cpSegmentShape *seg, cpVect p, cpVect rot)
 	}
 	
 	if(seg->ta.y < seg->tb.y){
-		s = seg->ta.y;
+		b = seg->ta.y;
 		t = seg->tb.y;
 	} else {
-		s = seg->tb.y;
+		b = seg->tb.y;
 		t = seg->ta.y;
 	}
 	
 	cpFloat rad = seg->r;
-	return cpBBNew(l - rad, s - rad, r + rad, t + rad);
+	return cpBBNew(l - rad, b - rad, r + rad, t + rad);
 }
 
 static cpBool

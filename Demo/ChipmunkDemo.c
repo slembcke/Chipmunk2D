@@ -59,7 +59,7 @@
 static chipmunkDemo *demos;
 static int demoCount = 0;
 static chipmunkDemo *currDemo = NULL;
-static const int firstDemoIndex = 'a' - 'a';
+static const int firstDemoIndex = 'b' - 'a';
 
 static cpBool paused = cpFalse;
 static cpBool step = cpFalse;

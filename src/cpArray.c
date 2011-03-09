@@ -38,17 +38,12 @@ cpArrayNew(int size)
 }
 
 void
-cpArrayDestroy(cpArray *arr)
-{
-	cpfree(arr->arr);
-	arr->arr = NULL;
-}
-
-void
 cpArrayFree(cpArray *arr)
 {
 	if(arr){
-		cpArrayDestroy(arr);
+		cpfree(arr->arr);
+		arr->arr = NULL;
+		
 		cpfree(arr);
 	}
 }

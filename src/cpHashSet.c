@@ -44,19 +44,14 @@ struct cpHashSet {
 };
 
 void
-cpHashSetDestroy(cpHashSet *set)
-{
-	cpfree(set->table);
-	
-	cpArrayFreeEach(set->allocatedBuffers, cpfree);
-	cpArrayFree(set->allocatedBuffers);
-}
-
-void
 cpHashSetFree(cpHashSet *set)
 {
 	if(set){
-		cpHashSetDestroy(set);
+		cpfree(set->table);
+		
+		cpArrayFreeEach(set->allocatedBuffers, cpfree);
+		cpArrayFree(set->allocatedBuffers);
+		
 		cpfree(set);
 	}
 }
