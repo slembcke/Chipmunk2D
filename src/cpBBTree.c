@@ -476,9 +476,9 @@ LeafAddPairs(Node *leaf, cpBBTree *tree)
 {
 	cpSpatialIndex *dynamicIndex = tree->spatialIndex.dynamicIndex;
 	if(dynamicIndex){
-		cpBBTree *dynamicTree = GetTree(dynamicIndex);
-		Node *dynamicRoot = dynamicTree->root;
+		Node *dynamicRoot = GetRootIfTree(dynamicIndex);
 		if(dynamicRoot){
+			cpBBTree *dynamicTree = GetTree(dynamicIndex);
 			MarkContext context = {dynamicTree, NULL, NULL, NULL};
 			MarkLeafQuery(dynamicRoot, leaf, cpTrue, &context);
 		}

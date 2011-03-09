@@ -11,6 +11,8 @@
 		D31402950E9DD07E00EF79DB /* Springies.c in Sources */ = {isa = PBXBuildFile; fileRef = D31402940E9DD07E00EF79DB /* Springies.c */; };
 		D31723C31328006900752CBE /* cpBruteIndex.c in Sources */ = {isa = PBXBuildFile; fileRef = D31723C21328006900752CBE /* cpBruteIndex.c */; };
 		D31723C41328006900752CBE /* cpBruteIndex.c in Sources */ = {isa = PBXBuildFile; fileRef = D31723C21328006900752CBE /* cpBruteIndex.c */; };
+		D317246613280FC900752CBE /* cpSweep1D.c in Sources */ = {isa = PBXBuildFile; fileRef = D317246513280FC900752CBE /* cpSweep1D.c */; };
+		D317246713280FC900752CBE /* cpSweep1D.c in Sources */ = {isa = PBXBuildFile; fileRef = D317246513280FC900752CBE /* cpSweep1D.c */; };
 		D31847750FC458FD00E30B0D /* Query.c in Sources */ = {isa = PBXBuildFile; fileRef = D31847740FC458FD00E30B0D /* Query.c */; };
 		D3185D200EC5610A00E6BFCB /* TheoJansen.c in Sources */ = {isa = PBXBuildFile; fileRef = D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */; };
 		D3238F8210C1B5ED00C4BDC2 /* Joints.c in Sources */ = {isa = PBXBuildFile; fileRef = D3238F8110C1B5ED00C4BDC2 /* Joints.c */; };
@@ -126,6 +128,7 @@
 		D3102B161119FD3000E77771 /* Tank.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tank.c; sourceTree = "<group>"; };
 		D31402940E9DD07E00EF79DB /* Springies.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Springies.c; sourceTree = "<group>"; };
 		D31723C21328006900752CBE /* cpBruteIndex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpBruteIndex.c; sourceTree = "<group>"; };
+		D317246513280FC900752CBE /* cpSweep1D.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpSweep1D.c; sourceTree = "<group>"; };
 		D31847740FC458FD00E30B0D /* Query.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Query.c; sourceTree = "<group>"; };
 		D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = TheoJansen.c; sourceTree = "<group>"; };
 		D3238F8110C1B5ED00C4BDC2 /* Joints.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Joints.c; sourceTree = "<group>"; };
@@ -258,6 +261,7 @@
 				D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */,
 				D3AA477312AF0F8900E27AAB /* cpBBTree.c */,
 				D31723C21328006900752CBE /* cpBruteIndex.c */,
+				D317246513280FC900752CBE /* cpSweep1D.c */,
 				D3E5F0C10AA75CA9004E361B /* cpArbiter.h */,
 				D3E5F0C20AA75CA9004E361B /* cpArbiter.c */,
 				D37E22FC0AAA63B800BB4C50 /* cpShape.h */,
@@ -552,6 +556,7 @@
 				D3AA477512AF0F8900E27AAB /* cpBBTree.c in Sources */,
 				D3AA477612AF0F8900E27AAB /* cpSpatialIndex.c in Sources */,
 				D31723C31328006900752CBE /* cpBruteIndex.c in Sources */,
+				D317246613280FC900752CBE /* cpSweep1D.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -588,6 +593,7 @@
 				D3AA477712AF0F8900E27AAB /* cpBBTree.c in Sources */,
 				D3AA477812AF0F8900E27AAB /* cpSpatialIndex.c in Sources */,
 				D31723C41328006900752CBE /* cpBruteIndex.c in Sources */,
+				D317246713280FC900752CBE /* cpSweep1D.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

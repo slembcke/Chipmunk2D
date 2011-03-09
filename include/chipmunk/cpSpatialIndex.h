@@ -41,6 +41,14 @@ void cpBBTreeOptimize(cpSpatialIndex *index);
 typedef cpVect (*cpBBTreeVelocityFunc)(void *obj);
 void cpBBTreeSetVelocityFunc(cpSpatialIndex *index, cpBBTreeVelocityFunc func);
 
+#pragma mark 1D Sweep
+
+typedef struct cpSweep1D cpSweep1D;
+
+cpSweep1D *cpSweep1DAlloc(void);
+cpSpatialIndex *cpSweep1DInit(cpSweep1D *sweep, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+cpSpatialIndex *cpSweep1DNew(cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+
 #pragma mark Spatial Index Implementation
 
 typedef void (*cpSpatialIndexDestroyImpl)(cpSpatialIndex *index);
