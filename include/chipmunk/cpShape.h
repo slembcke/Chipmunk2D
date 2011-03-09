@@ -36,20 +36,19 @@ typedef enum cpShapeType{
 	CP_NUM_SHAPES
 } cpShapeType;
 
+typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpVect p, cpVect rot);
+typedef void (*cpShapeDestroyImpl)(cpShape *shape);
+typedef cpBool (*cpShapePointQueryImpl)(cpShape *shape, cpVect p);
+typedef void (*cpShapeSegmentQueryImpl)(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+
 // Shape class. Holds function pointers and type data.
 struct cpShapeClass {
 	cpShapeType type;
 	
-	// Called by cpShapeCacheBB().
-	cpBB (*cacheData)(cpShape *shape, cpVect p, cpVect rot);
-	// Called to by cpShapeDestroy().
-	void (*destroy)(cpShape *shape);
-	
-	// called by cpShapePointQuery().
-	cpBool (*pointQuery)(cpShape *shape, cpVect p);
-	
-	// called by cpShapeSegmentQuery()
-	 void (*segmentQuery)(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+	cpShapeCacheDataImpl cacheData;
+	cpShapeDestroyImpl destroy;
+	cpShapePointQueryImpl pointQuery;
+	cpShapeSegmentQueryImpl segmentQuery;
 };
 
 // Basic shape struct that the others inherit from.

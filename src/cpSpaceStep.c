@@ -299,11 +299,11 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	}
 	
 	// Find colliding pairs.
-	cpSpaceLock(space);
-	cpSpacePushFreshContactBuffer(space);
-	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)updateBBCache, NULL);
-	cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryFunc)cpSpaceCollideShapes, space);
-	cpSpaceUnlock(space);
+	cpSpaceLock(space); {
+		cpSpacePushFreshContactBuffer(space);
+		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)updateBBCache, NULL);
+		cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryFunc)cpSpaceCollideShapes, space);
+	} cpSpaceUnlock(space);
 	
 	// If body sleeping is enabled, do that now.
 	if(space->sleepTimeThreshold != INFINITY){
@@ -337,11 +337,15 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	
 	if(space->stamp){
 		cpFloat dt_coef = dt/space->prev_dt;
+		
 		for(int i=0; i<arbiters->num; i++){
 			cpArbiterApplyCachedImpulse((cpArbiter *)arbiters->arr[i], dt_coef);
 		}
 		
-		// TODO Separate constraint cached impulses
+		for(int i=0; i<constraints->num; i++){
+			cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
+			constraint->klass->applyCachedImpulse(constraint, dt_coef);
+		}
 	}
 	
 	// Run the impulse solver.

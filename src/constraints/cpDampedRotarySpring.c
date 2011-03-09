@@ -33,7 +33,8 @@ defaultSpringTorque(cpDampedRotarySpring *spring, cpFloat relativeAngle){
 static void
 preStep(cpDampedRotarySpring *spring, cpFloat dt)
 {
-	CONSTRAINT_BEGIN(spring, a, b);
+	cpBody *a = spring->constraint.a;
+	cpBody *b = spring->constraint.b;
 	
 	cpFloat moment = a->i_inv + b->i_inv;
 	spring->iSum = 1.0f/moment;
@@ -47,10 +48,13 @@ preStep(cpDampedRotarySpring *spring, cpFloat dt)
 	b->w += j_spring*b->i_inv;
 }
 
+static void applyCachedImpulse(cpDampedRotarySpring *spring, cpFloat dt_coef){}
+
 static void
 applyImpulse(cpDampedRotarySpring *spring)
 {
-	CONSTRAINT_BEGIN(spring, a, b);
+	cpBody *a = spring->constraint.a;
+	cpBody *b = spring->constraint.b;
 	
 	// compute relative velocity
 	cpFloat wrn = a->w - b->w;//normal_relative_velocity(a, b, r1, r2, n) - spring->target_vrn;
@@ -73,9 +77,10 @@ getImpulse(cpConstraint *constraint)
 }
 
 static const cpConstraintClass klass = {
-	(cpConstraintPreStepFunction)preStep,
-	(cpConstraintApplyImpulseFunction)applyImpulse,
-	(cpConstraintGetImpulseFunction)getImpulse,
+	(cpConstraintPreStepImpl)preStep,
+	(cpConstraintApplyCachedImpulseImpl)applyCachedImpulse,
+	(cpConstraintApplyImpulseImpl)applyImpulse,
+	(cpConstraintGetImpulseImpl)getImpulse,
 };
 CP_DefineClassGetter(cpDampedRotarySpring)
 

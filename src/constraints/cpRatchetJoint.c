@@ -28,7 +28,8 @@
 static void
 preStep(cpRatchetJoint *joint, cpFloat dt)
 {
-	CONSTRAINT_BEGIN(joint, a, b);
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
 	
 	cpFloat angle = joint->angle;
 	cpFloat phase = joint->phase;
@@ -55,12 +56,18 @@ preStep(cpRatchetJoint *joint, cpFloat dt)
 	joint->jMax = J_MAX(joint, dt);
 
 	// If the bias is 0, the joint is not at a limit. Reset the impulse.
-	if(!joint->bias)
-		joint->jAcc = 0.0f;
+	if(!joint->bias) joint->jAcc = 0.0f;
+}
 
-	// apply joint torque
-	a->w -= joint->jAcc*a->i_inv;
-	b->w += joint->jAcc*b->i_inv;
+static void
+applyCachedImpulse(cpRatchetJoint *joint, cpFloat dt_coef)
+{
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
+	
+	cpFloat j = joint->jAcc*dt_coef;
+	a->w -= j*a->i_inv;
+	b->w += j*b->i_inv;
 }
 
 static void
@@ -68,7 +75,8 @@ applyImpulse(cpRatchetJoint *joint)
 {
 	if(!joint->bias) return; // early exit
 
-	CONSTRAINT_BEGIN(joint, a, b);
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
 	
 	// compute relative rotational velocity
 	cpFloat wr = b->w - a->w;
@@ -92,9 +100,10 @@ getImpulse(cpRatchetJoint *joint)
 }
 
 static const cpConstraintClass klass = {
-	(cpConstraintPreStepFunction)preStep,
-	(cpConstraintApplyImpulseFunction)applyImpulse,
-	(cpConstraintGetImpulseFunction)getImpulse,
+	(cpConstraintPreStepImpl)preStep,
+	(cpConstraintApplyCachedImpulseImpl)applyCachedImpulse,
+	(cpConstraintApplyImpulseImpl)applyImpulse,
+	(cpConstraintGetImpulseImpl)getImpulse,
 };
 CP_DefineClassGetter(cpRatchetJoint)
 

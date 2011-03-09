@@ -33,7 +33,8 @@ defaultSpringForce(cpDampedSpring *spring, cpFloat dist){
 static void
 preStep(cpDampedSpring *spring, cpFloat dt)
 {
-	CONSTRAINT_BEGIN(spring, a, b);
+	cpBody *a = spring->constraint.a;
+	cpBody *b = spring->constraint.b;
 	
 	spring->r1 = cpvrotate(spring->anchr1, a->rot);
 	spring->r2 = cpvrotate(spring->anchr2, b->rot);
@@ -53,10 +54,13 @@ preStep(cpDampedSpring *spring, cpFloat dt)
 	apply_impulses(a, b, spring->r1, spring->r2, cpvmult(spring->n, f_spring*dt));
 }
 
+static void applyCachedImpulse(cpDampedSpring *spring, cpFloat dt_coef){}
+
 static void
 applyImpulse(cpDampedSpring *spring)
 {
-	CONSTRAINT_BEGIN(spring, a, b);
+	cpBody *a = spring->constraint.a;
+	cpBody *b = spring->constraint.b;
 	
 	cpVect n = spring->n;
 	cpVect r1 = spring->r1;
@@ -80,9 +84,10 @@ getImpulse(cpConstraint *constraint)
 }
 
 static const cpConstraintClass klass = {
-	(cpConstraintPreStepFunction)preStep,
-	(cpConstraintApplyImpulseFunction)applyImpulse,
-	(cpConstraintGetImpulseFunction)getImpulse,
+	(cpConstraintPreStepImpl)preStep,
+	(cpConstraintApplyCachedImpulseImpl)applyCachedImpulse,
+	(cpConstraintApplyImpulseImpl)applyImpulse,
+	(cpConstraintGetImpulseImpl)getImpulse,
 };
 CP_DefineClassGetter(cpDampedSpring)
 

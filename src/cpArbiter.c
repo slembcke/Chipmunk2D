@@ -202,6 +202,8 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef)
 	}
 }
 
+// TODO is it worth splitting velocity/position correction?
+
 void
 cpArbiterApplyImpulse(cpArbiter *arb)
 {

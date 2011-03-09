@@ -66,12 +66,10 @@ cpPolyShapeTransformAxes(cpPolyShape *poly, cpVect p, cpVect rot)
 }
 
 static cpBB
-cpPolyShapeCacheData(cpShape *shape, cpVect p, cpVect rot)
+cpPolyShapeCacheData(cpPolyShape *poly, cpVect p, cpVect rot)
 {
-	cpPolyShape *poly = (cpPolyShape *)shape;
-	
 	cpPolyShapeTransformAxes(poly, p, rot);
-	cpBB bb = shape->bb = cpPolyShapeTransformVerts(poly, p, rot);
+	cpBB bb = poly->shape.bb = cpPolyShapeTransformVerts(poly, p, rot);
 	
 	return bb;
 }
@@ -89,14 +87,13 @@ cpPolyShapeDestroy(cpShape *shape)
 }
 
 static cpBool
-cpPolyShapePointQuery(cpShape *shape, cpVect p){
-	return cpBBContainsVect(shape->bb, p) && cpPolyShapeContainsVert((cpPolyShape *)shape, p);
+cpPolyShapePointQuery(cpPolyShape *poly, cpVect p){
+	return cpBBContainsVect(poly->shape.bb, p) && cpPolyShapeContainsVert(poly, p);
 }
 
 static void
-cpPolyShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
-	cpPolyShape *poly = (cpPolyShape *)shape;
 	cpPolyShapeAxis *axes = poly->tAxes;
 	cpVect *verts = poly->tVerts;
 	int numVerts = poly->numVerts;
@@ -116,7 +113,7 @@ cpPolyShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *
 		cpFloat dtMax = -cpvcross(n, verts[(i+1)%numVerts]);
 		
 		if(dtMin <= dt && dt <= dtMax){
-			info->shape = shape;
+			info->shape = (cpShape *)poly;
 			info->t = t;
 			info->n = n;
 		}
@@ -125,10 +122,10 @@ cpPolyShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *
 
 static const cpShapeClass polyClass = {
 	CP_POLY_SHAPE,
-	cpPolyShapeCacheData,
-	cpPolyShapeDestroy,
-	cpPolyShapePointQuery,
-	cpPolyShapeSegmentQuery,
+	(cpShapeCacheDataImpl)cpPolyShapeCacheData,
+	(cpShapeDestroyImpl)cpPolyShapeDestroy,
+	(cpShapePointQueryImpl)cpPolyShapePointQuery,
+	(cpShapeSegmentQueryImpl)cpPolyShapeSegmentQuery,
 };
 
 cpBool

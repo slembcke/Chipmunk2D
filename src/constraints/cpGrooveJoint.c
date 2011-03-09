@@ -27,7 +27,8 @@
 static void
 preStep(cpGrooveJoint *joint, cpFloat dt)
 {
-	CONSTRAINT_BEGIN(joint, a, b);
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
 	
 	// calculate endpoints in worldspace
 	cpVect ta = cpBodyLocal2World(a, joint->grv_a);
@@ -63,9 +64,15 @@ preStep(cpGrooveJoint *joint, cpFloat dt)
 	// calculate bias velocity
 	cpVect delta = cpvsub(cpvadd(b->p, joint->r2), cpvadd(a->p, joint->r1));
 	joint->bias = cpvclamp(cpvmult(delta, -joint->constraint.biasCoef/dt), joint->constraint.maxBias);
-	
-	// apply accumulated impulse
-	apply_impulses(a, b, joint->r1, joint->r2, joint->jAcc);
+}
+
+static void
+applyCachedImpulse(cpGrooveJoint *joint, cpFloat dt_coef)
+{
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
+		
+	apply_impulses(a, b, joint->r1, joint->r2, cpvmult(joint->jAcc, dt_coef));
 }
 
 static inline cpVect
@@ -78,7 +85,8 @@ grooveConstrain(cpGrooveJoint *joint, cpVect j){
 static void
 applyImpulse(cpGrooveJoint *joint)
 {
-	CONSTRAINT_BEGIN(joint, a, b);
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
 	
 	cpVect r1 = joint->r1;
 	cpVect r2 = joint->r2;
@@ -102,9 +110,10 @@ getImpulse(cpGrooveJoint *joint)
 }
 
 static const cpConstraintClass klass = {
-	(cpConstraintPreStepFunction)preStep,
-	(cpConstraintApplyImpulseFunction)applyImpulse,
-	(cpConstraintGetImpulseFunction)getImpulse,
+	(cpConstraintPreStepImpl)preStep,
+	(cpConstraintApplyCachedImpulseImpl)applyCachedImpulse,
+	(cpConstraintApplyImpulseImpl)applyImpulse,
+	(cpConstraintGetImpulseImpl)getImpulse,
 };
 CP_DefineClassGetter(cpGrooveJoint)
 

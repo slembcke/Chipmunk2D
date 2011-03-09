@@ -27,7 +27,8 @@
 static void
 preStep(cpGearJoint *joint, cpFloat dt)
 {
-	CONSTRAINT_BEGIN(joint, a, b);
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
 	
 	// calculate moment of inertia coefficient.
 	joint->iSum = 1.0f/(a->i_inv*joint->ratio_inv + joint->ratio*b->i_inv);
@@ -38,9 +39,15 @@ preStep(cpGearJoint *joint, cpFloat dt)
 	
 	// compute max impulse
 	joint->jMax = J_MAX(joint, dt);
+}
 
-	// apply joint torque
-	cpFloat j = joint->jAcc;
+static void
+applyCachedImpulse(cpGearJoint *joint, cpFloat dt_coef)
+{
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
+	
+	cpFloat j = joint->jAcc*dt_coef;
 	a->w -= j*a->i_inv*joint->ratio_inv;
 	b->w += j*b->i_inv;
 }
@@ -48,7 +55,8 @@ preStep(cpGearJoint *joint, cpFloat dt)
 static void
 applyImpulse(cpGearJoint *joint)
 {
-	CONSTRAINT_BEGIN(joint, a, b);
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
 	
 	// compute relative rotational velocity
 	cpFloat wr = b->w*joint->ratio - a->w;
@@ -71,9 +79,10 @@ getImpulse(cpGearJoint *joint)
 }
 
 static const cpConstraintClass klass = {
-	(cpConstraintPreStepFunction)preStep,
-	(cpConstraintApplyImpulseFunction)applyImpulse,
-	(cpConstraintGetImpulseFunction)getImpulse,
+	(cpConstraintPreStepImpl)preStep,
+	(cpConstraintApplyCachedImpulseImpl)applyCachedImpulse,
+	(cpConstraintApplyImpulseImpl)applyImpulse,
+	(cpConstraintGetImpulseImpl)getImpulse,
 };
 CP_DefineClassGetter(cpGearJoint)
 

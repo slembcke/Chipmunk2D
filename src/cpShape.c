@@ -122,17 +122,14 @@ bbFromCircle(const cpVect c, const cpFloat r)
 }
 
 static cpBB
-cpCircleShapeCacheData(cpShape *shape, cpVect p, cpVect rot)
+cpCircleShapeCacheData(cpCircleShape *circle, cpVect p, cpVect rot)
 {
-	cpCircleShape *circle = (cpCircleShape *)shape;
-	
 	circle->tc = cpvadd(p, cpvrotate(circle->c, rot));
 	return bbFromCircle(circle->tc, circle->r);
 }
 
 static cpBool
-cpCircleShapePointQuery(cpShape *shape, cpVect p){
-	cpCircleShape *circle = (cpCircleShape *)shape;
+cpCircleShapePointQuery(cpCircleShape *circle, cpVect p){
 	return cpvnear(circle->tc, p, circle->r);
 }
 
@@ -160,18 +157,17 @@ circleSegmentQuery(cpShape *shape, cpVect center, cpFloat r, cpVect a, cpVect b,
 }
 
 static void
-cpCircleShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+cpCircleShapeSegmentQuery(cpCircleShape *circle, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
-	cpCircleShape *circle = (cpCircleShape *)shape;
-	circleSegmentQuery(shape, circle->tc, circle->r, a, b, info);
+	circleSegmentQuery((cpShape *)circle, circle->tc, circle->r, a, b, info);
 }
 
 static const cpShapeClass cpCircleShapeClass = {
 	CP_CIRCLE_SHAPE,
-	cpCircleShapeCacheData,
+	(cpShapeCacheDataImpl)cpCircleShapeCacheData,
 	NULL,
-	cpCircleShapePointQuery,
-	cpCircleShapeSegmentQuery,
+	(cpShapePointQueryImpl)cpCircleShapePointQuery,
+	(cpShapeSegmentQueryImpl)cpCircleShapeSegmentQuery,
 };
 
 cpCircleShape *
@@ -201,10 +197,8 @@ cpSegmentShapeAlloc(void)
 }
 
 static cpBB
-cpSegmentShapeCacheData(cpShape *shape, cpVect p, cpVect rot)
+cpSegmentShapeCacheData(cpSegmentShape *seg, cpVect p, cpVect rot)
 {
-	cpSegmentShape *seg = (cpSegmentShape *)shape;
-	
 	seg->ta = cpvadd(p, cpvrotate(seg->a, rot));
 	seg->tb = cpvadd(p, cpvrotate(seg->b, rot));
 	seg->tn = cpvrotate(seg->n, rot);
@@ -232,10 +226,8 @@ cpSegmentShapeCacheData(cpShape *shape, cpVect p, cpVect rot)
 }
 
 static cpBool
-cpSegmentShapePointQuery(cpShape *shape, cpVect p){
-	if(!cpBBContainsVect(shape->bb, p)) return cpFalse;
-	
-	cpSegmentShape *seg = (cpSegmentShape *)shape;
+cpSegmentShapePointQuery(cpSegmentShape *seg, cpVect p){
+	if(!cpBBContainsVect(seg->shape.bb, p)) return cpFalse;
 	
 	// Calculate normal distance from segment.
 	cpFloat dn = cpvdot(seg->tn, p) - cpvdot(seg->ta, seg->tn);
@@ -272,11 +264,10 @@ cpSegmentShapePointQuery(cpShape *shape, cpVect p){
 static inline cpBool inUnitRange(cpFloat t){return (0.0f < t && t < 1.0f);}
 
 static void
-cpSegmentShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
 	// TODO this function could be optimized better.
 	
-	cpSegmentShape *seg = (cpSegmentShape *)shape;
 	cpVect n = seg->tn;
 	// flip n if a is behind the axis
 	if(cpvdot(a, n) < cpvdot(seg->ta, n))
@@ -296,7 +287,7 @@ cpSegmentShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInf
 			cpFloat dtMax = -cpvcross(seg->tn, seg->tb);
 			
 			if(dtMin < dt && dt < dtMax){
-				info->shape = shape;
+				info->shape = (cpShape *)seg;
 				info->t = t;
 				info->n = n;
 				
@@ -308,8 +299,8 @@ cpSegmentShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInf
 	if(seg->r) {
 		cpSegmentQueryInfo info1 = {NULL, 1.0f, cpvzero};
 		cpSegmentQueryInfo info2 = {NULL, 1.0f, cpvzero};
-		circleSegmentQuery(shape, seg->ta, seg->r, a, b, &info1);
-		circleSegmentQuery(shape, seg->tb, seg->r, a, b, &info2);
+		circleSegmentQuery((cpShape *)seg, seg->ta, seg->r, a, b, &info1);
+		circleSegmentQuery((cpShape *)seg, seg->tb, seg->r, a, b, &info2);
 		
 		if(info1.t < info2.t){
 			(*info) = info1;
@@ -321,10 +312,10 @@ cpSegmentShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInf
 
 static const cpShapeClass cpSegmentShapeClass = {
 	CP_SEGMENT_SHAPE,
-	cpSegmentShapeCacheData,
+	(cpShapeCacheDataImpl)cpSegmentShapeCacheData,
 	NULL,
-	cpSegmentShapePointQuery,
-	cpSegmentShapeSegmentQuery,
+	(cpShapePointQueryImpl)cpSegmentShapePointQuery,
+	(cpShapeSegmentQueryImpl)cpSegmentShapeSegmentQuery,
 };
 
 cpSegmentShape *

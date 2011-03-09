@@ -28,7 +28,8 @@
 static void
 preStep(cpPinJoint *joint, cpFloat dt)
 {
-	CONSTRAINT_BEGIN(joint, a, b);
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
 	
 	joint->r1 = cpvrotate(joint->anchr1, a->rot);
 	joint->r2 = cpvrotate(joint->anchr2, b->rot);
@@ -46,16 +47,23 @@ preStep(cpPinJoint *joint, cpFloat dt)
 	
 	// compute max impulse
 	joint->jnMax = J_MAX(joint, dt);
+}
+
+static void
+applyCachedImpulse(cpPinJoint *joint, cpFloat dt_coef)
+{
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
 	
-	// apply accumulated impulse
-	cpVect j = cpvmult(joint->n, joint->jnAcc);
+	cpVect j = cpvmult(joint->n, joint->jnAcc*dt_coef);
 	apply_impulses(a, b, joint->r1, joint->r2, j);
 }
 
 static void
 applyImpulse(cpPinJoint *joint)
 {
-	CONSTRAINT_BEGIN(joint, a, b);
+	cpBody *a = joint->constraint.a;
+	cpBody *b = joint->constraint.b;
 	cpVect n = joint->n;
 
 	// compute relative velocity
@@ -78,9 +86,10 @@ getImpulse(cpPinJoint *joint)
 }
 
 static const cpConstraintClass klass = {
-	(cpConstraintPreStepFunction)preStep,
-	(cpConstraintApplyImpulseFunction)applyImpulse,
-	(cpConstraintGetImpulseFunction)getImpulse,
+	(cpConstraintPreStepImpl)preStep,
+	(cpConstraintApplyCachedImpulseImpl)applyCachedImpulse,
+	(cpConstraintApplyImpulseImpl)applyImpulse,
+	(cpConstraintGetImpulseImpl)getImpulse,
 };
 CP_DefineClassGetter(cpPinJoint);
 
