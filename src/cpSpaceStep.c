@@ -274,7 +274,7 @@ cpShapeUpdateFunc(cpShape *shape, void *unused)
 }
 
 void
-cpSpaceUpdateShapes(cpSpace *space, cpFloat dt)
+cpSpaceStep(cpSpace *space, cpFloat dt)
 {
 	if(dt == 0.0f) return; // don't step if the timestep is 0!
 
