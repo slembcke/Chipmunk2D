@@ -12,5 +12,3 @@ Per body damping and gravity coefs?
 breakable object support functions?
 Breakable joints?
 Easy callback programable joint?
-
-Warm starting
