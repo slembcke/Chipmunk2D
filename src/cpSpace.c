@@ -341,7 +341,7 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 	cpAssertWarn(!cpBodyIsStatic(body), "Static bodies cannot be added to a space as they are not meant to be simulated.");
 	cpAssert(!cpSpaceContainsBody(space, body),
 		"Cannot add a body to a more than one space or to the same space twice.");
-//	cpAssertSpaceUnlocked(space); This should be safe as long as it's not from an integration callback
+	cpAssertSpaceUnlocked(space);
 	
 	cpArrayPush(space->bodies, body);
 	body->space = space;

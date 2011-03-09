@@ -37,9 +37,10 @@ preStep(cpDampedRotarySpring *spring, cpFloat dt)
 	cpBody *b = spring->constraint.b;
 	
 	cpFloat moment = a->i_inv + b->i_inv;
+	cpAssert(moment != 0.0, "Unsolvable spring.");
 	spring->iSum = 1.0f/moment;
 
-	spring->w_coef = 1.0f - cpfexp(-spring->damping*dt*moment);
+	spring->w_coef = 1.0f - cpfexp(-spring->damping*dt*moment*0.25/M_E);
 	spring->target_wrn = 0.0f;
 
 	// apply spring torque

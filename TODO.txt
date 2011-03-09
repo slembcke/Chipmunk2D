@@ -1,6 +1,4 @@
 Doxygen! (mark private/public parts of API)
-Fix units for damped springs
-Separate impulse application for joints
 constraint callbacks
 touch joint (Objective-Chipmunk)
 Building bodies from shape collections.
