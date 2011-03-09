@@ -265,8 +265,8 @@ init(void)
 	cpSpaceAddConstraint(space, cpGrooveJointNew(chassis, wheel1, cpv(-30, -10), cpv(-30, -40), cpvzero));
 	cpSpaceAddConstraint(space, cpGrooveJointNew(chassis, wheel2, cpv( 30, -10), cpv( 30, -40), cpvzero));
 	
-	cpSpaceAddConstraint(space, cpDampedSpringNew(chassis, wheel1, cpv(-30, 0), cpvzero, 50.0f, 20.0f, 1.5f));
-	cpSpaceAddConstraint(space, cpDampedSpringNew(chassis, wheel2, cpv( 30, 0), cpvzero, 50.0f, 20.0f, 1.5f));
+	cpSpaceAddConstraint(space, cpDampedSpringNew(chassis, wheel1, cpv(-30, 0), cpvzero, 50.0f, 20.0f, 10.0f));
+	cpSpaceAddConstraint(space, cpDampedSpringNew(chassis, wheel2, cpv( 30, 0), cpvzero, 50.0f, 20.0f, 10.0f));
 	
 	return space;
 }
