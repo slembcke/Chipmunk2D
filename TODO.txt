@@ -6,11 +6,11 @@ Building bodies from shape collections.
 Better accuracy for variable timestepping?
   - dt independent collision bias?
   - dt independent joint biasing? (ugh)
-  - apply fixed impulse for joints (ugh)
-
 
 Per body iterations and timestep?
 Per body damping and gravity coefs?
 breakable object support functions?
 Breakable joints?
 Easy callback programable joint?
+
+Warm starting

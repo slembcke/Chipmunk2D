@@ -137,6 +137,8 @@ cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *k
 
 #pragma mark Space Functions
 
+extern cpCollisionHandler cpDefaultCollisionHandler;
+
 cpContact *cpContactBufferGetArray(cpSpace *space);
 void cpSpacePushContacts(cpSpace *space, int count);
 void cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space);

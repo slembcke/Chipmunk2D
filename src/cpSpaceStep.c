@@ -100,7 +100,7 @@ cpSpacePushFreshContactBuffer(cpSpace *space)
 	if(!head){
 		// No buffers have been allocated, make one
 		space->contactBuffersHead = cpContactBufferHeaderInit(cpSpaceAllocContactBuffer(space), stamp, NULL);
-	} else if(stamp - head->next->stamp > cp_contact_persistence){
+	} else if(stamp - head->next->stamp > space->collisionPersistence){
 		// The tail buffer is available, rotate the ring
 	cpContactBufferHeader *tail = head->next;
 		space->contactBuffersHead = cpContactBufferHeaderInit(tail, stamp, tail);
@@ -183,7 +183,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space)
 	cpCollisionHandler *handler = (cpCollisionHandler *)cpHashSetFind(space->collisionHandlers, collHashID, types);
 	
 	cpBool sensor = a->sensor || b->sensor;
-	if(sensor && handler == &cpSpaceDefaultHandler) return;
+	if(sensor && handler == &cpDefaultCollisionHandler) return;
 	
 	// Shape 'a' should have the lower shape type. (required by cpCollideShapes() )
 	if(a->klass->type > b->klass->type){
@@ -246,7 +246,7 @@ arbiterSetFilter(cpArbiter *arb, cpSpace *space)
 		arb->state = cpArbiterStateCached;
 	}
 	
-	if(ticks >= cp_contact_persistence){
+	if(ticks >= space->collisionPersistence){
 		arb->contacts = NULL;
 		arb->numContacts = 0;
 		

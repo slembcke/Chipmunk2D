@@ -70,6 +70,7 @@ static void setupSpace_simpleTerrain(){
 	space = cpSpaceNew();
 	space->iterations = 10;
 	space->gravity = cpv(0, -100);
+	space->collisionSlop = 0.5f;
 	
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(simple_terrain_count - 1); i++){
@@ -202,6 +203,7 @@ static cpSpace *init_ComplexTerrainCircles_1000(){
 	space = cpSpaceNew();
 	space->iterations = 10;
 	space->gravity = cpv(0, -100);
+	space->collisionSlop = 0.5f;
 	
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(complex_terrain_count - 1); i++){
@@ -226,6 +228,7 @@ static cpSpace *init_ComplexTerrainHexagons_1000(){
 	space = cpSpaceNew();
 	space->iterations = 10;
 	space->gravity = cpv(0, -100);
+	space->collisionSlop = 0.5f;
 	
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(complex_terrain_count - 1); i++){

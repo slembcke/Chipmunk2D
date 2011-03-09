@@ -26,7 +26,10 @@
 
 #include "chipmunk_private.h"
 
-cpTimestamp cp_contact_persistence = 3;
+// TODO get rid of these entirely?
+//cpTimestamp cpContactPersistence = 3;
+cpFloat cpCollisionSlop = 0.1;
+cpFloat cpBiasCoef = 0.1;
 
 #pragma mark Contact Set Helpers
 
@@ -109,7 +112,7 @@ cpSpaceAlloc(void)
 #define DEFAULT_ITERATIONS 10
 #define DEFAULT_ELASTIC_ITERATIONS 0
 
-cpCollisionHandler cpSpaceDefaultHandler = {0, 0, alwaysCollide, alwaysCollide, nothing, nothing, NULL};
+cpCollisionHandler cpDefaultCollisionHandler = {0, 0, alwaysCollide, alwaysCollide, nothing, nothing, NULL};
 
 cpSpace*
 cpSpaceInit(cpSpace *space)
@@ -119,8 +122,9 @@ cpSpaceInit(cpSpace *space)
 	space->gravity = cpvzero;
 	space->damping = 1.0f;
 	
-	space->collisionSlop = cp_collision_slop;
-	space->collisionBias = cp_bias_coef;
+	space->collisionSlop = cpCollisionSlop;
+	space->collisionBias = cpBiasCoef;
+	space->collisionPersistence = 3;
 	
 	space->locked = 0;
 	space->stamp = 0;
@@ -146,9 +150,9 @@ cpSpaceInit(cpSpace *space)
 	
 	space->constraints = cpArrayNew(0);
 	
-	space->defaultHandler = cpSpaceDefaultHandler;
+	space->defaultHandler = cpDefaultCollisionHandler;
 	space->collisionHandlers = cpHashSetNew(0, (cpHashSetEqlFunc)handlerSetEql);
-	cpHashSetSetDefaultValue(space->collisionHandlers, &cpSpaceDefaultHandler);
+	cpHashSetSetDefaultValue(space->collisionHandlers, &cpDefaultCollisionHandler);
 	
 	space->postStepCallbacks = NULL;
 	

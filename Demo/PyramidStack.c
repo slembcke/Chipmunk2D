@@ -48,6 +48,7 @@ init(void)
 	space->iterations = 30;
 	space->gravity = cpv(0, -100);
 	space->sleepTimeThreshold = 0.5f;
+	space->collisionSlop = 0.5f;
 	
 	cpBody *body, *staticBody = space->staticBody;
 	cpShape *shape;

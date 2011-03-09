@@ -19,13 +19,6 @@
  * SOFTWARE.
  */
 
-// Determines how fast penetrations resolve themselves expressed as a percentage per step. Defaults to 0.1.
-extern cpFloat cp_bias_coef;
-
-// Amount of allowed penetration. Used to reduce oscillating contacts and keep the collision cache warm. Defaults to 0.1.
-extern cpFloat cp_collision_slop;
-
-
 // User collision handler function types.
 typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, void *data);
 typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);

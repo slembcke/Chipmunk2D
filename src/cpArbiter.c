@@ -24,9 +24,6 @@
 #include "chipmunk_private.h"
 #include "constraints/util.h"
 
-cpFloat cp_collision_slop = 0.1;
-cpFloat cp_bias_coef = 0.1;
-
 cpContact*
 cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash)
 {

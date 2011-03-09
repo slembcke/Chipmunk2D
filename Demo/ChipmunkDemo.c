@@ -115,7 +115,7 @@ drawInstructions()
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
 		"Arrow keys control some demos.\n"
-		"\\ enables anti-aliasing.\n"
+		"\\ disables anti-aliasing.\n"
 		"- toggles spatial hash visualization.\n"
 		"= toggles bounding boxes."
 	);
@@ -252,12 +252,8 @@ keyboard(unsigned char key, int x, int y)
 	} else if(key == '='){
 		options.drawBBs = !options.drawBBs;
 	} else if(key == '\\'){
-		glEnable(GL_LINE_SMOOTH);
-		glEnable(GL_POINT_SMOOTH);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-		glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
+		glDisable(GL_LINE_SMOOTH);
+		glDisable(GL_POINT_SMOOTH);
 	}
 }
 
@@ -363,6 +359,13 @@ initGL(void)
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
+	glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
 }
 
 static void
@@ -496,7 +499,6 @@ main(int argc, const char **argv)
 	}
 	
 	cpInitChipmunk();
-	cp_collision_slop = 0.5f;
 	
 	if(trial){
 		sleep(1);

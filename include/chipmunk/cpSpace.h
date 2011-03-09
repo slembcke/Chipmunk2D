@@ -19,11 +19,6 @@
  * SOFTWARE.
  */
 
-// Number of frames that contact information should persist.
-extern cpTimestamp cp_contact_persistence;
-
-extern cpCollisionHandler cpSpaceDefaultHandler;
-
 typedef struct cpContactBufferHeader cpContactBufferHeader;
 
 struct cpSpace {
@@ -46,8 +41,18 @@ struct cpSpace {
 	// The default value of INFINITY disables the sleeping algorithm.
 	cpFloat sleepTimeThreshold;
 	
+	// Amount of allowed penetration. Used to reduce oscillating contacts and keep the collision cache warm. Defaults to 0.1.
 	cpFloat collisionSlop;
+	
+	// Determines how fast penetrations resolve themselves expressed as a percentage of error per step. Defaults to 0.1.
 	cpFloat collisionBias;
+	
+	// Number of frames that contact information should persist.
+	cpTimestamp collisionPersistence;
+	
+	cpDataPointer data;
+	
+	cpBody *staticBody;
 	
 	// *** Internally Used Fields
 	
@@ -97,9 +102,6 @@ struct cpSpace {
 	CP_PRIVATE(cpHashSet *postStepCallbacks);
 	
 	CP_PRIVATE(cpBody _staticBody);
-	
-	cpDataPointer data;
-	cpBody *staticBody;
 };
 
 // Basic allocation/destruction functions.

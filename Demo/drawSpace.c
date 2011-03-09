@@ -55,8 +55,6 @@
 */
 
 #define LINE_COLOR 0.0f, 0.0f, 0.0f
-#define COLLISION_COLOR 1.0f, 0.0f, 0.0f
-#define BODY_COLOR 0.0f, 0.0f, 1.0f
 
 static void
 glColor_from_pointer(void *ptr)
@@ -82,13 +80,13 @@ glColor_from_pointer(void *ptr)
 	
 	GLubyte max = r>g ? (r>b ? r : b) : (g>b ? g : b);
 	
-	const int mult = 127;
-	const int add = 63;
+	const int mult = 255;
+	const int add = 0;
 	r = (r*mult)/max + add;
 	g = (g*mult)/max + add;
 	b = (b*mult)/max + add;
 	
-	glColor3ub(r, g, b);
+	glColor4ub(r, g, b, 128);
 }
 
 static void
@@ -411,6 +409,9 @@ void cpSpaceHashRenderDebug(cpSpatialIndex *index);
 void
 drawSpace(cpSpace *space, drawSpaceOptions *options)
 {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 	if(options->drawHash){
 //		glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
 //		drawSpatialHash(space->activeShapes);
@@ -475,7 +476,12 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 			for(int i=0; i<arbiters->num; i++){
 				cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
 				
-				glColor3f(COLLISION_COLOR);
+				cpArbiterState state = arb->state;
+				if(state == cpArbiterStateFirstColl){
+					glColor3f(0.0f, 1.0f, 0.0f);
+				} else if(state == cpArbiterStateNormal){
+					glColor3f(1.0f, 0.0f, 0.0f);
+				}
 				for(int i=0; i<arb->numContacts; i++){
 					cpVect v = arb->contacts[i].p;
 					glVertex2f(v.x, v.y);
