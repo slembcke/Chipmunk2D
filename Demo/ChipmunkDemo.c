@@ -171,13 +171,14 @@ static void
 reshape(int width, int height)
 {
 	glViewport(0, 0, width, height);
-
-	double rx = width / 2.0;
-	double ry = height / 2.0;
-
+	
+	double scale = 0.5/cpfmin(width/640.0, height/480.0);
+	double hw = width*scale;
+	double hh = height*scale;
+	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-rx, rx, -ry, ry, -1.0, 1.0);
+	glOrtho(-hw, hw, -hh, hh, -1.0, 1.0);
 	glTranslated(0.5, 0.5, 0.0);
 }
 
@@ -196,10 +197,8 @@ display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	drawSpace(space, currDemo->drawOptions ? currDemo->drawOptions : &options);
-	if(!paused){
-    drawInstructions();
-    drawInfo();
-  }
+	drawInstructions();
+	drawInfo();
 	drawString(-300, -210, messageString);
 		
 	glutSwapBuffers();
@@ -495,7 +494,7 @@ main(int argc, const char **argv)
 	}
 	
 	cpInitChipmunk();
-	cp_collision_slop = 0.2f;
+	cp_collision_slop = 0.5f;
 	
 	if(trial){
 //		sleep(1);
