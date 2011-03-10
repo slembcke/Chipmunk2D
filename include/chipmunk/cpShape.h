@@ -86,8 +86,6 @@ struct cpShape {
 	// User defined layer bitmask for the shape.
 	cpLayers layers;
 	
-	// *** Internally Used Fields
-	
 	// Shapes form a linked list when added to space on a non-NULL body
 	CP_PRIVATE(cpShape *next);
 	
@@ -109,7 +107,32 @@ cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot);
 // Test if a point lies within a shape.
 cpBool cpShapePointQuery(cpShape *shape, cpVect p);
 
-#define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(cpShape *shape)
+#define CP_DefineShapeGetter(type, member, name) \
+static inline type cpShapeGet##name(const cpShape *shape){return shape->member;}
+
+#define CP_DefineShapeSetter(type, member, name, activates) \
+static inline void \
+cpShapeSet##name(cpShape *shape, type value){ \
+	if(activates) cpBodyActivate(shape->body); \
+	shape->member = value; \
+} \
+
+#define CP_DefineShapeProperty(type, member, name, activates) \
+CP_DefineShapeGetter(type, member, name) \
+CP_DefineShapeSetter(type, member, name, activates)
+
+CP_DefineShapeProperty(cpBody *, body, Body, cpTrue);
+CP_DefineShapeGetter(cpBB, bb, BB);
+CP_DefineShapeProperty(cpBool, sensor, IsSensor, cpTrue);
+CP_DefineShapeProperty(cpFloat, e, Elasticity, cpFalse);
+CP_DefineShapeProperty(cpFloat, u, Friction, cpTrue);
+CP_DefineShapeProperty(cpVect, surface_v, SurfaceVelocity, cpTrue);
+CP_DefineShapeProperty(cpDataPointer, data, UserData, cpFalse);
+CP_DefineShapeProperty(cpCollisionType, collision_type, CollisionType, cpTrue);
+CP_DefineShapeProperty(cpGroup, group, Group, cpTrue);
+CP_DefineShapeProperty(cpLayers, layers, Layers, cpTrue);
+
+#define CP_DeclareShapeStructGetter(struct, type, name) type struct##Get##name(cpShape *shape)
 
 // Circle shape structure.
 typedef struct cpCircleShape {
@@ -129,8 +152,8 @@ cpCircleShape *cpCircleShapeAlloc(void);
 cpCircleShape *cpCircleShapeInit(cpCircleShape *circle, cpBody *body, cpFloat radius, cpVect offset);
 cpShape *cpCircleShapeNew(cpBody *body, cpFloat radius, cpVect offset);
 
-CP_DeclareShapeGetter(cpCircleShape, cpVect, Offset);
-CP_DeclareShapeGetter(cpCircleShape, cpFloat, Radius);
+CP_DeclareShapeStructGetter(cpCircleShape, cpVect, Offset);
+CP_DeclareShapeStructGetter(cpCircleShape, cpFloat, Radius);
 
 // Segment shape structure.
 typedef struct cpSegmentShape {
@@ -150,10 +173,10 @@ cpSegmentShape* cpSegmentShapeAlloc(void);
 cpSegmentShape* cpSegmentShapeInit(cpSegmentShape *seg, cpBody *body, cpVect a, cpVect b, cpFloat radius);
 cpShape* cpSegmentShapeNew(cpBody *body, cpVect a, cpVect b, cpFloat radius);
 
-CP_DeclareShapeGetter(cpSegmentShape, cpVect, A);
-CP_DeclareShapeGetter(cpSegmentShape, cpVect, B);
-CP_DeclareShapeGetter(cpSegmentShape, cpVect, Normal);
-CP_DeclareShapeGetter(cpSegmentShape, cpFloat, Radius);
+CP_DeclareShapeStructGetter(cpSegmentShape, cpVect, A);
+CP_DeclareShapeStructGetter(cpSegmentShape, cpVect, B);
+CP_DeclareShapeStructGetter(cpSegmentShape, cpVect, Normal);
+CP_DeclareShapeStructGetter(cpSegmentShape, cpFloat, Radius);
 
 // For determinism, you can reset the shape id counter.
 void cpResetShapeIdCounter(void);

@@ -107,6 +107,7 @@ cpBodyFree(cpBody *body)
 void
 cpBodySetMass(cpBody *body, cpFloat mass)
 {
+	cpBodyActivate(body);
 	body->m = mass;
 	body->m_inv = 1.0f/mass;
 }
@@ -114,6 +115,7 @@ cpBodySetMass(cpBody *body, cpFloat mass)
 void
 cpBodySetMoment(cpBody *body, cpFloat moment)
 {
+	cpBodyActivate(body);
 	body->i = moment;
 	body->i_inv = 1.0f/moment;
 }
@@ -121,6 +123,7 @@ cpBodySetMoment(cpBody *body, cpFloat moment)
 void
 cpBodySetAngle(cpBody *body, cpFloat angle)
 {
+	cpBodyActivate(body);
 	body->a = angle;//fmod(a, (cpFloat)M_PI*2.0f);
 	body->rot = cpvforangle(angle);
 }
@@ -128,8 +131,8 @@ cpBodySetAngle(cpBody *body, cpFloat angle)
 void
 cpBodySlew(cpBody *body, cpVect pos, cpFloat dt)
 {
-	cpVect delta = cpvsub(pos, body->p);
-	body->v = cpvmult(delta, 1.0f/dt);
+	cpBodyActivate(body);
+	body->v = cpvmult(cpvsub(pos, body->p), 1.0f/dt);
 }
 
 void

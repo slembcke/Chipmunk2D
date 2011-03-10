@@ -167,6 +167,9 @@ CP_DefineBodyGetter(cpVect, rot, Rot);
 CP_DefineBodyProperty(cpFloat, v_limit, VelLimit);
 CP_DefineBodyProperty(cpFloat, w_limit, AngVelLimit);
 
+static inline cpDataPointer cpBodyGetUserData(const cpBody *body){return body->data;}
+static inline void cpBodySetUserData(cpBody *body, cpDataPointer data){body->data = data;}
+
 //  Modify the velocity of the body so that it will move to the specified absolute coordinates in the next timestep.
 // Intended for objects that are moved manually with a custom velocity integration function.
 void cpBodySlew(cpBody *body, cpVect pos, cpFloat dt);
