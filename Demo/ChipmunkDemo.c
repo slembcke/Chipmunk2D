@@ -58,8 +58,7 @@
 
 static chipmunkDemo *demos;
 static int demoCount = 0;
-static chipmunkDemo *currDemo = NULL;
-static const int firstDemoIndex = 'a' - 'a';
+static int demoIndex = 'a' - 'a';
 
 static cpBool paused = cpFalse;
 static cpBool step = cpFalse;
@@ -192,7 +191,7 @@ display(void)
 		mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0f);
 		mousePoint_last = newPoint;
 		
-		currDemo->updateFunc(ticks);
+		demos[demoIndex].updateFunc(ticks);
 		
 		ticks++;
 		step = cpFalse;
@@ -200,7 +199,7 @@ display(void)
   
 	glClear(GL_COLOR_BUFFER_BIT);
 	
-	drawSpace(space, currDemo->drawOptions ? currDemo->drawOptions : &options);
+	drawSpace(space, demos[demoIndex].drawOptions ? demos[demoIndex].drawOptions : &options);
 	drawInstructions();
 	drawInfo();
 	drawString(-300, -210, messageString);
@@ -209,32 +208,29 @@ display(void)
 }
 
 static char *
-demoTitle(chipmunkDemo *demo)
+demoTitle(int index)
 {
 	static char title[1024];
-	sprintf(title, "Demo: %s", demo->name);
+	sprintf(title, "Demo(%c): %s", 'a' + index, demos[demoIndex].name);
 	
 	return title;
 }
 
 static void
-runDemo(chipmunkDemo *demo)
+runDemo(int index)
 {
 	srand(45073);
 	
-	if(currDemo)
-		currDemo->destroyFunc();
-		
-	currDemo = demo;
+	demoIndex = index;
 	ticks = 0;
 	mouseJoint = NULL;
 	messageString[0] = '\0';
 	maxArbiters = 0;
 	maxPoints = 0;
 	maxConstraints = 0;
-	space = currDemo->initFunc();
+	space = demos[demoIndex].initFunc();
 
-	glutSetWindowTitle(demoTitle(currDemo));
+	glutSetWindowTitle(demoTitle(index));
 }
 
 static void
@@ -243,9 +239,11 @@ keyboard(unsigned char key, int x, int y)
 	int index = key - 'a';
 	
 	if(0 <= index && index < demoCount){
-		runDemo(&demos[index]);
+		demos[demoIndex].destroyFunc();
+		runDemo(index);
 	} else if(key == '\r'){
-		runDemo(currDemo);
+		demos[demoIndex].destroyFunc();
+		runDemo(demoIndex);
   } else if(key == '`'){
 		paused = !paused;
   } else if(key == '1'){
@@ -379,7 +377,7 @@ glutStuff(int argc, const char *argv[])
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	
 	glutInitWindowSize(640, 480);
-	glutCreateWindow(demoTitle(&demos[firstDemoIndex]));
+	glutCreateWindow(demoTitle(demoIndex));
 	
 	initGL();
 	
@@ -425,19 +423,18 @@ static double GetMilliseconds(){
 
 void time_trial(int index, int count)
 {
-	currDemo = &demos[index];
-	space = currDemo->initFunc();
+	space = demos[demoIndex].initFunc();
 	
 	double start_time = GetMilliseconds();
 	
 	for(int i=0; i<count; i++)
-		currDemo->updateFunc(i);
+		demos[demoIndex].updateFunc(i);
 	
 	double end_time = GetMilliseconds();
 	
-	currDemo->destroyFunc();
+	demos[demoIndex].destroyFunc();
 	
-	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, currDemo->name);
+	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, demos[demoIndex].name);
 }
 
 extern chipmunkDemo LogoSmash;
@@ -512,7 +509,7 @@ main(int argc, const char **argv)
 		
 		glutStuff(argc, argv);
 		
-		runDemo(&demos[firstDemoIndex]);
+		runDemo(demoIndex);
 		glutMainLoop();
 	}
 

@@ -86,7 +86,7 @@ glColor_from_pointer(void *ptr)
 	g = (g*mult)/max + add;
 	b = (b*mult)/max + add;
 	
-	glColor4ub(r, g, b, 128);
+	glColor4ub(r, g, b, 196);
 }
 
 static void
@@ -470,18 +470,31 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 	}
 
 	if(options->collisionPointSize){
-		glPointSize(options->collisionPointSize);
+		cpArray *arbiters = space->arbiters;
+		
+		glColor3f(0.0f, 1.0f, 0.0f);
+		glPointSize(2.0f*options->collisionPointSize);
+		
 		glBegin(GL_POINTS); {
-			cpArray *arbiters = space->arbiters;
 			for(int i=0; i<arbiters->num; i++){
 				cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
+				if(arb->state != cpArbiterStateFirstColl) continue;
 				
-				cpArbiterState state = arb->state;
-				if(state == cpArbiterStateFirstColl){
-					glColor3f(0.0f, 1.0f, 0.0f);
-				} else if(state == cpArbiterStateNormal){
-					glColor3f(1.0f, 0.0f, 0.0f);
+				for(int i=0; i<arb->numContacts; i++){
+					cpVect v = arb->contacts[i].p;
+					glVertex2f(v.x, v.y);
 				}
+			}
+		} glEnd();
+		
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glPointSize(options->collisionPointSize);
+		
+		glBegin(GL_POINTS); {
+			for(int i=0; i<arbiters->num; i++){
+				cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
+				if(arb->state == cpArbiterStateFirstColl) continue;
+				
 				for(int i=0; i<arb->numContacts; i++){
 					cpVect v = arb->contacts[i].p;
 					glVertex2f(v.x, v.y);
