@@ -214,5 +214,11 @@ cpBodyKineticEnergy(const cpBody *body)
 	return (vsq ? vsq*body->m : 0.0f) + (wsq ? wsq*body->i : 0.0f);
 }
 
+typedef void (*cpBodyShapeIteratorFunc)(cpBody *body, cpShape *shape, void *data);
+void cpBodyEachShape(cpBody *body, cpBodyShapeIteratorFunc func, void *data);
+
+typedef void (*cpBodyConstraintIteratorFunc)(cpBody *body, cpConstraint *constraint, void *data);
+void cpBodyEachConstraint(cpBody *body, cpBodyConstraintIteratorFunc func, void *data);
+
 typedef void (*cpBodyArbiterIteratorFunc)(cpBody *body, cpArbiter *arbiter, void *data);
 void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data);

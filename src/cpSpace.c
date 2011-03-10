@@ -26,11 +26,6 @@
 
 #include "chipmunk_private.h"
 
-// TODO get rid of these entirely?
-//cpTimestamp cpContactPersistence = 3;
-cpFloat cpCollisionSlop = 0.1;
-cpFloat cpBiasCoef = 0.1;
-
 #pragma mark Contact Set Helpers
 
 // Equal function for arbiterSet.
@@ -69,7 +64,6 @@ static cpBool alwaysCollide(cpArbiter *arb, cpSpace *space, void *data){return 1
 static void nothing(cpArbiter *arb, cpSpace *space, void *data){}
 
 // BBfunc callback for the spatial hash.
-static cpBB shapeBBFunc(cpShape *shape){return shape->bb;}
 static cpVect shapeVelocityFunc(cpShape *shape){return shape->body->v;}
 
 // Iterator functions for destructors.
@@ -122,15 +116,15 @@ cpSpaceInit(cpSpace *space)
 	space->gravity = cpvzero;
 	space->damping = 1.0f;
 	
-	space->collisionSlop = cpCollisionSlop;
-	space->collisionBias = cpBiasCoef;
+	space->collisionSlop = 0.1f;
+	space->collisionBias = cpfpow(1.0f - 0.1f, 60.0f);
 	space->collisionPersistence = 3;
 	
 	space->locked = 0;
 	space->stamp = 0;
 
-	space->staticShapes = cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc, NULL);
-	space->activeShapes = cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc, space->staticShapes);
+	space->staticShapes = cpBBTreeNew((cpSpatialIndexBBFunc)cpShapeGetBB, NULL);
+	space->activeShapes = cpBBTreeNew((cpSpatialIndexBBFunc)cpShapeGetBB, space->staticShapes);
 	cpBBTreeSetVelocityFunc(space->activeShapes, (cpBBTreeVelocityFunc)shapeVelocityFunc);
 	
 	space->allocatedBuffers = cpArrayNew(0);
@@ -547,8 +541,8 @@ copyShapes(cpShape *shape, cpSpatialIndex *index)
 void
 cpSpaceUseSpatialHash(cpSpace *space, cpFloat dim, int count)
 {
-	cpSpatialIndex *staticShapes = cpSpaceHashNew(dim, count, (cpSpatialIndexBBFunc)shapeBBFunc, NULL);
-	cpSpatialIndex *activeShapes = cpSpaceHashNew(dim, count, (cpSpatialIndexBBFunc)shapeBBFunc, staticShapes);
+	cpSpatialIndex *staticShapes = cpSpaceHashNew(dim, count, (cpSpatialIndexBBFunc)cpShapeGetBB, NULL);
+	cpSpatialIndex *activeShapes = cpSpaceHashNew(dim, count, (cpSpatialIndexBBFunc)cpShapeGetBB, staticShapes);
 	
 	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)copyShapes, staticShapes);
 	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)copyShapes, activeShapes);

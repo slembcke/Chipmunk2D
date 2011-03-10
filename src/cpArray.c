@@ -32,7 +32,7 @@ cpArrayNew(int size)
 	
 	arr->num = 0;
 	arr->max = (size ? size : 4);
-	arr->arr = (void **)cpmalloc(arr->max*sizeof(void**));
+	arr->arr = (void **)cpcalloc(arr->max, sizeof(void**));
 	
 	return arr;
 }

@@ -40,6 +40,11 @@ cpBodyPositionFunc cpBodyUpdatePositionDefault = cpBodyUpdatePosition;
 cpBody *
 cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 {
+	body->space = NULL;
+	body->shapeList = NULL;
+	body->arbiterList = NULL;
+	body->constraintList = NULL;
+	
 	body->velocity_func = cpBodyUpdateVelocityDefault;
 	body->position_func = cpBodyUpdatePositionDefault;
 	
@@ -57,17 +62,13 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->v_bias = cpvzero;
 	body->w_bias = 0.0f;
 	
-	body->data = NULL;
 	body->v_limit = (cpFloat)INFINITY;
 	body->w_limit = (cpFloat)INFINITY;
 	
-	body->space = NULL;
-	body->shapeList = NULL;
-	body->arbiterList = NULL;
-	body->constraintList = NULL;
-	
 	cpComponentNode node = {NULL, NULL, 0.0f};
 	body->node = node;
+	
+	body->data = NULL;
 	
 	return body;
 }
@@ -120,12 +121,18 @@ cpBodySetMoment(cpBody *body, cpFloat moment)
 	body->i_inv = 1.0f/moment;
 }
 
+static inline void
+setAngle(cpBody *body, cpFloat angle, cpBool activate)
+{
+	if(activate) cpBodyActivate(body);
+	body->a = angle;//fmod(a, (cpFloat)M_PI*2.0f);
+	body->rot = cpvforangle(angle);
+}
+
 void
 cpBodySetAngle(cpBody *body, cpFloat angle)
 {
-	cpBodyActivate(body);
-	body->a = angle;//fmod(a, (cpFloat)M_PI*2.0f);
-	body->rot = cpvforangle(angle);
+	setAngle(body, angle, cpTrue);
 }
 
 void
@@ -149,7 +156,7 @@ void
 cpBodyUpdatePosition(cpBody *body, cpFloat dt)
 {
 	body->p = cpvadd(body->p, cpvmult(cpvadd(body->v, body->v_bias), dt));
-	cpBodySetAngle(body, body->a + (body->w + body->w_bias)*dt);
+	setAngle(body, body->a + (body->w + body->w_bias)*dt, cpFalse);
 	
 	body->v_bias = cpvzero;
 	body->w_bias = 0.0f;
@@ -167,6 +174,18 @@ cpBodyApplyForce(cpBody *body, cpVect force, cpVect r)
 {
 	body->f = cpvadd(body->f, force);
 	body->t += cpvcross(r, force);
+}
+
+void
+cpBodyEachShape(cpBody *body, cpBodyShapeIteratorFunc func, void *data)
+{
+	CP_BODY_FOREACH_SHAPE(body, shape) func(body, shape, data);
+}
+
+void
+cpBodyEachConstraint(cpBody *body, cpBodyConstraintIteratorFunc func, void *data)
+{
+	CP_BODY_FOREACH_CONSTRAINT(body,constraint) func(body, constraint, data);
 }
 
 void

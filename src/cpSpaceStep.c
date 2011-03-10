@@ -312,9 +312,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 
 	// Prestep the arbiters and constraints.
 	cpFloat slop = space->collisionSlop;
-	// TODO should be dt independent?
-	// 1.0f - cpfpow(error after 1s, dt);
-	cpFloat bias = space->collisionBias;
+	cpFloat bias = 1.0f - cpfpow(space->collisionBias, dt);
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiterPreStep((cpArbiter *)arbiters->arr[i], dt, slop, bias);
 	}
