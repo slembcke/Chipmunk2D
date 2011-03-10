@@ -130,7 +130,7 @@ cpSpaceInit(cpSpace *space)
 	space->stamp = 0;
 
 	space->staticShapes = cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc, NULL);
-	space->activeShapes = cpSweep1DNew((cpSpatialIndexBBFunc)shapeBBFunc, space->staticShapes);
+	space->activeShapes = cpBBTreeNew((cpSpatialIndexBBFunc)shapeBBFunc, space->staticShapes);
 	cpBBTreeSetVelocityFunc(space->activeShapes, (cpBBTreeVelocityFunc)shapeVelocityFunc);
 	
 	space->allocatedBuffers = cpArrayNew(0);
@@ -496,17 +496,19 @@ cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)
 void
 cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 {
-	cpArray *bodies = space->bodies;
-	
-	for(int i=0; i<bodies->num; i++){
-		func((cpBody *)bodies->arr[i], data);
-	}
-	
-	cpArray *components = space->sleepingComponents;
-	for(int i=0; i<components->num; i++){
-		cpBody *root = (cpBody *)components->arr[i];
-		CP_BODY_FOREACH_COMPONENT(root, body) func(body, data);
-	}
+	cpSpaceLock(space); {
+		cpArray *bodies = space->bodies;
+		
+		for(int i=0; i<bodies->num; i++){
+			func((cpBody *)bodies->arr[i], data);
+		}
+		
+		cpArray *components = space->sleepingComponents;
+		for(int i=0; i<components->num; i++){
+			cpBody *root = (cpBody *)components->arr[i];
+			CP_BODY_FOREACH_COMPONENT(root, body) func(body, data);
+		}
+	} cpSpaceUnlock(space);
 }
 
 #pragma mark Spatial Index Management

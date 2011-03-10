@@ -11,13 +11,6 @@ cpSpatialIndexFree(cpSpatialIndex *index)
 	}
 }
 
-typedef struct dynamicToStaticContext {
-	cpSpatialIndexBBFunc bbfunc;
-	cpSpatialIndex *staticIndex;
-	cpSpatialIndexQueryFunc queryFunc;
-	void *data;
-} dynamicToStaticContext;
-
 cpSpatialIndex *
 cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *klass, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex)
 {
@@ -32,6 +25,13 @@ cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *klass, cpSpatialI
 	
 	return index;
 }
+
+typedef struct dynamicToStaticContext {
+	cpSpatialIndexBBFunc bbfunc;
+	cpSpatialIndex *staticIndex;
+	cpSpatialIndexQueryFunc queryFunc;
+	void *data;
+} dynamicToStaticContext;
 
 static void
 dynamicToStaticIter(void *obj, dynamicToStaticContext *context)
