@@ -294,7 +294,7 @@ click(int button, int state, int x, int y)
 				cpBody *body = shape->body;
 				mouseJoint = cpPivotJointNew2(mouseBody, body, cpvzero, cpBodyWorld2Local(body, point));
 				mouseJoint->maxForce = 50000.0f;
-				mouseJoint->biasCoef = 0.15f;
+				mouseJoint->errorBias = cpfpow(1.0f - 0.15f, 60.0f);
 				cpSpaceAddConstraint(space, mouseJoint);
 			}
 		} else if(mouseJoint){

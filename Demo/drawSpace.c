@@ -57,11 +57,11 @@
 #define LINE_COLOR 0.0f, 0.0f, 0.0f
 
 static void
-glColor_from_pointer(void *ptr)
+glColor_from_hash(cpHashValue hash)
 {
-	unsigned long val = (long)ptr;
+	unsigned long val = (unsigned long)hash;
 	
-	// hash the pointer up nicely
+	// scramble the bits up using Robert Jenkins' 32 bit integer hash function
 	val = (val+0x7ed55d16) + (val<<12);
 	val = (val^0xc761c23c) ^ (val>>19);
 	val = (val+0x165667b1) + (val<<5);
@@ -69,17 +69,13 @@ glColor_from_pointer(void *ptr)
 	val = (val+0xfd7046c5) + (val<<3);
 	val = (val^0xb55a4f09) ^ (val>>16);
 	
-//	GLfloat v = (GLfloat)val/(GLfloat)ULONG_MAX;
-//	v = 0.95f - v*0.15f;
-//	
-//	glColor3f(v, v, v);
-
 	GLubyte r = (val>>0) & 0xFF;
 	GLubyte g = (val>>8) & 0xFF;
 	GLubyte b = (val>>16) & 0xFF;
 	
-	GLubyte max = r>g ? (r>b ? r : b) : (g>b ? g : b);
+	GLubyte max = (r > g ? (r > b ? r : b) : (g > b ? g : b));
 	
+	// saturate and scale the colors
 	const int mult = 255;
 	const int add = 0;
 	r = (r*mult)/max + add;
@@ -105,7 +101,7 @@ glColor_for_shape(cpShape *shape, cpSpace *space)
 		}
 	}
 	
-	glColor_from_pointer(shape);
+	glColor_from_hash(shape->hashid);
 }
 
 static const GLfloat circleVAR[] = {
@@ -440,7 +436,7 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 
 	cpArray *constraints = space->constraints;
 
-	glColor3f(0.5f, 1.0f, 0.5f);
+	glColor3f(0.0f, 0.0f, 0.5f);
 	for(int i=0, count = constraints->num; i<count; i++){
 		drawConstraint((cpConstraint *)constraints->arr[i]);
 	}

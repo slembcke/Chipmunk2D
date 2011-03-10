@@ -43,7 +43,7 @@ preStep(cpRotaryLimitJoint *joint, cpFloat dt)
 	
 	// calculate bias velocity
 	cpFloat maxBias = joint->constraint.maxBias;
-	joint->bias = cpfclamp(-joint->constraint.biasCoef*pdist/dt, -maxBias, maxBias);
+	joint->bias = cpfclamp(-bias_coef(joint->constraint.errorBias, dt)*pdist/dt, -maxBias, maxBias);
 	
 	// compute max impulse
 	joint->jMax = J_MAX(joint, dt);

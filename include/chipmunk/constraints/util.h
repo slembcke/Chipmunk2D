@@ -121,3 +121,9 @@ mult_k(cpVect vr, cpVect k1, cpVect k2)
 {
 	return cpv(cpvdot(vr, k1), cpvdot(vr, k2));
 }
+
+static inline cpFloat
+bias_coef(cpFloat errorBias, cpFloat dt)
+{
+	return 1.0f - cpfpow(errorBias, dt);
+}

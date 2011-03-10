@@ -19,8 +19,6 @@
  * SOFTWARE.
  */
 
-extern cpFloat cp_constraint_bias_coef;
-
 typedef struct cpConstraintClass cpConstraintClass;
 
 typedef void (*cpConstraintPreStepImpl)(cpConstraint *constraint, cpFloat dt);
@@ -44,7 +42,7 @@ struct cpConstraint {
 	cpConstraint CP_PRIVATE(*nextA), CP_PRIVATE(*nextB);
 	
 	cpFloat maxForce;
-	cpFloat biasCoef;
+	cpFloat errorBias;
 	cpFloat maxBias;
 	
 	cpDataPointer data;

@@ -35,7 +35,7 @@ preStep(cpGearJoint *joint, cpFloat dt)
 	
 	// calculate bias velocity
 	cpFloat maxBias = joint->constraint.maxBias;
-	joint->bias = cpfclamp(-joint->constraint.biasCoef*(b->a*joint->ratio - a->a - joint->phase)/dt, -maxBias, maxBias);
+	joint->bias = cpfclamp(-bias_coef(joint->constraint.errorBias, dt)*(b->a*joint->ratio - a->a - joint->phase)/dt, -maxBias, maxBias);
 	
 	// compute max impulse
 	joint->jMax = J_MAX(joint, dt);

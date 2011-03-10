@@ -110,11 +110,11 @@ init(void)
 		cpBody *body = add_box(10.0, 1.0);
 		
 		cpConstraint *pivot = cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, body, cpvzero, cpvzero));
-		pivot->biasCoef = 0.0f; // disable joint correction
+		pivot->errorBias = 1.0f; // disable joint correction
 		pivot->maxForce = 1000.0f; // emulate linear friction
 		
 		cpConstraint *gear = cpSpaceAddConstraint(space, cpGearJointNew(staticBody, body, 0.0f, 1.0f));
-		gear->biasCoef = 0.0f; // disable joint correction
+		gear->errorBias = 1.0f; // disable joint correction
 		gear->maxForce = 5000.0f; // emulate angular friction
 	}
 	
@@ -123,12 +123,12 @@ init(void)
 	tankBody = add_box(15.0, 10.0);
 	
 	cpConstraint *pivot = cpSpaceAddConstraint(space, cpPivotJointNew2(tankControlBody, tankBody, cpvzero, cpvzero));
-	pivot->biasCoef = 0.0f; // disable joint correction
+	pivot->errorBias = 1.0f; // disable joint correction
 	pivot->maxForce = 10000.0f; // emulate linear friction
 	
 	cpConstraint *gear = cpSpaceAddConstraint(space, cpGearJointNew(tankControlBody, tankBody, 0.0f, 1.0f));
-	gear->biasCoef = 1.0f; // limit angular correction rate
-	gear->maxBias = 1.0f; // limit angular correction rate
+	gear->errorBias = 0.0f; // attempt to fully correct the joint each step
+	gear->maxBias = 1.0f; // but limit it's angular correction rate
 	gear->maxForce = 500000.0f; // emulate angular friction
 		
 	return space;

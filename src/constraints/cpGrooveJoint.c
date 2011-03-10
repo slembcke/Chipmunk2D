@@ -63,7 +63,7 @@ preStep(cpGrooveJoint *joint, cpFloat dt)
 	
 	// calculate bias velocity
 	cpVect delta = cpvsub(cpvadd(b->p, joint->r2), cpvadd(a->p, joint->r1));
-	joint->bias = cpvclamp(cpvmult(delta, -joint->constraint.biasCoef/dt), joint->constraint.maxBias);
+	joint->bias = cpvclamp(cpvmult(delta, -bias_coef(joint->constraint.errorBias, dt)/dt), joint->constraint.maxBias);
 }
 
 static void

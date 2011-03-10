@@ -312,9 +312,9 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 
 	// Prestep the arbiters and constraints.
 	cpFloat slop = space->collisionSlop;
-	cpFloat bias = 1.0f - cpfpow(space->collisionBias, dt);
+	cpFloat biasCoef = 1.0f - cpfpow(space->collisionBias, dt);
 	for(int i=0; i<arbiters->num; i++){
-		cpArbiterPreStep((cpArbiter *)arbiters->arr[i], dt, slop, bias);
+		cpArbiterPreStep((cpArbiter *)arbiters->arr[i], dt, slop, biasCoef);
 	}
 
 	for(int i=0; i<constraints->num; i++){
