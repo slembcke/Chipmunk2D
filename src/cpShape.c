@@ -26,8 +26,8 @@
 #include "chipmunk_private.h"
 #include "chipmunk_unsafe.h"
 
-#define CP_DefineShapeStructGetter(struct, type, member, name) \
-CP_DeclareShapeStructGetter(struct, type, name){ \
+#define CP_DefineShapeGetter(struct, type, member, name) \
+CP_DeclareShapeGetter(struct, type, name){ \
 	cpAssert(shape->klass == &struct##Class, "shape is not a "#struct); \
 	return ((struct *)shape)->member; \
 }
@@ -188,8 +188,8 @@ cpCircleShapeNew(cpBody *body, cpFloat radius, cpVect offset)
 	return (cpShape *)cpCircleShapeInit(cpCircleShapeAlloc(), body, radius, offset);
 }
 
-CP_DefineShapeStructGetter(cpCircleShape, cpVect, c, Offset)
-CP_DefineShapeStructGetter(cpCircleShape, cpFloat, r, Radius)
+CP_DefineShapeGetter(cpCircleShape, cpVect, c, Offset)
+CP_DefineShapeGetter(cpCircleShape, cpFloat, r, Radius)
 
 cpSegmentShape *
 cpSegmentShapeAlloc(void)
@@ -337,10 +337,10 @@ cpSegmentShapeNew(cpBody *body, cpVect a, cpVect b, cpFloat r)
 	return (cpShape *)cpSegmentShapeInit(cpSegmentShapeAlloc(), body, a, b, r);
 }
 
-CP_DefineShapeStructGetter(cpSegmentShape, cpVect, a, A)
-CP_DefineShapeStructGetter(cpSegmentShape, cpVect, b, B)
-CP_DefineShapeStructGetter(cpSegmentShape, cpVect, n, Normal)
-CP_DefineShapeStructGetter(cpSegmentShape, cpFloat, r, Radius)
+CP_DefineShapeGetter(cpSegmentShape, cpVect, a, A)
+CP_DefineShapeGetter(cpSegmentShape, cpVect, b, B)
+CP_DefineShapeGetter(cpSegmentShape, cpVect, n, Normal)
+CP_DefineShapeGetter(cpSegmentShape, cpFloat, r, Radius)
 
 // Unsafe API (chipmunk_unsafe.h)
 

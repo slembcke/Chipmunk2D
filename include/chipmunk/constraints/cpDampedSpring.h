@@ -19,12 +19,16 @@
  * SOFTWARE.
  */
 
+/// @defgroup cpDampedSpring cpDampedSpring
+/// @{
+
 typedef struct cpDampedSpring cpDampedSpring;
 
 typedef cpFloat (*cpDampedSpringForceFunc)(cpConstraint *spring, cpFloat dist);
 
 const cpConstraintClass *cpDampedSpringGetClass();
 
+/// @private
 struct cpDampedSpring {
 	cpConstraint constraint;
 	cpVect anchr1, anchr2;
@@ -41,8 +45,11 @@ struct cpDampedSpring {
 	cpVect n;
 };
 
+/// Allocate a damped spring.
 cpDampedSpring *cpDampedSpringAlloc(void);
+/// Initialize a damped spring.
 cpDampedSpring *cpDampedSpringInit(cpDampedSpring *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping);
+/// Allocate and initialize a damped spring.
 cpConstraint *cpDampedSpringNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping);
 
 CP_DefineConstraintProperty(cpDampedSpring, cpVect, anchr1, Anchr1);
@@ -51,3 +58,5 @@ CP_DefineConstraintProperty(cpDampedSpring, cpFloat, restLength, RestLength);
 CP_DefineConstraintProperty(cpDampedSpring, cpFloat, stiffness, Stiffness);
 CP_DefineConstraintProperty(cpDampedSpring, cpFloat, damping, Damping);
 CP_DefineConstraintProperty(cpDampedSpring, cpDampedSpringForceFunc, springForceFunc, SpringForceFunc);
+
+/// @}

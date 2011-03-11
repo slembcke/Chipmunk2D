@@ -19,13 +19,25 @@
  * SOFTWARE.
  */
 
-// User collision handler function types.
+/// @defgroup cpArbiter cpArbiter
+/// The cpArbiter struct controls pairs of colliding shapes.
+/// They are also used in conjuction with collision handler callbacks
+/// allowing you to retrieve information on the collision and control it.
+/// @{
+
+/// Collision begin event function callback type.
+/// Returning false from a begin callback causes the collision to be ignored until
+/// the the separate callback is called when the objects stop colliding.
 typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, void *data);
+/// Collision pre-solve event function callback type.
+/// Returning false from a pre-step callback causes the collision to be ignored until the next step.
 typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
+/// Collision post-solve event function callback type.
 typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
+/// Collision separate event function callback type.
 typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data);
 
-// Structure for holding collision handler function callback information.
+/// @private
 typedef struct cpCollisionHandler {
 	cpCollisionType a;
 	cpCollisionType b;
@@ -36,11 +48,11 @@ typedef struct cpCollisionHandler {
 	void *data;
 } cpCollisionHandler;
 
-// Data structure for contact points.
 typedef struct cpContact cpContact;
 
 #define CP_MAX_CONTACTS_PER_ARBITER 4
 
+/// @private
 typedef enum cpArbiterState {
 	cpArbiterStateNormal,
 	cpArbiterStateFirstColl,
@@ -48,41 +60,49 @@ typedef enum cpArbiterState {
 	cpArbiterStateCached,
 } cpArbiterState;
 
-// Data structure for tracking collisions between shapes.
+/// A colliding pair of shapes.
 struct cpArbiter {
-	// Information on the contact points between the objects.
+	/// Calculated value to use for the elasticity coefficient.
+	/// Override in a pre-solve collision handler for custom behavior.
+	cpFloat e;
+	/// Calculated value to use for the friction coefficient.
+	/// Override in a pre-solve collision handler for custom behavior.
+	cpFloat u;
+	 /// Calculated value to use for applying surface velocities.
+	/// Override in a pre-solve collision handler for custom behavior.
+	cpVect surface_vr;
+	
+	CP_PRIVATE(cpShape *a);
+	CP_PRIVATE(cpShape *b);
+	CP_PRIVATE(cpBody *body_a);
+	CP_PRIVATE(cpBody *body_b);
+	CP_PRIVATE(cpArbiter *next_a);
+	CP_PRIVATE(cpArbiter *next_b);
+	
 	CP_PRIVATE(int numContacts);
 	CP_PRIVATE(cpContact *contacts);
 	
-	// The two shapes and bodies involved in the collision.
-	// These variables are NOT in the order defined by the collision handler.
-	cpShape CP_PRIVATE(*a), CP_PRIVATE(*b);
-	cpBody CP_PRIVATE(*body_a), CP_PRIVATE(*body_b);
-	cpArbiter CP_PRIVATE(*nextA), CP_PRIVATE(*nextB);
-	
-	// Calculated before calling the pre-solve collision handler
-	// Override them with custom values if you want specialized behavior
-	CP_PRIVATE(cpFloat e);
-	CP_PRIVATE(cpFloat u);
-	 // Used for surface_v calculations, implementation may change
-	CP_PRIVATE(cpVect surface_vr);
-	
-	// Time stamp of the arbiter. (from cpSpace)
 	CP_PRIVATE(cpTimestamp stamp);
-	
 	CP_PRIVATE(cpCollisionHandler *handler);
-	
-	// Are the shapes swapped in relation to the collision handler?
 	CP_PRIVATE(cpBool swappedColl);
 	CP_PRIVATE(cpArbiterState state);
 };
 
-// Arbiter Helper Functions
+/// Calculate the total impulse that was applied by this arbiter.
+/// Calling this function from a begin or pre-solve callback is undefined.
 cpVect cpArbiterTotalImpulse(cpArbiter *arb);
+/// Calculate the total impulse including the friction that was applied by this arbiter.
+/// Calling this function from a begin or pre-solve callback is undefined.
 cpVect cpArbiterTotalImpulseWithFriction(cpArbiter *arb);
+
+/// Causes a collision pair to be ignored as if you returned false from a begin callback.
+/// If called from a pre-step callback, you will still need to return false
+/// if you want it to be ignored in the current step.
 void cpArbiterIgnore(cpArbiter *arb);
 
-
+/// Return the colliding shapes involved for this arbiter.
+/// The order of their cpSpace.collision_type values will match
+/// the order set when the collision handler was registered.
 static inline void
 cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
 {
@@ -92,8 +112,12 @@ cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
 		(*a) = arb->CP_PRIVATE(a), (*b) = arb->CP_PRIVATE(b);
 	}
 }
+/// A macro shortcut for defining and retrieving the shapes from an arbiter.
 #define CP_ARBITER_GET_SHAPES(arb, a, b) cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
 
+/// Return the colliding bodies involved for this arbiter.
+/// The order of the cpSpace.collision_type the bodies are associated with values will match
+/// the order set when the collision handler was registered.
 static inline void
 cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)
 {
@@ -101,30 +125,46 @@ cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)
 	(*a) = shape_a->body;
 	(*b) = shape_b->body;
 }
+/// A macro shortcut for defining and retrieving the bodies from an arbiter.
 #define CP_ARBITER_GET_BODIES(arb, a, b) cpBody *a, *b; cpArbiterGetBodies(arb, &a, &b);
 
+/// Returns true if this is the first step a pair of objects started colliding.
 static inline cpBool
 cpArbiterIsFirstContact(const cpArbiter *arb)
 {
 	return arb->CP_PRIVATE(state) == cpArbiterStateFirstColl;
 }
 
+/// Get the number of contact points for this arbiter.
 static inline int
 cpArbiterGetCount(const cpArbiter *arb)
 {
 	return arb->CP_PRIVATE(numContacts);
 }
 
+/// A struct that wraps up the important collision data for an arbiter.
 typedef struct cpContactPointSet {
+	/// The number of contact points in the set.
 	int count;
 	
+	/// The array of contact points.
 	struct {
-		cpVect point, normal;
+		/// The position of the contact point.
+		cpVect point;
+		/// The normal of the contact point.
+		cpVect normal;
+		/// The depth of the contact point.
 		cpFloat dist;
 	} points[CP_MAX_CONTACTS_PER_ARBITER];
 } cpContactPointSet;
-
-cpVect cpArbiterGetNormal(const cpArbiter *arb, int i);
-cpVect cpArbiterGetPoint(const cpArbiter *arb, int i);
-cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i);
+/// Return a contact set from an arbiter.
 cpContactPointSet cpArbiterGetContactPointSet(const cpArbiter *arb);
+
+/// Get the normal of the @c ith contact point.
+cpVect cpArbiterGetNormal(const cpArbiter *arb, int i);
+/// Get the position of the @c ith contact point.
+cpVect cpArbiterGetPoint(const cpArbiter *arb, int i);
+/// Get the depth of the @c ith contact point.
+cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i);
+
+/// @}

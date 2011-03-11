@@ -19,6 +19,9 @@
  * SOFTWARE.
  */
 
+/// @defgroup cpConstraint cpConstraint
+/// @{
+
 typedef struct cpConstraintClass cpConstraintClass;
 
 typedef void (*cpConstraintPreStepImpl)(cpConstraint *constraint, cpFloat dt);
@@ -26,6 +29,7 @@ typedef void (*cpConstraintApplyCachedImpulseImpl)(cpConstraint *constraint, cpF
 typedef void (*cpConstraintApplyImpulseImpl)(cpConstraint *constraint);
 typedef cpFloat (*cpConstraintGetImpulseImpl)(cpConstraint *constraint);
 
+/// @private
 struct cpConstraintClass {
 	cpConstraintPreStepImpl preStep;
 	cpConstraintApplyCachedImpulseImpl applyCachedImpulse;
@@ -34,23 +38,41 @@ struct cpConstraintClass {
 };
 
 
-
+/// Opaque cpConstraint struct.
 struct cpConstraint {
 	CP_PRIVATE(const cpConstraintClass *klass);
 	
-	cpBody *a, *b;
-	cpConstraint CP_PRIVATE(*nextA), CP_PRIVATE(*nextB);
+	/// The first body connected to this constraint.
+	cpBody *a;
+	/// The second body connected to this constraint.
+	cpBody *b;
 	
+	CP_PRIVATE(cpConstraint *next_a);
+	CP_PRIVATE(cpConstraint *next_b);
+	
+	/// The maximum force that this constraint is allowed to use.
+	/// Defaults to infinity.
 	cpFloat maxForce;
+	/// The rate at which joint error is corrected.
+	/// Defaults to pow(1.0 - 0.1, 60.0) meaning that it will
+	/// correct 10% of the error every 1/60th of a second.
 	cpFloat errorBias;
+	/// The maximum rate at which joint error is corrected.
+	/// Defaults to infinity.
 	cpFloat maxBias;
 	
+	/// User definable data pointer.
+	/// Generally this points to your the game object class so you can access it
+	/// when given a cpConstraint reference in a callback.
 	cpDataPointer data;
 };
 
+/// Destroy a constraint.
 void cpConstraintDestroy(cpConstraint *constraint);
+/// Destroy and free a constraint.
 void cpConstraintFree(cpConstraint *constraint);
 
+/// @private
 static inline void
 cpConstraintActivateBodies(cpConstraint *constraint)
 {
@@ -58,6 +80,27 @@ cpConstraintActivateBodies(cpConstraint *constraint)
 	cpBody *b = constraint->b; if(b) cpBodyActivate(b);
 }
 
+#define CP_DefineConstraintStructGetter(type, member, name) \
+static inline type cpConstraint##Get##name(const cpConstraint *constraint){return constraint->member;}
+
+#define CP_DefineConstraintStructSetter(type, member, name) \
+static inline void struct##Set##name(cpConstraint *constraint, type value){ \
+	cpConstraintActivateBodies(constraint); \
+	constraint->member = value; \
+}
+
+#define CP_DefineConstraintStructProperty(type, member, name) \
+CP_DefineConstraintStructGetter(type, member, name) \
+CP_DefineConstraintStructSetter(type, member, name)
+
+CP_DefineConstraintStructGetter(cpBody *, a, A);
+CP_DefineConstraintStructGetter(cpBody *, b, B);
+CP_DefineConstraintStructProperty(cpFloat, maxForce, MaxForce);
+CP_DefineConstraintStructProperty(cpFloat, errorBias, ErrorBias);
+CP_DefineConstraintStructProperty(cpFloat, maxBias, maxBias);
+CP_DefineConstraintStructProperty(cpDataPointer, data, Data);
+
+/// Get the last impulse applied by this constraint.
 static inline cpFloat
 cpConstraintGetImpulse(cpConstraint *constraint)
 {
@@ -69,23 +112,23 @@ cpConstraintGetImpulse(cpConstraint *constraint)
 
 
 #define CP_DefineConstraintGetter(struct, type, member, name) \
-static inline type \
-struct##Get##name(const cpConstraint *constraint){ \
+static inline type struct##Get##name(const cpConstraint *constraint){ \
 	cpConstraintCheckCast(constraint, struct); \
 	return ((struct *)constraint)->member; \
-} \
+}
 
 #define CP_DefineConstraintSetter(struct, type, member, name) \
-static inline void \
-struct##Set##name(cpConstraint *constraint, type value){ \
+static inline void struct##Set##name(cpConstraint *constraint, type value){ \
 	cpConstraintCheckCast(constraint, struct); \
 	cpConstraintActivateBodies(constraint); \
 	((struct *)constraint)->member = value; \
-} \
+}
 
 #define CP_DefineConstraintProperty(struct, type, member, name) \
 CP_DefineConstraintGetter(struct, type, member, name) \
 CP_DefineConstraintSetter(struct, type, member, name)
+
+/// @}
 
 // Built in Joint types
 #include "cpPinJoint.h"

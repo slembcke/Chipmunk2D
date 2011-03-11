@@ -549,7 +549,7 @@ WARNINGS               = YES
 # for undocumented members. If EXTRACT_ALL is set to YES then this flag will 
 # automatically be disabled.
 
-WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_UNDOCUMENTED   = NO
 
 # If WARN_IF_DOC_ERROR is set to YES, doxygen will generate warnings for 
 # potential errors in the documentation, such as not documenting some 
@@ -746,7 +746,7 @@ INLINE_SOURCES         = NO
 # doxygen to hide any special comment blocks from generated source code 
 # fragments. Normal C and C++ comments will always remain visible.
 
-STRIP_CODE_COMMENTS    = YES
+STRIP_CODE_COMMENTS    = NO
 
 # If the REFERENCED_BY_RELATION tag is set to YES 
 # then for each documented function all documented 
@@ -1415,7 +1415,7 @@ EXPAND_AS_DEFINED      =
 # function macros are typically used for boiler-plate code, and will confuse 
 # the parser if not removed.
 
-SKIP_FUNCTION_MACROS   = YES
+SKIP_FUNCTION_MACROS   = NO
 
 #---------------------------------------------------------------------------
 # Configuration::additions related to external references

@@ -339,12 +339,12 @@ cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint)
 	cpConstraint *node = body->constraintList;
 	
 	while(node && node != constraint){
-		prev_ptr = (node->a == body ? &node->nextA : &node->nextB);
+		prev_ptr = (node->a == body ? &node->next_a : &node->next_b);
 		node = *prev_ptr;
 	}
 	
 	cpAssert(node, "Attempted to remove a constraint from a body it was never attached to.");
-	(*prev_ptr) = (node->a == body ? node->nextA : node->nextB);
+	(*prev_ptr) = (node->a == body ? node->next_a : node->next_b);
 }
 
 
@@ -362,8 +362,8 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	
 	// Push onto the heads of the bodies' constraint lists
 	cpBody *a = constraint->a, *b = constraint->b;
-	constraint->nextA = a->constraintList; a->constraintList = constraint;
-	constraint->nextB = b->constraintList; b->constraintList = constraint;
+	constraint->next_a = a->constraintList; a->constraintList = constraint;
+	constraint->next_b = b->constraintList; b->constraintList = constraint;
 	
 	return constraint;
 }

@@ -25,7 +25,7 @@
 	#define CP_USE_DOUBLES 1
 #endif
 
-/// @defgroup basicTypes Chipmunk Basic Types
+/// @defgroup basicTypes Basic Types
 /// Most of these types can be configured at compile time.
 /// @{
 

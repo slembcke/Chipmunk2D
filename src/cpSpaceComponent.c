@@ -168,9 +168,9 @@ cpBodyPushArbiter(cpBody *body, cpArbiter *arb)
 {
 	if(!cpBodyIsStatic(body) && !cpBodyIsRogue(body)){
 		if(body == arb->body_a){
-			arb->nextA = body->arbiterList;
+			arb->next_a = body->arbiterList;
 		} else {
-			arb->nextB = body->arbiterList;
+			arb->next_b = body->arbiterList;
 		}
 		
 		body->arbiterList = arb;

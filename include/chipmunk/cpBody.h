@@ -30,6 +30,8 @@ typedef void (*cpBodyVelocityFunc)(cpBody *body, cpVect gravity, cpFloat damping
 /// Rigid body position update function type.
 typedef void (*cpBodyPositionFunc)(cpBody *body, cpFloat dt);
 
+/// Used internally to track information on the collision graph.
+/// @private
 typedef struct cpComponentNode {
 	cpBody *root;
 	cpBody *next;
@@ -148,11 +150,10 @@ cpBodyIsRogue(const cpBody *body)
 static inline type cpBodyGet##name(const cpBody *body){return body->member;}
 
 #define CP_DefineBodySetter(type, member, name) \
-static inline void \
-cpBodySet##name(cpBody *body, const type value){ \
+static inline void cpBodySet##name(cpBody *body, const type value){ \
 	cpBodyActivate(body); \
 	body->member = value; \
-} \
+}
 
 #define CP_DefineBodyProperty(type, member, name) \
 CP_DefineBodyGetter(type, member, name) \
@@ -176,6 +177,7 @@ CP_DefineBodyProperty(cpFloat, t, Torque);
 CP_DefineBodyGetter(cpVect, rot, Rot);
 CP_DefineBodyProperty(cpFloat, v_limit, VelLimit);
 CP_DefineBodyProperty(cpFloat, w_limit, AngVelLimit);
+CP_DefineBodyProperty(cpDataPointer, data, Data);
 
 /// Return the user data pointer for a body.
 static inline cpDataPointer cpBodyGetUserData(const cpBody *body){return body->data;}
@@ -223,17 +225,17 @@ cpBodyKineticEnergy(const cpBody *body)
 	return (vsq ? vsq*body->m : 0.0f) + (wsq ? wsq*body->i : 0.0f);
 }
 
-/// Body/shape iterator function type. 
+/// Body/shape iterator callback function type. 
 typedef void (*cpBodyShapeIteratorFunc)(cpBody *body, cpShape *shape, void *data);
 /// Call @c func once for each shape attached to @c body and added to the space.
 void cpBodyEachShape(cpBody *body, cpBodyShapeIteratorFunc func, void *data);
 
-/// Body/constraint iterator function type. 
+/// Body/constraint iterator callback function type. 
 typedef void (*cpBodyConstraintIteratorFunc)(cpBody *body, cpConstraint *constraint, void *data);
 /// Call @c func once for each constraint attached to @c body and added to the space.
 void cpBodyEachConstraint(cpBody *body, cpBodyConstraintIteratorFunc func, void *data);
 
-/// Body/arbiter iterator function type. 
+/// Body/arbiter iterator callback function type. 
 typedef void (*cpBodyArbiterIteratorFunc)(cpBody *body, cpArbiter *arbiter, void *data);
 /// Call @c func once for each arbiter that is currently active on the body.
 void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data);

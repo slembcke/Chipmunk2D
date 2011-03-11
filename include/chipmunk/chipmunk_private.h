@@ -47,10 +47,10 @@ void cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*));
 #pragma mark Foreach loops
 
 #define CP_BODY_FOREACH_CONSTRAINT(body, var)\
-	for(cpConstraint *var = body->constraintList; var; var = (var->a == body ? var->nextA : var->nextB))
+	for(cpConstraint *var = body->constraintList; var; var = (var->a == body ? var->next_a : var->next_b))
 
 #define CP_BODY_FOREACH_ARBITER(bdy, var)\
-	for(cpArbiter *var = bdy->arbiterList; var; var = (var->a->body == bdy ? var->nextA : var->nextB))
+	for(cpArbiter *var = bdy->arbiterList; var; var = (var->a->body == bdy ? var->next_a : var->next_b))
 
 #define CP_BODY_FOREACH_SHAPE(body, var)\
 	for(cpShape *var = body->shapeList; var; var = var->next)
@@ -109,7 +109,9 @@ void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
 void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
 void cpArbiterApplyImpulse(cpArbiter *arb);
 
-#pragma mark Collision Functions
+#pragma mark Shape/Collision Functions
+
+cpShape* cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body);
 
 int cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr);
 
