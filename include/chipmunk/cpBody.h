@@ -146,38 +146,40 @@ cpBodyIsRogue(const cpBody *body)
 }
 
 
-#define CP_DefineBodyGetter(type, member, name) \
+#define CP_DefineBodyStructGetter(type, member, name) \
 static inline type cpBodyGet##name(const cpBody *body){return body->member;}
 
-#define CP_DefineBodySetter(type, member, name) \
+#define CP_DefineBodyStructSetter(type, member, name) \
 static inline void cpBodySet##name(cpBody *body, const type value){ \
 	cpBodyActivate(body); \
 	body->member = value; \
 }
 
-#define CP_DefineBodyProperty(type, member, name) \
-CP_DefineBodyGetter(type, member, name) \
-CP_DefineBodySetter(type, member, name)
+#define CP_DefineBodyStructProperty(type, member, name) \
+CP_DefineBodyStructGetter(type, member, name) \
+CP_DefineBodyStructSetter(type, member, name)
 
 /// TODO need to document these somehow.
-CP_DefineBodyGetter(cpFloat, m, Mass);
+CP_DefineBodyStructGetter(cpFloat, m, Mass);
+/// Set the mass of a body.
 void cpBodySetMass(cpBody *body, cpFloat m);
 
-CP_DefineBodyGetter(cpFloat, i, Moment);
+CP_DefineBodyStructGetter(cpFloat, i, Moment);
+/// Set the moment of a body.
 void cpBodySetMoment(cpBody *body, cpFloat i);
 
-
-CP_DefineBodyProperty(cpVect, p, Pos);
-CP_DefineBodyProperty(cpVect, v, Vel);
-CP_DefineBodyProperty(cpVect, f, Force);
-CP_DefineBodyGetter(cpFloat, a, Angle);
+CP_DefineBodyStructProperty(cpVect, p, Pos);
+CP_DefineBodyStructProperty(cpVect, v, Vel);
+CP_DefineBodyStructProperty(cpVect, f, Force);
+CP_DefineBodyStructGetter(cpFloat, a, Angle);
+/// Set the angle of a body.
 void cpBodySetAngle(cpBody *body, cpFloat a);
-CP_DefineBodyProperty(cpFloat, w, AngVel);
-CP_DefineBodyProperty(cpFloat, t, Torque);
-CP_DefineBodyGetter(cpVect, rot, Rot);
-CP_DefineBodyProperty(cpFloat, v_limit, VelLimit);
-CP_DefineBodyProperty(cpFloat, w_limit, AngVelLimit);
-CP_DefineBodyProperty(cpDataPointer, data, Data);
+CP_DefineBodyStructProperty(cpFloat, w, AngVel);
+CP_DefineBodyStructProperty(cpFloat, t, Torque);
+CP_DefineBodyStructGetter(cpVect, rot, Rot);
+CP_DefineBodyStructProperty(cpFloat, v_limit, VelLimit);
+CP_DefineBodyStructProperty(cpFloat, w_limit, AngVelLimit);
+CP_DefineBodyStructProperty(cpDataPointer, data, Data);
 
 /// Return the user data pointer for a body.
 static inline cpDataPointer cpBodyGetUserData(const cpBody *body){return body->data;}

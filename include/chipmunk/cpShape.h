@@ -133,8 +133,6 @@ CP_DefineShapeStructProperty(cpCollisionType, collision_type, CollisionType, cpT
 CP_DefineShapeStructProperty(cpGroup, group, Group, cpTrue);
 CP_DefineShapeStructProperty(cpLayers, layers, Layers, cpTrue);
 
-#define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(cpShape *shape)
-
 /// When initializing a shape, it's hash value comes from a counter.
 /// Because the hash value may affect iteration order, you can reset the shape ID counter
 /// when recreating a space. This will make the simulation be deterministic.
@@ -156,6 +154,8 @@ cpSegmentQueryHitDist(const cpVect start, const cpVect end, const cpSegmentQuery
 {
 	return cpvdist(start, end)*info.t;
 }
+
+#define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(const cpShape *shape)
 
 /// @}
 /// @defgroup cpCircleShape cpCircleShape

@@ -84,7 +84,7 @@ cpConstraintActivateBodies(cpConstraint *constraint)
 static inline type cpConstraint##Get##name(const cpConstraint *constraint){return constraint->member;}
 
 #define CP_DefineConstraintStructSetter(type, member, name) \
-static inline void struct##Set##name(cpConstraint *constraint, type value){ \
+static inline void cpConstraint##Set##name(cpConstraint *constraint, type value){ \
 	cpConstraintActivateBodies(constraint); \
 	constraint->member = value; \
 }
@@ -97,7 +97,7 @@ CP_DefineConstraintStructGetter(cpBody *, a, A);
 CP_DefineConstraintStructGetter(cpBody *, b, B);
 CP_DefineConstraintStructProperty(cpFloat, maxForce, MaxForce);
 CP_DefineConstraintStructProperty(cpFloat, errorBias, ErrorBias);
-CP_DefineConstraintStructProperty(cpFloat, maxBias, maxBias);
+CP_DefineConstraintStructProperty(cpFloat, maxBias, MaxBias);
 CP_DefineConstraintStructProperty(cpDataPointer, data, Data);
 
 /// Get the last impulse applied by this constraint.
@@ -107,9 +107,12 @@ cpConstraintGetImpulse(cpConstraint *constraint)
 	return constraint->CP_PRIVATE(klass)->getImpulse(constraint);
 }
 
-#define cpConstraintCheckCast(constraint, struct) \
-	cpAssert(constraint->CP_PRIVATE(klass) == struct##GetClass(), "Constraint is not a "#struct);
-
+#ifdef NDEBUG
+	#define cpConstraintCheckCast(constraint, struct)
+#else
+	#define cpConstraintCheckCast(constraint, struct) \
+		cpAssert(constraint->CP_PRIVATE(klass) == struct##GetClass(), "Constraint is not a "#struct)
+#endif
 
 #define CP_DefineConstraintGetter(struct, type, member, name) \
 static inline type struct##Get##name(const cpConstraint *constraint){ \
@@ -124,13 +127,15 @@ static inline void struct##Set##name(cpConstraint *constraint, type value){ \
 	((struct *)constraint)->member = value; \
 }
 
+#define CP_DefineConstraintSetter(struct, type, member, name) \
+static inline void struct##Set##name(cpConstraint *constraint, type value){}
+
 #define CP_DefineConstraintProperty(struct, type, member, name) \
 CP_DefineConstraintGetter(struct, type, member, name) \
 CP_DefineConstraintSetter(struct, type, member, name)
 
 /// @}
 
-// Built in Joint types
 #include "cpPinJoint.h"
 #include "cpSlideJoint.h"
 #include "cpPivotJoint.h"
