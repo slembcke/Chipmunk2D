@@ -236,8 +236,9 @@ cpSweep1DReindexQuery(cpSweep1D *sweep, cpSpatialIndexQueryFunc func, void *data
 		}
 	}
 	
-	cpSpatialIndex *staticIndex = sweep->spatialIndex.staticIndex;
-	if(staticIndex) cpSpatialIndexCollideStatic((cpSpatialIndex *)sweep, staticIndex, func, data);
+	// Reindex query is also responsible for colliding against the static index.
+	// Fortunately there is a helper function for that.
+	cpSpatialIndexCollideStatic((cpSpatialIndex *)sweep, sweep->spatialIndex.staticIndex, func, data);
 }
 
 static cpSpatialIndexClass klass = {

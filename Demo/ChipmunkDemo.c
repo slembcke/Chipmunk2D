@@ -438,18 +438,18 @@ static double GetMilliseconds(){
 
 void time_trial(int index, int count)
 {
-	space = demos[demoIndex].initFunc();
+	space = demos[index].initFunc();
 	
 	double start_time = GetMilliseconds();
 	
 	for(int i=0; i<count; i++)
-		demos[demoIndex].updateFunc(i);
+		demos[index].updateFunc(i);
 	
 	double end_time = GetMilliseconds();
 	
-	demos[demoIndex].destroyFunc();
+	demos[index].destroyFunc();
 	
-	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, demos[demoIndex].name);
+	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, demos[index].name);
 }
 
 extern chipmunkDemo LogoSmash;
