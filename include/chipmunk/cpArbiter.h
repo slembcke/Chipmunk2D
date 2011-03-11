@@ -37,23 +37,7 @@ typedef struct cpCollisionHandler {
 } cpCollisionHandler;
 
 // Data structure for contact points.
-typedef struct cpContact {
-	// Contact point and normal.
-	cpVect CP_PRIVATE(p), CP_PRIVATE(n);
-	// Penetration distance.
-	CP_PRIVATE(cpFloat dist);
-	
-	// Calculated by cpArbiterPreStep().
-	cpVect CP_PRIVATE(r1), CP_PRIVATE(r2);
-	cpFloat CP_PRIVATE(nMass), CP_PRIVATE(tMass), CP_PRIVATE(bounce);
-
-	// Persistant contact information.
-	cpFloat CP_PRIVATE(jnAcc), CP_PRIVATE(jtAcc), CP_PRIVATE(jBias);
-	CP_PRIVATE(cpFloat bias);
-	
-	// Hash value used to (mostly) uniquely identify a contact.
-	CP_PRIVATE(cpHashValue hash);
-} cpContact;
+typedef struct cpContact cpContact;
 
 #define CP_MAX_CONTACTS_PER_ARBITER 4
 
@@ -131,25 +115,6 @@ cpArbiterGetCount(const cpArbiter *arb)
 	return arb->CP_PRIVATE(numContacts);
 }
 
-static inline cpVect
-cpArbiterGetNormal(const cpArbiter *arb, int i)
-{
-	cpVect n = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(n);
-	return arb->CP_PRIVATE(swappedColl) ? cpvneg(n) : n;
-}
-
-static inline cpVect
-cpArbiterGetPoint(const cpArbiter *arb, int i)
-{
-	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
-}
-
-static inline cpFloat
-cpArbiterGetDepth(const cpArbiter *arb, int i)
-{
-	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
-}
-
 typedef struct cpContactPointSet {
 	int count;
 	
@@ -159,18 +124,7 @@ typedef struct cpContactPointSet {
 	} points[CP_MAX_CONTACTS_PER_ARBITER];
 } cpContactPointSet;
 
-static inline cpContactPointSet
-cpArbiterGetContactPointSet(const cpArbiter *arb)
-{
-	cpContactPointSet set;
-	set.count = cpArbiterGetCount(arb);
-	
-	int i;
-	for(i=0; i<set.count; i++){
-		set.points[i].point = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
-		set.points[i].normal = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(n);
-		set.points[i].dist = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
-	}
-	
-	return set;
-}
+cpVect cpArbiterGetNormal(const cpArbiter *arb, int i);
+cpVect cpArbiterGetPoint(const cpArbiter *arb, int i);
+cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i);
+cpContactPointSet cpArbiterGetContactPointSet(const cpArbiter *arb);

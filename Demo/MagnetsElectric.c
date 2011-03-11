@@ -486,7 +486,7 @@ init(void)
 static void
 destroy(void)
 {
-	cpSpaceFreeChildren(space);
+	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
 }
 

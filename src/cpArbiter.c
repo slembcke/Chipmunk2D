@@ -41,6 +41,42 @@ cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash
 }
 
 cpVect
+cpArbiterGetNormal(const cpArbiter *arb, int i)
+{
+	cpVect n = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(n);
+	return arb->CP_PRIVATE(swappedColl) ? cpvneg(n) : n;
+}
+
+cpVect
+cpArbiterGetPoint(const cpArbiter *arb, int i)
+{
+	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
+}
+
+cpFloat
+cpArbiterGetDepth(const cpArbiter *arb, int i)
+{
+	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
+}
+
+cpContactPointSet
+cpArbiterGetContactPointSet(const cpArbiter *arb)
+{
+	cpContactPointSet set;
+	set.count = cpArbiterGetCount(arb);
+	
+	int i;
+	for(i=0; i<set.count; i++){
+		set.points[i].point = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
+		set.points[i].normal = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(n);
+		set.points[i].dist = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
+	}
+	
+	return set;
+}
+
+
+cpVect
 cpArbiterTotalImpulse(cpArbiter *arb)
 {
 	cpContact *contacts = arb->contacts;

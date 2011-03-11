@@ -1,9 +1,6 @@
 Doxygen! (mark private/public parts of API)
 touch joint (Objective-Chipmunk)
 
-Better accuracy for variable timestepping?
-  - dt independent joint biasing?
-
 Future features to think about:
 constraint callbacks?
 Building bodies from shape collections.

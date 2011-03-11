@@ -34,9 +34,6 @@ cpBodyAlloc(void)
 	return (cpBody *)cpmalloc(sizeof(cpBody));
 }
 
-cpBodyVelocityFunc cpBodyUpdateVelocityDefault = cpBodyUpdateVelocity;
-cpBodyPositionFunc cpBodyUpdatePositionDefault = cpBodyUpdatePosition;
-
 cpBody *
 cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 {
@@ -45,8 +42,8 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->arbiterList = NULL;
 	body->constraintList = NULL;
 	
-	body->velocity_func = cpBodyUpdateVelocityDefault;
-	body->position_func = cpBodyUpdatePositionDefault;
+	body->velocity_func = cpBodyUpdateVelocity;
+	body->position_func = cpBodyUpdatePosition;
 	
 	cpBodySetMass(body, m);
 	cpBodySetMoment(body, i);
@@ -135,12 +132,12 @@ cpBodySetAngle(cpBody *body, cpFloat angle)
 	setAngle(body, angle, cpTrue);
 }
 
-void
-cpBodySlew(cpBody *body, cpVect pos, cpFloat dt)
-{
-	cpBodyActivate(body);
-	body->v = cpvmult(cpvsub(pos, body->p), 1.0f/dt);
-}
+//void
+//cpBodySlew(cpBody *body, cpVect pos, cpFloat dt)
+//{
+//	cpBodyActivate(body);
+//	body->v = cpvmult(cpvsub(pos, body->p), 1.0f/dt);
+//}
 
 void
 cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)

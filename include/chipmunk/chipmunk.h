@@ -19,6 +19,9 @@
  * SOFTWARE.
  */
 
+/// @defgroup misc Misc
+/// @{
+
 #ifndef CHIPMUNK_HEADER
 #define CHIPMUNK_HEADER
 
@@ -104,57 +107,41 @@ typedef struct cpSpace cpSpace;
 
 #include "cpSpace.h"
 
-#define CP_HASH_COEF (3344921057ul)
-#define CP_HASH_PAIR(A, B) ((cpHashValue)(A)*CP_HASH_COEF ^ (cpHashValue)(B)*CP_HASH_COEF)
-
+/// Version string.
 extern const char *cpVersionString;
+
+/// Initialize Chipmunk.
+/// Must be called before anything else or your program will crash.
 void cpInitChipmunk(void);
 
-/**
-	Calculate the moment of inertia for a circle.
-	r1 and r2 are the inner and outer diameters. A solid circle has an inner diameter of 0.
-*/
+/// Calculate the moment of inertia for a circle.
+/// @c r1 and @c r2 are the inner and outer diameters. A solid circle has an inner diameter of 0.
 cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset);
 
-/**
-	Calculate area of a hollow circle.
-*/
+/// Calculate area of a hollow circle.
+/// @c r1 and @c r2 are the inner and outer diameters. A solid circle has an inner diameter of 0.
 cpFloat cpAreaForCircle(cpFloat r1, cpFloat r2);
 
-/**
-	Calculate the moment of inertia for a line segment.
-	Beveling radius is not supported.
-*/
+/// Calculate the moment of inertia for a line segment.
+/// Beveling radius is not supported.
 cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b);
 
-/**
-	Calculate the area of a fattened (capsule shaped) line segment.
-*/
+/// Calculate the area of a fattened (capsule shaped) line segment.
 cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat r);
 
-/**
-	Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
-*/
+/// Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
 cpFloat cpMomentForPoly(cpFloat m, int numVerts, const cpVect *verts, cpVect offset);
 
-/**
-	Calculate the signed area of a polygon.
-*/
+/// Calculate the signed area of a polygon.
 cpFloat cpAreaForPoly(const int numVerts, const cpVect *verts);
 
-/**
-	Calculate the natural centroid of a polygon.
-*/
+/// Calculate the natural centroid of a polygon.
 cpVect cpCentroidForPoly(const int numVerts, const cpVect *verts);
 
-/**
-	Center the polygon on the origin. (Subtracts the centroid of the polygon from each vertex)
-*/
+/// Center the polygon on the origin. (Subtracts the centroid of the polygon from each vertex)
 void cpRecenterPoly(const int numVerts, cpVect *verts);
 
-/**
-	Calculate the moment of inertia for a solid box.
-*/
+/// Calculate the moment of inertia for a solid box.
 cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height);
 
 #ifdef __cplusplus
@@ -167,5 +154,5 @@ static inline cpBool operator ==(const cpVect v1, const cpVect v2){return cpveql
 static inline cpVect operator -(const cpVect v){return cpvneg(v);}
 
 #endif
-
 #endif
+//@}

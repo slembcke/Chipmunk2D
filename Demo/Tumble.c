@@ -117,7 +117,7 @@ static void
 destroy(void)
 {
 	cpBodyFree(staticBody);
-	cpSpaceFreeChildren(space);
+	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
 }
 

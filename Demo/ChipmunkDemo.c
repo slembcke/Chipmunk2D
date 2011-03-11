@@ -88,6 +88,21 @@ drawSpaceOptions options = {
 	1.5f,
 };
 
+static void shapeFreeWrap(cpShape *ptr, void *unused){cpShapeFree(ptr);}
+
+void
+ChipmunkDemoFreeSpaceChildren(cpSpace *space)
+{
+	cpArray *components = space->sleepingComponents;
+	while(components->num) cpBodyActivate((cpBody *)components->arr[0]);
+	
+	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)&shapeFreeWrap, NULL);
+	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)&shapeFreeWrap, NULL);
+	
+	cpArrayFreeEach(space->bodies, (void (*)(void*))cpBodyFree);
+	cpArrayFreeEach(space->constraints, (void (*)(void*))cpConstraintFree);
+}
+
 static void
 drawString(int x, int y, const char *str)
 {

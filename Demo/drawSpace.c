@@ -91,11 +91,11 @@ glColor_for_shape(cpShape *shape, cpSpace *space)
 	cpBody *body = shape->body;
 	if(body){
 		if(cpBodyIsSleeping(body)){
-			GLfloat v = 0.25f;
+			GLfloat v = 0.2f;
 			glColor3f(v,v,v);
 			return;
 		} else if(body->node.idleTime > space->sleepTimeThreshold) {
-			GLfloat v = 0.9f;
+			GLfloat v = 0.66f;
 			glColor3f(v,v,v);
 			return;
 		}

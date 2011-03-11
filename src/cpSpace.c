@@ -63,12 +63,10 @@ handlerSetTrans(cpCollisionHandler *handler, void *unused)
 static cpBool alwaysCollide(cpArbiter *arb, cpSpace *space, void *data){return 1;}
 static void nothing(cpArbiter *arb, cpSpace *space, void *data){}
 
-// BBfunc callback for the spatial hash.
+// function to get the estimated velocity of a shape for the cpBBTree.
 static cpVect shapeVelocityFunc(cpShape *shape){return shape->body->v;}
 
-// Iterator functions for destructors.
-static void             freeWrap(void         *ptr, void *unused){          cpfree(ptr);}
-static void        shapeFreeWrap(cpShape      *ptr, void *unused){     cpShapeFree(ptr);}
+static void freeWrap(void *ptr, void *unused){cpfree(ptr);}
 
 void
 cpSpaceLock(cpSpace *space)
@@ -202,19 +200,6 @@ cpSpaceFree(cpSpace *space)
 		cpSpaceDestroy(space);
 		cpfree(space);
 	}
-}
-
-void
-cpSpaceFreeChildren(cpSpace *space)
-{
-	cpArray *components = space->sleepingComponents;
-	while(components->num) cpBodyActivate((cpBody *)components->arr[0]);
-	
-	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)&shapeFreeWrap, NULL);
-	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)&shapeFreeWrap, NULL);
-	
-	cpArrayFreeEach(space->bodies, (void (*)(void*))cpBodyFree);
-	cpArrayFreeEach(space->constraints, (void (*)(void*))cpConstraintFree);
 }
 
 #pragma mark Collision Handler Function Management

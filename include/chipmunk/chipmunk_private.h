@@ -22,6 +22,9 @@
 #define CP_ALLOW_PRIVATE_ACCESS 1
 #include "chipmunk.h"
 
+#define CP_HASH_COEF (3344921057ul)
+#define CP_HASH_PAIR(A, B) ((cpHashValue)(A)*CP_HASH_COEF ^ (cpHashValue)(B)*CP_HASH_COEF)
+
 #pragma mark cpArray
 
 struct cpArray {
@@ -78,6 +81,25 @@ typedef cpBool (*cpHashSetFilterFunc)(void *elt, void *data);
 void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);
 
 #pragma mark Arbiters
+
+// Data structure for contact points.
+struct cpContact {
+	// Contact point and normal.
+	cpVect p, n;
+	// Penetration distance.
+	cpFloat dist;
+	
+	// Calculated by cpArbiterPreStep().
+	cpVect r1, r2;
+	cpFloat nMass, tMass, bounce;
+
+	// Persistant contact information.
+	cpFloat jnAcc, jtAcc, jBias;
+	cpFloat bias;
+	
+	// Hash value used to (mostly) uniquely identify a contact.
+	cpHashValue hash;
+};
 
 cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash);
 cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);

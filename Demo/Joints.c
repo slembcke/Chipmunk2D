@@ -280,7 +280,7 @@ update(int ticks)
 static void
 destroy(void)
 {
-	cpSpaceFreeChildren(space);
+	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
 }
 

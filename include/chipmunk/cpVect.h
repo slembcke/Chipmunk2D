@@ -19,6 +19,10 @@
  * SOFTWARE.
  */
 
+/// @defgroup cpVect cpVect
+/// Chipmunk's 2D vector type along with a handy 2D vector math lib.
+/// @{
+
 /// Constant for the zero vector.
 static const cpVect cpvzero = {0.0f,0.0f};
 
@@ -29,8 +33,6 @@ cpv(const cpFloat x, const cpFloat y)
 	cpVect v = {x, y};
 	return v;
 }
-
-// non-inlined functions
 
 /// Returns the length of v.
 cpFloat cpvlength(const cpVect v);
@@ -47,12 +49,9 @@ cpVect cpvforangle(const cpFloat a);
 /// Returns the angular direction v is pointing in (in radians).
 cpFloat cpvtoangle(const cpVect v);
 
-/**
-	Returns a string representation of v. Intended mostly for debugging purposes and not production use.
-	
-	@attention The string points to a static local and is reset every time the function is called.
-	If you want to print more than one vector you will have to split up your printing onto separate lines.
-*/
+///	Returns a string representation of v. Intended mostly for debugging purposes and not production use.
+///	@attention The string points to a static local and is reset every time the function is called.
+///	If you want to print more than one vector you will have to split up your printing onto separate lines.
 char *cpvstr(const cpVect v);
 
 /// Check if two vectors are equal. (Be careful when comparing floating point numbers!)
@@ -97,11 +96,9 @@ cpvdot(const cpVect v1, const cpVect v2)
 	return v1.x*v2.x + v1.y*v2.y;
 }
 
-/**
-	2D vector cross product analog.
-	The cross product of 2D vectors results in a 3D vector with only a z component.
-	This function returns the magnitude of the z value.
-*/
+/// 2D vector cross product analog.
+/// The cross product of 2D vectors results in a 3D vector with only a z component.
+/// This function returns the magnitude of the z value.
 static inline cpFloat
 cpvcross(const cpVect v1, const cpVect v2)
 {
@@ -205,3 +202,4 @@ cpvnear(const cpVect v1, const cpVect v2, const cpFloat dist)
 {
 	return cpvdistsq(v1, v2) < dist*dist;
 }
+/// @}
