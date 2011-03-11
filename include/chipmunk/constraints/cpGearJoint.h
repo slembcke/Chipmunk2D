@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-/// @defgroup cpRotaryLimitJoint cpRotaryLimitJoint
+/// @defgroup cpGearJoint cpGearJoint
 /// @{
 
 const cpConstraintClass *cpGearJointGetClass();

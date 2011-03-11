@@ -107,12 +107,10 @@ cpConstraintGetImpulse(cpConstraint *constraint)
 	return constraint->CP_PRIVATE(klass)->getImpulse(constraint);
 }
 
-#ifdef NDEBUG
-	#define cpConstraintCheckCast(constraint, struct)
-#else
-	#define cpConstraintCheckCast(constraint, struct) \
-		cpAssert(constraint->CP_PRIVATE(klass) == struct##GetClass(), "Constraint is not a "#struct)
-#endif
+/// @}
+
+#define cpConstraintCheckCast(constraint, struct) \
+	cpAssert(constraint->CP_PRIVATE(klass) == struct##GetClass(), "Constraint is not a "#struct)
 
 #define CP_DefineConstraintGetter(struct, type, member, name) \
 static inline type struct##Get##name(const cpConstraint *constraint){ \
@@ -127,14 +125,9 @@ static inline void struct##Set##name(cpConstraint *constraint, type value){ \
 	((struct *)constraint)->member = value; \
 }
 
-#define CP_DefineConstraintSetter(struct, type, member, name) \
-static inline void struct##Set##name(cpConstraint *constraint, type value){}
-
 #define CP_DefineConstraintProperty(struct, type, member, name) \
 CP_DefineConstraintGetter(struct, type, member, name) \
 CP_DefineConstraintSetter(struct, type, member, name)
-
-/// @}
 
 #include "cpPinJoint.h"
 #include "cpSlideJoint.h"

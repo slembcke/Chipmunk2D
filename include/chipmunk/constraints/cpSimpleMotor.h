@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-/// @defgroup cpRotaryLimitJoint cpRotaryLimitJoint
+/// @defgroup cpSimpleMotor cpSimpleMotor
 /// @{
 
 const cpConstraintClass *cpSimpleMotorGetClass();
