@@ -58,6 +58,18 @@ cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void 
 	cpHashSetInsert(space->postStepCallbacks, (cpHashValue)(size_t)obj, &callback, NULL, (cpHashSetTransFunc)postStepFuncSetTrans);
 }
 
+void *
+cpSpaceGetPostStepData(cpSpace *space, void *obj)
+{
+	if(space->postStepCallbacks){
+		cpPostStepCallback query = {NULL, obj, NULL};
+		cpPostStepCallback *callback = (cpPostStepCallback *)cpHashSetFind(space->postStepCallbacks, (cpHashValue)(size_t)obj, &query);
+		return (callback ? callback->data : NULL);
+	} else {
+		return NULL;
+	}
+}
+
 #pragma mark Contact Buffer Functions
 
 struct cpContactBufferHeader {

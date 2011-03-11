@@ -118,10 +118,10 @@ int cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr);
 static inline cpFloat
 cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
 {
-	cpVect *verts = poly->CP_PRIVATE(tVerts);
+	cpVect *verts = poly->tVerts;
 	cpFloat min = cpvdot(n, verts[0]);
 	
-	for(int i=1; i<poly->CP_PRIVATE(numVerts); i++){
+	for(int i=1; i<poly->numVerts; i++){
 		min = cpfmin(min, cpvdot(n, verts[i]));
 	}
 	
@@ -131,9 +131,9 @@ cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
 static inline cpBool
 cpPolyShapeContainsVert(const cpPolyShape *poly, const cpVect v)
 {
-	cpPolyShapeAxis *axes = poly->CP_PRIVATE(tAxes);
+	cpPolyShapeAxis *axes = poly->tAxes;
 	
-	for(int i=0; i<poly->CP_PRIVATE(numVerts); i++){
+	for(int i=0; i<poly->numVerts; i++){
 		cpFloat dist = cpvdot(axes[i].n, v) - axes[i].d;
 		if(dist > 0.0f) return cpFalse;
 	}
@@ -144,9 +144,9 @@ cpPolyShapeContainsVert(const cpPolyShape *poly, const cpVect v)
 static inline cpBool
 cpPolyShapeContainsVertPartial(const cpPolyShape *poly, const cpVect v, const cpVect n)
 {
-	cpPolyShapeAxis *axes = poly->CP_PRIVATE(tAxes);
+	cpPolyShapeAxis *axes = poly->tAxes;
 	
-	for(int i=0; i<poly->CP_PRIVATE(numVerts); i++){
+	for(int i=0; i<poly->numVerts; i++){
 		if(cpvdot(axes[i].n, n) < 0.0f) continue;
 		cpFloat dist = cpvdot(axes[i].n, v) - axes[i].d;
 		if(dist > 0.0f) return cpFalse;
@@ -168,6 +168,8 @@ void cpSpacePushFreshContactBuffer(cpSpace *space);
 cpContact *cpContactBufferGetArray(cpSpace *space);
 void cpSpacePushContacts(cpSpace *space, int count);
 void cpSpacePopContacts(cpSpace *space, int count);
+
+void *cpSpaceGetPostStepData(cpSpace *space, void *obj);
 
 typedef struct cpPostStepCallback cpPostStepCallback;
 void cpSpacePostStepCallbackSetIter(cpPostStepCallback *callback, cpSpace *space);
