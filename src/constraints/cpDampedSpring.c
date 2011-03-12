@@ -48,7 +48,7 @@ preStep(cpDampedSpring *spring, cpFloat dt)
 	spring->nMass = 1.0f/k;
 	
 	spring->target_vrn = 0.0f;
-	spring->v_coef = 1.0f - cpfexp(-spring->damping*dt*k*0.5/M_E);
+	spring->v_coef = 1.0f - cpfexp(-spring->damping*dt*k*0.5f/(cpFloat)M_E);
 
 	// apply spring force
 	cpFloat f_spring = spring->springForceFunc((cpConstraint *)spring, dist);
