@@ -82,22 +82,16 @@ void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);
 
 #pragma mark Arbiters
 
-// Data structure for contact points.
 struct cpContact {
-	// Contact point and normal.
 	cpVect p, n;
-	// Penetration distance.
 	cpFloat dist;
 	
-	// Calculated by cpArbiterPreStep().
 	cpVect r1, r2;
 	cpFloat nMass, tMass, bounce;
 
-	// Persistant contact information.
 	cpFloat jnAcc, jtAcc, jBias;
 	cpFloat bias;
 	
-	// Hash value used to (mostly) uniquely identify a contact.
 	cpHashValue hash;
 };
 

@@ -73,9 +73,9 @@ cpfmin(cpFloat a, cpFloat b)
 
 /// Return the absolute value of a cpFloat.
 static inline cpFloat
-cpfabs(cpFloat n)
+cpfabs(cpFloat f)
 {
-	return (n < 0) ? -n : n;
+	return (f < 0) ? -f : f;
 }
 
 /// Clamp @c f to be between @c min and @c max.

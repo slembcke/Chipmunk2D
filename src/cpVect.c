@@ -27,7 +27,7 @@
 cpFloat
 cpvlength(const cpVect v)
 {
-	return cpfsqrt( cpvdot(v, v) );
+	return cpfsqrt(cpvdot(v, v));
 }
 
 inline cpVect

@@ -63,8 +63,6 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 	shape->data = NULL;
 	shape->next = NULL;
 	
-//	cpShapeCacheBB(shape);
-	
 	return shape;
 }
 
@@ -116,17 +114,12 @@ cpCircleShapeAlloc(void)
 	return (cpCircleShape *)cpcalloc(1, sizeof(cpCircleShape));
 }
 
-static inline cpBB
-bbFromCircle(const cpVect c, const cpFloat r)
-{
-	return cpBBNew(c.x-r, c.y-r, c.x+r, c.y+r);
-}
-
 static cpBB
 cpCircleShapeCacheData(cpCircleShape *circle, cpVect p, cpVect rot)
 {
-	circle->tc = cpvadd(p, cpvrotate(circle->c, rot));
-	return bbFromCircle(circle->tc, circle->r);
+	cpVect c = circle->tc = cpvadd(p, cpvrotate(circle->c, rot));
+	cpFloat r = circle->r;
+	return cpBBNew(c.x-r, c.y-r, c.x+r, c.y+r);
 }
 
 static cpBool

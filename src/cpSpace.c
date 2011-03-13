@@ -99,17 +99,12 @@ cpSpaceAlloc(void)
 	return (cpSpace *)cpcalloc(1, sizeof(cpSpace));
 }
 
-#define DEFAULT_DIM_SIZE 100.0f
-#define DEFAULT_COUNT 1000
-#define DEFAULT_ITERATIONS 10
-#define DEFAULT_ELASTIC_ITERATIONS 0
-
 cpCollisionHandler cpDefaultCollisionHandler = {0, 0, alwaysCollide, alwaysCollide, nothing, nothing, NULL};
 
 cpSpace*
 cpSpaceInit(cpSpace *space)
 {
-	space->iterations = DEFAULT_ITERATIONS;
+	space->iterations = 10;
 	
 	space->gravity = cpvzero;
 	space->damping = 1.0f;

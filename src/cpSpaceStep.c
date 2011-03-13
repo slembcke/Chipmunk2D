@@ -237,8 +237,8 @@ collideShapes(cpShape *a, cpShape *b, cpSpace *space)
 		arb->contacts = NULL;
 		arb->numContacts = 0;
 		
-		// Normally arbiters are set as used after calling the post-step callback.
-		// However, post-step callbacks are not called for sensors or arbiters rejected from pre-solve.
+		// Normally arbiters are set as used after calling the post-solve callback.
+		// However, post-solve callbacks are not called for sensors or arbiters rejected from pre-solve.
 		if(arb->state != cpArbiterStateIgnore) arb->state = cpArbiterStateNormal;
 	}
 	
@@ -289,10 +289,7 @@ void
 cpSpaceStep(cpSpace *space, cpFloat dt)
 {
 	if(dt == 0.0f) return; // don't step if the timestep is 0!
-
-	cpArray *bodies = space->bodies;
-	cpArray *constraints = space->constraints;
-	
+		
 	// Reset and empty the arbiter list.
 	cpArray *arbiters = space->arbiters;
 	for(int i=0; i<arbiters->num; i++){
@@ -302,6 +299,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	arbiters->num = 0;
 
 	// Integrate positions
+	cpArray *bodies = space->bodies;
 	for(int i=0; i<bodies->num; i++){
 		cpBody *body = (cpBody *)bodies->arr[i];
 		body->position_func(body, dt);
@@ -329,6 +327,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpArbiterPreStep((cpArbiter *)arbiters->arr[i], dt, slop, biasCoef);
 	}
 
+	cpArray *constraints = space->constraints;
 	for(int i=0; i<constraints->num; i++){
 		cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
 		constraint->klass->preStep(constraint, dt);
