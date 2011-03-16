@@ -68,29 +68,6 @@ static cpVect shapeVelocityFunc(cpShape *shape){return shape->body->v;}
 
 static void freeWrap(void *ptr, void *unused){cpfree(ptr);}
 
-void
-cpSpaceLock(cpSpace *space)
-{
-	space->locked++;
-}
-
-void
-cpSpaceUnlock(cpSpace *space)
-{
-	space->locked--;
-	cpAssert(space->locked >= 0, "Internal error:Space lock underflow.");
-	
-	if(!space->locked){
-		cpArray *waking = space->rousedBodies;
-		for(int i=0, count=waking->num; i<count; i++){
-			cpSpaceActivateBody(space, (cpBody *)waking->arr[i]);
-		}
-		
-		waking->num = 0;
-	}
-}
-
-
 #pragma mark Memory Management Functions
 
 cpSpace *
@@ -482,7 +459,28 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 			cpBody *root = (cpBody *)components->arr[i];
 			CP_BODY_FOREACH_COMPONENT(root, body) func(body, data);
 		}
-	} cpSpaceUnlock(space);
+	} cpSpaceUnlock(space, cpTrue);
+}
+
+typedef struct spaceShapeContext {
+	cpSpaceShapeIteratorFunc func;
+	void *data;
+} spaceShapeContext;
+
+static void
+spaceEachShapeIterator(void *obj, spaceShapeContext *context)
+{
+	context->func(obj, context->data);
+}
+
+void
+cpSpaceEachShape(cpSpace *space, cpSpaceShapeIteratorFunc func, void *data)
+{
+	cpSpaceLock(space); {
+		spaceShapeContext context = {func, data};
+		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)spaceEachShapeIterator, &context);
+		cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)spaceEachShapeIterator, &context);
+	} cpSpaceUnlock(space, cpTrue);
 }
 
 #pragma mark Spatial Index Management

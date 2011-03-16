@@ -1,10 +1,9 @@
-Doxygen! (mark private/public parts of API)
 touch joint (Objective-Chipmunk)
 
 Each Shape.
-Test rotary springs again.
 
 Future features to think about:
+http://www.slembcke.net/forums/viewtopic.php?f=1&t=1459
 constraint callbacks?
 Building bodies from shape collections.
 Quickhull?

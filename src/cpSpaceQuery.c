@@ -51,7 +51,7 @@ cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, 
 	cpSpaceLock(space); {
     cpSpatialIndexPointQuery(space->activeShapes, point, (cpSpatialIndexQueryFunc)pointQueryHelper, &context);
     cpSpatialIndexPointQuery(space->staticShapes, point, (cpSpatialIndexQueryFunc)pointQueryHelper, &context);
-	} cpSpaceUnlock(space);
+	} cpSpaceUnlock(space, cpTrue);
 }
 
 static void
@@ -106,7 +106,7 @@ cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, c
 	cpSpaceLock(space); {
     cpSpatialIndexSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryFunc)segQueryFunc, data);
     cpSpatialIndexSegmentQuery(space->activeShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryFunc)segQueryFunc, data);
-	} cpSpaceUnlock(space);
+	} cpSpaceUnlock(space, cpTrue);
 }
 
 typedef struct segQueryFirstContext {
@@ -181,7 +181,7 @@ cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceB
 	cpSpaceLock(space); {
     cpSpatialIndexQuery(space->activeShapes, &bb, bb, (cpSpatialIndexQueryFunc)bbQueryHelper, &context);
     cpSpatialIndexQuery(space->staticShapes, &bb, bb, (cpSpatialIndexQueryFunc)bbQueryHelper, &context);
-	} cpSpaceUnlock(space);
+	} cpSpaceUnlock(space, cpTrue);
 }
 
 #pragma mark Shape Query Functions
@@ -240,7 +240,7 @@ cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, vo
 	cpSpaceLock(space); {
     cpSpatialIndexQuery(space->activeShapes, shape, bb, (cpSpatialIndexQueryFunc)shapeQueryHelper, &context);
     cpSpatialIndexQuery(space->staticShapes, shape, bb, (cpSpatialIndexQueryFunc)shapeQueryHelper, &context);
-	} cpSpaceUnlock(space);
+	} cpSpaceUnlock(space, cpTrue);
 	
 	return context.anyCollision;
 }

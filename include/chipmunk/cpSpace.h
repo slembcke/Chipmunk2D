@@ -200,10 +200,13 @@ void cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape);
 
 /// Space/body iterator callback function type.
 typedef void (*cpSpaceBodyIteratorFunc)(cpBody *body, void *data);
-/// Call @c func for each shape in the space.
+/// Call @c func for each body in the space.
 void cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data);
 
-// TODO each shape
+/// Space/body iterator callback function type.
+typedef void (*cpSpaceShapeIteratorFunc)(cpShape *shape, void *data);
+/// Call @c func for each shape in the space.
+void cpSpaceEachShape(cpSpace *space, cpSpaceShapeIteratorFunc func, void *data);
 
 /// Update the collision detection info for the static shapes in the space.
 void cpSpaceReindexStatic(cpSpace *space);

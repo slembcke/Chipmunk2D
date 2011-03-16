@@ -59,13 +59,6 @@ apply_bias_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
 	apply_bias_impulse(b, j, r2);
 }
 
-static inline cpVect
-clamp_vect(cpVect v, cpFloat len)
-{
-	return cpvclamp(v, len);
-//	return (cpvdot(v,v) > len*len) ? cpvmult(cpvnormalize(v), len) : v;
-}
-
 static inline cpFloat
 k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n)
 {

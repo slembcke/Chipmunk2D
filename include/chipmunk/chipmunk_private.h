@@ -166,7 +166,7 @@ void cpSpacePopContacts(cpSpace *space, int count);
 void *cpSpaceGetPostStepData(cpSpace *space, void *obj);
 
 typedef struct cpPostStepCallback cpPostStepCallback;
-void cpSpacePostStepCallbackSetIter(cpPostStepCallback *callback, cpSpace *space);
+//void cpSpacePostStepCallbackSetIter(cpPostStepCallback *callback, cpSpace *space);
 
 cpBool cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space);
 void *cpSpaceArbiterSetTrans(cpShape **shapes, cpSpace *space);
@@ -175,4 +175,4 @@ void cpShapeUpdateFunc(cpShape *shape, void *unused);
 //void cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space);
 void cpSpaceActivateBody(cpSpace *space, cpBody *body);
 void cpSpaceLock(cpSpace *space);
-void cpSpaceUnlock(cpSpace *space);
+void cpSpaceUnlock(cpSpace *space, cpBool runPostStep);

@@ -50,6 +50,10 @@ postStepFuncSetTrans(cpPostStepCallback *callback, void *ignored)
 void
 cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)
 {
+	cpAssertWarn(!space->locked,
+		"Adding a post-step callback when the space is not locked is unnecessary. "
+		"Post-step callbacks will not called until the end of the next call to cpSpaceStep() or the next query.");
+	
 	if(!space->postStepCallbacks){
 		space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql);
 	}
@@ -67,6 +71,52 @@ cpSpaceGetPostStepData(cpSpace *space, void *obj)
 		return (callback ? callback->data : NULL);
 	} else {
 		return NULL;
+	}
+}
+
+static void
+cpSpacePostStepCallbackSetIter(cpPostStepCallback *callback, cpSpace *space)
+{
+	callback->func(space, callback->obj, callback->data);
+	cpfree(callback);
+}
+
+static void
+cpSpaceRunPostStepCallbacks(cpSpace *space)
+{
+	// Loop because post step callbacks may add more post step callbacks directly or indirectly.
+	while(space->postStepCallbacks){
+		cpHashSet *callbacks = space->postStepCallbacks;
+		space->postStepCallbacks = NULL;
+		
+		cpHashSetEach(callbacks, (cpHashSetIteratorFunc)cpSpacePostStepCallbackSetIter, space);
+		cpHashSetFree(callbacks);
+	}
+}
+
+#pragma mark Locking Functions
+
+void
+cpSpaceLock(cpSpace *space)
+{
+	space->locked++;
+}
+
+void
+cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
+{
+	space->locked--;
+	cpAssert(space->locked >= 0, "Internal error: Space lock underflow.");
+	
+	if(!space->locked){
+		cpArray *waking = space->rousedBodies;
+		for(int i=0, count=waking->num; i<count; i++){
+			cpSpaceActivateBody(space, (cpBody *)waking->arr[i]);
+		}
+		
+		waking->num = 0;
+		
+		cpSpaceRunPostStepCallbacks(space);
 	}
 }
 
@@ -269,13 +319,6 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	return cpTrue;
 }
 
-void
-cpSpacePostStepCallbackSetIter(cpPostStepCallback *callback, cpSpace *space)
-{
-	callback->func(space, callback->obj, callback->data);
-	cpfree(callback);
-}
-
 #pragma mark All Important cpSpaceStep() Function
 
 void
@@ -310,7 +353,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpSpacePushFreshContactBuffer(space);
 		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)cpShapeUpdateFunc, NULL);
 		cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryFunc)collideShapes, space);
-	} cpSpaceUnlock(space);
+	} cpSpaceUnlock(space, cpFalse);
 	
 	// If body sleeping is enabled, do that now.
 	if(space->sleepTimeThreshold != INFINITY){
@@ -364,7 +407,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		}
 	}
 	
-	// run the post solve callbacks
+	// run the post-solve callbacks
 	cpSpaceLock(space);
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiter *arb = (cpArbiter *) arbiters->arr[i];
@@ -372,17 +415,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpCollisionHandler *handler = arb->handler;
 		handler->postSolve(arb, space, handler->data);
 	}
-	cpSpaceUnlock(space);
-	
-	// Run the post step callbacks
-	// Loop because post step callbacks may create more post step callbacks
-	while(space->postStepCallbacks){
-		cpHashSet *callbacks = space->postStepCallbacks;
-		space->postStepCallbacks = NULL;
-		
-		cpHashSetEach(callbacks, (cpHashSetIteratorFunc)cpSpacePostStepCallbackSetIter, space);
-		cpHashSetFree(callbacks);
-	}
+	cpSpaceUnlock(space, cpTrue);
 	
 	// Increment the stamp.
 	space->stamp++;
