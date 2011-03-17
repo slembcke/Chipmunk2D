@@ -43,6 +43,7 @@ struct cpSpace {
 	cpFloat idleSpeedThreshold;
 	
 	/// Time a group of bodies must remain idle in order to fall asleep.
+	/// Enabling sleeping also implicitly enables the the contact graph.
 	/// The default value of INFINITY disables the sleeping algorithm.
 	cpFloat sleepTimeThreshold;
 	
@@ -60,6 +61,10 @@ struct cpSpace {
 	/// Number of frames that contact information should persist.
 	/// Defaults to 3. There is probably never a reason to change this value.
 	cpTimestamp collisionPersistence;
+	
+	/// Rebuild the contact graph during each step. Must be enabled to use the cpBodyEachArbiter() function.
+	/// Disabled by default for a small performance boost.
+	cpBool enableContactGraph;
 	
 	/// User definable data pointer.
 	/// Generally this points to your game's controller or game state

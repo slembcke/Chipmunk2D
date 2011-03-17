@@ -188,5 +188,8 @@ cpBodyEachConstraint(cpBody *body, cpBodyConstraintIteratorFunc func, void *data
 void
 cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 {
-	CP_BODY_FOREACH_ARBITER(body, arb) func(body, arb, data);
+	CP_BODY_FOREACH_ARBITER(body, arb){
+		arb->swappedColl = (body == arb->body_b);
+		func(body, arb, data);
+	}
 }

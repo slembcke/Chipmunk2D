@@ -21,7 +21,7 @@ h1. Chipmunk Physics 5.3.4
 
 First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games on every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
 
-First of all, I would like to give a Erin Catto a big thank you, as Chipmunk's impulse solver was directly inspired by his Box2D example code way back in 2006. (Now a full fledged physics engine all it's own: "Box2D.org":http://www.box2d.org/). His contact persistence idea allows for stable stacks of objects with very few iterations of the solver. My previous solver produced mushy piles of objects or required a large amount of CPU to operate stably.
+First of all, I would like to give a Erin Catto a big thank you, as Chipmunk's impulse solver was directly inspired by his example code way back in 2006. (Now a full fledged physics engine all it's own: "Box2D.org":http://www.box2d.org/). His contact persistence idea allows for stable stacks of objects with very few iterations of the solver. My previous solver produced mushy piles of objects or required a large amount of CPU to operate stably.
 
 h2. Why a C Library?
 
@@ -33,7 +33,7 @@ If you are writing iPhone games using Chipmunk, you should check out the Objecti
 
 h2. Limitations of a C API:
 
-There are two major problems with Chipmunk's C API. The first is that it lacks operator overloading. Chipmunk defines vector operators as functions instead of allowing you to use operators such as *, +, and -. (However Chipmunk 5.3.3 and up does provide overloaded operators if you are using C++) In practice, it's usually not a major problem for readability. The second, and bigger problem is that it's not possible to mark fields as private in C structure types. Be warned that if you are reading fields from Chipmunk structs that are not documented here, that they might change in the future without a lot of prior warning.
+The two biggest inconveniences of Chipmunk's C API are lack of operator overloading and access control. Chipmunk defines vector operators as functions instead of allowing you to use regular operators such as @*@, @+@, and @-@. (However Chipmunk 5.3.3 and above does provide overloaded operators if you are using C++) In practice, it's usually not a major problem for readability once you get used to it. The second, and bigger problem is that it's not possible to mark parts of Chipmunk's C API as private. To work around this, I have a separate header full of Chipmunk's private API, @chipmunk_private.h@. I also use a macro, @CP_PRIVATE()@ to mangle names in public structures. While you can feel free to include this header and use the macro in your own code to access this private API, be aware that the fields and functions may be renamed or disappear without warning.
 
 h2. Support:
 
@@ -87,10 +87,10 @@ h2. Overview:
 
 There are 4 basic objects you will use in Chipmunk.
 
-* *Rigid Bodies:* A rigid body holds the physical properties of an object. (mass, position, rotation, velocity, etc.) It does not have a shape by itself. If you’ve done physics with particles before, rigid bodies differ in that they are able to rotate.
+* *Rigid Bodies:* A rigid body holds the physical properties of an object. (mass, position, rotation, velocity, etc.) It does not have a shape until you attach one or more collision shapes to it. If you’ve done physics with particles before, rigid bodies differ in that they are able to rotate. Rigid bodies generally tend to have a 1:1 correlation to sprites in a game. You should structure your game so that you use the position and rotation of the rigid body for drawing your sprite.
 * *Collision Shapes:* By attaching shapes to bodies, you can define the a body’s shape. You can attach as many shapes to a single body as you need to in order to define a complex shape. Shapes contain the surface properties of an object such as how much friction or elasticity it has.
 * *Constraints/Joints:* Constraints and joints describe how bodies are attached to each other.
-* *Spaces:* Spaces are the basic simulation unit in Chipmunk. You add bodies, shapes and joints to a space, and then update the space as a whole.
+* *Spaces:* Spaces are containers for simulating objects in Chipmunk. constraints work together. You add bodies, shapes and joints to a space and then update the space as a whole. They control how all the rigid bodies, shapes, and
 
 There is often confusion between rigid bodies and their collision shapes in Chipmunk and how they relate to sprites. A sprite would be a visual representation of an object, while a collision shape is an invisible property that defines how objects should collide. Both the sprite's and the collision shape's position and rotation are controlled by a rigid body.
 

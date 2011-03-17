@@ -824,7 +824,7 @@ cpBBTreeOptimize(cpSpatialIndex *index)
 
 #pragma mark Debug Draw
 
-#define CP_BBTREE_DEBUG_DRAW
+//#define CP_BBTREE_DEBUG_DRAW
 #ifdef CP_BBTREE_DEBUG_DRAW
 #include "OpenGL/gl.h"
 #include "OpenGL/glu.h"

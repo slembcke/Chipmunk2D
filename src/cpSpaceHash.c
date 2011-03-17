@@ -605,7 +605,7 @@ static cpSpatialIndexClass klass = {
 
 #pragma mark Debug Drawing
 
-#define CP_BBTREE_DEBUG_DRAW
+//#define CP_BBTREE_DEBUG_DRAW
 #ifdef CP_BBTREE_DEBUG_DRAW
 #include "OpenGL/gl.h"
 #include "OpenGL/glu.h"

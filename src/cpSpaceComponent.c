@@ -157,8 +157,7 @@ FloodFillComponent(cpBody *root, cpBody *body)
 			CP_BODY_FOREACH_ARBITER(body, arb) FloodFillComponent(root, (body == arb->body_a ? arb->body_b : arb->body_a));
 			CP_BODY_FOREACH_CONSTRAINT(body, constraint) FloodFillComponent(root, (body == constraint->a ? constraint->b : constraint->a));
 		} else {
-			// TODO can probably remove this at some point.
-			cpAssert(other_root == root, "Uh oh. This shouldn't happen?");
+			cpAssert(other_root == root, "Internal Error: Inconsistency dectected in the contact graph.");
 		}
 	}
 }
@@ -189,14 +188,14 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		cpBody *body = (cpBody*)bodies->arr[i];
 		
 		// Need to deal with infinite mass objects
-		cpFloat thresh = (dvsq ? body->m*dvsq : 0.0f);
-		body->node.idleTime = (cpBodyKineticEnergy(body) > thresh ? 0.0f : body->node.idleTime + dt);
+		cpFloat keThreshold = (dvsq ? body->m*dvsq : 0.0f);
+		body->node.idleTime = (cpBodyKineticEnergy(body) > keThreshold ? 0.0f : body->node.idleTime + dt);
 		
 		body->arbiterList = NULL;
 		body->node.next = NULL;
 	}
 	
-	// Add arbiters to body lists and awaken any sleeping bodies found
+	// Awaken any sleeping bodies found and then push arbiters to the bodies' lists.
 	cpArray *arbiters = space->arbiters;
 	for(int i=0, count=arbiters->num; i<count; i++){
 		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
@@ -209,14 +208,14 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		cpBodyPushArbiter(b, arb);
 	}
 	
-	// Bodies are awoken when adding constraints, is this redundant?
+	// Bodies should be held active if connected by a joint to a rouge body.
 	cpArray *constraints = space->constraints;
 	for(int i=0; i<constraints->num; i++){
 		cpConstraint *constraint = constraints->arr[i];
 		cpBody *a = constraint->a, *b = constraint->b;
 		
-		if(cpBodyIsSleeping(a) || (cpBodyIsRogue(b) && !cpBodyIsStatic(b))) cpBodyActivate(a);
-		if(cpBodyIsSleeping(b) || (cpBodyIsRogue(a) && !cpBodyIsStatic(a))) cpBodyActivate(b);
+		if(cpBodyIsRogue(b)) cpBodyActivate(a);
+		if(cpBodyIsRogue(a)) cpBodyActivate(b);
 	}
 	
 	// Generate components and deactivate sleeping ones
@@ -224,10 +223,11 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		cpBody *body = (cpBody*)bodies->arr[i];
 		
 		if(body->node.root == NULL){
-			// Body not in a component.
-			// Perform a flood fill to find and mark the component in the contact graph.
+			// Body not in a component yet. Perform a DFS to flood fill mark 
+			// the component in the contact graph using this body as the root.
 			FloodFillComponent(body, body);
 			
+			// Check if the component should be put to sleep.
 			if(!ComponentActive(body, space->sleepTimeThreshold)){
 				cpArrayPush(space->sleepingComponents, body);
 				CP_BODY_FOREACH_COMPONENT(body, other) cpSpaceDeactivateBody(space, other);

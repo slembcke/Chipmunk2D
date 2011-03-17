@@ -415,10 +415,10 @@ drawSpace(cpSpace *space, drawSpaceOptions *options)
 //		drawSpatialHash(space->staticShapes);
 //		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 		
-		glColor3f(0.5, 0.5, 0.5);
-		cpBBTreeRenderDebug(space->staticShapes);
-		glColor3f(0, 1, 0);
-		cpBBTreeRenderDebug(space->activeShapes);
+//		glColor3f(0.5, 0.5, 0.5);
+//		cpBBTreeRenderDebug(space->staticShapes);
+//		glColor3f(0, 1, 0);
+//		cpBBTreeRenderDebug(space->activeShapes);
 	}
 	
 	glLineWidth(options->lineThickness);

@@ -106,7 +106,7 @@ void
 cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
 {
 	space->locked--;
-	cpAssert(space->locked >= 0, "Internal error: Space lock underflow.");
+	cpAssert(space->locked >= 0, "Internal Error: Space lock underflow.");
 	
 	if(!space->locked){
 		cpArray *waking = space->rousedBodies;
@@ -356,7 +356,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	} cpSpaceUnlock(space, cpFalse);
 	
 	// If body sleeping is enabled, do that now.
-	if(space->sleepTimeThreshold != INFINITY){
+	if(space->sleepTimeThreshold != INFINITY || space->enableContactGraph){
 		cpSpaceProcessComponents(space, dt);
 	}
 	

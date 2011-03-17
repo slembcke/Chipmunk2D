@@ -105,6 +105,7 @@ cpSpaceInit(cpSpace *space)
 	
 	space->sleepTimeThreshold = INFINITY;
 	space->idleSpeedThreshold = 0.0f;
+	space->enableContactGraph = cpFalse;
 	
 	space->arbiters = cpArrayNew(0);
 	space->pooledArbiters = cpArrayNew(0);
@@ -340,20 +341,37 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	return constraint;
 }
 
-typedef struct removalContext {
+typedef struct arbiterRemovalContext {
 	cpSpace *space;
 	cpShape *shape;
-} removalContext;
+} arbiterRemovalContext;
 
 // Hashset filter func to throw away old arbiters.
 static cpBool
-arbiterSetFilterRemovedShape(cpArbiter *arb, removalContext *context)
+arbiterSetFilterRemovedShape(cpArbiter *arb, arbiterRemovalContext *context)
 {
-	if(context->shape == arb->a || context->shape == arb->b){
+	cpShape *shape = context->shape;
+	
+	if(shape == arb->a || shape == arb->b){
+		// If the Arbiter is active (non-cached) call it's separate function immediately.
 		if(arb->state != cpArbiterStateCached){
 			arb->handler->separate(arb, context->space, arb->handler->data);
 		}
 		
+		// Rebuild the arbiter list for the body it's attached to.
+		cpBody *body = shape->body;
+		cpArbiter **prev_ptr = &body->arbiterList;
+		cpArbiter *node = body->arbiterList;
+		
+		while(node && node != arb){
+			prev_ptr = (node->body_a == body ? &node->next_a : &node->next_b);
+			node = *prev_ptr;
+		}
+		
+		cpAssert(node, "Internal Error: Attempted to remove an arbiter from a body it was never attached to.");
+		(*prev_ptr) = (node->body_a == body ? node->next_a : node->next_b);
+		
+		// Add the arbiter back to the pool
 		cpArrayPush(context->space->pooledArbiters, arb);
 		return cpFalse;
 	}
@@ -378,7 +396,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 	
 	cpBodyRemoveShape(body, shape);
 	
-	removalContext context = {space, shape};
+	arbiterRemovalContext context = {space, shape};
 	cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
 	cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
 }
@@ -390,7 +408,7 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 		"Cannot remove a static or sleeping shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
-	removalContext context = {space, shape};
+	arbiterRemovalContext context = {space, shape};
 	cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
 	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
 	
