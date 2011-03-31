@@ -24,7 +24,15 @@
 
 #include "chipmunk_private.h"
 
-static cpSpatialIndexClass klass;
+#ifdef _MSC_VER
+// Are you freaking kidding me?
+// Can it really not tell the difference between a declaration and a definition?
+// Have I ever mentioned how much I hate MSVC?
+extern
+#else
+static
+#endif
+cpSpatialIndexClass klass;
 
 typedef struct Node Node;
 typedef struct Pair Pair;
@@ -579,7 +587,7 @@ cpBBTreeDestroy(cpBBTree *tree)
 static void
 cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
-	Node *leaf = cpHashSetInsert(tree->leaves, hashid, obj, tree, (cpHashSetTransFunc)leafSetTrans);
+	Node *leaf = (Node *)cpHashSetInsert(tree->leaves, hashid, obj, tree, (cpHashSetTransFunc)leafSetTrans);
 	
 	Node *root = tree->root;
 	tree->root = SubtreeInsert(root, leaf, tree);
@@ -592,7 +600,7 @@ cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 static void
 cpBBTreeRemove(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
-	Node *leaf = cpHashSetRemove(tree->leaves, hashid, obj);
+	Node *leaf = (Node *)cpHashSetRemove(tree->leaves, hashid, obj);
 	
 	tree->root = SubtreeRemove(tree->root, leaf, tree);
 	PairsClear(leaf, tree);
@@ -734,7 +742,7 @@ partitionNodes(cpBBTree *tree, Node **nodes, int count)
 	cpBool splitWidth = (bb.r - bb.l > bb.t - bb.b);
 	
 	// Sort the bounds and use the median as the splitting point
-	cpFloat bounds[count*2];
+	cpFloat *bounds = (cpFloat *)cpcalloc(count*2, sizeof(cpFloat));
 	if(splitWidth){
 		for(int i=0; i<count; i++){
 			bounds[2*i + 0] = nodes[i]->bb.l;
@@ -749,7 +757,8 @@ partitionNodes(cpBBTree *tree, Node **nodes, int count)
 	
 	qsort(bounds, count*2, sizeof(cpFloat), (int (*)(const void *, const void *))cpfcompare);
 	cpFloat split = (bounds[count - 1] + bounds[count])*0.5f; // use the medain as the split
-	
+	cpfree(bounds);
+
 	// Generate the child BBs
 	cpBB a = bb, b = bb;
 	if(splitWidth) a.r = b.l = split; else a.t = b.b = split;
@@ -813,13 +822,14 @@ cpBBTreeOptimize(cpSpatialIndex *index)
 	if(!root) return;
 	
 	int count = cpBBTreeCount(tree);
-	Node *nodes[count];
+	Node **nodes = (Node **)cpcalloc(count, sizeof(Node *));
 	Node **cursor = nodes;
 	
 	cpHashSetEach(tree->leaves, (cpHashSetIteratorFunc)fillNodeArray, &cursor);
 	
 	SubtreeRecycle(tree, root);
 	tree->root = partitionNodes(tree, nodes, count);
+	cpfree(nodes);
 }
 
 #pragma mark Debug Draw

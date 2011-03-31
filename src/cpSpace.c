@@ -486,9 +486,9 @@ typedef struct spaceShapeContext {
 } spaceShapeContext;
 
 static void
-spaceEachShapeIterator(void *obj, spaceShapeContext *context)
+spaceEachShapeIterator(cpShape *shape, spaceShapeContext *context)
 {
-	context->func(obj, context->data);
+	context->func(shape, context->data);
 }
 
 void

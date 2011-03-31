@@ -516,7 +516,7 @@ main(int argc, const char **argv)
 	cpInitChipmunk();
 	
 	if(trial){
-		sleep(1);
+//		sleep(1);
 		for(int i=0; i<demoCount; i++) time_trial(i, 1000);
 		exit(0);
 	} else {

@@ -101,7 +101,7 @@ typedef cpVect (*cpBBTreeVelocityFunc)(void *obj);
 /// Set the velocity function for the bounding box tree to enable temporal coherence.
 void cpBBTreeSetVelocityFunc(cpSpatialIndex *index, cpBBTreeVelocityFunc func);
 
-#pragma mark 1D Sweep
+#pragma mark Single Axis Sweep
 
 typedef struct cpSweep1D cpSweep1D;
 

@@ -157,6 +157,7 @@
     <ProjectReference />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Demo\Bench.c" />
     <ClCompile Include="..\..\..\Demo\Bounce.c" />
     <ClCompile Include="..\..\..\Demo\ChipmunkDemo.c" />
     <ClCompile Include="..\..\..\Demo\drawSpace.c" />

@@ -171,7 +171,15 @@ cpSpaceHashAllocTable(cpSpaceHash *hash, int numcells)
 	hash->table = (cpSpaceHashBin **)cpcalloc(numcells, sizeof(cpSpaceHashBin *));
 }
 
-static cpSpatialIndexClass klass;
+#ifdef _MSC_VER
+// Are you freaking kidding me?
+// Can it really not tell the difference between a declaration and a definition?
+// Have I ever mentioned how much I hate MSVC?
+extern
+#else
+static
+#endif
+cpSpatialIndexClass klass;
 
 cpSpatialIndex *
 cpSpaceHashInit(cpSpaceHash *hash, cpFloat celldim, int numcells, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex)

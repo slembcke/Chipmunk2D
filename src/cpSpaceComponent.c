@@ -211,7 +211,7 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 	// Bodies should be held active if connected by a joint to a rouge body.
 	cpArray *constraints = space->constraints;
 	for(int i=0; i<constraints->num; i++){
-		cpConstraint *constraint = constraints->arr[i];
+		cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
 		cpBody *a = constraint->a, *b = constraint->b;
 		
 		if(cpBodyIsRogue(b)) cpBodyActivate(a);
