@@ -64,6 +64,7 @@
     <ClCompile Include="..\..\..\src\cpArbiter.c" />
     <ClCompile Include="..\..\..\src\cpArray.c" />
     <ClCompile Include="..\..\..\src\cpBB.c" />
+    <ClCompile Include="..\..\..\src\cpBBTree.c" />
     <ClCompile Include="..\..\..\src\cpBody.c" />
     <ClCompile Include="..\..\..\src\cpCollision.c" />
     <ClCompile Include="..\..\..\src\cpHashSet.c" />
@@ -74,6 +75,8 @@
     <ClCompile Include="..\..\..\src\cpSpaceHash.c" />
     <ClCompile Include="..\..\..\src\cpSpaceQuery.c" />
     <ClCompile Include="..\..\..\src\cpSpaceStep.c" />
+    <ClCompile Include="..\..\..\src\cpSpatialIndex.c" />
+    <ClCompile Include="..\..\..\src\cpSweep1D.c" />
     <ClCompile Include="..\..\..\src\cpVect.c" />
   </ItemGroup>
   <ItemGroup>
