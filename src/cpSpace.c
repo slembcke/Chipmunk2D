@@ -320,8 +320,6 @@ cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint)
 	(*prev_ptr) = (node->a == body ? node->next_a : node->next_b);
 }
 
-
-
 cpConstraint *
 cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
@@ -341,6 +339,25 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	return constraint;
 }
 
+static void
+removeArbiterFromBodyList(cpBody *body, cpArbiter *arb)
+{
+	cpArbiter **prev_ptr = &body->arbiterList;
+	cpArbiter *node = body->arbiterList;
+	
+	while(node && node != arb){
+		prev_ptr = (node->body_a == body ? &node->next_a : &node->next_b);
+		node = *prev_ptr;
+	}
+	
+	// Need to double check, but there is probably quite a few situations where an arbiter isn't in the body list.
+	//cpAssert(node, "Internal Error: Attempted to remove an arbiter from a body it was never attached to.");
+	
+	if(node){
+		(*prev_ptr) = (node->body_a == body ? node->next_a : node->next_b);
+	}
+}
+
 typedef struct arbiterRemovalContext {
 	cpSpace *space;
 	cpShape *shape;
@@ -358,18 +375,8 @@ arbiterSetFilterRemovedShape(cpArbiter *arb, arbiterRemovalContext *context)
 			arb->handler->separate(arb, context->space, arb->handler->data);
 		}
 		
-		// Rebuild the arbiter list for the body it's attached to.
-		cpBody *body = shape->body;
-		cpArbiter **prev_ptr = &body->arbiterList;
-		cpArbiter *node = body->arbiterList;
-		
-		while(node && node != arb){
-			prev_ptr = (node->body_a == body ? &node->next_a : &node->next_b);
-			node = *prev_ptr;
-		}
-		
-		cpAssert(node, "Internal Error: Attempted to remove an arbiter from a body it was never attached to.");
-		(*prev_ptr) = (node->body_a == body ? node->next_a : node->next_b);
+		removeArbiterFromBodyList(arb->body_a, arb);
+		removeArbiterFromBodyList(arb->body_b, arb);
 		
 		// Add the arbiter back to the pool
 		cpArrayPush(context->space->pooledArbiters, arb);

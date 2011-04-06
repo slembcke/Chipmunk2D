@@ -201,21 +201,21 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
 		cpBody *a = arb->body_a, *b = arb->body_b;
 		
-		if(cpBodyIsSleeping(a) || (cpBodyIsRogue(b) && !cpBodyIsStatic(b))) cpBodyActivate(a);
-		if(cpBodyIsSleeping(b) || (cpBodyIsRogue(a) && !cpBodyIsStatic(a))) cpBodyActivate(b);
+		if((cpBodyIsRogue(b) && !cpBodyIsStatic(b)) || cpBodyIsSleeping(a)) cpBodyActivate(a);
+		if((cpBodyIsRogue(a) && !cpBodyIsStatic(a)) || cpBodyIsSleeping(b)) cpBodyActivate(b);
 		
 		cpBodyPushArbiter(a, arb);
 		cpBodyPushArbiter(b, arb);
 	}
 	
-	// Bodies should be held active if connected by a joint to a rouge body.
+	// Bodies should be held active if connected by a joint to a non-static rouge body.
 	cpArray *constraints = space->constraints;
 	for(int i=0; i<constraints->num; i++){
 		cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
 		cpBody *a = constraint->a, *b = constraint->b;
 		
-		if(cpBodyIsRogue(b)) cpBodyActivate(a);
-		if(cpBodyIsRogue(a)) cpBodyActivate(b);
+		if(cpBodyIsRogue(b) && !cpBodyIsStatic(b)) cpBodyActivate(a);
+		if(cpBodyIsRogue(a) && !cpBodyIsStatic(a)) cpBodyActivate(b);
 	}
 	
 	// Generate components and deactivate sleeping ones

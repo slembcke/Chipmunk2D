@@ -50,7 +50,7 @@ postStepFuncSetTrans(cpPostStepCallback *callback, void *ignored)
 void
 cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)
 {
-	cpAssertWarn(!space->locked,
+	cpAssertWarn(space->locked,
 		"Adding a post-step callback when the space is not locked is unnecessary. "
 		"Post-step callbacks will not called until the end of the next call to cpSpaceStep() or the next query.");
 	
@@ -384,7 +384,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		body->velocity_func(body, gravity, damping, dt);
 	}
 	
-	// Don't apply cached impulses on the first frame 
+	// Apply cached impulses
 	cpFloat dt_coef = (space->stamp ? dt/space->prev_dt : 0.0f);
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiterApplyCachedImpulse((cpArbiter *)arbiters->arr[i], dt_coef);
