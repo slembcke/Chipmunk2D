@@ -44,6 +44,8 @@ cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash
 cpVect
 cpArbiterGetNormal(const cpArbiter *arb, int i)
 {
+	cpAssert(0 <= i && i < arb->numContacts, "Index error: The specified contact index is invalid for this arbiter");
+	
 	cpVect n = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(n);
 	return arb->CP_PRIVATE(swappedColl) ? cpvneg(n) : n;
 }
@@ -51,12 +53,16 @@ cpArbiterGetNormal(const cpArbiter *arb, int i)
 cpVect
 cpArbiterGetPoint(const cpArbiter *arb, int i)
 {
+	cpAssert(0 <= i && i < arb->numContacts, "Index error: The specified contact index is invalid for this arbiter");
+	
 	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
 }
 
 cpFloat
 cpArbiterGetDepth(const cpArbiter *arb, int i)
 {
+	cpAssert(0 <= i && i < arb->numContacts, "Index error: The specified contact index is invalid for this arbiter");
+	
 	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
 }
 
@@ -78,7 +84,7 @@ cpArbiterGetContactPointSet(const cpArbiter *arb)
 
 
 cpVect
-cpArbiterTotalImpulse(cpArbiter *arb)
+cpArbiterTotalImpulse(const cpArbiter *arb)
 {
 	cpContact *contacts = arb->contacts;
 	cpVect sum = cpvzero;
@@ -92,7 +98,7 @@ cpArbiterTotalImpulse(cpArbiter *arb)
 }
 
 cpVect
-cpArbiterTotalImpulseWithFriction(cpArbiter *arb)
+cpArbiterTotalImpulseWithFriction(const cpArbiter *arb)
 {
 	cpContact *contacts = arb->contacts;
 	cpVect sum = cpvzero;
@@ -105,23 +111,23 @@ cpArbiterTotalImpulseWithFriction(cpArbiter *arb)
 	return sum;
 }
 
-cpFloat
-cpContactsEstimateCrushingImpulse(cpContact *contacts, int numContacts)
-{
-	cpFloat fsum = 0.0f;
-	cpVect vsum = cpvzero;
-	
-	for(int i=0; i<numContacts; i++){
-		cpContact *con = &contacts[i];
-		cpVect j = cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc));
-		
-		fsum += cpvlength(j);
-		vsum = cpvadd(vsum, j);
-	}
-	
-	cpFloat vmag = cpvlength(vsum);
-	return (1.0f - vmag/fsum);
-}
+//cpFloat
+//cpContactsEstimateCrushingImpulse(cpContact *contacts, int numContacts)
+//{
+//	cpFloat fsum = 0.0f;
+//	cpVect vsum = cpvzero;
+//	
+//	for(int i=0; i<numContacts; i++){
+//		cpContact *con = &contacts[i];
+//		cpVect j = cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc));
+//		
+//		fsum += cpvlength(j);
+//		vsum = cpvadd(vsum, j);
+//	}
+//	
+//	cpFloat vmag = cpvlength(vsum);
+//	return (1.0f - vmag/fsum);
+//}
 
 void
 cpArbiterIgnore(cpArbiter *arb)

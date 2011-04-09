@@ -111,7 +111,7 @@ cpAreaForPoly(const int numVerts, const cpVect *verts)
 		area += cpvcross(verts[i], verts[(i+1)%numVerts]);
 	}
 	
-	return area/2.0f;
+	return -area/2.0f;
 }
 
 cpVect

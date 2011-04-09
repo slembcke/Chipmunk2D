@@ -37,6 +37,8 @@ cpBodyAlloc(void)
 cpBody *
 cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 {
+	bzero(body, sizeof(cpBody));
+	
 	body->space = NULL;
 	body->shapeList = NULL;
 	body->arbiterList = NULL;
@@ -102,6 +104,30 @@ cpBodyFree(cpBody *body)
 	}
 }
 
+static void cpv_assert_nan(cpVect v, char *message){cpAssert(v.x == v.x && v.y == v.y, message);}
+static void cpv_assert_infinite(cpVect v, char *message){cpAssert(cpfabs(v.x) != INFINITY && cpfabs(v.y) != INFINITY, message);}
+static void cpv_assert_sane(cpVect v, char *message){cpv_assert_nan(v, message); cpv_assert_infinite(v, message);}
+
+void
+cpBodySanityCheck(cpBody *body)
+{
+	cpAssert(body->m == body->m && body->m_inv == body->m_inv, "Body's mass is invalid.");
+	cpAssert(body->i == body->i && body->i_inv == body->i_inv, "Body's moment is invalid.");
+	
+	cpv_assert_sane(body->p, "Body's position is invalid.");
+	cpv_assert_sane(body->v, "Body's velocity is invalid.");
+	cpv_assert_sane(body->f, "Body's force is invalid.");
+
+	cpAssert(body->a == body->a && cpfabs(body->a) != INFINITY, "Body's angle is invalid.");
+	cpAssert(body->w == body->w && cpfabs(body->w) != INFINITY, "Body's angular velocity is invalid.");
+	cpAssert(body->t == body->t && cpfabs(body->t) != INFINITY, "Body's torque is invalid.");
+	
+	cpv_assert_sane(body->rot, "Internal error: Body's rotation vector is invalid.");
+	
+	cpAssert(body->v_limit == body->v_limit, "Body's velocity limit is invalid.");
+	cpAssert(body->w_limit == body->w_limit, "Body's angular velocity limit is invalid.");
+}
+
 void
 cpBodySetMass(cpBody *body, cpFloat mass)
 {
@@ -131,6 +157,7 @@ void
 cpBodySetPos(cpBody *body, cpVect pos)
 {
 	cpBodyActivate(body);
+	cpBodyAssertSane(body);
 	updateShapes(body);
 	body->p = pos;
 }
@@ -146,6 +173,7 @@ void
 cpBodySetAngle(cpBody *body, cpFloat angle)
 {
 	cpBodyActivate(body);
+	cpBodyAssertSane(body);
 	updateShapes(body);
 	setAngle(body, angle);
 }
@@ -165,6 +193,8 @@ cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 	
 	cpFloat w_limit = body->w_limit;
 	body->w = cpfclamp(body->w*damping + body->t*body->i_inv*dt, -w_limit, w_limit);
+	
+	cpBodySanityCheck(body);
 }
 
 void
@@ -175,6 +205,8 @@ cpBodyUpdatePosition(cpBody *body, cpFloat dt)
 	
 	body->v_bias = cpvzero;
 	body->w_bias = 0.0f;
+	
+	cpBodySanityCheck(body);
 }
 
 void

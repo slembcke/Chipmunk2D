@@ -116,6 +116,14 @@ void cpBodyDestroy(cpBody *body);
 /// Destroy and free a cpBody.
 void cpBodyFree(cpBody *body);
 
+/// Check that the properties of a body is sane. (Only in debug mode)
+#ifdef NDEBUG
+	#define	cpBodyAssertSane(body)
+#else
+	void cpBodySanityCheck(cpBody *body);
+	#define	cpBodyAssertSane(body) cpBodySanityCheck(body)
+#endif
+
 // Defined in cpSpace.c
 /// Wake up a sleeping or idle body.
 void cpBodyActivate(cpBody *body);
@@ -152,6 +160,7 @@ static inline type cpBodyGet##name(const cpBody *body){return body->member;}
 #define CP_DefineBodyStructSetter(type, member, name) \
 static inline void cpBodySet##name(cpBody *body, const type value){ \
 	cpBodyActivate(body); \
+	cpBodyAssertSane(body); \
 	body->member = value; \
 }
 
