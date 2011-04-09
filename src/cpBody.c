@@ -119,9 +119,25 @@ cpBodySetMoment(cpBody *body, cpFloat moment)
 }
 
 static inline void
-setAngle(cpBody *body, cpFloat angle, cpBool activate)
+updateShapes(cpBody *body){
+	cpSpace *space = body->space;
+	
+	if(space){
+		CP_BODY_FOREACH_SHAPE(body, shape) cpSpaceReindexShape(space, shape);
+	}
+}
+
+void
+cpBodySetPos(cpBody *body, cpVect pos)
 {
-	if(activate) cpBodyActivate(body);
+	cpBodyActivate(body);
+	updateShapes(body);
+	body->p = pos;
+}
+
+static inline void
+setAngle(cpBody *body, cpFloat angle)
+{
 	body->a = angle;//fmod(a, (cpFloat)M_PI*2.0f);
 	body->rot = cpvforangle(angle);
 }
@@ -129,7 +145,9 @@ setAngle(cpBody *body, cpFloat angle, cpBool activate)
 void
 cpBodySetAngle(cpBody *body, cpFloat angle)
 {
-	setAngle(body, angle, cpTrue);
+	cpBodyActivate(body);
+	updateShapes(body);
+	setAngle(body, angle);
 }
 
 //void
@@ -153,7 +171,7 @@ void
 cpBodyUpdatePosition(cpBody *body, cpFloat dt)
 {
 	body->p = cpvadd(body->p, cpvmult(cpvadd(body->v, body->v_bias), dt));
-	setAngle(body, body->a + (body->w + body->w_bias)*dt, cpFalse);
+	setAngle(body, body->a + (body->w + body->w_bias)*dt);
 	
 	body->v_bias = cpvzero;
 	body->w_bias = 0.0f;

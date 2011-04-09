@@ -168,7 +168,9 @@ CP_DefineBodyStructGetter(cpFloat, i, Moment);
 /// Set the moment of a body.
 void cpBodySetMoment(cpBody *body, cpFloat i);
 
-CP_DefineBodyStructProperty(cpVect, p, Pos);
+CP_DefineBodyStructGetter(cpVect, p, Pos);
+/// Set the position of a body.
+void cpBodySetPos(cpBody *body, cpVect pos);
 CP_DefineBodyStructProperty(cpVect, v, Vel);
 CP_DefineBodyStructProperty(cpVect, f, Force);
 CP_DefineBodyStructGetter(cpFloat, a, Angle);
