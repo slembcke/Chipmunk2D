@@ -94,10 +94,7 @@ componentActivate(cpBody *root)
 void
 cpBodyActivate(cpBody *body)
 {
-	if(!cpBodyIsRogue(body)){
-		body->node.idleTime = 0.0f;
-		componentActivate(componentNodeRoot(body));
-	}
+	componentActivate(componentNodeRoot(body));
 }
 
 static inline void
