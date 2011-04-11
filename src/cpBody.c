@@ -24,6 +24,7 @@
 #include <math.h>
 
 #include "chipmunk_private.h"
+#include "constraints/util.h"
 
 // initialized in cpInitChipmunk()
 cpBody cpStaticBodySingleton;
@@ -221,6 +222,13 @@ cpBodyApplyForce(cpBody *body, cpVect force, cpVect r)
 {
 	body->f = cpvadd(body->f, force);
 	body->t += cpvcross(r, force);
+}
+
+void
+cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)
+{
+	cpBodyActivate(body);
+	apply_impulse(body, j, r);
 }
 
 void

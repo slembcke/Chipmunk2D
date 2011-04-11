@@ -302,7 +302,17 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 {
 	cpTimestamp ticks = space->stamp - arb->stamp;
 	
-	// was used last frame, but not this one
+	cpBody *a = arb->body_a, *b = arb->body_b;
+	
+	// Preserve arbiters on sensors and rejected arbiters for sleeping objects.
+	if(
+		(cpBodyIsStatic(a) || cpBodyIsSleeping(a)) &&
+		(cpBodyIsStatic(b) || cpBodyIsSleeping(b))
+	){
+		return cpTrue;
+	}
+	
+	// Arbiter was used last frame, but not this one
 	if(ticks >= 1 && arb->state != cpArbiterStateCached){
 		arb->handler->separate(arb, space, arb->handler->data);
 		arb->state = cpArbiterStateCached;

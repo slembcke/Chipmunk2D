@@ -54,9 +54,14 @@ typedef struct cpContact cpContact;
 
 /// @private
 typedef enum cpArbiterState {
-	cpArbiterStateNormal,
+	// Arbiter is active and its the first collision.
 	cpArbiterStateFirstColl,
+	// Arbiter is active and its not the first collision.
+	cpArbiterStateNormal,
+	// Collision has been explicitly ignored.
+	// Either by returning false from a begin collision handler or calling cpArbiterIgnore().
 	cpArbiterStateIgnore,
+	// Collison has separated, arbiter will be recyled soon.
 	cpArbiterStateCached,
 } cpArbiterState;
 

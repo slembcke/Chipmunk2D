@@ -1,6 +1,12 @@
 touch joint (Objective-Chipmunk)
 
-Each Shape.
+Tutorial ideas:
+	Hello World - Create a single circle than falls on a line. Print "hello" in a begin callback and "world" in a separate.
+	One Way Platforms.
+	Player grounding example.
+	Bouyancy example.
+	OpenGL transform example.
+	
 
 Future features to think about:
 http://www.slembcke.net/forums/viewtopic.php?f=1&t=1459

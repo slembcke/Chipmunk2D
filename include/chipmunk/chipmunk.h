@@ -57,6 +57,7 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 // Maximum allocated size for various Chipmunk buffers
 #define CP_BUFFER_BYTES (32*1024)
 
+//TODO allow redifinition
 #define cpmalloc malloc
 #define cpcalloc calloc
 #define cprealloc realloc
