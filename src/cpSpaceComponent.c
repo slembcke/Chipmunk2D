@@ -103,6 +103,12 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 	}
 }
 
+static inline cpBody *
+ComponentRoot(cpBody *body)
+{
+	return (body ? body->node.root : NULL);
+}
+
 static inline void
 ComponentActivate(cpBody *root)
 {
@@ -133,7 +139,7 @@ cpBodyActivate(cpBody *body)
 {
 	if(!cpBodyIsRogue(body)){
 		body->node.idleTime = 0.0f;
-		ComponentActivate(body->node.root);
+		ComponentActivate(ComponentRoot(body));
 	}
 }
 
@@ -151,7 +157,7 @@ static inline void
 FloodFillComponent(cpBody *root, cpBody *body)
 {
 	if(!cpBodyIsStatic(body) && !cpBodyIsRogue(body)){
-		cpBody *other_root = body->node.root;
+		cpBody *other_root = ComponentRoot(body);
 		if(other_root == NULL){
 			ComponentAdd(root, body);
 			CP_BODY_FOREACH_ARBITER(body, arb) FloodFillComponent(root, (body == arb->body_a ? arb->body_b : arb->body_a));
@@ -222,7 +228,7 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 	for(int i=0; i<bodies->num;){
 		cpBody *body = (cpBody*)bodies->arr[i];
 		
-		if(body->node.root == NULL){
+		if(ComponentRoot(body) == NULL){
 			// Body not in a component yet. Perform a DFS to flood fill mark 
 			// the component in the contact graph using this body as the root.
 			FloodFillComponent(body, body);
@@ -259,14 +265,18 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 	cpSpace *space = body->space;
 	cpAssert(space, "Cannot put a rogue body to sleep.");
 	cpAssert(!space->locked, "Bodies cannot be put to sleep during a query or a call to cpSpaceStep(). Put these calls into a post-step callback.");
-	cpAssert(!group || cpBodyIsSleeping(group), "Cannot use a non-sleeping body as a group identifier.");
-	cpAssert(!group || cpBodyIsSleeping(body), "Cannot add a body that is already sleeping to a group.");
-		
+	cpAssert(group == NULL || cpBodyIsSleeping(group), "Cannot use a non-sleeping body as a group identifier.");
+	
+	if(cpBodyIsSleeping(body)){
+		cpAssert(ComponentRoot(body) == ComponentRoot(group), "The body is already sleeping and it's group cannot be reassigned.");
+		return;
+	}
+	
 	CP_BODY_FOREACH_SHAPE(body, shape) cpShapeUpdate(shape, body->p, body->rot);
 	cpSpaceDeactivateBody(space, body);
 	
 	if(group){
-		cpBody *root = group->node.root;
+		cpBody *root = ComponentRoot(group);
 		
 		cpComponentNode node = {root, root->node.next, 0.0f};
 		body->node = node;
