@@ -75,10 +75,8 @@ cpPolyShapeCacheData(cpPolyShape *poly, cpVect p, cpVect rot)
 }
 
 static void
-cpPolyShapeDestroy(cpShape *shape)
+cpPolyShapeDestroy(cpPolyShape *poly)
 {
-	cpPolyShape *poly = (cpPolyShape *)shape;
-	
 	cpfree(poly->verts);
 	cpfree(poly->tVerts);
 	
@@ -227,6 +225,6 @@ void
 cpPolyShapeSetVerts(cpShape *shape, int numVerts, cpVect *verts, cpVect offset)
 {
 	cpAssert(shape->klass == &polyClass, "Shape is not a poly shape.");
-	cpPolyShapeDestroy(shape);
+	cpPolyShapeDestroy((cpPolyShape *)shape);
 	setUpVerts((cpPolyShape *)shape, numVerts, verts, offset);
 }

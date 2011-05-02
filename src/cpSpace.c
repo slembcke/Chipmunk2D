@@ -51,7 +51,7 @@ handlerSetEql(cpCollisionHandler *check, cpCollisionHandler *pair)
 static void *
 handlerSetTrans(cpCollisionHandler *handler, void *unused)
 {
-	cpCollisionHandler *copy = (cpCollisionHandler *)cpmalloc(sizeof(cpCollisionHandler));
+	cpCollisionHandler *copy = (cpCollisionHandler *)cpcalloc(1, sizeof(cpCollisionHandler));
 	(*copy) = (*handler);
 	
 	return copy;
@@ -155,15 +155,11 @@ cpSpaceDestroy(cpSpace *space)
 		cpArrayFree(space->allocatedBuffers);
 	}
 	
-	if(space->postStepCallbacks){
-		cpHashSetEach(space->postStepCallbacks, freeWrap, NULL);
-		cpHashSetFree(space->postStepCallbacks);
-	}
+	if(space->postStepCallbacks) cpHashSetEach(space->postStepCallbacks, freeWrap, NULL);
+	cpHashSetFree(space->postStepCallbacks);
 	
-	if(space->collisionHandlers){
-		cpHashSetEach(space->collisionHandlers, freeWrap, NULL);
-		cpHashSetFree(space->collisionHandlers);
-	}
+	if(space->collisionHandlers) cpHashSetEach(space->collisionHandlers, freeWrap, NULL);
+	cpHashSetFree(space->collisionHandlers);
 }
 
 void

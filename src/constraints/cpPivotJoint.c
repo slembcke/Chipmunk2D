@@ -93,7 +93,7 @@ CP_DefineClassGetter(cpPivotJoint)
 cpPivotJoint *
 cpPivotJointAlloc(void)
 {
-	return (cpPivotJoint *)cpmalloc(sizeof(cpPivotJoint));
+	return (cpPivotJoint *)cpcalloc(1, sizeof(cpPivotJoint));
 }
 
 cpPivotJoint *

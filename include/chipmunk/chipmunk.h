@@ -58,7 +58,6 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 #define CP_BUFFER_BYTES (32*1024)
 
 //TODO allow redifinition
-#define cpmalloc malloc
 #define cpcalloc calloc
 #define cprealloc realloc
 #define cpfree free

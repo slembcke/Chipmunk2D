@@ -41,7 +41,7 @@ postStepFuncSetEql(cpPostStepCallback *a, cpPostStepCallback *b){
 static void *
 postStepFuncSetTrans(cpPostStepCallback *callback, void *ignored)
 {
-	cpPostStepCallback *value = (cpPostStepCallback *)cpmalloc(sizeof(cpPostStepCallback));
+	cpPostStepCallback *value = (cpPostStepCallback *)cpcalloc(1, sizeof(cpPostStepCallback));
 	(*value) = (*callback);
 	
 	return value;
@@ -137,7 +137,7 @@ typedef struct cpContactBuffer {
 static cpContactBufferHeader *
 cpSpaceAllocContactBuffer(cpSpace *space)
 {
-	cpContactBuffer *buffer = (cpContactBuffer *)cpmalloc(sizeof(cpContactBuffer));
+	cpContactBuffer *buffer = (cpContactBuffer *)cpcalloc(1, sizeof(cpContactBuffer));
 	cpArrayPush(space->allocatedBuffers, buffer);
 	return (cpContactBufferHeader *)buffer;
 }
@@ -208,7 +208,7 @@ cpSpaceArbiterSetTrans(cpShape **shapes, cpSpace *space)
 		int count = CP_BUFFER_BYTES/sizeof(cpArbiter);
 		cpAssert(count, "Buffer size too small.");
 		
-		cpArbiter *buffer = (cpArbiter *)cpmalloc(CP_BUFFER_BYTES);
+		cpArbiter *buffer = (cpArbiter *)cpcalloc(1, CP_BUFFER_BYTES);
 		cpArrayPush(space->allocatedBuffers, buffer);
 		
 		for(int i=0; i<count; i++) cpArrayPush(space->pooledArbiters, buffer + i);

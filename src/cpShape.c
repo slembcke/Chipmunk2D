@@ -69,7 +69,7 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 void
 cpShapeDestroy(cpShape *shape)
 {
-	if(shape->klass->destroy) shape->klass->destroy(shape);
+	if(shape->klass && shape->klass->destroy) shape->klass->destroy(shape);
 }
 
 void

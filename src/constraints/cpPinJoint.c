@@ -97,7 +97,7 @@ CP_DefineClassGetter(cpPinJoint);
 cpPinJoint *
 cpPinJointAlloc(void)
 {
-	return (cpPinJoint *)cpmalloc(sizeof(cpPinJoint));
+	return (cpPinJoint *)cpcalloc(1, sizeof(cpPinJoint));
 }
 
 cpPinJoint *

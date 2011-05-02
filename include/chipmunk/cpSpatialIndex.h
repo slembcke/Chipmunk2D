@@ -159,7 +159,7 @@ void cpSpatialIndexCollideStatic(cpSpatialIndex *dynamicIndex, cpSpatialIndex *s
 static inline void
 cpSpatialIndexDestroy(cpSpatialIndex *index)
 {
-	index->klass->destroy(index);
+	if(index->klass) index->klass->destroy(index);
 }
 
 /// Get the number of objects in the spatial index.

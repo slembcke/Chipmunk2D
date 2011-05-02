@@ -153,7 +153,7 @@ PairFromPool(cpBBTree *tree)
 		int count = CP_BUFFER_BYTES/sizeof(Pair);
 		cpAssert(count, "Buffer size is too small.");
 		
-		Pair *buffer = (Pair *)cpmalloc(CP_BUFFER_BYTES);
+		Pair *buffer = (Pair *)cpcalloc(1, CP_BUFFER_BYTES);
 		cpArrayPush(tree->allocatedBuffers, buffer);
 		
 		// push all but the first one, return the first instead
@@ -242,7 +242,7 @@ NodeFromPool(cpBBTree *tree)
 		int count = CP_BUFFER_BYTES/sizeof(Node);
 		cpAssert(count, "Buffer size is too small.");
 		
-		Node *buffer = (Node *)cpmalloc(CP_BUFFER_BYTES);
+		Node *buffer = (Node *)cpcalloc(1, CP_BUFFER_BYTES);
 		cpArrayPush(tree->allocatedBuffers, buffer);
 		
 		// push all but the first one, return the first instead
@@ -578,7 +578,7 @@ cpBBTreeDestroy(cpBBTree *tree)
 {
 	cpHashSetFree(tree->leaves);
 	
-	cpArrayFreeEach(tree->allocatedBuffers, cpfree);
+	if(tree->allocatedBuffers) cpArrayFreeEach(tree->allocatedBuffers, cpfree);
 	cpArrayFree(tree->allocatedBuffers);
 }
 
