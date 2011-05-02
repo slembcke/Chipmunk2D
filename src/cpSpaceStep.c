@@ -41,7 +41,7 @@ postStepFuncSetEql(PostStepCallback *a, PostStepCallback *b){
 static void *
 postStepFuncSetTrans(PostStepCallback *callback, void *ignored)
 {
-	PostStepCallback *value = (PostStepCallback *)cpmalloc(sizeof(PostStepCallback));
+	PostStepCallback *value = (PostStepCallback *)cpcalloc(1, sizeof(PostStepCallback));
 	(*value) = (*callback);
 	
 	return value;
@@ -81,7 +81,7 @@ typedef struct cpContactBuffer {
 static cpContactBufferHeader *
 cpSpaceAllocContactBuffer(cpSpace *space)
 {
-	cpContactBuffer *buffer = (cpContactBuffer *)cpmalloc(sizeof(cpContactBuffer));
+	cpContactBuffer *buffer = (cpContactBuffer *)cpcalloc(1, sizeof(cpContactBuffer));
 	cpArrayPush(space->allocatedBuffers, buffer);
 	return (cpContactBufferHeader *)buffer;
 }

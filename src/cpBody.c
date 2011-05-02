@@ -32,7 +32,7 @@ cpBody cpStaticBodySingleton;
 cpBody*
 cpBodyAlloc(void)
 {
-	return (cpBody *)cpmalloc(sizeof(cpBody));
+	return (cpBody *)cpcalloc(1, sizeof(cpBody));
 }
 
 cpBodyVelocityFunc cpBodyUpdateVelocityDefault = cpBodyUpdateVelocity;

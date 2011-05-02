@@ -49,7 +49,7 @@ contactSetTrans(cpShape **shapes, cpSpace *space)
 		int count = CP_BUFFER_BYTES/sizeof(cpArbiter);
 		cpAssert(count, "Buffer size too small.");
 		
-		cpArbiter *buffer = (cpArbiter *)cpmalloc(CP_BUFFER_BYTES);
+		cpArbiter *buffer = (cpArbiter *)cpcalloc(1, CP_BUFFER_BYTES);
 		cpArrayPush(space->allocatedBuffers, buffer);
 		
 		for(int i=0; i<count; i++) cpArrayPush(space->pooledArbiters, buffer + i);
@@ -71,7 +71,7 @@ collFuncSetEql(cpCollisionHandler *check, cpCollisionHandler *pair)
 static void *
 collFuncSetTrans(cpCollisionHandler *handler, void *unused)
 {
-	cpCollisionHandler *copy = (cpCollisionHandler *)cpmalloc(sizeof(cpCollisionHandler));
+	cpCollisionHandler *copy = (cpCollisionHandler *)cpcalloc(1, sizeof(cpCollisionHandler));
 	(*copy) = (*handler);
 	
 	return copy;
@@ -174,20 +174,14 @@ cpSpaceDestroy(cpSpace *space)
 	cpArrayFree(space->arbiters);
 	cpArrayFree(space->pooledArbiters);
 	
-	if(space->allocatedBuffers){
-		cpArrayEach(space->allocatedBuffers, freeWrap, NULL);
-		cpArrayFree(space->allocatedBuffers);
-	}
+	if(space->allocatedBuffers) cpArrayEach(space->allocatedBuffers, freeWrap, NULL);
+	cpArrayFree(space->allocatedBuffers);
 	
-	if(space->postStepCallbacks){
-		cpHashSetEach(space->postStepCallbacks, freeWrap, NULL);
-		cpHashSetFree(space->postStepCallbacks);
-	}
+	if(space->postStepCallbacks) cpHashSetEach(space->postStepCallbacks, freeWrap, NULL);
+	cpHashSetFree(space->postStepCallbacks);
 	
-	if(space->collFuncSet){
-		cpHashSetEach(space->collFuncSet, freeWrap, NULL);
-		cpHashSetFree(space->collFuncSet);
-	}
+	if(space->collFuncSet) cpHashSetEach(space->collFuncSet, freeWrap, NULL);
+	cpHashSetFree(space->collFuncSet);
 }
 
 void
