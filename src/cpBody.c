@@ -38,8 +38,6 @@ cpBodyAlloc(void)
 cpBody *
 cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 {
-	bzero(body, sizeof(cpBody));
-	
 	body->space = NULL;
 	body->shapeList = NULL;
 	body->arbiterList = NULL;
@@ -47,6 +45,9 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	
 	body->velocity_func = cpBodyUpdateVelocity;
 	body->position_func = cpBodyUpdatePosition;
+	
+	cpComponentNode node = {NULL, NULL, 0.0f};
+	body->node = node;
 	
 	cpBodySetMass(body, m);
 	cpBodySetMoment(body, i);
@@ -64,9 +65,6 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	
 	body->v_limit = (cpFloat)INFINITY;
 	body->w_limit = (cpFloat)INFINITY;
-	
-	cpComponentNode node = {NULL, NULL, 0.0f};
-	body->node = node;
 	
 	body->data = NULL;
 	
