@@ -40,7 +40,7 @@ preStep(cpDampedRotarySpring *spring, cpFloat dt)
 	cpAssert(moment != 0.0, "Unsolvable spring.");
 	spring->iSum = 1.0f/moment;
 
-	spring->w_coef = 1.0f - cpfexp(-spring->damping*dt*moment*0.25f/(cpFloat)M_E);
+	spring->w_coef = 1.0f - cpfexp(-spring->damping*dt*moment);
 	spring->target_wrn = 0.0f;
 
 	// apply spring torque
@@ -62,13 +62,13 @@ applyImpulse(cpDampedRotarySpring *spring)
 	
 	// compute velocity loss from drag
 	// not 100% certain this is derived correctly, though it makes sense
-	cpFloat w_damp = wrn*spring->w_coef;
-	spring->target_wrn = wrn - w_damp;
+	cpFloat w_damp = (spring->target_wrn - wrn)*spring->w_coef;
+	spring->target_wrn = wrn + w_damp;
 	
 	//apply_impulses(a, b, spring->r1, spring->r2, cpvmult(spring->n, v_damp*spring->nMass));
 	cpFloat j_damp = w_damp*spring->iSum;
-	a->w -= j_damp*a->i_inv;
-	b->w += j_damp*b->i_inv;
+	a->w += j_damp*a->i_inv;
+	b->w -= j_damp*b->i_inv;
 }
 
 static cpFloat

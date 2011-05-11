@@ -49,14 +49,10 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	cpComponentNode node = {NULL, NULL, 0.0f};
 	body->node = node;
 	
-	cpBodySetMass(body, m);
-	cpBodySetMoment(body, i);
-
 	body->p = cpvzero;
 	body->v = cpvzero;
 	body->f = cpvzero;
 	
-	cpBodySetAngle(body, 0.0f);
 	body->w = 0.0f;
 	body->t = 0.0f;
 	
@@ -67,6 +63,11 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->w_limit = (cpFloat)INFINITY;
 	
 	body->data = NULL;
+	
+	// Setters must be called after full initialization so the sanity checks don't assert on garbage data.
+	cpBodySetMass(body, m);
+	cpBodySetMoment(body, i);
+	cpBodySetAngle(body, 0.0f);
 	
 	return body;
 }
