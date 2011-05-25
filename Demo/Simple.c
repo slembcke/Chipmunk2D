@@ -38,9 +38,9 @@ init(void)
 	
 	// Lets set some parameters of the space:
 	// More iterations make the simulation more accurate but slower
-	space->iterations = 10;
+	space->iterations = 1;
 	// Give it some gravity
-	space->gravity = cpv(0, -100);
+//	space->gravity = cpv(0, -100);
 	
 	// Create A ground segment along the bottom of the screen
 	// By attaching it to &space->staticBody instead of a body, we make it a static shape.
@@ -55,25 +55,23 @@ init(void)
 	// Do not change the postion of a static shape after adding it.
 	cpSpaceAddShape(space, ground);
 	
-	// Add a moving circle object.
-	cpFloat radius = 15.0f;
-	cpFloat mass = 10.0f;
-	// This time we need to give a mass and moment of inertia when creating the circle.
-	cpBody *ballBody = cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero));
-	// Set some parameters of the body:
-	// For more info: http://code.google.com/p/chipmunk-physics/wiki/cpBody
-	ballBody->p = cpv(0, -240 + radius+50);
-	ballBody->v = cpv(0, -20);
-	// Add the body to the space so it will be simulated and move around.
-	cpSpaceAddBody(space, ballBody);
-	
-	
-	// Add a circle shape for the ball.
-	// Shapes are always defined relative to the center of gravity of the body they are attached to.
-	// When the body moves or rotates, the shape will move with it.
-	// Additionally, all of the cpSpaceAdd*() functions return the thing they added so you can create and add in one go.
-	cpShape *ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero));
-	ballShape->e = 0.0f; ballShape->u = 0.9f;
+	for(int i=-5; i<=5; i++){
+		cpFloat radius = 25.0f;
+		cpFloat mass = 1.0f;
+//		cpBody *ballBody = cpBodyNew(INFINITY, cpMomentForCircle(mass, 0.0f, radius, cpvzero));
+		cpBody *ballBody = cpBodyNew(mass, INFINITY);
+		ballBody->p = cpv((5 + 2*radius)*i, 200);
+		cpSpaceAddBody(space, ballBody);
+		
+		cpShape *ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero));
+		ballShape->e = 0.0f; ballShape->u = 0.9f;
+		
+		float stiffness = 30;
+		float damping = 2.0f*sqrt(stiffness*ballBody->m)*cpfpow(1.1f, i);
+//		float stiffness = 30;
+//		float damping = 0.0;
+		cpSpaceAddConstraint(space, cpDampedSpringNew(space->staticBody, ballBody, cpv((5 + 2*radius)*i, 0), cpvzero, 0, stiffness, damping));
+	}
 	
 	return space;
 }

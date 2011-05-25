@@ -171,6 +171,12 @@ cpSpaceFree(cpSpace *space)
 	}
 }
 
+#define cpAssertSpaceUnlocked(space) \
+	cpAssert(!space->locked, \
+		"This addition/removal cannot be done safely during a call to cpSpaceStep() or during a query. " \
+		"Put these calls into a post-step callback." \
+	);
+
 #pragma mark Collision Handler Function Management
 
 void
@@ -183,6 +189,8 @@ cpSpaceAddCollisionHandler(
 	cpCollisionSeparateFunc separate,
 	void *data
 ){
+	cpAssertSpaceUnlocked(space);
+	
 	// Remove any old function so the new one will get added.
 	cpSpaceRemoveCollisionHandler(space, a, b);
 	
@@ -201,6 +209,8 @@ cpSpaceAddCollisionHandler(
 void
 cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
+	cpAssertSpaceUnlocked(space);
+	
 	struct { cpCollisionType a, b; } ids = {a, b};
 	cpCollisionHandler *old_handler = (cpCollisionHandler *) cpHashSetRemove(space->collisionHandlers, CP_HASH_PAIR(a, b), &ids);
 	cpfree(old_handler);
@@ -215,6 +225,8 @@ cpSpaceSetDefaultCollisionHandler(
 	cpCollisionSeparateFunc separate,
 	void *data
 ){
+	cpAssertSpaceUnlocked(space);
+	
 	cpCollisionHandler handler = {
 		0, 0,
 		begin ? begin : alwaysCollide,
@@ -229,13 +241,6 @@ cpSpaceSetDefaultCollisionHandler(
 }
 
 #pragma mark Body, Shape, and Joint Management
-
-#define cpAssertSpaceUnlocked(space) \
-	cpAssert(!space->locked, \
-		"This addition/removal cannot be done safely during a call to cpSpaceStep() or during a query. " \
-		"Put these calls into a post-step callback." \
-	);
-
 static void
 cpBodyRemoveShape(cpBody *body, cpShape *shape)
 {
