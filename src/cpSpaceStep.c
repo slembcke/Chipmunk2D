@@ -143,6 +143,13 @@ cpSpacePopContacts(cpSpace *space, int count){
 
 #pragma mark Collision Detection Functions
 
+static inline cpCollisionHandler *
+lookupCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
+{
+	cpCollisionType types[] = {a, b};
+	return (cpCollisionHandler *)cpHashSetFind(space->collFuncSet, CP_HASH_PAIR(a, b), types);
+}
+
 static inline cpBool
 queryReject(cpShape *a, cpShape *b)
 {
@@ -164,10 +171,7 @@ queryFunc(cpShape *a, cpShape *b, cpSpace *space)
 	// Reject any of the simple cases
 	if(queryReject(a,b)) return;
 	
-	// Find the collision pair function for the shapes.
-	struct{cpCollisionType a, b;} ids = {a->collision_type, b->collision_type};
-	cpHashValue collHashID = CP_HASH_PAIR(a->collision_type, b->collision_type);
-	cpCollisionHandler *handler = (cpCollisionHandler *)cpHashSetFind(space->collFuncSet, collHashID, &ids);
+	cpCollisionHandler *handler = lookupCollisionHandler(space, a->collision_type, b->collision_type);
 	
 	cpBool sensor = a->sensor || b->sensor;
 	if(sensor && handler == &cpSpaceDefaultHandler) return;
@@ -255,7 +259,9 @@ contactSetFilter(cpArbiter *arb, cpSpace *space)
 	
 	// was used last frame, but not this one
 	if(ticks >= 1 && arb->state != cpArbiterStateCached){
-		arb->handler->separate(arb, space, arb->handler->data);
+		// The handler needs to be looked up again as the handler cached on the arbiter may have been deleted since the last step.
+		cpCollisionHandler *handler = lookupCollisionHandler(space, arb->a->collision_type, arb->b->collision_type);
+		handler->separate(arb, space, handler->data);
 		arb->state = cpArbiterStateCached;
 	}
 	
