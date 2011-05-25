@@ -241,21 +241,6 @@ cpSpaceSetDefaultCollisionHandler(
 }
 
 #pragma mark Body, Shape, and Joint Management
-static void
-cpBodyRemoveShape(cpBody *body, cpShape *shape)
-{
-	cpShape **prev_ptr = &body->shapeList;
-	cpShape *node = body->shapeList;
-	
-	while(node && node != shape){
-		prev_ptr = &node->next;
-		node = node->next;
-	}
-	
-	cpAssert(node, "Attempted to remove a shape from a body it was never attached to.");
-	(*prev_ptr) = node->next;
-}
-
 cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
@@ -267,9 +252,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
-	
-	// Push onto the head of the body's shape list
-	shape->next = body->shapeList; body->shapeList = shape;
+	cpBodyAddShape(body, shape);
 	
 	cpShapeUpdate(shape, body->p, body->rot);
 	cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
@@ -285,6 +268,7 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
+	cpBodyAddShape(body, shape);
 	cpShapeUpdate(shape, body->p, body->rot);
 	cpSpaceActivateShapesTouchingShape(space, shape);
 	cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
@@ -393,20 +377,19 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 	cpBody *body = shape->body;
 	if(cpBodyIsStatic(body)){
 		cpSpaceRemoveStaticShape(space, shape);
-		return;
+	} else {
+		cpBodyActivate(body);
+		
+		cpAssert(cpSpaceContainsShape(space, shape),
+			"Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
+		cpAssertSpaceUnlocked(space);
+		
+		cpBodyRemoveShape(body, shape);
+		
+		arbiterRemovalContext context = {space, shape};
+		cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
+		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
 	}
-
-	cpBodyActivate(body);
-	
-	cpAssert(cpSpaceContainsShape(space, shape),
-		"Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
-	cpAssertSpaceUnlocked(space);
-	
-	cpBodyRemoveShape(body, shape);
-	
-	arbiterRemovalContext context = {space, shape};
-	cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
-	cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
 }
 
 void
@@ -415,6 +398,8 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 	cpAssert(cpSpaceContainsShape(space, shape),
 		"Cannot remove a static or sleeping shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
+	
+	cpBodyRemoveShape(shape->body, shape);
 	
 	arbiterRemovalContext context = {space, shape};
 	cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);

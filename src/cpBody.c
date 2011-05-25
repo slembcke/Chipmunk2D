@@ -144,6 +144,27 @@ cpBodySetMoment(cpBody *body, cpFloat moment)
 	body->i_inv = 1.0f/moment;
 }
 
+void
+cpBodyAddShape(cpBody *body, cpShape *shape)
+{
+	shape->next = body->shapeList; body->shapeList = shape;
+}
+
+void
+cpBodyRemoveShape(cpBody *body, cpShape *shape)
+{
+	cpShape **prev_ptr = &body->shapeList;
+	cpShape *node = body->shapeList;
+	
+	while(node && node != shape){
+		prev_ptr = &node->next;
+		node = node->next;
+	}
+	
+	cpAssert(node, "Attempted to remove a shape from a body it was never attached to.");
+	(*prev_ptr) = node->next;
+}
+
 static inline void
 updateShapes(cpBody *body){
 	cpSpace *space = body->space;

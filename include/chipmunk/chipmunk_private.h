@@ -103,6 +103,11 @@ void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
 void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
 void cpArbiterApplyImpulse(cpArbiter *arb);
 
+#pragma mark Body Functions
+
+void cpBodyAddShape(cpBody *body, cpShape *shape);
+void cpBodyRemoveShape(cpBody *body, cpShape *shape);
+
 #pragma mark Shape/Collision Functions
 
 cpShape* cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body);

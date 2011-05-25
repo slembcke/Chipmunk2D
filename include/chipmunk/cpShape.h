@@ -121,8 +121,9 @@ static inline void cpShapeSet##name(cpShape *shape, type value){ \
 CP_DefineShapeStructGetter(type, member, name) \
 CP_DefineShapeStructSetter(type, member, name, activates)
 
-// TODO the properties
-CP_DefineShapeStructProperty(cpBody *, body, Body, cpTrue);
+CP_DefineShapeStructGetter(cpBody *, body, Body);
+void cpShapeSetBody(cpShape *shape, cpBody *body);
+
 CP_DefineShapeStructGetter(cpBB, bb, BB);
 CP_DefineShapeStructProperty(cpBool, sensor, IsSensor, cpTrue);
 CP_DefineShapeStructProperty(cpFloat, e, Elasticity, cpFalse);
