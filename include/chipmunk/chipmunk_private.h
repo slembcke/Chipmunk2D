@@ -181,3 +181,12 @@ void cpShapeUpdateFunc(cpShape *shape, void *unused);
 void cpSpaceActivateBody(cpSpace *space, cpBody *body);
 void cpSpaceLock(cpSpace *space);
 void cpSpaceUnlock(cpSpace *space, cpBool runPostStep);
+
+static inline cpCollisionHandler *
+cpSpaceLookupHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
+{
+	cpCollisionType types[] = {a, b};
+	return (cpCollisionHandler *)cpHashSetFind(space->collisionHandlers, CP_HASH_PAIR(a, b), types);
+}
+
+

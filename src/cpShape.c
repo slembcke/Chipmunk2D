@@ -84,13 +84,7 @@ cpShapeFree(cpShape *shape)
 void
 cpShapeSetBody(cpShape *shape, cpBody *body)
 {
-	// This is a little tricky, but was requested by a user.
-	// Changing the body on an active shape swapping out the shape lists on the bodies
-	if(shape->next){
-		cpBodyRemoveShape(shape->body, shape);
-		cpBodyAddShape(body, shape);
-	}
-	
+	cpAssert(shape->next == NULL, "You cannot change the body on an active shape. You must remove the shape, then ");
 	shape->body = body;
 }
 

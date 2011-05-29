@@ -217,13 +217,6 @@ cpSpaceArbiterSetTrans(cpShape **shapes, cpSpace *space)
 	return cpArbiterInit((cpArbiter *)cpArrayPop(space->pooledArbiters), shapes[0], shapes[1]);
 }
 
-static inline cpCollisionHandler *
-lookupCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
-{
-	cpCollisionType types[] = {a, b};
-	return (cpCollisionHandler *)cpHashSetFind(space->collisionHandlers, CP_HASH_PAIR(a, b), types);
-}
-
 static inline cpBool
 queryReject(cpShape *a, cpShape *b)
 {
@@ -246,7 +239,7 @@ collideShapes(cpShape *a, cpShape *b, cpSpace *space)
 	// Reject any of the simple cases
 	if(queryReject(a,b)) return;
 	
-	cpCollisionHandler *handler = lookupCollisionHandler(space, a->collision_type, b->collision_type);
+	cpCollisionHandler *handler = cpSpaceLookupHandler(space, a->collision_type, b->collision_type);
 	
 	cpBool sensor = a->sensor || b->sensor;
 	if(sensor && handler == &cpDefaultCollisionHandler) return;
@@ -319,7 +312,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	// Arbiter was used last frame, but not this one
 	if(ticks >= 1 && arb->state != cpArbiterStateCached){
 		// The handler needs to be looked up again as the handler cached on the arbiter may have been deleted since the last step.
-		cpCollisionHandler *handler = lookupCollisionHandler(space, arb->a->collision_type, arb->b->collision_type);
+		cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->a->collision_type, arb->b->collision_type);
 		handler->separate(arb, space, handler->data);
 		arb->state = cpArbiterStateCached;
 	}

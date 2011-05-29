@@ -30,9 +30,11 @@
 void
 cpSpaceActivateBody(cpSpace *space, cpBody *body)
 {
+	cpAssert(!cpBodyIsRogue(body), "Internal error: Attempting to activate a rouge body.");
+	
 	if(space->locked){
 		// cpSpaceActivateBody() is called again once the space is unlocked
-		cpArrayPush(space->rousedBodies, body);
+		if(!cpArrayContains(space->rousedBodies, body)) cpArrayPush(space->rousedBodies, body);
 	} else {
 		cpArrayPush(space->bodies, body);
 
@@ -52,12 +54,19 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 				memcpy(arb->contacts, contacts, numContacts*sizeof(cpContact));
 				cpSpacePushContacts(space, numContacts);
 				
+				// Reinsert the arbiter into the arbiter cache
 				cpShape *a = arb->a, *b = arb->b;
 				cpShape *shape_pair[] = {a, b};
 				cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
 				cpHashSetInsert(space->cachedArbiters, arbHashID, shape_pair, arb, NULL);
-				cpArrayPush(space->arbiters, arb);
+				
+				// Update the arbiter's state
 				arb->stamp = space->stamp;
+				arb->handler = cpSpaceLookupHandler(space, a->collision_type, b->collision_type);
+				cpArrayPush(space->arbiters, arb);
+				
+				// TODO pre-step callbacks for freshly awoken bodies need to be done somewhere.
+				// Probably not here?
 				
 				cpfree(contacts);
 			}
@@ -73,6 +82,8 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 static void
 cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 {
+	cpAssert(!cpBodyIsRogue(body), "Internal error: Attempting to deactivate a rouge body.");
+	
 	cpArrayDeleteObj(space->bodies, body);
 	
 	CP_BODY_FOREACH_SHAPE(body, shape){
@@ -293,12 +304,13 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 }
 
 static void
-activateTouchingHelper(cpShape *shape, cpContactPointSet *points, cpArray **bodies){
+activateTouchingHelper(cpShape *shape, cpContactPointSet *points, void *unused){
 	cpBodyActivate(shape->body);
 }
 
 void
 cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape){
-	cpArray *bodies = NULL;
-	cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)activateTouchingHelper, &bodies);
+	if(space->sleepTimeThreshold != INFINITY){
+		cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)activateTouchingHelper, NULL);
+	}
 }
