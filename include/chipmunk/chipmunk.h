@@ -55,12 +55,22 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 #include "chipmunk_types.h"
 	
 // Maximum allocated size for various Chipmunk buffers
-#define CP_BUFFER_BYTES (32*1024)
+#ifndef CP_BUFFER_BYTES
+	#define CP_BUFFER_BYTES (32*1024)
+#endif
 
-//TODO allow redifinition
-#define cpcalloc calloc
-#define cprealloc realloc
-#define cpfree free
+// Chipmunk memory function aliases.
+#ifndef cpcalloc
+	#define cpcalloc calloc
+#endif
+
+#ifndef cprealloc
+	#define cprealloc realloc
+#endif
+
+#ifndef cpfree
+	#define cpfree free
+#endif
 
 typedef struct cpArray cpArray;
 typedef struct cpHashSet cpHashSet;
@@ -85,6 +95,10 @@ typedef struct cpSpace cpSpace;
 #include "constraints/cpConstraint.h"
 
 #include "cpSpace.h"
+
+#define CP_VERSION_MAJOR 6
+#define CP_VERSION_MINOR 0
+#define CP_VERSION_RELEASE 0
 
 /// Version string.
 extern const char *cpVersionString;

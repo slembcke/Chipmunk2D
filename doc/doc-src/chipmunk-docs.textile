@@ -32,7 +32,7 @@ The best way to get support is to visit the "Chipmunk Forums":http://www.slembck
 
 <%= h 2, "Contact:", "ContactUS" %>
 
-If you find any bugs in Chipmunk or this document, or have a question or comment about Chipmunk you can contact me at slembcke(at)gmail(dot)com.
+If you find any bugs in Chipmunk, errors or broken links in this document, or have a question or comment about Chipmunk you can contact me at slembcke(at)gmail(dot)com. (email or GTalk)
 
 <%= h 2, "License:", "License" %>
 
@@ -83,6 +83,8 @@ There are 4 basic objects you will use in Chipmunk.
 
 There is often confusion between rigid bodies and their collision shapes in Chipmunk and how they relate to sprites. A sprite would be a visual representation of an object, while a collision shape is an invisible property that defines how objects should collide. Both the sprite's and the collision shape's position and rotation are controlled by a rigid body.
 
+TODO game object example
+
 <%= h 2, "Initialization:", "Initialization" %>
 
 Before you do anything else, you *must* initialize Chipmunk. Otherwise you _will_ crash as soon as the first collision is detected.
@@ -91,20 +93,26 @@ Before you do anything else, you *must* initialize Chipmunk. Otherwise you _will
 
 If Chipmunk was not compiled with the NDEBUG flag set, it will also print out the debug mode message and the current version number to stdout.
 
+TODO not a memory leak.
+
 <%= h 2, "Memory Management the Chipmunk way:", "Memory" %>
 
-For many of the structures you will use, Chipmunk uses a more or less standard set of memory management functions. Take the "cpSpace":#cpSpace struct for example:
+For most of the structures you will use, Chipmunk uses a more or less standard and straightforward set of memory management functions. Take the "cpSpace":#cpSpace struct for example:
 
-* @cpSpaceAlloc()@ - allocates but does not initialize a "cpSpace":#cpSpace struct.
-* @cpSpaceInit(cpSpace *space)@ - initializes a "cpSpace":#cpSpace struct.
-* @cpSpaceDestroy(cpSpace *space)@ - frees all memory allocated by the @cpSpaceInit()@, but does not free the "cpSpace":#cpSpace struct itself.
+* @cpSpaceNew()@ - Allocates and initializes a @cpSpace@ struct. It calls @cpSpaceAlloc()@ then @cpSpaceInit()@.
+* @cpSpaceFree(cpSpace *space)@ -  Destroys and frees the @cpSpace@ struct.
 
-* @cpSpaceNew()@ - allocates and initializes a "cpSpace":#cpSpace struct. It calls @cpSpaceAlloc()@ then @cpSpaceInit()@.
-* @cpSpaceFree(cpSpace *space)@ -  calls @cpSpaceDestroy()@ and then frees the "cpSpace":#cpSpace struct.
+You are responsible for freeing any structs that you allocate. Chipmunk does not do reference counting or garbage collection. If you call a @new@ function, you must call the matching @free@ function or you will leak memory.
 
-While you will probably use the new/free versions exclusively if you are using C/C++, but the alloc/init/destroy functions can be helpful when writing language extensions so that you can more easily work with a garbage collector.
+Additionally if you need more control over allocation and initialization because you are allocating temporary structs on the stack, writting a language binding, or working in a low memory environment you can also use the following functions. _Most people will never have any need to use these functions._
 
-In general, you are responsible for freeing any structs that you allocate. Chipmunk does not have any fancy reference counting or garbage collection built in. If you call an allocate @alloc@ or @new@ function, you must call the matching @free@. If you call an @init@ function, you must call the matching @destroy@ function.
+* @cpSpaceAlloc()@ - Allocates but does not initialize a @cpSpace@ struct. All allocation functions look more or less like this: @return (cpSpace *)cpcalloc(1, sizeof(cpSpace));@ You can write your own allocation functions if you want. It is not a requirement that the memory be zeroed.
+* @cpSpaceInit(cpSpace *space)@ - Initializes a @cpSpace@ struct.
+* @cpSpaceDestroy(cpSpace *space)@ - Frees all memory allocated by @cpSpaceInit()@, but does not free the @cpSpace@ struct itself.
+
+Like calls to the @new@ and @free@ functions. Any memory allocated by an @alloc@ function must be freed by @cpfree()@ or similar. Any call to an @init@ function must be matched with it's @destroy@ function.
+
+TODO definable primitive memory functions
 
 <%= h 2, "Basic Types:", "Types" %>
 

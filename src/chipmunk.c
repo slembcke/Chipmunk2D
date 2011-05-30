@@ -43,8 +43,10 @@ cpMessage(const char *message, const char *condition, const char *file, int line
 	if(isError) abort();
 }
 
+#define XSTR(s) STR(s)
+#define STR(s) #s
 
-const char *cpVersionString = "6.0.0b";
+const char *cpVersionString = XSTR(CP_VERSION_MAJOR)"."XSTR(CP_VERSION_MINOR)"."XSTR(CP_VERSION_RELEASE);
 
 void
 cpInitChipmunk(void)
