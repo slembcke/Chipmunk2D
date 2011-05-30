@@ -190,12 +190,7 @@ CP_DefineBodyStructProperty(cpFloat, t, Torque);
 CP_DefineBodyStructGetter(cpVect, rot, Rot);
 CP_DefineBodyStructProperty(cpFloat, v_limit, VelLimit);
 CP_DefineBodyStructProperty(cpFloat, w_limit, AngVelLimit);
-CP_DefineBodyStructProperty(cpDataPointer, data, Data);
-
-/// Return the user data pointer for a body.
-static inline cpDataPointer cpBodyGetUserData(const cpBody *body){return body->data;}
-/// Set the user data pointer for a body.
-static inline void cpBodySetUserData(cpBody *body, cpDataPointer data){body->data = data;}
+CP_DefineBodyStructProperty(cpDataPointer, data, UserData);
 
 /// Default Integration functions.
 void cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);

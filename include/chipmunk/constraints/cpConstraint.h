@@ -98,7 +98,7 @@ CP_DefineConstraintStructGetter(cpBody *, b, B);
 CP_DefineConstraintStructProperty(cpFloat, maxForce, MaxForce);
 CP_DefineConstraintStructProperty(cpFloat, errorBias, ErrorBias);
 CP_DefineConstraintStructProperty(cpFloat, maxBias, MaxBias);
-CP_DefineConstraintStructProperty(cpDataPointer, data, Data);
+CP_DefineConstraintStructProperty(cpDataPointer, data, UserData);
 
 /// Get the last impulse applied by this constraint.
 static inline cpFloat
