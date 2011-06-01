@@ -386,9 +386,11 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 		
 		cpBodyRemoveShape(body, shape);
 		
-		arbiterRemovalContext context = {space, shape};
-		cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
 		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
+		if(space->sleepTimeThreshold != INFINITY || space->enableContactGraph){
+		  arbiterRemovalContext context = {space, shape};
+		  cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
+		}
 	}
 }
 
@@ -401,9 +403,11 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 	
 //	cpBodyRemoveShape(shape->body, shape);
 	
-	arbiterRemovalContext context = {space, shape};
-	cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
 	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
+	if(space->sleepTimeThreshold != INFINITY || space->enableContactGraph){
+	  arbiterRemovalContext context = {space, shape};
+	  cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
+	}
 	
 	cpSpaceActivateShapesTouchingShape(space, shape);
 }
