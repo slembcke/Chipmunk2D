@@ -268,7 +268,7 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
-	cpBodyAddShape(body, shape);
+//	cpBodyAddShape(body, shape);
 	cpShapeUpdate(shape, body->p, body->rot);
 	cpSpaceActivateShapesTouchingShape(space, shape);
 	cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
@@ -399,7 +399,7 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 		"Cannot remove a static or sleeping shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
-	cpBodyRemoveShape(shape->body, shape);
+//	cpBodyRemoveShape(shape->body, shape);
 	
 	arbiterRemovalContext context = {space, shape};
 	cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
