@@ -308,9 +308,32 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	return constraint;
 }
 
+struct arbiterFilterContext {
+	cpSpace *space;
+	cpBody *body;
+};
+
+static cpBool
+contactSetFilterRemovedBody(cpArbiter *arb, struct arbiterFilterContext *context)
+{
+	cpBody *body = context->body;
+	if(body == arb->body_a || body == arb->body_b){
+		cpArrayPush(context->space->pooledArbiters, arb);
+		return cpFalse;
+	}
+	
+	return cpTrue;
+}
+
 static void
 cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter)
 {
+	// Just removing the body, so we need to filter all cached arbiters
+	if(filter == NULL){
+		struct arbiterFilterContext context = {space, body};
+		cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)contactSetFilterRemovedBody, &context);
+	}
+	
 	cpArbiter *arb = body->arbiterList;
 	while(arb){
 		cpArbiter *next = cpArbiterNext(arb, body);
