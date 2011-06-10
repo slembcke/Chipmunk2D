@@ -94,11 +94,7 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 	CP_BODY_FOREACH_ARBITER(body, arb){
 		cpBody *bodyA = arb->body_a;
 		if(body == bodyA || cpBodyIsStatic(bodyA)){
-			cpShape *a = arb->a, *b = arb->b;
-			cpShape *shape_pair[] = {a, b};
-			cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
-			cpHashSetRemove(space->cachedArbiters, arbHashID, shape_pair);
-			cpArrayDeleteObj(space->arbiters, arb);
+			cpSpaceUncacheArbiter(space, arb);
 			
 			// Save contact values to a new block of memory so they won't time out
 			size_t bytes = arb->numContacts*sizeof(cpContact);
@@ -235,6 +231,11 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
 		cpBody *a = arb->body_a, *b = arb->body_b;
 		
+		cpAssert(arb->thread_a.next == NULL, "Caching an arbiter with a dangling graph pointer");
+		cpAssert(arb->thread_a.prev == NULL, "Caching an arbiter with a dangling graph pointer");
+		cpAssert(arb->thread_b.next == NULL, "Caching an arbiter with a dangling graph pointer");
+		cpAssert(arb->thread_b.prev == NULL, "Caching an arbiter with a dangling graph pointer");
+		
 		if((cpBodyIsRogue(b) && !cpBodyIsStatic(b)) || cpBodyIsSleeping(a)) cpBodyActivate(a);
 		if((cpBodyIsRogue(a) && !cpBodyIsStatic(a)) || cpBodyIsSleeping(b)) cpBodyActivate(b);
 		
@@ -322,23 +323,6 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 
 static void
 activateTouchingHelper(cpShape *shape, cpContactPointSet *points, cpShape *other){
-	//BORK
-	cpBody *body = shape->body;
-	if(cpBodyIsSleeping(body)){
-		cpBool fail1 = cpFalse;
-		CP_BODY_FOREACH_ARBITER(body, arb){
-			fail1 = fail1 || (shape == arb->a && other == arb->b) || (shape == arb->b && other == arb->a);
-		}
-		
-		cpBody *body2 = other->body;
-		cpBool fail2 = cpFalse;
-		CP_BODY_FOREACH_ARBITER(body2, arb){
-			fail2 = fail2 || (shape == arb->a && other == arb->b) || (shape == arb->b && other == arb->a);
-		}
-		
-		cpAssert(!(fail1 || fail2), "fail");
-	}
-	
 	cpBodyActivate(shape->body);
 }
 

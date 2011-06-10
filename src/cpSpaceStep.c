@@ -277,6 +277,10 @@ collideShapes(cpShape *a, cpShape *b, cpSpace *space)
 		// Process, but don't add collisions for sensors.
 		!sensor
 	){
+		cpAssert(arb->thread_a.next == NULL, "Caching an arbiter with a dangling graph pointer");
+		cpAssert(arb->thread_a.prev == NULL, "Caching an arbiter with a dangling graph pointer");
+		cpAssert(arb->thread_b.next == NULL, "Caching an arbiter with a dangling graph pointer");
+		cpAssert(arb->thread_b.prev == NULL, "Caching an arbiter with a dangling graph pointer");
 		cpArrayPush(space->arbiters, arb);
 	} else {
 		cpSpacePopContacts(space, numContacts);

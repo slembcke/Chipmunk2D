@@ -77,6 +77,7 @@ void
 cpShapeFree(cpShape *shape)
 {
 	if(shape){
+		printf("freeing shape %p\n", shape);
 		cpShapeDestroy(shape);
 		cpfree(shape);
 	}
@@ -85,7 +86,7 @@ cpShapeFree(cpShape *shape)
 void
 cpShapeSetBody(cpShape *shape, cpBody *body)
 {
-	cpAssert(cpShapeActive(shape), "You cannot change the body on an active shape. You must remove the shape, then ");
+	cpAssert(!cpShapeActive(shape), "You cannot change the body on an active shape. You must remove the shape, then ");
 	shape->body = body;
 }
 

@@ -197,18 +197,6 @@ cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint)
 	body->constraintList = filterConstraints(body->constraintList, body, constraint);
 }
 
-
-void
-cpBodyFilterArbiters(cpBody *body, cpShape *filter)
-{
-	cpArbiter *arb = body->arbiterList;
-	while(arb){
-		cpArbiter *next = cpArbiterNext(arb, body);
-		if(filter == NULL || filter == arb->a || filter == arb->b) cpArbiterUnthread(arb);
-		arb = next;
-	}
-}
-
 void
 cpBodySetPos(cpBody *body, cpVect pos)
 {

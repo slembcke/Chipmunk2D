@@ -270,7 +270,6 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	cpBody *body = shape->body;
 	cpBodyAddShape(body, shape);
 	cpShapeUpdate(shape, body->p, body->rot);
-//	cpSpaceActivateShapesTouchingShape(space, shape);
 	cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
 	
 	return shape;
@@ -309,6 +308,28 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	return constraint;
 }
 
+static void
+cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter)
+{
+	cpArbiter *arb = body->arbiterList;
+	while(arb){
+		cpArbiter *next = cpArbiterNext(arb, body);
+		if(filter == NULL || filter == arb->a || filter == arb->b){
+			if(arb->state != cpArbiterStateCached){
+				arb->handler->separate(arb, space, arb->handler->data);
+			}
+			
+			cpArbiterUnthread(arb);
+			cpAssert(arb->thread_a.next == NULL, "Caching an arbiter with a dangling graph pointer");
+			cpAssert(arb->thread_a.prev == NULL, "Caching an arbiter with a dangling graph pointer");
+			cpAssert(arb->thread_b.next == NULL, "Caching an arbiter with a dangling graph pointer");
+			cpAssert(arb->thread_b.prev == NULL, "Caching an arbiter with a dangling graph pointer");
+			cpSpaceUncacheArbiter(space, arb);
+			cpArrayPush(space->pooledArbiters, arb);
+		}
+		arb = next;
+	}
+}
 
 void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
@@ -323,7 +344,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 		
 		cpBodyActivate(body);
 		cpBodyRemoveShape(body, shape);
-		cpBodyFilterArbiters(body, shape);
+		cpSpaceFilterArbiters(space, body, shape);
 		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
 	}
 }
@@ -338,7 +359,7 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 	cpBody *body = shape->body;
 	cpBodyActivateStatic(body, shape);
 	cpBodyRemoveShape(body, shape);
-	cpBodyFilterArbiters(body, shape);
+	cpSpaceFilterArbiters(space, body, shape);
 	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
 	
 //	cpSpaceActivateShapesTouchingShape(space, shape);
@@ -352,7 +373,7 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
-	cpBodyFilterArbiters(body, NULL);
+	cpSpaceFilterArbiters(space, body, NULL);
 	cpArrayDeleteObj(space->bodies, body);
 	body->space = NULL;
 }

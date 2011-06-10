@@ -54,7 +54,7 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 
 #include "chipmunk_types.h"
 	
-// Maximum allocated size for various Chipmunk buffers
+// Allocated size for various Chipmunk buffers
 #ifndef CP_BUFFER_BYTES
 	#define CP_BUFFER_BYTES (32*1024)
 #endif

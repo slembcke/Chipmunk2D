@@ -128,7 +128,6 @@ void cpArbiterApplyImpulse(cpArbiter *arb);
 void cpBodyAddShape(cpBody *body, cpShape *shape);
 void cpBodyRemoveShape(cpBody *body, cpShape *shape);
 void cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint);
-void cpBodyFilterArbiters(cpBody *body, cpShape *shape);
 
 
 #pragma mark Shape/Collision Functions
@@ -218,4 +217,12 @@ cpSpaceLookupHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
 	return (cpCollisionHandler *)cpHashSetFind(space->collisionHandlers, CP_HASH_PAIR(a, b), types);
 }
 
-
+static inline void
+cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb)
+{
+	cpShape *a = arb->a, *b = arb->b;
+	cpShape *shape_pair[] = {a, b};
+	cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
+	cpHashSetRemove(space->cachedArbiters, arbHashID, shape_pair);
+	cpArrayDeleteObj(space->arbiters, arb);
+}
