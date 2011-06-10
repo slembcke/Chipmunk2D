@@ -77,7 +77,6 @@ void
 cpShapeFree(cpShape *shape)
 {
 	if(shape){
-		printf("freeing shape %p\n", shape);
 		cpShapeDestroy(shape);
 		cpfree(shape);
 	}
