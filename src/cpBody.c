@@ -93,7 +93,10 @@ cpBodyNewStatic()
 	return cpBodyInitStatic(cpBodyAlloc());
 }
 
-void cpBodyDestroy(cpBody *body){}
+void cpBodyDestroy(cpBody *body){
+	cpAssertWarn(cpBodyIsRogue(body), "Destroying a body that is still added to a space.");
+	cpAssertWarn(body->shapeList == NULL, "Destroying a body that is still has shapes attached to it.");
+}
 
 void
 cpBodyFree(cpBody *body)
@@ -147,30 +150,62 @@ cpBodySetMoment(cpBody *body, cpFloat moment)
 void
 cpBodyAddShape(cpBody *body, cpShape *shape)
 {
-	shape->next = body->shapeList; body->shapeList = shape;
+	cpShape *next = body->shapeList;
+	if(next) next->prev = shape;
+	
+	shape->next = next;
+	body->shapeList = shape;
 }
 
 void
 cpBodyRemoveShape(cpBody *body, cpShape *shape)
 {
-	cpShape **prev_ptr = &body->shapeList;
-	cpShape *node = body->shapeList;
-	
-	while(node && node != shape){
-		prev_ptr = &node->next;
-		node = node->next;
+  cpShape *prev = shape->prev;
+  cpShape *next = shape->next;
+  
+  if(prev){
+		prev->next = next;
+  } else {
+		body->shapeList = next;
+  }
+  
+  if(next){
+		next->prev = prev;
 	}
-	
-	cpAssert(node, "Attempted to remove a shape from a body it was never attached to.");
-	(*prev_ptr) = node->next;
+  
+  shape->prev = NULL;
+  shape->next = NULL;
 }
 
-static inline void
-updateShapes(cpBody *body){
-	cpSpace *space = body->space;
+static cpConstraint *
+filterConstraints(cpConstraint *node, cpBody *body, cpConstraint *filter)
+{
+	if(node == filter){
+		return cpConstraintNext(node, body);
+	} else if(node->a == body){
+		node->next_a = filterConstraints(node->next_a, body, filter);
+	} else {
+		node->next_b = filterConstraints(node->next_b, body, filter);
+	}
 	
-	if(space){
-		CP_BODY_FOREACH_SHAPE(body, shape) cpSpaceReindexShape(space, shape);
+	return node;
+}
+
+void
+cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint)
+{
+	body->constraintList = filterConstraints(body->constraintList, body, constraint);
+}
+
+
+void
+cpBodyFilterArbiters(cpBody *body, cpShape *filter)
+{
+	cpArbiter *arb = body->arbiterList;
+	while(arb){
+		cpArbiter *next = cpArbiterNext(arb, body);
+		if(filter == NULL || filter == arb->a || filter == arb->b) cpArbiterUnthread(arb);
+		arb = next;
 	}
 }
 
@@ -179,7 +214,6 @@ cpBodySetPos(cpBody *body, cpVect pos)
 {
 	cpBodyActivate(body);
 	cpBodyAssertSane(body);
-	updateShapes(body);
 	body->p = pos;
 }
 
@@ -195,16 +229,8 @@ cpBodySetAngle(cpBody *body, cpFloat angle)
 {
 	cpBodyActivate(body);
 	cpBodyAssertSane(body);
-	updateShapes(body);
 	setAngle(body, angle);
 }
-
-//void
-//cpBodySlew(cpBody *body, cpVect pos, cpFloat dt)
-//{
-//	cpBodyActivate(body);
-//	body->v = cpvmult(cpvsub(pos, body->p), 1.0f/dt);
-//}
 
 void
 cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)

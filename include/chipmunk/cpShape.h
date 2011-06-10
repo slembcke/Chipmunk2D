@@ -92,6 +92,8 @@ struct cpShape {
 	cpLayers layers;
 	
 	CP_PRIVATE(cpShape *next);
+	CP_PRIVATE(cpShape *prev);
+	
 	CP_PRIVATE(cpHashValue hashid);
 };
 

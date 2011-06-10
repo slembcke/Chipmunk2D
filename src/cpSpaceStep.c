@@ -315,6 +315,11 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 		cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->a->collision_type, arb->b->collision_type);
 		handler->separate(arb, space, handler->data);
 		arb->state = cpArbiterStateCached;
+		
+		cpAssert(arb->thread_a.next == NULL, "Caching an arbiter with a dangling graph pointer");
+		cpAssert(arb->thread_a.prev == NULL, "Caching an arbiter with a dangling graph pointer");
+		cpAssert(arb->thread_b.next == NULL, "Caching an arbiter with a dangling graph pointer");
+		cpAssert(arb->thread_b.prev == NULL, "Caching an arbiter with a dangling graph pointer");
 	}
 	
 	if(ticks >= space->collisionPersistence){
@@ -347,6 +352,11 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiter *arb = (cpArbiter *)arbiters->arr[i];
 		arb->state = cpArbiterStateNormal;
+		
+		// If both bodies are awake, unthread the arbiter from the contact graph.
+		if(!cpBodyIsSleeping(arb->body_a) && !cpBodyIsSleeping(arb->body_b)){
+			cpArbiterUnthread(arb);
+		}
 	}
 	arbiters->num = 0;
 

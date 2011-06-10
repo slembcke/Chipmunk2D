@@ -46,11 +46,23 @@ void cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*));
 
 #pragma mark Foreach loops
 
-#define CP_BODY_FOREACH_CONSTRAINT(body, var)\
-	for(cpConstraint *var = body->constraintList; var; var = (var->a == body ? var->next_a : var->next_b))
+static inline cpConstraint *
+cpConstraintNext(cpConstraint *node, cpBody *body)
+{
+	return (node->a == body ? node->next_a : node->next_b);
+}
+
+#define CP_BODY_FOREACH_CONSTRAINT(bdy, var)\
+	for(cpConstraint *var = bdy->constraintList; var; var = cpConstraintNext(var, bdy))
+
+static inline cpArbiter *
+cpArbiterNext(cpArbiter *node, cpBody *body)
+{
+	return (node->body_a == body ? node->thread_a.next : node->thread_b.next);
+}
 
 #define CP_BODY_FOREACH_ARBITER(bdy, var)\
-	for(cpArbiter *var = bdy->arbiterList; var; var = (var->a->body == bdy ? var->next_a : var->next_b))
+	for(cpArbiter *var = bdy->arbiterList; var; var = cpArbiterNext(var, bdy))
 
 #define CP_BODY_FOREACH_SHAPE(body, var)\
 	for(cpShape *var = body->shapeList; var; var = var->next)
@@ -98,6 +110,14 @@ struct cpContact {
 cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash);
 cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
 
+static inline struct cpArbiterThread *
+cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
+{
+	return (arb->body_a == body ? &arb->thread_a : &arb->thread_b);
+}
+
+void cpArbiterUnthread(cpArbiter *arb);
+
 void cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
 void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
 void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
@@ -107,10 +127,19 @@ void cpArbiterApplyImpulse(cpArbiter *arb);
 
 void cpBodyAddShape(cpBody *body, cpShape *shape);
 void cpBodyRemoveShape(cpBody *body, cpShape *shape);
+void cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint);
+void cpBodyFilterArbiters(cpBody *body, cpShape *shape);
+
 
 #pragma mark Shape/Collision Functions
 
 cpShape* cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body);
+
+static inline cpBool
+cpShapeActive(cpShape *shape)
+{
+	return shape->prev || shape->body->shapeList == shape;
+}
 
 int cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr);
 

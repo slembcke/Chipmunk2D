@@ -65,6 +65,12 @@ typedef enum cpArbiterState {
 	cpArbiterStateCached,
 } cpArbiterState;
 
+/// @private
+struct cpArbiterThread {
+	// Links to next and previous arbiters in the contact graph.
+	struct cpArbiter *next, *prev;
+};
+
 /// A colliding pair of shapes.
 struct cpArbiter {
 	/// Calculated value to use for the elasticity coefficient.
@@ -81,8 +87,9 @@ struct cpArbiter {
 	CP_PRIVATE(cpShape *b);
 	CP_PRIVATE(cpBody *body_a);
 	CP_PRIVATE(cpBody *body_b);
-	CP_PRIVATE(cpArbiter *next_a);
-	CP_PRIVATE(cpArbiter *next_b);
+	
+	CP_PRIVATE(struct cpArbiterThread thread_a);
+	CP_PRIVATE(struct cpArbiterThread thread_b);
 	
 	CP_PRIVATE(int numContacts);
 	CP_PRIVATE(cpContact *contacts);

@@ -217,6 +217,8 @@ void cpSpaceEachShape(cpSpace *space, cpSpaceShapeIteratorFunc func, void *data)
 void cpSpaceReindexStatic(cpSpace *space);
 /// Update the collision detection data for a specific shape in the space.
 void cpSpaceReindexShape(cpSpace *space, cpShape *shape);
+/// Update the collision detection data for all shapes attached to a body.
+void cpSpaceReindexShapesForBody(cpSpace *space, cpBody *body);
 
 /// Switch the space to use a spatial has as it's spatial index.
 void cpSpaceUseSpatialHash(cpSpace *space, cpFloat dim, int count);

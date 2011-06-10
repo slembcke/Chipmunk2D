@@ -41,13 +41,40 @@ cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash
 	return con;
 }
 
+// TODO make this generic so I can reuse it for constraints also.
+static inline void
+unthreadHelper(cpArbiter *arb, cpBody *body)
+{
+	struct cpArbiterThread *thread = cpArbiterThreadForBody(arb, body);
+	cpArbiter *prev = thread->prev;
+	cpArbiter *next = thread->next;
+	
+	if(prev){
+		cpArbiterThreadForBody(prev, body)->next = next;
+	} else {
+		body->arbiterList = next;
+	}
+	
+	if(next) cpArbiterThreadForBody(next, body)->prev = prev;
+	
+	thread->prev = NULL;
+	thread->next = NULL;
+}
+
+void
+cpArbiterUnthread(cpArbiter *arb)
+{
+	unthreadHelper(arb, arb->body_a);
+	unthreadHelper(arb, arb->body_b);
+}
+
 cpVect
 cpArbiterGetNormal(const cpArbiter *arb, int i)
 {
 	cpAssert(0 <= i && i < arb->numContacts, "Index error: The specified contact index is invalid for this arbiter");
 	
-	cpVect n = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(n);
-	return arb->CP_PRIVATE(swappedColl) ? cpvneg(n) : n;
+	cpVect n = arb->contacts[i].n;
+	return arb->swappedColl ? cpvneg(n) : n;
 }
 
 cpVect
@@ -151,8 +178,10 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 	arb->a = a; arb->body_a = a->body;
 	arb->b = b; arb->body_b = b->body;
 	
-	arb->next_a = NULL;
-	arb->next_b = NULL;
+	arb->thread_a.next = NULL;
+	arb->thread_b.next = NULL;
+	arb->thread_a.prev = NULL;
+	arb->thread_b.prev = NULL;
 	
 	arb->stamp = 0;
 	arb->state = cpArbiterStateFirstColl;

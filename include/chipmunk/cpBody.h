@@ -127,6 +127,9 @@ void cpBodyFree(cpBody *body);
 // Defined in cpSpace.c
 /// Wake up a sleeping or idle body.
 void cpBodyActivate(cpBody *body);
+/// Wake up any sleeping or idle bodies touching a static body.
+void cpBodyActivateStatic(cpBody *body, cpShape *filter);
+
 /// Force a body to fall asleep immediately.
 void cpBodySleep(cpBody *body);
 /// Force a body to fall asleep immediately along with other bodies in a group.

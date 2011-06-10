@@ -268,9 +268,9 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
-//	cpBodyAddShape(body, shape);
+	cpBodyAddShape(body, shape);
 	cpShapeUpdate(shape, body->p, body->rot);
-	cpSpaceActivateShapesTouchingShape(space, shape);
+//	cpSpaceActivateShapesTouchingShape(space, shape);
 	cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
 	
 	return shape;
@@ -288,21 +288,6 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 	body->space = space;
 	
 	return body;
-}
-
-static void
-cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint)
-{
-	cpConstraint **prev_ptr = &body->constraintList;
-	cpConstraint *node = body->constraintList;
-	
-	while(node && node != constraint){
-		prev_ptr = (node->a == body ? &node->next_a : &node->next_b);
-		node = *prev_ptr;
-	}
-	
-	cpAssert(node, "Attempted to remove a constraint from a body it was never attached to.");
-	(*prev_ptr) = (node->a == body ? node->next_a : node->next_b);
 }
 
 cpConstraint *
@@ -324,52 +309,6 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	return constraint;
 }
 
-static void
-removeArbiterFromBodyList(cpBody *body, cpArbiter *arb)
-{
-	cpArbiter **prev_ptr = &body->arbiterList;
-	cpArbiter *node = body->arbiterList;
-	
-	while(node && node != arb){
-		prev_ptr = (node->body_a == body ? &node->next_a : &node->next_b);
-		node = *prev_ptr;
-	}
-	
-	// Need to double check, but there is probably quite a few situations where an arbiter isn't in the body list.
-	//cpAssert(node, "Internal Error: Attempted to remove an arbiter from a body it was never attached to.");
-	
-	if(node){
-		(*prev_ptr) = (node->body_a == body ? node->next_a : node->next_b);
-	}
-}
-
-typedef struct arbiterRemovalContext {
-	cpSpace *space;
-	cpShape *shape;
-} arbiterRemovalContext;
-
-// Hashset filter func to throw away old arbiters.
-static cpBool
-arbiterSetFilterRemovedShape(cpArbiter *arb, arbiterRemovalContext *context)
-{
-	cpShape *shape = context->shape;
-	
-	if(shape == arb->a || shape == arb->b){
-		// If the Arbiter is active (non-cached) call it's separate function immediately.
-		if(arb->state != cpArbiterStateCached){
-			arb->handler->separate(arb, context->space, arb->handler->data);
-		}
-		
-		removeArbiterFromBodyList(arb->body_a, arb);
-		removeArbiterFromBodyList(arb->body_b, arb);
-		
-		// Add the arbiter back to the pool
-		cpArrayPush(context->space->pooledArbiters, arb);
-		return cpFalse;
-	}
-	
-	return cpTrue;
-}
 
 void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
@@ -378,19 +317,14 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 	if(cpBodyIsStatic(body)){
 		cpSpaceRemoveStaticShape(space, shape);
 	} else {
-		cpBodyActivate(body);
-		
 		cpAssert(cpSpaceContainsShape(space, shape),
 			"Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
 		cpAssertSpaceUnlocked(space);
 		
+		cpBodyActivate(body);
 		cpBodyRemoveShape(body, shape);
-		
+		cpBodyFilterArbiters(body, shape);
 		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
-		if(space->sleepTimeThreshold != INFINITY || space->enableContactGraph){
-		  arbiterRemovalContext context = {space, shape};
-		  cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
-		}
 	}
 }
 
@@ -401,15 +335,13 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 		"Cannot remove a static or sleeping shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
-//	cpBodyRemoveShape(shape->body, shape);
-	
+	cpBody *body = shape->body;
+	cpBodyActivateStatic(body, shape);
+	cpBodyRemoveShape(body, shape);
+	cpBodyFilterArbiters(body, shape);
 	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
-	if(space->sleepTimeThreshold != INFINITY || space->enableContactGraph){
-	  arbiterRemovalContext context = {space, shape};
-	  cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)arbiterSetFilterRemovedShape, &context);
-	}
 	
-	cpSpaceActivateShapesTouchingShape(space, shape);
+//	cpSpaceActivateShapesTouchingShape(space, shape);
 }
 
 void
@@ -420,6 +352,7 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
+	cpBodyFilterArbiters(body, NULL);
 	cpArrayDeleteObj(space->bodies, body);
 	body->space = NULL;
 }
@@ -524,6 +457,13 @@ cpSpaceReindexShape(cpSpace *space, cpShape *shape)
 	cpSpatialIndexReindexObject(space->activeShapes, shape, shape->hashid);
 	cpSpatialIndexReindexObject(space->staticShapes, shape, shape->hashid);
 }
+
+void
+cpSpaceReindexShapesForBody(cpSpace *space, cpBody *body)
+{
+	CP_BODY_FOREACH_SHAPE(body, shape) cpSpaceReindexShape(space, shape);
+}
+
 
 static void
 copyShapes(cpShape *shape, cpSpatialIndex *index)

@@ -62,6 +62,7 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 	
 	shape->data = NULL;
 	shape->next = NULL;
+	shape->prev = NULL;
 	
 	return shape;
 }
@@ -84,7 +85,7 @@ cpShapeFree(cpShape *shape)
 void
 cpShapeSetBody(cpShape *shape, cpBody *body)
 {
-	cpAssert(shape->next == NULL, "You cannot change the body on an active shape. You must remove the shape, then ");
+	cpAssert(cpShapeActive(shape), "You cannot change the body on an active shape. You must remove the shape, then ");
 	shape->body = body;
 }
 
