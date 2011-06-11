@@ -27,11 +27,11 @@
 
 #pragma mark Post Step Callback Functions
 
-struct cpPostStepCallback {
+typedef struct cpPostStepCallback {
 	cpPostStepFunc func;
 	void *obj;
 	void *data;
-};
+} cpPostStepCallback;
 
 static cpBool
 postStepFuncSetEql(cpPostStepCallback *a, cpPostStepCallback *b){
@@ -152,7 +152,7 @@ cpContactBufferHeaderInit(cpContactBufferHeader *header, cpTimestamp stamp, cpCo
 	return header;
 }
 
-void
+static void
 cpSpacePushFreshContactBuffer(cpSpace *space)
 {
 	cpTimestamp stamp = space->stamp;
@@ -193,14 +193,14 @@ cpSpacePushContacts(cpSpace *space, int count)
 	space->contactBuffersHead->numContacts += count;
 }
 
-void
+static void
 cpSpacePopContacts(cpSpace *space, int count){
 	space->contactBuffersHead->numContacts -= count;
 }
 
 #pragma mark Collision Detection Functions
 
-void *
+static void *
 cpSpaceArbiterSetTrans(cpShape **shapes, cpSpace *space)
 {
 	if(space->pooledArbiters->num == 0){
@@ -298,7 +298,7 @@ collideShapes(cpShape *a, cpShape *b, cpSpace *space)
 }
 
 // Hashset filter func to throw away old arbiters.
-cpBool
+static cpBool
 cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 {
 	cpTimestamp ticks = space->stamp - arb->stamp;
@@ -339,7 +339,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 
 #pragma mark All Important cpSpaceStep() Function
 
-void
+static void
 cpShapeUpdateFunc(cpShape *shape, void *unused)
 {
 	cpBody *body = shape->body;

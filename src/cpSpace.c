@@ -325,7 +325,7 @@ contactSetFilterRemovedBody(cpArbiter *arb, struct arbiterFilterContext *context
 	return cpTrue;
 }
 
-static void
+void
 cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter)
 {
 	// Just removing the body, so we need to filter all cached arbiters
@@ -384,8 +384,6 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 	cpBodyRemoveShape(body, shape);
 	cpSpaceFilterArbiters(space, body, shape);
 	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
-	
-//	cpSpaceActivateShapesTouchingShape(space, shape);
 }
 
 void

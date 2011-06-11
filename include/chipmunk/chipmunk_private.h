@@ -191,21 +191,13 @@ cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *k
 extern cpCollisionHandler cpDefaultCollisionHandler;
 void cpSpaceProcessComponents(cpSpace *space, cpFloat dt);
 
-void cpSpacePushFreshContactBuffer(cpSpace *space);
 cpContact *cpContactBufferGetArray(cpSpace *space);
 void cpSpacePushContacts(cpSpace *space, int count);
-void cpSpacePopContacts(cpSpace *space, int count);
 
 void *cpSpaceGetPostStepData(cpSpace *space, void *obj);
 
-typedef struct cpPostStepCallback cpPostStepCallback;
-//void cpSpacePostStepCallbackSetIter(cpPostStepCallback *callback, cpSpace *space);
+void cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter);
 
-cpBool cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space);
-void *cpSpaceArbiterSetTrans(cpShape **shapes, cpSpace *space);
-void cpShapeUpdateFunc(cpShape *shape, void *unused);
-
-//void cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space);
 void cpSpaceActivateBody(cpSpace *space, cpBody *body);
 void cpSpaceLock(cpSpace *space);
 void cpSpaceUnlock(cpSpace *space, cpBool runPostStep);
