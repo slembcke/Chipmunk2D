@@ -61,7 +61,7 @@ typedef enum cpArbiterState {
 	// Collision has been explicitly ignored.
 	// Either by returning false from a begin collision handler or calling cpArbiterIgnore().
 	cpArbiterStateIgnore,
-	// Collison has separated, arbiter will be recyled soon.
+	// Collison is no longer active. A space will cache an arbiter for up to cpSpace.collisionPersistence more steps.
 	cpArbiterStateCached,
 } cpArbiterState;
 

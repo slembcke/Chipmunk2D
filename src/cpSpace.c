@@ -328,12 +328,6 @@ contactSetFilterRemovedBody(cpArbiter *arb, struct arbiterFilterContext *context
 void
 cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter)
 {
-	// Just removing the body, so we need to filter all cached arbiters
-	if(filter == NULL){
-		struct arbiterFilterContext context = {space, body};
-		cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)contactSetFilterRemovedBody, &context);
-	}
-	
 	cpArbiter *arb = body->arbiterList;
 	while(arb){
 		cpArbiter *next = cpArbiterNext(arb, body);
@@ -343,14 +337,17 @@ cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter)
 			}
 			
 			cpArbiterUnthread(arb);
-			cpAssert(arb->thread_a.next == NULL, "Caching an arbiter with a dangling graph pointer");
-			cpAssert(arb->thread_a.prev == NULL, "Caching an arbiter with a dangling graph pointer");
-			cpAssert(arb->thread_b.next == NULL, "Caching an arbiter with a dangling graph pointer");
-			cpAssert(arb->thread_b.prev == NULL, "Caching an arbiter with a dangling graph pointer");
 			cpSpaceUncacheArbiter(space, arb);
 			cpArrayPush(space->pooledArbiters, arb);
 		}
 		arb = next;
+	}
+	
+	// TODO see note at cpSpaceArbiterSetFilter()
+	// When just removing the body, so we need to filter all cached arbiters to avoid dangling pointers.
+	if(filter == NULL){
+		struct arbiterFilterContext context = {space, body};
+		cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)contactSetFilterRemovedBody, &context);
 	}
 }
 

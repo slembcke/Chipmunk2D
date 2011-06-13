@@ -277,10 +277,6 @@ collideShapes(cpShape *a, cpShape *b, cpSpace *space)
 		// Process, but don't add collisions for sensors.
 		!sensor
 	){
-		cpAssert(arb->thread_a.next == NULL, "Caching an arbiter with a dangling graph pointer");
-		cpAssert(arb->thread_a.prev == NULL, "Caching an arbiter with a dangling graph pointer");
-		cpAssert(arb->thread_b.next == NULL, "Caching an arbiter with a dangling graph pointer");
-		cpAssert(arb->thread_b.prev == NULL, "Caching an arbiter with a dangling graph pointer");
 		cpArrayPush(space->arbiters, arb);
 	} else {
 		cpSpacePopContacts(space, numContacts);
@@ -305,6 +301,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	
 	cpBody *a = arb->body_a, *b = arb->body_b;
 	
+	// TODO should make an arbiter state for this so it doesn't require filtering arbiters for dangling body pointers.
 	// Preserve arbiters on sensors and rejected arbiters for sleeping objects.
 	if(
 		(cpBodyIsStatic(a) || cpBodyIsSleeping(a)) &&
@@ -319,11 +316,6 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 		cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->a->collision_type, arb->b->collision_type);
 		handler->separate(arb, space, handler->data);
 		arb->state = cpArbiterStateCached;
-		
-		cpAssert(arb->thread_a.next == NULL, "Caching an arbiter with a dangling graph pointer");
-		cpAssert(arb->thread_a.prev == NULL, "Caching an arbiter with a dangling graph pointer");
-		cpAssert(arb->thread_b.next == NULL, "Caching an arbiter with a dangling graph pointer");
-		cpAssert(arb->thread_b.prev == NULL, "Caching an arbiter with a dangling graph pointer");
 	}
 	
 	if(ticks >= space->collisionPersistence){

@@ -65,9 +65,6 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 				arb->handler = cpSpaceLookupHandler(space, a->collision_type, b->collision_type);
 				cpArrayPush(space->arbiters, arb);
 				
-				// TODO pre-step callbacks for freshly awoken bodies need to be done somewhere.
-				// Probably not here?
-				
 				cpfree(contacts);
 			}
 		}
@@ -123,9 +120,15 @@ ComponentActivate(cpBody *root)
 	cpAssert(!cpBodyIsRogue(root), "Internal Error: ComponentActivate() called on a rogue body.");
 	
 	cpSpace *space = root->space;
-	CP_BODY_FOREACH_COMPONENT(root, body){
+	cpBody *body = root;
+	while(body){
+		cpBody *next = body->node.next;
+		
 		body->node.root = NULL;
+		body->node.next = NULL;
 		cpSpaceActivateBody(space, body);
+		
+		body = next;
 	}
 	
 	cpArrayDeleteObj(space->sleepingComponents, root);
@@ -191,12 +194,11 @@ FloodFillComponent(cpBody *root, cpBody *body)
 static inline void
 cpBodyPushArbiter(cpBody *body, cpArbiter *arb)
 {
-	//BORK
-	cpAssert(cpArbiterThreadForBody(arb, body)->next == NULL, "Internal Error: Dangling contact graph pointers detected.");
-	cpAssert(cpArbiterThreadForBody(arb, body)->prev == NULL, "Internal Error: Dangling contact graph pointers detected.");
+	cpAssert(cpArbiterThreadForBody(arb, body)->next == NULL, "Internal Error: Dangling contact graph pointers detected. (A)");
+	cpAssert(cpArbiterThreadForBody(arb, body)->prev == NULL, "Internal Error: Dangling contact graph pointers detected. (B)");
 	
 	cpArbiter *next = body->arbiterList;
-	cpAssert(next == NULL || cpArbiterThreadForBody(next, body)->prev == NULL, "Internal Error: Dangling contact graph pointers detected.");
+	cpAssert(next == NULL || cpArbiterThreadForBody(next, body)->prev == NULL, "Internal Error: Dangling contact graph pointers detected. (C)");
 	cpArbiterThreadForBody(arb, body)->next = next;
 	
 	if(next) cpArbiterThreadForBody(next, body)->prev = arb;
@@ -218,11 +220,8 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		cpFloat keThreshold = (dvsq ? body->m*dvsq : 0.0f);
 		body->node.idleTime = (cpBodyKineticEnergy(body) > keThreshold ? 0.0f : body->node.idleTime + dt);
 		
-		//BORK
-		cpAssert(body->arbiterList == NULL, "Internal Error: Dangling contact graph pointers detected.");
-		
-		// TODO This could be reset in ComponentActivate() instead.
-		body->node.next = NULL;
+		cpAssert(body->node.next == NULL, "Internal Error: Dangling next pointer detected in contact graph.");
+		cpAssert(body->node.root == NULL, "Internal Error: Dangling root pointer detected in contact graph.");
 	}
 	
 	// Awaken any sleeping bodies found and then push arbiters to the bodies' lists.
@@ -230,11 +229,6 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 	for(int i=0, count=arbiters->num; i<count; i++){
 		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
 		cpBody *a = arb->body_a, *b = arb->body_b;
-		
-		cpAssert(arb->thread_a.next == NULL, "Caching an arbiter with a dangling graph pointer");
-		cpAssert(arb->thread_a.prev == NULL, "Caching an arbiter with a dangling graph pointer");
-		cpAssert(arb->thread_b.next == NULL, "Caching an arbiter with a dangling graph pointer");
-		cpAssert(arb->thread_b.prev == NULL, "Caching an arbiter with a dangling graph pointer");
 		
 		if((cpBodyIsRogue(b) && !cpBodyIsStatic(b)) || cpBodyIsSleeping(a)) cpBodyActivate(a);
 		if((cpBodyIsRogue(a) && !cpBodyIsStatic(a)) || cpBodyIsSleeping(b)) cpBodyActivate(b);
