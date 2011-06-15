@@ -73,8 +73,7 @@ void cpConstraintDestroy(cpConstraint *constraint);
 void cpConstraintFree(cpConstraint *constraint);
 
 /// @private
-static inline void
-cpConstraintActivateBodies(cpConstraint *constraint)
+static inline void cpConstraintActivateBodies(cpConstraint *constraint)
 {
 	cpBody *a = constraint->a; if(a) cpBodyActivate(a);
 	cpBody *b = constraint->b; if(b) cpBodyActivate(b);
@@ -101,8 +100,7 @@ CP_DefineConstraintStructProperty(cpFloat, maxBias, MaxBias);
 CP_DefineConstraintStructProperty(cpDataPointer, data, UserData);
 
 /// Get the last impulse applied by this constraint.
-static inline cpFloat
-cpConstraintGetImpulse(cpConstraint *constraint)
+static inline cpFloat cpConstraintGetImpulse(cpConstraint *constraint)
 {
 	return constraint->CP_PRIVATE(klass)->getImpulse(constraint);
 }

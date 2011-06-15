@@ -115,8 +115,7 @@ void cpArbiterIgnore(cpArbiter *arb);
 /// Return the colliding shapes involved for this arbiter.
 /// The order of their cpSpace.collision_type values will match
 /// the order set when the collision handler was registered.
-static inline void
-cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
+static inline void cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
 {
 	if(arb->CP_PRIVATE(swappedColl)){
 		(*a) = arb->CP_PRIVATE(b), (*b) = arb->CP_PRIVATE(a);
@@ -130,8 +129,7 @@ cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
 /// Return the colliding bodies involved for this arbiter.
 /// The order of the cpSpace.collision_type the bodies are associated with values will match
 /// the order set when the collision handler was registered.
-static inline void
-cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)
+static inline void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)
 {
 	CP_ARBITER_GET_SHAPES(arb, shape_a, shape_b);
 	(*a) = shape_a->body;
@@ -141,15 +139,13 @@ cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)
 #define CP_ARBITER_GET_BODIES(arb, a, b) cpBody *a, *b; cpArbiterGetBodies(arb, &a, &b);
 
 /// Returns true if this is the first step a pair of objects started colliding.
-static inline cpBool
-cpArbiterIsFirstContact(const cpArbiter *arb)
+static inline cpBool cpArbiterIsFirstContact(const cpArbiter *arb)
 {
 	return arb->CP_PRIVATE(state) == cpArbiterStateFirstColl;
 }
 
 /// Get the number of contact points for this arbiter.
-static inline int
-cpArbiterGetCount(const cpArbiter *arb)
+static inline int cpArbiterGetCount(const cpArbiter *arb)
 {
 	return arb->CP_PRIVATE(numContacts);
 }

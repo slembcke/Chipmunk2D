@@ -136,22 +136,19 @@ void cpBodySleep(cpBody *body);
 void cpBodySleepWithGroup(cpBody *body, cpBody *group);
 
 /// Returns true if the body is sleeping.
-static inline cpBool
-cpBodyIsSleeping(const cpBody *body)
+static inline cpBool cpBodyIsSleeping(const cpBody *body)
 {
 	return (CP_PRIVATE(body->node).root != ((cpBody*)0));
 }
 
 /// Returns true if the body is static.
-static inline cpBool
-cpBodyIsStatic(const cpBody *body)
+static inline cpBool cpBodyIsStatic(const cpBody *body)
 {
 	return CP_PRIVATE(body->node).idleTime == INFINITY;
 }
 
 /// Returns true if the body has not been added to a space.
-static inline cpBool
-cpBodyIsRogue(const cpBody *body)
+static inline cpBool cpBodyIsRogue(const cpBody *body)
 {
 	return (body->CP_PRIVATE(space) == ((cpSpace*)0));
 }
@@ -199,15 +196,13 @@ void cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat
 void cpBodyUpdatePosition(cpBody *body, cpFloat dt);
 
 /// Convert body relative/local coordinates to absolute/world coordinates.
-static inline cpVect
-cpBodyLocal2World(const cpBody *body, const cpVect v)
+static inline cpVect cpBodyLocal2World(const cpBody *body, const cpVect v)
 {
 	return cpvadd(body->p, cpvrotate(v, body->rot));
 }
 
 /// Convert body absolute/world coordinates to  relative/local coordinates.
-static inline cpVect
-cpBodyWorld2Local(const cpBody *body, const cpVect v)
+static inline cpVect cpBodyWorld2Local(const cpBody *body, const cpVect v)
 {
 	return cpvunrotate(cpvsub(v, body->p), body->rot);
 }
@@ -220,8 +215,7 @@ void cpBodyApplyForce(cpBody *body, const cpVect f, const cpVect r);
 void cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r);
 
 /// Get the kinetic energy of a body.
-static inline cpFloat
-cpBodyKineticEnergy(const cpBody *body)
+static inline cpFloat cpBodyKineticEnergy(const cpBody *body)
 {
 	// Need to do some fudging to avoid NaNs
 	cpFloat vsq = cpvdot(body->v, body->v);

@@ -29,8 +29,7 @@ typedef struct cpBB{
 } cpBB;
 
 /// Convenience constructor for cpBB structs.
-static inline cpBB
-cpBBNew(const cpFloat l, const cpFloat b,
+static inline cpBB cpBBNew(const cpFloat l, const cpFloat b,
 		const cpFloat r, const cpFloat t)
 {
 	cpBB bb = {l, b, r, t};
@@ -38,29 +37,25 @@ cpBBNew(const cpFloat l, const cpFloat b,
 }
 
 /// Returns true if @c a and @c b intersect.
-static inline cpBool
-cpBBIntersects(const cpBB a, const cpBB b)
+static inline cpBool cpBBIntersects(const cpBB a, const cpBB b)
 {
 	return (a.l <= b.r && b.l <= a.r && a.b <= b.t && b.b <= a.t);
 }
 
 /// Returns true if @c other lies completely within @c bb.
-static inline cpBool
-cpBBContainsBB(const cpBB bb, const cpBB other)
+static inline cpBool cpBBContainsBB(const cpBB bb, const cpBB other)
 {
 	return (bb.l <= other.l && bb.r >= other.r && bb.b <= other.b && bb.t >= other.t);
 }
 
 /// Returns true if @c bb contains @c v.
-static inline cpBool
-cpBBContainsVect(const cpBB bb, const cpVect v)
+static inline cpBool cpBBContainsVect(const cpBB bb, const cpVect v)
 {
 	return (bb.l <= v.x && bb.r >= v.x && bb.b <= v.y && bb.t >= v.y);
 }
 
 /// Returns a bounding box that holds both bounding boxes.
-static inline cpBB
-cpBBMerge(const cpBB a, const cpBB b){
+static inline cpBB cpBBMerge(const cpBB a, const cpBB b){
 	return cpBBNew(
 		cpfmin(a.l, b.l),
 		cpfmin(a.b, b.b),
@@ -70,8 +65,7 @@ cpBBMerge(const cpBB a, const cpBB b){
 }
 
 /// Returns a bounding box that holds both @c bb and @c v.
-static inline cpBB
-cpBBExpand(const cpBB bb, const cpVect v){
+static inline cpBB cpBBExpand(const cpBB bb, const cpVect v){
 	return cpBBNew(
 		cpfmin(bb.l, v.x),
 		cpfmin(bb.b, v.y),
@@ -81,22 +75,19 @@ cpBBExpand(const cpBB bb, const cpVect v){
 }
 
 /// Returns the area of the bounding box.
-static inline cpFloat
-cpBBArea(cpBB bb)
+static inline cpFloat cpBBArea(cpBB bb)
 {
 	return (bb.r - bb.l)*(bb.t - bb.b);
 }
 
 /// Merges @c a and @c b and returns the area of the merged bounding box.
-static inline cpFloat
-cpBBMergedArea(cpBB a, cpBB b)
+static inline cpFloat cpBBMergedArea(cpBB a, cpBB b)
 {
 	return (cpfmax(a.r, b.r) - cpfmin(a.l, b.l))*(cpfmax(a.t, b.t) - cpfmin(a.b, b.b));
 }
 
 /// Return true if the bounding box intersects the line segment with ends @c a and @c b.
-static inline cpBool
-cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)
+static inline cpBool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)
 {
 	cpBB seg_bb = cpBBNew(cpfmin(a.x, b.x), cpfmin(a.y, b.y), cpfmax(a.x, b.x), cpfmax(a.y, b.y));
 	if(cpBBIntersects(bb, seg_bb)){

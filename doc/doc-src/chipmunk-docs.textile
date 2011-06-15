@@ -10,7 +10,7 @@ TODO needs a compilation section on the flags and such
 
 <%= h 1, "Chipmunk Physics 6.0.0", "Intro" %>
 
-First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games on every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
+First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be blazingly fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games across just about every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
 
 First of all, I would like to give a Erin Catto a big thank you, as Chipmunk's impulse solver was directly inspired by his example code way back in 2006. (Now a full fledged physics engine all it's own: "Box2D.org":http://www.box2d.org/). His contact persistence idea allows for stable stacks of objects with very few iterations of the solver. My previous solver produced mushy piles of objects or required a large amount of CPU to operate stably.
 
@@ -74,7 +74,7 @@ This means that you do not have to buy a license or pay to use Chipmunk in comme
 
 <%= h 2, "Overview:", "Overview" %>
 
-There are 4 basic objects you will use in Chipmunk.
+There are 4 basic object types you will use in Chipmunk.
 
 * *Rigid Bodies:* A rigid body holds the physical properties of an object. (mass, position, rotation, velocity, etc.) It does not have a shape until you attach one or more collision shapes to it. If you’ve done physics with particles before, rigid bodies differ in that they are able to rotate. Rigid bodies generally tend to have a 1:1 correlation to sprites in a game. You should structure your game so that you use the position and rotation of the rigid body for drawing your sprite.
 * *Collision Shapes:* By attaching shapes to bodies, you can define the a body’s shape. You can attach as many shapes to a single body as you need to in order to define a complex shape. Shapes contain the surface properties of an object such as how much friction or elasticity it has.
@@ -91,9 +91,9 @@ Before you do anything else, you *must* initialize Chipmunk. Otherwise you _will
 
 <pre><code>cpInitChipmunk(); // That is all</code></pre>
 
-If Chipmunk was not compiled with the NDEBUG flag set, it will also print out the debug mode message and the current version number to stdout.
+Chipmunk allocates a small (< 100 bytes) jump table used for performing collision detection between different kinds of shapes. There is no function to explicitly release this memory, but it is no more a memory leak than using a statically allocated array.
 
-TODO not a memory leak.
+If Chipmunk was not compiled with the NDEBUG flag set, it will also print out the debug mode message and the current version number to stdout.
 
 <%= h 2, "Memory Management the Chipmunk way:", "Memory" %>
 
@@ -112,18 +112,20 @@ Additionally if you need more control over allocation and initialization because
 
 Like calls to the @new@ and @free@ functions. Any memory allocated by an @alloc@ function must be freed by @cpfree()@ or similar. Any call to an @init@ function must be matched with it's @destroy@ function.
 
-TODO definable primitive memory functions
+To further ease integration with garbage collectors or other memory management constraints, Chipmunk has a number of compile time defines (@cpcalloc()@, @cprealloc()@, and @cpfree()@) that can be overriden. If you aren't using Chipmunk from a garbage collected language, I'd highly recommend using libGC. It provides nearly transparent garbage collection for C based languages.
 
 <%= h 2, "Basic Types:", "Types" %>
 
 @chipmunk_types.h@ defines a number of basic types that Chipmunk uses. These can be changed at compile time to better suit your needs:
-* @cpFloat@: Floating point type. Defaults to @double@. See below.
+* @cpFloat@: Floating point type. Defaults to @double@.
 * @cpVect@: 2D vector type. "cpVect documentation":#cpVect
 * @cpBool@: Like every good C library that wants good cross language compatibility, you end up defining your own boolean type. :-\ Defaults to @int@.
 * @cpDataPointer@: Pointer type defined for callbacks and the user definable data pointer on most Chipmunk structs. Defaults to @void*@.
-* @cpCollisionType@: Unique identifier for collision shape types. Defaults to @unsigned int@.
-* @cpGroup@: Unique identifier for collision groups. Defaults to @unsigned int@. A @CP_NO_GROUP@ value is defined that can be used when you don't want to specify a group.
-* @cpLayers@: Type used as the layers bitmask. Defaults to @unsigned int@. A @CP_ALL_LAYERS@ value is defined that has all layer bits set.
+* @cpCollisionType@: Unique identifier for collision shape types. Defaults to @unsigned int@. Defined type must support the @==@ operator.
+* @cpGroup@: Unique identifier for collision groups. Defaults to @unsigned int@. A @CP_NO_GROUP@ value is defined that can be used when you don't want to specify a group. Defined type must support the equality @==@ operator.
+* @cpLayers@: Type used as the layers bitmask. Defaults to @unsigned int@. A @CP_ALL_LAYERS@ value is defined that has all layer bits set. Defined type must support the bitwise AND @&@ operator.
+
+If you are writting a game engine or language binding on top of Chipmunk, you might want to choose to use object references instead of integers for collision type and group. I often use class pointers for collision types and game object pointers for groups. It's much simpler than keeping a table of enumerations around.
 
 *Note:* On the iPhone, @cpFloat@ is defined as @float@ and @cpVect@ is an alias for @CGPoint@ for performance and compatibility reasons.
 
@@ -133,19 +135,11 @@ First of all, Chipmunk uses double precision floating point numbers throughout i
 
 Chipmunk defines a number of aliases for common math functions so that you can choose to use floats or doubles for Chipmunk's floating point type. In your own code, there probably isn't a strong reason to use these aliases unless you expect you might want to change Chipmunk's floating point type later and a 2% performance hit from using the wrong float/double version of math functions will matter.
 
-That said, there are a few functions you will probably find very useful:
+There are a few unique functions you will probably find very useful:
 
-<pre><code>cpFloat cpfclamp(cpFloat f, cpFloat min, cpFloat max)</code></pre>
-
-p(expl). Clamp @f@ to be between @min@ and @max@.
-
-<pre><code>cpFloat cpflerp(cpFloat f1, cpFloat f2, cpFloat t)</code></pre>
-
-p(expl). Linearly interpolate between @f1@ and @f2@.
-
-<pre><code>cpFloat cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)</code></pre>
-
-p(expl). Linearly interpolate from @f1@ towards @f2@ by no more than @d@.
+* @cpFloat cpfclamp(cpFloat f, cpFloat min, cpFloat max)@ - Clamp @f@ to be between @min@ and @max@.
+* @cpFloat cpflerp(cpFloat f1, cpFloat f2, cpFloat t)@ - Linearly interpolate between @f1@ and @f2@.
+* @cpFloat cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)@ - Linearly interpolate from @f1@ towards @f2@ by no more than @d@.
 
 Floating point infinity is defined as @INFINITY@. This is defined by many math libraries, but is not actually part of the C standard library.
 
@@ -161,7 +155,7 @@ To represent vectors, Chipmunk defines the "cpVect":#cpVect type and a set of in
 	cpFloat x, y;
 } cpVect</code></pre>
 
-p(expl). Simply a 2D vector packed into a struct.
+p(expl). 2D vector packed into a struct. No surprises here.
 
 <pre><code>static const cpVect cpvzero = {0.0f,0.0f};</code></pre>
 
@@ -173,113 +167,32 @@ p(expl). Convenience constructor for creating new @cpVect@ structs.
 
 <%= h 2, "Operations:", "Operations" %>
 
-<pre><code>cpBool cpveql(const cpVect v1, const cpVect v2)</code></pre>
-
-p(expl). Check if two vectors are equal. (Be careful when comparing floating point numbers!)
-
-<pre><code>cpVect cpvadd(const cpVect v1, const cpVect v2)
-cpVect cpvsub(const cpVect v1, const cpVect v2)</code></pre>
-
-p(expl). Add or subtract two vectors.
-
-<pre><code>cpVect cpvneg(const cpVect v)</code></pre>
-
-p(expl). Negate a vector.
-
-<pre><code>cpVect cpvmult(const cpVect v, const cpFloat s)</code></pre>
-
-p(expl). Scalar multiplication.
-
-<pre><code>cpFloat cpvdot(const cpVect v1, const cpVect v2)</code></pre>
-
-p(expl). Vector dot product.
-
-<pre><code>cpFloat cpvcross(const cpVect v1, const cpVect v2)</code></pre>
-
-p(expl). 2D vector cross product analog. The cross product of 2D vectors results in a 3D vector with only a z component. This function returns the magnitude of the z value.
-
-<pre><code>cpVect cpvperp(const cpVect v)</code></pre>
-
-p(expl). Returns a perpendicular vector. (90 degree rotation)
-
-<pre><code>cpVect cpvrperp(const cpVect v)</code></pre>
-
-p(expl). Returns a perpendicular vector. (-90 degree rotation)
-
-<pre><code>cpVect cpvproject(const cpVect v1, const cpVect v2)</code></pre>
-
-p(expl). Returns the vector projection of @v1@ onto @v2@.
-
-<pre><code>cpVect cpvrotate(const cpVect v1, const cpVect v2)</code></pre>
-
-p(expl). Uses complex multiplication to rotate @v1@ by @v2@. Scaling will occur if @v1@ is not a unit vector.
-
-<pre><code>cpVect cpvunrotate(const cpVect v1, const cpVect v2)</code></pre>
-
-p(expl). Inverse of @cpvrotate()@.
-
-<pre><code>cpFloat cpvlength(const cpVect v)</code></pre>
-
-p(expl). Returns the length of @v@.
-
-<pre><code>cpFloat cpvlengthsq(const cpVect v)</code></pre>
-
-p(expl). Returns the squared length of @v@. Faster than @cpvlength()@ when you only need to compare lengths.
-
-<pre><code>cpVect cpvlerp(const cpVect v1, const cpVect v2, const cpFloat t)</code></pre>
-
-p(expl). Linearly interpolate between @v1@ and @v2@.
-
-<pre><code>cpVect cpvlerpconst(const cpVect v1, const cpVect v2, const cpFloat d)</code></pre>
-
-p(expl). Linearly interpolate between @v1@ towards @v2@ by distance @d@.
-
-<pre><code>cpVect cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t)</code></pre>
-
-p(expl). Spherical linearly interpolate between @v1@ and @v2@.
-
-<pre><code>cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)</code></pre>
-
-p(expl). Spherical linearly interpolate between @v1@ towards @v2@ by no more than angle @a@' in radians.
-
-<pre><code>cpVect cpvnormalize(const cpVect v)</code></pre>
-
-p(expl). Returns a normalized copy of @v@.
-
-<pre><code>cpVect cpvnormalize_safe(const cpVect v)</code></pre>
-
-p(expl). Returns a normalized copy of @v@ or @cpvzero@ if @v@ was already @cpvzero@. Protects against divide by zero errors.
-
-<pre><code>cpVect cpvclamp(const cpVect v, const cpFloat len)</code></pre>
-
-p(expl). Clamp @v@ to length @len@.
-
-<pre><code>cpFloat cpvdist(const cpVect v1, const cpVect v2)</code></pre>
-
-p(expl). Returns the distance between @v1@ and @v2@.
-
-<pre><code>cpFloat cpvdistsq(const cpVect v1, const cpVect v2)</code></pre>
-
-p(expl). Returns the squared distance between @v1@ and @v2@. Faster than @cpvdist()@ when you only need to compare distances.
-
-<pre><code>int cpvnear(const cpVect v1, const cpVect v2, const cpFloat dist)</code></pre>
-
-p(expl). Returns true if the distance between @v1@ and @v2@ is less than @dist@.
-
-<pre><code>cpVect cpvforangle(const cpFloat a)</code></pre>
-
-p(expl). Returns the unit length vector for the given angle (in radians).
-
-<pre><code>cpFloat cpvtoangle(const cpVect v)</code></pre>
-
-p(expl). Returns the angular direction @v@ is pointing in (in radians).
-
-<pre><code>char *cpvstr(const cpVect v)</code></pre>
-
-p(expl). Returns a string representation of @v@. Intended mostly for debugging purposes and not production use.
-
-*NOTE:* The string points to a static local and is reset every time the function is called. If you want to print more than one vector you will have to split up your printing onto separate lines.
-
+* @cpBool cpveql(const cpVect v1, const cpVect v2)@ - Check if two vectors are equal. Chipmunk provides an overloaded @==@ operator when used in C++ programs. _(Be careful when comparing floating point numbers!)_
+* @cpVect cpvadd(const cpVect v1, const cpVect v2)@ - Add two vectors. Chipmunk provides an overloaded @+@ operator when used in C++ programs.
+* @cpVect cpvsub(const cpVect v1, const cpVect v2)@ - Subtract two vectors. Chipmunk provides an overloaded @-@ operator when used in C++ programs.
+* @cpVect cpvneg(const cpVect v)@ - Negate a vector. Chipmunk provides an overloaded unary negation operator @-@ when used in C++ programs.
+* @cpVect cpvmult(const cpVect v, const cpFloat s)@ - Scalar multiplication. Chipmunk provides an overloaded @*@ operator when used in C++ programs.
+* @cpFloat cpvdot(const cpVect v1, const cpVect v2)@ - Vector dot product.
+* @cpFloat cpvcross(const cpVect v1, const cpVect v2)@ - 2D vector cross product analog. The cross product of 2D vectors results in a 3D vector with only a z component. This function returns the value along the z-axis.
+* @cpVect cpvperp(const cpVect v)@ - Returns a perpendicular vector. (90 degree rotation)
+* @cpVect cpvrperp(const cpVect v)@ - Returns a perpendicular vector. (-90 degree rotation)
+* @cpVect cpvproject(const cpVect v1, const cpVect v2)@ - Returns the vector projection of @v1@ onto @v2@.
+* @cpVect cpvrotate(const cpVect v1, const cpVect v2)@ - Uses complex multiplication to rotate @v1@ by @v2@. Scaling will occur if @v1@ is not a unit vector.
+* @cpVect cpvunrotate(const cpVect v1, const cpVect v2)@ - Inverse of @cpvrotate()@.
+* @cpFloat cpvlength(const cpVect v)@ - Returns the length of @v@.
+* @cpFloat cpvlengthsq(const cpVect v)@ - Returns the squared length of @v@. Faster than @cpvlength()@ when you only need to compare lengths.
+* @cpVect cpvlerp(const cpVect v1, const cpVect v2, const cpFloat t)@ - Linearly interpolate between @v1@ and @v2@.
+* @cpVect cpvlerpconst(cpVect v1, cpVect v2, cpFloat d)@ - Linearly interpolate between @v1@ towards @v2@ by distance @d@.
+* @cpVect cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t)@ - Spherical linearly interpolate between @v1@ and @v2@.
+* @cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)@ - Spherical linearly interpolate between @v1@ towards @v2@ by no more than angle @a@' in radians.
+* @cpVect cpvnormalize(const cpVect v)@ - Returns a normalized copy of @v@.
+* @cpVect cpvnormalize_safe(const cpVect v)@ - Returns a normalized copy of @v@ or @cpvzero@ if @v@ was already @cpvzero@. Protects against divide by zero errors.
+* @cpVect cpvclamp(const cpVect v, const cpFloat len)@ - Clamp @v@ to length @len@.
+* @cpFloat cpvdist(const cpVect v1, const cpVect v2)@ - Returns the distance between @v1@ and @v2@.
+* @cpFloat cpvdistsq(const cpVect v1, const cpVect v2)@ - Returns the squared distance between @v1@ and @v2@. Faster than @cpvdist()@ when you only need to compare distances.
+* @cpBool cpvnear(const cpVect v1, const cpVect v2, const cpFloat dist)@ - Returns true if the distance between @v1@ and @v2@ is less than @dist@.
+* @cpVect cpvforangle(const cpFloat a)@ - Returns the unit length vector for the given angle (in radians).
+* @cpFloat cpvtoangle(const cpVect v)@ - Returns the angular direction @v@ is pointing in (in radians).
 
 
 <%= h 1, "Chipmunk Axis Aligned Bounding Boxes: @cpBB@", "cpBB" %>
@@ -296,57 +209,104 @@ p(expl). Simple bounding box struct. Stored as left, bottom, right, top values.
 
 p(expl). Convenience constructor for @cpBB@ structs. Like @cpv()@ this function returns a copy and not a malloced pointer.
 
+
 <%= h 2, "Operations:", "Operations" %>
 
-<pre><code>int cpBBIntersects(const cpBB a, const cpBB b)</code></pre>
-
-p(expl). Returns true if the bounding boxes intersect.
-
-<pre><code>int cpBBcontainsBB(const cpBB bb, const cpBB other)</code></pre>
-
-p(expl). Returns true if @bb@ completely contains @other@.
-
-<pre><code>int cpBBContainsVect(const cpBB bb, const cpVect v)</code></pre>
-
-p(expl). Returns true if @bb@ contains @v@.
-
-<pre><code>int cpBBMerge(const cpBB a,  const cpBB b)</code></pre>
-
-p(expl). Return the minimal bounding box that contains both @a@ and @b@.
-
-<pre><code>int cpBBExpand(const cpBB bb,  const cpVect v)</code></pre>
-
-p(expl). Return the minimal bounding box that contains both @bb@ and @v@.
-
-<pre><code>int cpBBArea(const cpBB bb)</code></pre>
-
-p(expl). Return the area of @bb@.
-
-<pre><code>cpVect cpBBClampVect(const cpBB bb, const cpVect v)</code></pre>
-
-p(expl). Returns a copy of @v@ clamped to the bounding box.
-
-<pre><code>cpVect cpBBIntersectsSegment(const cpBB bb, const cpVect a, const cpVect b)</code></pre>
-
-p(expl). Returns true if the segment defined by endpoints @a@ and @b@ intersect @bb@.
-
-<pre><code>cpVect cpBBWrapVect(const cpBB bb, const cpVect v)</code></pre>
-
-p(expl). Returns a copy of @v@ wrapped to the bounding box.
-
+* @cpBool cpBBIntersects(const cpBB a, const cpBB b)@ - Returns true if the bounding boxes intersect.
+* @cpBool cpBBContainsBB(const cpBB bb, const cpBB other)@ - Returns true if @bb@ completely contains @other@.
+* @cpBool cpBBContainsVect(const cpBB bb, const cpVect v)@ - Returns true if @bb@ contains @v@.
+* @cpBB cpBBMerge(const cpBB a, const cpBB b)@ - Return the minimal bounding box that contains both @a@ and @b@.
+* @cpBB cpBBExpand(const cpBB bb, const cpVect v)@ - Return the minimal bounding box that contains both @bb@ and @v@.
+* @cpFloat cpBBArea(cpBB bb)@ - Return the area of @bb@.
+* @cpFloat cpBBMergedArea(cpBB a, cpBB b)@ - Merges @a@ and @b@ then returns the area of the merged bounding box.
+* @cpBool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)@ - Returns true if the segment defined by endpoints @a@ and @b@ intersect @bb@.
+* @cpVect cpBBClampVect(const cpBB bb, const cpVect v)@ - Returns a copy of @v@ clamped to the bounding box.
+* @cpVect cpBBWrapVect(const cpBB bb, const cpVect v)@ - Returns a copy of @v@ wrapped to the bounding box.
 
 
 TODO:
 overview rogue and static body types here?
 Shapes update automatically when changing position of bodies.
 Need code samples for calculating moments.
-Document getters and setters.
 Better document integration functions.
 Better explain the need for coordinate conversion functions.
 Better explain how forces are applied and what an impulse is.
 Document new iterator functions. With examples!
+No units, no tuning.
+Performance/Quality
 
 <%= h 1, "Chipmunk Rigid Bodies: @cpBody@", "cpBody" %>
+
+<%= h 2, "Properties:", "Properties" %>
+
+* @cpFloat cpBodyGetMass(const cpBody *body)@
+* @void cpBodySetMass(cpBody *body, cpFloat m)@
+
+p(expl). Mass of the body.
+
+* @cpFloat cpBodyGetMoment(const cpBody *body)@
+* @void cpBodySetMoment(cpBody *body, cpFloat i)@
+
+p(expl). Moment of inertia (MoI or sometimes just moment) of the body. The moment is like the rotational mass of a body. See below for function to help calculate the moment. TODO make a section for moment functions.
+
+* @cpVect cpBodyGetPos(const cpBody *body)@
+* @void cpBodySetPos(cpBody *body, cpVect pos)@
+
+p(expl). Position of the center of gravity (CoG) of the body.
+
+* @cpVect cpBodyGetVel(const cpBody *body)@
+* @void cpBodySetVel(cpBody *body, const cpVect value)@
+
+p(expl). Linear velocity of the CoG of the body.
+
+* @cpVect cpBodyGetForce(const cpBody *body)@
+* @void cpBodySetForce(cpBody *body, const cpVect value)@
+
+p(expl). Force applied to the CoG of the body.
+
+* @cpFloat cpBodyGetAngle(const cpBody *body)@
+* @void cpBodySetAngle(cpBody *body, cpFloat a)@
+
+p(expl). Rotation of the body in radians.
+
+* @cpFloat cpBodyGetAngVel(const cpBody *body)@
+* @void cpBodySetAngVel(cpBody *body, const cpFloat value)@
+
+p(expl). The angular velocity of the body in radians per second.
+
+* @cpFloat cpBodyGetTorque(const cpBody *body)@
+* @void cpBodySetTorque(cpBody *body, const cpFloat value)@
+
+p(expl). The torque applied to the body.
+
+* @cpVect cpBodyGetRot(const cpBody *body)@
+
+p(expl). The rotation vector for the body. Can be used with @cpvrotate()@ or @cpvunrotate()@ to perform fast rotations.
+
+* @cpFloat cpBodyGetVelLimit(const cpBody *body)@
+* @void cpBodySetVelLimit(cpBody *body, const cpFloat value)@
+
+p(expl). Velocity limit of the body. Defaults to @INFINITY@ unless you set it specifically. Can be used to limit falling speeds, etc.
+
+* @cpFloat cpBodyGetAngVelLimit(const cpBody *body)@
+* @void cpBodySetAngVelLimit(cpBody *body, const cpFloat value)@
+
+p(expl). Angular velocity limit of the body in radians per second. Defaults to @INFINITY@ unless you set it specifically.
+
+* @cpDataPointer cpBodyGetUserData(const cpBody *body)@
+* @void cpBodySetUserData(cpBody *body, const cpDataPointer value)@
+
+p(expl). User data pointer. Use this pointer to get a reference to the game object that owns this body from callbacks.
+
+
+<%= h 2, "Rogue and Static Bodies:", "RougeStatic" %>
+
+Normally when you create a rigid body, you add it to a space so the space will start simulating it. This means it will update it's position and velocity, apply forces to it, be affected by gravity, etc. A body that isn't added to a space (and not simulated) is called a _rogue body_. The most important use for rogue bodies are as static bodies, but you can also use them to implement directly controlled objects such as moving platforms.
+
+Static bodies are rogue bodies, but with a special flag set on them to let Chipmunk know that they never move unless you tell it. Static bodies have two purposes. Originally they were added for the sleeping algorithm. Because static bodies don't move, Chipmunk knows that it's safe to let objects that are touching or jointed to them fall asleep. Objects touching or jointed to regular rogue bodies are never allowed to sleep. The second purpose for static bodies is that Chipmunk knows shapes attached to them never need to have their collision detection data updated. Chipmunk also doesn't need to bother checking for collisions between static objects. Generally all of your level geometry will be attached to a static body except for things like moving platforms or doors.
+
+TODO In previous versions of Chipmunk before 5.2 you would create an infinite mass rogue body to attach static shapes to using @cpSpaceAddStaticShape()@. Now all you need 
+TODO Additional static bodies can be created using @cpBodyNewStatic()@ or @cpBodyInitStatic()@.
 
 <%= h 2, "Function Types for Integration Callbacks:", "FunctionsTypes" %>
 
@@ -360,7 +320,7 @@ p(expl). Integration function types. You can write your own integration function
 * @velocity_func@ - @cpBodyVelocityFunc@: Function pointer called to update the velocity of the body.
 * @position_func@ - @cpBodyPositionFunc@: Function pointer called to update the position of the body.
 * @m@ - @cpFloat@: Mass of the body. 
-* @i@ - @cpFloat@: Moment of inertia (MoI or sometimes just moment) of the body. The moment is like the rotational mass of a body. See below for function to help calculate the moment.
+* @i@ - @cpFloat@: 
 * @p@ - @cpVect@: Position of the body.
 * @v@ - @cpVect@: Velocity of the body.
 * @f@ - @cpVect@: Current force being applied to the body. *Note:* does not reset automatically as in some physics engines.
@@ -593,7 +553,7 @@ Layers can also be used to set up rule based collisions. Say you have four types
 | Player Bullet | - | - | - |  |
 | Enemy Bullet | - | - | - | - |
 
-The '-'s are for redundant spots in the chart, and the numbers are spots where types should collide. You can use a layer for rule that you want to define. Then add the layers to each type: The player should be in layers 1 and 2, the enemy should be in layers 1 and 3, the player bullets should be in layer 3, and the enemy bullets should be in layer 2. Treating layers as rules this way, you can define up to 32 rules. The default @cpLayers@ type is @unsigned int@ which has a resolution of 32 bits on most systems. Redefine it if you need more to work with.
+The '-'s are for redundant spots in the chart, and the numbers are spots where types should collide. You can use a layer for rule that you want to define. TODO umm what? Then add the layers to each type: The player should be in layers 1 and 2, the enemy should be in layers 1 and 3, the player bullets should be in layer 3, and the enemy bullets should be in layer 2. Treating layers as rules this way, you can define up to 32 rules. The default @cpLayers@ type is @unsigned int@ which has a resolution of 32 bits on most systems. Redefine it if you need more to work with.
 
 There is one last way of filtering collisions using collision handlers. See the "section on callbacks":#Callbacks for more information. While collision handlers can be more flexible, they are also the slowest method. So you try to use groups or layers first.
 
@@ -692,12 +652,6 @@ Spaces in Chipmunk are the basic unit of simulation. You add rigid bodies, shape
 <%= h 2, "What Are Iterations, and Why Should I care?", "Iterations" %>
 
 Chipmunk uses an iterative solver to figure out the forces between objects in the space. What this means is that it builds a big list of all of the collisions, joints, and other constraints between the bodies and makes several passes over the list considering each one individually. The number of passes it makes is the iteration count, and each iteration makes the solution more accurate. If you use too many iterations, the physics should look nice and solid, but may use up too much CPU time. If you use too few iterations, the simulation may seem mushy or bouncy when the objects should be solid. Setting the number of iterations lets you balance between CPU usage and the accuracy of the physics. Chipmunk's default of 10 iterations is sufficient for most simple games.
-
-<%= h 2, "Rogue and Static Bodies:", "RougeStatic" %>
-
-Rogue bodies are bodies that have not been added to the space, but are referenced from shapes or joints. Rogue bodies are a common way of controlling moving elements in Chipmunk such as platforms. As long as the body's velocity matches the changes to it's position, there is no problem with doing this. Most games will not need rogue bodies however.
-
-In previous versions, Chipmunk used infinite mass rogue bodies to attach static shapes to. Creating and maintaining your own body for this is no longer necessary as each space has it's own body for attaching static shapes to. This body is marked as being a _static body_. A static body allows other objects resting on or jointed to it to fall asleep even though it does not fall asleep itself. Additional static bodies can be created using @cpBodyNewStatic()@ or @cpBodyInitStatic()@. Objects resting on or jointed to rogue bodies can never fall asleep. This is because the purpose of rogue bodies are to allow the programmer to move or modify them at any time. Without knowing when they will move, Chipmunk has to assume that objects cannot fall asleep when touching them.
 
 <%= h 2, "Static Shapes:", "StaticShapes" %>
 

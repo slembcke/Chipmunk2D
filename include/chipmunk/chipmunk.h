@@ -70,13 +70,6 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 
 
 #ifndef cpfree
-//	#include "malloc/malloc.h"
-//	#include "string.h"
-//	#include "stdlib.h"
-//	static inline void fake_free(void *ptr){
-//		bzero(ptr, malloc_size(ptr));
-//		free(ptr);
-//	}
 	#define cpfree free
 #endif
 
