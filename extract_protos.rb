@@ -10,9 +10,9 @@ REGEX = /.*?((\w+(\s+\*)?)\s*(cp\w*)\(.*?\))(.*)/
 STDIN.readlines.each do|str|
 	while match = REGEX.match(str)
 		captures = match.captures
-		proto, ret, ignored, sym, str = captures
+		proto, ret, sym, str = captures.values_at(0, 1, 3, 4)
 		break if ret == "return"
 		
-		puts eval('"' + FORMAT + '"') || "#{sym}: #{proto}"
+		puts eval('"' + FORMAT + '"') || "* #{proto} - #{sym}"
 	end
 end

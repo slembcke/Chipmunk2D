@@ -6,33 +6,63 @@
 
 </div>
 
-TODO needs a compilation section on the flags and such
-
 <%= h 1, "Chipmunk Physics 6.0.0", "Intro" %>
 
 First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be blazingly fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games across just about every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
 
 First of all, I would like to give a Erin Catto a big thank you, as Chipmunk's impulse solver was directly inspired by his example code way back in 2006. (Now a full fledged physics engine all it's own: "Box2D.org":http://www.box2d.org/). His contact persistence idea allows for stable stacks of objects with very few iterations of the solver. My previous solver produced mushy piles of objects or required a large amount of CPU to operate stably.
 
+
 <%= h 2, "Why a C Library?", "WhyC" %>
 
-A lot of people ask me why I wrote Chipmunk in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, OOC, Lua, Io... the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I wanted Chipmunk to be fast, portable, and easy to optimize. With Chipmunk weiging in at less than 7,500 lines of C code, headers and comments, I don't feel that using C has made Chipmunk difficult to develop. In fact, at times I feel it has made it easier to optimize and debug.
+A lot of people ask me why I wrote Chipmunk in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, OOC, Lua, Io... the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I also wanted Chipmunk to be fast, portable, easy to optimize and easy to debug. I felt using C helps with all of those.
 
 That said, I've never developed a whole game in C and I probably never will. There are much more interesting languages to do that in than C with all sorts of nice features like garbage collection, closures and object oriented runtimes. Check out the "Bindings and Ports":http://code.google.com/p/chipmunk-physics/wiki/BindingsAndPorts page to see if you can use Chipmunk from your language of choice. Because Chipmunk is written in a subset of C99 it compiles cleanly as C, C++, Objective-C and Objective-C++ code, making it easy to integrate into projects in those languages.
 
 If you are writing iPhone games using Chipmunk, you should check out the Objective-Chipmunk wrapper that we've developed for Chipmunk. It integrates with the Objective-C memory model and provides a number of high level APIs that make writing physics based games for the iPhone even easier. While we do charge for Objective-Chipmunk, it will almost certainly save you more time than the small cost to license it. As a bonus, you'll be helping to ensure that we can afford to continue to work on Chipmunk improvements.
 
+
 <%= h 2, "Limitations of a C API:", "Limitations" %>
 
 The two biggest inconveniences of Chipmunk's C API are lack of operator overloading and access control. Chipmunk defines vector operators as functions instead of allowing you to use regular operators such as @*@, @+@, and @-@. (However Chipmunk 5.3.3 and up does provide overloaded operators if you are using C++) In practice, it's usually not a major problem for readability once you get used to it. The second, and bigger problem is that it's not possible to mark parts of Chipmunk's C API as private. To work around this, I have a separate header full of Chipmunk's private API, @chipmunk_private.h@. I also use a macro, @CP_PRIVATE()@ to mangle names in public structures. While you can feel free to include this header and use the macro in your own code to access this private API, be aware that the fields and functions may be renamed or disappear without warning.
+
+
+<%= h 2, "Get it, Compile it:", "Compiling" %>
+
+If you haven't downloaded it yet, you can always download the newest version of Chipmunk "here":http://files.slembcke.net/chipmunk/release/ChipmunkLatest.tgz. Inside you'll find a command line build script that works with "CMake":http://www.cmake.org/, a XCode project and project files for Visual Studio '09 and '10.
+
+<%= h 3, "Debug or Release?", "DebugRelease" %>
+
+Release mode might be slightly slower, but will include a lot of error checking assertions that can help you find bugs quicker such as removing objects twice or doing things that might cause unsolvable collisions. I highly recommend you use a debug build until you are ready to ship the game and only then switch to a release build.
+
+<%= h 3, "XCode (Mac/iPhone)", "XCode" %>
+
+The included XCode project has targets for building a static library for the Mac or iOS. Additionally, you might want to just run the @macosx/iphonestatic.command@ or @macosx/macstatic.command@ to build you a directory with the headers and debug/release static libraries that you can just drop right into your projects. Including Chipmunk in your project with all the correct compiler flags applied couldn't be simpler. The iPhone script generates a "fat" library that can be used with both the iOS simulator and devices. The device version is compiled as release, and the simulator version is compiled as debug.
+
+<%= h 3, "MSVC", "MSVC" %>
+
+I rarely use MSVC, but others have chipped in to help me maintain Visual Studio project files. Let me know if there are any issues.
+
+<%= h 3, "Command Line", "CommandLine" %>
+
+The CMake build script should work on any system (Unix/Win/Mac) as long as you have CMake installed. It can even generate XCode or MSVC projects if you want (see CMake's documentation for more information).
+
+To compile a Chipmunk debug build on the command line, all you need to do is run:
+<pre><code>cmake -D CMAKE_BUILD_TYPE=Debug .
+make</code></pre>
+
+If the @-D CMAKE_BUILD_TYPE=Debug@ option is left out, it will make a release build instead.
+
 
 <%= h 2, "Support:", "Support" %>
 
 The best way to get support is to visit the "Chipmunk Forums":http://www.slembcke.net/forums/viewforum.php?f=1. There are plenty of people around using Chipmunk on the just about every platform I've ever heard of. If you are working on a commercial project, Howling Moon Software (my company) is "available for contracting":http://howlingmoonsoftware.com/contracting.php. We can help with implementing custom Chipmunk behaviors, as well as priority bug fixes and performance tuning.
 
+
 <%= h 2, "Contact:", "ContactUS" %>
 
 If you find any bugs in Chipmunk, errors or broken links in this document, or have a question or comment about Chipmunk you can contact me at slembcke(at)gmail(dot)com. (email or GTalk)
+
 
 <%= h 2, "License:", "License" %>
 
@@ -62,6 +92,7 @@ SOFTWARE.
 
 This means that you do not have to buy a license or pay to use Chipmunk in commercial projects. (Though we really appreciate donations) 
 
+
 <%= h 2, "Links:", "Links" %>
 
 * "slembcke.net/forums":http://www.slembcke.net/forums/viewforum.php?f=1 - The official forum Chipmunk Physics forum.
@@ -69,6 +100,7 @@ This means that you do not have to buy a license or pay to use Chipmunk in comme
 * "Objective-Chipmunk":http://howlingmoonsoftware.com/objectiveChipmunk.php - An Objective-C wrapper that makes developing Chipmunk apps on the iPhone a snap.
 * "Games":http://code.google.com/p/chipmunk-physics/wiki/Games - A small list of games done with Chipmunk.
 * "Bindings and Ports":http://code.google.com/p/chipmunk-physics/wiki/BindingsAndPorts - A list of bindings and ports of Chipmunk to other languages.
+
 
 <%= h 1, "Chipmunk Basics:", "Basics" %>
 
@@ -142,10 +174,6 @@ There are a few unique functions you will probably find very useful:
 * @cpFloat cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)@ - Linearly interpolate from @f1@ towards @f2@ by no more than @d@.
 
 Floating point infinity is defined as @INFINITY@. This is defined by many math libraries, but is not actually part of the C standard library.
-
-To represent vectors, Chipmunk defines the "cpVect":#cpVect type and a set of inline functions for working with them (cpv, cpvadd, cpvmult, etc). See the API reference for more information..
-
-<%= h 1, "Chipmunk C API:", "API" %>
 
 <%= h 1, "Chipmunk Vectors: @cpVect@", "cpVect" %>
 
@@ -229,114 +257,20 @@ overview rogue and static body types here?
 Shapes update automatically when changing position of bodies.
 Need code samples for calculating moments.
 Better document integration functions.
-Better explain the need for coordinate conversion functions.
-Better explain how forces are applied and what an impulse is.
 Document new iterator functions. With examples!
 No units, no tuning.
 Performance/Quality
 
 <%= h 1, "Chipmunk Rigid Bodies: @cpBody@", "cpBody" %>
 
-<%= h 2, "Properties:", "Properties" %>
-
-* @cpFloat cpBodyGetMass(const cpBody *body)@
-* @void cpBodySetMass(cpBody *body, cpFloat m)@
-
-p(expl). Mass of the body.
-
-* @cpFloat cpBodyGetMoment(const cpBody *body)@
-* @void cpBodySetMoment(cpBody *body, cpFloat i)@
-
-p(expl). Moment of inertia (MoI or sometimes just moment) of the body. The moment is like the rotational mass of a body. See below for function to help calculate the moment. TODO make a section for moment functions.
-
-* @cpVect cpBodyGetPos(const cpBody *body)@
-* @void cpBodySetPos(cpBody *body, cpVect pos)@
-
-p(expl). Position of the center of gravity (CoG) of the body.
-
-* @cpVect cpBodyGetVel(const cpBody *body)@
-* @void cpBodySetVel(cpBody *body, const cpVect value)@
-
-p(expl). Linear velocity of the CoG of the body.
-
-* @cpVect cpBodyGetForce(const cpBody *body)@
-* @void cpBodySetForce(cpBody *body, const cpVect value)@
-
-p(expl). Force applied to the CoG of the body.
-
-* @cpFloat cpBodyGetAngle(const cpBody *body)@
-* @void cpBodySetAngle(cpBody *body, cpFloat a)@
-
-p(expl). Rotation of the body in radians.
-
-* @cpFloat cpBodyGetAngVel(const cpBody *body)@
-* @void cpBodySetAngVel(cpBody *body, const cpFloat value)@
-
-p(expl). The angular velocity of the body in radians per second.
-
-* @cpFloat cpBodyGetTorque(const cpBody *body)@
-* @void cpBodySetTorque(cpBody *body, const cpFloat value)@
-
-p(expl). The torque applied to the body.
-
-* @cpVect cpBodyGetRot(const cpBody *body)@
-
-p(expl). The rotation vector for the body. Can be used with @cpvrotate()@ or @cpvunrotate()@ to perform fast rotations.
-
-* @cpFloat cpBodyGetVelLimit(const cpBody *body)@
-* @void cpBodySetVelLimit(cpBody *body, const cpFloat value)@
-
-p(expl). Velocity limit of the body. Defaults to @INFINITY@ unless you set it specifically. Can be used to limit falling speeds, etc.
-
-* @cpFloat cpBodyGetAngVelLimit(const cpBody *body)@
-* @void cpBodySetAngVelLimit(cpBody *body, const cpFloat value)@
-
-p(expl). Angular velocity limit of the body in radians per second. Defaults to @INFINITY@ unless you set it specifically.
-
-* @cpDataPointer cpBodyGetUserData(const cpBody *body)@
-* @void cpBodySetUserData(cpBody *body, const cpDataPointer value)@
-
-p(expl). User data pointer. Use this pointer to get a reference to the game object that owns this body from callbacks.
-
-
 <%= h 2, "Rogue and Static Bodies:", "RougeStatic" %>
 
 Normally when you create a rigid body, you add it to a space so the space will start simulating it. This means it will update it's position and velocity, apply forces to it, be affected by gravity, etc. A body that isn't added to a space (and not simulated) is called a _rogue body_. The most important use for rogue bodies are as static bodies, but you can also use them to implement directly controlled objects such as moving platforms.
 
-Static bodies are rogue bodies, but with a special flag set on them to let Chipmunk know that they never move unless you tell it. Static bodies have two purposes. Originally they were added for the sleeping algorithm. Because static bodies don't move, Chipmunk knows that it's safe to let objects that are touching or jointed to them fall asleep. Objects touching or jointed to regular rogue bodies are never allowed to sleep. The second purpose for static bodies is that Chipmunk knows shapes attached to them never need to have their collision detection data updated. Chipmunk also doesn't need to bother checking for collisions between static objects. Generally all of your level geometry will be attached to a static body except for things like moving platforms or doors.
+Static bodies are rogue bodies, but with a special flag set on them to let Chipmunk know that they never move unless you tell it. Static bodies have two purposes. Originally they were added for the sleeping feature. Because static bodies don't move, Chipmunk knows that it's safe to let objects that are touching or jointed to them fall asleep. Objects touching or jointed to regular rogue bodies are never allowed to sleep. The second purpose for static bodies is that Chipmunk knows shapes attached to them never need to have their collision detection data updated. Chipmunk also doesn't need to bother checking for collisions between static objects. Generally all of your level geometry will be attached to a static body except for things like moving platforms or doors.
 
-TODO In previous versions of Chipmunk before 5.2 you would create an infinite mass rogue body to attach static shapes to using @cpSpaceAddStaticShape()@. Now all you need 
-TODO Additional static bodies can be created using @cpBodyNewStatic()@ or @cpBodyInitStatic()@.
+In previous versions of Chipmunk before 5.2 you would create an infinite mass rogue body to attach static shapes to using @cpSpaceAddStaticShape()@. You don't need to do any of that anymore, and shouldn't if you want to use the sleeping feature. Each space has a dedicated static body that you can use to attach your static shapes to. Chipmunk also automatically adds shapes attached to static bodies as static shapes.
 
-<%= h 2, "Function Types for Integration Callbacks:", "FunctionsTypes" %>
-
-<pre><code>typedef void (*cpBodyVelocityFunc)(struct cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);
-typedef void (*cpBodyPositionFunc)(struct cpBody *body, cpFloat dt);</code></pre>
-
-p(expl). Integration function types. You can write your own integration functions to create your own body behaviors that go beyond applying simply gravity. It's unlikely that you'll need to override the position integration function, and if you do you should carefully study how the default function (@cpBodyUpdatePosition()@) works. See the "planet demo":http://code.google.com/p/chipmunk-physics/source/browse/trunk/Demo/Planet.c#49 for an example of how to create planetary gravity.
-
-<%= h 2, "Fields:", "Fields" %>
-
-* @velocity_func@ - @cpBodyVelocityFunc@: Function pointer called to update the velocity of the body.
-* @position_func@ - @cpBodyPositionFunc@: Function pointer called to update the position of the body.
-* @m@ - @cpFloat@: Mass of the body. 
-* @i@ - @cpFloat@: 
-* @p@ - @cpVect@: Position of the body.
-* @v@ - @cpVect@: Velocity of the body.
-* @f@ - @cpVect@: Current force being applied to the body. *Note:* does not reset automatically as in some physics engines.
-* @a@ - @cpFloat@: Current rotation angle of the body in radians.
-* @w@ - @cpFloat@: Current rotational velocity of the body.
-* @t@ - @cpFloat@: Current torque being applied to the body. *Note:* does not reset automatically as in some physics engines.
-* @rot@ - @cpVect@: Cached unit length rotation vector.
-* @v_limit@ - @cpFloat@: Maximum speed a body may have after updating it's velocity.
-* @w_limit@ - @cpFloat@: Maximum rotational speed a body may have after updating it's velocity.
-* @data@ - @cpDataPointer@: A user definable data pointer. If you set this to point at the game object the shapes is for, then you can access your game object from Chipmunk callbacks.
-
-Using the standard single letter names used in physics equations for these values probably wasn't the best idea in the long run. For me at least, it made things easier as the equations in the code looked more like the written equations I was used to. The getter/setter functions listed below may help save your sanity however.
-
-When changing any of a body's properties, you should also call @cpBodyActivate()@ to make sure that it is not stuck sleeping when you've changed a property that should make it move again. The @cpBodySet*()@ functions do this for you automatically.
-
-*Note:* @m@, @i@, and @a@ *must* be set using setter functions. The body holds on to cached values based on them.
 
 <%= h 2, "Memory Management Functions:", "Memory" %>
 
@@ -349,9 +283,10 @@ void cpBodyFree(cpBody *body)</code></pre>
 
 p(expl). Standard set of Chipmunk memory management functions. @m@ and @i@ are the mass and moment of inertia for the body. Guessing the mass for a body is usually fine, but guessing a moment of inertia can lead to a very poor simulation.
 
+
 <%= h 2, "Creating Additional Static Bodies:", "StaticBodies" %>
 
-While every @cpSpace@:#cpSpace has a built in static body that you can use, it can be convenient to make your own as well. One potential use is in a level editor. By attaching chunks of your level to static bodies, you can still move and rotate the chunks independently of each other. Then all you have to do is call @cpSpaceRehashStatic()@ to rebuild the static collision detection data when you are done.
+While every cpSpace has a built in static body that you can use, it can be convenient to make your own as well. One potential use is in a level editor. By attaching chunks of your level to static bodies, you can still move and rotate the chunks independently of each other. Then all you have to do is call @cpSpaceRehashStatic()@ to rebuild the static collision detection data when you are done.
 
 For more information on rogue and static bodies, see "Chipmunk Spaces":#cpSpace.
 
@@ -361,146 +296,125 @@ cpBody *cpBodyNewStatic()</code></pre>
 
 p(expl). Create additional static bodies with infinite mass and moment of inertia.
 
-<%= h 2, "Moment of Inertia Helper Functions:", "MomentHelpers" %>
+
+<%= h 2, "Properties:", "Properties" %>
+
+<pre><code>cpFloat cpBodyGetMass(const cpBody *body)
+void cpBodySetMass(cpBody *body, cpFloat m)</code></pre>
+
+p(expl). Mass of the body.
+
+<pre><code>cpFloat cpBodyGetMoment(const cpBody *body)
+void cpBodySetMoment(cpBody *body, cpFloat i)</code></pre>
+
+p(expl). Moment of inertia (MoI or sometimes just moment) of the body. The moment is like the rotational mass of a body. See below for function to help calculate the moment.
+
+<pre><code>cpVect cpBodyGetPos(const cpBody *body)
+void cpBodySetPos(cpBody *body, cpVect pos)</code></pre>
+
+p(expl). Position of the center of gravity of the body.
+
+<pre><code>cpVect cpBodyGetVel(const cpBody *body)
+void cpBodySetVel(cpBody *body, const cpVect value)</code></pre>
+
+p(expl). Linear velocity of the center of gravity of the body.
+
+<pre><code>cpVect cpBodyGetForce(const cpBody *body)
+void cpBodySetForce(cpBody *body, const cpVect value)</code></pre>
+
+p(expl). Force applied to the center of gravity of the body.
+
+<pre><code>cpFloat cpBodyGetAngle(const cpBody *body)
+void cpBodySetAngle(cpBody *body, cpFloat a)</code></pre>
+
+p(expl). Rotation of the body in radians.
+
+<pre><code>cpFloat cpBodyGetAngVel(const cpBody *body)
+void cpBodySetAngVel(cpBody *body, const cpFloat value)</code></pre>
+
+p(expl). The angular velocity of the body in radians per second.
+
+<pre><code>cpFloat cpBodyGetTorque(const cpBody *body)
+void cpBodySetTorque(cpBody *body, const cpFloat value)</code></pre>
+
+p(expl). The torque applied to the body.
+
+<pre><code>cpVect cpBodyGetRot(const cpBody *body)</code></pre>
+
+p(expl). The rotation vector for the body. Can be used with @cpvrotate()@ or @cpvunrotate()@ to perform fast rotations.
+
+<pre><code>cpFloat cpBodyGetVelLimit(const cpBody *body)
+void cpBodySetVelLimit(cpBody *body, const cpFloat value)</code></pre>
+
+p(expl). Velocity limit of the body. Defaults to @INFINITY@ unless you set it specifically. Can be used to limit falling speeds, etc.
+
+<pre><code>cpFloat cpBodyGetAngVelLimit(const cpBody *body)
+void cpBodySetAngVelLimit(cpBody *body, const cpFloat value)</code></pre>
+
+p(expl). Angular velocity limit of the body in radians per second. Defaults to @INFINITY@ unless you set it specifically.
+
+<pre><code>cpDataPointer cpBodyGetUserData(const cpBody *body)
+void cpBodySetUserData(cpBody *body, const cpDataPointer value)</code></pre>
+
+p(expl). User data pointer. Use this pointer to get a reference to the game object that owns this body from callbacks.
+
+
+<%= h 2, "Moment of Inertia and Area Helper Functions:", "Helpers" %>
 
 Use the following functions to approximate the moment of inertia for your body, adding the results together if you want to use more than one.
 
-<pre><code>cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset)</code></pre>
+* @cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset)@ - Calculate the moment of inertia for a hollow circle, @r1@ and @r2@ are the inner and outer diameters in no particular order. _(A solid circle has an inner diameter of 0)_
+* @cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b)@ - Calculate the moment of inertia for a line segment. The endpoints @a@ and @b@ are relative to the body.
+* @cpFloat cpMomentForPoly(cpFloat m, int numVerts, const cpVect *verts, cpVect offset)@ - Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
+* @cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height)@ - Calculate the moment of inertia for a solid box centered on the body.
 
-p(expl). Calculate the moment of inertia for a hollow circle, @r1@ and @r2@ are the inner and outer diameters in no particular order. _(A solid circle has an inner diameter of 0)_
+TODO examples
 
-<pre><code>cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b)</code></pre>
+Use the following functions to get the area for common Chipmunk shapes if you want to approximate masses or density or whatnot.
 
-p(expl). Calculate the moment of inertia for a line segment. The endpoints @a@ and @b@ are relative to the body.
+* @cpFloat cpAreaForCircle(cpFloat r1, cpFloat r2)@ - Area of a hollow circle.
+* @cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat r)@ - Area of a beveled segment. _(Will always be zero if radius is zero)_
+* @cpFloat cpAreaForPoly(const int numVerts, const cpVect *verts)@ - Signed area of a polygon shape. Returns a negative number for polygons with a backwards winding.
 
-<pre><code>cpFloat cpMomentForPoly(cpFloat m, int numVerts, cpVect *verts, cpVect offset)</code></pre>
-
-p(expl). Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
-
-<pre><code>cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height)</code></pre>
-
-p(expl). Calculate the moment of inertia for a solid box centered on the body.
-
-<%= h 2, "Area Helper Functions:", "AreaHelpers" %>
-
-Use the following functions to get the area for common Chipmunk shapes if you want to approximate masses.
-
-<pre><code>cpFloat cpAreaForCircle(cpFloat r1, cpFloat r2)</code></pre>
-
-p(expl). Area of a hollow circle.
-
-<pre><code>cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat r)</code></pre>
-
-p(expl). Area of a beveled segment. (Will always be zero if radius is zero)
-
-<pre><code>cpFloat cpAreaForPoly(const int numVerts, const cpVect *verts)</code></pre>
-
-p(expl). Signed area of a polygon shape. Returns a negative number for polygons with a backwards winding.
-
-
-<%= h 2, "Setters for Linked Values:", "RequiredSetters" %>
-
-Because several rigid body values are linked (@m@/@m_inv@, @i@/@i_inv@, @a@/@rot@), don't set them explicitly. Use the following setter functions instead.
-
-<pre><code>void cpBodySetMass(cpBody *body, cpFloat m);
-void cpBodySetMoment(cpBody *body, cpFloat i);
-void cpBodySetAngle(cpBody *body, cpFloat a);</code></pre>
-
-<%= h 2, "Getters and Setters:", "Properties" %>
-
-While you *MUST* use the setters in the previous section. You are encouraged to use setters/getters for all properties.
-
-Getters and setters will all be of the form:
-
-<pre><code>cpFloat cpBodyGetMass(cpBody *body)
-void cpBodySetMass(cpBody *body, cpFloat mass)</code></pre>
-
-And the full list:
-
-|_. Name |_. Type |_. Read Only? |
-| Mass | cpFloat | no |
-| Moment | cpFloat | no |
-| Pos | cpVect | no |
-| Vel | cpVect | no |
-| Force | cpVect | no |
-| Angle | cpFloat | no |
-| AngVel | cpFloat | no |
-| Torque | cpFloat | no |
-| Rot | cpVect | yes |
-
-<%= h 2, "Integration Functions:", "IntegrationFunctions" %>
-
-<pre><code>void cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)</code></pre>
-
-p(expl). Default rigid body velocity integration function. Updates the velocity of the body using Euler integration.
-
-<pre><code>void cpBodyUpdatePosition(cpBody *body, cpFloat dt)</code></pre>
-
-p(expl). Default rigid body position integration function. Updates the position of the body using Euler integration. Unlike the velocity function, it's unlikely you'll want to override this function. If you do, make sure you understand it's source code as it's an important part of the collision/joint correction process.
 
 <%= h 2, "Coordinate Conversion Functions:", "CoordinateConversion" %>
 
-<pre><code>cpVect cpBodyLocal2World(cpBody *body, cpVect v)</code></pre>
+Many things are defined in coordinates local to a body meaning that the (0,0) is at the center of gravity of the body and the axis rotate along with the body.
 
-p(expl). Convert from body local coordinates to world space coordinates.
+* @cpVect cpBodyLocal2World(const cpBody *body, const cpVect v)@ - Convert from body local coordinates to world space coordinates.
+* @cpVect cpBodyWorld2Local(const cpBody *body, const cpVect v)@ - Convert from world space coordinates to body local coordinates.
 
-<pre><code>cpVect cpBodyWorld2Local(cpBody *body, cpVect v)</code></pre>
-
-p(expl). Convert from world space coordinates to body local coordinates.
 
 <%= h 2, "Applying Forces and Torques:", "Forces" %>
 
-<pre><code>void cpBodyApplyImpulse(cpBody *body, cpVect j, cpVect r)</code></pre>
+People are sometimes confused by the difference between a force and an impulse. An impulse is basically a very large force applied over a very short period of time, like a ball hitting a wall or cannon firing. Chipmunk treats impulses as if they occur instantaneously by simply adding directly to the velocity of an object. Both impulses and forces are affected the mass of an object. Double the mass of the object and halve the effect.
 
-p(expl). Apply the impulse @j@ to @body@ at a relative offset @r@ from the center of gravity. Both @r@ and @j@ are in world coordinates. @r@ is relative to the position of the body, but not the rotation. Many people get tripped up by this.
+* @void cpBodyResetForces(cpBody *body)@ - Zero both the forces and torques currently applied to the body.
+* @void cpBodyApplyForce(cpBody *body, const cpVect f, const cpVect r)@ - Add the impulse @j@ to @body@ at a relative offset @r@ from the center of gravity.
+* @void cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)@ - Add the force @f@ to @body@ at a relative offset @r@ from the center of gravity.
 
-<pre><code>void cpBodyResetForces(cpBody *body)</code></pre>
+*Note:* Both the @cpBodyApplyForce()@ @cpBodyApplyImpulse()@ functions take a force or impulse in absolute coordinates and applies it at a relative offset in absolute coordinates. (The offset is relative to the center of gravity, but is not rotated with the body)
 
-p(expl). Zero both the forces and torques accumulated on @body@.
-
-<pre><code>void cpBodyApplyForce(cpBody *body, cpVect f, cpVect r)</code></pre>
-
-p(expl). Apply (accumulate) the force @f@ on @body@ at a *relative offset (important!)* @r@ from the center of gravity. Both @r@ and @f@ are in world coordinates.
 
 <%= h 2, "Sleeping Functions:", "Sleeping" %>
 
-See Chipmunk Spaces":#cpSpace for more information on Chipmunk's sleeping feature.
+Chipmunk supports a sleeping feature so that it stops using CPU time simulating groups of objects that stop moving. Read more about it in the "cpSpace section":#cpSpace-Sleeping.
 
-<pre><code>cpBool cpBodyIsSleeping(const cpBody *body)</code></pre>
-
-p(expl). Returns true if @body@ is sleeping.
+* @cpBool cpBodyIsSleeping(const cpBody *body)@ - Returns true if @body@ is sleeping.
+* @void cpBodyActivate(cpBody *body)@ - Reset the idle timer on a body. If it was sleeping, wake it and any other bodies it was touching.
+* @void cpBodySleep(cpBody *body)@ - Forces a body to fall asleep immediately even if it's in midair. Cannot be called from a callback.
+* @void cpBodyActivateStatic(cpBody *body, cpShape *filter)@ - Similar in function to @cpBodyActivate()@. Activates all bodies touching @body@. If @filter@ is not @NULL@, then only bodies touching through @filter@ will be awoken.
 
 <pre><code>void cpBodySleepWithGroup(cpBody *body, cpBody *group)</code></pre>
 
-p(expl). When objects in Chipmunk sleep, they sleep as a group of all objects that are touching or jointed together. When an object is woken up, all of the objects in it's group are woken up. Calling cpBodySleepWithGroup() forces a body to fall asleep immediately. If @group@ is @NULL@, a new group will be created. If group is another sleeping body, it will be added to that body's group. It is an error to specify a non-sleeping body for @group@. Make sure everything is set up before calling this method. Calling a setter function or adding/removing a shape or constraint will cause the body to be woken up again. Also, this function must not be called from a collision handler or query callback. Use a post-step callback instead.
+p(expl). When objects in Chipmunk sleep, they sleep as a group of all objects that are touching or jointed together. When an object is woken up, all of the objects in it's group are woken up. @cpBodySleepWithGroup()@ allows you group sleeping objects together. It acts identically to @cpBodySleep()@ if you pass @NULL@ as @group@ by starting a new group. If you pass a sleeping body for @group@, @body@ will be awoken when @group@ is awoken. You can use this to initialize levels and start stacks of objects in a pre-sleeping state.
 
-An example of how this could be used is to set up a piles of boxes that a player can knock over. Creating the piles and letting them fall asleep normally would work, but it means that all of the boxes would need to be simulated until they fell asleep. This could be slow if you had a lot of piles. Instead you can force them to sleep and start the game with the boxes already sleeping.
-
-Another example would be collapsing platforms. You could create a sleeping object that is suspended in the air. As soon as the player comes along to jump on it, it wakes up and starts falling. In this case, it would be impossible to have the platform fall asleep naturally.
-
-<!-- TODO example needed here -->
-
-<pre><code>void cpBodySleep(cpBody *body)</code></pre>
-
-p(expl). Equivalent to calling @cpBodySleepWithGroup(body, NULL)@. It forces @body@ to fall asleep and creates a new group for it.
-
-<pre><code>void cpBodyActivate(cpBody *body)</code></pre>
-
-p(expl). Reset the idle timer on @body@ and wake it up if it was sleeping. This function is now safe to call from collision, query, and iteration callbacks.
+TODO code example here
 
 <%= h 2, "Misc Functions:", "Misc" %>
 
-<pre><code>cpBool cpBodyIsStatic(const cpBody *body)</code></pre>
-
-p(expl). Returns true if @body@ is a static body. (cpSpace.staticBody or a static rogue body)
-
-<pre><code>cpBool cpBodyIsRogue(const cpBody *body)</code></pre>
-
-p(expl). Returns true if @body@ has never been added to a space. Though shapes attached to this body may still be added to a space. For more information on rogue and static bodies, see "Chipmunk Spaces":#cpSpace.
-
-<pre><code>cpBool cpBodyIsSleeping(const cpBody *body)</code></pre>
-
-p(expl). Returns true if @body@ is sleeping.
+* @cpBool cpBodyIsStatic(const cpBody *body)@ - Returns true if @body@ is a static body. Either @cpSpace.staticBody@, a body created with @cpBodyNewStatic()@ or @cpBodyInitStatic()@.
+* @cpBool cpBodyIsRogue(const cpBody *body)@ - Returns true if @body@ has never been added to a space.
 
 
 <%= h 2, "Notes:", "Notes" %>
@@ -564,11 +478,13 @@ void cpShapeFree(cpShape *shape)</code></pre>
 
 p(expl). @Destroy@ and @Free@ functions are shared by all shape types. Allocation and initialization functions are specific to each shape type. See below.
 
-<%= h 2, "Shape Operations:", "Operations" %>
+<%= h 2, "Misc Functions:", "Misc" %>
 
 <pre><code>cpBB cpShapeCacheBB(cpShape *shape)</code></pre>
 
 p(expl). Updates and returns the bounding box of @shape@.
+
+TODO new variant of this
 
 <pre><code>void cpResetShapeIdCounter(void)</code></pre>
 
@@ -617,17 +533,12 @@ p(expl). Getters for poly shape properties. Passing a non-poly shape or an index
 
 <%= h 3, "Poly Shape Helper Functions:", "PolyHelpers" %>
 
-<pre><code>cpVect cpCentroidForPoly(const int numVerts, const cpVect *verts)</code></pre>
-
-p(expl). Calculate the centroid for a polygon.
-
-<pre><code>void cpRecenterPoly(const int numVerts, cpVect *verts)</code></pre>
-
-p(expl). Center a polygon to (0,0). Subtracts the centroid from each vertex.
+* @cpVect cpCentroidForPoly(const int numVerts, const cpVect *verts)@ - Calculate the centroid for a polygon.
+* @void cpRecenterPoly(const int numVerts, cpVect *verts)@ - Center a polygon to (0,0). Subtracts the centroid from each vertex.
 
 <%= h 2, "Modifying cpShapes:", "Modifing" %>
 
-The short answer is that you can't because the changes would be only picked up as a change to the position of the shape's surface, but not it's velocity. The long answer is that you can using the "unsafe" API as long as you realize that doing so will not result in realistic physical behavior. These extra functions are define in a separate header @chipmunk_unsafe.h@.
+The short answer is that you can't because the changes would be only picked up as a change to the position of the shape's surface, but not it's velocity. The long answer is that you can using the "unsafe" API as long as you realize that doing so will not result in realistic physical behavior. These extra functions are defined in a separate header @chipmunk_unsafe.h@.
 
 <%= h 2, "Notes:", "Notes" %>
 
@@ -673,7 +584,7 @@ New in Chipmunk 5.3 is the ability of spaces to disable entire groups of objects
 * @gravity@ - @cpVect@: Global gravity applied to the space. Defaults to @cpvzero@. Can be overridden on a per body basis by writing custom integration functions.
 * @damping@ - @cpFloat@: Amount of viscous damping to apply to the space. A value of 0.9 means that each body will lose 10% of it's velocity per second. Defaults to 1. Like @gravity@ can be overridden on a per body basis.
 * @idleSpeedThreshold@ - @cpFloat@: Speed threshold for a body to be considered idle. The default value of 0 means to let the space guess a good threshold based on gravity.
-* @sleepTimeThreshold@ - @cpFloat@: Time a group of bodies must remain idle in order to fall asleep. The default value of @INFINITY@ disables the sleeping algorithm.
+* @sleepTimeThreshold@ - @cpFloat@: Time a group of bodies must remain idle in order to fall asleep. The default value of @INFINITY@ disables the sleeping feature.
 * @staticBody@ - @cpBody@: A statically allocated infinite mass body that the space uses to substitute for NULL bodies on shapes and constraints. Set the @space->staticBody.data@ pointer to something helpful if you want to have some context from within callbacks.
 
 <%= h 2, "Memory Management Functions:", "Memory" %>

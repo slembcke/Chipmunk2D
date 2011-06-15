@@ -94,8 +94,8 @@ cpBodyNewStatic()
 }
 
 void cpBodyDestroy(cpBody *body){
-	cpAssertWarn(cpBodyIsRogue(body), "Destroying a body that is still added to a space.");
-	cpAssertWarn(body->shapeList == NULL, "Destroying a body that is still has shapes attached to it.");
+//	cpAssertWarn(cpBodyIsRogue(body), "Destroying a body that is still added to a space.");
+//	cpAssertWarn(body->shapeList == NULL, "Destroying a body that is still has shapes attached to it.");
 }
 
 void
