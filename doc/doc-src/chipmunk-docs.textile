@@ -113,9 +113,8 @@ There are 4 basic object types you will use in Chipmunk.
 * *Constraints/Joints:* Constraints and joints describe how bodies are attached to each other.
 * *Spaces:* Spaces are containers for simulating objects in Chipmunk. You add bodies, shapes and joints to a space and then update the space as a whole. They control how all the rigid bodies, shapes, and
 
-There is often confusion between rigid bodies and their collision shapes in Chipmunk and how they relate to sprites. A sprite would be a visual representation of an object, while a collision shape is an invisible property that defines how objects should collide. Both the sprite's and the collision shape's position and rotation are controlled by a rigid body.
+There is often confusion between rigid bodies and their collision shapes in Chipmunk and how they relate to sprites. A sprite would be a visual representation of an object, while a collision shape is an invisible property that defines how objects should collide. Both the sprite's and the collision shape's position and rotation are controlled by a rigid body. Generally you want to create a game object type that ties these things all together.
 
-TODO game object example
 
 <%= h 2, "Initialization:", "Initialization" %>
 
@@ -253,8 +252,6 @@ p(expl). Convenience constructor for @cpBB@ structs. Like @cpv()@ this function 
 
 
 TODO:
-overview rogue and static body types here?
-Shapes update automatically when changing position of bodies.
 Need code samples for calculating moments.
 Better document integration functions.
 Document new iterator functions. With examples!
@@ -269,7 +266,7 @@ Normally when you create a rigid body, you add it to a space so the space will s
 
 Static bodies are rogue bodies, but with a special flag set on them to let Chipmunk know that they never move unless you tell it. Static bodies have two purposes. Originally they were added for the sleeping feature. Because static bodies don't move, Chipmunk knows that it's safe to let objects that are touching or jointed to them fall asleep. Objects touching or jointed to regular rogue bodies are never allowed to sleep. The second purpose for static bodies is that Chipmunk knows shapes attached to them never need to have their collision detection data updated. Chipmunk also doesn't need to bother checking for collisions between static objects. Generally all of your level geometry will be attached to a static body except for things like moving platforms or doors.
 
-In previous versions of Chipmunk before 5.2 you would create an infinite mass rogue body to attach static shapes to using @cpSpaceAddStaticShape()@. You don't need to do any of that anymore, and shouldn't if you want to use the sleeping feature. Each space has a dedicated static body that you can use to attach your static shapes to. Chipmunk also automatically adds shapes attached to static bodies as static shapes.
+In previous versions of Chipmunk before 5.3 you would create an infinite mass rogue body to attach static shapes to using @cpSpaceAddStaticShape()@. You don't need to do any of that anymore, and shouldn't if you want to use the sleeping feature. Each space has a dedicated static body that you can use to attach your static shapes to. Chipmunk also automatically adds shapes attached to static bodies as static shapes.
 
 
 <%= h 2, "Memory Management Functions:", "Memory" %>
@@ -299,6 +296,8 @@ p(expl). Create additional static bodies with infinite mass and moment of inerti
 
 <%= h 2, "Properties:", "Properties" %>
 
+Chipmunk provides getter/setter functions for a number of properties on rigid bodies. Setting most properties automatically wakes the rigid bodies up if they were sleeping. You can also set the fields directly on the cpBody struct if you wish. They are documented in the headers.
+
 <pre><code>cpFloat cpBodyGetMass(const cpBody *body)
 void cpBodySetMass(cpBody *body, cpFloat m)</code></pre>
 
@@ -312,7 +311,7 @@ p(expl). Moment of inertia (MoI or sometimes just moment) of the body. The momen
 <pre><code>cpVect cpBodyGetPos(const cpBody *body)
 void cpBodySetPos(cpBody *body, cpVect pos)</code></pre>
 
-p(expl). Position of the center of gravity of the body.
+p(expl). Position of the center of gravity of the body. When changing the position you may also want to call @cpSpaceReindexShapesForBody()@ to update the collision detection information for the attached shapes if plan to make any queries against the space.
 
 <pre><code>cpVect cpBodyGetVel(const cpBody *body)
 void cpBodySetVel(cpBody *body, const cpVect value)</code></pre>
@@ -327,7 +326,7 @@ p(expl). Force applied to the center of gravity of the body.
 <pre><code>cpFloat cpBodyGetAngle(const cpBody *body)
 void cpBodySetAngle(cpBody *body, cpFloat a)</code></pre>
 
-p(expl). Rotation of the body in radians.
+p(expl). Rotation of the body in radians. When changing the rotation you may also want to call @cpSpaceReindexShapesForBody()@ to update the collision detection information for the attached shapes if plan to make any queries against the space.
 
 <pre><code>cpFloat cpBodyGetAngVel(const cpBody *body)
 void cpBodySetAngVel(cpBody *body, const cpFloat value)</code></pre>
@@ -422,11 +421,9 @@ TODO code example here
 * Use forces to modify the rigid bodies if possible. This will be the most stable.
 * Modifying a body's velocity shouldn't necessarily be avoided, but applying large changes every frame can cause strange results in the simulation. Experiment freely, but be warned.
 * *Don't* modify a body's position every step unless you really know what you are doing. Otherwise you're likely to get the position/velocity badly out of sync.
+* If you free a body before calling @cpSpaceRemoveShape()@ on the shapes attached to it, you *will* cause crashes.
 
 <%= h 1, "Chipmunk Collision Shapes: @cpShape@", "cpShape" %>
-
-TODO:
-Document cpShapeUpdate() function.
 
 There are currently 3 collision shape types:
 
@@ -434,30 +431,72 @@ There are currently 3 collision shape types:
 * *Line segments*: Meant mainly as a static shape. They can be attached to moving bodies, but they don't currently generate collisions with other line segments. Can be beveled in order to give them a thickness.
 * *Convex polygons*: Slowest, but most flexible collision shape.
 
-You can add multiple shapes to a body. This should give you the flexibility to make any shape you want as well providing different areas of the same object with different friction, elasticity or callback values.
-
-<%= h 2, "Fields:", "Fields" %>
+You can add as many shapes to a body as you wish. That is why the two types are separate. This should give you the flexibility to make any shape you want as well providing different areas of the same object with different friction, elasticity or callback values.
 
 When creating different types of shapes, you will always be given a @cpShape*@ pointer back. This is because Chipmunk shapes are meant to be opaque types. Think of the specific collision types such as @cpCircleShape@, @cpSegmentShape@ and @cpPolyShape@ as private subclasses of @cpShape@. You can still read some properties from them using the getter functions, but you are not intended to cast @cpShape@ pointers to their specific types.
 
-* @body@ - @cpBody*@: The rigid body the shape is attached to.
-* @bb@ - @cpBB@: The bounding box of the shape. Only guaranteed to be valid after @cpShapeCacheBB()@ or @cpSpaceStep()@ is called. Moving a body that a shape is connected to does not update it's bounding box.
-* @sensor@ - @cpBool@: A boolean value if this shape is a sensor or not. Sensors only call collision callbacks, and never generate real collisions.
-* @e@ - @cpFloat@: Elasticity of the shape. A value of 0.0 gives no bounce, while a value of 1.0 will give a "perfect" bounce. However due to inaccuracies in the simulation using 1.0 or greater is not recommended however. _See the notes at the end of the section._
-* @u@ - @cpFloat@: Friction coefficient. Chipmunk uses the Coulomb friction model, a value of 0.0 is frictionless. "Tables of friction coefficients":http://www.roymech.co.uk/Useful_Tables/Tribology/co_of_frict.htm. _See the notes at the end of the section._
-* @surface_v@ - @cpVect@: The surface velocity of the object. Useful for creating conveyor belts or players that move around. This value is only used when calculating friction, not resolving the collision.
-* @collision_type@ - @cpCollisionType@: You can assign types to Chipmunk collision shapes that trigger callbacks when objects of certain types touch. See the "callbacks section":#Callbacks or an "example":examples.html#CollisionCallbacks for more information.
-* @group@ - @cpCollisionGroup@: Shapes in the same non-zero group do not generate collisions. Useful when creating an object out of many shapes that you don't want to self collide. Defaults to @CP_NO_GROUP@.
-* @layers@ - @cpLayers@: Shapes only collide if they are in the same bit-planes. i.e. @(a->layers & b->layers) != 0@ By default, a shape occupies all bit-planes. "Wikipedia":http://en.wikipedia.org/wiki/Mask_(computing)#top has a nice article on bitmasks if you are unfamiliar with how to use them. Defaults to @CP_ALL_LAYERS@.
-* @data@ - @cpDataPointer@: A user definable data pointer. If you set this to point at the game object the shapes is for, then you can access your game object from Chipmunk callbacks.
+
+<%= h 2, "Properties:", "Properties" %>
+
+Chipmunk provides getter/setter functions for a number of properties on collision shapes. Setting most properties automatically wakes the rigid body they are attached to up if it was sleeping. You can also set some of the fields directly on the cpShape struct if you wish. They are documented in the headers.
+
+* @cpBody * cpShapeGetBody(const cpShape *shape)@
+* @void cpShapeSetBody(cpShape *shape, cpBody *body)@
+
+p(expl). The rigid body the shape is attached to. Can only be set when the shape is not added to a space.
+
+* @cpBB cpShapeGetBB(const cpShape *shape)@ - cpShapeGetBB
+
+p(expl). The bounding box of the shape. Only guaranteed to be valid after @cpShapeCacheBB()@ or @cpSpaceStep()@ is called. Moving a body that a shape is connected to does not update it's bounding box. For shapes used for queries that aren't attached to bodies, you can also use @cpShapeUpdate()@.
+
+* @cpBool cpShapeGetSensor(const cpShape *shape)@ - cpShapeGetIsSensor
+* @void cpShapeSetSensor(cpShape *shape, cpBool value)@ - cpShapeSetIsSensor
+
+p(expl). A boolean value if this shape is a sensor or not. Sensors only call collision callbacks, and never generate real collisions.
+
+* @cpFloat cpShapeGetElasticity(const cpShape *shape)@ - cpShapeGetElasticity
+* @void cpShapeSetElasticity(cpShape *shape, cpFloat value)@ - cpShapeSetElasticity
+
+p(expl). Elasticity of the shape. A value of 0.0 gives no bounce, while a value of 1.0 will give a "perfect" bounce. However due to inaccuracies in the simulation using 1.0 or greater is not recommended however. The elasticity for a collision is found by multiplying the elasticity of the individual shapes together.
+
+* @cpFloat cpShapeGetFriction(const cpShape *shape)@ - cpShapeGetFriction
+* @void cpShapeSetFriction(cpShape *shape, cpFloat value)@ - cpShapeSetFriction
+
+p(expl). Friction coefficient. Chipmunk uses the Coulomb friction model, a value of 0.0 is frictionless. The friction for a collision is found by multiplying the friction of the individual shapes together. "Tables of friction coefficients":http://www.roymech.co.uk/Useful_Tables/Tribology/co_of_frict.htm.
+
+* @cpVect cpShapeGetSurfaceVelocity(const cpShape *shape)@ - cpShapeGetSurfaceVelocity
+* @void cpShapeSetSurfaceVelocity(cpShape *shape, cpVect value)@ - cpShapeSetSurfaceVelocity
+
+p(expl). The surface velocity of the object. Useful for creating conveyor belts or players that move around. This value is only used when calculating friction, not resolving the collision.
+
+* @cpCollisionType cpShapeGetCollisionType(const cpShape *shape)@ - cpShapeGetCollisionType
+* @void cpShapeSetCollisionType(cpShape *shape, cpCollisionType value)@ - cpShapeSetCollisionType
+
+p(expl). You can assign types to Chipmunk collision shapes that trigger callbacks when objects of certain types touch. See the "callbacks section":#Callbacks-Handlers for more information.
+
+* @cpGroup cpShapeGetGroup(const cpShape *shape)@ - cpShapeGetGroup
+* @void cpShapeSetGroup(cpShape *shape, cpGroup value)@ - cpShapeSetGroup
+
+p(expl). Shapes in the same non-zero group do not generate collisions. Useful when creating an object out of many shapes that you don't want to self collide. Defaults to @CP_NO_GROUP@.
+
+* @cpLayers cpShapeGetLayers(const cpShape *shape)@ - cpShapeGetLayers
+* @void cpShapeSetLayers(cpShape *shape, cpLayers value)@ - cpShapeSetLayers
+
+p(expl). Shapes only collide if they are in the same bit-planes. i.e. @(a->layers & b->layers) != 0@ By default, a shape occupies all bit-planes. "Wikipedia":http://en.wikipedia.org/wiki/Mask_(computing)#top has a nice article on bitmasks if you are unfamiliar with how to use them. Defaults to @CP_ALL_LAYERS@.
+
+* @cpDataPointer cpShapeGetUserData(const cpShape *shape)@ - cpShapeGetUserData
+* @void cpShapeSetUserData(cpShape *shape, cpDataPointer value)@ - cpShapeSetUserData
+
+p(expl). A user definable data pointer. If you set this to point at the game object the shapes is for, then you can access your game object from Chipmunk callbacks.
+
 
 <%= h 2, "Filtering Collisions:", "Filtering" %>
 
 Chipmunk has two primary means of ignoring collisions: groups and layers.
 
-Groups are meant to ignore collisions between parts on a complex object. A ragdoll is a good example. When jointing an arm onto the torso, you'll want them to allow them to overlap. Groups allow you to do exactly that. Shapes that have the same group don't generate collisions. So by placing all of the shapes in a ragdoll in the same group, you'll prevent it from colliding against other parts of itself.
+*Groups* are meant to ignore collisions between parts on a complex object. A ragdoll is a good example. When jointing an arm onto the torso, you'll want them to allow them to overlap. Groups allow you to do exactly that. Shapes that have the same group don't generate collisions. So by placing all of the shapes in a ragdoll in the same group, you'll prevent it from colliding against other parts of itself.
 
-Layers allow you to separate collision shapes into mutually exclusive planes. Shapes can be in more than one layer, and shapes only collide with other shapes that are in at least one of the same layers. As a simple example, say shape A is in layer 1, shape B is in layer 2, and shape C is in layer 1 and 2. Shape A and B won't collide with each other, but shape C will collide with both A and B.
+*Layers* allow you to separate collision shapes into mutually exclusive planes. Shapes can be in more than one layer, and shapes only collide with other shapes that are in at least one of the same layers. As a simple example, say shape A is in layer 1, shape B is in layer 2, and shape C is in layer 1 and 2. Shape A and B won't collide with each other, but shape C will collide with both A and B.
 
 Layers can also be used to set up rule based collisions. Say you have four types of shapes in your game. The player, the enemies, player bullets and enemy bullets. The are that the player should collide with enemies, and bullets shouldn't collide with the type (player or enemy) that fired them. Making a chart would look like this:
 
@@ -467,7 +506,7 @@ Layers can also be used to set up rule based collisions. Say you have four types
 | Player Bullet | - | - | - |  |
 | Enemy Bullet | - | - | - | - |
 
-The '-'s are for redundant spots in the chart, and the numbers are spots where types should collide. You can use a layer for rule that you want to define. TODO umm what? Then add the layers to each type: The player should be in layers 1 and 2, the enemy should be in layers 1 and 3, the player bullets should be in layer 3, and the enemy bullets should be in layer 2. Treating layers as rules this way, you can define up to 32 rules. The default @cpLayers@ type is @unsigned int@ which has a resolution of 32 bits on most systems. Redefine it if you need more to work with.
+The '-'s are for redundant spots in the chart, and the numbers are spots where types should collide. You can use a layer for rule that you want to define. TODO umm what? Then add the layers to each type: The player should be in layers 1 and 2, the enemy should be in layers 1 and 3, the player bullets should be in layer 3, and the enemy bullets should be in layer 2. Treating layers as rules this way, you can define up to 32 rules. The default @cpLayers@ type is @unsigned int@ which has a resolution of 32 bits on most systems. You can redefine the @cpLayers@ type in @chipmunk_types.h@ if you need more bits to work with.
 
 There is one last way of filtering collisions using collision handlers. See the "section on callbacks":#Callbacks for more information. While collision handlers can be more flexible, they are also the slowest method. So you try to use groups or layers first.
 
@@ -480,15 +519,9 @@ p(expl). @Destroy@ and @Free@ functions are shared by all shape types. Allocatio
 
 <%= h 2, "Misc Functions:", "Misc" %>
 
-<pre><code>cpBB cpShapeCacheBB(cpShape *shape)</code></pre>
-
-p(expl). Updates and returns the bounding box of @shape@.
-
-TODO new variant of this
-
-<pre><code>void cpResetShapeIdCounter(void)</code></pre>
-
-p(expl). Chipmunk keeps a counter so that every new shape is given a unique hash value to be used in the spatial hash. Because this affects the order in which the collisions are found and handled, you can reset the shape counter every time you populate a space with new shapes. If you don't, there might be (very) slight differences in the simulation.
+* @cpBB cpShapeCacheBB(cpShape *shape)@ - Synchronizes @shape@ with the body its attached to.
+* @cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot)@ - Sets the position and rotation of the shape to 
+* @void cpResetShapeIdCounter(void)@ - Chipmunk keeps a counter so that every new shape is given a unique hash value to be used in the spatial hash. Because this affects the order in which the collisions are found and handled, you can reset the shape counter every time you populate a space with new shapes. If you don't, there might be (very) slight differences in the simulation.
 
 <%= h 2, "Working With Circle Shapes:", "Circles" %>
 
@@ -531,10 +564,19 @@ cpVect cpPolyShapeGetVert(cpShape *shape, int index)</code></pre>
 
 p(expl). Getters for poly shape properties. Passing a non-poly shape or an index that does not exist will throw an assertion.
 
+<%= h 3, "Boxes:", "Boxes" %>
+
+Because boxes are so common in physics games, Chipmunk provides shortcuts to create box shaped polygons. The boxes will always be centered at the center of gravity of the body you are attaching them to. If you want to create an off-center box, you will need to use @cpPolyShapeNew()@ or @cpPolyShapeInit()@.
+
+<pre><code>cpPolyShape *cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height)
+cpShape *cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height)</code></pre>
+
 <%= h 3, "Poly Shape Helper Functions:", "PolyHelpers" %>
 
+* @cpBool cpPolyValidate(const cpVect *verts, const int numVerts)@ - Check if a vertex array is convex and with the correct winding.
 * @cpVect cpCentroidForPoly(const int numVerts, const cpVect *verts)@ - Calculate the centroid for a polygon.
 * @void cpRecenterPoly(const int numVerts, cpVect *verts)@ - Center a polygon to (0,0). Subtracts the centroid from each vertex.
+
 
 <%= h 2, "Modifying cpShapes:", "Modifing" %>
 
@@ -544,48 +586,76 @@ The short answer is that you can't because the changes would be only picked up a
 
 * You can attach multiple collision shapes to a rigid body. This should allow you to create almost any shape you could possibly need.
 * Shapes attached to the same rigid body will never generate collisions. You don't have to worry about overlap when attaching multiple shapes to a rigid body.
-* The amount of elasticity applied during a collision is determined by multiplying the elasticity of both shapes together. The same is done for determining the friction. If you want to override this default behavior, you can do so inside of a preSolve collision callback. See the "Chipmunk Callbacks":#ChipmunkCallbacks section for more information.
-* Make sure you add both the body and it's collision shapes to a space. The exception is when you want to have a static body or a body that you integrate yourself. In that case, only add the shape.
+* Make sure you add both the body and it's collision shapes to a space. The exception is when you want to have an externally body or a body that you integrate yourself. In that case, only add the shape.
 
 <%= h 1, "Chipmunk Spaces: @cpSpace@", "cpSpace" %>
 
-TODO
-Document changes for the spatial indexing.
-Document changes for the variable time-steping.
-Document changes for collision slop and bias.
-Document object query methods.
-Document iterators.
-Document use-spatial-hash function.
-
-
-Spaces in Chipmunk are the basic unit of simulation. You add rigid bodies, shapes and constraints to it and then step them forward through time.
+Spaces in Chipmunk are the basic unit of simulation. You add rigid bodies, shapes and constraints to it and then step them all forward through time together.
 
 <%= h 2, "What Are Iterations, and Why Should I care?", "Iterations" %>
 
 Chipmunk uses an iterative solver to figure out the forces between objects in the space. What this means is that it builds a big list of all of the collisions, joints, and other constraints between the bodies and makes several passes over the list considering each one individually. The number of passes it makes is the iteration count, and each iteration makes the solution more accurate. If you use too many iterations, the physics should look nice and solid, but may use up too much CPU time. If you use too few iterations, the simulation may seem mushy or bouncy when the objects should be solid. Setting the number of iterations lets you balance between CPU usage and the accuracy of the physics. Chipmunk's default of 10 iterations is sufficient for most simple games.
 
-<%= h 2, "Static Shapes:", "StaticShapes" %>
-
-Chipmunk optimizes collision detection against shapes that do not move. There are two ways that Chipmunk knows a shape is static.
-
-The first is automatic. When adding or removing shapes attached to static bodies, Chipmunk knows to handle them specially and you just use the same functions as adding regular dynamic shapes, @cpSpaceAddShape()@ and @cpSpaceRemoveShape()@.
-
-The second way is to explicitly tag shapes as static using @cpSpaceAddStaticShape()@. This is rarely needed, but say for instance that you have a rogue body that seldomly moves. In this case, adding a shape attached to it as a static shape and updating it only when the body moves can increase performance. Shapes added this way must be removed by calling @cpSpaceRemoveStaticShape()@.
-
-Because static shapes aren't updated automatically, you must let Chipmunk know that it needs to update the static shapes. You can update all of the static shapes at once using @cpSpaceRehashStatic()@ or individual shapes using @cpSpaceRehashShape()@. If you find yourself rehashing static bodies often, you should be adding them normally using @cpSpaceAddShape()@ instead.
-
 <%= h 2, "Sleeping", "Sleeping" %>
 
 New in Chipmunk 5.3 is the ability of spaces to disable entire groups of objects that have stopped moving to save CPU time as well as battery life. In order to use this feature you must do 2 things. The first is that you must attach all your static geometry to static bodies. Objects cannot fall asleep if they are touching a non-static rogue body even if it's shapes were added as static shapes. The second is that you must enable sleeping explicitly by choosing a time threshold value for @cpSpace.sleepTimeThreshold@. If you do not set @cpSpace.idleSpeedThreshold@ explicitly, a value will be chosen automatically based on the current amount of gravity.
 
-<%= h 2, "Fields:", "Fields" %>
+<%= h 2, "Properties:", "Properties" %>
 
-* @iterations@ - @int@: Allow you to control the accuracy of the solver. Defaults to 10. See the section on iterations above for an explanation.
-* @gravity@ - @cpVect@: Global gravity applied to the space. Defaults to @cpvzero@. Can be overridden on a per body basis by writing custom integration functions.
-* @damping@ - @cpFloat@: Amount of viscous damping to apply to the space. A value of 0.9 means that each body will lose 10% of it's velocity per second. Defaults to 1. Like @gravity@ can be overridden on a per body basis.
-* @idleSpeedThreshold@ - @cpFloat@: Speed threshold for a body to be considered idle. The default value of 0 means to let the space guess a good threshold based on gravity.
-* @sleepTimeThreshold@ - @cpFloat@: Time a group of bodies must remain idle in order to fall asleep. The default value of @INFINITY@ disables the sleeping feature.
-* @staticBody@ - @cpBody@: A statically allocated infinite mass body that the space uses to substitute for NULL bodies on shapes and constraints. Set the @space->staticBody.data@ pointer to something helpful if you want to have some context from within callbacks.
+* @int cpSpaceGetIterations(const cpSpace *space)@
+* @void cpSpaceSetIterations(cpSpace *space, int value)@
+
+p(expl). Iterations allow you to control the accuracy of the solver. Defaults to 10. See "above":#cpSpace-Iterations for more information.
+
+* @cpVect cpSpaceGetGravity(const cpSpace *space)@
+* @void cpSpaceSetGravity(cpSpace *space, cpVect value)@
+
+p(expl). Global gravity applied to the space. Defaults to @cpvzero@. Can be overridden on a per body basis by writing custom integration functions.
+
+* @cpFloat cpSpaceGetDamping(const cpSpace *space)@
+* @void cpSpaceSetDamping(cpSpace *space, cpFloat value)@
+
+p(expl). Amount of simple damping to apply to the space. A value of 0.9 means that each body will lose 10% of it's velocity per second. Defaults to 1. Like @gravity@ can be overridden on a per body basis.
+
+* @cpFloat cpSpaceGetIdleSpeedThreshold(const cpSpace *space)@
+* @void cpSpaceSetIdleSpeedThreshold(cpSpace *space, cpFloat value)@
+
+p(expl). Speed threshold for a body to be considered idle. The default value of 0 means to let the space guess a good threshold based on gravity.
+
+* @cpFloat cpSpaceGetSleepTimeThreshold(const cpSpace *space)@
+* @void cpSpaceSetSleepTimeThreshold(cpSpace *space, cpFloat value)@
+
+p(expl). Time a group of bodies must remain idle in order to fall asleep. The default value of @INFINITY@ disables the sleeping feature.
+
+* @cpFloat cpSpaceGetCollisionSlop(const cpSpace *space)@
+* @void cpSpaceSetCollisionSlop(cpSpace *space, cpFloat value)@
+
+p(expl). Amount of overlap between shapes that is allowed. It's encouraged to set this as high as you can without noticable overlapping as it improves the stability. It defaults to 0.1.
+
+* @cpFloat cpSpaceGetCollisionBias(const cpSpace *space)@
+* @void cpSpaceSetCollisionBias(cpSpace *space, cpFloat value)@
+
+p(expl). Chipmunk allows fast moving objects to overlap, then fixes the overlap over several frames. The bias value controls how much overlap is left after a second and defaults to @cpfpow(1.0f - 0.1f, 60.0f)@ meaning it fixes 10% of the overlap every 1/60th of a second or 99.8% over a second. Most games won't need to change this value.
+
+* @cpTimestamp cpSpaceGetCollisionPersistence(const cpSpace *space)@
+* @void cpSpaceSetCollisionPersistence(cpSpace *space, cpTimestamp value)@
+
+p(expl). The number of frames the space keeps collision solutions around for. Helps prevent jittering contacts from getting worse. This defaults to 3 and very very _very_ few games will need to change this value.
+
+* @cpBool cpSpaceGetEnableContactGraph(const cpSpace *space)@
+* @void cpSpaceSetEnableContactGraph(cpSpace *space, cpBool value)@
+
+p(expl). In order to use the @cpBodyEachArbiter()@ function, you must tell Chipmunk to generate the contact graph. Disabled by default as it incurrs a small 5-10% overhead. Enabling the sleeping feature also enables the contact graph.
+
+* @cpDataPointer cpSpaceGetUserData(const cpSpace *space)@
+* @void cpSpaceSetUserData(cpSpace *space, cpDataPointer value)@
+
+p(expl). A user definable data pointer. It's useful to point this at the gamestate object or scene management object that owns the space.
+
+* @cpBody * cpSpaceGetStaticBody(const cpSpace *space)@
+
+p(expl). A statically allocated infinite mass body that the space uses to substitute for NULL bodies on shapes and constraints. You can set its user data pointer to something helpful if you want for callbacks.
+
 
 <%= h 2, "Memory Management Functions:", "Memory" %>
 
@@ -604,34 +674,76 @@ p(expl). This function will free all of the shapes, bodies and joints that have 
 
 <%= h 2, "Operations:", "Operations" %>
 
-<pre><code>void cpSpaceAddShape(cpSpace *space, cpShape *shape)
-void cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
-void cpSpaceAddBody(cpSpace *space, cpBody *body)
-void cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
+<pre><code>cpShape *cpSpaceAddShape(cpSpace *space, cpShape *shape)
+cpShape *cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
+cpBody *cpSpaceAddBody(cpSpace *space, cpBody *body)
+cpConstraint *cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 
 void cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
-void cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 void cpSpaceRemoveBody(cpSpace *space, cpBody *body)
-void cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)</code></pre>
+void cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 
-p(expl). These functions add and remove shapes, bodies and constraints from @space@. See the section on Static Shapes above for an explanation of what a static shape is and how it differs from a normal shape. Also, you cannot call the any of these functions from within a callback other than a post-step callback (which is different than a post-solve callback!). Attempting to add or remove objects from the space while @cpSpaceStep()@ is still executing will throw an assertion. See the "callbacks section":#Callbacks for more information.
+cpBool cpSpaceContainsShape(cpSpace *space, cpShape *shape)
+cpBool cpSpaceContainsBody(cpSpace *space, cpBody *body)
+cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)</code></pre>
 
-<%= h 2, "Misc:", "Misc" %>
+p(expl). These functions add and remove shapes, bodies and constraints from @space@. The add/remove functions cannot be called from within a callback other than a @postStep()@ callback _(which is different than a postSolve() callback!)_. Attempting to add or remove objects from the space while @cpSpaceStep()@ is still executing will throw an assertion. See the "callbacks section":#Callbacks for more information. The add functions return the thing being added so that you can create and add something in one line. The contains functions allow you to check if an object has been added to the space or not.
 
-<pre><code>void cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape)</code></pre>
 
-p(expl). Perform a query for all shapes touching @shape@ and call @cpBodyActivate()@ on them. This is useful when you need to move a shape explicitly. Waking shapes touching the moved shape prevents objects from sleeping when the floor is moved or something similar. You only need to do this when changing the shape of an existing shape or moving a static shape. Most other methods of moving a shape automatically would wake up other touching objects.
+<%= h 3, "Deprecated:", "Deprecated" %>
 
-<%= h 2, "Spatial Hash Management Functions:", "SpatialHash" %>
+<pre><code>cpShape *cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
+void cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)</code></pre>
 
-Chipmunk uses a spatial hash to accelerate it's collision detection. While it's not necessary to interact with the hash directly. The current API does expose some of this at the space level to allow you to tune it's performance.
+p(expl). Shapes attached to static bodies are automatically treated as static. There isn't really a good reason to explicitly add static shapes anymore.
 
-<pre><code>void cpSpaceResizeStaticHash(cpSpace *space, cpFloat dim, int count)
-void cpSpaceResizeActiveHash(cpSpace *space, cpFloat dim, int count)</code></pre>
+* @void cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape)@ - Use @cpBodyActivateStatic()@ instead.
 
-p(expl). The spatial hash data structures used by Chipmunk's collision detection are fairly size sensitive. @dim@ is the size of the hash cells. Setting @dim@ to the average collision shape size is likely to give the best performance. Setting @dim@ too small will cause the shape to be inserted into many cells, setting it too low will cause too many objects into the same hash slot.
 
-@count@ is the _suggested_ minimum number of cells in the hash table. If there are too few cells, the spatial hash will return many false positives. Too many cells will be hard on the cache and waste memory. the  Setting @count@ to ~10x the number of objects in the space is probably a good starting point. Tune from there if necessary. By default, @dim@ is 100.0, and @count@ is 1000. The new demo program has a visualizer for the static hash. You can use this to get a feel for how to size things up against the spatial hash.
+<%= h 2, "Spatial Indexing:", "SpatialIndexing" %>
+
+Chipmunk 6 officially supports 2 spatial indexes. The default is an axis-aligned bounding box tree inspired by the one used in the Bullet Physics library, but extended with my own collision pair caching to give the tree very good temporal coherence. The tree requires no tuning, and most games will find that they get much better performance using it. The other available index available is a spatial hash, which can be much faster when you have a very large number (1000s) of objects that are all the same size.
+
+Occasionally, you might want to update the collision detection data for a shape. If you move a static shape or a static body you *must* do this to let Chipmunk know it needs to have it's collision detection data updated. You may also want to manually update the collision data for normal shapes if you move them and still want to perform queries.
+
+* @void cpSpaceReindexShape(cpSpace *space, cpShape *shape)@ - Reindex a specific shape.
+* @void cpSpaceReindexShapesForBody(cpSpace *space, cpBody *body)@ - Reindex all the shapes for a certain body.
+* @void cpSpaceReindexStatic(cpSpace *space)@ - Reindex all static shapes. Generally updating only the shapes that changed is faster.
+
+
+<%= h 2, "Iterators:", "Iterators" %>
+
+<pre><code>typedef void (*cpSpaceBodyIteratorFunc)(cpBody *body, void *data)
+void cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)</code></pre>
+
+p(expl). Call @func@ for each body in the space also passing along your data pointer. Sleeping bodies are included, but static and rogue bodies are not as they aren't added to the space.	
+
+<pre><code>typedef void (*cpSpaceShapeIteratorFunc)(cpShape *shape, void *data)
+void cpSpaceEachShape(cpSpace *space, cpSpaceShapeIteratorFunc func, void *data)</code></pre>
+
+p(expl). Call @func@ for each shape in the space also passing along your data pointer. Sleeping and static shapes are included.
+
+TODO examples
+
+
+<%= h 2, "Simulating the Space:", "Simulating" %>
+
+<pre><code>void cpSpaceStep(cpSpace *space, cpFloat dt)</code></pre>
+
+p(expl). Update the space for the given time step. Using a fixed time step is _highly_ recommended. Doing so can greatly increase the quality of the simulation.
+
+
+<%= h 2, "Enabling and Tuning the Spatial Hash:", "SpatialHash" %>
+
+If you have thousands of objects that are all approximately the same size, the spatial hash may be for you.
+
+<pre><code>void cpSpaceUseSpatialHash(cpSpace *space, cpFloat dim, int count)</code></pre>
+
+p(expl). Switch the space to use a spatial hash instead of the bounding box tree.
+
+The spatial hash data is fairly size sensitive. @dim@ is the size of the hash cells. Setting @dim@ to the average collision shape size is likely to give the best performance. Setting @dim@ too small will cause the shape to be inserted into many cells, setting it too low will cause too many objects into the same hash slot.
+
+@count@ is the _suggested_ minimum number of cells in the hash table. If there are too few cells, the spatial hash will return many false positives. Too many cells will be hard on the cache and waste memory. the  Setting @count@ to ~10x the number of objects in the space is probably a good starting point. Tune from there if necessary. 
 
 Using the spatial has visualization in the demo program you can see what I mean. The grey squares represent cells in the spatial hash. The darker the cell, the more objects have been mapped into that cell. A good @dim@ size is when your objects fit nicely into the grid:
 
@@ -651,20 +763,8 @@ When you use too big of a size, a lot of shapes will fit into each cell. Each sh
 
 Notice the dark grey cells meaning that many objects are mapped onto them.
 
-<pre><code>void cpSpaceRehashStatic(cpSpace *space)</code></pre>
 
-p(expl). Rehashes the shapes in the static spatial hash. You must call this if you move any static shapes or Chipmunk won't update their collision detection data.
-
-<pre><code>void cpSpaceRehashShape(cpSpace *space, cpShape *shape)</code></pre>
-
-p(expl). Update an individual static shape that has moved.
-
-
-<%= h 2, "Simulating the Space:", "Simulating" %>
-
-<pre><code>void cpSpaceStep(cpSpace *space, cpFloat dt)</code></pre>
-
-p(expl). Update the space for the given time step. Using a fixed time step is _highly_ recommended. Doing so will increase the efficiency of the contact persistence, requiring an order of magnitude fewer iterations and CPU usage.
+Chipmunk 6 also has an experimental single axis sort and sweep implementation. It can be very efficient on mobile games if your world is very long and flat like a racing game. See the code for @cpSpaceUseSpatialHash()@ if you want to try enabling it.
 
 
 <%= h 2, "Notes:", "Notes" %>
@@ -689,14 +789,36 @@ Constraints in Chipmunk are all velocity based constraints. This means that they
 
 A spring connected between two bodies is not a constraint. It's very constraint-like as it creates forces that affect the velocities of the two bodies, but a spring takes distances as input and produces forces as it's output. If a spring is not a constraint, then why do I have two varieties of spring constraints you ask? The reason is because they are _damped springs_. The damping associated with the spring is a true constraint that creates velocity changes based on the relative velocities of the two bodies it links. As it is convenient to put a damper and a spring together most of the time, I figured I might as well just apply the spring force as part of the constraint instead of having a damper constraint and having the user calculate and apply their own spring forces separately. 
 
-<%= h 2, "Fields:", "Fields" %>
+<%= h 2, "Properties:", "Properties" %>
 
-* @a@ - @cpBody*@: The first body that the constraint acts on.
-* @b@ - @cpBody*@: The second body that the constraint acts on.
-* @maxForce@ - @cpFloat@: is the maximum force that the constraint can use to act on the two bodies. Defaults to INFINITY.
-* @biasCoef@ - @cpFloat@: is the percentage of error corrected each step of the space. (Can cause issues if you don't use a constant time step) Defaults to 0.1.
-* @maxBias@ - @cpFloat@: is the maximum speed at which the constraint can apply error correction. Defaults to INFINITY.
-* @data@ - @cpDataPointer@: A user definable data pointer. If you set this to point at the game object the shapes is for, then you can access your game object from Chipmunk callbacks.
+<pre><code>cpBody * cpConstraintGetA(const cpConstraint *constraint)
+cpBody * cpConstraintGetB(const cpConstraint *constraint)</code></pre>
+
+p(expl). Getters for the two bodies the constraint is attached to.
+
+<pre><code>cpFloat cpConstraintGetMaxForce(const cpConstraint *constraint)
+void cpConstraintSetMaxForce(cpConstraint *constraint, cpFloat value)</code></pre>
+
+p(expl). The maximum force that the constraint can use to act on the two bodies. Defaults to INFINITY.
+
+<pre><code>cpFloat cpConstraintGetErrorBias(const cpConstraint *constraint)
+void cpConstraintSetErrorBias(cpConstraint *constraint, cpFloat value)</code></pre>
+
+p(expl). The percentage of error corrected each step of the space. (Can cause issues if you don't use a constant time step) Defaults to 0.1.
+
+<pre><code>cpFloat cpConstraintGetMaxBias(const cpConstraint *constraint)
+void cpConstraintSetMaxBias(cpConstraint *constraint, cpFloat value)</code></pre>
+
+p(expl). The maximum speed at which the constraint can apply error correction. Defaults to INFINITY.
+
+<pre><code>cpDataPointer cpConstraintGetUserData(const cpConstraint *constraint)
+void cpConstraintSetUserData(cpConstraint *constraint, cpDataPointer value)</code></pre>
+
+p(expl). User data pointer. Use this pointer to get a reference to the game object that owns this constraint from callbacks.
+
+<pre><code>cpFloat cpConstraintGetImpulse(cpConstraint *constraint)</code></pre>
+
+p(expl). The most recent impulse that @constraint@ applied. To convert this to a force, divide by the timestep passed to @cpSpaceStep()@.
 
 To access properties of specific joint types, use the getter and setter functions provided (ex: @cpPinJointGetAnchr1()@). See the lists of properties for more information.
 
@@ -727,12 +849,6 @@ void cpConstraintFree(cpConstraint *constraint)</code></pre>
 
 p(expl). @Destroy@ and @Free@ functions are shared by all joint types. Allocation and initialization functions are specific to each joint type.
 
-<%= h 2, "Misc Functions:", "Misc" %>
-
-<pre><code>cpFloat cpConstraintGetImpulse(cpConstraint *constraint)</code></pre>
-
-p(expl). Get the most recent impulse that @constraint@ applied. To convert this to a force, divide by the timestep passed to @cpSpaceStep()@.
-
 <%= h 1, "Constraint Types:", "ConstraintTypes" %>
 
 <%= h 2, "Pin Joints:", "cpPinJoint" %>
@@ -743,12 +859,14 @@ cpConstraint *cpPinJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)<
 
 p(expl). @a@ and @b@ are the two bodies to connect, and @anchr1@ and @anchr2@ are the anchor points on those bodies. The distance between the two anchor points is measured when the joint is created. If you want to set a specific distance, use the setter function to override it.
 
-*Properties List:*
+<%= h 3, "Properties", "Properties" %>
 
-|_. Name |_. Type |
-| Anchr1 | cpVect |
-| Anchr2 | cpVect |
-| Dist | cpFloat |
+* @cpVect cpPinJointGetAnchr1(const cpConstraint *constraint)@
+* @void cpPinJointSetAnchr1(cpConstraint *constraint, cpVect value)@
+* @cpVect cpPinJointGetAnchr2(const cpConstraint *constraint)@
+* @void cpPinJointSetAnchr2(cpConstraint *constraint, cpVect value)@
+* @cpFloat cpPinJointGetDist(const cpConstraint *constraint)@
+* @void cpPinJointSetDist(cpConstraint *constraint, cpFloat value)@
 
 <%= h 2, "Slide Joints:", "cpSlideJoint" %>
 
@@ -763,13 +881,16 @@ cpConstraint *cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2
 
 p(expl). @a@ and @b@ are the two bodies to connect, @anchr1@ and @anchr2@ are the anchor points on those bodies, and @min@ and @max@ define the allowed distances of the anchor points.
 
-*Properties List:*
+<%= h 3, "Properties", "Properties" %>
 
-|_. Name |_. Type |
-| Anchr1 | cpVect |
-| Anchr2 | cpVect |
-| Min | cpFloat |
-| Max | cpFloat |
+* @cpVect cpSlideJointGetAnchr1(const cpConstraint *constraint)@
+* @void cpSlideJointSetAnchr1(cpConstraint *constraint, cpVect value)@
+* @cpVect cpSlideJointGetAnchr2(const cpConstraint *constraint)@
+* @void cpSlideJointSetAnchr2(cpConstraint *constraint, cpVect value)@
+* @cpFloat cpSlideJointGetMin(const cpConstraint *constraint)@
+* @void cpSlideJointSetMin(cpConstraint *constraint, cpFloat value)@
+* @cpFloat cpSlideJointGetMax(const cpConstraint *constraint)@
+* @void cpSlideJointSetMax(cpConstraint *constraint, cpFloat value)@
 
 <%= h 2, "Pivot Joints:", "cpPivotJoint" %>
 
@@ -780,11 +901,12 @@ cpConstraint *cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr
 
 p(expl). @a@ and @b@ are the two bodies to connect, and @pivot@ is the point in world coordinates of the pivot. Because the pivot location is given in world coordinates, you must have the bodies moved into the correct positions already. Alternatively you can specify the joint based on a pair of anchor points, but make sure you have the bodies in the right place as the joint will fix itself as soon as you start simulating the space.
 
-*Properties List:*
+<%= h 3, "Properties", "Properties" %>
 
-|_. Name |_. Type |
-| Anchr1 | cpVect |
-| Anchr2 | cpVect |
+* @cpVect cpPivotJointGetAnchr1(const cpConstraint *constraint)@
+* @void cpPivotJointSetAnchr1(cpConstraint *constraint, cpVect value)@
+* @cpVect cpPivotJointGetAnchr2(const cpConstraint *constraint)@
+* @void cpPivotJointSetAnchr2(cpConstraint *constraint, cpVect value)@
 
 <%= h 2, "Groove Joint:", "cpGrooveJoint" %>
 
@@ -799,12 +921,14 @@ cpConstraint *cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect gro
 
 p(expl). The groove goes from @groov_a@ to @groove_b@ on body @a@, and the pivot is attached to @anchr2@ on body @b@. All coordinates are body local.
 
-*Properties List:*
+<%= h 3, "Properties", "Properties" %>
 
-|_. Name |_. Type |
-| Anchr2 | cpVect |
-| GrooveA | cpVect |
-| GrooveB | cpVect |
+* @cpVect cpGrooveJointGetGrooveA(const cpConstraint *constraint)@
+* @void cpGrooveJointSetGrooveA(cpConstraint *constraint, cpVect value)@
+* @cpVect cpGrooveJointGetGrooveB(const cpConstraint *constraint)@
+* @void cpGrooveJointSetGrooveB(cpConstraint *constraint, cpVect value)@
+* @cpVect cpGrooveJointGetAnchr2(const cpConstraint *constraint)@
+* @void cpGrooveJointSetAnchr2(cpConstraint *constraint, cpVect value)@
 
 <%= h 2, "Damped Spring:", "cpDampedSpring" %>
 
@@ -822,14 +946,18 @@ cpConstraint *cpDampedSpringNew(
 
 p(expl). Defined much like a slide joint. @restLength@ is the distance the spring wants to be, @stiffness@ is the spring constant ("Young's modulus":http://en.wikipedia.org/wiki/Young's_modulus), and @damping@ is how soft to make the damping of the spring.
 
-*Properties List:*
+<%= h 3, "Properties", "Properties" %>
 
-|_. Name |_. Type |
-| Anchr1 | cpVect |
-| Anchr2 | cpVect |
-| RestLength | cpFloat |
-| Stiffness | cpFloat |
-| Damping | cpFloat |
+* @cpVect cpDampedSpringGetAnchr1(const cpConstraint *constraint)@
+* @void cpDampedSpringSetAnchr1(cpConstraint *constraint, cpVect value)@
+* @cpVect cpDampedSpringGetAnchr2(const cpConstraint *constraint)@
+* @void cpDampedSpringSetAnchr2(cpConstraint *constraint, cpVect value)@
+* @cpFloat cpDampedSpringGetRestLength(const cpConstraint *constraint)@
+* @void cpDampedSpringSetRestLength(cpConstraint *constraint, cpFloat value)@
+* @cpFloat cpDampedSpringGetStiffness(const cpConstraint *constraint)@
+* @void cpDampedSpringSetStiffness(cpConstraint *constraint, cpFloat value)@
+* @cpFloat cpDampedSpringGetDamping(const cpConstraint *constraint)@
+* @void cpDampedSpringSetDamping(cpConstraint *constraint, cpFloat value)@
 
 <%= h 2, "Damped Rotary Spring:", "cpDampedRotarySpring" %>
 
@@ -844,12 +972,14 @@ cpConstraint *cpDampedRotarySpringNew(cpBody *a, cpBody *b, cpFloat restAngle, c
 
 p(expl). Like a damped spring, but works in an angular fashion. @restAngle@ is the relative angle in radians that the bodies want to have, @stiffness@ and @damping@ work basically the same as on a damped spring.
 
-*Properties List:*
+<%= h 3, "Properties", "Properties" %>
 
-|_. Name |_. Type |
-| RestAngle | cpFloat |
-| Stiffness | cpFloat |
-| Damping | cpFloat |
+* @cpFloat cpDampedRotarySpringGetRestAngle(const cpConstraint *constraint)@
+* @void cpDampedRotarySpringSetRestAngle(cpConstraint *constraint, cpFloat value)@
+* @cpFloat cpDampedRotarySpringGetStiffness(const cpConstraint *constraint)@
+* @void cpDampedRotarySpringSetStiffness(cpConstraint *constraint, cpFloat value)@
+* @cpFloat cpDampedRotarySpringGetDamping(const cpConstraint *constraint)@
+* @void cpDampedRotarySpringSetDamping(cpConstraint *constraint, cpFloat value)@
 
 <%= h 2, "Rotary Limit Joint:", "cpRotaryLimitJoint" %>
 
@@ -859,11 +989,12 @@ cpConstraint *cpRotaryLimitJointNew(cpBody *a, cpBody *b, cpFloat min, cpFloat m
 
 p(expl). Constrains the relative rotations of two bodies. @min@ and @max@ are the angular limits in radians. It is implemented so that it's possible to for the range to be greater than a full revolution.
 
-*Properties List:*
+<%= h 3, "Properties", "Properties" %>
 
-|_. Name |_. Type |
-| Min | cpFloat |
-| Max | cpFloat |
+* @cpFloat cpRotaryLimitJointGetMin(const cpConstraint *constraint)@
+* @void cpRotaryLimitJointSetMin(cpConstraint *constraint, cpFloat value)@
+* @cpFloat cpRotaryLimitJointGetMax(const cpConstraint *constraint)@
+* @void cpRotaryLimitJointSetMax(cpConstraint *constraint, cpFloat value)@
 
 <%= h 2, "Ratchet Joint:", "cpRatchetJoint" %>
 
@@ -873,12 +1004,14 @@ cpConstraint *cpRatchetJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat rat
 
 p(expl). Works like a socket wrench. @ratchet@ is the distance between "clicks", @phase@ is the initial offset to use when deciding where the ratchet angles are.
 
-*Properties List:*
+<%= h 3, "Properties", "Properties" %>
 
-|_. Name |_. Type |
-| Angle | cpFloat |
-| Phase | cpFloat |
-| Ratchet | cpFloat |
+* @cpFloat cpRatchetJointGetAngle(const cpConstraint *constraint)@
+* @void cpRatchetJointSetAngle(cpConstraint *constraint, cpFloat value)@
+* @cpFloat cpRatchetJointGetPhase(const cpConstraint *constraint)@
+* @void cpRatchetJointSetPhase(cpConstraint *constraint, cpFloat value)@
+* @cpFloat cpRatchetJointGetRatchet(const cpConstraint *constraint)@
+* @void cpRatchetJointSetRatchet(cpConstraint *constraint, cpFloat value)@
 
 <%= h 2, "Gear Joint:", "cpGearJoint" %>
 
@@ -888,11 +1021,12 @@ cpConstraint *cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio)
 
 p(expl). Keeps the angular velocity ratio of a pair of bodies constant. @ratio@ is always measured in absolute terms. It is currently not possible to set the ratio in relation to a third body's angular velocity. @phase@ is the initial angular offset of the two bodies.
 
-*Properties List:*
+<%= h 3, "Properties", "Properties" %>
 
-|_. Name |_. Type |
-| Phase | cpFloat |
-| Ratio | cpFloat |
+* @cpFloat cpGearJointGetPhase(const cpConstraint *constraint)@
+* @void cpGearJointSetPhase(cpConstraint *constraint, cpFloat value)@
+* @cpFloat cpGearJointGetRatio(const cpConstraint *constraint)@
+* @void cpGearJointSetRatio(cpConstraint *constraint, cpFloat value)@
 
 <%= h 2, "Simple Motor:", "cpSimpleMotor" %>
 
@@ -902,71 +1036,47 @@ cpConstraint *cpSimpleMotorNew(cpBody *a, cpBody *b, cpFloat rate);</code></pre>
 
 p(expl). Keeps the relative angular velocity of a pair of bodies constant. @rate@ is the desired relative angular velocity. You will usually want to set an force (torque) maximum for motors as otherwise they will be able to apply a nearly infinite torque to keep the bodies moving.
 
-*Properties List:*
+<%= h 3, "Properties", "Properties" %>
 
-|_. Name |_. Type |
-| Rate | cpFloat |
+* @cpFloat cpSimpleMotorGetRate(const cpConstraint *constraint)@
+* @void cpSimpleMotorSetRate(cpConstraint *constraint, cpFloat value)@
+
 
 <%= h 2, "Notes:", "Notes" %>
 
 * You can add multiple joints between two bodies, but make sure that they don't fight. Doing so can cause the bodies jitter or spin violently.
 
+
 <%= h 1, "Overview of Collision Detection in Chipmunk:", "CollisionDetection" %>
 
-TODO
-Magic collision detections globals are gone.
-Update section on spatial hashing.
+In order to make collision detection in Chipmunk as fast as possible, the process is broken down into several stages. While I've tried to keep it conceptually simple, the implementation can be a bit daunting. Fortunately as a user of the library, you don't need to understand everything about how it works. Though if you are trying to squeeze every ounce of performance out of Chipmunk, understanding this section can be helpful.
 
-In order to make collision detection in Chipmunk as fast as possible, the process is broken down into several stages. While I've tried to keep it conceptually simple, the implementation can be a bit daunting. Fortunately as a user of the library, you don't need to understand everything about how it works. If you are trying to squeeze every ounce of performance out of Chipmunk, understanding this section is crucial.
+<%= h 2, "Spatial Indexing:", "SpatialIndexing" %>
 
-<%= h 2, "Magic Collision Detection Globals:", "Globals" %>
-
-Chipmunk contains a few global variables that control how collisions are solved. They can't be set on a per space basis, but most games wont need to change them at all.
-
-<pre><code>extern cpFloat cp_bias_coef</code></pre>
-
-p(expl). Because Chipmunk does not perform swept collisions, shapes may overlap. Each time you call @cpSpaceStep()@ Chipmunk fixes a percentage of the overlap to push the shapes apart. By default, this value is set to 0.1. With this setting, after 15 steps the overlap will be reduced to 20%, after 30 it will be reduced to 4%. This is usually satisfactory for most games. Setting cp_bias_coef to 1.0 is not recommended as it will reduce the stability of stacked objects.
-
-<pre><code>extern cpFloat cp_collision_slop</code></pre>
-
-p(expl). Chipmunk's impulse solver works by caching the last solution as it is likely to be very similar to the current one. In order to help keep objects touching, Chipmunk allows objects to overlap a small amount. By default this value is 0.1. If you are using pixel coordinates you won't even notice. If using a different scale, adjust the value to be as high as possible without creating any unwanted visual overlap.
-
-<pre><code>extern cpTimestamp cp_contact_persistence</code></pre>
-
-p(expl). This is how many steps the space should remember old contact solutions. The default value is 3 and it's unlikely that you'll need to change it.
-
-<%= h 2, "Spatial Hashing:", "SpatialHashing" %>
-
-Chipmunk uses a spatial hash for its broad phase culling. Spatial hashes are very efficient for a scene made up of consistently sized objects. It basically works by taking the axis aligned bounding boxes for all the objects in the scene, mapping them onto an infinite sized grid, then mapping those grid cells onto a finite sized hash table. This way, you only have to check collisions between objects in the same hash table cells, and mapping the objects onto the grid can be done fairly quickly. Objects in the same hash table cells tend to be very close together, and therefore more likely to be colliding. The downside is that in order to get the best performance out of a spatial hash, you have to tune the size of the grid cells and the size of the hash table so you don't get too many false positives. For more information about tuning the hash see the "cpSpace":#cpSpace section.
-
-Things to keep in mind:
-* Using too small a grid size means that your objects will be split into many grid cells which means that the spatial hash will spend a lot of time filling empty hash cells for just one object and rarely finding any with multiple objects. Making the grid size too big means that you will be putting a lot of objects into a single hash cell, and collisions will have to be checked between all of them.
-* Using too small of a hash table means that you will map too many far away objects into a single hash cell. Using too many means that the hash table will have to spend a lot of time doing clears and rehashes.
-
-For more information on spatial hashing in general, "Optimized Spatial Hashing for Collision Detection of Deformable Objects":http://www.beosil.com/download/CollisionDetectionHashing_VMV03.pdf is a good paper that covers all the basics.
+A for loop that checks every object against every other object in the scene would be _very_ slow. So the first stage of the collision detection (or broadphase as it is commonly called), is to use a high level spatial algorithm to figure out which objects should be even be checked for collisions. Currently Chipmunk supports two spatial indexes, an axis-aligned bounding box tree and a spatial hash. These spatial indexes are able to quickly identify which shapes are near each other and should be checked for a collision.
 
 <%= h 2, "Collision Filtering:", "Filtering" %>
 
-After the spatial hash figures out pairs of shapes that are likely to be near each other, it passes them back to the space to perform some additional filtering on the pairs. If the pairs pass all the filters, then Chipmunk will test if the shapes are actually overlapping. If the shape to shape collision check passes, then the collision handler callbacks are called. These tests are much faster to try than the shape to shape collision checks, so use these if you can to reject collisions early instead of rejecting them from callbacks if you can.
+After the spatial index figures out which pairs of shapes are likely to be near each other, it passes them back to the space to perform some additional filtering on the pairs. Before doing anything else, Chipmunk performs a few quick tests to check if shapes should collide.
 
-* *Bounding Box Test:* The shapes are not colliding if their bounding boxes are not overlapping. You can't really affect this, but this is when it's done.
-* *Layer Test:* The shapes are not colliding if they don't occupy and of the same layers. (the bitwise AND of their layer masks is 0)
+* *Bounding Box Test:* The shapes are not colliding if their bounding boxes are not overlapping. Objects like diagonal line segments can trigger a lot of false positives here, but it's unlikely to be something you should worry about.
+* *Layer Test:* The shapes are not colliding if they don't occupy any of the same layers. (the bitwise AND of their layer masks is 0)
 * *Group Test:* Shapes shouldn't collide with other shapes in the same non-zero group.
 
 <%= h 2, "Primitive Shape to Shape Collision Detection:", "PrimitiveTest" %>
 
-The most expensive test that you can do to see if shapes should collide is to actually check based on their geometry. Circle to circle and circle to line collisions are pretty quick. Poly to poly collisions get more expensive as the number of vertexes increases. Simpler shapes make for faster collisions (and more importantly fewer collision points for the solver to run).
+The most expensive test is to actually check for overlap based on their geometry. Circle to circle and circle to line collisions are pretty quick. Poly to poly collisions get more expensive as the number of vertexes increases. Simpler shapes make for faster collisions (and more importantly fewer collision points for the solver to run). Chipmunk uses a small dispatch table to figure out which function to use to check if the shapes overlap.
 
 <%= h 2, "Collision Handler Filtering:", "HandlerFiltering" %>
 
-After checking if two shapes overlap Chipmunk will look to see if you have defined a collision handler for the collision types of the shapes. This gives you a large amount of flexibility to process collisions events, but also gives you a very flexible way to filter out collisions. The return value of the begin and preSolve callback determines whether or not the colliding pair of shapes is discarded or not. Returning true will keep the pair, false will discard it. If you don't define a handler for the given collision_types, Chipmunk will call the space's default handler, which by default is defined to simply accept all collisions.
+After checking if two shapes overlap Chipmunk will look to see if you have defined a collision handler for the collision types of the shapes. This is vital to process collisions events for the gameplay, but also gives you a very flexible way to filter out collisions. The return value of the @begin()@ and @preSolve()@ callbacks determines whether or not the colliding pair of shapes is discarded or not. Returning true will keep the pair, false will discard it. Rejecting a collision from a @begin()@ callback is permanent, rejecting it from the @preSolve()@ only applies to the step it occured in. If you don't define a handler for the given collision_types, Chipmunk will call the space's default handler, which by default is defined to simply accept all collisions.
 
 While using callbacks to filter collisions is the most flexible way, keep in mind that by the time your callback is called all of the most expensive collision detection has already been done. For simulations with a lot of colliding objects each frame, the time spent finding collisions is small compared to the time spent solving the physics for them so it may not be a big deal. Still, use layers or groups first if you can.
 
-<%= h 1, "Callbacks:", "Callbacks" %>
+<%= h 1, "Collision Callbacks:", "CollisionCallbacks" %>
 
 TODO
-Document that post-step callbacks can now be scheduled from iterators or queries as well.
+Document that @postStep()@ callbacks can now be scheduled from iterators or queries as well.
 Example for cpArbiterGetContactPointSet().
 No public fields on an arbiter anymore.
 
@@ -975,14 +1085,14 @@ A physics library without any events or feedback would not be very useful for ga
 <%= h 2, "Collision Handlers:", "Handlers" %>
 
 A collision handler is a set of 4 function callbacks for the different collision events that Chipmunk recognizes. The event types are:
-* *Begin:* Two shapes just started touching for the first time this step. Return true from the callback to process the collision normally or false to cause Chipmunk to ignore the collision entirely. If you return false, the pre-solve and post-solve callbacks will never be run, but you will still recieve a separate event when the shapes stop overlapping.
-* *Pre-Solve:* Two shapes are touching during this step. Return false from the callback to make Chipmunk ignore the collision this step or true to process it normally. Additionally, you may override collision values such as cpArbiter.e and cpArbiter.u to provide custom friction or elasticity values. See "cpArbiter":#cpArbiter for more info.
-* *Post-Solve:* Two shapes are touching and their collision response has been processed. You can retrieve the collision force at this time if you want to use it to calculate sound volumes or damage amounts. See "cpArbiter":#cpArbiter for more info.
-* *Separate:* Two shapes have just stopped touching for the first time this step.
+* @begin()@: Two shapes just started touching for the first time this step. Return true from the callback to process the collision normally or false to cause Chipmunk to ignore the collision entirely. If you return false, the @preSolve()@ and @postSolve()@ callbacks will never be run, but you will still recieve a separate event when the shapes stop overlapping.
+* @preSolve()@: Two shapes are touching during this step. Return false from the callback to make Chipmunk ignore the collision this step or true to process it normally. Additionally, you may override collision values such as cpArbiter.e and cpArbiter.u to provide custom friction or elasticity values. See "cpArbiter":#cpArbiter for more info.
+* @postSolve()@: Two shapes are touching and their collision response has been processed. You can retrieve the collision force at this time if you want to use it to calculate sound volumes or damage amounts. See "cpArbiter":#cpArbiter for more info.
+* @separate()@: Two shapes have just stopped touching for the first time this step.
 
 Collision callbacks are closely associated with "cpArbiter":#cpArbiter structs. You should familiarize yourself with those as well.
 
-*Note:* Shapes tagged as sensors (@cpShape.sensor == true@) never generate collisions that get processed so collisions between sensors shapes and other shapes will never call the post-solve callback. They still generate begin, and separate callbacks, and the pre solve callback is also called every frame even though there is no real collision.
+*Note:* Shapes tagged as sensors (@cpShape.sensor == true@) never generate collisions that get processed so collisions between sensors shapes and other shapes will never call the @postSolve()@ callback. They still generate @begin()@, and @separate()@ callbacks, and the @preSolve()@ callback is also called every frame even though there is no real collision.
 
 <%= h 2, "Collision Handler API:", "HandlerAPI" %>
 
@@ -991,7 +1101,7 @@ typedef int (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *dat
 typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *data)
 typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data)</code></pre>
 
-p(expl). Collision handler function types. While all of them take an arbiter, space, and a user data pointer, only the begin and pre-solve callbacks return a value. See above for more information.
+p(expl). Collision handler function types. While all of them take an arbiter, space, and a user data pointer, only the @begin()@ and @preSolve()@ callbacks return a value. See above for more information.
 
 <pre><code>void cpSpaceAddCollisionHandler(
 	cpSpace *space,
@@ -1025,15 +1135,15 @@ p(expl). Register a default collision handler to be used when no specific collis
 
 Post-step callbacks are the one place where you can break the rules about adding or removing objects from within a callback. In fact, their primary function is to help you safely remove objects from the space that you wanted to disable or destroy in a collision callback.
 
-Post step callbacks are registered as a function and a pointer that is used as a key. You can only register one post step callback per key. This prevents you from accidentally removing an object more than once. For instance, say that you get a collision callback between a bullet and object A. You want to destroy both the bullet and object A, so you register a post-step callback to safely remove them from your game. Then you get a second collision callback between the bullet and object B. You register a post-step callback to remove object B, and a second post-step callback to remove the bullet. Because you can only register one callback per key, the post-step callback for the bullet will only be called once and you can't accidentally try to remove it twice.
+Post step callbacks are registered as a function and a pointer that is used as a key. You can only register one @postStep()@ callback per key. This prevents you from accidentally removing an object more than once. For instance, say that you get a collision callback between a bullet and object A. You want to destroy both the bullet and object A, so you register a @postStep()@ callback to safely remove them from your game. Then you get a second collision callback between the bullet and object B. You register a @postStep()@ callback to remove object B, and a second @postStep()@ callback to remove the bullet. Because you can only register one callback per key, the @postStep()@ callback for the bullet will only be called once and you can't accidentally try to remove it twice.
 
 <pre><code>typedef void (*cpPostStepFunc)(cpSpace *space, void *obj, void *data)</code></pre>
 
-p(expl). Function type used for post step callbacks. @space@ is the space the callback was registered on, @obj@ is the pointer value you supplied as the key, and @data@ is a user definable pointer you can use to pass in as a context value.
+p(expl). Function type used for @postStep()@ callbacks. @space@ is the space the callback was registered on, @obj@ is the pointer value you supplied as the key, and @data@ is a user definable pointer you can use to pass in as a context value.
 
 <pre><code>void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)</code></pre>
 
-p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @obj@ and @data@ will be passed to your function. Only the last callback registered for any unique value of @obj@ will be recorded. You can add post-step callbacks from outside of other callback functions, but they won't be called until @cpSpaceStep()@ is called again.
+p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @obj@ and @data@ will be passed to your function. Only the last callback registered for any unique value of @obj@ will be recorded. You can add @postStep()@ callbacks from outside of other callback functions, but they won't be called until @cpSpaceStep()@ is called again.
 
 <%= h 2, "Examples:", "Examples" %>
 
@@ -1043,22 +1153,60 @@ See the "callback examples":examples.html#CollisionCallbacks for more informatio
 
 First of all, why are they called arbiters? The short answer is that Box2D called them that way back in 2006 when I was looking at the source for it's solver. An arbiter is like a judge, a person that has authority to settle disputes between two people. It was a fun, fitting name and was shorter to type than CollisionPair which I had been using. :p
 
-Originally arbiters were going to be an internal data type that Chipmunk used that wouldn't ever be sent to outside code. In Chipmunk 4.x and earlier, only a single callback hook was provided for handling collision events. It was triggered every step that to shapes were touching. This made it non-trivial to track when objects started and stopped touching as the user would have to record and process this themselves. Many people, including myself, wanted to get collision begin/separate events and eventually I realized that information was already being stored in the arbiter cache that the Chipmunk maintains. With some changes to the collision callback API, that information is now exposed to the user. Internally, arbiters are used primarily for solving collision impulses. To external users, you can simply think of them as a weird type used in collision callbacks.
+Originally arbiters were going to be an internal data type that Chipmunk used that wouldn't ever be sent to outside code. In Chipmunk 4.x and earlier, only a single callback hook was provided for handling collision events. It was triggered every step that to shapes were touching. This made it non-trivial to track when objects started and stopped touching as the user would have to record and process this themselves. Many people, including myself, wanted to get collision @begin()@/separate events and eventually I realized that information was already being stored in the arbiter cache that the Chipmunk maintains. With some changes to the collision callback API, that information is now exposed to the user. Internally, arbiters are used primarily for solving collision impulses. To external users, you can simply think of them as a weird type used in collision callbacks.
 
 <%= h 2, "Memory Management:", "Memory" %>
 
-You should never need to create an arbiter, nor will you ever need to free one as they are handled by the space. More importantly, because they are managed by the space you should never store a reference to an arbiter as you don't know when they will be destroyed. Use them within the callback where they are given to you and then forget about them or copy out the information you need.
+You will never need to create or free an arbiter. More importantly, because they are entirely managed by the space you should *never* store a reference to an arbiter as you don't know when they will be recycled. Use them within the callback where they are given to you and then forget about them or copy out the information you need.
+
+<%= h 2, "Properties:", "Properties" %>
+
+<pre><code>cpFloat cpArbiterGetElasticity(const cpArbiter *arb)
+void cpArbiterSetElasticity(cpArbiter *arb, cpFloat value)</code></pre>
+
+p(expl). The calculated elasticity for this collision pair. Setting the value in a @preSolve()@ callback will override the value calculated by the space.
+
+<pre><code>cpFloat cpArbiterGetFriction(const cpArbiter *arb)
+void cpArbiterSetFriction(cpArbiter *arb, cpFloat value)</code></pre>
+
+p(expl). The calculated friction for this collision pair. Setting the value in a @preSolve()@ callback will override the value calculated by the space.
+
+<pre><code>cpVect cpArbiterGetSurfaceVelocity(const cpArbiter *arb)
+void cpArbiterSetSurfaceVelocity(cpArbiter *arb, cpVect value)</code></pre>
+
+p(expl). The calculated surface velocity for this collision pair. Setting the value in a @preSolve()@ callback will override the value calculated by the space.
+
+<pre><code>int cpArbiterGetCount(const cpArbiter *arb)
+cpVect cpArbiterGetNormal(const cpArbiter *arb, int i)
+cpVect cpArbiterGetPoint(const cpArbiter *arb, int i)
+cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i)</code></pre>
+
+p(expl). Get the number of contacts tracked by this arbiter or the specific collision point, collision normal or penetration depth of a collision point.
+
+TODO contact point set
+
+<pre><code>cpBool cpArbiterIsFirstContact(const cpArbiter *arb)</code></pre>
+
+p(expl). Returns true if this is the first step the two shapes started touching. Can be used 
+
+<pre><code>void cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
+void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)</code></pre>
+
+p(expl). Get the shapes or bodies in the order that they were defined in the collision handler associated with this arbiter. If you defined the handler as @cpSpaceAddCollisionHandler(space, 1, 2, ...)@, you you will find that @a->collision_type == 1@ and @b->collision_type == 2@.
+
 
 <%= h 2, "Helper Functions:", "HelperFunctions" %>
 
+TODO
+
 <pre><code>void cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
-#define CP_ARBITER_GET_SHAPES(arb, a, b) cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);</code></pre>
+#define CP_ARBITER_GET_SHAPES(arb, a, b) cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b)</code></pre>
 
 p(expl). Get the shapes in the order that they were defined in the collision handler associated with this arbiter. If you defined the handler as @cpSpaceAddCollisionHandler(space, 1, 2, ...)@, you you will find that @a->collision_type == 1@ and @b->collision_type == 2@. The convenience macro defines and initializes the two shape variables for you. "example":examples.html#CollisionCallbacks
 
 <pre><code>int cpArbiterIsFirstContact(cpArbiter *arb)</code></pre>
 
-p(expl). Returns true if this is the first step that the shapes touched. You can use this from @preSolve()@ and @postSolve()@ callbacks to know if a collision between two shapes is new without needing to flag a boolean in your begin callback.
+p(expl). Returns true if this is the first step that the shapes touched. You can use this from @preSolve()@ and @postSolve()@ callbacks to know if a collision between two shapes is new without needing to flag a boolean in your @begin()@ callback.
 
 <pre><code>typedef struct cpContactPointSet {
 	int count;
@@ -1106,7 +1254,7 @@ p(expl). Returns the impulse that was applied this step to resolve the collision
 
 <%= h 2, "Fields:", "Fields" %>
 
-It's unlikely that you'll need to interact with a @cpArbiter@ struct directly as the collision helper functions should provide most functionality that people will need. One exception is the @e@, and @u@ fields. By default, Chipmunk multiplies the friction and elasticity values of to shapes together to determine what values to use when solving the collision. This mostly works, but in many cases is simply not flexible enough. If you are running into problems with that, you can change the values calculated for @e@ and @u@ in a preSolve callback. This is likely to change in the next major version of Chipmunk.
+It's unlikely that you'll need to interact with a @cpArbiter@ struct directly as the collision helper functions should provide most functionality that people will need. One exception is the @e@, and @u@ fields. By default, Chipmunk multiplies the friction and elasticity values of to shapes together to determine what values to use when solving the collision. This mostly works, but in many cases is simply not flexible enough. If you are running into problems with that, you can change the values calculated for @e@ and @u@ in a @preSolve()@ callback. This is likely to change in the next major version of Chipmunk.
 
 * @numContacts@ - @int@: Number of contact points for this collision.
 * @e@ - @cpFloat@: Calculated amount of elasticity to apply for this collision. Can be overriden from a @preSolve()@ callback.

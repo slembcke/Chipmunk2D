@@ -127,7 +127,7 @@ CP_DefineShapeStructGetter(cpBody *, body, Body);
 void cpShapeSetBody(cpShape *shape, cpBody *body);
 
 CP_DefineShapeStructGetter(cpBB, bb, BB);
-CP_DefineShapeStructProperty(cpBool, sensor, IsSensor, cpTrue);
+CP_DefineShapeStructProperty(cpBool, sensor, Sensor, cpTrue);
 CP_DefineShapeStructProperty(cpFloat, e, Elasticity, cpFalse);
 CP_DefineShapeStructProperty(cpFloat, u, Friction, cpTrue);
 CP_DefineShapeStructProperty(cpVect, surface_v, SurfaceVelocity, cpTrue);

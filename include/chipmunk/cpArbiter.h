@@ -100,6 +100,20 @@ struct cpArbiter {
 	CP_PRIVATE(cpArbiterState state);
 };
 
+#define CP_DefineArbiterStructGetter(type, member, name) \
+static inline type cpArbiterGet##name(const cpArbiter *arb){return arb->member;}
+
+#define CP_DefineArbiterStructSetter(type, member, name) \
+static inline void cpArbiterSet##name(cpArbiter *arb, type value){arb->member = value;}
+
+#define CP_DefineArbiterStructProperty(type, member, name) \
+CP_DefineArbiterStructGetter(type, member, name) \
+CP_DefineArbiterStructSetter(type, member, name)
+
+CP_DefineArbiterStructProperty(cpFloat, e, Elasticity);
+CP_DefineArbiterStructProperty(cpFloat, u, Friction);
+CP_DefineArbiterStructProperty(cpVect, surface_vr, SurfaceVelocity);
+
 /// Calculate the total impulse that was applied by this arbiter.
 /// Calling this function from a begin or pre-solve callback is undefined.
 cpVect cpArbiterTotalImpulse(const cpArbiter *arb);

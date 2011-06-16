@@ -13,6 +13,10 @@ STDIN.readlines.each do|str|
 		proto, ret, sym, str = captures.values_at(0, 1, 3, 4)
 		break if ret == "return"
 		
-		puts eval('"' + FORMAT + '"') || "* #{proto} - #{sym}"
+		if FORMAT
+			puts eval('"' + FORMAT + '"')
+		else
+			puts "* #{proto} - #{sym}"
+		end
 	end
 end

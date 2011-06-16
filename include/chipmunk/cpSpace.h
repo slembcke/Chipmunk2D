@@ -114,6 +114,28 @@ void cpSpaceDestroy(cpSpace *space);
 /// Destroy and free a cpSpace.
 void cpSpaceFree(cpSpace *space);
 
+#define CP_DefineSpaceStructGetter(type, member, name) \
+static inline type cpSpaceGet##name(const cpSpace *space){return space->member;}
+
+#define CP_DefineSpaceStructSetter(type, member, name) \
+static inline void cpSpaceSet##name(cpSpace *space, type value){space->member = value;}
+
+#define CP_DefineSpaceStructProperty(type, member, name) \
+CP_DefineSpaceStructGetter(type, member, name) \
+CP_DefineSpaceStructSetter(type, member, name)
+
+CP_DefineSpaceStructProperty(int, iterations, Iterations);
+CP_DefineSpaceStructProperty(cpVect, gravity, Gravity);
+CP_DefineSpaceStructProperty(cpFloat, damping, Damping);
+CP_DefineSpaceStructProperty(cpFloat, idleSpeedThreshold, IdleSpeedThreshold);
+CP_DefineSpaceStructProperty(cpFloat, sleepTimeThreshold, SleepTimeThreshold);
+CP_DefineSpaceStructProperty(cpFloat, collisionSlop, CollisionSlop);
+CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias);
+CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence);
+CP_DefineSpaceStructProperty(cpBool, enableContactGraph, EnableContactGraph);
+CP_DefineSpaceStructProperty(cpDataPointer, data, UserData);
+CP_DefineSpaceStructGetter(cpBody *, staticBody, StaticBody);
+
 /// Set a default collision handler for this space.
 /// The default collision handler is invoked for each colliding pair of shapes
 /// that isn't explicitly handled by a specific collision handler.
