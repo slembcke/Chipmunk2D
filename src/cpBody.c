@@ -278,14 +278,24 @@ cpBodyEachShape(cpBody *body, cpBodyShapeIteratorFunc func, void *data)
 void
 cpBodyEachConstraint(cpBody *body, cpBodyConstraintIteratorFunc func, void *data)
 {
-	CP_BODY_FOREACH_CONSTRAINT(body,constraint) func(body, constraint, data);
+	cpConstraint *constraint = body->constraintList;
+	while(constraint){
+		cpConstraint *next = cpConstraintNext(constraint, body);
+		func(body, constraint, data);
+		constraint = next;
+	}
 }
 
 void
 cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 {
-	CP_BODY_FOREACH_ARBITER(body, arb){
+	cpArbiter *arb = body->arbiterList;
+	while(arb){
+		cpArbiter *next = cpArbiterNext(arb, body);
+		
 		arb->swappedColl = (body == arb->body_b);
 		func(body, arb, data);
+		
+		arb = next;
 	}
 }
