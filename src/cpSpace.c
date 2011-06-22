@@ -247,6 +247,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	cpBody *body = shape->body;
 	if(cpBodyIsStatic(body)) return cpSpaceAddStaticShape(space, shape);
 	
+	// TODO change these to check if it was added to a space at all.
 	cpAssert(!cpSpaceContainsShape(space, shape),
 		"Cannot add the same shape more than once.");
 	cpAssertSpaceUnlocked(space);
@@ -318,6 +319,7 @@ contactSetFilterRemovedBody(cpArbiter *arb, struct arbiterFilterContext *context
 {
 	cpBody *body = context->body;
 	if(body == arb->body_a || body == arb->body_b){
+		cpArrayDeleteObj(context->space->arbiters, arb);
 		cpArrayPush(context->space->pooledArbiters, arb);
 		return cpFalse;
 	}

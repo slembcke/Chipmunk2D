@@ -267,7 +267,12 @@ cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)
 void
 cpBodyEachShape(cpBody *body, cpBodyShapeIteratorFunc func, void *data)
 {
-	CP_BODY_FOREACH_SHAPE(body, shape) func(body, shape, data);
+	cpShape *shape = body->shapeList;
+	while(shape){
+		cpShape *next = shape->next;
+		func(body, shape, data);
+		shape = next;
+	}
 }
 
 void
