@@ -46,11 +46,15 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 	#define cpAssertWarn(condition, message) if(!(condition)) cpMessage(message, #condition, __FILE__, __LINE__, 0)
 #endif
 
+// Hard assertions are important and cheap to execute. They are not disabled by compiling as debug.
+#define cpAssertHard(condition, message) if(!(condition)) cpMessage(message, #condition, __FILE__, __LINE__, 1)
+
 #ifdef NDEBUG
-	#define	cpAssert(condition, message)
+	#define	cpAssertSoft(condition, message)
 #else
-	#define cpAssert(condition, message) if(!(condition)) cpMessage(message, #condition, __FILE__, __LINE__, 1)
+	#define cpAssertSoft(condition, message) cpAssertHard(condition, message)
 #endif
+
 
 #include "chipmunk_types.h"
 	
@@ -67,7 +71,6 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 #ifndef cprealloc
 	#define cprealloc realloc
 #endif
-
 
 #ifndef cpfree
 	#define cpfree free

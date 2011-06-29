@@ -405,7 +405,7 @@ int
 cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr)
 {
 	// Their shape types must be in order.
-	cpAssert(a->klass->type <= b->klass->type, "Collision shapes passed to cpCollideShapes() are not sorted.");
+	cpAssertSoft(a->klass->type <= b->klass->type, "Collision shapes passed to cpCollideShapes() are not sorted.");
 	
 	collisionFunc cfunc = colfuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
 	return (cfunc) ? cfunc(a, b, arr) : 0;

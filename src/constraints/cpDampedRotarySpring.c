@@ -37,7 +37,7 @@ preStep(cpDampedRotarySpring *spring, cpFloat dt)
 	cpBody *b = spring->constraint.b;
 	
 	cpFloat moment = a->i_inv + b->i_inv;
-	cpAssert(moment != 0.0, "Unsolvable spring.");
+	cpAssertSoft(moment != 0.0, "Unsolvable spring.");
 	spring->iSum = 1.0f/moment;
 
 	spring->w_coef = 1.0f - cpfexp(-spring->damping*dt*moment);

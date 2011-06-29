@@ -30,7 +30,7 @@
 void
 cpSpaceActivateBody(cpSpace *space, cpBody *body)
 {
-	cpAssert(!cpBodyIsRogue(body), "Internal error: Attempting to activate a rouge body.");
+	cpAssertSoft(!cpBodyIsRogue(body), "Internal error: Attempting to activate a rouge body.");
 	
 	if(space->locked){
 		// cpSpaceActivateBody() is called again once the space is unlocked
@@ -79,7 +79,7 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 static void
 cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 {
-	cpAssert(!cpBodyIsRogue(body), "Internal error: Attempting to deactivate a rouge body.");
+	cpAssertSoft(!cpBodyIsRogue(body), "Internal error: Attempting to deactivate a rouge body.");
 	
 	cpArrayDeleteObj(space->bodies, body);
 	
@@ -117,7 +117,7 @@ static inline void
 ComponentActivate(cpBody *root)
 {
 	if(!root || !cpBodyIsSleeping(root)) return;
-	cpAssert(!cpBodyIsRogue(root), "Internal Error: ComponentActivate() called on a rogue body.");
+	cpAssertSoft(!cpBodyIsRogue(root), "Internal Error: ComponentActivate() called on a rogue body.");
 	
 	cpSpace *space = root->space;
 	cpBody *body = root;
@@ -156,7 +156,7 @@ cpBodyActivate(cpBody *body)
 void
 cpBodyActivateStatic(cpBody *body, cpShape *filter)
 {
-	cpAssert(cpBodyIsStatic(body), "cpBodyActivateStatic() called on a non-static body.");
+	cpAssertHard(cpBodyIsStatic(body), "cpBodyActivateStatic() called on a non-static body.");
 	
 	CP_BODY_FOREACH_ARBITER(body, arb){
 		if(!filter || filter == arb->a || filter == arb->b){
@@ -185,7 +185,7 @@ FloodFillComponent(cpBody *root, cpBody *body)
 			CP_BODY_FOREACH_ARBITER(body, arb) FloodFillComponent(root, (body == arb->body_a ? arb->body_b : arb->body_a));
 			CP_BODY_FOREACH_CONSTRAINT(body, constraint) FloodFillComponent(root, (body == constraint->a ? constraint->b : constraint->a));
 		} else {
-			cpAssert(other_root == root, "Internal Error: Inconsistency dectected in the contact graph.");
+			cpAssertSoft(other_root == root, "Internal Error: Inconsistency dectected in the contact graph.");
 		}
 	}
 }
@@ -194,11 +194,11 @@ FloodFillComponent(cpBody *root, cpBody *body)
 static inline void
 cpBodyPushArbiter(cpBody *body, cpArbiter *arb)
 {
-	cpAssert(cpArbiterThreadForBody(arb, body)->next == NULL, "Internal Error: Dangling contact graph pointers detected. (A)");
-	cpAssert(cpArbiterThreadForBody(arb, body)->prev == NULL, "Internal Error: Dangling contact graph pointers detected. (B)");
+	cpAssertSoft(cpArbiterThreadForBody(arb, body)->next == NULL, "Internal Error: Dangling contact graph pointers detected. (A)");
+	cpAssertSoft(cpArbiterThreadForBody(arb, body)->prev == NULL, "Internal Error: Dangling contact graph pointers detected. (B)");
 	
 	cpArbiter *next = body->arbiterList;
-	cpAssert(next == NULL || cpArbiterThreadForBody(next, body)->prev == NULL, "Internal Error: Dangling contact graph pointers detected. (C)");
+	cpAssertSoft(next == NULL || cpArbiterThreadForBody(next, body)->prev == NULL, "Internal Error: Dangling contact graph pointers detected. (C)");
 	cpArbiterThreadForBody(arb, body)->next = next;
 	
 	if(next) cpArbiterThreadForBody(next, body)->prev = arb;
@@ -220,8 +220,8 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		cpFloat keThreshold = (dvsq ? body->m*dvsq : 0.0f);
 		body->node.idleTime = (cpBodyKineticEnergy(body) > keThreshold ? 0.0f : body->node.idleTime + dt);
 		
-		cpAssert(body->node.next == NULL, "Internal Error: Dangling next pointer detected in contact graph.");
-		cpAssert(body->node.root == NULL, "Internal Error: Dangling root pointer detected in contact graph.");
+		cpAssertSoft(body->node.next == NULL, "Internal Error: Dangling next pointer detected in contact graph.");
+		cpAssertSoft(body->node.root == NULL, "Internal Error: Dangling root pointer detected in contact graph.");
 	}
 	
 	// Awaken any sleeping bodies found and then push arbiters to the bodies' lists.
@@ -283,15 +283,15 @@ cpBodySleep(cpBody *body)
 
 void
 cpBodySleepWithGroup(cpBody *body, cpBody *group){
-	cpAssert(!cpBodyIsStatic(body) && !cpBodyIsRogue(body), "Rogue and static bodies cannot be put to sleep.");
+	cpAssertHard(!cpBodyIsStatic(body) && !cpBodyIsRogue(body), "Rogue and static bodies cannot be put to sleep.");
 	
 	cpSpace *space = body->space;
-	cpAssert(space, "Cannot put a rogue body to sleep.");
-	cpAssert(!space->locked, "Bodies cannot be put to sleep during a query or a call to cpSpaceStep(). Put these calls into a post-step callback.");
-	cpAssert(group == NULL || cpBodyIsSleeping(group), "Cannot use a non-sleeping body as a group identifier.");
+	cpAssertHard(space, "Cannot put a rogue body to sleep.");
+	cpAssertHard(!space->locked, "Bodies cannot be put to sleep during a query or a call to cpSpaceStep(). Put these calls into a post-step callback.");
+	cpAssertHard(group == NULL || cpBodyIsSleeping(group), "Cannot use a non-sleeping body as a group identifier.");
 	
 	if(cpBodyIsSleeping(body)){
-		cpAssert(ComponentRoot(body) == ComponentRoot(group), "The body is already sleeping and it's group cannot be reassigned.");
+		cpAssertHard(ComponentRoot(body) == ComponentRoot(group), "The body is already sleeping and it's group cannot be reassigned.");
 		return;
 	}
 	

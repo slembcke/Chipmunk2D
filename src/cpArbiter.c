@@ -71,7 +71,7 @@ cpArbiterUnthread(cpArbiter *arb)
 cpVect
 cpArbiterGetNormal(const cpArbiter *arb, int i)
 {
-	cpAssert(0 <= i && i < arb->numContacts, "Index error: The specified contact index is invalid for this arbiter");
+	cpAssertHard(0 <= i && i < arb->numContacts, "Index error: The specified contact index is invalid for this arbiter");
 	
 	cpVect n = arb->contacts[i].n;
 	return arb->swappedColl ? cpvneg(n) : n;
@@ -80,7 +80,7 @@ cpArbiterGetNormal(const cpArbiter *arb, int i)
 cpVect
 cpArbiterGetPoint(const cpArbiter *arb, int i)
 {
-	cpAssert(0 <= i && i < arb->numContacts, "Index error: The specified contact index is invalid for this arbiter");
+	cpAssertHard(0 <= i && i < arb->numContacts, "Index error: The specified contact index is invalid for this arbiter");
 	
 	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
 }
@@ -88,7 +88,7 @@ cpArbiterGetPoint(const cpArbiter *arb, int i)
 cpFloat
 cpArbiterGetDepth(const cpArbiter *arb, int i)
 {
-	cpAssert(0 <= i && i < arb->numContacts, "Index error: The specified contact index is invalid for this arbiter");
+	cpAssertHard(0 <= i && i < arb->numContacts, "Index error: The specified contact index is invalid for this arbiter");
 	
 	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
 }

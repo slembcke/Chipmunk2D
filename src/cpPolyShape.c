@@ -144,15 +144,15 @@ cpPolyValidate(const cpVect *verts, const int numVerts)
 int
 cpPolyShapeGetNumVerts(cpShape *shape)
 {
-	cpAssert(shape->klass == &polyClass, "Shape is not a poly shape.");
+	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
 	return ((cpPolyShape *)shape)->numVerts;
 }
 
 cpVect
 cpPolyShapeGetVert(cpShape *shape, int idx)
 {
-	cpAssert(shape->klass == &polyClass, "Shape is not a poly shape.");
-	cpAssert(0 <= idx && idx < cpPolyShapeGetNumVerts(shape), "Index out of range.");
+	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
+	cpAssertHard(0 <= idx && idx < cpPolyShapeGetNumVerts(shape), "Index out of range.");
 	
 	return ((cpPolyShape *)shape)->verts[idx];
 }
@@ -183,7 +183,7 @@ cpPolyShape *
 cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, cpVect *verts, cpVect offset)
 {
 	// Fail if the user attempts to pass a concave poly, or a bad winding.
-	cpAssert(cpPolyValidate(verts, numVerts), "Polygon is concave or has a reversed winding.");
+	cpAssertHard(cpPolyValidate(verts, numVerts), "Polygon is concave or has a reversed winding.");
 	
 	setUpVerts(poly, numVerts, verts, offset);
 	cpShapeInit((cpShape *)poly, &polyClass, body);
@@ -224,7 +224,7 @@ cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height)
 void
 cpPolyShapeSetVerts(cpShape *shape, int numVerts, cpVect *verts, cpVect offset)
 {
-	cpAssert(shape->klass == &polyClass, "Shape is not a poly shape.");
+	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
 	cpPolyShapeDestroy((cpPolyShape *)shape);
 	setUpVerts((cpPolyShape *)shape, numVerts, verts, offset);
 }

@@ -44,7 +44,7 @@ preStep(cpDampedSpring *spring, cpFloat dt)
 	spring->n = cpvmult(delta, 1.0f/(dist ? dist : INFINITY));
 	
 	cpFloat k = k_scalar(a, b, spring->r1, spring->r2, spring->n);
-	cpAssert(k != 0.0, "Unsolvable spring.");
+	cpAssertSoft(k != 0.0, "Unsolvable spring.");
 	spring->nMass = 1.0f/k;
 	
 	spring->target_vrn = 0.0f;

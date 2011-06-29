@@ -172,7 +172,7 @@ cpSpaceFree(cpSpace *space)
 }
 
 #define cpAssertSpaceUnlocked(space) \
-	cpAssert(!space->locked, \
+	cpAssertHard(!space->locked, \
 		"This addition/removal cannot be done safely during a call to cpSpaceStep() or during a query. " \
 		"Put these calls into a post-step callback." \
 	);
@@ -248,8 +248,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	if(cpBodyIsStatic(body)) return cpSpaceAddStaticShape(space, shape);
 	
 	// TODO change these to check if it was added to a space at all.
-	cpAssert(!cpSpaceContainsShape(space, shape),
-		"Cannot add the same shape more than once.");
+	cpAssertSoft(!shape->space, "This shape is already added to a space and cannot be added to another.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
@@ -257,6 +256,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	
 	cpShapeUpdate(shape, body->p, body->rot);
 	cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
+	shape->space = space;
 		
 	return shape;
 }
@@ -264,14 +264,14 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 cpShape *
 cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
-	cpAssert(!cpSpaceContainsShape(space, shape),
-		"Cannot add the same static shape more than once.");
+	cpAssertSoft(!shape->space, "This shape is already added to a space and cannot be added to another.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
 	cpBodyAddShape(body, shape);
 	cpShapeUpdate(shape, body->p, body->rot);
 	cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
+	shape->space = space;
 	
 	return shape;
 }
@@ -280,8 +280,7 @@ cpBody *
 cpSpaceAddBody(cpSpace *space, cpBody *body)
 {
 	cpAssertWarn(!cpBodyIsStatic(body), "Static bodies cannot be added to a space as they are not meant to be simulated.");
-	cpAssert(!cpSpaceContainsBody(space, body),
-		"Cannot add a body to a more than one space or to the same space twice.");
+	cpAssertSoft(!body->space, "This body is already added to a space and cannot be added to another.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpArrayPush(space->bodies, body);
@@ -293,8 +292,7 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 cpConstraint *
 cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
-	cpAssert(!cpSpaceContainsConstraint(space, constraint),
-		"Cannot add the same constraint more than once.");
+	cpAssertSoft(!constraint->space, "This shape is already added to a space and cannot be added to another.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(constraint->a);
@@ -305,6 +303,7 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	cpBody *a = constraint->a, *b = constraint->b;
 	constraint->next_a = a->constraintList; a->constraintList = constraint;
 	constraint->next_b = b->constraintList; b->constraintList = constraint;
+	constraint->space = space;
 	
 	return constraint;
 }
@@ -360,7 +359,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 	if(cpBodyIsStatic(body)){
 		cpSpaceRemoveStaticShape(space, shape);
 	} else {
-		cpAssert(cpSpaceContainsShape(space, shape),
+		cpAssertSoft(cpSpaceContainsShape(space, shape),
 			"Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
 		cpAssertSpaceUnlocked(space);
 		
@@ -368,13 +367,14 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 		cpBodyRemoveShape(body, shape);
 		cpSpaceFilterArbiters(space, body, shape);
 		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
+		shape->space = NULL;
 	}
 }
 
 void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
-	cpAssert(cpSpaceContainsShape(space, shape),
+	cpAssertSoft(cpSpaceContainsShape(space, shape),
 		"Cannot remove a static or sleeping shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
@@ -383,6 +383,7 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 	cpBodyRemoveShape(body, shape);
 	cpSpaceFilterArbiters(space, body, shape);
 	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
+	shape->space = NULL;
 }
 
 void
@@ -411,13 +412,12 @@ cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 	
 	cpBodyRemoveConstraint(constraint->a, constraint);
 	cpBodyRemoveConstraint(constraint->b, constraint);
+	constraint->space = NULL;
 }
 
 cpBool cpSpaceContainsShape(cpSpace *space, cpShape *shape)
 {
-	return
-		cpSpatialIndexContains(space->activeShapes, shape, shape->hashid) ||
-		cpSpatialIndexContains(space->staticShapes, shape, shape->hashid);
+	return (shape->space == space);
 }
 
 cpBool cpSpaceContainsBody(cpSpace *space, cpBody *body)
@@ -427,7 +427,7 @@ cpBool cpSpaceContainsBody(cpSpace *space, cpBody *body)
 
 cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)
 {
-	return cpArrayContains(space->constraints, constraint);
+	return (constraint->space == space);
 }
 
 

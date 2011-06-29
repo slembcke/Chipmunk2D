@@ -73,7 +73,7 @@ k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n)
 	cpFloat r2cn = cpvcross(r2, n);
 	
 	cpFloat value = mass_sum + a->i_inv*r1cn*r1cn + b->i_inv*r2cn*r2cn;
-	cpAssert(value != 0.0, "Unsolvable collision or constraint.");
+	cpAssertSoft(value != 0.0, "Unsolvable collision or constraint.");
 	
 	return value;
 }
@@ -108,7 +108,7 @@ k_tensor(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect *k1, cpVect *k2)
 	
 	// invert
 	cpFloat determinant = k11*k22 - k12*k21;
-	cpAssert(determinant != 0.0, "Unsolvable constraint.");
+	cpAssertSoft(determinant != 0.0, "Unsolvable constraint.");
 	
 	cpFloat det_inv = 1.0f/determinant;
 	*k1 = cpv( k22*det_inv, -k12*det_inv);

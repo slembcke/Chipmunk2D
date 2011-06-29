@@ -91,6 +91,8 @@ struct cpShape {
 	// Layer bitmask for this shape. Shapes only collide if the bitwise and of their layers is non-zero.
 	cpLayers layers;
 	
+	CP_PRIVATE(cpSpace *space);
+	
 	CP_PRIVATE(cpShape *next);
 	CP_PRIVATE(cpShape *prev);
 	

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 
 void
 cpSpatialIndexFree(cpSpatialIndex *index)
@@ -19,7 +19,7 @@ cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *klass, cpSpatialI
 	index->staticIndex = staticIndex;
 	
 	if(staticIndex){
-		cpAssert(!staticIndex->dynamicIndex, "This static index is already is already associated with a dynamic index.");
+		cpAssertHard(!staticIndex->dynamicIndex, "This static index is already is already associated with a dynamic index.");
 		staticIndex->dynamicIndex = index;
 	}
 	

@@ -106,7 +106,7 @@ void
 cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
 {
 	space->locked--;
-	cpAssert(space->locked >= 0, "Internal Error: Space lock underflow.");
+	cpAssertSoft(space->locked >= 0, "Internal Error: Space lock underflow.");
 	
 	if(!space->locked){
 		cpArray *waking = space->rousedBodies;
@@ -189,7 +189,7 @@ cpContactBufferGetArray(cpSpace *space)
 void
 cpSpacePushContacts(cpSpace *space, int count)
 {
-	cpAssert(count <= CP_MAX_CONTACTS_PER_ARBITER, "Internal Error:contact buffer overflow!");
+	cpAssertSoft(count <= CP_MAX_CONTACTS_PER_ARBITER, "Internal Error:contact buffer overflow!");
 	space->contactBuffersHead->numContacts += count;
 }
 
@@ -206,7 +206,7 @@ cpSpaceArbiterSetTrans(cpShape **shapes, cpSpace *space)
 	if(space->pooledArbiters->num == 0){
 		// arbiter pool is exhausted, make more
 		int count = CP_BUFFER_BYTES/sizeof(cpArbiter);
-		cpAssert(count, "Buffer size too small.");
+		cpAssertSoft(count, "Buffer size too small.");
 		
 		cpArbiter *buffer = (cpArbiter *)cpcalloc(1, CP_BUFFER_BYTES);
 		cpArrayPush(space->allocatedBuffers, buffer);

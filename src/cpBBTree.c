@@ -151,7 +151,7 @@ PairFromPool(cpBBTree *tree)
 	} else {
 		// Pool is exhausted, make more
 		int count = CP_BUFFER_BYTES/sizeof(Pair);
-		cpAssert(count, "Buffer size is too small.");
+		cpAssertSoft(count, "Buffer size is too small.");
 		
 		Pair *buffer = (Pair *)cpcalloc(1, CP_BUFFER_BYTES);
 		cpArrayPush(tree->allocatedBuffers, buffer);
@@ -240,7 +240,7 @@ NodeFromPool(cpBBTree *tree)
 	} else {
 		// Pool is exhausted, make more
 		int count = CP_BUFFER_BYTES/sizeof(Node);
-		cpAssert(count, "Buffer size is too small.");
+		cpAssertSoft(count, "Buffer size is too small.");
 		
 		Node *buffer = (Node *)cpcalloc(1, CP_BUFFER_BYTES);
 		cpArrayPush(tree->allocatedBuffers, buffer);
@@ -295,8 +295,8 @@ NodeOther(Node *node, Node *child)
 static inline void
 NodeReplaceChild(Node *parent, Node *child, Node *value, cpBBTree *tree)
 {
-	cpAssert(!NodeIsLeaf(parent), "Cannot replace child of a leaf.");
-	cpAssert(child == parent->a || child == parent->b, "Node is not a child of parent.");
+	cpAssertSoft(!NodeIsLeaf(parent), "Cannot replace child of a leaf.");
+	cpAssertSoft(child == parent->a || child == parent->b, "Node is not a child of parent.");
 	
 	if(parent->a == child){
 		NodeRecycle(tree, parent->a);
