@@ -25,13 +25,13 @@
 
 #include "chipmunk_private.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-	void cpInitCollisionFuncs(void);
-#ifdef __cplusplus
-}
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
+//	void cpInitCollisionFuncs(void);
+//#ifdef __cplusplus
+//}
+//#endif
 
 void
 cpMessage(const char *message, const char *condition, const char *file, int line, int isError)
@@ -48,22 +48,15 @@ cpMessage(const char *message, const char *condition, const char *file, int line
 
 const char *cpVersionString = XSTR(CP_VERSION_MAJOR)"."XSTR(CP_VERSION_MINOR)"."XSTR(CP_VERSION_RELEASE);
 
-#define printsize(struct) printf("sizeof("STR(struct)"): %ul\n", (int)sizeof(struct))
-
 void
 cpInitChipmunk(void)
 {
-#ifndef NDEBUG
-	printf("Initializing Chipmunk v%s (Debug Enabled)\n", cpVersionString);
-	printf("Compile with -DNDEBUG defined to disable debug mode and runtime assertion checks\n");
-	printsize(cpBody);
-	printsize(cpShape);
-	printsize(cpPivotJoint);
-	printsize(cpArbiter);
-	printsize(cpContact);
-#endif
-	
-	cpInitCollisionFuncs();
+//#ifndef NDEBUG
+//	printf("Initializing Chipmunk v%s (Debug Enabled)\n", cpVersionString);
+//	printf("Compile with -DNDEBUG defined to disable debug mode and runtime assertion checks\n");
+//#endif
+//	
+//	cpInitCollisionFuncs();
 }
 
 cpFloat

@@ -63,8 +63,6 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->w_limit = (cpFloat)INFINITY;
 	
 	body->data = NULL;
-	body->dat
-	cpB
 	
 	// Setters must be called after full initialization so the sanity checks don't assert on garbage data.
 	cpBodySetMass(body, m);

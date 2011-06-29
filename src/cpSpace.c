@@ -81,6 +81,11 @@ cpCollisionHandler cpDefaultCollisionHandler = {0, 0, alwaysCollide, alwaysColli
 cpSpace*
 cpSpaceInit(cpSpace *space)
 {
+#ifndef NDEBUG
+	printf("Initializing cpSpace - Chipmunk v%s (Debug Enabled)\n", cpVersionString);
+	printf("Compile with -DNDEBUG defined to disable debug mode and runtime assertion checks\n");
+#endif
+
 	space->iterations = 10;
 	
 	space->gravity = cpvzero;

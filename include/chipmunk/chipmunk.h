@@ -107,8 +107,7 @@ typedef struct cpSpace cpSpace;
 /// Version string.
 extern const char *cpVersionString;
 
-/// Initialize Chipmunk.
-/// Must be called before anything else or your program will crash.
+/// @deprecated
 void cpInitChipmunk(void);
 
 /// Calculate the moment of inertia for a circle.

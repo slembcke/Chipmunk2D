@@ -34,7 +34,6 @@ struct cpArray {
 
 cpArray *cpArrayNew(int size);
 
-//void cpArrayDestroy(cpArray *arr);
 void cpArrayFree(cpArray *arr);
 
 void cpArrayPush(cpArray *arr, void *object);
@@ -78,7 +77,6 @@ typedef void *(*cpHashSetTransFunc)(void *ptr, void *data);
 cpHashSet *cpHashSetNew(int size, cpHashSetEqlFunc eqlFunc);
 void cpHashSetSetDefaultValue(cpHashSet *set, void *default_value);
 
-//void cpHashSetDestroy(cpHashSet *set);
 void cpHashSetFree(cpHashSet *set);
 
 int cpHashSetCount(cpHashSet *set);

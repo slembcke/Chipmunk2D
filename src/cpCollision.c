@@ -357,49 +357,49 @@ circle2poly(const cpShape *shape1, const cpShape *shape2, cpContact *con)
 	}
 }
 
-//static const collisionFunc builtinCollisionFuncs[9] = {
-//	circle2circle,
-//	NULL,
-//	NULL,
-//	circle2segment,
-//	NULL,
-//	NULL,
-//	circle2poly,
-//	seg2poly,
-//	poly2poly,
-//};
-//static const collisionFunc *colfuncs = builtinCollisionFuncs;
+static const collisionFunc builtinCollisionFuncs[9] = {
+	circle2circle,
+	NULL,
+	NULL,
+	circle2segment,
+	NULL,
+	NULL,
+	circle2poly,
+	seg2poly,
+	poly2poly,
+};
+static const collisionFunc *colfuncs = builtinCollisionFuncs;
 
-static collisionFunc *colfuncs = NULL;
-
-static void
-addColFunc(const cpShapeType a, const cpShapeType b, const collisionFunc func)
-{
-	colfuncs[a + b*CP_NUM_SHAPES] = func;
-}
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-	void cpInitCollisionFuncs(void);
-	
-	// Initializes the array of collision functions.
-	// Called by cpInitChipmunk().
-	void
-	cpInitCollisionFuncs(void)
-	{
-		if(!colfuncs)
-			colfuncs = (collisionFunc *)cpcalloc(CP_NUM_SHAPES*CP_NUM_SHAPES, sizeof(collisionFunc));
-		
-		addColFunc(CP_CIRCLE_SHAPE,  CP_CIRCLE_SHAPE,  circle2circle);
-		addColFunc(CP_CIRCLE_SHAPE,  CP_SEGMENT_SHAPE, circle2segment);
-		addColFunc(CP_SEGMENT_SHAPE, CP_POLY_SHAPE,    seg2poly);
-		addColFunc(CP_CIRCLE_SHAPE,  CP_POLY_SHAPE,    circle2poly);
-		addColFunc(CP_POLY_SHAPE,    CP_POLY_SHAPE,    poly2poly);
-	}	
-#ifdef __cplusplus
-}
-#endif
+//static collisionFunc *colfuncs = NULL;
+//
+//static void
+//addColFunc(const cpShapeType a, const cpShapeType b, const collisionFunc func)
+//{
+//	colfuncs[a + b*CP_NUM_SHAPES] = func;
+//}
+//
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
+//	void cpInitCollisionFuncs(void);
+//	
+//	// Initializes the array of collision functions.
+//	// Called by cpInitChipmunk().
+//	void
+//	cpInitCollisionFuncs(void)
+//	{
+//		if(!colfuncs)
+//			colfuncs = (collisionFunc *)cpcalloc(CP_NUM_SHAPES*CP_NUM_SHAPES, sizeof(collisionFunc));
+//		
+//		addColFunc(CP_CIRCLE_SHAPE,  CP_CIRCLE_SHAPE,  circle2circle);
+//		addColFunc(CP_CIRCLE_SHAPE,  CP_SEGMENT_SHAPE, circle2segment);
+//		addColFunc(CP_SEGMENT_SHAPE, CP_POLY_SHAPE,    seg2poly);
+//		addColFunc(CP_CIRCLE_SHAPE,  CP_POLY_SHAPE,    circle2poly);
+//		addColFunc(CP_POLY_SHAPE,    CP_POLY_SHAPE,    poly2poly);
+//	}	
+//#ifdef __cplusplus
+//}
+//#endif
 
 int
 cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr)

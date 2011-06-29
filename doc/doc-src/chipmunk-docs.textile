@@ -15,16 +15,18 @@ First of all, I would like to give a Erin Catto a big thank you, as Chipmunk's i
 
 <%= h 2, "Why a C Library?", "WhyC" %>
 
-A lot of people ask me why I wrote Chipmunk in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, OOC, Lua, Io... the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I also wanted Chipmunk to be fast, portable, easy to optimize and easy to debug. I felt using C helps with all of those.
+A lot of people ask me why I wrote Chipmunk in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, OOC, Lua, Io... the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I also wanted Chipmunk to be fast, portable, easy to optimize and easy to debug. Writting Chipmunk in C made it simpler to acheive all of those goals.
 
-That said, I've never developed a whole game in C and I probably never will. There are much more interesting languages to do that in than C with all sorts of nice features like garbage collection, closures and object oriented runtimes. Check out the "Bindings and Ports":http://code.google.com/p/chipmunk-physics/wiki/BindingsAndPorts page to see if you can use Chipmunk from your language of choice. Because Chipmunk is written in a subset of C99 it compiles cleanly as C, C++, Objective-C and Objective-C++ code, making it easy to integrate into projects in those languages.
+That said, I've never developed a whole game in C and I probably never will. There are much more interesting and fun languages than C with all sorts of nice features like garbage collection, closures and all sorts of unique object oriented runtimes. Check out the "Bindings and Ports":http://code.google.com/p/chipmunk-physics/wiki/BindingsAndPorts page to see if you can use Chipmunk from your language of choice. Because Chipmunk is written in a subset of C99 it compiles cleanly as C, C++, Objective-C and Objective-C++ code, making it easy to integrate into projects in those languages.
 
 If you are writing iPhone games using Chipmunk, you should check out the Objective-Chipmunk wrapper that we've developed for Chipmunk. It integrates with the Objective-C memory model and provides a number of high level APIs that make writing physics based games for the iPhone even easier. While we do charge for Objective-Chipmunk, it will almost certainly save you more time than the small cost to license it. As a bonus, you'll be helping to ensure that we can afford to continue to work on Chipmunk improvements.
 
 
 <%= h 2, "Limitations of a C API:", "Limitations" %>
 
-The two biggest inconveniences of Chipmunk's C API are lack of operator overloading and access control. Chipmunk defines vector operators as functions instead of allowing you to use regular operators such as @*@, @+@, and @-@. (However Chipmunk 5.3.3 and up does provide overloaded operators if you are using C++) In practice, it's usually not a major problem for readability once you get used to it. The second, and bigger problem is that it's not possible to mark parts of Chipmunk's C API as private. To work around this, I have a separate header full of Chipmunk's private API, @chipmunk_private.h@. I also use a macro, @CP_PRIVATE()@ to mangle names in public structures. While you can feel free to include this header and use the macro in your own code to access this private API, be aware that the fields and functions may be renamed or disappear without warning.
+Chipmunk does provide overloaded operators for @*@, @+@, and @-@ (unary and binary) if you are using C++, but falls back to using functions such as @cpvadd()@ and @cpvsub()@ for C code. This is a little harder to read, but works OK once you get used to it. Most of the interesting vector operations that are possible don't have a symbol for them anyway (at least not on a keyboard).
+
+Another problem for a C API is access restriction. There are many structs, fields and functions in Chipmunk that are only meant to be used internally. To work around this, I have a separate header full of Chipmunk's private API, @chipmunk_private.h@. I also use a macro, @CP_PRIVATE()@ to mangle names in public structures. While you can feel free to include this header or use the macro in your own code to access the private API, be aware that the fields and functions may be renamed or disappear without warning and I have no plans to document or support usage of the private API.
 
 
 <%= h 2, "Get it, Compile it:", "Compiling" %>
@@ -69,7 +71,7 @@ If you find any bugs in Chipmunk, errors or broken links in this document, or ha
 Chipmunk is licensed under the MIT license.
 
 <pre>
-Copyright (c) 2007 Scott Lembcke
+Copyright (c) 2007-2011 Scott Lembcke
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -113,18 +115,8 @@ There are 4 basic object types you will use in Chipmunk.
 * *Constraints/Joints:* Constraints and joints describe how bodies are attached to each other.
 * *Spaces:* Spaces are containers for simulating objects in Chipmunk. You add bodies, shapes and joints to a space and then update the space as a whole. They control how all the rigid bodies, shapes, and
 
-There is often confusion between rigid bodies and their collision shapes in Chipmunk and how they relate to sprites. A sprite would be a visual representation of an object, while a collision shape is an invisible property that defines how objects should collide. Both the sprite's and the collision shape's position and rotation are controlled by a rigid body. Generally you want to create a game object type that ties these things all together.
+There is often confusion between rigid bodies and their collision shapes in Chipmunk and how they relate to sprites. A sprite would be a visual representation of an object, while a collision shape is an invisible property that defines how objects should collide. Both the sprite's and the collision shape's position and rotation are controlled by the motion of a rigid body. Generally you want to create a game object type that ties these things all together.
 
-
-<%= h 2, "Initialization:", "Initialization" %>
-
-Before you do anything else, you *must* initialize Chipmunk. Otherwise you _will_ crash as soon as the first collision is detected.
-
-<pre><code>cpInitChipmunk(); // That is all</code></pre>
-
-Chipmunk allocates a small (< 100 bytes) jump table used for performing collision detection between different kinds of shapes. There is no function to explicitly release this memory, but it is no more a memory leak than using a statically allocated array.
-
-If Chipmunk was not compiled with the NDEBUG flag set, it will also print out the debug mode message and the current version number to stdout.
 
 <%= h 2, "Memory Management the Chipmunk way:", "Memory" %>
 
@@ -252,11 +244,7 @@ p(expl). Convenience constructor for @cpBB@ structs. Like @cpv()@ this function 
 
 
 TODO:
-Need code samples for calculating moments.
 Better document integration functions.
-Document new iterator functions. With examples!
-No units, no tuning.
-Performance/Quality
 
 <%= h 1, "Chipmunk Rigid Bodies: @cpBody@", "cpBody" %>
 
@@ -392,7 +380,7 @@ People are sometimes confused by the difference between a force and an impulse. 
 * @void cpBodyApplyForce(cpBody *body, const cpVect f, const cpVect r)@ - Add the impulse @j@ to @body@ at a relative offset @r@ from the center of gravity.
 * @void cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)@ - Add the force @f@ to @body@ at a relative offset @r@ from the center of gravity.
 
-*Note:* Both the @cpBodyApplyForce()@ @cpBodyApplyImpulse()@ functions take a force or impulse in absolute coordinates and applies it at a relative offset in absolute coordinates. (The offset is relative to the center of gravity, but is not rotated with the body)
+*Note:* Both the @cpBodyApplyForce()@ @cpBodyApplyImpulse()@ functions take a force or impulse in absolute coordinates and applies it at a relative offset in absolute coordinates. (The offset is relative to the center of gravity, but is _not_ rotated with the body)
 
 
 <%= h 2, "Sleeping Functions:", "Sleeping" %>
@@ -409,6 +397,24 @@ Chipmunk supports a sleeping feature so that it stops using CPU time simulating 
 p(expl). When objects in Chipmunk sleep, they sleep as a group of all objects that are touching or jointed together. When an object is woken up, all of the objects in it's group are woken up. @cpBodySleepWithGroup()@ allows you group sleeping objects together. It acts identically to @cpBodySleep()@ if you pass @NULL@ as @group@ by starting a new group. If you pass a sleeping body for @group@, @body@ will be awoken when @group@ is awoken. You can use this to initialize levels and start stacks of objects in a pre-sleeping state.
 
 TODO code example here
+
+<%= h 2, "Iterators", "Iterators" %>
+
+<pre><code>typedef void (*cpBodyShapeIteratorFunc)(cpBody *body, cpShape *shape, void *data)
+void cpBodyEachShape(cpBody *body, cpBodyShapeIteratorFunc func, void *data)</code></pre>
+
+p(expl). Call @func@ once for each shape that is attached to @body@ and added to a space. @data@ is passed along as a context value. It is safe to remove shapes using these callbacks.
+
+<pre><code>typedef void (*cpBodyConstraintIteratorFunc)(cpBody *body, cpConstraint *constraint, void *data)
+void cpBodyEachConstraint(cpBody *body, cpBodyConstraintIteratorFunc func, void *data)</code></pre>
+
+p(expl). Call @func@ once for each constraint that is attached to @body@ and added to a space. @data@ is passed along as a context value. It is safe to remove constraints using thes callbacks.
+
+<pre><code>typedef void (*cpBodyArbiterIteratorFunc)(cpBody *body, cpArbiter *arbiter, void *data)
+void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)</code></pre>
+
+p(expl). This one is more interesting. Calls @func@ once for each collision pair that @body@ is involved in. Calling @cpArbiterGet[Bodies|Shapes]()@ or @CP_ARBITER_GET_[BODIES|SHAPES]()@  will return the body or shape for @body@ as the first argument. You can use this to check all sorts of collision information for a body like if it's touching the ground, another particular object, how much collision force is being applied to an object, etc. *Note:* This function only works if the contact graph is enabled either by enabling the sleeping feature of a space or by enabling the contact graph.
+
 
 <%= h 2, "Misc Functions:", "Misc" %>
 
@@ -506,7 +512,7 @@ Layers can also be used to set up rule based collisions. Say you have four types
 | Player Bullet | - | - | - |  |
 | Enemy Bullet | - | - | - | - |
 
-The '-'s are for redundant spots in the chart, and the numbers are spots where types should collide. You can use a layer for rule that you want to define. TODO umm what? Then add the layers to each type: The player should be in layers 1 and 2, the enemy should be in layers 1 and 3, the player bullets should be in layer 3, and the enemy bullets should be in layer 2. Treating layers as rules this way, you can define up to 32 rules. The default @cpLayers@ type is @unsigned int@ which has a resolution of 32 bits on most systems. You can redefine the @cpLayers@ type in @chipmunk_types.h@ if you need more bits to work with.
+The '-'s are for redundant spots in the chart, and the numbers are spots where types should collide. You can use a layer for each rule that you want to define. Then add the layers to each type: The player should be in layers 1 and 2, the enemy should be in layers 1 and 3, the player bullets should be in layer 3, and the enemy bullets should be in layer 2. Treating layers as rules this way, you can define up to 32 rules. The default @cpLayers@ type is @unsigned int@ which has a resolution of 32 bits on most systems. You can redefine the @cpLayers@ type in @chipmunk_types.h@ if you need more bits to work with.
 
 There is one last way of filtering collisions using collision handlers. See the "section on callbacks":#Callbacks for more information. While collision handlers can be more flexible, they are also the slowest method. So you try to use groups or layers first.
 
@@ -818,7 +824,7 @@ p(expl). User data pointer. Use this pointer to get a reference to the game obje
 
 <pre><code>cpFloat cpConstraintGetImpulse(cpConstraint *constraint)</code></pre>
 
-p(expl). The most recent impulse that @constraint@ applied. To convert this to a force, divide by the timestep passed to @cpSpaceStep()@.
+p(expl). The most recent impulse that @constraint@ applied. To convert this to a force, divide by the timestep passed to @cpSpaceStep()@. You can use this to implement breakable joints to check if the force they attempted to apply exceeded a certain threshold.
 
 To access properties of specific joint types, use the getter and setter functions provided (ex: @cpPinJointGetAnchr1()@). See the lists of properties for more information.
 
@@ -830,7 +836,7 @@ Joints in Chipmunk are not perfect. A pin joint can't maintain the exact correct
 * Winches - Pull one object towards another at a constant speed without going over a maximum force.
 * Mouse manipulation - Interact with objects smoothly given coarse/shaky mouse input.
 
-There are three public fields of cpConstraint structs that control the error correction, @maxForce@, @maxBias@, and @biasCoef@. @maxForce@ is pretty self explanatory, a joint or constraint will not be able to use more than this amount of force in order to function. If it needs more force to be able to hold itself together, it will fall apart. @maxBias@ is the maximum speed at which error correction can be applied. If you change a property on a joint so that the joint will have to correct itself, it normally does so very quickly. By setting a maxSpeed you can make the joint work like a servo, correcting itself at a constant rate over a longer period of time. Lastly, @biasCoef@ is the percentage of error corrected every step before clamping to a maximum speed. You can use this to make joints correct themselves smoothly instead of at a constant speed, but is probably the least useful of the three properties by far.
+There are three properties of cpConstraint structs that control the error correction, @maxForce@, @maxBias@, and @biasCoef@. @maxForce@ is pretty self explanatory, a joint or constraint will not be able to use more than this amount of force in order to function. If it needs more force to be able to hold itself together, it will fall apart. @maxBias@ is the maximum speed at which error correction can be applied. If you change a property on a joint so that the joint will have to correct itself, it normally does so very quickly. By setting a maxSpeed you can make the joint work like a servo, correcting itself at a constant rate over a longer period of time. Lastly, @biasCoef@ is the percentage of error corrected every step before clamping to a maximum speed. You can use this to make joints correct themselves smoothly instead of at a constant speed, but is probably the least useful of the three properties by far.
 
 <!-- TODO examples -->
 
@@ -1075,11 +1081,6 @@ While using callbacks to filter collisions is the most flexible way, keep in min
 
 <%= h 1, "Collision Callbacks:", "CollisionCallbacks" %>
 
-TODO
-Document that @postStep()@ callbacks can now be scheduled from iterators or queries as well.
-Example for cpArbiterGetContactPointSet().
-No public fields on an arbiter anymore.
-
 A physics library without any events or feedback would not be very useful for games. How would you know when the player bumped into an enemy so that you could take some health points away? How would you know how hard the car hit something so you don't play a loud crash noise when a pebble hits it? What if you need to decide if a collision should be ignored based on specific conditions, like implementing one way platforms? Chipmunk has a number of powerful callback systems that you can plug into to accomplish all of that.
 
 <%= h 2, "Collision Handlers:", "Handlers" %>
@@ -1133,7 +1134,7 @@ p(expl). Register a default collision handler to be used when no specific collis
 
 <%= h 2, "Post-Step Callbacks:", "PostStep" %>
 
-Post-step callbacks are the one place where you can break the rules about adding or removing objects from within a callback. In fact, their primary function is to help you safely remove objects from the space that you wanted to disable or destroy in a collision callback.
+Post-step callbacks are the one place where you can break the rules about adding or removing objects from within a callback. In fact, their primary function is to help you safely remove objects from the space that you wanted to disable or destroy in a collision or query callback.
 
 Post step callbacks are registered as a function and a pointer that is used as a key. You can only register one @postStep()@ callback per key. This prevents you from accidentally removing an object more than once. For instance, say that you get a collision callback between a bullet and object A. You want to destroy both the bullet and object A, so you register a @postStep()@ callback to safely remove them from your game. Then you get a second collision callback between the bullet and object B. You register a @postStep()@ callback to remove object B, and a second @postStep()@ callback to remove the bullet. Because you can only register one callback per key, the @postStep()@ callback for the bullet will only be called once and you can't accidentally try to remove it twice.
 
@@ -1143,7 +1144,7 @@ p(expl). Function type used for @postStep()@ callbacks. @space@ is the space the
 
 <pre><code>void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)</code></pre>
 
-p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @obj@ and @data@ will be passed to your function. Only the last callback registered for any unique value of @obj@ will be recorded. You can add @postStep()@ callbacks from outside of other callback functions, but they won't be called until @cpSpaceStep()@ is called again.
+p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @obj@ and @data@ will be passed to your function. Only the last callback registered for any unique value of @obj@ will be recorded. You can add @postStep()@ callbacks from outside of other callback functions, but there isn't a good reason to and they won't be called until the next time @cpSpaceStep()@ is finishing.
 
 <%= h 2, "Examples:", "Examples" %>
 
@@ -1183,7 +1184,7 @@ cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i)</code></pre>
 
 p(expl). Get the number of contacts tracked by this arbiter or the specific collision point, collision normal or penetration depth of a collision point.
 
-TODO contact point set
+TODO contact point set and example
 
 <pre><code>cpBool cpArbiterIsFirstContact(const cpArbiter *arb)</code></pre>
 
