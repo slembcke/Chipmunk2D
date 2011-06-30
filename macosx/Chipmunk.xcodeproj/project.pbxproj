@@ -647,6 +647,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				INSTALL_PATH = /usr/local/lib;
+				OTHER_CFLAGS = (
+					"-DNDEBUG",
+					"-ffast-math",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Chipmunk;
 				ZERO_LINK = NO;
@@ -690,7 +694,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "Chipmunk-iPhone";
-				SDKROOT = iphoneos4.1;
+				SDKROOT = iphoneos;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -698,13 +702,12 @@
 		D3E5F01B0AA32EAC004E361B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = ../include/chipmunk;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
-				SDKROOT = macosx10.5;
+				SDKROOT = "";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-W",
@@ -721,11 +724,10 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = ../include/chipmunk;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = "-DNDEBUG";
-				SDKROOT = macosx10.5;
+				SDKROOT = "";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-W",
