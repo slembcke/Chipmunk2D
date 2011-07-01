@@ -7,9 +7,6 @@ Tutorial ideas:
 	Bouyancy example.
 	OpenGL transform example.
 
-Bugs:
-- Pre-solve collision handlers aren't called for freshly awoken shapes.
-
 Future features to think about:
 http://www.slembcke.net/forums/viewtopic.php?f=1&t=1459
 constraint callbacks?

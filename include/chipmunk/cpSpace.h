@@ -47,7 +47,7 @@ struct cpSpace {
 	/// The default value of INFINITY disables the sleeping algorithm.
 	cpFloat sleepTimeThreshold;
 	
-	/// Amount of allowed penetration.
+	/// Amount of encouraged penetration between colliding shapes..
 	/// Used to reduce oscillating contacts and keep the collision cache warm.
 	/// Defaults to 0.1. If you have poor simulation quality,
 	/// increase this number as much as possible without allowing visible amounts of overlap.
@@ -63,7 +63,7 @@ struct cpSpace {
 	cpTimestamp collisionPersistence;
 	
 	/// Rebuild the contact graph during each step. Must be enabled to use the cpBodyEachArbiter() function.
-	/// Disabled by default for a small performance boost.
+	/// Disabled by default for a small performance boost. Enabled implicitly when the sleeping feature is enabled.
 	cpBool enableContactGraph;
 	
 	/// User definable data pointer.

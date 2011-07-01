@@ -243,9 +243,6 @@ p(expl). Convenience constructor for @cpBB@ structs. Like @cpv()@ this function 
 * @cpVect cpBBWrapVect(const cpBB bb, const cpVect v)@ - Returns a copy of @v@ wrapped to the bounding box.
 
 
-TODO:
-Better document integration functions.
-
 <%= h 1, "Chipmunk Rigid Bodies: @cpBody@", "cpBody" %>
 
 <%= h 2, "Rogue and Static Bodies:", "RougeStatic" %>
@@ -355,7 +352,7 @@ Use the following functions to approximate the moment of inertia for your body, 
 * @cpFloat cpMomentForPoly(cpFloat m, int numVerts, const cpVect *verts, cpVect offset)@ - Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
 * @cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height)@ - Calculate the moment of inertia for a solid box centered on the body.
 
-TODO examples
+<!-- TODO examples -->
 
 Use the following functions to get the area for common Chipmunk shapes if you want to approximate masses or density or whatnot.
 
@@ -396,7 +393,7 @@ Chipmunk supports a sleeping feature so that it stops using CPU time simulating 
 
 p(expl). When objects in Chipmunk sleep, they sleep as a group of all objects that are touching or jointed together. When an object is woken up, all of the objects in it's group are woken up. @cpBodySleepWithGroup()@ allows you group sleeping objects together. It acts identically to @cpBodySleep()@ if you pass @NULL@ as @group@ by starting a new group. If you pass a sleeping body for @group@, @body@ will be awoken when @group@ is awoken. You can use this to initialize levels and start stacks of objects in a pre-sleeping state.
 
-TODO code example here
+<!-- TODO examples -->
 
 <%= h 2, "Iterators", "Iterators" %>
 
@@ -413,8 +410,13 @@ p(expl). Call @func@ once for each constraint that is attached to @body@ and add
 <pre><code>typedef void (*cpBodyArbiterIteratorFunc)(cpBody *body, cpArbiter *arbiter, void *data)
 void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)</code></pre>
 
-p(expl). This one is more interesting. Calls @func@ once for each collision pair that @body@ is involved in. Calling @cpArbiterGet[Bodies|Shapes]()@ or @CP_ARBITER_GET_[BODIES|SHAPES]()@  will return the body or shape for @body@ as the first argument. You can use this to check all sorts of collision information for a body like if it's touching the ground, another particular object, how much collision force is being applied to an object, etc. *Note:* This function only works if the contact graph is enabled either by enabling the sleeping feature of a space or by enabling the contact graph.
+p(expl). This one is more interesting. Calls @func@ once for each collision pair that @body@ is involved in. Calling @cpArbiterGet[Bodies|Shapes]()@ or @CP_ARBITER_GET_[BODIES|SHAPES]()@  will return the body or shape for @body@ as the first argument. You can use this to check all sorts of collision information for a body like if it's touching the ground, another particular object, how much collision force is being applied to an object, etc. *Note:* This function only works if the contact graph is enabled either by enabling the sleeping feature of a space or by enabling the contact graph. Sensor shapes and arbiters that have been rejected by a collision handler callback or @cpArbiterIgnore()@ are not tracked by the contact graph.
 
+<%= h 2, "Integration Callbacks:", "Integration Callbacks" %>
+
+This section is a stub. For now you can look at the Planet demo for an example of how to use integration callbacks to implement planetary gravity.
+
+<!-- TODO document and examples -->
 
 <%= h 2, "Misc Functions:", "Misc" %>
 
@@ -446,52 +448,52 @@ When creating different types of shapes, you will always be given a @cpShape*@ p
 
 Chipmunk provides getter/setter functions for a number of properties on collision shapes. Setting most properties automatically wakes the rigid body they are attached to up if it was sleeping. You can also set some of the fields directly on the cpShape struct if you wish. They are documented in the headers.
 
-* @cpBody * cpShapeGetBody(const cpShape *shape)@
-* @void cpShapeSetBody(cpShape *shape, cpBody *body)@
+<pre><code>cpBody * cpShapeGetBody(const cpShape *shape)
+void cpShapeSetBody(cpShape *shape, cpBody *body)</code></pre>
 
 p(expl). The rigid body the shape is attached to. Can only be set when the shape is not added to a space.
 
-* @cpBB cpShapeGetBB(const cpShape *shape)@ - cpShapeGetBB
+<pre><code>cpBB cpShapeGetBB(const cpShape *shape)</code></pre>
 
 p(expl). The bounding box of the shape. Only guaranteed to be valid after @cpShapeCacheBB()@ or @cpSpaceStep()@ is called. Moving a body that a shape is connected to does not update it's bounding box. For shapes used for queries that aren't attached to bodies, you can also use @cpShapeUpdate()@.
 
-* @cpBool cpShapeGetSensor(const cpShape *shape)@ - cpShapeGetIsSensor
-* @void cpShapeSetSensor(cpShape *shape, cpBool value)@ - cpShapeSetIsSensor
+<pre><code>cpBool cpShapeGetSensor(const cpShape *shape)
+void cpShapeSetSensor(cpShape *shape, cpBool value)</code></pre>
 
 p(expl). A boolean value if this shape is a sensor or not. Sensors only call collision callbacks, and never generate real collisions.
 
-* @cpFloat cpShapeGetElasticity(const cpShape *shape)@ - cpShapeGetElasticity
-* @void cpShapeSetElasticity(cpShape *shape, cpFloat value)@ - cpShapeSetElasticity
+<pre><code>cpFloat cpShapeGetElasticity(const cpShape *shape)
+void cpShapeSetElasticity(cpShape *shape, cpFloat value)</code></pre>
 
 p(expl). Elasticity of the shape. A value of 0.0 gives no bounce, while a value of 1.0 will give a "perfect" bounce. However due to inaccuracies in the simulation using 1.0 or greater is not recommended however. The elasticity for a collision is found by multiplying the elasticity of the individual shapes together.
 
-* @cpFloat cpShapeGetFriction(const cpShape *shape)@ - cpShapeGetFriction
-* @void cpShapeSetFriction(cpShape *shape, cpFloat value)@ - cpShapeSetFriction
+<pre><code>cpFloat cpShapeGetFriction(const cpShape *shape)
+void cpShapeSetFriction(cpShape *shape, cpFloat value)</code></pre>
 
 p(expl). Friction coefficient. Chipmunk uses the Coulomb friction model, a value of 0.0 is frictionless. The friction for a collision is found by multiplying the friction of the individual shapes together. "Tables of friction coefficients":http://www.roymech.co.uk/Useful_Tables/Tribology/co_of_frict.htm.
 
-* @cpVect cpShapeGetSurfaceVelocity(const cpShape *shape)@ - cpShapeGetSurfaceVelocity
-* @void cpShapeSetSurfaceVelocity(cpShape *shape, cpVect value)@ - cpShapeSetSurfaceVelocity
+<pre><code>cpVect cpShapeGetSurfaceVelocity(const cpShape *shape)
+void cpShapeSetSurfaceVelocity(cpShape *shape, cpVect value)</code></pre>
 
 p(expl). The surface velocity of the object. Useful for creating conveyor belts or players that move around. This value is only used when calculating friction, not resolving the collision.
 
-* @cpCollisionType cpShapeGetCollisionType(const cpShape *shape)@ - cpShapeGetCollisionType
-* @void cpShapeSetCollisionType(cpShape *shape, cpCollisionType value)@ - cpShapeSetCollisionType
+<pre><code>cpCollisionType cpShapeGetCollisionType(const cpShape *shape)
+void cpShapeSetCollisionType(cpShape *shape, cpCollisionType value)</code></pre>
 
 p(expl). You can assign types to Chipmunk collision shapes that trigger callbacks when objects of certain types touch. See the "callbacks section":#Callbacks-Handlers for more information.
 
-* @cpGroup cpShapeGetGroup(const cpShape *shape)@ - cpShapeGetGroup
-* @void cpShapeSetGroup(cpShape *shape, cpGroup value)@ - cpShapeSetGroup
+<pre><code>cpGroup cpShapeGetGroup(const cpShape *shape)
+void cpShapeSetGroup(cpShape *shape, cpGroup value)</code></pre>
 
 p(expl). Shapes in the same non-zero group do not generate collisions. Useful when creating an object out of many shapes that you don't want to self collide. Defaults to @CP_NO_GROUP@.
 
-* @cpLayers cpShapeGetLayers(const cpShape *shape)@ - cpShapeGetLayers
-* @void cpShapeSetLayers(cpShape *shape, cpLayers value)@ - cpShapeSetLayers
+<pre><code>cpLayers cpShapeGetLayers(const cpShape *shape)
+void cpShapeSetLayers(cpShape *shape, cpLayers value)</code></pre>
 
 p(expl). Shapes only collide if they are in the same bit-planes. i.e. @(a->layers & b->layers) != 0@ By default, a shape occupies all bit-planes. "Wikipedia":http://en.wikipedia.org/wiki/Mask_(computing)#top has a nice article on bitmasks if you are unfamiliar with how to use them. Defaults to @CP_ALL_LAYERS@.
 
-* @cpDataPointer cpShapeGetUserData(const cpShape *shape)@ - cpShapeGetUserData
-* @void cpShapeSetUserData(cpShape *shape, cpDataPointer value)@ - cpShapeSetUserData
+<pre><code>cpDataPointer cpShapeGetUserData(const cpShape *shape)
+void cpShapeSetUserData(cpShape *shape, cpDataPointer value)</code></pre>
 
 p(expl). A user definable data pointer. If you set this to point at the game object the shapes is for, then you can access your game object from Chipmunk callbacks.
 
@@ -608,59 +610,59 @@ New in Chipmunk 5.3 is the ability of spaces to disable entire groups of objects
 
 <%= h 2, "Properties:", "Properties" %>
 
-* @int cpSpaceGetIterations(const cpSpace *space)@
-* @void cpSpaceSetIterations(cpSpace *space, int value)@
+<pre><code>int cpSpaceGetIterations(const cpSpace *space)
+void cpSpaceSetIterations(cpSpace *space, int value)</code></pre>
 
 p(expl). Iterations allow you to control the accuracy of the solver. Defaults to 10. See "above":#cpSpace-Iterations for more information.
 
-* @cpVect cpSpaceGetGravity(const cpSpace *space)@
-* @void cpSpaceSetGravity(cpSpace *space, cpVect value)@
+<pre><code>cpVect cpSpaceGetGravity(const cpSpace *space)
+void cpSpaceSetGravity(cpSpace *space, cpVect value)</code></pre>
 
 p(expl). Global gravity applied to the space. Defaults to @cpvzero@. Can be overridden on a per body basis by writing custom integration functions.
 
-* @cpFloat cpSpaceGetDamping(const cpSpace *space)@
-* @void cpSpaceSetDamping(cpSpace *space, cpFloat value)@
+<pre><code>cpFloat cpSpaceGetDamping(const cpSpace *space)
+void cpSpaceSetDamping(cpSpace *space, cpFloat value)</code></pre>
 
 p(expl). Amount of simple damping to apply to the space. A value of 0.9 means that each body will lose 10% of it's velocity per second. Defaults to 1. Like @gravity@ can be overridden on a per body basis.
 
-* @cpFloat cpSpaceGetIdleSpeedThreshold(const cpSpace *space)@
-* @void cpSpaceSetIdleSpeedThreshold(cpSpace *space, cpFloat value)@
+<pre><code>cpFloat cpSpaceGetIdleSpeedThreshold(const cpSpace *space)
+void cpSpaceSetIdleSpeedThreshold(cpSpace *space, cpFloat value)</code></pre>
 
 p(expl). Speed threshold for a body to be considered idle. The default value of 0 means to let the space guess a good threshold based on gravity.
 
-* @cpFloat cpSpaceGetSleepTimeThreshold(const cpSpace *space)@
-* @void cpSpaceSetSleepTimeThreshold(cpSpace *space, cpFloat value)@
+<pre><code>cpFloat cpSpaceGetSleepTimeThreshold(const cpSpace *space)
+void cpSpaceSetSleepTimeThreshold(cpSpace *space, cpFloat value)</code></pre>
 
 p(expl). Time a group of bodies must remain idle in order to fall asleep. The default value of @INFINITY@ disables the sleeping feature.
 
-* @cpFloat cpSpaceGetCollisionSlop(const cpSpace *space)@
-* @void cpSpaceSetCollisionSlop(cpSpace *space, cpFloat value)@
+<pre><code>cpFloat cpSpaceGetCollisionSlop(const cpSpace *space)
+void cpSpaceSetCollisionSlop(cpSpace *space, cpFloat value)</code></pre>
 
 p(expl). Amount of overlap between shapes that is allowed. It's encouraged to set this as high as you can without noticable overlapping as it improves the stability. It defaults to 0.1.
 
-* @cpFloat cpSpaceGetCollisionBias(const cpSpace *space)@
-* @void cpSpaceSetCollisionBias(cpSpace *space, cpFloat value)@
+<pre><code>cpFloat cpSpaceGetCollisionBias(const cpSpace *space)
+void cpSpaceSetCollisionBias(cpSpace *space, cpFloat value)</code></pre>
 
-p(expl). Chipmunk allows fast moving objects to overlap, then fixes the overlap over several frames. The bias value controls how much overlap is left after a second and defaults to @cpfpow(1.0f - 0.1f, 60.0f)@ meaning it fixes 10% of the overlap every 1/60th of a second or 99.8% over a second. Most games won't need to change this value.
+p(expl). Chipmunk allows fast moving objects to overlap, then fixes the overlap over time. Overlapping objects are unavoidable even if swept collisions are supported, and this is an efficient and stable way to deal with overlapping objects. The bias value controls what percentage of overlap remains unfixed after a second and defaults to ~0.2%. Valid values are in the range from 0 to 1, but using 0 is not recommended for stability reasons. The default value is calculated as @cpfpow(1.0f - 0.1f, 60.0f)@ meaning that Chipmunk attempts to correct 10% of error ever 1/60th of a second. *Note:* Very very few games will need to change this value.
 
-* @cpTimestamp cpSpaceGetCollisionPersistence(const cpSpace *space)@
-* @void cpSpaceSetCollisionPersistence(cpSpace *space, cpTimestamp value)@
+<pre><code>cpTimestamp cpSpaceGetCollisionPersistence(const cpSpace *space)
+void cpSpaceSetCollisionPersistence(cpSpace *space, cpTimestamp value)</code></pre>
 
 p(expl). The number of frames the space keeps collision solutions around for. Helps prevent jittering contacts from getting worse. This defaults to 3 and very very _very_ few games will need to change this value.
 
-* @cpBool cpSpaceGetEnableContactGraph(const cpSpace *space)@
-* @void cpSpaceSetEnableContactGraph(cpSpace *space, cpBool value)@
+<pre><code>cpBool cpSpaceGetEnableContactGraph(const cpSpace *space)
+void cpSpaceSetEnableContactGraph(cpSpace *space, cpBool value)</code></pre>
 
 p(expl). In order to use the @cpBodyEachArbiter()@ function, you must tell Chipmunk to generate the contact graph. Disabled by default as it incurrs a small 5-10% overhead. Enabling the sleeping feature also enables the contact graph.
 
-* @cpDataPointer cpSpaceGetUserData(const cpSpace *space)@
-* @void cpSpaceSetUserData(cpSpace *space, cpDataPointer value)@
+<pre><code>cpDataPointer cpSpaceGetUserData(const cpSpace *space)
+void cpSpaceSetUserData(cpSpace *space, cpDataPointer value)</code></pre>
 
 p(expl). A user definable data pointer. It's useful to point this at the gamestate object or scene management object that owns the space.
 
-* @cpBody * cpSpaceGetStaticBody(const cpSpace *space)@
+<pre><code>cpBody * cpSpaceGetStaticBody(const cpSpace *space)</code></pre>
 
-p(expl). A statically allocated infinite mass body that the space uses to substitute for NULL bodies on shapes and constraints. You can set its user data pointer to something helpful if you want for callbacks.
+p(expl). A dedicated static body for the space. You don't have to use it, but because it's memory is managed automatically with the space it's very convenient. You can set its user data pointer to something helpful if you want for callbacks.
 
 
 <%= h 2, "Memory Management Functions:", "Memory" %>
@@ -729,7 +731,7 @@ void cpSpaceEachShape(cpSpace *space, cpSpaceShapeIteratorFunc func, void *data)
 
 p(expl). Call @func@ for each shape in the space also passing along your data pointer. Sleeping and static shapes are included.
 
-TODO examples
+<!-- TODO examples -->
 
 
 <%= h 2, "Simulating the Space:", "Simulating" %>
@@ -779,11 +781,6 @@ Chipmunk 6 also has an experimental single axis sort and sweep implementation. I
 * The number of iterations, and the size of the time step determine the quality of the simulation. More iterations, or smaller time steps increase the quality. Keep in mind that higher quality also means higher CPU usage.
 * Because static shapes are only rehashed when you request it, it's possible to use a much higher @count@ argument to @cpHashResizeStaticHash()@ than to @cpSpaceResizeActiveHash()@. Doing so will use more memory but can improve performance if you have a lot of static shapes.
 
-TODO
-Document changes for variable time stepping.
-Document changes for springs.
-Add example showing how to use impulse getter for breakable joints.
-
 
 <%= h 1, "Chipmunk Constraints: @cpConstraint@", "cpConstraint" %>
 
@@ -810,7 +807,7 @@ p(expl). The maximum force that the constraint can use to act on the two bodies.
 <pre><code>cpFloat cpConstraintGetErrorBias(const cpConstraint *constraint)
 void cpConstraintSetErrorBias(cpConstraint *constraint, cpFloat value)</code></pre>
 
-p(expl). The percentage of error corrected each step of the space. (Can cause issues if you don't use a constant time step) Defaults to 0.1.
+p(expl). The percentage of joint error that remains unfixed after a second. This works exactly the same as the collision bias property of a space, but applies to fixing error (stretching) of joints instead of overlapping collisions.
 
 <pre><code>cpFloat cpConstraintGetMaxBias(const cpConstraint *constraint)
 void cpConstraintSetMaxBias(cpConstraint *constraint, cpFloat value)</code></pre>
@@ -825,6 +822,8 @@ p(expl). User data pointer. Use this pointer to get a reference to the game obje
 <pre><code>cpFloat cpConstraintGetImpulse(cpConstraint *constraint)</code></pre>
 
 p(expl). The most recent impulse that @constraint@ applied. To convert this to a force, divide by the timestep passed to @cpSpaceStep()@. You can use this to implement breakable joints to check if the force they attempted to apply exceeded a certain threshold.
+
+<!-- TODO examples -->
 
 To access properties of specific joint types, use the getter and setter functions provided (ex: @cpPinJointGetAnchr1()@). See the lists of properties for more information.
 
@@ -1095,6 +1094,8 @@ Collision callbacks are closely associated with "cpArbiter":#cpArbiter structs. 
 
 *Note:* Shapes tagged as sensors (@cpShape.sensor == true@) never generate collisions that get processed so collisions between sensors shapes and other shapes will never call the @postSolve()@ callback. They still generate @begin()@, and @separate()@ callbacks, and the @preSolve()@ callback is also called every frame even though there is no real collision.
 
+*Note #2:* @preSolve()@ callbacks are called before the sleeping algorithm runs. If an object falls asleep, it's @postSolve()@ callback won't be called until it's reawoken.
+
 <%= h 2, "Collision Handler API:", "HandlerAPI" %>
 
 <pre><code>typedef int (*cpCollisionBeginFunc)(cpArbiter *arb, struct cpSpace *space, void *data)
@@ -1152,9 +1153,9 @@ See the "callback examples":examples.html#CollisionCallbacks for more informatio
 
 <%= h 1, "Chipmunk Collision Pairs: @cpArbiter@", "cpArbiter" %>
 
-First of all, why are they called arbiters? The short answer is that Box2D called them that way back in 2006 when I was looking at the source for it's solver. An arbiter is like a judge, a person that has authority to settle disputes between two people. It was a fun, fitting name and was shorter to type than CollisionPair which I had been using. :p
+Chipmunk's @cpArbiter@ struct encapsulates a pair of colliding shapes and all of the data about their collision. 
 
-Originally arbiters were going to be an internal data type that Chipmunk used that wouldn't ever be sent to outside code. In Chipmunk 4.x and earlier, only a single callback hook was provided for handling collision events. It was triggered every step that to shapes were touching. This made it non-trivial to track when objects started and stopped touching as the user would have to record and process this themselves. Many people, including myself, wanted to get collision @begin()@/separate events and eventually I realized that information was already being stored in the arbiter cache that the Chipmunk maintains. With some changes to the collision callback API, that information is now exposed to the user. Internally, arbiters are used primarily for solving collision impulses. To external users, you can simply think of them as a weird type used in collision callbacks.
+Why are they called arbiters? The short answer is that Box2D called them that way back in 2006 when I was looking at the source for it's solver. An arbiter is like a judge, a person that has authority to settle disputes between two people. It was a fun, fitting name and was shorter to type than CollisionPair which I had been using. It was originally meant to be a private internal structure only, but evolved to be useful from callbacks.
 
 <%= h 2, "Memory Management:", "Memory" %>
 
@@ -1184,7 +1185,7 @@ cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i)</code></pre>
 
 p(expl). Get the number of contacts tracked by this arbiter or the specific collision point, collision normal or penetration depth of a collision point.
 
-TODO contact point set and example
+<!-- TODO examples contact point set example -->
 
 <pre><code>cpBool cpArbiterIsFirstContact(const cpArbiter *arb)</code></pre>
 
@@ -1196,33 +1197,15 @@ void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)</code></pr
 p(expl). Get the shapes or bodies in the order that they were defined in the collision handler associated with this arbiter. If you defined the handler as @cpSpaceAddCollisionHandler(space, 1, 2, ...)@, you you will find that @a->collision_type == 1@ and @b->collision_type == 2@.
 
 
-<%= h 2, "Helper Functions:", "HelperFunctions" %>
+<%= h 2, "Contact Point Sets:", "HelperFunctions" %>
 
-TODO
+Contact point sets make getting contact information simpler.
 
-<pre><code>void cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
-#define CP_ARBITER_GET_SHAPES(arb, a, b) cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b)</code></pre>
+<pre><code>cpContactPointSet cpArbiterGetContactPointSet(const cpArbiter *arb)</code></pre>
 
-p(expl). Get the shapes in the order that they were defined in the collision handler associated with this arbiter. If you defined the handler as @cpSpaceAddCollisionHandler(space, 1, 2, ...)@, you you will find that @a->collision_type == 1@ and @b->collision_type == 2@. The convenience macro defines and initializes the two shape variables for you. "example":examples.html#CollisionCallbacks
+p(expl). Get a contact point set struct from an arbiter.
 
-<pre><code>int cpArbiterIsFirstContact(cpArbiter *arb)</code></pre>
-
-p(expl). Returns true if this is the first step that the shapes touched. You can use this from @preSolve()@ and @postSolve()@ callbacks to know if a collision between two shapes is new without needing to flag a boolean in your @begin()@ callback.
-
-<pre><code>typedef struct cpContactPointSet {
-	int count;
-	
-	struct {
-		cpVect point, normal;
-		cpFloat dist;
-	} points[CP_MAX_CONTACTS_PER_ARBITER];
-} cpContactPointSet;
-
-static inline cpContactPointSet
-cpArbiterGetContactPointSet(const cpArbiter *arb)</code></pre>
-
-p(expl). Returns a @cpContactPointSet@ structure. This is the new and preferred API for working with contact points instead of the @cpArbiterGet*()@ functions as it is faster and slightly simpler.
-
+You might do something like the following to get and process a contact point set:
 <pre><code>cpContactPointSet set = cpArbiterGetContactPointSet(arbiter);
 for(int i=0; i<set.count; i++){
 	// get and work with the collision point normal and penetration distance:
@@ -1231,42 +1214,30 @@ for(int i=0; i<set.count; i++){
 	set.points[i].dist
 }</code></pre>
 
-<pre><code>cpVect cpArbiterGetCount(cpArbiter *arb)</code></pre>
+<%= h 2, "Helper Functions:", "HelperFunctions" %>
 
-p(expl). Returns the number of contact points in this arbiter.
+<pre><code>void cpArbiterGetShapes(cpArbiter *arb, cpShape **a, cpShape **b)
+void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)</code></pre>
 
-<pre><code>cpVect cpArbiterGetNormal(cpArbiter *arb, int i)</code></pre>
+p(expl). Get the shapes (or their bodies) in the order that they were defined in the collision handler associated with this arbiter. If you defined the handler as @cpSpaceAddCollisionHandler(space, 1, 2, ...)@, you you will find that @a->collision_type == 1@ and @b->collision_type == 2@. The convenience macro defines and initializes the two shape variables for you. The default collision handler doesn't use collision types so the order is undefined.
 
-p(expl). Returns the collision normal for the i'th contact point, flipping it if necessary. *Note:* Currently due to how Chipmunk's collision detection is implemented, the collision normals will be the same for all collision points. You can simply do @cpArbiterGetNormal(arb, 0)@ and not have to check each contact point. *Note:* calling this function from the @separate()@ callback is undefined.
+<!-- TODO example -->
 
-<pre><code>cpVect cpArbiterGetPoint(cpArbiter *arb, int i)</code></pre>
+<pre><code>#define CP_ARBITER_GET_SHAPES(arb, a, b) cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b)
+#define CP_ARBITER_GET_BODIES(arb, a, b) cpBody *a, *b; cpArbiterGetBodies(arb, &a, &b);</code></pre>
 
-p(expl). Returns the position of the i'th collision point. *Note:* calling this function from the @separate()@ callback is undefined.
+p(expl). Shortcut macros for defining variables for and retrieving the shapes/bodies for an arbiter.
 
-<pre><code>cpVect cpArbiterGetDepth(cpArbiter *arb, int i)</code></pre>
-
-p(expl). Returns the penetration depth of the i'th collision point.
-
+<!-- TODO example -->
 
 <pre><code>cpVect cpArbiterTotalImpulse(cpArbiter *arb);
 cpVect cpArbiterTotalImpulseWithFriction(cpArbiter *arb);</code></pre>
 
-p(expl). Returns the impulse that was applied this step to resolve the collision. These functions should only be called from a @postStep()@ callback, otherwise the result is undefined. *Note:* If you are using the deprecated elastic iterations setting on your space, it will cause you to get incorrect results. Elastic iterations should no longer be needed, and you should be able to safely turn them off.
-
-<%= h 2, "Fields:", "Fields" %>
-
-It's unlikely that you'll need to interact with a @cpArbiter@ struct directly as the collision helper functions should provide most functionality that people will need. One exception is the @e@, and @u@ fields. By default, Chipmunk multiplies the friction and elasticity values of to shapes together to determine what values to use when solving the collision. This mostly works, but in many cases is simply not flexible enough. If you are running into problems with that, you can change the values calculated for @e@ and @u@ in a @preSolve()@ callback. This is likely to change in the next major version of Chipmunk.
-
-* @numContacts@ - @int@: Number of contact points for this collision.
-* @e@ - @cpFloat@: Calculated amount of elasticity to apply for this collision. Can be overriden from a @preSolve()@ callback.
-* @u@ - @cpFloat@: Calculated amount of friction to apply for this collision. Can be overriden from a @preSolve()@ callback.
-* @surface_v@ - @cpVect@: Calculated amount of surface velocity to apply for this collision. Can be overriden from a @preSolve()@ callback. (_Very_ likely to change in the next major version of Chipmunk).
+p(expl). Returns the impulse that was applied this step to resolve the collision. These functions should only be called from a @postStep()@ or @cpBodyEachArbiter()@ callback, otherwise the result is undefined.
 
 <%= h 1, "Queries:", "Queries" %>
 
-TODO document rectangle and shape queries.
-
-Chipmunk spaces currently support three kinds of spatial queries, point, segment and bounding box. Any type can be done efficiently against an entire space, or against individual shapes. All types of queries take a collision group and layer that are used to filter matches out using the same rules used for filtering collisions between shapes. See "cpShape":#cpShape for more information. If you don't want to filter out any matches, use @CP_ALL_LAYERS@ for the layers and @CP_NO_GROUP@ as the group.
+Chipmunk spaces support four kinds of spatial queries, point, segment, shape and fast bounding box queries. Any type can be performed efficiently against an entire space, and point and segment queries can be performed against individual shapes. All types of queries take a collision group and layer that are used to filter matches out using the same rules used for filtering collisions between shapes. See "cpShape":#cpShape for more information. If you don't want to filter out any matches, use @CP_ALL_LAYERS@ for the layers and @CP_NO_GROUP@ as the group.
 
 <%= h 2, "Point Queries:", "PointQueries" %>
 
@@ -1333,6 +1304,9 @@ p(expl). Return the hit point in world coordinates where the segment first inter
 <pre><code>cpFloat cpSegmentQueryHitDist(cpVect start, cpVect end, cpSegmentQueryInfo info)</code></pre>
 
 p(expl). Return the absolute distance where the segment first hit the shape.
+
+<!-- TODO shape and BB queries -->
+
 
 <%= h 2, "Examples:", "Examples" %>
 

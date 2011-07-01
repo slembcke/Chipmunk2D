@@ -90,37 +90,6 @@ void cpHashSetEach(cpHashSet *set, cpHashSetIteratorFunc func, void *data);
 typedef cpBool (*cpHashSetFilterFunc)(void *elt, void *data);
 void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);
 
-#pragma mark Arbiters
-
-struct cpContact {
-	cpVect p, n;
-	cpFloat dist;
-	
-	cpVect r1, r2;
-	cpFloat nMass, tMass, bounce;
-
-	cpFloat jnAcc, jtAcc, jBias;
-	cpFloat bias;
-	
-	cpHashValue hash;
-};
-
-cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash);
-cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
-
-static inline struct cpArbiterThread *
-cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
-{
-	return (arb->body_a == body ? &arb->thread_a : &arb->thread_b);
-}
-
-void cpArbiterUnthread(cpArbiter *arb);
-
-void cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
-void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
-void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
-void cpArbiterApplyImpulse(cpArbiter *arb);
-
 #pragma mark Body Functions
 
 void cpBodyAddShape(cpBody *body, cpShape *shape);
@@ -216,3 +185,42 @@ cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb)
 	cpHashSetRemove(space->cachedArbiters, arbHashID, shape_pair);
 	cpArrayDeleteObj(space->arbiters, arb);
 }
+
+#pragma mark Arbiters
+
+struct cpContact {
+	cpVect p, n;
+	cpFloat dist;
+	
+	cpVect r1, r2;
+	cpFloat nMass, tMass, bounce;
+
+	cpFloat jnAcc, jtAcc, jBias;
+	cpFloat bias;
+	
+	cpHashValue hash;
+};
+
+cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash);
+cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
+
+static inline void
+cpArbiterCallSeparate(cpArbiter *arb, cpSpace *space)
+{
+	// The handler needs to be looked up again as the handler cached on the arbiter may have been deleted since the last step.
+	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->a->collision_type, arb->b->collision_type);
+	handler->separate(arb, space, handler->data);
+}
+
+static inline struct cpArbiterThread *
+cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
+{
+	return (arb->body_a == body ? &arb->thread_a : &arb->thread_b);
+}
+
+void cpArbiterUnthread(cpArbiter *arb);
+
+void cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
+void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
+void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
+void cpArbiterApplyImpulse(cpArbiter *arb);

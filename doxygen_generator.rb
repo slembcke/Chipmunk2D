@@ -44,6 +44,7 @@ end
 search_struct("cpBody")
 search_struct("cpShape")
 search_struct("cpConstraint")
+search_struct("cpSpace")
 
 def output_getter2(struct_base, struct, type, name)
 	output "/// @addtogroup #{struct}"

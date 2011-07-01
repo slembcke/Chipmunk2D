@@ -83,6 +83,7 @@ typedef struct cpBody cpBody;
 typedef struct cpShape cpShape;
 typedef struct cpConstraint cpConstraint;
 
+typedef struct cpCollisionHandler cpCollisionHandler;
 typedef struct cpArbiter cpArbiter;
 
 typedef struct cpSpace cpSpace;

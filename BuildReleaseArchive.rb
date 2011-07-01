@@ -19,6 +19,11 @@ system("mkdir -p #{DIR}/Objective-Chipmunk/")
 
 # Build docs
 system("cd #{DIR}/doc/doc-src; ruby make_docs.rb")
+system("ruby doxygen_generator.rb")
+system("/Applications/Doxygen.app/Contents/Resources/doxygen Doxyfile")
+system("cp -R html #{DIR}/html")
+system("ln -s ../html/index.html #{DIR}/doc/C-API-Docs.html")
+
 
 # Copy in Objective-Chipmunk stuff
 system("cp -R ../Objective-Chipmunk/doxygen/html/ #{DIR}/Objective-Chipmunk/API\\ Docs");

@@ -215,7 +215,7 @@ shapeQueryHelper(cpShape *a, cpShape *b, shapeQueryContext *context)
 	}
 	
 	if(numContacts){
-		context->anyCollision = cpTrue;
+		context->anyCollision = !(a->sensor || b->sensor);
 		
 		if(context->func){
 			cpContactPointSet set = {numContacts, {}};

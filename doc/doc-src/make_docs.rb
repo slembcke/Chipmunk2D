@@ -16,7 +16,7 @@ class Node
 	
 	def outline(level)
 		stars = "*"*level
-		children = @children.map{|child| child.outline(level + 1)}
+		children = (level == 1 ? @children.map{|child| child.outline(level + 1)} : [])
 		(["#{stars} \"#{@title}\":##{anchor}"] + children).join("\n")
 	end
 	

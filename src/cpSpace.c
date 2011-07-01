@@ -338,9 +338,7 @@ cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter)
 	while(arb){
 		cpArbiter *next = cpArbiterNext(arb, body);
 		if(filter == NULL || filter == arb->a || filter == arb->b){
-			if(arb->state != cpArbiterStateCached){
-				arb->handler->separate(arb, space, arb->handler->data);
-			}
+			if(arb->state != cpArbiterStateCached) cpArbiterCallSeparate(arb, space);
 			
 			cpArbiterUnthread(arb);
 			cpSpaceUncacheArbiter(space, arb);

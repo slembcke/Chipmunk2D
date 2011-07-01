@@ -38,7 +38,7 @@ typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *d
 typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data);
 
 /// @private
-typedef struct cpCollisionHandler {
+struct cpCollisionHandler {
 	cpCollisionType a;
 	cpCollisionType b;
 	cpCollisionBeginFunc begin;
@@ -46,7 +46,7 @@ typedef struct cpCollisionHandler {
 	cpCollisionPostSolveFunc postSolve;
 	cpCollisionSeparateFunc separate;
 	void *data;
-} cpCollisionHandler;
+};
 
 typedef struct cpContact cpContact;
 

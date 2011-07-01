@@ -312,9 +312,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	
 	// Arbiter was used last frame, but not this one
 	if(ticks >= 1 && arb->state != cpArbiterStateCached){
-		// The handler needs to be looked up again as the handler cached on the arbiter may have been deleted since the last step.
-		cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->a->collision_type, arb->b->collision_type);
-		handler->separate(arb, space, handler->data);
+		cpArbiterCallSeparate(arb, space);
 		arb->state = cpArbiterStateCached;
 	}
 	
