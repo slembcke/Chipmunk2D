@@ -35,7 +35,7 @@ If you haven't downloaded it yet, you can always download the newest version of 
 
 <%= h 3, "Debug or Release?", "DebugRelease" %>
 
-Release mode might be slightly slower, but will include a lot of error checking assertions that can help you find bugs quicker such as removing objects twice or doing things that might cause unsolvable collisions. I highly recommend you use a debug build until you are ready to ship the game and only then switch to a release build.
+Debug mode might be slightly slower, but will include a lot of error checking assertions that can help you find bugs quicker such as removing objects twice or doing things that might cause unsolvable collisions. I highly recommend you use a debug build until you are ready to ship the game and only then switch to a release build.
 
 <%= h 3, "XCode (Mac/iPhone)", "XCode" %>
 
