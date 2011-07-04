@@ -1275,7 +1275,7 @@ p(expl). Segment queries return more information than just a simple yes or no, t
 
 <pre><code>cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)</code></pre>
 
-p(expl). Check if the line segment from @a@ to @b@ intersects the shape. @info@ must be a valid pointer to a @cpSegmentQueryInfo@ structure which will be initialized with the raycast info.
+p(expl). Perform a segment query from @a@ to @b@ against a single shape @shape@. @info@ must be a valid pointer to a @cpSegmentQueryInfo@ structure which will be initialized with the raycast info.
 
 <pre><code>typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, void *data)
 

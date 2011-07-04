@@ -33,6 +33,28 @@ http://www.slembcke.net/forums
 CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
+CHANGES SINCE 5.x:
+Chipmunk 6.x's API is not quite 100% compatible with 5.x. Make sure you read the list of changes carefully.
+Keep in mind that this is a x.0.0 release and that it's likely there are still some bugs I don't know about yet. I've spent a lot of effort rewritting the collision detection, sleeping, and contact graph algorithms that have required large changes and cleanup to the 5.x codebase. I've ironed out all the bugs that I know of, and the beta test went well. So it's finally time for 6!
+
+* API: Chipmunk now has hard runtime assertions that aren't disabled in release mode for many error conditions. Most people have been using release builds of Chipmunk during development and were missing out on very important error checking.
+* API: Access to the private API has been disabled by default now and much of the private API has changed. I've added official APIs for all the uses of the private API I knew of.
+* API: Added accessor functions for every property on every type. As Chipmunk's complexity has grown, it's become more difficult to ignore accessors. You are en* API: Added cpSpaceEachBody() and cpSpaceEachShape() to iterate bodies/shapes in a space.
+* API: Added cpSpaceReindexShapesForBody() to reindex all the shapes attached to a particular body.
+* API: Added a 'data' pointer to spaces now too.
+* API: cpSpace.staticBody is a pointer to the static body instead of a static reference.
+* API: The globals cp_bias_coef, cp_collision_slop, cp_contact_persistence have been moved to properties of a space. (collisionBias, collisionSlop, collisionPersistence respectively)
+* API: Added cpBodyActivateStatic() to wake up bodies touching a static body with an optional shape filter parameter.
+* API: Added cpBodyEachShape() and cpBodyEachConstraint() iterators to iterate the active shapes/constraints attached to a body.
+* API: Added cpBodyEeachArbiter() to iterate the collision pairs a body is involved in. This makes it easy to perform grounding checks or find how much collision force is being applied to an object.
+* API: The error correction applied by the collision bias and joint bias is now timestep independent and the units have completely changed.
+couraged to use them, but are not required to.
+* FIX: Units of damping for springs are correct regardless of the number of iterations. Previously they were only correct if you had 1 or 2 iterations.
+* MISC: Numerous changes to help make Chipmunk work better with variable timesteps. Use of constant timesteps is still highly recommended, but it is now easier to change the time scale without introducing artifacts.
+* MISC: Performance! Chipmunk 6 should be way faster than Chipmunk 5 for almost any game.
+* MISC: Chipmunk supports multiple spatial indexes and uses a bounding box tree similar to the one found in the Bullet physics library by default. This should provide much better performance for scenes with objects of differening size and works without any tuning for any scale.
+
+
 CHANGES SINCE 5.3.4
 * FIX: Fixed spelling of cpArbiterGetDepth(). Was cpArbiteGetDepth() before. Apparently nobody ever used this function.
 * FIX: Added defines for M_PI and M_E. Apparently these values were never part of the C standard math library. Who knew!?
