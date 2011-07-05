@@ -39,7 +39,8 @@ Keep in mind that this is a x.0.0 release and that it's likely there are still s
 
 * API: Chipmunk now has hard runtime assertions that aren't disabled in release mode for many error conditions. Most people have been using release builds of Chipmunk during development and were missing out on very important error checking.
 * API: Access to the private API has been disabled by default now and much of the private API has changed. I've added official APIs for all the uses of the private API I knew of.
-* API: Added accessor functions for every property on every type. As Chipmunk's complexity has grown, it's become more difficult to ignore accessors. You are en* API: Added cpSpaceEachBody() and cpSpaceEachShape() to iterate bodies/shapes in a space.
+* API: Added accessor functions for every property on every type. As Chipmunk's complexity has grown, it's become more difficult to ignore accessors. You are encouraged to use them, but are not required to.
+* API: Added cpSpaceEachBody() and cpSpaceEachShape() to iterate bodies/shapes in a space.
 * API: Added cpSpaceReindexShapesForBody() to reindex all the shapes attached to a particular body.
 * API: Added a 'data' pointer to spaces now too.
 * API: cpSpace.staticBody is a pointer to the static body instead of a static reference.
@@ -48,7 +49,6 @@ Keep in mind that this is a x.0.0 release and that it's likely there are still s
 * API: Added cpBodyEachShape() and cpBodyEachConstraint() iterators to iterate the active shapes/constraints attached to a body.
 * API: Added cpBodyEeachArbiter() to iterate the collision pairs a body is involved in. This makes it easy to perform grounding checks or find how much collision force is being applied to an object.
 * API: The error correction applied by the collision bias and joint bias is now timestep independent and the units have completely changed.
-couraged to use them, but are not required to.
 * FIX: Units of damping for springs are correct regardless of the number of iterations. Previously they were only correct if you had 1 or 2 iterations.
 * MISC: Numerous changes to help make Chipmunk work better with variable timesteps. Use of constant timesteps is still highly recommended, but it is now easier to change the time scale without introducing artifacts.
 * MISC: Performance! Chipmunk 6 should be way faster than Chipmunk 5 for almost any game.
