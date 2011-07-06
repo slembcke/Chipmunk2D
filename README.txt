@@ -33,6 +33,9 @@ http://www.slembcke.net/forums
 CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
+CHANGES SINCE 6.0.0:
+* API: Added cpSpaceEachConstraint().
+
 CHANGES SINCE 5.x:
 Chipmunk 6.x's API is not quite 100% compatible with 5.x. Make sure you read the list of changes carefully.
 Keep in mind that this is a x.0.0 release and that it's likely there are still some bugs I don't know about yet. I've spent a lot of effort rewritting the collision detection, sleeping, and contact graph algorithms that have required large changes and cleanup to the 5.x codebase. I've ironed out all the bugs that I know of, and the beta test went well. So it's finally time for 6!

@@ -24,7 +24,6 @@
 
 // TODO
 #include "chipmunk_private.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -57,7 +56,7 @@ static void
 update(int ticks)
 {
 	static int lastJumpState = 0;
-	int jumpState = (arrowDirection.y > 0.0f);
+	int jumpState = (ChipmunkDemoKeyboard.y > 0.0f);
 	
 	cpBody *body = playerInstance.shape->body;
 	
@@ -65,8 +64,8 @@ update(int ticks)
 	cpBodyEachArbiter(body, (cpBodyArbiterIteratorFunc)SelectPlayerGroundNormal, &groundNormal);
 	
 	if(groundNormal.y > 0.0f){
-		playerInstance.shape->surface_v = cpv(400.0f*arrowDirection.x, 0.0f);//cpvmult(cpvperp(groundNormal), 400.0f*arrowDirection.x);
-		if(arrowDirection.x) cpBodyActivate(body);
+		playerInstance.shape->surface_v = cpv(400.0f*ChipmunkDemoKeyboard.x, 0.0f);//cpvmult(cpvperp(groundNormal), 400.0f*arrowDirection.x);
+		if(ChipmunkDemoKeyboard.x) cpBodyActivate(body);
 	} else {
 		playerInstance.shape->surface_v = cpvzero;
 	}
@@ -79,7 +78,7 @@ update(int ticks)
 	}
 	
 	if(cpvlengthsq(groundNormal)){
-		cpFloat air_accel = body->v.x + arrowDirection.x*(2000.0f);
+		cpFloat air_accel = body->v.x + ChipmunkDemoKeyboard.x*(2000.0f);
 		body->f.x = body->m*air_accel;
 //		body->v.x = cpflerpconst(body->v.x, 400.0f*arrowDirection.x, 2000.0f/60.0f);
 	}
@@ -173,10 +172,10 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Player = {
+ChipmunkDemo Player = {
 	"Player",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

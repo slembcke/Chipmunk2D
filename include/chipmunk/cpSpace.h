@@ -235,6 +235,11 @@ typedef void (*cpSpaceShapeIteratorFunc)(cpShape *shape, void *data);
 /// Call @c func for each shape in the space.
 void cpSpaceEachShape(cpSpace *space, cpSpaceShapeIteratorFunc func, void *data);
 
+/// Space/constraint iterator callback function type.
+typedef void (*cpSpaceConstraintIteratorFunc)(cpConstraint *constraint, void *data);
+/// Call @c func for each shape in the space.
+void cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, void *data);
+
 /// Update the collision detection info for the static shapes in the space.
 void cpSpaceReindexStatic(cpSpace *space);
 /// Update the collision detection data for a specific shape in the space.

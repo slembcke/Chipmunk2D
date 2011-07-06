@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -124,45 +123,55 @@ init(void)
 	cpShape *shape;
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,120), cpv(320,120), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,0), cpv(320,0), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-120), cpv(320,-120), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-160,-240), cpv(-160,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(0,-240), cpv(0,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(160,-240), cpv(160,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	cpVect boxOffset;
 	cpBody *body1, *body2;
@@ -284,10 +293,10 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Joints = {
+ChipmunkDemo Joints = {
 	"Joints and Constraints",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

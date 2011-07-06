@@ -51,41 +51,34 @@
 #endif
 
 #include "chipmunk_private.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 #define SLEEP_TICKS 16
 
-static chipmunkDemo *demos;
+static ChipmunkDemo *demos;
 static int demoCount = 0;
 static int demoIndex = 'a' - 'a';
 
 static cpBool paused = cpFalse;
 static cpBool step = cpFalse;
+
+static cpBool drawBBs = cpFalse;
+
 static int ticks = 0;
 static cpSpace *space;
 
-cpVect mousePoint;
-cpVect mousePoint_last;
+cpVect ChipmunkDemoMouse;
 cpBody *mouseBody = NULL;
 cpConstraint *mouseJoint = NULL;
 
-char messageString[1024] = {};
+char *ChipmunkDemoMessageString = NULL;
 
 int key_up = 0;
 int key_down = 0;
 int key_left = 0;
 int key_right = 0;
 
-cpVect arrowDirection = {};
-
-drawSpaceOptions options = {
-	0,
-	1,
-	4.0f,
-	0.0f,
-	1.5f,
-};
+cpVect ChipmunkDemoKeyboard = {};
 
 static void shapeFreeWrap(cpShape *ptr, void *unused){cpShapeFree(ptr);}
 
@@ -101,6 +94,15 @@ ChipmunkDemoFreeSpaceChildren(cpSpace *space)
 	cpArrayFreeEach(space->bodies, (void (*)(void*))cpBodyFree);
 	cpArrayFreeEach(space->constraints, (void (*)(void*))cpConstraintFree);
 }
+
+void ChipmunkDemoDefaultDrawImpl(void)
+{
+	ChipmunkDebugDrawShapes(space);
+	ChipmunkDebugDrawConstraints(space);
+	
+	ChipmunkDebugDrawCollisionPoints(space);
+}
+
 
 static void
 drawString(int x, int y, const char *str)
@@ -196,13 +198,18 @@ reshape(int width, int height)
 }
 
 static void
+drawShapeBB(cpShape *shape, void *unused)
+{
+	ChipmunkDebugDrawBB(shape->bb, RGBAColor(0.3f, 0.5f, 0.3f, 1.0f));
+}
+
+static void
 display(void)
 {
 	if(!paused || step){
-		cpVect newPoint = cpvlerp(mousePoint_last, mousePoint, 0.25f);
+		cpVect newPoint = cpvlerp(mouseBody->p, ChipmunkDemoMouse, 0.25f);
+		mouseBody->v = cpvmult(cpvsub(newPoint, mouseBody->p), 60.0f);
 		mouseBody->p = newPoint;
-		mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0f);
-		mousePoint_last = newPoint;
 		
 		demos[demoIndex].updateFunc(ticks);
 		
@@ -212,10 +219,12 @@ display(void)
   
 	glClear(GL_COLOR_BUFFER_BIT);
 	
-	drawSpace(space, demos[demoIndex].drawOptions ? demos[demoIndex].drawOptions : &options);
+	demos[demoIndex].drawFunc();
+	if(drawBBs) cpSpaceEachShape(space, drawShapeBB, NULL);
+	
 	drawInstructions();
 	drawInfo();
-	drawString(-300, -210, messageString);
+	drawString(-300, -210, ChipmunkDemoMessageString);
 		
 	glutSwapBuffers();
 }
@@ -237,7 +246,7 @@ runDemo(int index)
 	demoIndex = index;
 	ticks = 0;
 	mouseJoint = NULL;
-	messageString[0] = '\0';
+	ChipmunkDemoMessageString = "";
 	maxArbiters = 0;
 	maxPoints = 0;
 	maxConstraints = 0;
@@ -262,7 +271,7 @@ keyboard(unsigned char key, int x, int y)
   } else if(key == '1'){
 		step = cpTrue;
 	} else if(key == '='){
-		options.drawBBs = !options.drawBBs;
+		drawBBs = !drawBBs;
 	} else if(key == '\\'){
 		glDisable(GL_LINE_SMOOTH);
 		glDisable(GL_POINT_SMOOTH);
@@ -290,7 +299,7 @@ mouseToSpace(int x, int y)
 static void
 mouse(int x, int y)
 {
-	mousePoint = mouseToSpace(x, y);
+	ChipmunkDemoMouse = mouseToSpace(x, y);
 }
 
 static void
@@ -334,7 +343,7 @@ set_arrowDirection()
 	if(key_right) x += 1;
 	if(key_left) x -= 1;
 	
-	arrowDirection = cpv(x, y);
+	ChipmunkDemoKeyboard = cpv(x, y);
 }
 
 static void
@@ -374,10 +383,12 @@ initGL(void)
 	
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_POINT_SMOOTH);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
 	glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 static void
@@ -448,33 +459,33 @@ void time_trial(int index, int count)
 	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, demos[index].name);
 }
 
-extern chipmunkDemo LogoSmash;
-extern chipmunkDemo Simple;
-extern chipmunkDemo PyramidStack;
-extern chipmunkDemo Plink;
-extern chipmunkDemo Tumble;
-extern chipmunkDemo PyramidTopple;
-extern chipmunkDemo Bounce;
-extern chipmunkDemo Planet;
-extern chipmunkDemo Springies;
-extern chipmunkDemo Pump;
-extern chipmunkDemo TheoJansen;
-extern chipmunkDemo MagnetsElectric;
-extern chipmunkDemo UnsafeOps;
-extern chipmunkDemo Query;
-extern chipmunkDemo OneWay;
-extern chipmunkDemo Player;
-extern chipmunkDemo Sensors;
-extern chipmunkDemo Joints;
-extern chipmunkDemo Tank;
+extern ChipmunkDemo LogoSmash;
+extern ChipmunkDemo Simple;
+extern ChipmunkDemo PyramidStack;
+extern ChipmunkDemo Plink;
+extern ChipmunkDemo Tumble;
+extern ChipmunkDemo PyramidTopple;
+extern ChipmunkDemo Bounce;
+extern ChipmunkDemo Planet;
+extern ChipmunkDemo Springies;
+extern ChipmunkDemo Pump;
+extern ChipmunkDemo TheoJansen;
+extern ChipmunkDemo MagnetsElectric;
+extern ChipmunkDemo UnsafeOps;
+extern ChipmunkDemo Query;
+extern ChipmunkDemo OneWay;
+extern ChipmunkDemo Player;
+extern ChipmunkDemo Sensors;
+extern ChipmunkDemo Joints;
+extern ChipmunkDemo Tank;
 
-extern chipmunkDemo bench_list[];
+extern ChipmunkDemo bench_list[];
 extern int bench_count;
 
 int
 main(int argc, const char **argv)
 {
-	chipmunkDemo demo_list[] = {
+	ChipmunkDemo demo_list[] = {
 		LogoSmash,
 		PyramidStack,
 		Plink,
@@ -491,7 +502,7 @@ main(int argc, const char **argv)
 	};
 	
 	demos = demo_list;
-	demoCount = sizeof(demo_list)/sizeof(chipmunkDemo);
+	demoCount = sizeof(demo_list)/sizeof(ChipmunkDemo);
 	int trial = 0;
 	
 	for(int i=0; i<argc; i++){

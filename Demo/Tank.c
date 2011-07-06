@@ -23,10 +23,7 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
-
-extern cpVect mousePoint;
 
 static cpSpace *space;
 
@@ -40,12 +37,12 @@ update(int ticks)
 	
 	for(int i=0; i<steps; i++){
 		// turn the control body based on the angle relative to the actual body
-		cpVect mouseDelta = cpvsub(mousePoint, tankBody->p);
+		cpVect mouseDelta = cpvsub(ChipmunkDemoMouse, tankBody->p);
 		cpFloat turn = cpvtoangle(cpvunrotate(tankBody->rot, mouseDelta));
 		cpBodySetAngle(tankControlBody, tankBody->a - turn);
 		
 		// drive the tank towards the mouse
-		if(cpvnear(mousePoint, tankBody->p, 30.0)){
+		if(cpvnear(ChipmunkDemoMouse, tankBody->p, 30.0)){
 			tankControlBody->v = cpvzero; // stop
 		} else {
 			cpFloat direction = (cpvdot(mouseDelta, tankBody->rot) > 0.0 ? 1.0 : -1.0);
@@ -91,20 +88,24 @@ init(void)
 		
 	// Create segments around the edge of the screen.
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	for(int i=0; i<50; i++){
 		cpBody *body = add_box(10.0, 1.0);
@@ -142,10 +143,10 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Tank = {
+ChipmunkDemo Tank = {
 	"Tank",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

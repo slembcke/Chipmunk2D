@@ -24,7 +24,6 @@
 #include <string.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -162,10 +161,10 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Springies = {
+ChipmunkDemo Springies = {
 	"Springies",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

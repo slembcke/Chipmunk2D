@@ -475,6 +475,18 @@ cpSpaceEachShape(cpSpace *space, cpSpaceShapeIteratorFunc func, void *data)
 	} cpSpaceUnlock(space, cpTrue);
 }
 
+void
+cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, void *data)
+{
+	cpSpaceLock(space); {
+		cpArray *constraints = space->constraints;
+		
+		for(int i=0; i<constraints->num; i++){
+			func((cpConstraint *)constraints->arr[i], data);
+		}
+	} cpSpaceUnlock(space, cpTrue);
+}
+
 #pragma mark Spatial Index Management
 
 static void

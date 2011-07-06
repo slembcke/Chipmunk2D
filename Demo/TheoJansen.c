@@ -29,7 +29,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -39,8 +38,8 @@ static cpConstraint *motor;
 static void
 update(int ticks)
 {
-	cpFloat coef = (2.0f + arrowDirection.y)/3.0f;
-	cpFloat rate = arrowDirection.x*10.0f*coef;
+	cpFloat coef = (2.0f + ChipmunkDemoKeyboard.y)/3.0f;
+	cpFloat rate = ChipmunkDemoKeyboard.x*10.0f*coef;
 	cpSimpleMotorSetRate(motor, rate);
 	motor->maxForce = (rate) ? 100000.0f : 0.0f;
 	
@@ -113,20 +112,20 @@ init(void)
 	cpVect a, b;
 	
 	// Create segments around the edge of the screen.
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f);
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddShape(space, shape);
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f);
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddShape(space, shape);
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
-	shape = cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f);
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
-	cpSpaceAddShape(space, shape);
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	cpFloat offset = 30.0f;
 
@@ -170,10 +169,10 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-chipmunkDemo TheoJansen = {
+ChipmunkDemo TheoJansen = {
 	"Theo Jansen Machine",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

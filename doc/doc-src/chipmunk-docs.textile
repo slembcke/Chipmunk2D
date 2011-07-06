@@ -731,12 +731,17 @@ void cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)</
 
 p(expl). Call @func@ for each body in the space also passing along your data pointer. Sleeping bodies are included, but static and rogue bodies are not as they aren't added to the space.	
 
+<%= pop_open_example "cpSpaceEachBody" %>
+
 <pre><code>typedef void (*cpSpaceShapeIteratorFunc)(cpShape *shape, void *data)
 void cpSpaceEachShape(cpSpace *space, cpSpaceShapeIteratorFunc func, void *data)</code></pre>
 
 p(expl). Call @func@ for each shape in the space also passing along your data pointer. Sleeping and static shapes are included.
 
-<%= pop_open_example "cpSpaceEachBody" %>
+<pre><code>typedef void (*cpSpaceConstraintIteratorFunc)(cpConstraint *constraint, void *data)
+void cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, void *data)</code></pre>
+
+p(expl). Call @func@ for each constraint in the space also passing along your data pointer.	
 
 <%= h 2, "Simulating the Space:", "Simulating" %>
 

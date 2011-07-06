@@ -19,16 +19,6 @@
  * SOFTWARE.
  */
 
-typedef struct drawSpaceOptions {
-	int drawBBs;
-	int drawShapes;
-	float collisionPointSize;
-	float bodyPointSize;
-	float lineThickness;
-} drawSpaceOptions;
-
-void drawSpace(cpSpace *space, drawSpaceOptions *options);
-
 typedef struct Color {
 	float r, g, b, a;
 } Color;
@@ -42,3 +32,14 @@ static inline Color LAColor(float l, float a){
 	Color color = {l, l, l, a};
 	return color;
 }
+
+void ChipmunkDebugDrawCircle(cpVect center, cpFloat angle, cpFloat radius, Color lineColor, Color fillColor);
+void ChipmunkDebugDrawSegment(cpVect a, cpVect b, Color color);
+void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, Color lineColor, Color fillColor);
+void ChipmunkDebugDrawPolygon(int count, cpVect *verts, Color lineColor, Color fillColor);
+void ChipmunkDebugDrawPoints(cpFloat size, int count, cpVect *verts, Color color);
+void ChipmunkDebugDrawBB(cpBB bb, Color color);
+
+void ChipmunkDebugDrawShapes(cpSpace *space);
+void ChipmunkDebugDrawConstraints(cpSpace *space);
+void ChipmunkDebugDrawCollisionPoints(cpSpace *space);

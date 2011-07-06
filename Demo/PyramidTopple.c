@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -68,8 +67,9 @@ init(void)
 	
 	// Add a floor.
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpv(-600,-240), cpv(600,-240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	
 	// Add the dominoes.
@@ -102,10 +102,10 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-chipmunkDemo PyramidTopple = {
+ChipmunkDemo PyramidTopple = {
 	"Pyramid Topple",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

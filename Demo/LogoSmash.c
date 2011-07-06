@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static const int image_width = 188;
@@ -73,6 +72,7 @@ get_pixel(int x, int y)
 }
 
 static cpSpace *space;
+static int bodyCount = 0;
 
 static void
 update(int ticks)
@@ -83,6 +83,28 @@ update(int ticks)
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
 	}
+}
+
+static void
+PushBodyPos(cpBody *body, cpVect **cursor)
+{
+	(**cursor) = cpBodyGetPos(body);
+	(*cursor)++;
+}
+
+static void
+draw()
+{
+	// Make an array with all the body positions to draw dots
+	cpVect *verts = (cpVect *)cpcalloc(bodyCount, sizeof(cpVect));
+	
+	cpVect *cursor = verts;
+	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)PushBodyPos, &cursor);
+	
+	ChipmunkDebugDrawPoints(3, bodyCount, verts, LAColor(0, 1));
+	cpfree(verts);
+	
+	ChipmunkDebugDrawCollisionPoints(space);
 }
 
 static cpShape *
@@ -102,12 +124,14 @@ static cpSpace *
 init(void)
 {
 	space = cpSpaceNew();
-	space->iterations = 1;
+	cpSpaceSetIterations(space, 1);
 	
 	// The space will contain a very large number of similary sized objects.
 	// This is the perfect candidate for using the spatial hash.
 	// Generally you will never need to do this.
 	cpSpaceUseSpatialHash(space, 2.0, 10000);
+	
+	bodyCount = 0;
 	
 	cpBody *body;
 	cpShape *shape;
@@ -120,8 +144,10 @@ init(void)
 			cpFloat y_jitter = 0.05*frand();
 			
 			shape = make_ball(2*(x - image_width/2 + x_jitter), 2*(image_height/2 - y + y_jitter));
-			cpSpaceAddBody(space, shape->body);
+			cpSpaceAddBody(space, cpShapeGetBody(shape));
 			cpSpaceAddShape(space, shape);
+			
+			bodyCount++;
 		}
 	}
 	
@@ -133,6 +159,8 @@ init(void)
 	cpShapeSetElasticity(shape, 0.0);
 	cpShapeSetFriction(shape, 0.0);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+	
+	bodyCount++;
 
 	return space;
 }
@@ -144,14 +172,10 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-drawSpaceOptions draw_options = {
-	0, 0, 2.0f, 3.0f, 0.0f,
-};
-
-chipmunkDemo LogoSmash = {
+ChipmunkDemo LogoSmash = {
 	"Logo Smash",
-	&draw_options,
 	init,
 	update,
+	draw,
 	destroy,
 };

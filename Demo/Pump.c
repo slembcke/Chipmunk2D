@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -35,8 +34,8 @@ static cpBody *balls[numBalls];
 static void
 update(int ticks)
 {
-	cpFloat coef = (2.0f + arrowDirection.y)/3.0f;
-	cpFloat rate = arrowDirection.x*30.0f*coef;
+	cpFloat coef = (2.0f + ChipmunkDemoKeyboard.y)/3.0f;
+	cpFloat rate = ChipmunkDemoKeyboard.x*30.0f*coef;
 	
 	cpSimpleMotorSetRate(motor, rate);
 	motor->maxForce = (rate ? 1000000.0f : 0.0f);
@@ -176,10 +175,10 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Pump = {
+ChipmunkDemo Pump = {
 	"Pump",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

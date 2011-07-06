@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -77,20 +76,24 @@ init(void)
 	cpVect d = cpv( 200, -200);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, a, b, 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, b, c, 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, c, d, 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, d, a, 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	// Give the box a little spin.
 	// Because staticBody is never added to the space, we will need to
@@ -121,10 +124,10 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Tumble = {
+ChipmunkDemo Tumble = {
 	"Tumble",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

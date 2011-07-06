@@ -40,7 +40,7 @@
 #endif
 
 #include "chipmunk_private.h"
-#include "drawSpace.h"
+#include "ChipmunkDebugDraw.h"
 
 /*
 	IMPORTANT - READ ME!
@@ -256,7 +256,8 @@ void ChipmunkDebugDrawPolygon(int count, cpVect *verts, Color lineColor, Color f
 	}
 }
 
-void ChipmunkDebugDrawPoints(cpFloat size, int count, cpVect *verts, Color color){
+void ChipmunkDebugDrawPoints(cpFloat size, int count, cpVect *verts, Color color)
+{
 #if CP_USE_DOUBLES
 	glVertexPointer(2, GL_DOUBLE, 0, verts);
 #else
@@ -268,8 +269,7 @@ void ChipmunkDebugDrawPoints(cpFloat size, int count, cpVect *verts, Color color
 	glDrawArrays(GL_POINTS, 0, count);
 }
 
-void
-ChipmunkDebugDrawBB(cpBB bb, Color color)
+void ChipmunkDebugDrawBB(cpBB bb, Color color)
 {
 	cpVect verts[] = {
 		cpv(bb.l, bb.b),
@@ -277,11 +277,11 @@ ChipmunkDebugDrawBB(cpBB bb, Color color)
 		cpv(bb.r, bb.t),
 		cpv(bb.r, bb.b),
 	};
-	ChipmunkDebugDrawPolygon(4, verts, LAColor(0, 0), color);
+	ChipmunkDebugDrawPolygon(4, verts, color, LAColor(0, 0));
 }
 
 static void
-drawObject(cpShape *shape)
+drawShape(cpShape *shape, void *unused)
 {
 	cpBody *body = shape->body;
 	Color color = ColorForShape(shape);
@@ -304,6 +304,11 @@ drawObject(cpShape *shape)
 		}
 		default: break;
 	}
+}
+
+void ChipmunkDebugDrawShapes(cpSpace *space)
+{
+	cpSpaceEachShape(space, drawShape, NULL);
 }
 
 static const GLfloat springVAR[] = {
@@ -357,7 +362,7 @@ drawSpring(cpDampedSpring *spring, cpBody *body_a, cpBody *body_b)
 }
 
 static void
-drawConstraint(cpConstraint *constraint)
+drawConstraint(cpConstraint *constraint, void *unused)
 {
 	cpBody *body_a = constraint->a;
 	cpBody *body_b = constraint->b;
@@ -403,80 +408,26 @@ drawConstraint(cpConstraint *constraint)
 	}
 }
 
-static void
-drawShapeBB(cpShape *shape, void *unused)
+void ChipmunkDebugDrawConstraints(cpSpace *space)
 {
-	ChipmunkDebugDrawBB(shape->bb, RGBAColor(0.3f, 0.5f, 0.3f, 1.0f));
+	cpSpaceEachConstraint(space, drawConstraint, NULL);
 }
 
-void
-drawSpace(cpSpace *space, drawSpaceOptions *options)
+void ChipmunkDebugDrawCollisionPoints(cpSpace *space)
 {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	cpArray *arbiters = space->arbiters;
 	
-	glLineWidth(options->lineThickness);
-	if(options->drawShapes){
-		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)drawObject, space);
-		cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)drawObject, space);
-	}
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glPointSize(4.0f);
 	
-	glLineWidth(1.0f);
-	if(options->drawBBs){
-		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)drawShapeBB, NULL);
-		cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)drawShapeBB, NULL);
-	}
-
-	cpArray *constraints = space->constraints;
-
-	for(int i=0, count = constraints->num; i<count; i++){
-		drawConstraint((cpConstraint *)constraints->arr[i]);
-	}
-	
-	if(options->bodyPointSize){
-		glPointSize(options->bodyPointSize);
-		
-		glBegin(GL_POINTS); {
-			glColor4f(0, 0, 0, 1);
-			cpArray *bodies = space->bodies;
-			for(int i=0, count = bodies->num; i<count; i++){
-				cpBody *body = (cpBody *)bodies->arr[i];
-				glVertex2f(body->p.x, body->p.y);
+	glBegin(GL_POINTS); {
+		for(int i=0; i<arbiters->num; i++){
+			cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
+			
+			for(int i=0; i<arb->numContacts; i++){
+				cpVect v = arb->contacts[i].p;
+				glVertex2f(v.x, v.y);
 			}
-		} glEnd();
-	}
-
-	if(options->collisionPointSize){
-		cpArray *arbiters = space->arbiters;
-		
-		glColor3f(0.0f, 1.0f, 0.0f);
-		glPointSize(2.0f*options->collisionPointSize);
-		
-		glBegin(GL_POINTS); {
-			for(int i=0; i<arbiters->num; i++){
-				cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
-				if(arb->state != cpArbiterStateFirstColl) continue;
-				
-				for(int i=0; i<arb->numContacts; i++){
-					cpVect v = arb->contacts[i].p;
-					glVertex2f(v.x, v.y);
-				}
-			}
-		} glEnd();
-		
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glPointSize(options->collisionPointSize);
-		
-		glBegin(GL_POINTS); {
-			for(int i=0; i<arbiters->num; i++){
-				cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
-				if(arb->state == cpArbiterStateFirstColl) continue;
-				
-				for(int i=0; i<arb->numContacts; i++){
-					cpVect v = arb->contacts[i].p;
-					glVertex2f(v.x, v.y);
-				}
-			}
-		} glEnd();
-	}
+		}
+	} glEnd();
 }

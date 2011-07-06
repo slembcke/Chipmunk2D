@@ -2,7 +2,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -431,8 +430,8 @@ static void destroy(void){
 	cpSpaceFree(space);
 }
 
-#define BENCH(n) {"benchmark - " #n, NULL, init_##n, update, destroy}
-chipmunkDemo bench_list[] = {
+#define BENCH(n) {"benchmark - " #n, init_##n, update, 	ChipmunkDemoDefaultDrawImpl, destroy}
+ChipmunkDemo bench_list[] = {
 	BENCH(SimpleTerrainCircles_1000),
 	BENCH(SimpleTerrainCircles_500),
 	BENCH(SimpleTerrainCircles_100),
@@ -452,4 +451,4 @@ chipmunkDemo bench_list[] = {
 	BENCH(NoCollide),
 };
 
-int bench_count = sizeof(bench_list)/sizeof(chipmunkDemo);
+int bench_count = sizeof(bench_list)/sizeof(ChipmunkDemo);

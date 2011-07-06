@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -132,10 +131,10 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Planet = {
+ChipmunkDemo Planet = {
 	"Planet",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };
