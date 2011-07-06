@@ -63,10 +63,10 @@ add_bar(cpVect a, cpVect b, int group)
 	cpFloat mass = length/160.0f;
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, mass*length*length/12.0f));
-	body->p = center;
+	cpBodySetPos(body, center);
 	
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpvsub(a, center), cpvsub(b, center), 10.0f));
-	shape->group = group;
+	cpShapeSetGroup(shape, group);
 	
 	return body;
 }
@@ -75,7 +75,7 @@ static cpSpace *
 init(void)
 {
 	space = cpSpaceNew();
-	cpBody *staticBody = space->staticBody;
+	cpBody *staticBody = cpSpaceGetStaticBody(space);
 	
 	cpBody *body1  = add_bar(cpv(-240,  160), cpv(-160,   80), 1);
 	cpBody *body2  = add_bar(cpv(-160,   80), cpv( -80,  160), 1);

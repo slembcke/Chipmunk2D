@@ -47,26 +47,25 @@ add_domino(cpSpace *space, cpVect pos, cpBool flipped)
 	cpFloat moment = cpMomentForBox(mass, WIDTH, HEIGHT);
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-	body->p = pos;
+	cpBodySetPos(body, pos);
 
 	cpShape *shape = (flipped ? cpBoxShapeNew(body, HEIGHT, WIDTH) : cpBoxShapeNew(body, WIDTH, HEIGHT));
 	cpSpaceAddShape(space, shape);
-	shape->e = 0.0f; shape->u = 0.6f;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.6f);
 }
 
 static cpSpace *
 init(void)
 {
-	cpResetShapeIdCounter();
-	
 	space = cpSpaceNew();
-	space->iterations = 30;
-	space->gravity = cpv(0, -300);
-	space->sleepTimeThreshold = 0.5f;
-	space->collisionSlop = 0.5f;
+	cpSpaceSetIterations(space, 30);
+	cpSpaceSetGravity(space, cpv(0, -300));
+	cpSpaceSetSleepTimeThreshold(space, 0.5f);
+	cpSpaceSetCollisionSlop(space, 0.5f);
 	
 	// Add a floor.
-	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpv(-600,-240), cpv(600,-240), 0.0f));
+	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpv(-600,-240), cpv(600,-240), 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);

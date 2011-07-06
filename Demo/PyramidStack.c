@@ -41,8 +41,6 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	cpResetShapeIdCounter();
-	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -100));

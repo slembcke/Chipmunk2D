@@ -87,7 +87,7 @@ init(void)
 	ChipmunkDemoMessageString = messageScratchSpace;
 	
 	space = cpSpaceNew();
-	space->iterations = 5;
+	cpSpaceSetIterations(space, 5);
 	
 	{ // add a fat segment
 		cpFloat mass = 1.0f;
@@ -95,13 +95,13 @@ init(void)
 		cpVect a = cpv(-length/2.0f, 0.0f), b = cpv(length/2.0f, 0.0f);
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
-		body->p = cpv(0.0f, 100.0f);
+		cpBodySetPos(body, cpv(0.0f, 100.0f));
 		
 		cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 20.0f));
 	}
 	
 	{ // add a static segment
-		cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpv(0, 300), cpv(300, 0), 0.0f));
+		cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpv(0, 300), cpv(300, 0), 0.0f));
 	}
 	
 	{ // add a pentagon
@@ -115,7 +115,7 @@ init(void)
 		}
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-		body->p = cpv(50.0f, 50.0f);
+		cpBodySetPos(body, cpv(50.0f, 50.0f));
 		
 		cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 	}
@@ -125,7 +125,7 @@ init(void)
 		cpFloat r = 20.0f;
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, r, cpvzero)));
-		body->p = cpv(100.0f, 100.0f);
+		cpBodySetPos(body, cpv(100.0f, 100.0f));
 		
 		cpSpaceAddShape(space, cpCircleShapeNew(body, r, cpvzero));
 	}

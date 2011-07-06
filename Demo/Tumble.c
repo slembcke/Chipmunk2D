@@ -26,7 +26,7 @@
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
-static cpBody *staticBody;
+static cpBody *rogueBoxBody;
 
 static void
 update(int ticks)
@@ -37,37 +37,26 @@ update(int ticks)
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
 		
-		// Manually update the position of the static shape so that
-		// the box rotates.
-		cpBodyUpdatePosition(staticBody, dt);
-		
-		// Because the box was added as a static shape and we moved it
-		// we need to manually rehash the static spatial hash.
-		cpSpaceReindexStatic(space);
+		// Manually update the position of the box body so that the box rotates.
+		// Normally Chipmunk calls this and cpBodyUpdateVelocity() for you,
+		// but we wanted to control the angular velocity explicitly.
+		cpBodyUpdatePosition(rogueBoxBody, dt);
 	}
 }
 
 static cpSpace *
 init(void)
 {
-	staticBody = cpBodyNew(INFINITY, INFINITY);
-	
-	cpResetShapeIdCounter();
-	
 	space = cpSpaceNew();
-	space->gravity = cpv(0, -600);
+	cpSpaceSetGravity(space, cpv(0, -600));
 	
 	cpBody *body;
 	cpShape *shape;
 	
-	// Vertexes for the bricks
-	int num = 4;
-	cpVect verts[] = {
-		cpv(-30,-15),
-		cpv(-30, 15),
-		cpv( 30, 15),
-		cpv( 30,-15),
-	};
+	// We create an infinite mass rogue body to attach the line segments too
+	// This way we can control the rotation however we want.
+	rogueBoxBody = cpBodyNew(INFINITY, INFINITY);
+	cpBodySetAngVel(rogueBoxBody, 0.4f);
 	
 	// Set up the static box.
 	cpVect a = cpv(-200, -200);
@@ -75,41 +64,39 @@ init(void)
 	cpVect c = cpv( 200,  200);
 	cpVect d = cpv( 200, -200);
 	
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, a, b, 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(rogueBoxBody, a, b, 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, b, c, 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(rogueBoxBody, b, c, 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, c, d, 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(rogueBoxBody, c, d, 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, d, a, 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(rogueBoxBody, d, a, 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
-	// Give the box a little spin.
-	// Because staticBody is never added to the space, we will need to
-	// update it ourselves. (see above).
-	// NOTE: Normally you would want to add the segments as normal and not static shapes.
-	// I'm just doing it to demonstrate the cpSpaceReindexStatic() function.
-	staticBody->w = 0.4f;
+	cpFloat mass = 1;
+	cpFloat width = 60;
+	cpFloat height = 30;
 	
 	// Add the bricks.
 	for(int i=0; i<3; i++){
 		for(int j=0; j<7; j++){
-			body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForPoly(1.0f, num, verts, cpvzero)));
-			body->p = cpv(i*60 - 150, j*30 - 150);
+			body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, width, height)));
+			cpBodySetPos(body, cpv(i*60 - 150, j*30 - 150));
 			
-			shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
-			shape->e = 0.0f; shape->u = 0.7f;
+			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+			cpShapeSetElasticity(shape, 0.0f);
+			cpShapeSetFriction(shape, 0.7f);
 		}
 	}
 	
@@ -119,7 +106,7 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(staticBody);
+	cpBodyFree(rogueBoxBody);
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
 }
