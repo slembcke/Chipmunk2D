@@ -103,6 +103,7 @@
 		D3E4A9CC0E99683200EE08BA /* cpGrooveJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */; };
 		D3E5F0550AA3303F004E361B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0530AA3303F004E361B /* GLUT.framework */; };
 		D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0540AA3303F004E361B /* OpenGL.framework */; };
+		D3F52BD313C509DC00EB67D9 /* Chains.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F52BD213C509DC00EB67D9 /* Chains.c */; };
 		D3FBA1A70E9B1E0400950BCC /* ChipmunkDebugDraw.c in Sources */ = {isa = PBXBuildFile; fileRef = D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */; };
 /* End PBXBuildFile section */
 
@@ -196,8 +197,9 @@
 		D3E5F2DA0AAA5622004E361B /* cpBB.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpBB.c; sourceTree = "<group>"; };
 		D3E5F2DD0AAA562B004E361B /* cpArray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpArray.c; sourceTree = "<group>"; };
 		D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpSpaceHash.c; sourceTree = "<group>"; };
+		D3F52BD213C509DC00EB67D9 /* Chains.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Chains.c; sourceTree = "<group>"; };
 		D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ChipmunkDebugDraw.c; sourceTree = "<group>"; };
-		D3FBA1B80E9B1F6300950BCC /* ChipmunkDebugDraw.h */ = {isa = PBXFileReference; fileEncoding = 4; path = ChipmunkDebugDraw.h; sourceTree = "<group>"; };
+		D3FBA1B80E9B1F6300950BCC /* ChipmunkDebugDraw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChipmunkDebugDraw.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -312,6 +314,7 @@
 				D3BAD0C710B61AAD00376394 /* Player.c */,
 				D3238F8110C1B5ED00C4BDC2 /* Joints.c */,
 				D3102B161119FD3000E77771 /* Tank.c */,
+				D3F52BD213C509DC00EB67D9 /* Chains.c */,
 				D3E4867513175AE000A00840 /* Bench.c */,
 			);
 			name = Demo;
@@ -597,6 +600,7 @@
 				D3238F8210C1B5ED00C4BDC2 /* Joints.c in Sources */,
 				D3102B171119FD3000E77771 /* Tank.c in Sources */,
 				D3E4867613175AE000A00840 /* Bench.c in Sources */,
+				D3F52BD313C509DC00EB67D9 /* Chains.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

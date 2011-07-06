@@ -77,7 +77,7 @@ struct cpSpace {
 	cpBody *staticBody;
 	
 	CP_PRIVATE(cpTimestamp stamp);
-	CP_PRIVATE(cpFloat prev_dt);
+	CP_PRIVATE(cpFloat curr_dt);
 
 	CP_PRIVATE(cpArray *bodies);
 	CP_PRIVATE(cpArray *rousedBodies);
@@ -135,6 +135,7 @@ CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersist
 CP_DefineSpaceStructProperty(cpBool, enableContactGraph, EnableContactGraph);
 CP_DefineSpaceStructProperty(cpDataPointer, data, UserData);
 CP_DefineSpaceStructGetter(cpBody *, staticBody, StaticBody);
+CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep);
 
 /// Set a default collision handler for this space.
 /// The default collision handler is invoked for each colliding pair of shapes

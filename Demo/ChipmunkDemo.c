@@ -460,24 +460,21 @@ void time_trial(int index, int count)
 }
 
 extern ChipmunkDemo LogoSmash;
-extern ChipmunkDemo Simple;
 extern ChipmunkDemo PyramidStack;
 extern ChipmunkDemo Plink;
+extern ChipmunkDemo BouncyHexagons;
 extern ChipmunkDemo Tumble;
 extern ChipmunkDemo PyramidTopple;
-extern ChipmunkDemo Bounce;
 extern ChipmunkDemo Planet;
 extern ChipmunkDemo Springies;
 extern ChipmunkDemo Pump;
 extern ChipmunkDemo TheoJansen;
-extern ChipmunkDemo MagnetsElectric;
-extern ChipmunkDemo UnsafeOps;
 extern ChipmunkDemo Query;
 extern ChipmunkDemo OneWay;
 extern ChipmunkDemo Player;
-extern ChipmunkDemo Sensors;
 extern ChipmunkDemo Joints;
 extern ChipmunkDemo Tank;
+extern ChipmunkDemo Chains;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -489,6 +486,7 @@ main(int argc, const char **argv)
 		LogoSmash,
 		PyramidStack,
 		Plink,
+		BouncyHexagons,
 		Tumble,
 		PyramidTopple,
 		Planet,
@@ -499,6 +497,7 @@ main(int argc, const char **argv)
 		OneWay,
 		Joints,
 		Tank,
+		Chains,
 	};
 	
 	demos = demo_list;

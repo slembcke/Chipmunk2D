@@ -1,3 +1,5 @@
+cpSpaceGetPrevTimeStep doc
+
 touch joint (Objective-Chipmunk)
 
 Tutorial ideas:

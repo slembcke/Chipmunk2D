@@ -430,6 +430,15 @@ static void destroy(void){
 	cpSpaceFree(space);
 }
 
+// Make a second demo declaration for this demo to use in the regular demo set.
+ChipmunkDemo BouncyHexagons = {
+	"Bouncy Hexagons",
+	init_BouncyTerrainHexagons_500,
+	update,
+	ChipmunkDemoDefaultDrawImpl,
+	destroy,
+};
+
 #define BENCH(n) {"benchmark - " #n, init_##n, update, 	ChipmunkDemoDefaultDrawImpl, destroy}
 ChipmunkDemo bench_list[] = {
 	BENCH(SimpleTerrainCircles_1000),
