@@ -14,7 +14,6 @@
 		D31847750FC458FD00E30B0D /* Query.c in Sources */ = {isa = PBXBuildFile; fileRef = D31847740FC458FD00E30B0D /* Query.c */; };
 		D3185D200EC5610A00E6BFCB /* TheoJansen.c in Sources */ = {isa = PBXBuildFile; fileRef = D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */; };
 		D3238F8210C1B5ED00C4BDC2 /* Joints.c in Sources */ = {isa = PBXBuildFile; fileRef = D3238F8110C1B5ED00C4BDC2 /* Joints.c */; };
-		D329CC9C10BADC7200909DB1 /* Sensors.c in Sources */ = {isa = PBXBuildFile; fileRef = D329CC9B10BADC7200909DB1 /* Sensors.c */; };
 		D34963C10B56CBA900CAD239 /* chipmunk.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0C40AA75CC3004E361B /* chipmunk.h */; };
 		D34963C20B56CBA900CAD239 /* cpVect.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0270AA32F16004E361B /* cpVect.h */; };
 		D34963C30B56CBA900CAD239 /* cpBB.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F2D90AAA5622004E361B /* cpBB.h */; };
@@ -43,8 +42,6 @@
 		D34E9EA312558A7C002C0FE5 /* cpSpaceStep.c in Sources */ = {isa = PBXBuildFile; fileRef = D34E9EA212558A7C002C0FE5 /* cpSpaceStep.c */; };
 		D34E9EA412558A7C002C0FE5 /* cpSpaceStep.c in Sources */ = {isa = PBXBuildFile; fileRef = D34E9EA212558A7C002C0FE5 /* cpSpaceStep.c */; };
 		D35420C00F4E1FD70017F4F7 /* chipmunk_unsafe.h in Headers */ = {isa = PBXBuildFile; fileRef = D35420BF0F4E1FD70017F4F7 /* chipmunk_unsafe.h */; };
-		D35422EC0F4E769F0017F4F7 /* UnsafeOps.c in Sources */ = {isa = PBXBuildFile; fileRef = D35422EB0F4E769F0017F4F7 /* UnsafeOps.c */; };
-		D365D90410B595CE0005A03B /* Simple.c in Sources */ = {isa = PBXBuildFile; fileRef = D365D90310B595CE0005A03B /* Simple.c */; };
 		D36B19510EA13B6D0028A362 /* cpDampedRotarySpring.c in Sources */ = {isa = PBXBuildFile; fileRef = D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */; };
 		D36D87831012D63600DB5078 /* cpRatchetJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D36D87811012D63600DB5078 /* cpRatchetJoint.c */; };
 		D36D87841012D63600DB5078 /* cpRatchetJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D36D87821012D63600DB5078 /* cpRatchetJoint.h */; };
@@ -75,7 +72,6 @@
 		D3BAFA040E9C52810039DD5C /* Plink.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFA030E9C52810039DD5C /* Plink.c */; };
 		D3BAFA360E9C53E50039DD5C /* Tumble.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFA350E9C53E50039DD5C /* Tumble.c */; };
 		D3BAFA510E9C549C0039DD5C /* PyramidTopple.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFA500E9C549C0039DD5C /* PyramidTopple.c */; };
-		D3BAFA870E9C5A230039DD5C /* Bounce.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFA860E9C5A230039DD5C /* Bounce.c */; };
 		D3BAFB8B0E9C7C150039DD5C /* Planet.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAFB8A0E9C7C150039DD5C /* Planet.c */; };
 		D3BC99C10AB381EE0025A2C0 /* ChipmunkDemo.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */; };
 		D3C378F511063C57003EF1D9 /* cpConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800E100E9815FC00A3D7FA /* cpConstraint.c */; };
@@ -107,7 +103,6 @@
 		D3E4A9CC0E99683200EE08BA /* cpGrooveJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */; };
 		D3E5F0550AA3303F004E361B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0530AA3303F004E361B /* GLUT.framework */; };
 		D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0540AA3303F004E361B /* OpenGL.framework */; };
-		D3EDBC250ED935F40027D943 /* MagnetsElectric.c in Sources */ = {isa = PBXBuildFile; fileRef = D3EDBC240ED935F40027D943 /* MagnetsElectric.c */; };
 		D3FBA1A70E9B1E0400950BCC /* drawSpace.c in Sources */ = {isa = PBXBuildFile; fileRef = D3FBA1A60E9B1E0400950BCC /* drawSpace.c */; };
 /* End PBXBuildFile section */
 
@@ -129,15 +124,12 @@
 		D31847740FC458FD00E30B0D /* Query.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Query.c; sourceTree = "<group>"; };
 		D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = TheoJansen.c; sourceTree = "<group>"; };
 		D3238F8110C1B5ED00C4BDC2 /* Joints.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Joints.c; sourceTree = "<group>"; };
-		D329CC9B10BADC7200909DB1 /* Sensors.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Sensors.c; sourceTree = "<group>"; };
 		D34963BB0B56CAA300CAD239 /* libChipmunk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libChipmunk.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D34E9E6412558081002C0FE5 /* cpSpaceQuery.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpSpaceQuery.c; path = ../src/cpSpaceQuery.c; sourceTree = "<group>"; };
 		D34E9E96125581DD002C0FE5 /* cpSpaceComponent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpSpaceComponent.c; path = ../src/cpSpaceComponent.c; sourceTree = "<group>"; };
 		D34E9EA212558A7C002C0FE5 /* cpSpaceStep.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpSpaceStep.c; path = ../src/cpSpaceStep.c; sourceTree = "<group>"; };
 		D353B6480B059C5F0038D274 /* prime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prime.h; sourceTree = "<group>"; };
 		D35420BF0F4E1FD70017F4F7 /* chipmunk_unsafe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_unsafe.h; path = ../include/chipmunk/chipmunk_unsafe.h; sourceTree = SOURCE_ROOT; };
-		D35422EB0F4E769F0017F4F7 /* UnsafeOps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UnsafeOps.c; sourceTree = "<group>"; };
-		D365D90310B595CE0005A03B /* Simple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Simple.c; sourceTree = "<group>"; };
 		D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpDampedRotarySpring.c; sourceTree = "<group>"; };
 		D36B192E0EA1364E0028A362 /* cpDampedRotarySpring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpDampedRotarySpring.h; path = ../../include/chipmunk/constraints/cpDampedRotarySpring.h; sourceTree = "<group>"; };
 		D36C44DD10F53DEB003D48B5 /* chipmunk_ffi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_ffi.h; path = ../include/chipmunk/chipmunk_ffi.h; sourceTree = SOURCE_ROOT; };
@@ -177,7 +169,6 @@
 		D3BAFA030E9C52810039DD5C /* Plink.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Plink.c; sourceTree = "<group>"; };
 		D3BAFA350E9C53E50039DD5C /* Tumble.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tumble.c; sourceTree = "<group>"; };
 		D3BAFA500E9C549C0039DD5C /* PyramidTopple.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = PyramidTopple.c; sourceTree = "<group>"; };
-		D3BAFA860E9C5A230039DD5C /* Bounce.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Bounce.c; sourceTree = "<group>"; };
 		D3BAFB8A0E9C7C150039DD5C /* Planet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Planet.c; sourceTree = "<group>"; };
 		D3BC99AB0AB381AF0025A2C0 /* cpPolyShape.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpPolyShape.c; sourceTree = "<group>"; };
 		D3BC99AC0AB381AF0025A2C0 /* cpPolyShape.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpPolyShape.h; path = ../include/chipmunk/cpPolyShape.h; sourceTree = "<group>"; };
@@ -205,7 +196,6 @@
 		D3E5F2DA0AAA5622004E361B /* cpBB.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpBB.c; sourceTree = "<group>"; };
 		D3E5F2DD0AAA562B004E361B /* cpArray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpArray.c; sourceTree = "<group>"; };
 		D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpSpaceHash.c; sourceTree = "<group>"; };
-		D3EDBC240ED935F40027D943 /* MagnetsElectric.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MagnetsElectric.c; sourceTree = "<group>"; };
 		D3FBA1A60E9B1E0400950BCC /* drawSpace.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = drawSpace.c; sourceTree = "<group>"; };
 		D3FBA1B80E9B1F6300950BCC /* drawSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = drawSpace.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -309,22 +299,17 @@
 				D3FBA1B80E9B1F6300950BCC /* drawSpace.h */,
 				D3FBA1A60E9B1E0400950BCC /* drawSpace.c */,
 				D3CCDF460AE35D920080442F /* LogoSmash.c */,
-				D365D90310B595CE0005A03B /* Simple.c */,
 				D3BAF9C40E9C4F250039DD5C /* PyramidStack.c */,
 				D3BAFA030E9C52810039DD5C /* Plink.c */,
 				D3BAFA350E9C53E50039DD5C /* Tumble.c */,
 				D3BAFA500E9C549C0039DD5C /* PyramidTopple.c */,
-				D3BAFA860E9C5A230039DD5C /* Bounce.c */,
 				D3BAFB8A0E9C7C150039DD5C /* Planet.c */,
 				D31402940E9DD07E00EF79DB /* Springies.c */,
 				D393275B0EA02C710026F6A2 /* Pump.c */,
 				D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */,
-				D3EDBC240ED935F40027D943 /* MagnetsElectric.c */,
-				D35422EB0F4E769F0017F4F7 /* UnsafeOps.c */,
 				D31847740FC458FD00E30B0D /* Query.c */,
 				D3BACF8210B5DF8900376394 /* OneWay.c */,
 				D3BAD0C710B61AAD00376394 /* Player.c */,
-				D329CC9B10BADC7200909DB1 /* Sensors.c */,
 				D3238F8110C1B5ED00C4BDC2 /* Joints.c */,
 				D3102B161119FD3000E77771 /* Tank.c */,
 				D3E4867513175AE000A00840 /* Bench.c */,
@@ -602,18 +587,13 @@
 				D3BAFA040E9C52810039DD5C /* Plink.c in Sources */,
 				D3BAFA360E9C53E50039DD5C /* Tumble.c in Sources */,
 				D3BAFA510E9C549C0039DD5C /* PyramidTopple.c in Sources */,
-				D3BAFA870E9C5A230039DD5C /* Bounce.c in Sources */,
 				D3BAFB8B0E9C7C150039DD5C /* Planet.c in Sources */,
 				D31402950E9DD07E00EF79DB /* Springies.c in Sources */,
 				D393275C0EA02C710026F6A2 /* Pump.c in Sources */,
 				D3185D200EC5610A00E6BFCB /* TheoJansen.c in Sources */,
-				D3EDBC250ED935F40027D943 /* MagnetsElectric.c in Sources */,
-				D35422EC0F4E769F0017F4F7 /* UnsafeOps.c in Sources */,
 				D31847750FC458FD00E30B0D /* Query.c in Sources */,
-				D365D90410B595CE0005A03B /* Simple.c in Sources */,
 				D3BACF8310B5DF8900376394 /* OneWay.c in Sources */,
 				D3BAD65810B8B52900376394 /* Player.c in Sources */,
-				D329CC9C10BADC7200909DB1 /* Sensors.c in Sources */,
 				D3238F8210C1B5ED00C4BDC2 /* Joints.c in Sources */,
 				D3102B171119FD3000E77771 /* Tank.c in Sources */,
 				D3E4867613175AE000A00840 /* Bench.c in Sources */,

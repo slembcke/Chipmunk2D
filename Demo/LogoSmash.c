@@ -88,11 +88,12 @@ update(int ticks)
 static cpShape *
 make_ball(cpFloat x, cpFloat y)
 {
-	cpBody *body = cpBodyNew(1.0f, INFINITY);
-	body->p = cpv(x, y);
+	cpBody *body = cpBodyNew(1.0, INFINITY);
+	cpBodySetPos(body, cpv(x, y));
 
-	cpShape *shape = cpCircleShapeNew(body, 0.95f, cpvzero);
-	shape->e = 0.0f; shape->u = 0.0f;
+	cpShape *shape = cpCircleShapeNew(body, 0.95, cpvzero);
+	cpShapeSetElasticity(shape, 0.0);
+	cpShapeSetFriction(shape, 0.0);
 	
 	return shape;
 }
@@ -106,7 +107,7 @@ init(void)
 	// The space will contain a very large number of similary sized objects.
 	// This is the perfect candidate for using the spatial hash.
 	// Generally you will never need to do this.
-	cpSpaceUseSpatialHash(space, 2.0f, 10000);
+	cpSpaceUseSpatialHash(space, 2.0, 10000);
 	
 	cpBody *body;
 	cpShape *shape;
@@ -115,8 +116,8 @@ init(void)
 		for(int x=0; x<image_width; x++){
 			if(!get_pixel(x, y)) continue;
 			
-			cpFloat x_jitter = 0.05f*frand();
-			cpFloat y_jitter = 0.05f*frand();
+			cpFloat x_jitter = 0.05*frand();
+			cpFloat y_jitter = 0.05*frand();
 			
 			shape = make_ball(2*(x - image_width/2 + x_jitter), 2*(image_height/2 - y + y_jitter));
 			cpSpaceAddBody(space, shape->body);
@@ -125,12 +126,13 @@ init(void)
 	}
 	
 	body = cpSpaceAddBody(space, cpBodyNew(INFINITY, INFINITY));
-	body->p = cpv(-1000.0f, -10.0f);
-	body->v = cpv(400.0f, 0.0f);
+	cpBodySetPos(body, cpv(-1000, -10));
+	cpBodySetVel(body, cpv(400, 0));
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, 8.0f, cpvzero));
-	shape->e = 0.0f; shape->u = 0.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 0.0);
+	cpShapeSetFriction(shape, 0.0);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	return space;
 }
@@ -143,7 +145,7 @@ destroy(void)
 }
 
 drawSpaceOptions draw_options = {
-	0, 0, 0, 2.0f, 3.0f, 0.0f,
+	0, 0, 2.0f, 3.0f, 0.0f,
 };
 
 chipmunkDemo LogoSmash = {
