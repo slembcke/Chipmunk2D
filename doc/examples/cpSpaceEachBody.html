@@ -1,0 +1,12 @@
+<pre style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; "><em><span style="color:#236e25;">// Code snippet to check if all bodies in the space are sleeping
+</span></em>
+<em><span style="color:#236e25;">// This function is called once for each body in the space.
+</span></em><strong><span style="color:#881350;">static</span></strong> <strong><span style="color:#881350;">void</span></strong> <span style="color:#003369;">EachBody</span>(cpBody *body, cpBool *allSleeping){
+  <strong><span style="color:#881350;">if</span></strong>(!<span style="color:#003369;">cpBodyIsSleeping</span>(body)) *allSleeping = cpFalse;
+}
+
+<em><span style="color:#236e25;">// Then in your tick method, do this:
+</span></em>cpBool allSleeping = true;
+<span style="color:#003369;">cpSpaceEachBody</span>(space, (cpSpaceBodyIteratorFunc)EachBody, &amp;allSleeping);
+<span style="color:#003369;">printf</span>(<span style="color:#760f15;">&quot;All are sleeping: %s\n&quot;</span>, allSleeping ? <span style="color:#760f15;">&quot;true&quot;</span> : <span style="color:#760f15;">&quot;false&quot;</span>);
+</pre>

@@ -1,10 +1,6 @@
 !images/logo1_med.png! !{float:right;}images/hms_logo.png!:http://howlingmoonsoftware.com
 
-<%= pop_open_div("Outline") %>
-
-<%%= Node::Root.outline %>
-
-</div>
+<%= pop_open_div("Outline") %><%%= Node::Root.outline %></div></div>
 
 <%= h 1, "Chipmunk Physics 6.0.0", "Intro" %>
 
@@ -50,10 +46,17 @@ I rarely use MSVC, but others have chipped in to help me maintain Visual Studio 
 The CMake build script should work on any system (Unix/Win/Mac) as long as you have CMake installed. It can even generate XCode or MSVC projects if you want (see CMake's documentation for more information).
 
 To compile a Chipmunk debug build on the command line, all you need to do is run:
+
 <pre><code>cmake -D CMAKE_BUILD_TYPE=Debug .
 make</code></pre>
 
 If the @-D CMAKE_BUILD_TYPE=Debug@ option is left out, it will make a release build instead.
+
+<%= h 2, "Hello Chipmunk (World)", "HelloChipmunk" %>
+
+Hello world Chipmunk style. Create a simple simulation where a ball falls onto a static line segment, then rolls off. Print out the coordinates of the ball.
+
+<%= pop_open_example "Hello Chipmunk" %>
 
 
 <%= h 2, "Support:", "Support" %>
@@ -352,7 +355,9 @@ Use the following functions to approximate the moment of inertia for your body, 
 * @cpFloat cpMomentForPoly(cpFloat m, int numVerts, const cpVect *verts, cpVect offset)@ - Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
 * @cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height)@ - Calculate the moment of inertia for a solid box centered on the body.
 
-<!-- TODO examples -->
+<!-- TODO poly examples -->
+
+<%= pop_open_example "Moments" %>
 
 Use the following functions to get the area for common Chipmunk shapes if you want to approximate masses or density or whatnot.
 
@@ -393,7 +398,7 @@ Chipmunk supports a sleeping feature so that it stops using CPU time simulating 
 
 p(expl). When objects in Chipmunk sleep, they sleep as a group of all objects that are touching or jointed together. When an object is woken up, all of the objects in it's group are woken up. @cpBodySleepWithGroup()@ allows you group sleeping objects together. It acts identically to @cpBodySleep()@ if you pass @NULL@ as @group@ by starting a new group. If you pass a sleeping body for @group@, @body@ will be awoken when @group@ is awoken. You can use this to initialize levels and start stacks of objects in a pre-sleeping state.
 
-<!-- TODO examples -->
+<%= pop_open_example "Sleeping" %>
 
 <%= h 2, "Iterators", "Iterators" %>
 
@@ -731,14 +736,13 @@ void cpSpaceEachShape(cpSpace *space, cpSpaceShapeIteratorFunc func, void *data)
 
 p(expl). Call @func@ for each shape in the space also passing along your data pointer. Sleeping and static shapes are included.
 
-<!-- TODO examples -->
-
+<%= pop_open_example "cpSpaceEachBody" %>
 
 <%= h 2, "Simulating the Space:", "Simulating" %>
 
 <pre><code>void cpSpaceStep(cpSpace *space, cpFloat dt)</code></pre>
 
-p(expl). Update the space for the given time step. Using a fixed time step is _highly_ recommended. Doing so can greatly increase the quality of the simulation.
+p(expl). Update the space for the given time step. Using a fixed time step is _highly_ recommended. Doing so can greatly increase the quality of the simulation. The easiest way to do constant timesteps is to simple step forward by 1/60th of a second (or whatever your target framerate is) for each frame regardless of how long it took to render. This works fine for many games, but a better way to do it is to separate your physics timestep and rendering. "This":http://gafferongames.com/game-physics/fix-your-timestep/ is a good article on how to do that.
 
 
 <%= h 2, "Enabling and Tuning the Spatial Hash:", "SpatialHash" %>
@@ -823,7 +827,7 @@ p(expl). User data pointer. Use this pointer to get a reference to the game obje
 
 p(expl). The most recent impulse that @constraint@ applied. To convert this to a force, divide by the timestep passed to @cpSpaceStep()@. You can use this to implement breakable joints to check if the force they attempted to apply exceeded a certain threshold.
 
-<!-- TODO examples -->
+<%= pop_open_example "BreakableJoint" %>
 
 To access properties of specific joint types, use the getter and setter functions provided (ex: @cpPinJointGetAnchr1()@). See the lists of properties for more information.
 
@@ -837,7 +841,9 @@ Joints in Chipmunk are not perfect. A pin joint can't maintain the exact correct
 
 There are three properties of cpConstraint structs that control the error correction, @maxForce@, @maxBias@, and @biasCoef@. @maxForce@ is pretty self explanatory, a joint or constraint will not be able to use more than this amount of force in order to function. If it needs more force to be able to hold itself together, it will fall apart. @maxBias@ is the maximum speed at which error correction can be applied. If you change a property on a joint so that the joint will have to correct itself, it normally does so very quickly. By setting a maxSpeed you can make the joint work like a servo, correcting itself at a constant rate over a longer period of time. Lastly, @biasCoef@ is the percentage of error corrected every step before clamping to a maximum speed. You can use this to make joints correct themselves smoothly instead of at a constant speed, but is probably the least useful of the three properties by far.
 
-<!-- TODO examples -->
+<!-- TODO more examples -->
+
+<%= pop_open_example "JointRecipies" %>
 
 <%= h 2, "Constraints and Collision Shapes:", "Shapes" %>
 
@@ -1185,8 +1191,6 @@ cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i)</code></pre>
 
 p(expl). Get the number of contacts tracked by this arbiter or the specific collision point, collision normal or penetration depth of a collision point.
 
-<!-- TODO examples contact point set example -->
-
 <pre><code>cpBool cpArbiterIsFirstContact(const cpArbiter *arb)</code></pre>
 
 p(expl). Returns true if this is the first step the two shapes started touching. Can be used 
@@ -1196,6 +1200,7 @@ void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)</code></pr
 
 p(expl). Get the shapes or bodies in the order that they were defined in the collision handler associated with this arbiter. If you defined the handler as @cpSpaceAddCollisionHandler(space, 1, 2, ...)@, you you will find that @a->collision_type == 1@ and @b->collision_type == 2@.
 
+<%= pop_open_example "CollisionCallback" %>
 
 <%= h 2, "Contact Point Sets:", "HelperFunctions" %>
 
@@ -1206,6 +1211,7 @@ Contact point sets make getting contact information simpler.
 p(expl). Get a contact point set struct from an arbiter.
 
 You might do something like the following to get and process a contact point set:
+
 <pre><code>cpContactPointSet set = cpArbiterGetContactPointSet(arbiter);
 for(int i=0; i<set.count; i++){
 	// get and work with the collision point normal and penetration distance:
@@ -1221,14 +1227,10 @@ void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)</code></pr
 
 p(expl). Get the shapes (or their bodies) in the order that they were defined in the collision handler associated with this arbiter. If you defined the handler as @cpSpaceAddCollisionHandler(space, 1, 2, ...)@, you you will find that @a->collision_type == 1@ and @b->collision_type == 2@. The convenience macro defines and initializes the two shape variables for you. The default collision handler doesn't use collision types so the order is undefined.
 
-<!-- TODO example -->
-
 <pre><code>#define CP_ARBITER_GET_SHAPES(arb, a, b) cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b)
 #define CP_ARBITER_GET_BODIES(arb, a, b) cpBody *a, *b; cpArbiterGetBodies(arb, &a, &b);</code></pre>
 
 p(expl). Shortcut macros for defining variables for and retrieving the shapes/bodies for an arbiter.
-
-<!-- TODO example -->
 
 <pre><code>cpVect cpArbiterTotalImpulse(cpArbiter *arb);
 cpVect cpArbiterTotalImpulseWithFriction(cpArbiter *arb);</code></pre>

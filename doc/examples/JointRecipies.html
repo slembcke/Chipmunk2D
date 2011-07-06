@@ -1,0 +1,17 @@
+<pre style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; "><em><span style="color:#236e25;">// Faked top down friction.
+</span></em>
+<em><span style="color:#236e25;">// A pivot joint configured this way will calculate friction against the ground for games with a top down perspective.
+// Because the joint correction is disabled, the joint will not recenter itself and only apply to the velocity.
+// The force the joint applies when changing the velocity will be clamped by the max force
+// and this causes it to work exactly like friction!
+</span></em>cpConstraint *pivot = <span style="color:#003369;">cpSpaceAddConstraint</span>(space, <span style="color:#003369;">cpPivotJointNew2</span>(staticBody, body, cpvzero, cpvzero));
+pivot-&gt;maxBias = <span style="color:#0000ff;">0.0f</span>; <em><span style="color:#236e25;">// disable joint correction
+</span></em>pivot-&gt;maxForce = <span style="color:#0000ff;">1000.0f</span>;
+
+<em><span style="color:#236e25;">// The pivot joint doesn't apply rotational forces, use a gear joint with a ratio of 1.0 for that.
+</span></em>cpConstraint *gear = <span style="color:#003369;">cpSpaceAddConstraint</span>(space, <span style="color:#003369;">cpGearJointNew</span>(staticBody, body, <span style="color:#0000ff;">0.0f</span>, <span style="color:#0000ff;">1.0f</span>));
+gear-&gt;maxBias = <span style="color:#0000ff;">0.0f</span>; <em><span style="color:#236e25;">// disable joint correction
+</span></em>gear-&gt;maxForce = <span style="color:#0000ff;">5000.0f</span>;
+
+<em><span style="color:#236e25;">// Also, instead of connecting the joints to a static body, you can connect them to an infinite mass rogue body.
+// You can then use the rogue body as a control body to the connected body. See the Tank demo as an example.</span></em></pre>

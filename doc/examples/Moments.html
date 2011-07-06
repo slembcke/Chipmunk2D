@@ -1,0 +1,14 @@
+<pre style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; "><em><span style="color:#236e25;">// Moment for a solid circle with a mass of 2 and radius 5.
+</span></em>cpFloat circle1 = <span style="color:#003369;">cpMomentForCircle</span>(<span style="color:#0000ff;">2</span>, <span style="color:#0000ff;">0</span>, <span style="color:#0000ff;">5</span>, cpvzero);
+
+<em><span style="color:#236e25;">// Moment for a hollow circle with a mass of 1, inner radius of 2 and outer radius of 6.
+</span></em>cpFloat circle2 = <span style="color:#003369;">cpMomentForCircle</span>(<span style="color:#0000ff;">1</span>, <span style="color:#0000ff;">2</span>, <span style="color:#0000ff;">6</span>, cpvzero);
+
+<em><span style="color:#236e25;">// Moment for a solid circle with a mass of 1, radius of 3 and
+// centered 3 units along the x axis from the center of gravity.
+</span></em>cpFloat circle3 = <span style="color:#003369;">cpMomentForCircle</span>(<span style="color:#0000ff;">2</span>, <span style="color:#0000ff;">0</span>, <span style="color:#0000ff;">5</span>, <span style="color:#003369;">cpv</span>(<span style="color:#0000ff;">3</span>, <span style="color:#0000ff;">0</span>));
+
+<em><span style="color:#236e25;">// Composite object. 1x4 box centered on the center of gravity and a circle sitting on top.
+// Just add the moments together.
+</span></em>cpFloat composite = <span style="color:#003369;">cpMomentForBox</span>(boxMass, <span style="color:#0000ff;">1</span>, <span style="color:#0000ff;">4</span>) + <span style="color:#003369;">cpMomentForCircle</span>(circleMass, <span style="color:#0000ff;">0</span>, <span style="color:#0000ff;">1</span>, <span style="color:#003369;">cpv</span>(<span style="color:#0000ff;">0</span>, <span style="color:#0000ff;">3</span>));
+</pre>
