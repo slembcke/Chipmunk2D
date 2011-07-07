@@ -111,6 +111,14 @@ static inline cpFloat cpfclamp(cpFloat f, cpFloat min, cpFloat max)
 	return cpfmin(cpfmax(f, min), max);
 }
 
+/// Clamp @c f to be between 0 and 1.
+static inline cpFloat cpfclamp01(cpFloat f)
+{
+	return cpfmax(0.0f, cpfmin(f, 1.0f));
+}
+
+
+
 /// Linearly interpolate (or extrapolate) between @c f1 and @c f2 by @c t percent.
 static inline cpFloat cpflerp(cpFloat f1, cpFloat f2, cpFloat t)
 {
