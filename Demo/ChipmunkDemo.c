@@ -482,7 +482,6 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
-		Crane,
 		LogoSmash,
 		PyramidStack,
 		Plink,
@@ -498,6 +497,7 @@ main(int argc, const char **argv)
 		Joints,
 		Tank,
 		Chains,
+		Crane,
 	};
 	
 	demos = demo_list;
