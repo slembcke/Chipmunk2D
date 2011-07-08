@@ -45,6 +45,7 @@
 		D36B19510EA13B6D0028A362 /* cpDampedRotarySpring.c in Sources */ = {isa = PBXBuildFile; fileRef = D36B192D0EA1364E0028A362 /* cpDampedRotarySpring.c */; };
 		D36D87831012D63600DB5078 /* cpRatchetJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D36D87811012D63600DB5078 /* cpRatchetJoint.c */; };
 		D36D87841012D63600DB5078 /* cpRatchetJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D36D87821012D63600DB5078 /* cpRatchetJoint.h */; };
+		D37282AD13C6432F00FFFA3F /* Crane.c in Sources */ = {isa = PBXBuildFile; fileRef = D37282AC13C6432F00FFFA3F /* Crane.c */; };
 		D37697200B50C53900BB33CC /* LogoSmash.c in Sources */ = {isa = PBXBuildFile; fileRef = D3CCDF460AE35D920080442F /* LogoSmash.c */; };
 		D37BB76E0EAADA6300C70958 /* cpRotaryLimitJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D37BB76C0EAADA6300C70958 /* cpRotaryLimitJoint.c */; };
 		D37BB76F0EAADA6300C70958 /* cpRotaryLimitJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D37BB76D0EAADA6300C70958 /* cpRotaryLimitJoint.h */; };
@@ -136,6 +137,7 @@
 		D36C44DD10F53DEB003D48B5 /* chipmunk_ffi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_ffi.h; path = ../include/chipmunk/chipmunk_ffi.h; sourceTree = SOURCE_ROOT; };
 		D36D87811012D63600DB5078 /* cpRatchetJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpRatchetJoint.c; sourceTree = "<group>"; };
 		D36D87821012D63600DB5078 /* cpRatchetJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpRatchetJoint.h; path = ../../include/chipmunk/constraints/cpRatchetJoint.h; sourceTree = "<group>"; };
+		D37282AC13C6432F00FFFA3F /* Crane.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Crane.c; sourceTree = "<group>"; };
 		D37BB76C0EAADA6300C70958 /* cpRotaryLimitJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpRotaryLimitJoint.c; sourceTree = "<group>"; };
 		D37BB76D0EAADA6300C70958 /* cpRotaryLimitJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpRotaryLimitJoint.h; path = ../../include/chipmunk/constraints/cpRotaryLimitJoint.h; sourceTree = "<group>"; };
 		D37BB8B10EAB01E400C70958 /* cpGearJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpGearJoint.c; sourceTree = "<group>"; };
@@ -315,6 +317,7 @@
 				D3238F8110C1B5ED00C4BDC2 /* Joints.c */,
 				D3102B161119FD3000E77771 /* Tank.c */,
 				D3F52BD213C509DC00EB67D9 /* Chains.c */,
+				D37282AC13C6432F00FFFA3F /* Crane.c */,
 				D3E4867513175AE000A00840 /* Bench.c */,
 			);
 			name = Demo;
@@ -601,6 +604,7 @@
 				D3102B171119FD3000E77771 /* Tank.c in Sources */,
 				D3E4867613175AE000A00840 /* Bench.c in Sources */,
 				D3F52BD313C509DC00EB67D9 /* Chains.c in Sources */,
+				D37282AD13C6432F00FFFA3F /* Crane.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

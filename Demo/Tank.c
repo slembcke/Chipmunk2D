@@ -71,6 +71,8 @@ add_box(cpFloat size, cpFloat mass)
 static cpSpace *
 init(void)
 {
+	ChipmunkDemoMessageString = "Use the mouse to drive the tank, it will follow the cursor.";
+	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 10);
 	cpSpaceSetSleepTimeThreshold(space, 0.5f);

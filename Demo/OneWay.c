@@ -61,6 +61,8 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
+	ChipmunkDemoMessageString = "One way platforms are trivial in Chipmunk using a very simple collision callback.";
+	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 10);
 	cpSpaceSetGravity(space, cpv(0, -100));

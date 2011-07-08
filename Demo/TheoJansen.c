@@ -99,7 +99,7 @@ make_leg(cpFloat side, cpFloat offset, cpBody *chassis, cpBody *crank, cpVect an
 static cpSpace *
 init(void)
 {
-	space = cpSpaceNew();
+	ChipmunkDemoMessageString = "Use the arrow keys to control the machine.";
 	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 20);

@@ -74,6 +74,8 @@ add_ball(cpVect pos)
 static cpSpace *
 init(void)
 {
+	ChipmunkDemoMessageString = "Use the arrow keys to control the machine.";
+	
 	space = cpSpaceNew();
 	cpSpaceSetGravity(space, cpv(0, -600));
 	

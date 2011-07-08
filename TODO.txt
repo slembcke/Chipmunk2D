@@ -3,8 +3,6 @@ cpSpaceGetPrevTimeStep doc
 touch joint (Objective-Chipmunk)
 
 Tutorial ideas:
-	Hello World - Create a single circle than falls on a line. Print "hello" in a begin callback and "world" in a separate.
-	One Way Platforms.
 	Player grounding example.
 	Bouyancy example.
 	OpenGL transform example.

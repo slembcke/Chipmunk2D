@@ -129,8 +129,6 @@ drawInstructions()
 		"Controls:\n"
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
-		"Arrow keys control some demos.\n"
-		"\\ disables anti-aliasing.\n"
 		"= toggles bounding boxes."
 	);
 }
@@ -160,7 +158,7 @@ drawInfo()
 		"Contact Points: %d (%d)\n"
 		"Other Constraints: %d, Iterations: %d\n"
 		"Constraints x Iterations: %d (%d)\n"
-		"Seconds:% 5.2f, KE:% 5.2e";
+		"Time:% 5.2fs, KE:% 5.2e";
 	
 	cpArray *bodies = space->bodies;
 	cpFloat ke = 0.0f;
@@ -475,6 +473,7 @@ extern ChipmunkDemo Player;
 extern ChipmunkDemo Joints;
 extern ChipmunkDemo Tank;
 extern ChipmunkDemo Chains;
+extern ChipmunkDemo Crane;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -483,6 +482,7 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
+		Crane,
 		LogoSmash,
 		PyramidStack,
 		Plink,
