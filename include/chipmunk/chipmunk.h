@@ -142,6 +142,9 @@ void cpRecenterPoly(const int numVerts, cpVect *verts);
 /// Calculate the moment of inertia for a solid box.
 cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height);
 
+/// Calculate the moment of inertia for a solid box.
+cpFloat cpMomentForBox2(cpFloat m, cpBB box);
+
 #ifdef __cplusplus
 }
 

@@ -38,64 +38,76 @@ update(int ticks)
 	}
 }
 
-//static cpBool
-//waterPreSolve(cpArbiter *arb, cpSpace *space, Boat *self)
-//{
-//	CHIPMUNK_ARBITER_GET_SHAPES(arb, object, water);
-//	
-//	cpFloat level = water.bb.t;
-//	cpPolyShape *pshape = (cpPolyShape *)object.shape;
-//	
-//	int count = pshape->numVerts;
-//	cpVect *verts = pshape->tVerts;
-//	
-//	int clippedCount = 0;
-//	cpVect clipped[count + 1];
-//	for(int i=0, j=count-1; i<count; j=i, i++){
-//		cpVect a = verts[j];
-//		cpVect b = verts[i];
-//		
-//		if(a.y < level){
-//			clipped[clippedCount] = a;
-//			clippedCount++;
-//		}
-//		
-//		cpFloat a_level = a.y - level;
-//		cpFloat b_level = b.y - level;
-//		
-//		if(a_level*b_level < 0.0f){
-//			cpFloat t = cpfabs(a_level)/(cpfabs(a_level) + cpfabs(b_level));
-//			
-//			clipped[clippedCount] = cpvlerp(a, b, t);
-//			clippedCount++;
-//		}
-//	}
-//	
-//	cpBody *body = object.body.body;
-//	cpFloat area = cpfabs(cpAreaForPoly(count, verts));
-//	cpFloat clippedArea = cpfabs(cpAreaForPoly(clippedCount, clipped));
-//	cpVect r = cpvsub(cpCentroidForPoly(clippedCount, clipped), body->p);
-//	
-//	cpVect bouyancy = cpvmult(space->gravity, -clippedArea*FLUID_DENSITY);
-//	
-//	cpBodyResetForces(body);
-//	cpBodyApplyForce(body, bouyancy, r);
-//	
+#define FLUID_DENSITY 0.0002f
+
+char messageBuffer[1024] = {};
+
+static cpBool
+waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
+{
+	CP_ARBITER_GET_SHAPES(arb, water, poly);
+	
+	// Get the top of the water sensor bounding box to use as the water level.
+	cpFloat level = cpShapeGetBB(water).t;
+	
+	cpBody *body = cpShapeGetBody(poly);
+	
+	int count = cpPolyShapeGetNumVerts(poly);
+	int clippedCount = 0;
+	cpVect clipped[count + 1];
+	
+	for(int i=0, j=count-1; i<count; j=i, i++){
+		cpVect a = cpBodyLocal2World(body, cpPolyShapeGetVert(poly, j));
+		cpVect b = cpBodyLocal2World(body, cpPolyShapeGetVert(poly, i));
+		
+		if(a.y < level){
+			clipped[clippedCount] = a;
+			clippedCount++;
+		}
+		
+		cpFloat a_level = a.y - level;
+		cpFloat b_level = b.y - level;
+		
+		if(a_level*b_level < 0.0f){
+			cpFloat t = cpfabs(a_level)/(cpfabs(a_level) + cpfabs(b_level));
+			
+			clipped[clippedCount] = cpvlerp(a, b, t);
+			clippedCount++;
+		}
+	}
+	
+	cpFloat area = cpfabs(cpAreaForPoly(count, ((cpPolyShape *)poly)->tVerts));
+	cpFloat clippedArea = cpfabs(cpAreaForPoly(clippedCount, clipped));
+	cpVect r = cpvsub(cpCentroidForPoly(clippedCount, clipped), body->p);
+	
+	sprintf(messageBuffer, "area: %5.2f, clipped: %5.2f, count %d\n", area, clippedArea, clippedCount);
+	ChipmunkDebugDrawPolygon(clippedCount, clipped, RGBAColor(0, 0, 1, 1), LAColor(0,0));
+	cpVect centroid = cpvadd(r, cpBodyGetPos(body));
+	ChipmunkDebugDrawPoints(5, 1, &centroid, RGBAColor(0, 0, 1, 1));
+	
+	cpVect bouyancy = cpvmult(cpSpaceGetGravity(space), -clippedArea*FLUID_DENSITY);
+	
+	cpBodyResetForces(body);
+	cpBodyApplyForce(body, bouyancy, r);
+	
 //	cpFloat v_coef = cpfpow(0.97f, clippedArea/area);
 //	cpVect v_centroid = cpvadd(body->v, cpvmult(cpvperp(r), body->w));
 //	
 //	cpBodyApplyImpulse(body, cpvmult(v_centroid, v_coef - 1.0f), r);
 //	body->w *= v_coef*v_coef;
-//	
-//	return TRUE;
-//}
+	
+	return TRUE;
+}
 
 static cpSpace *
 init(void)
 {
+	ChipmunkDemoMessageString = messageBuffer;
+	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -100));
+	cpSpaceSetDamping(space, 0.5);
 	cpSpaceSetSleepTimeThreshold(space, 0.5f);
 	cpSpaceSetCollisionSlop(space, 0.5f);
 	
@@ -118,27 +130,51 @@ init(void)
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
-	// Add lots of boxes.
-	for(int i=0; i<14; i++){
-		for(int j=0; j<=i; j++){
-			body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForBox(1.0f, 30.0f, 30.0f)));
-			cpBodySetPos(body, cpv(j*32 - i*16, 300 - i*32));
-			
-			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 30.0f, 30.0f));
-			cpShapeSetElasticity(shape, 0.0f);
-			cpShapeSetFriction(shape, 0.8f);
-		}
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+	
+	{
+		// Add the edges of the bucket
+		cpBB bb = cpBBNew(-200, -100, 200, 100);
+		cpFloat radius = 5.0f;
+		
+		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(bb.l, bb.b), cpv(bb.l, bb.t), radius));
+		cpShapeSetElasticity(shape, 1.0f);
+		cpShapeSetFriction(shape, 1.0f);
+		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+
+		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(bb.r, bb.b), cpv(bb.r, bb.t), radius));
+		cpShapeSetElasticity(shape, 1.0f);
+		cpShapeSetFriction(shape, 1.0f);
+		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+
+		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(bb.l, bb.b), cpv(bb.r, bb.b), radius));
+		cpShapeSetElasticity(shape, 1.0f);
+		cpShapeSetFriction(shape, 1.0f);
+		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+		
+		// Add the sensor for the water.
+		shape = cpSpaceAddShape(space, cpBoxShapeNew2(staticBody, bb));
+		cpShapeSetSensor(shape, cpTrue);
+		cpShapeSetCollisionType(shape, 1);
+	}
+
+
+	{
+		cpFloat mass = 1.0f;
+		cpFloat size = 60.0f;
+		
+		body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, 2*size)));
+		cpBodySetPos(body, cpv(280, -200));
+		
+		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, 2*size));
+		cpShapeSetFriction(shape, 0.8f);
 	}
 	
-	// Add a ball to make things more interesting
-	cpFloat radius = 15.0f;
-	body = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 0.0f, radius, cpvzero)));
-	cpBodySetPos(body, cpv(0, -240 + radius+5));
-
-	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
-	cpShapeSetElasticity(shape, 0.0f);
-	cpShapeSetFriction(shape, 0.9f);
-	
+	cpSpaceAddCollisionHandler(space, 1, 0, NULL, (cpCollisionBeginFunc)waterPreSolve, NULL, NULL, NULL);
+		
 	return space;
 }
 
@@ -150,7 +186,7 @@ destroy(void)
 }
 
 ChipmunkDemo Buoyancy = {
-	"Pyramid Stack",
+	"Simple Sensor based fluids.",
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

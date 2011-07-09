@@ -215,8 +215,6 @@ display(void)
 		step = cpFalse;
 	}
   
-	glClear(GL_COLOR_BUFFER_BIT);
-	
 	demos[demoIndex].drawFunc();
 	if(drawBBs) cpSpaceEachShape(space, drawShapeBB, NULL);
 	
@@ -225,6 +223,7 @@ display(void)
 	drawString(-300, -210, ChipmunkDemoMessageString);
 		
 	glutSwapBuffers();
+	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 static char *
@@ -474,6 +473,7 @@ extern ChipmunkDemo Joints;
 extern ChipmunkDemo Tank;
 extern ChipmunkDemo Chains;
 extern ChipmunkDemo Crane;
+extern ChipmunkDemo Buoyancy;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -482,6 +482,7 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
+		Buoyancy,
 		LogoSmash,
 		PyramidStack,
 		Plink,

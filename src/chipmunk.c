@@ -149,4 +149,14 @@ cpMomentForBox(cpFloat m, cpFloat width, cpFloat height)
 	return m*(width*width + height*height)/12.0f;
 }
 
+cpFloat
+cpMomentForBox2(cpFloat m, cpBB box)
+{
+	cpFloat width = box.r - box.l;
+	cpFloat height = box.t - box.b;
+	cpVect offset = cpvmult(cpv(box.l + box.r, box.b + box.t), 0.5f);
+	
+	return cpMomentForBox(m, width, height) + m*cpvlengthsq(offset);
+}
+
 #include "chipmunk_ffi.h"

@@ -203,11 +203,17 @@ cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height)
 	cpFloat hw = width/2.0f;
 	cpFloat hh = height/2.0f;
 	
+	return cpBoxShapeInit2(poly, body, cpBBNew(-hw, -hh, hw, hh));
+}
+
+cpPolyShape *
+cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box)
+{
 	cpVect verts[] = {
-		cpv(-hw,-hh),
-		cpv(-hw, hh),
-		cpv( hw, hh),
-		cpv( hw,-hh),
+		cpv(box.l, box.b),
+		cpv(box.l, box.t),
+		cpv(box.r, box.t),
+		cpv(box.r, box.b),
 	};
 	
 	return cpPolyShapeInit(poly, body, 4, verts, cpvzero);
@@ -217,6 +223,12 @@ cpShape *
 cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height)
 {
 	return (cpShape *)cpBoxShapeInit(cpPolyShapeAlloc(), body, width, height);
+}
+
+cpShape *
+cpBoxShapeNew2(cpBody *body, cpBB box)
+{
+	return (cpShape *)cpBoxShapeInit2(cpPolyShapeAlloc(), body, box);
 }
 
 // Unsafe API (chipmunk_unsafe.h)

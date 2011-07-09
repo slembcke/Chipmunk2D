@@ -48,8 +48,12 @@ cpShape *cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset
 
 /// Initialize a box shaped polygon shape.
 cpPolyShape *cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height);
+/// Initialize an offset box shaped polygon shape.
+cpPolyShape *cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box);
 /// Allocate and initialize a box shaped polygon shape.
 cpShape *cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height);
+/// Allocate and initialize an offset box shaped polygon shape.
+cpShape *cpBoxShapeNew2(cpBody *body, cpBB box);
 
 /// Check that a set of vertexes is convex and has a clockwise winding.
 cpBool cpPolyValidate(const cpVect *verts, const int numVerts);
