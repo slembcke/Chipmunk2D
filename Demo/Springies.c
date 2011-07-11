@@ -24,7 +24,6 @@
 #include <string.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -64,10 +63,10 @@ add_bar(cpVect a, cpVect b, int group)
 	cpFloat mass = length/160.0f;
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, mass*length*length/12.0f));
-	body->p = center;
+	cpBodySetPos(body, center);
 	
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpvsub(a, center), cpvsub(b, center), 10.0f));
-	shape->group = group;
+	cpShapeSetGroup(shape, group);
 	
 	return body;
 }
@@ -76,7 +75,7 @@ static cpSpace *
 init(void)
 {
 	space = cpSpaceNew();
-	cpBody *staticBody = &space->staticBody;
+	cpBody *staticBody = cpSpaceGetStaticBody(space);
 	
 	cpBody *body1  = add_bar(cpv(-240,  160), cpv(-160,   80), 1);
 	cpBody *body2  = add_bar(cpv(-160,   80), cpv( -80,  160), 1);
@@ -158,14 +157,14 @@ init(void)
 static void
 destroy(void)
 {
-	cpSpaceFreeChildren(space);
+	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Springies = {
+ChipmunkDemo Springies = {
 	"Springies",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

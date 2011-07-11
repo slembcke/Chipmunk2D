@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -32,9 +31,10 @@ static cpSpace *space;
 static void
 eachBody(cpBody *body, void *unused)
 {
-	if(body->p.y < -260 || cpfabs(body->p.x) > 340){
+	cpVect pos = cpBodyGetPos(body);
+	if(pos.y < -260 || cpfabs(pos.x) > 340){
 		cpFloat x = rand()/(cpFloat)RAND_MAX*640 - 320;
-		body->p = cpv(x, 260);
+		cpBodySetPos(body, cpv(x, 260));
 	}
 }
 
@@ -55,16 +55,11 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	cpResetShapeIdCounter();
-	
 	space = cpSpaceNew();
-	space->iterations = 5;
-	space->gravity = cpv(0, -100);
-	
-	cpSpaceResizeStaticHash(space, 40.0f, 999);
-	cpSpaceResizeActiveHash(space, 30.0f, 2999);
-	
-	cpBody *body, *staticBody = &space->staticBody;
+	cpSpaceSetIterations(space, 5);
+	cpSpaceSetGravity(space, cpv(0, -100));
+		
+	cpBody *body, *staticBody = cpSpaceGetStaticBody(space);
 	cpShape *shape;
 	
 	// Create vertexes for a pentagon shape.
@@ -87,8 +82,9 @@ init(void)
 			cpFloat stagger = (j%2)*40;
 			cpVect offset = cpv(i*80 - 320 + stagger, j*70 - 240);
 			shape = cpSpaceAddShape(space, cpPolyShapeNew(staticBody, 3, tris, offset));
-			shape->e = 1.0f; shape->u = 1.0f;
-			shape->layers = NOT_GRABABLE_MASK;
+			cpShapeSetElasticity(shape, 1.0f);
+			cpShapeSetFriction(shape, 1.0f);
+			cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 		}
 	}
 	
@@ -96,10 +92,11 @@ init(void)
 	for(int i=0; i<300; i++){
 		body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForPoly(1.0f, NUM_VERTS, verts, cpvzero)));
 		cpFloat x = rand()/(cpFloat)RAND_MAX*640 - 320;
-		body->p = cpv(x, 350);
+		cpBodySetPos(body, cpv(x, 350));
 		
 		shape = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
-		shape->e = 0.0f; shape->u = 0.4f;
+		cpShapeSetElasticity(shape, 0.0f);
+		cpShapeSetFriction(shape, 0.4f);
 	}
 	
 	return space;
@@ -108,14 +105,14 @@ init(void)
 static void
 destroy(void)
 {
-	cpSpaceFreeChildren(space);
+	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Plink = {
+ChipmunkDemo Plink = {
 	"Plink",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

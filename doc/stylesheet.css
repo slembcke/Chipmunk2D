@@ -1,15 +1,52 @@
-h1, h2 { padding: 3px; }
-h1 { background-color: #DB944D;}
-h2 { background-color: lightGrey;}
-p { margin-left: 1em; }
-p.expl { margin-left: 2em; }
-code { color: #191970 }
+h1, h2 {
+	padding: 0.25em;
+	border-radius: 0.25em;
+}
+
+h1 {
+	background-color: #89b4cb;
+}
+
+h2 {
+	background-color: lightGrey;
+}
+
+p {
+	margin-left: 1em;
+}
+
+p.expl {
+	margin-left: 2em;
+}
+
+code {
+	color: #191970
+}
+
+.HideShow {
+	background-color: lightGrey;
+	padding: 0.5em;
+	border-radius: 1em;
+	border: 2px grey solid;
+}
+
+.PopOpen {
+	border-radius: 1em;
+	border: 1px grey solid;
+}
 
 pre {
-		background-color: #F0F0F0;
-		padding: 3px;
-		margin-left: 1em;
+	border-radius: 0.75em;
+	background-color: #F0F0F0;
+	padding: 0.5em;
+	margin-left: 1em;
 }
+
+/*ul {
+	border-radius: 0.75em;
+	background-color: #F0F0F0;
+	margin-left: 1em;
+}*/
 
 table {
 	border: 2px solid black;
@@ -19,5 +56,17 @@ table {
 
 table td, th {
 	border: 1px black solid;
-	padding: 5px;
+	padding: 0.5em;
+}
+
+h1 a:link, h2 a:link, h3 a:link, h1 a:visited, h2 a:visited, h3 a:visited {
+	text-decoration:none;
+	color:black;
+	background-color:transparent
+}
+
+h1 a:hover, h2 a:hover, h3 a:hover, h1 a:active, h2 a:active, h3 a:active {
+	text-decoration:underline;
+	color:black;
+	background-color:transparent
 }

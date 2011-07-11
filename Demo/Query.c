@@ -25,48 +25,13 @@
 #include <string.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
-#include "chipmunk_unsafe.h"
-
 static cpSpace *space;
-extern cpVect mousePoint;
-
-static cpShape *querySeg = NULL;
-
 
 static void
 update(int ticks)
 {
-	messageString[0] = '\0';
-	
-	cpVect start = cpvzero;
-	cpVect end = /*cpv(0, 85);//*/mousePoint;
-	cpVect lineEnd = end;
-	
-	{
-		char infoString[1024];
-		sprintf(infoString, "Query: Dist(%f) Point%s, ", cpvdist(start, end), cpvstr(end));
-		strcat(messageString, infoString);
-	}
-	
-	cpSegmentQueryInfo info = {};
-	if(cpSpaceSegmentQueryFirst(space, start, end, CP_ALL_LAYERS, CP_NO_GROUP, &info)){
-		cpVect point = cpSegmentQueryHitPoint(start, end, info);
-		lineEnd = cpvadd(point, cpvzero);//cpvmult(info.n, 4.0f));
-		
-		char infoString[1024];
-		sprintf(infoString, "Segment Query: Dist(%f) Normal%s", cpSegmentQueryHitDist(start, end, info), cpvstr(info.n));
-		strcat(messageString, infoString);
-	} else {
-		strcat(messageString, "Segment Query (None)");
-	}
-	
-	cpSegmentShapeSetEndpoints(querySeg, start, lineEnd);
-	cpShapeCacheBB(querySeg); // force it to update it's collision detection data so it will draw
-	
-	// normal other stuff.
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
@@ -75,25 +40,54 @@ update(int ticks)
 	}
 }
 
+char messageScratchSpace[1024] = {};
+
+static void
+draw(void)
+{
+	ChipmunkDemoDefaultDrawImpl();
+	
+	char *messageCursor = messageScratchSpace;
+	messageCursor[0] = '\0';
+	
+	cpVect start = cpvzero;
+	cpVect end = ChipmunkDemoMouse;
+	ChipmunkDebugDrawSegment(start, end, RGBAColor(0,1,0,1));
+	
+	messageCursor += sprintf(messageCursor, "Query: Dist(%f) Point%s, ", cpvdist(start, end), cpvstr(end));
+	
+	cpSegmentQueryInfo info = {};
+	if(cpSpaceSegmentQueryFirst(space, start, end, CP_ALL_LAYERS, CP_NO_GROUP, &info)){
+		cpVect point = cpSegmentQueryHitPoint(start, end, info);
+		
+		// Draw red over the occluded part of the query
+		ChipmunkDebugDrawSegment(point, end, RGBAColor(1,0,0,1));
+		
+		// Draw a little blue surface normal
+		ChipmunkDebugDrawSegment(point, cpvadd(point, cpvmult(info.n, 16)), RGBAColor(0,0,1,1));
+		
+		// Draw a little red dot on the hit point.
+		ChipmunkDebugDrawPoints(3, 1, &point, RGBAColor(1,0,0,1));
+
+		
+		messageCursor += sprintf(messageCursor, "Segment Query: Dist(%f) Normal%s", cpSegmentQueryHitDist(start, end, info), cpvstr(info.n));
+	} else {
+		messageCursor += sprintf(messageCursor, "Segment Query (None)");
+	}
+	
+	// Draw a red bounding box around the shape under the mouse.
+	cpShape *mouseShape = cpSpacePointQueryFirst(space, ChipmunkDemoMouse, CP_ALL_LAYERS, CP_NO_GROUP);
+	if(mouseShape) ChipmunkDebugDrawBB(cpShapeGetBB(mouseShape), RGBAColor(1,0,0,1));
+}
+
 static cpSpace *
 init(void)
 {
-	cpResetShapeIdCounter();
+	messageScratchSpace[0] = '\0';
+	ChipmunkDemoMessageString = messageScratchSpace;
 	
 	space = cpSpaceNew();
-	space->elasticIterations = 0;
-	space->iterations = 5;
-
-	cpSpaceResizeStaticHash(space, 40.0f, 999);
-	cpSpaceResizeActiveHash(space, 30.0f, 2999);
-
-	cpBody *staticBody = &space->staticBody;
-	cpShape *shape;
-	
-	// add a non-collidable segment as a quick and dirty way to draw the query line
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpvzero, cpv(100.0f, 0.0f), 4.0f));
-	shape->layers = 0;
-	querySeg = shape;
+	cpSpaceSetIterations(space, 5);
 	
 	{ // add a fat segment
 		cpFloat mass = 1.0f;
@@ -101,13 +95,13 @@ init(void)
 		cpVect a = cpv(-length/2.0f, 0.0f), b = cpv(length/2.0f, 0.0f);
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
-		body->p = cpv(0.0f, 100.0f);
+		cpBodySetPos(body, cpv(0.0f, 100.0f));
 		
 		cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 20.0f));
 	}
 	
 	{ // add a static segment
-		cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(0, 300), cpv(300, 0), 0.0f));
+		cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpv(0, 300), cpv(300, 0), 0.0f));
 	}
 	
 	{ // add a pentagon
@@ -121,7 +115,7 @@ init(void)
 		}
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-		body->p = cpv(50.0f, 50.0f);
+		cpBodySetPos(body, cpv(50.0f, 50.0f));
 		
 		cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 	}
@@ -131,7 +125,7 @@ init(void)
 		cpFloat r = 20.0f;
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, r, cpvzero)));
-		body->p = cpv(100.0f, 100.0f);
+		cpBodySetPos(body, cpv(100.0f, 100.0f));
 		
 		cpSpaceAddShape(space, cpCircleShapeNew(body, r, cpvzero));
 	}
@@ -142,14 +136,14 @@ init(void)
 static void
 destroy(void)
 {
-	cpSpaceFreeChildren(space);
+	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Query = {
+ChipmunkDemo Query = {
 	"Segment Query",
-	NULL,
 	init,
 	update,
+	draw,
 	destroy,
 };

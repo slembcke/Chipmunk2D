@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -35,11 +34,11 @@ static cpBody *balls[numBalls];
 static void
 update(int ticks)
 {
-	cpFloat coef = (2.0f + arrowDirection.y)/3.0f;
-	cpFloat rate = arrowDirection.x*30.0f*coef;
+	cpFloat coef = (2.0f + ChipmunkDemoKeyboard.y)/3.0f;
+	cpFloat rate = ChipmunkDemoKeyboard.x*30.0f*coef;
 	
 	cpSimpleMotorSetRate(motor, rate);
-	motor->maxForce = (rate ? 1000000.0f : 0.0f);
+	cpConstraintSetMaxForce(motor, rate ? 1000000.0f : 0.0f);
 
 	int steps = 2;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -49,9 +48,11 @@ update(int ticks)
 		
 		for(int i=0; i<numBalls; i++){
 			cpBody *ball = balls[i];
-			if(ball->p.x > 320.0f){
-				ball->v = cpvzero;
-				ball->p = cpv(-224.0f, 200.0f);
+			cpVect pos = cpBodyGetPos(ball);
+			
+			if(pos.x > 320.0f){
+				cpBodySetVel(ball, cpvzero);
+				cpBodySetPos(ball, cpv(-224.0f, 200.0f));
 			}
 		}
 	}
@@ -61,10 +62,11 @@ static cpBody *
 add_ball(cpVect pos)
 {
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForCircle(1.0f, 30, 0, cpvzero)));
-	body->p = pos;
+	cpBodySetPos(body, pos);
 	
 	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, 30, cpvzero));
-	shape->e = 0.0f; shape->u = 0.5f;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.5f);
 	
 	return body;
 }
@@ -72,40 +74,49 @@ add_ball(cpVect pos)
 static cpSpace *
 init(void)
 {
-	space = cpSpaceNew();
-	space->gravity = cpv(0, -600);
+	ChipmunkDemoMessageString = "Use the arrow keys to control the machine.";
 	
-	cpBody *staticBody = &space->staticBody;
+	space = cpSpaceNew();
+	cpSpaceSetGravity(space, cpv(0, -600));
+	
+	cpBody *staticBody = cpSpaceGetStaticBody(space);
 	cpShape *shape;
 	
 	// beveling all of the line segments slightly helps prevent things from getting stuck on cracks
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-256,16), cpv(-256,300), 2.0f));
-	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.5f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-256,16), cpv(-192,0), 2.0f));
-	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.5f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-192,0), cpv(-192, -64), 2.0f));
-	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.5f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-128,-64), cpv(-128,144), 2.0f));
-	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.5f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-192,80), cpv(-192,176), 2.0f));
-	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.5f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-192,176), cpv(-128,240), 2.0f));
-	shape->e = 0.0f; shape->u = 0.0f; shape->layers = 1;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.5f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-128,144), cpv(192,64), 2.0f));
-	shape->e = 0.0f; shape->u = 0.5f; shape->layers = 1;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.5f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	cpVect verts[] = {
 		cpv(-30,-80),
@@ -115,10 +126,12 @@ init(void)
 	};
 
 	cpBody *plunger = cpSpaceAddBody(space, cpBodyNew(1.0f, INFINITY));
-	plunger->p = cpv(-160,-80);
+	cpBodySetPos(plunger, cpv(-160,-80));
 	
 	shape = cpSpaceAddShape(space, cpPolyShapeNew(plunger, 4, verts, cpvzero));
-	shape->e = 1.0f; shape->u = 0.5f; shape->layers = 1;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 0.5f);
+	cpShapeSetLayers(shape, 1);
 	
 	// add balls to hopper
 	for(int i=0; i<numBalls; i++)
@@ -126,21 +139,21 @@ init(void)
 	
 	// add small gear
 	cpBody *smallGear = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 80, 0, cpvzero)));
-	smallGear->p = cpv(-160,-160);
+	cpBodySetPos(smallGear, cpv(-160,-160));
 	cpBodySetAngle(smallGear, -M_PI_2);
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(smallGear, 80.0f, cpvzero));
-	shape->layers = 0;
+	cpShapeSetLayers(shape, 0);
 	
 	cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, smallGear, cpv(-160,-160), cpvzero));
 
 	// add big gear
 	cpBody *bigGear = cpSpaceAddBody(space, cpBodyNew(40.0f, cpMomentForCircle(40.0f, 160, 0, cpvzero)));
-	bigGear->p = cpv(80,-160);
+	cpBodySetPos(bigGear, cpv(80,-160));
 	cpBodySetAngle(bigGear, M_PI_2);
 	
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(bigGear, 160.0f, cpvzero));
-	shape->layers = 0;
+	cpShapeSetLayers(shape, 0);
 	
 	cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, bigGear, cpv(80,-160), cpvzero));
 
@@ -154,7 +167,7 @@ init(void)
 	cpFloat bottom = -300.0f;
 	cpFloat top = 32.0f;
 	cpBody *feeder = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForSegment(1.0f, cpv(-224.0f, bottom), cpv(-224.0f, top))));
-	feeder->p = cpv(-224, (bottom + top)/2.0f);
+	cpBodySetPos(feeder, cpv(-224, (bottom + top)/2.0f));
 	
 	cpFloat len = top - bottom;
 	cpSpaceAddShape(space, cpSegmentShapeNew(feeder, cpv(0.0f, len/2.0f), cpv(0.0f, -len/2.0f), 20.0f));
@@ -172,14 +185,14 @@ init(void)
 static void
 destroy(void)
 {
-	cpSpaceFreeChildren(space);
+	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Pump = {
+ChipmunkDemo Pump = {
 	"Pump",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

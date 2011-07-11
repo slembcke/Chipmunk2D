@@ -1,0 +1,25 @@
+<pre style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; "><em><span style="color:#236e25;">// Construct a pile of boxes.
+// Force them to sleep until the first time they are touched.
+// Group them together so that touching any box wakes all of them.
+</span></em>cpFloat size = <span style="color:#0000ff;">20</span>;
+cpFloat mass = <span style="color:#0000ff;">1</span>;
+cpFloat moment = <span style="color:#003369;">cpMomentForBox</span>(mass, size, size);
+
+cpBody *lastBody = <strong><span style="color:#881350;">NULL</span></strong>;
+
+<strong><span style="color:#881350;">for</span></strong>(<strong><span style="color:#881350;">int</span></strong> i=<span style="color:#0000ff;">0</span>; i&lt;<span style="color:#0000ff;">5</span>; i++){
+  cpBody *body = <span style="color:#003369;">cpSpaceAddBody</span>(space, <span style="color:#003369;">cpBodyNew</span>(mass, moment));
+  <span style="color:#003369;">cpBodySetPos</span>(body, <span style="color:#003369;">cpv</span>(<span style="color:#0000ff;">0</span>, i*size));
+  
+  cpShape *shape = <span style="color:#003369;">cpSpaceAddShape</span>(space, <span style="color:#003369;">cpBoxShapeNew</span>(body, size, size));
+  <span style="color:#003369;">cpShapeSetFriction</span>(shape, <span style="color:#0000ff;">0.7</span>);
+  
+  <em><span style="color:#236e25;">// You can use any sleeping body as a group identifier.
+</span></em>  <em><span style="color:#236e25;">// Here we just keep a reference to the last body we initialized.
+</span></em>  <em><span style="color:#236e25;">// Passing NULL as the group starts a new sleeping group.
+</span></em>  <em><span style="color:#236e25;">// You MUST do this after completely initializing the object.
+</span></em>  <em><span style="color:#236e25;">// Attaching shapes or calling setter functions will wake the body back up.
+</span></em>  <span style="color:#003369;">cpBodySleepWithGroup</span>(body, lastBody);
+  lastBody = body;
+}
+</pre>

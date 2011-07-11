@@ -25,17 +25,6 @@ void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, 
 
 #define J_MAX(constraint, dt) (((cpConstraint *)constraint)->maxForce*(dt))
 
-// Get valid body pointers and exit early if the bodies are idle
-#define CONSTRAINT_BEGIN(constraint, a_var, b_var) \
-cpBody *a_var, *b_var; { \
-	a_var = ((cpConstraint *)constraint)->a; \
-	b_var = ((cpConstraint *)constraint)->b; \
-	if( \
-		(cpBodyIsSleeping(a_var) || cpBodyIsStatic(a_var)) && \
-		(cpBodyIsSleeping(b_var) || cpBodyIsStatic(b_var)) \
-	) return; \
-}
-
 static inline cpVect
 relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2){
 	cpVect v1_sum = cpvadd(a->v, cpvmult(cpvperp(r1), a->w));
@@ -76,13 +65,6 @@ apply_bias_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
 	apply_bias_impulse(b, j, r2);
 }
 
-static inline cpVect
-clamp_vect(cpVect v, cpFloat len)
-{
-	return cpvclamp(v, len);
-//	return (cpvdot(v,v) > len*len) ? cpvmult(cpvnormalize(v), len) : v;
-}
-
 static inline cpFloat
 k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n)
 {
@@ -91,7 +73,7 @@ k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n)
 	cpFloat r2cn = cpvcross(r2, n);
 	
 	cpFloat value = mass_sum + a->i_inv*r1cn*r1cn + b->i_inv*r2cn*r2cn;
-	cpAssert(value != 0.0, "Unsolvable collision or constraint.");
+	cpAssertSoft(value != 0.0, "Unsolvable collision or constraint.");
 	
 	return value;
 }
@@ -126,7 +108,7 @@ k_tensor(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect *k1, cpVect *k2)
 	
 	// invert
 	cpFloat determinant = k11*k22 - k12*k21;
-	cpAssert(determinant != 0.0, "Unsolvable constraint.");
+	cpAssertSoft(determinant != 0.0, "Unsolvable constraint.");
 	
 	cpFloat det_inv = 1.0f/determinant;
 	*k1 = cpv( k22*det_inv, -k12*det_inv);
@@ -137,4 +119,10 @@ static inline cpVect
 mult_k(cpVect vr, cpVect k1, cpVect k2)
 {
 	return cpv(cpvdot(vr, k1), cpvdot(vr, k2));
+}
+
+static inline cpFloat
+bias_coef(cpFloat errorBias, cpFloat dt)
+{
+	return 1.0f - cpfpow(errorBias, dt);
 }

@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -38,7 +37,7 @@ static cpBool
 preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
-	OneWayPlatform *platform = (OneWayPlatform *)a->data;
+	OneWayPlatform *platform = (OneWayPlatform *)cpShapeGetUserData(a);
 		
 	if(cpvdot(cpArbiterGetNormal(arb, 0), platform->n) < 0){
 		cpArbiterIgnore(arb);
@@ -62,48 +61,53 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	cpResetShapeIdCounter();
+	ChipmunkDemoMessageString = "One way platforms are trivial in Chipmunk using a very simple collision callback.";
 	
 	space = cpSpaceNew();
-	space->iterations = 10;
-	space->gravity = cpv(0, -100);
+	cpSpaceSetIterations(space, 10);
+	cpSpaceSetGravity(space, cpv(0, -100));
 
-	cpBody *body, *staticBody = &space->staticBody;
+	cpBody *body, *staticBody = cpSpaceGetStaticBody(space);
 	cpShape *shape;
 
 	// Create segments around the edge of the screen.
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	// Add our one way segment
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-160,-100), cpv(160,-100), 10.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->collision_type = 1;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetCollisionType(shape, 1);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	// We'll use the data pointer for the OneWayPlatform struct
 	platformInstance.n = cpv(0, 1); // let objects pass upwards
-	shape->data = &platformInstance;
+	cpShapeSetUserData(shape, &platformInstance);
 	
 	
 	// Add a ball to make things more interesting
 	cpFloat radius = 15.0f;
 	body = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 0.0f, radius, cpvzero)));
-	body->p = cpv(0, -200);
-	body->v = cpv(0, 170);
+	cpBodySetPos(body, cpv(0, -200));
+	cpBodySetVel(body, cpv(0, 170));
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
-	shape->e = 0.0f; shape->u = 0.9f;
-	shape->collision_type = 2;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.9f);
+	cpShapeSetCollisionType(shape, 2);
 	
 	cpSpaceAddCollisionHandler(space, 1, 2, NULL, preSolve, NULL, NULL, NULL);
 	
@@ -113,14 +117,14 @@ init(void)
 static void
 destroy(void)
 {
-	cpSpaceFreeChildren(space);
+	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
 }
 
-chipmunkDemo OneWay = {
+ChipmunkDemo OneWay = {
 	"One Way Platforms",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

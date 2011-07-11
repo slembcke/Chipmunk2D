@@ -30,16 +30,17 @@
 	#include "OpenGL/glu.h"
 	#include <GLUT/glut.h>
 #else
-#ifdef WIN32
-	#include <windows.h>
-#endif
+	#ifdef WIN32
+		#include <windows.h>
+	#endif
+	
 	#include <GL/gl.h>
 	#include <GL/glu.h>
 	#include <GL/glut.h>
 #endif
 
 #include "chipmunk_private.h"
-#include "drawSpace.h"
+#include "ChipmunkDebugDraw.h"
 
 /*
 	IMPORTANT - READ ME!
@@ -53,16 +54,16 @@
 	about Chipmunk which may change with little to no warning.
 */
 
-#define LINE_COLOR 0.0f, 0.0f, 0.0f
-#define COLLISION_COLOR 1.0f, 0.0f, 0.0f
-#define BODY_COLOR 0.0f, 0.0f, 1.0f
+const Color LINE_COLOR = {0, 0, 0, 1};
+const Color CONSTRAINT_COLOR = {0.0f, 0.0f, 0.5f, 1.0f};
+const float SHAPE_ALPHA = 196.0/255.0;
 
-static void
-glColor_from_pointer(void *ptr)
+static Color
+ColorFromHash(cpHashValue hash, float alpha)
 {
-	unsigned long val = (long)ptr;
+	unsigned long val = (unsigned long)hash;
 	
-	// hash the pointer up nicely
+	// scramble the bits up using Robert Jenkins' 32 bit integer hash function
 	val = (val+0x7ed55d16) + (val<<12);
 	val = (val^0xc761c23c) ^ (val>>19);
 	val = (val+0x165667b1) + (val<<5);
@@ -70,43 +71,45 @@ glColor_from_pointer(void *ptr)
 	val = (val+0xfd7046c5) + (val<<3);
 	val = (val^0xb55a4f09) ^ (val>>16);
 	
-//	GLfloat v = (GLfloat)val/(GLfloat)ULONG_MAX;
-//	v = 0.95f - v*0.15f;
-//	
-//	glColor3f(v, v, v);
-
-	GLubyte r = (val>>0) & 0xFF;
-	GLubyte g = (val>>8) & 0xFF;
-	GLubyte b = (val>>16) & 0xFF;
+	GLfloat r = (val>>0) & 0xFF;
+	GLfloat g = (val>>8) & 0xFF;
+	GLfloat b = (val>>16) & 0xFF;
 	
-	GLubyte max = r>g ? (r>b ? r : b) : (g>b ? g : b);
+	float max = cpfmax(cpfmax(r, g), b);
 	
-	const int mult = 127;
-	const int add = 63;
-	r = (r*mult)/max + add;
-	g = (g*mult)/max + add;
-	b = (b*mult)/max + add;
+	// saturate and scale the colors
+	const GLfloat mult = 1.0;
+	const GLfloat add = 0.0;
 	
-	glColor3ub(r, g, b);
+	return RGBAColor(
+		r = (r*mult)/max + add,
+		g = (g*mult)/max + add,
+		b = (b*mult)/max + add,
+		alpha
+	);
 }
 
-static void
-glColor_for_shape(cpShape *shape, cpSpace *space)
+static inline void
+glColor_from_color(Color color){
+	glColor4fv((GLfloat *)&color);
+}
+
+static Color
+ColorForShape(cpShape *shape)
 {
-	cpBody *body = shape->body;
-	if(body){
-		if(body->node.next){
-			GLfloat v = 0.25f;
-			glColor3f(v,v,v);
-			return;
-		} else if(body->node.idleTime > space->sleepTimeThreshold) {
-			GLfloat v = 0.9f;
-			glColor3f(v,v,v);
-			return;
+	if(cpShapeGetSensor(shape)){
+		return LAColor(1, 0);
+	} else {
+		cpBody *body = shape->body;
+		
+		if(cpBodyIsSleeping(body)){
+			return LAColor(0.2, 1);
+		} else if(body->node.idleTime > shape->space->sleepTimeThreshold) {
+			return LAColor(0.66, 1);
+		} else {
+			return ColorFromHash(shape->hashid, SHAPE_ALPHA);
 		}
 	}
-	
-	glColor_from_pointer(shape);
 }
 
 static const GLfloat circleVAR[] = {
@@ -139,24 +142,24 @@ static const GLfloat circleVAR[] = {
 };
 static const int circleVAR_count = sizeof(circleVAR)/sizeof(GLfloat)/2;
 
-static void
-drawCircleShape(cpBody *body, cpCircleShape *circle, cpSpace *space)
+void ChipmunkDebugDrawCircle(cpVect center, cpFloat angle, cpFloat radius, Color lineColor, Color fillColor)
 {
 	glVertexPointer(2, GL_FLOAT, 0, circleVAR);
 
 	glPushMatrix(); {
-		cpVect center = circle->tc;
 		glTranslatef(center.x, center.y, 0.0f);
-		glRotatef(body->a*180.0f/M_PI, 0.0f, 0.0f, 1.0f);
-		glScalef(circle->r, circle->r, 1.0f);
+		glRotatef(angle*180.0f/M_PI, 0.0f, 0.0f, 1.0f);
+		glScalef(radius, radius, 1.0f);
 		
-		if(!circle->shape.sensor){
-			glColor_for_shape((cpShape *)circle, space);
+		if(fillColor.a > 0){
+			glColor_from_color(fillColor);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, circleVAR_count - 1);
 		}
 		
-		glColor3f(LINE_COLOR);
-		glDrawArrays(GL_LINE_STRIP, 0, circleVAR_count);
+		if(lineColor.a > 0){
+			glColor_from_color(lineColor);
+			glDrawArrays(GL_LINE_STRIP, 0, circleVAR_count);
+		}
 	} glPopMatrix();
 }
 
@@ -191,17 +194,25 @@ static const GLfloat pillVAR[] = {
 };
 static const int pillVAR_count = sizeof(pillVAR)/sizeof(GLfloat)/3;
 
-static void
-drawSegmentShape(cpBody *body, cpSegmentShape *seg, cpSpace *space)
+void ChipmunkDebugDrawSegment(cpVect a, cpVect b, Color color)
 {
-	cpVect a = seg->ta;
-	cpVect b = seg->tb;
+	GLfloat verts[] = {
+		a.x, a.y,
+		b.x, b.y,
+	};
 	
-	if(seg->r){
+	glVertexPointer(2, GL_FLOAT, 0, verts);
+	glColor_from_color(color);
+	glDrawArrays(GL_LINES, 0, 2);
+}
+
+void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, Color lineColor, Color fillColor)
+{
+	if(radius){
 		glVertexPointer(3, GL_FLOAT, 0, pillVAR);
 		glPushMatrix(); {
 			cpVect d = cpvsub(b, a);
-			cpVect r = cpvmult(d, seg->r/cpvlength(d));
+			cpVect r = cpvmult(d, radius/cpvlength(d));
 
 			const GLfloat matrix[] = {
 				 r.x, r.y, 0.0f, 0.0f,
@@ -211,60 +222,93 @@ drawSegmentShape(cpBody *body, cpSegmentShape *seg, cpSpace *space)
 			};
 			glMultMatrixf(matrix);
 			
-			if(!seg->shape.sensor){
-				glColor_for_shape((cpShape *)seg, space);
+			if(fillColor.a > 0){
+				glColor_from_color(fillColor);
 				glDrawArrays(GL_TRIANGLE_FAN, 0, pillVAR_count);
 			}
 			
-			glColor3f(LINE_COLOR);
-			glDrawArrays(GL_LINE_LOOP, 0, pillVAR_count);
+			if(lineColor.a > 0){
+				glColor_from_color(lineColor);
+				glDrawArrays(GL_LINE_LOOP, 0, pillVAR_count);
+			}
 		} glPopMatrix();
 	} else {
-		glColor3f(LINE_COLOR);
-		glBegin(GL_LINES); {
-			glVertex2f(a.x, a.y);
-			glVertex2f(b.x, b.y);
-		} glEnd();
+		ChipmunkDebugDrawSegment(a, b, lineColor);
 	}
 }
 
-static void
-drawPolyShape(cpBody *body, cpPolyShape *poly, cpSpace *space)
+void ChipmunkDebugDrawPolygon(int count, cpVect *verts, Color lineColor, Color fillColor)
 {
-	int count = poly->numVerts;
 #if CP_USE_DOUBLES
-	glVertexPointer(2, GL_DOUBLE, 0, poly->tVerts);
+	glVertexPointer(2, GL_DOUBLE, 0, verts);
 #else
-	glVertexPointer(2, GL_FLOAT, 0, poly->tVerts);
+	glVertexPointer(2, GL_FLOAT, 0, verts);
 #endif
 	
-	if(!poly->shape.sensor){
-		glColor_for_shape((cpShape *)poly, space);
+	if(fillColor.a > 0){
+		glColor_from_color(fillColor);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, count);
 	}
 	
-	glColor3f(LINE_COLOR);
-	glDrawArrays(GL_LINE_LOOP, 0, count);
+	if(lineColor.a > 0){
+		glColor_from_color(lineColor);
+		glDrawArrays(GL_LINE_LOOP, 0, count);
+	}
+}
+
+void ChipmunkDebugDrawPoints(cpFloat size, int count, cpVect *verts, Color color)
+{
+#if CP_USE_DOUBLES
+	glVertexPointer(2, GL_DOUBLE, 0, verts);
+#else
+	glVertexPointer(2, GL_FLOAT, 0, verts);
+#endif
+	
+	glPointSize(size);
+	glColor_from_color(color);
+	glDrawArrays(GL_POINTS, 0, count);
+}
+
+void ChipmunkDebugDrawBB(cpBB bb, Color color)
+{
+	cpVect verts[] = {
+		cpv(bb.l, bb.b),
+		cpv(bb.l, bb.t),
+		cpv(bb.r, bb.t),
+		cpv(bb.r, bb.b),
+	};
+	ChipmunkDebugDrawPolygon(4, verts, color, LAColor(0, 0));
 }
 
 static void
-drawObject(cpShape *shape, cpSpace *space)
+drawShape(cpShape *shape, void *unused)
 {
 	cpBody *body = shape->body;
+	Color color = ColorForShape(shape);
 	
 	switch(shape->klass->type){
-		case CP_CIRCLE_SHAPE:
-			drawCircleShape(body, (cpCircleShape *)shape, space);
+		case CP_CIRCLE_SHAPE: {
+			cpCircleShape *circle = (cpCircleShape *)shape;
+			ChipmunkDebugDrawCircle(circle->tc, body->a, circle->r, LINE_COLOR, color);
 			break;
-		case CP_SEGMENT_SHAPE:
-			drawSegmentShape(body, (cpSegmentShape *)shape, space);
+		}
+		case CP_SEGMENT_SHAPE: {
+			cpSegmentShape *seg = (cpSegmentShape *)shape;
+			ChipmunkDebugDrawFatSegment(seg->ta, seg->tb, seg->r, LINE_COLOR, color);
 			break;
-		case CP_POLY_SHAPE:
-			drawPolyShape(body, (cpPolyShape *)shape, space);
+		}
+		case CP_POLY_SHAPE: {
+			cpPolyShape *poly = (cpPolyShape *)shape;
+			ChipmunkDebugDrawPolygon(poly->numVerts, poly->tVerts, LINE_COLOR, color);
 			break;
-		default:
-			printf("Bad enumeration in drawObject().\n");
+		}
+		default: break;
 	}
+}
+
+void ChipmunkDebugDrawShapes(cpSpace *space)
+{
+	cpSpaceEachShape(space, drawShape, NULL);
 }
 
 static const GLfloat springVAR[] = {
@@ -291,12 +335,9 @@ drawSpring(cpDampedSpring *spring, cpBody *body_a, cpBody *body_b)
 {
 	cpVect a = cpvadd(body_a->p, cpvrotate(spring->anchr1, body_a->rot));
 	cpVect b = cpvadd(body_b->p, cpvrotate(spring->anchr2, body_b->rot));
-
-	glPointSize(5.0f);
-	glBegin(GL_POINTS); {
-		glVertex2f(a.x, a.y);
-		glVertex2f(b.x, b.y);
-	} glEnd();
+	
+	cpVect points[] = {a, b};
+	ChipmunkDebugDrawPoints(5, 2, points, CONSTRAINT_COLOR);
 
 	cpVect delta = cpvsub(b, a);
 
@@ -321,7 +362,7 @@ drawSpring(cpDampedSpring *spring, cpBody *body_a, cpBody *body_b)
 }
 
 static void
-drawConstraint(cpConstraint *constraint)
+drawConstraint(cpConstraint *constraint, void *unused)
 {
 	cpBody *body_a = constraint->a;
 	cpBody *body_b = constraint->b;
@@ -332,181 +373,61 @@ drawConstraint(cpConstraint *constraint)
 	
 		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
 		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
-
-		glPointSize(5.0f);
-		glBegin(GL_POINTS); {
-			glVertex2f(a.x, a.y);
-			glVertex2f(b.x, b.y);
-		} glEnd();
-
-		glBegin(GL_LINES); {
-			glVertex2f(a.x, a.y);
-			glVertex2f(b.x, b.y);
-		} glEnd();
+		
+		cpVect points[] = {a, b};
+		ChipmunkDebugDrawPoints(5, 2, points, CONSTRAINT_COLOR);
+		ChipmunkDebugDrawSegment(a, b, CONSTRAINT_COLOR);
 	} else if(klass == cpSlideJointGetClass()){
 		cpSlideJoint *joint = (cpSlideJoint *)constraint;
 	
 		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
 		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
-
-		glPointSize(5.0f);
-		glBegin(GL_POINTS); {
-			glVertex2f(a.x, a.y);
-			glVertex2f(b.x, b.y);
-		} glEnd();
-
-		glBegin(GL_LINES); {
-			glVertex2f(a.x, a.y);
-			glVertex2f(b.x, b.y);
-		} glEnd();
+		
+		cpVect points[] = {a, b};
+		ChipmunkDebugDrawPoints(5, 2, points, CONSTRAINT_COLOR);
+		ChipmunkDebugDrawSegment(a, b, CONSTRAINT_COLOR);
 	} else if(klass == cpPivotJointGetClass()){
 		cpPivotJoint *joint = (cpPivotJoint *)constraint;
 	
 		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
 		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
 
-		glPointSize(10.0f);
-		glBegin(GL_POINTS); {
-			glVertex2f(a.x, a.y);
-			glVertex2f(b.x, b.y);
-		} glEnd();
+		cpVect points[] = {a, b};
+		ChipmunkDebugDrawPoints(10, 2, points, CONSTRAINT_COLOR);
 	} else if(klass == cpGrooveJointGetClass()){
 		cpGrooveJoint *joint = (cpGrooveJoint *)constraint;
 	
 		cpVect a = cpvadd(body_a->p, cpvrotate(joint->grv_a, body_a->rot));
 		cpVect b = cpvadd(body_a->p, cpvrotate(joint->grv_b, body_a->rot));
 		cpVect c = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
-
-		glPointSize(5.0f);
-		glBegin(GL_POINTS); {
-			glVertex2f(c.x, c.y);
-		} glEnd();
 		
-		glBegin(GL_LINES); {
-			glVertex2f(a.x, a.y);
-			glVertex2f(b.x, b.y);
-		} glEnd();
+		ChipmunkDebugDrawPoints(5, 1, &c, CONSTRAINT_COLOR);
+		ChipmunkDebugDrawSegment(a, b, CONSTRAINT_COLOR);
 	} else if(klass == cpDampedSpringGetClass()){
 		drawSpring((cpDampedSpring *)constraint, body_a, body_b);
-	} else {
-//		printf("Cannot draw constraint\n");
 	}
 }
 
-static void
-drawBB(cpShape *shape, void *unused)
+void ChipmunkDebugDrawConstraints(cpSpace *space)
 {
-	glBegin(GL_LINE_LOOP); {
-		glVertex2f(shape->bb.l, shape->bb.b);
-		glVertex2f(shape->bb.l, shape->bb.t);
-		glVertex2f(shape->bb.r, shape->bb.t);
-		glVertex2f(shape->bb.r, shape->bb.b);
-	} glEnd();
+	cpSpaceEachConstraint(space, drawConstraint, NULL);
 }
 
-// copied from cpSpaceHash.c
-static inline cpHashValue
-hash_func(cpHashValue x, cpHashValue y, cpHashValue n)
+void ChipmunkDebugDrawCollisionPoints(cpSpace *space)
 {
-	return (x*1640531513ul ^ y*2654435789ul) % n;
-}
-
-static void
-drawSpatialHash(cpSpaceHash *hash)
-{
-	cpBB bb = cpBBNew(-320, -240, 320, 240);
+	cpArray *arbiters = space->arbiters;
 	
-	cpFloat dim = hash->celldim;
-	int n = hash->numcells;
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glPointSize(4.0f);
 	
-	int l = (int)floor(bb.l/dim);
-	int r = (int)floor(bb.r/dim);
-	int b = (int)floor(bb.b/dim);
-	int t = (int)floor(bb.t/dim);
-	
-	for(int i=l; i<=r; i++){
-		for(int j=b; j<=t; j++){
-			int cell_count = 0;
+	glBegin(GL_POINTS); {
+		for(int i=0; i<arbiters->num; i++){
+			cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
 			
-			int index = hash_func(i,j,n);
-			for(cpSpaceHashBin *bin = hash->table[index]; bin; bin = bin->next)
-				cell_count++;
-			
-			GLfloat v = 1.0f - (GLfloat)cell_count/10.0f;
-			glColor3f(v,v,v);
-			glRectf(i*dim, j*dim, (i + 1)*dim, (j + 1)*dim);
+			for(int i=0; i<arb->numContacts; i++){
+				cpVect v = arb->contacts[i].p;
+				glVertex2f(v.x, v.y);
+			}
 		}
-	}
-}
-
-void
-drawSpace(cpSpace *space, drawSpaceOptions *options)
-{
-	if(options->drawHash){
-		glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_TRUE);
-		drawSpatialHash(space->activeShapes);
-		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
-		drawSpatialHash(space->staticShapes);
-		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-	}
-	
-	glLineWidth(options->lineThickness);
-	if(options->drawShapes){
-		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)drawObject, space);
-		cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)drawObject, space);
-	}
-	
-	glLineWidth(1.0f);
-	if(options->drawBBs){
-		glColor3f(0.3f, 0.5f, 0.3f);
-		cpSpaceHashEach(space->activeShapes, (cpSpaceHashIterator)drawBB, NULL);
-		cpSpaceHashEach(space->staticShapes, (cpSpaceHashIterator)drawBB, NULL);
-	}
-
-	cpArray *constraints = space->constraints;
-
-	glColor3f(0.5f, 1.0f, 0.5f);
-	for(int i=0, count = constraints->num; i<count; i++){
-		drawConstraint((cpConstraint *)constraints->arr[i]);
-	}
-	
-	if(options->bodyPointSize){
-		glPointSize(options->bodyPointSize);
-		
-		glBegin(GL_POINTS); {
-			glColor3f(LINE_COLOR);
-			cpArray *bodies = space->bodies;
-			for(int i=0, count = bodies->num; i<count; i++){
-				cpBody *body = (cpBody *)bodies->arr[i];
-				glVertex2f(body->p.x, body->p.y);
-			}
-			
-//			glColor3f(0.5f, 0.5f, 0.5f);
-//			cpArray *components = space->components;
-//			for(int i=0; i<components->num; i++){
-//				cpBody *root = components->arr[i];
-//				cpBody *body = root, *next;
-//				do {
-//					next = body->node.next;
-//					glVertex2f(body->p.x, body->p.y);
-//				} while((body = next) != root);
-//			}
-		} glEnd();
-	}
-
-	if(options->collisionPointSize){
-		glPointSize(options->collisionPointSize);
-		glBegin(GL_POINTS); {
-			cpArray *arbiters = space->arbiters;
-			for(int i=0; i<arbiters->num; i++){
-				cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
-				
-				glColor3f(COLLISION_COLOR);
-				for(int i=0; i<arb->numContacts; i++){
-					cpVect v = arb->contacts[i].p;
-					glVertex2f(v.x, v.y);
-				}
-			}
-		} glEnd();
-	}
+	} glEnd();
 }

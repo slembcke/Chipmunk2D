@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -51,7 +50,7 @@ planetGravityVelocityFunc(cpBody *body, cpVect gravity, cpFloat damping, cpFloat
 	// Gravitational acceleration is proportional to the inverse square of
 	// distance, and directed toward the origin. The central planet is assumed
 	// to be massive enough that it affects the satellites but not vice versa.
-	cpVect p = body->p;
+	cpVect p = cpBodyGetPos(body);
 	cpFloat sqdist = cpvlengthsq(p);
 	cpVect g = cpvmult(p, -gravityStrength / (sqdist * cpfsqrt(sqdist)));
 	
@@ -83,44 +82,45 @@ add_box()
 	};
 	
 	cpFloat radius = cpvlength(cpv(size, size));
-
+	cpVect pos = rand_pos(radius);
+	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 4, verts, cpvzero)));
 	body->velocity_func = planetGravityVelocityFunc;
-	body->p = rand_pos(radius);
+	cpBodySetPos(body, pos);
 
 	// Set the box's velocity to put it into a circular orbit from its
 	// starting position.
-	cpFloat r = cpvlength(body->p);
+	cpFloat r = cpvlength(pos);
 	cpFloat v = cpfsqrt(gravityStrength / r) / r;
-	body->v = cpvmult(cpvperp(body->p), v);
+	cpBodySetVel(body, cpvmult(cpvperp(pos), v));
 
 	// Set the box's angular velocity to match its orbital period and
 	// align its initial angle with its position.
-	body->w = v;
-	cpBodySetAngle(body, cpfatan2(body->p.y, body->p.x));
+	cpBodySetAngVel(body, v);
+	cpBodySetAngle(body, cpfatan2(pos.y, pos.x));
 
 	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 4, verts, cpvzero));
-	shape->e = 0.0f; shape->u = 0.7f;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.7f);
 }
 
 static cpSpace *
 init(void)
 {
+	// Create a rouge body to control the planet manually.
 	planetBody = cpBodyNew(INFINITY, INFINITY);
-	planetBody->w = 0.2f;
-	
-	cpResetShapeIdCounter();
+	cpBodySetAngVel(planetBody, 0.2f);
 	
 	space = cpSpaceNew();
-	cpSpaceResizeActiveHash(space, 30.0f, 10000);
-	space->iterations = 20;
+	cpSpaceSetIterations(space, 20);
 	
 	for(int i=0; i<30; i++)
 		add_box();
 	
 	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(planetBody, 70.0f, cpvzero));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	return space;
 }
@@ -129,14 +129,14 @@ static void
 destroy(void)
 {
 	cpBodyFree(planetBody);
-	cpSpaceFreeChildren(space);
+	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Planet = {
+ChipmunkDemo Planet = {
 	"Planet",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

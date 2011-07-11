@@ -51,43 +51,58 @@
 #endif
 
 #include "chipmunk_private.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 #define SLEEP_TICKS 16
 
-static chipmunkDemo *demos;
+static ChipmunkDemo *demos;
 static int demoCount = 0;
-static chipmunkDemo *currDemo = NULL;
-static const int firstDemoIndex = 'a' - 'a';
+static int demoIndex = 'a' - 'a';
 
-static int paused = 0;
-static int step = 0;
+static cpBool paused = cpFalse;
+static cpBool step = cpFalse;
+
+static cpBool drawBBs = cpFalse;
+
 static int ticks = 0;
 static cpSpace *space;
 
-cpVect mousePoint;
-cpVect mousePoint_last;
+cpVect ChipmunkDemoMouse;
 cpBody *mouseBody = NULL;
 cpConstraint *mouseJoint = NULL;
 
-char messageString[1024] = {};
+char *ChipmunkDemoMessageString = NULL;
 
 int key_up = 0;
 int key_down = 0;
 int key_left = 0;
 int key_right = 0;
 
-cpVect arrowDirection = {};
+cpVect ChipmunkDemoKeyboard = {};
 
-drawSpaceOptions options = {
-	0,
-	0,
-	1,
-	4.0f,
-	0.0f,
-	1.5f,
-};
+static void shapeFreeWrap(cpShape *ptr, void *unused){cpShapeFree(ptr);}
+
+void
+ChipmunkDemoFreeSpaceChildren(cpSpace *space)
+{
+	cpArray *components = space->sleepingComponents;
+	while(components->num) cpBodyActivate((cpBody *)components->arr[0]);
+	
+	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)&shapeFreeWrap, NULL);
+	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)&shapeFreeWrap, NULL);
+	
+	cpArrayFreeEach(space->bodies, (void (*)(void*))cpBodyFree);
+	cpArrayFreeEach(space->constraints, (void (*)(void*))cpConstraintFree);
+}
+
+void ChipmunkDemoDefaultDrawImpl(void)
+{
+	ChipmunkDebugDrawShapes(space);
+	ChipmunkDebugDrawConstraints(space);
+	
+	ChipmunkDebugDrawCollisionPoints(space);
+}
+
 
 static void
 drawString(int x, int y, const char *str)
@@ -114,9 +129,6 @@ drawInstructions()
 		"Controls:\n"
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
-		"Arrow keys control some demos.\n"
-		"\\ enables anti-aliasing.\n"
-		"- toggles spatial hash visualization.\n"
 		"= toggles bounding boxes."
 	);
 }
@@ -134,7 +146,7 @@ drawInfo()
 	for(int i=0; i<arbiters; i++)
 		points += ((cpArbiter *)(space->arbiters->arr[i]))->numContacts;
 	
-	int constraints = (space->constraints->num + points)*(space->iterations + space->elasticIterations);
+	int constraints = (space->constraints->num + points)*space->iterations;
 	
 	maxArbiters = arbiters > maxArbiters ? arbiters : maxArbiters;
 	maxPoints = points > maxPoints ? points : maxPoints;
@@ -146,7 +158,7 @@ drawInfo()
 		"Contact Points: %d (%d)\n"
 		"Other Constraints: %d, Iterations: %d\n"
 		"Constraints x Iterations: %d (%d)\n"
-		"KE:% 5.2e";
+		"Time:% 5.2fs, KE:% 5.2e";
 	
 	cpArray *bodies = space->bodies;
 	cpFloat ke = 0.0f;
@@ -160,8 +172,9 @@ drawInfo()
 	sprintf(buffer, format,
 		arbiters, maxArbiters,
 		points, maxPoints,
-		space->constraints->num, space->iterations + space->elasticIterations,
-		constraints, maxConstraints, (ke < 1e-10f ? 0.0f : ke)
+		space->constraints->num, space->iterations,
+		constraints, maxConstraints,
+		ticks/60.0f, (ke < 1e-10f ? 0.0f : ke)
 	);
 	
 	drawString(0, 220, buffer);
@@ -183,53 +196,60 @@ reshape(int width, int height)
 }
 
 static void
+drawShapeBB(cpShape *shape, void *unused)
+{
+	ChipmunkDebugDrawBB(shape->bb, RGBAColor(0.3f, 0.5f, 0.3f, 1.0f));
+}
+
+static void
 display(void)
 {
-	cpVect newPoint = cpvlerp(mousePoint_last, mousePoint, 0.25f);
-	mouseBody->p = newPoint;
-	mouseBody->v = cpvmult(cpvsub(newPoint, mousePoint_last), 60.0f);
-	mousePoint_last = newPoint;
-  if(!paused || step > 0){
-    currDemo->updateFunc(ticks);
-    step = (step > 1 ? step - 1 : 0);
-  }
+	if(!paused || step){
+		cpVect newPoint = cpvlerp(mouseBody->p, ChipmunkDemoMouse, 0.25f);
+		mouseBody->v = cpvmult(cpvsub(newPoint, mouseBody->p), 60.0f);
+		mouseBody->p = newPoint;
+		
+		demos[demoIndex].updateFunc(ticks);
+		
+		ticks++;
+		step = cpFalse;
+	}
   
-	glClear(GL_COLOR_BUFFER_BIT);
+	demos[demoIndex].drawFunc();
+	if(drawBBs) cpSpaceEachShape(space, drawShapeBB, NULL);
 	
-	drawSpace(space, currDemo->drawOptions ? currDemo->drawOptions : &options);
 	drawInstructions();
 	drawInfo();
-	drawString(-300, -210, messageString);
+	drawString(-300, -210, ChipmunkDemoMessageString);
 		
 	glutSwapBuffers();
-	ticks++;
+	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 static char *
-demoTitle(chipmunkDemo *demo)
+demoTitle(int index)
 {
 	static char title[1024];
-	sprintf(title, "Demo: %s", demo->name);
+	sprintf(title, "Demo(%c): %s", 'a' + index, demos[demoIndex].name);
 	
 	return title;
 }
 
 static void
-runDemo(chipmunkDemo *demo)
+runDemo(int index)
 {
-	if(currDemo)
-		currDemo->destroyFunc();
-		
-	currDemo = demo;
+	srand(45073);
+	
+	demoIndex = index;
 	ticks = 0;
 	mouseJoint = NULL;
-	messageString[0] = '\0';
+	ChipmunkDemoMessageString = "";
 	maxArbiters = 0;
 	maxPoints = 0;
 	maxConstraints = 0;
-	space = currDemo->initFunc();
+	space = demos[demoIndex].initFunc();
 
-	glutSetWindowTitle(demoTitle(currDemo));
+	glutSetWindowTitle(demoTitle(index));
 }
 
 static void
@@ -238,24 +258,20 @@ keyboard(unsigned char key, int x, int y)
 	int index = key - 'a';
 	
 	if(0 <= index && index < demoCount){
-		runDemo(&demos[index]);
+		demos[demoIndex].destroyFunc();
+		runDemo(index);
 	} else if(key == '\r'){
-		runDemo(currDemo);
+		demos[demoIndex].destroyFunc();
+		runDemo(demoIndex);
   } else if(key == '`'){
 		paused = !paused;
   } else if(key == '1'){
-		step += 1;
-	} else if(key == '-'){
-		options.drawHash = !options.drawHash;
+		step = cpTrue;
 	} else if(key == '='){
-		options.drawBBs = !options.drawBBs;
+		drawBBs = !drawBBs;
 	} else if(key == '\\'){
-		glEnable(GL_LINE_SMOOTH);
-		glEnable(GL_POINT_SMOOTH);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-		glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
+		glDisable(GL_LINE_SMOOTH);
+		glDisable(GL_POINT_SMOOTH);
 	}
 }
 
@@ -280,7 +296,7 @@ mouseToSpace(int x, int y)
 static void
 mouse(int x, int y)
 {
-	mousePoint = mouseToSpace(x, y);
+	ChipmunkDemoMouse = mouseToSpace(x, y);
 }
 
 static void
@@ -295,7 +311,7 @@ click(int button, int state, int x, int y)
 				cpBody *body = shape->body;
 				mouseJoint = cpPivotJointNew2(mouseBody, body, cpvzero, cpBodyWorld2Local(body, point));
 				mouseJoint->maxForce = 50000.0f;
-				mouseJoint->biasCoef = 0.15f;
+				mouseJoint->errorBias = cpfpow(1.0f - 0.15f, 60.0f);
 				cpSpaceAddConstraint(space, mouseJoint);
 			}
 		} else if(mouseJoint){
@@ -324,7 +340,7 @@ set_arrowDirection()
 	if(key_right) x += 1;
 	if(key_left) x -= 1;
 	
-	arrowDirection = cpv(x, y);
+	ChipmunkDemoKeyboard = cpv(x, y);
 }
 
 static void
@@ -361,6 +377,15 @@ initGL(void)
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POINT_SMOOTH);
+
+	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
+	glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 static void
@@ -371,7 +396,7 @@ glutStuff(int argc, const char *argv[])
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	
 	glutInitWindowSize(640, 480);
-	glutCreateWindow(demoTitle(&demos[firstDemoIndex]));
+	glutCreateWindow(demoTitle(demoIndex));
 	
 	initGL();
 	
@@ -415,73 +440,69 @@ static double GetMilliseconds(){
 
 #endif
 
-// TODO need to make a Windows compatible version here
 void time_trial(int index, int count)
 {
-	currDemo = &demos[index];
-	space = currDemo->initFunc();
+	space = demos[index].initFunc();
 	
 	double start_time = GetMilliseconds();
 	
 	for(int i=0; i<count; i++)
-		currDemo->updateFunc(i);
+		demos[index].updateFunc(i);
 	
 	double end_time = GetMilliseconds();
 	
-	currDemo->destroyFunc();
+	demos[index].destroyFunc();
 	
-	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, currDemo->name);
+	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, demos[index].name);
 }
 
-extern chipmunkDemo LogoSmash;
-extern chipmunkDemo Simple;
-extern chipmunkDemo PyramidStack;
-extern chipmunkDemo Plink;
-extern chipmunkDemo Tumble;
-extern chipmunkDemo PyramidTopple;
-extern chipmunkDemo Bounce;
-extern chipmunkDemo Planet;
-extern chipmunkDemo Springies;
-extern chipmunkDemo Pump;
-extern chipmunkDemo TheoJansen;
-extern chipmunkDemo MagnetsElectric;
-extern chipmunkDemo UnsafeOps;
-extern chipmunkDemo Query;
-extern chipmunkDemo OneWay;
-extern chipmunkDemo Player;
-extern chipmunkDemo Sensors;
-extern chipmunkDemo Joints;
-extern chipmunkDemo Tank;
+extern ChipmunkDemo LogoSmash;
+extern ChipmunkDemo PyramidStack;
+extern ChipmunkDemo Plink;
+extern ChipmunkDemo BouncyHexagons;
+extern ChipmunkDemo Tumble;
+extern ChipmunkDemo PyramidTopple;
+extern ChipmunkDemo Planet;
+extern ChipmunkDemo Springies;
+extern ChipmunkDemo Pump;
+extern ChipmunkDemo TheoJansen;
+extern ChipmunkDemo Query;
+extern ChipmunkDemo OneWay;
+extern ChipmunkDemo Player;
+extern ChipmunkDemo Joints;
+extern ChipmunkDemo Tank;
+extern ChipmunkDemo Chains;
+extern ChipmunkDemo Crane;
+extern ChipmunkDemo Buoyancy;
 
-extern chipmunkDemo bench_list[];
+extern ChipmunkDemo bench_list[];
 extern int bench_count;
 
 int
 main(int argc, const char **argv)
 {
-	chipmunkDemo demo_list[] = {
+	ChipmunkDemo demo_list[] = {
+		Buoyancy,
 		LogoSmash,
 		PyramidStack,
 		Plink,
+		BouncyHexagons,
 		Tumble,
 		PyramidTopple,
-		Bounce,
 		Planet,
 		Springies,
 		Pump,
 		TheoJansen,
-		MagnetsElectric,
-		UnsafeOps,
 		Query,
 		OneWay,
-		Player,
-		Sensors,
 		Joints,
 		Tank,
+		Chains,
+		Crane,
 	};
 	
 	demos = demo_list;
-	demoCount = sizeof(demo_list)/sizeof(chipmunkDemo);
+	demoCount = sizeof(demo_list)/sizeof(ChipmunkDemo);
 	int trial = 0;
 	
 	for(int i=0; i<argc; i++){
@@ -494,7 +515,6 @@ main(int argc, const char **argv)
 	}
 	
 	cpInitChipmunk();
-	cp_collision_slop = 0.5f;
 	
 	if(trial){
 //		sleep(1);
@@ -505,7 +525,7 @@ main(int argc, const char **argv)
 		
 		glutStuff(argc, argv);
 		
-		runDemo(&demos[firstDemoIndex]);
+		runDemo(demoIndex);
 		glutMainLoop();
 	}
 

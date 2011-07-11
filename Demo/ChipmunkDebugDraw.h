@@ -19,10 +19,27 @@
  * SOFTWARE.
  */
 
-//TODO delete this header?
+typedef struct Color {
+	float r, g, b, a;
+} Color;
 
-// Collides two cpShape structures.
-// Returns the number of contact points added to arr
-// which should be at least CP_MAX_CONTACTS_PER_ARBITER in length.
-// This function is very lonely in this header :(
-int cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr);
+static inline Color RGBAColor(float r, float g, float b, float a){
+	Color color = {r, g, b, a};
+	return color;
+}
+
+static inline Color LAColor(float l, float a){
+	Color color = {l, l, l, a};
+	return color;
+}
+
+void ChipmunkDebugDrawCircle(cpVect center, cpFloat angle, cpFloat radius, Color lineColor, Color fillColor);
+void ChipmunkDebugDrawSegment(cpVect a, cpVect b, Color color);
+void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, Color lineColor, Color fillColor);
+void ChipmunkDebugDrawPolygon(int count, cpVect *verts, Color lineColor, Color fillColor);
+void ChipmunkDebugDrawPoints(cpFloat size, int count, cpVect *verts, Color color);
+void ChipmunkDebugDrawBB(cpBB bb, Color color);
+
+void ChipmunkDebugDrawShapes(cpSpace *space);
+void ChipmunkDebugDrawConstraints(cpSpace *space);
+void ChipmunkDebugDrawCollisionPoints(cpSpace *space);

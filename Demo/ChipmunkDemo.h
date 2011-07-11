@@ -19,21 +19,24 @@
  * SOFTWARE.
  */
 
-struct chipmunkDemo;
+#include "ChipmunkDebugDraw.h"
 
-typedef cpSpace *(*demoInitFunc)(void);
-typedef void (*demoUpdateFunc)(int ticks);
-typedef void (*demoDestroyFunc)(void);
+typedef struct ChipmunkDemo ChipmunkDemo;
 
-typedef struct chipmunkDemo {
+typedef cpSpace *(*ChipmunkDemoInitFunc)(void);
+typedef void (*ChipmunkDemoUpdateFunc)(int ticks);
+typedef void (*ChipmunkDemoDrawFunc)(void);
+typedef void (*ChipmunkDemoDestroyFunc)(void);
+
+struct ChipmunkDemo {
 	const char *name;
  
-	drawSpaceOptions *drawOptions;
+	ChipmunkDemoInitFunc initFunc;
+	ChipmunkDemoUpdateFunc updateFunc;
+	ChipmunkDemoDrawFunc drawFunc;
 	
-	demoInitFunc initFunc;
-	demoUpdateFunc updateFunc;
-	demoDestroyFunc destroyFunc;
-} chipmunkDemo;
+	ChipmunkDemoDestroyFunc destroyFunc;
+};
 
 static inline cpFloat
 frand(void)
@@ -41,8 +44,12 @@ frand(void)
 	return (cpFloat)rand()/(cpFloat)RAND_MAX;
 }
 
-extern cpVect arrowDirection;
-extern char messageString[1024];
+extern cpVect ChipmunkDemoKeyboard;
+extern cpVect ChipmunkDemoMouse;
+extern char *ChipmunkDemoMessageString;
 
 #define GRABABLE_MASK_BIT (1<<31)
 #define NOT_GRABABLE_MASK (~GRABABLE_MASK_BIT)
+
+void ChipmunkDemoDefaultDrawImpl(void);
+void ChipmunkDemoFreeSpaceChildren(cpSpace *space);

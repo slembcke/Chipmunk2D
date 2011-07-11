@@ -1,0 +1,22 @@
+<pre style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; "><em><span style="color:#236e25;">// Create the joint and set it's max force property.
+</span></em>breakableJoint = <span style="color:#003369;">cpSpaceAddConstraint</span>(space, <span style="color:#003369;">cpPinJointNew</span>(body1, body2, <span style="color:#003369;">cpv</span>(<span style="color:#0000ff;">15</span>,<span style="color:#0000ff;">0</span>), <span style="color:#003369;">cpv</span>(-<span style="color:#0000ff;">15</span>,<span style="color:#0000ff;">0</span>)));
+<span style="color:#003369;">cpConstraintSetMaxForce</span>(breakableJoint, <span style="color:#0000ff;">4000</span>);
+
+
+<em><span style="color:#236e25;">// In your update function:
+// Step your space normally...
+</span></em>cpFloat dt = <span style="color:#0000ff;">1.0</span>/<span style="color:#0000ff;">60.0</span>;
+<span style="color:#003369;">cpSpaceStep</span>(space, dt);
+
+<strong><span style="color:#881350;">if</span></strong>(breakableJoint){
+  <em><span style="color:#236e25;">// Convert the impulse to a force by dividing it by the timestep.
+</span></em>  cpFloat force = <span style="color:#003369;">cpConstraintGetImpulse</span>(breakableJoint)/dt;
+  cpFloat maxForce = <span style="color:#003369;">cpConstraintGetMaxForce</span>(breakableJoint);
+
+  <em><span style="color:#236e25;">// If the force is almost as big as the joint's max force, break it.
+</span></em>  <strong><span style="color:#881350;">if</span></strong>(force &gt; <span style="color:#0000ff;">0.9</span>*maxForce){
+    <span style="color:#003369;">cpSpaceRemoveConstraint</span>(space, breakableJoint);
+    breakableJoint = <strong><span style="color:#881350;">NULL</span></strong>;
+  }
+}
+</pre>

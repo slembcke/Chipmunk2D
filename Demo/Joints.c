@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "chipmunk.h"
-#include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -34,10 +33,11 @@ addBall(cpVect pos, cpVect boxOffset)
 	cpFloat radius = 15.0f;
 	cpFloat mass = 1.0f;
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero)));
-	body->p = cpvadd(pos, boxOffset);
+	cpBodySetPos(body, cpvadd(pos, boxOffset));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
-	shape->e = 0.0f; shape->u = 0.7f;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.7f);
 	
 	return body;
 }
@@ -50,10 +50,11 @@ addLever(cpVect pos, cpVect boxOffset)
 	cpVect b = cpv(0, -15);
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
-	body->p = cpvadd(pos, cpvadd(boxOffset, cpv(0, -15)));
+	cpBodySetPos(body, cpvadd(pos, cpvadd(boxOffset, cpv(0, -15))));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 5.0f));
-	shape->e = 0.0f; shape->u = 0.7f;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.7f);
 	
 	return body;
 }
@@ -66,10 +67,11 @@ addBar(cpVect pos, cpVect boxOffset)
 	cpVect b = cpv(0, -30);
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
-	body->p = cpvadd(pos, boxOffset);
+	cpBodySetPos(body, cpvadd(pos, boxOffset));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 5.0f));
-	shape->e = 0.0f; shape->u = 0.7f;
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.7f);
 	
 	return body;
 }
@@ -80,11 +82,12 @@ addWheel(cpVect pos, cpVect boxOffset)
 	cpFloat radius = 15.0f;
 	cpFloat mass = 1.0f;
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero)));
-	body->p = cpvadd(pos, boxOffset);
+	cpBodySetPos(body, cpvadd(pos, boxOffset));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
-	shape->e = 0.0f; shape->u = 0.7f;
-	shape->group = 1; // use a group to keep the car parts from colliding
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.7f);
+	cpShapeSetGroup(shape, 1); // use a group to keep the car parts from colliding
 	
 	return body;
 }
@@ -92,22 +95,17 @@ addWheel(cpVect pos, cpVect boxOffset)
 static cpBody *
 addChassis(cpVect pos, cpVect boxOffset)
 {
-	int num = 4;
-	cpVect verts[] = {
-		cpv(-40,-15),
-		cpv(-40, 15),
-		cpv( 40, 15),
-		cpv( 40,-15),
-	};
-
-	
 	cpFloat mass = 5.0f;
-	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, num, verts, cpvzero)));
-	body->p = cpvadd(pos, boxOffset);
+	cpFloat width = 80;
+	cpFloat height = 30;
 	
-	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, num, verts, cpvzero));
-	shape->e = 0.0f; shape->u = 0.7f;
-	shape->group = 1; // use a group to keep the car parts from colliding
+	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, width, height)));
+	cpBodySetPos(body, cpvadd(pos, boxOffset));
+	
+	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.7f);
+	cpShapeSetGroup(shape, 1); // use a group to keep the car parts from colliding
 	
 	return body;
 }
@@ -116,53 +114,63 @@ static cpSpace *
 init(void)
 {
 	space = cpSpaceNew();
-	space->iterations = 10;
-	space->gravity = cpv(0, -100);
-	space->sleepTimeThreshold = 0.5f;
+	cpSpaceSetIterations(space, 10);
+	cpSpaceSetGravity(space, cpv(0, -100));
+	cpSpaceSetSleepTimeThreshold(space, 0.5f);
 	
-	cpBody *staticBody = &space->staticBody;
+	cpBody *staticBody = cpSpaceGetStaticBody(space);
 	cpShape *shape;
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,120), cpv(320,120), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,0), cpv(320,0), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-120), cpv(320,-120), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-160,-240), cpv(-160,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(0,-240), cpv(0,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(160,-240), cpv(160,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetElasticity(shape, 1.0f);
+	cpShapeSetFriction(shape, 1.0f);
+	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	cpVect boxOffset;
 	cpBody *body1, *body2;
@@ -265,8 +273,8 @@ init(void)
 	cpSpaceAddConstraint(space, cpGrooveJointNew(chassis, wheel1, cpv(-30, -10), cpv(-30, -40), cpvzero));
 	cpSpaceAddConstraint(space, cpGrooveJointNew(chassis, wheel2, cpv( 30, -10), cpv( 30, -40), cpvzero));
 	
-	cpSpaceAddConstraint(space, cpDampedSpringNew(chassis, wheel1, cpv(-30, 0), cpvzero, 50.0f, 20.0f, 1.5f));
-	cpSpaceAddConstraint(space, cpDampedSpringNew(chassis, wheel2, cpv( 30, 0), cpvzero, 50.0f, 20.0f, 1.5f));
+	cpSpaceAddConstraint(space, cpDampedSpringNew(chassis, wheel1, cpv(-30, 0), cpvzero, 50.0f, 20.0f, 10.0f));
+	cpSpaceAddConstraint(space, cpDampedSpringNew(chassis, wheel2, cpv( 30, 0), cpvzero, 50.0f, 20.0f, 10.0f));
 	
 	return space;
 }
@@ -280,14 +288,14 @@ update(int ticks)
 static void
 destroy(void)
 {
-	cpSpaceFreeChildren(space);
+	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
 }
 
-chipmunkDemo Joints = {
+ChipmunkDemo Joints = {
 	"Joints and Constraints",
-	NULL,
 	init,
 	update,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

@@ -1,0 +1,64 @@
+<pre style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; "><span style="color:#683821;">#include &lt;stdio.h&gt;
+#include &lt;chipmunk.h&gt;
+</span>
+<strong><span style="color:#881350;">int</span></strong> <span style="color:#003369;">main</span>(<strong><span style="color:#881350;">void</span></strong>){
+  <em><span style="color:#236e25;">// cpVect is a 2D vector and cpv() is a shortcut for initializing them.
+</span></em>  cpVect gravity = <span style="color:#003369;">cpv</span>(<span style="color:#0000ff;">0</span>, -<span style="color:#0000ff;">100</span>);
+  
+  <em><span style="color:#236e25;">// Create an empty space.
+</span></em>  cpSpace *space = <span style="color:#003369;">cpSpaceNew</span>();
+  <span style="color:#003369;">cpSpaceSetGravity</span>(space, gravity);
+  
+  <em><span style="color:#236e25;">// Add a static line segment shape for the ground.
+</span></em>  <em><span style="color:#236e25;">// We'll make it slightly tilted so the ball will roll off.
+</span></em>  <em><span style="color:#236e25;">// We attach it to space-&gt;staticBody to tell Chipmunk it shouldn't be movable.
+</span></em>  cpShape *ground = <span style="color:#003369;">cpSegmentShapeNew</span>(space-&gt;staticBody, <span style="color:#003369;">cpv</span>(-<span style="color:#0000ff;">20</span>, <span style="color:#0000ff;">5</span>), <span style="color:#003369;">cpv</span>(<span style="color:#0000ff;">20</span>, -<span style="color:#0000ff;">5</span>), <span style="color:#0000ff;">0</span>);
+  <span style="color:#003369;">cpShapeSetFriction</span>(ground, <span style="color:#0000ff;">1</span>);
+  <span style="color:#003369;">cpSpaceAddShape</span>(space, ground);
+  
+  <em><span style="color:#236e25;">// Now let's make a ball that falls onto the line and rolls off.
+</span></em>  <em><span style="color:#236e25;">// First we need to make a cpBody to hold the physical properties of the object.
+</span></em>  <em><span style="color:#236e25;">// These include the mass, position, velocity, angle, etc. of the object.
+</span></em>  <em><span style="color:#236e25;">// Then we attach collision shapes to the cpBody to give it a size and shape.
+</span></em>  
+  cpFloat radius = <span style="color:#0000ff;">5</span>;
+  cpFloat mass = <span style="color:#0000ff;">1</span>;
+  
+  <em><span style="color:#236e25;">// The moment of inertia is like mass for rotation
+</span></em>  <em><span style="color:#236e25;">// Use the cpMomentFor*() functions to help you approximate it.
+</span></em>  cpFloat moment = <span style="color:#003369;">cpMomentForCircle</span>(mass, <span style="color:#0000ff;">0</span>, radius, cpvzero);
+  
+  <em><span style="color:#236e25;">// The cpSpaceAdd*() functions return the thing that you are adding.
+</span></em>  <em><span style="color:#236e25;">// It's convenient to create and add an object in one line.
+</span></em>  cpBody *ballBody = <span style="color:#003369;">cpSpaceAddBody</span>(space, <span style="color:#003369;">cpBodyNew</span>(mass, moment));
+  <span style="color:#003369;">cpBodySetPos</span>(ballBody, <span style="color:#003369;">cpv</span>(<span style="color:#0000ff;">0</span>, <span style="color:#0000ff;">15</span>));
+  
+  <em><span style="color:#236e25;">// Now we create the collision shape for the ball.
+</span></em>  <em><span style="color:#236e25;">// You can create multiple collision shapes that point to the same body.
+</span></em>  <em><span style="color:#236e25;">// They will all be attached to the body and move around to follow it.
+</span></em>  cpShape *ballShape = <span style="color:#003369;">cpSpaceAddShape</span>(space, <span style="color:#003369;">cpCircleShapeNew</span>(ballBody, radius, cpvzero));
+  <span style="color:#003369;">cpShapeSetFriction</span>(ballShape, <span style="color:#0000ff;">0.7</span>);
+  
+  <em><span style="color:#236e25;">// Now that it's all set up, we simulate all the objects in the space by
+</span></em>  <em><span style="color:#236e25;">// stepping forward through time in small increments called steps.
+</span></em>  <em><span style="color:#236e25;">// It is *highly* recommended to use a fixed size time step.
+</span></em>  cpFloat timeStep = <span style="color:#0000ff;">1.0</span>/<span style="color:#0000ff;">60.0</span>;
+  <strong><span style="color:#881350;">for</span></strong>(cpFloat time = <span style="color:#0000ff;">0</span>; time &lt; <span style="color:#0000ff;">2</span>; time += timeStep){
+    cpVect pos = <span style="color:#003369;">cpBodyGetPos</span>(ballBody);
+    cpVect vel = <span style="color:#003369;">cpBodyGetVel</span>(ballBody);
+    <span style="color:#003369;">printf</span>(
+      <span style="color:#760f15;">&quot;Time is %5.2f. ballBody is at (%5.2f, %5.2f). It's velocity is (%5.2f, %5.2f)\n&quot;</span>,
+      time, pos.x, pos.y, vel.x, vel.y
+    );
+    
+    <span style="color:#003369;">cpSpaceStep</span>(space, timeStep);
+  }
+  
+  <em><span style="color:#236e25;">// Clean up our objects and exit!
+</span></em>  <span style="color:#003369;">cpShapeFree</span>(ballShape);
+  <span style="color:#003369;">cpBodyFree</span>(ballBody);
+  <span style="color:#003369;">cpShapeFree</span>(ground);
+  <span style="color:#003369;">cpSpaceFree</span>(space);
+  
+  <strong><span style="color:#881350;">return</span></strong> <span style="color:#0000ff;">0</span>;
+}</pre>
