@@ -17,7 +17,7 @@
 
 <a name="ChipmunkPhysics" />
 
-h1. Chipmunk Physics 5.3.4
+h1. Chipmunk Physics 5.3.5
 
 First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games on every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
 
@@ -33,7 +33,7 @@ If you are writing iPhone games using Chipmunk, you should check out the Objecti
 
 h2. Limitations of a C API:
 
-There are two major problems with Chipmunk's C API. The first is that it lacks operator overloading. Chipmunk defines vector operators as functions instead of allowing you to use operators such as *, +, and -. (However Chipmunk 5.3.3 and up does provide overloaded operators if you are using C++) In practice, it's usually not a major problem for readability. The second, and bigger problem is that it's not possible to mark fields as private in C structure types. Be warned that if you are reading fields from Chipmunk structs that are not documented here, that they might change in the future without a lot of prior warning.
+There are two problems with C APIs. The first is that they lack operator overloading. Chipmunk defines vector operators as functions instead of allowing you to use inline operators such as *, +, and -. In practice, it's usually not a major problem for readability, but a little annoying. Chipmunk does provide overloaded operators if you are using C++. Another problem is that there is no way to mark struct field or functions as "private" in C. To get around this, I created the @CP_PRIVATE()@ macro, if you see a struct field or function defined using CP_PRIVATE it means that you shouldn't be using it as it's name or meaning might change in future versions without warning. In Chipmunk 6, it will be a hard error to access these fields or functions unless you import the _chipmunk_private.h_ header.
 
 h2. Support:
 
@@ -537,7 +537,7 @@ p(expl). Equivalent to calling @cpBodySleepWithGroup(body, NULL)@. It forces @bo
 
 <pre><code>void cpBodyActivate(cpBody *body)</code></pre>
 
-p(expl). Wake @body@ up so that it starts actively simulating again if it's sleeping, or reset the idle timer if it's active. This function must not be called from a collision handler callback. Use a post-step callback instead.
+p(expl). Wake @body@ up so that it starts actively simulating again if it's sleeping, or reset the idle timer if it's active. In Chipmunk 5.3.4 and up, you can call this function from a collision or query callback. In previous versions this was an error.
 
 h2. Misc Functions:
 
@@ -1156,13 +1156,15 @@ h2. Post-Step Callbacks:
 
 Post-step callbacks are the one place where you can break the rules about adding or removing objects from within a callback. In fact, their primary function is to help you safely remove objects from the space that you wanted to disable or destroy in a collision callback.
 
-Post step callbacks are registered as a function and a pointer that is used as a key. You can only register one post step callback per key. This prevents you from accidentally removing an object more than once. For instance, say that you get a collision callback between a bullet and object A. You want to destroy both the bullet and object A, so you register a post-step callback to safely remove them from your game. Then you get a second collision callback between the bullet and object B. You register a post-step callback to remove object B, and a second post-step callback to remove the bullet. Because you can only register one callback per key, the post-step callback for the bullet will only be called once and you can't accidentally try to remove it twice.
+Post step callbacks are registered as a function and a pointer that is used as a key. You can only register one post step callback per key. This prevents you from accidentally removing an object more than once. For instance, say that you get a collision callback between a bullet and object A. You want to destroy both the bullet and object A, so you register a post-step callback to safely remove them from your game. Then you get a second collision callback between the bullet and object B. You register a post-step callback to remove object B, and a second post-step callback to remove the bullet. Because you can only register one callback per key, the post-step callback for the bullet will only be called once and you can't accidentally register to have it removed twice.
 
-<pre><code>typedef void (*cpPostStepFunc)(cpSpace *space, void *obj, void *data)</code></pre>
+Note: Additional callbacks registered to the same key are ignored even if they use a different callback function or data pointer.
+
+<pre><code>typedef void (*cpPostStepFunc)(cpSpace *space, void *key, void *data)</code></pre>
 
 p(expl). Function type used for post step callbacks. @space@ is the space the callback was registered on, @obj@ is the pointer value you supplied as the key, and @data@ is a user definable pointer you can use to pass in as a context value.
 
-<pre><code>void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)</code></pre>
+<pre><code>void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data)</code></pre>
 
 p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @obj@ and @data@ will be passed to your function. Only the last callback registered for any unique value of @obj@ will be recorded. You can add post-step callbacks from outside of other callback functions, but they won't be called until @cpSpaceStep()@ is called again.
 
@@ -1235,7 +1237,7 @@ p(expl). Returns the penetration depth of the i'th collision point.
 <pre><code>cpVect cpArbiterTotalImpulse(cpArbiter *arb);
 cpVect cpArbiterTotalImpulseWithFriction(cpArbiter *arb);</code></pre>
 
-p(expl). Returns the impulse that was applied this step to resolve the collision. These functions should only be called from a @postStep()@ callback, otherwise the result is undefined. *Note:* If you are using the deprecated elastic iterations setting on your space, it will cause you to get incorrect results. Elastic iterations should no longer be needed, and you should be able to safely turn them off.
+p(expl). Returns the impulse that was applied this step to resolve the collision. These functions should only be called from a @postStep()@ or @postSolve()@ callback, otherwise the result is undefined. *Note:* If you are using the deprecated elastic iterations setting on your space, it will cause you to get incorrect results. Elastic iterations should no longer be needed, and you should be able to safely turn them off.
 
 h2. Fields:
 

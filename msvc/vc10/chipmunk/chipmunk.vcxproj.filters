@@ -184,4 +184,7 @@
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="chipmunk.def" />
+  </ItemGroup>
 </Project>

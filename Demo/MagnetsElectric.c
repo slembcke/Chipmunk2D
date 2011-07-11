@@ -302,7 +302,7 @@ make_mag(cpVect p, cpFloat ang, cpFloat mag)
 	body->w = 0.0e0;
 	
     // Load the singularities
-    Sing *magnet=(Sing*)cpmalloc(sizeof(Sing));
+    Sing *magnet=(Sing*)cpcalloc(1, sizeof(Sing));
 	magnet->Nsing=1; 
 	magnet->value[0]=mag;
 	sprintf(magnet->type[0],"magdipole"); 
@@ -345,7 +345,7 @@ make_charged(cpVect p, cpFloat chg)
 	body->w = 0.0e0;
 	
     // Load the singularities
-    Sing *charge=(Sing*)cpmalloc(sizeof(Sing));;
+    Sing *charge=(Sing*)cpcalloc(1, sizeof(Sing));;
 	charge->Nsing=1; 
 	charge->value[0]=chg;
 	sprintf(charge->type[0],"electrical"); 
@@ -387,7 +387,7 @@ make_mix(cpVect p, cpFloat ang, cpFloat mag,cpFloat chg)
 	body->w = 0.0e0;
 	
     // Load the singularities
-    Sing *mix=(Sing*)cpmalloc(sizeof(Sing));;
+    Sing *mix=(Sing*)cpcalloc(1, sizeof(Sing));;
 	mix->Nsing=2; 
 	mix->value[0]=mag;
 	mix->value[1]=chg;

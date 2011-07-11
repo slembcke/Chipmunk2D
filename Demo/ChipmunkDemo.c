@@ -50,56 +50,14 @@
 	#include <GL/glut.h>
 #endif
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 #include "drawSpace.h"
 #include "ChipmunkDemo.h"
 
 #define SLEEP_TICKS 16
 
-//extern chipmunkDemo Test;
-extern chipmunkDemo LogoSmash;
-extern chipmunkDemo Simple;
-extern chipmunkDemo PyramidStack;
-extern chipmunkDemo Plink;
-extern chipmunkDemo Tumble;
-extern chipmunkDemo PyramidTopple;
-extern chipmunkDemo Bounce;
-extern chipmunkDemo Planet;
-extern chipmunkDemo Springies;
-extern chipmunkDemo Pump;
-extern chipmunkDemo TheoJansen;
-extern chipmunkDemo MagnetsElectric;
-extern chipmunkDemo UnsafeOps;
-extern chipmunkDemo Query;
-extern chipmunkDemo OneWay;
-extern chipmunkDemo Player;
-extern chipmunkDemo Sensors;
-extern chipmunkDemo Joints;
-extern chipmunkDemo Tank;
-
-//extern chipmunkDemo Test;
-
-static chipmunkDemo *demos[] = {
-	&LogoSmash,
-	&PyramidStack,
-	&Plink,
-	&Tumble,
-	&PyramidTopple,
-	&Bounce,
-	&Planet,
-	&Springies,
-	&Pump,
-	&TheoJansen,
-	&MagnetsElectric,
-	&UnsafeOps,
-	&Query,
-	&OneWay,
-	&Player,
-	&Sensors,
-	&Joints,
-	&Tank,
-};
-static const int demoCount = sizeof(demos)/sizeof(chipmunkDemo *);
+static chipmunkDemo *demos;
+static int demoCount = 0;
 static chipmunkDemo *currDemo = NULL;
 static const int firstDemoIndex = 'a' - 'a';
 
@@ -213,13 +171,14 @@ static void
 reshape(int width, int height)
 {
 	glViewport(0, 0, width, height);
-
-	double rx = width / 2.0;
-	double ry = height / 2.0;
-
+	
+	double scale = 0.5/cpfmin(width/640.0, height/480.0);
+	double hw = width*scale;
+	double hh = height*scale;
+	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-rx, rx, -ry, ry, -1.0, 1.0);
+	glOrtho(-hw, hw, -hh, hh, -1.0, 1.0);
 	glTranslated(0.5, 0.5, 0.0);
 }
 
@@ -238,10 +197,8 @@ display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	drawSpace(space, currDemo->drawOptions ? currDemo->drawOptions : &options);
-	if(!paused){
-    drawInstructions();
-    drawInfo();
-  }
+	drawInstructions();
+	drawInfo();
 	drawString(-300, -210, messageString);
 		
 	glutSwapBuffers();
@@ -281,7 +238,7 @@ keyboard(unsigned char key, int x, int y)
 	int index = key - 'a';
 	
 	if(0 <= index && index < demoCount){
-		runDemo(demos[index]);
+		runDemo(&demos[index]);
 	} else if(key == '\r'){
 		runDemo(currDemo);
   } else if(key == '`'){
@@ -414,7 +371,7 @@ glutStuff(int argc, const char *argv[])
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	
 	glutInitWindowSize(640, 480);
-	glutCreateWindow(demoTitle(demos[firstDemoIndex]));
+	glutCreateWindow(demoTitle(&demos[firstDemoIndex]));
 	
 	initGL();
 	
@@ -434,53 +391,123 @@ glutStuff(int argc, const char *argv[])
 	glutMouseFunc(click);
 }
 
-//#define TIME_TRIAL
-#ifdef TIME_TRIAL
+#ifdef WIN32
+
+static double GetMilliseconds(){
+	__int64 count, freq;
+	QueryPerformanceCounter((LARGE_INTEGER*)&count);
+	QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+
+	return 1000.0*(double)count/(double)freq;
+}
+
+#else
+
 #include <sys/time.h>
 #include <unistd.h>
+
+static double GetMilliseconds(){
+	struct timeval time;
+	gettimeofday(&time, NULL);
+	
+	return (time.tv_sec*1000.0 + time.tv_usec/1000.0);
+}
+
+#endif
+
+// TODO need to make a Windows compatible version here
 void time_trial(int index, int count)
 {
-	currDemo = demos[index];
+	currDemo = &demos[index];
 	space = currDemo->initFunc();
 	
-	struct timeval start_time, end_time;
-	gettimeofday(&start_time, NULL);
+	double start_time = GetMilliseconds();
 	
 	for(int i=0; i<count; i++)
 		currDemo->updateFunc(i);
 	
-	gettimeofday(&end_time, NULL);
-	long millisecs = (end_time.tv_sec - start_time.tv_sec)*1000;
-	millisecs += (end_time.tv_usec - start_time.tv_usec)/1000;
+	double end_time = GetMilliseconds();
 	
 	currDemo->destroyFunc();
 	
-	printf("Time(%c) = %ldms\n", index + 'a', millisecs);
+	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, currDemo->name);
 }
-#endif
+
+extern chipmunkDemo LogoSmash;
+extern chipmunkDemo Simple;
+extern chipmunkDemo PyramidStack;
+extern chipmunkDemo Plink;
+extern chipmunkDemo Tumble;
+extern chipmunkDemo PyramidTopple;
+extern chipmunkDemo Bounce;
+extern chipmunkDemo Planet;
+extern chipmunkDemo Springies;
+extern chipmunkDemo Pump;
+extern chipmunkDemo TheoJansen;
+extern chipmunkDemo MagnetsElectric;
+extern chipmunkDemo UnsafeOps;
+extern chipmunkDemo Query;
+extern chipmunkDemo OneWay;
+extern chipmunkDemo Player;
+extern chipmunkDemo Sensors;
+extern chipmunkDemo Joints;
+extern chipmunkDemo Tank;
+
+extern chipmunkDemo bench_list[];
+extern int bench_count;
 
 int
 main(int argc, const char **argv)
 {
-	cpInitChipmunk();
-	cp_collision_slop = 0.2f;
+	chipmunkDemo demo_list[] = {
+		LogoSmash,
+		PyramidStack,
+		Plink,
+		Tumble,
+		PyramidTopple,
+		Bounce,
+		Planet,
+		Springies,
+		Pump,
+		TheoJansen,
+		MagnetsElectric,
+		UnsafeOps,
+		Query,
+		OneWay,
+		Player,
+		Sensors,
+		Joints,
+		Tank,
+	};
 	
-#ifdef TIME_TRIAL
-	sleep(1);
-	for(int i=0; i<demoCount; i++){
-		if(i == 'l' - 'a') continue;
-		time_trial(i, 1000);
+	demos = demo_list;
+	demoCount = sizeof(demo_list)/sizeof(chipmunkDemo);
+	int trial = 0;
+	
+	for(int i=0; i<argc; i++){
+		if(strcmp(argv[i], "-bench") == 0){
+			demos = bench_list;
+			demoCount = bench_count;
+		} else if(strcmp(argv[i], "-trial") == 0){
+			trial = 1;
+		}
 	}
-//	time_trial(0, 1000);
-	exit(0);
-#endif
 	
-	mouseBody = cpBodyNew(INFINITY, INFINITY);
+	cpInitChipmunk();
+	cp_collision_slop = 0.5f;
 	
-	glutStuff(argc, argv);
-	
-	runDemo(demos[firstDemoIndex]);
-	glutMainLoop();
+	if(trial){
+//		sleep(1);
+		for(int i=0; i<demoCount; i++) time_trial(i, 1000);
+		exit(0);
+	} else {
+		mouseBody = cpBodyNew(INFINITY, INFINITY);
+		
+		glutStuff(argc, argv);
+		
+		runDemo(&demos[firstDemoIndex]);
+		glutMainLoop();
+	}
 
 	return 0;
 }

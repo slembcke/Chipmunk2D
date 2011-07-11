@@ -11,6 +11,7 @@
 		D31402950E9DD07E00EF79DB /* Springies.c in Sources */ = {isa = PBXBuildFile; fileRef = D31402940E9DD07E00EF79DB /* Springies.c */; };
 		D31847750FC458FD00E30B0D /* Query.c in Sources */ = {isa = PBXBuildFile; fileRef = D31847740FC458FD00E30B0D /* Query.c */; };
 		D3185D200EC5610A00E6BFCB /* TheoJansen.c in Sources */ = {isa = PBXBuildFile; fileRef = D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */; };
+		D319687F1315C6A1007508CE /* Bench.c in Sources */ = {isa = PBXBuildFile; fileRef = D319687E1315C6A1007508CE /* Bench.c */; };
 		D3238F8210C1B5ED00C4BDC2 /* Joints.c in Sources */ = {isa = PBXBuildFile; fileRef = D3238F8110C1B5ED00C4BDC2 /* Joints.c */; };
 		D329CC9C10BADC7200909DB1 /* Sensors.c in Sources */ = {isa = PBXBuildFile; fileRef = D329CC9B10BADC7200909DB1 /* Sensors.c */; };
 		D34963C10B56CBA900CAD239 /* chipmunk.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0C40AA75CC3004E361B /* chipmunk.h */; };
@@ -123,6 +124,7 @@
 		D31402940E9DD07E00EF79DB /* Springies.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Springies.c; sourceTree = "<group>"; };
 		D31847740FC458FD00E30B0D /* Query.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Query.c; sourceTree = "<group>"; };
 		D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = TheoJansen.c; sourceTree = "<group>"; };
+		D319687E1315C6A1007508CE /* Bench.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Bench.c; sourceTree = "<group>"; };
 		D3238F8110C1B5ED00C4BDC2 /* Joints.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Joints.c; sourceTree = "<group>"; };
 		D329CC9B10BADC7200909DB1 /* Sensors.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Sensors.c; sourceTree = "<group>"; };
 		D34963BB0B56CAA300CAD239 /* libChipmunk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libChipmunk.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -319,6 +321,7 @@
 				D329CC9B10BADC7200909DB1 /* Sensors.c */,
 				D3238F8110C1B5ED00C4BDC2 /* Joints.c */,
 				D3102B161119FD3000E77771 /* Tank.c */,
+				D319687E1315C6A1007508CE /* Bench.c */,
 			);
 			name = Demo;
 			path = ../Demo;
@@ -605,6 +608,7 @@
 				D329CC9C10BADC7200909DB1 /* Sensors.c in Sources */,
 				D3238F8210C1B5ED00C4BDC2 /* Joints.c in Sources */,
 				D3102B171119FD3000E77771 /* Tank.c in Sources */,
+				D319687F1315C6A1007508CE /* Bench.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -643,6 +647,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				INSTALL_PATH = /usr/local/lib;
+				OTHER_CFLAGS = (
+					"-DNDEBUG",
+					"-ffast-math",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Chipmunk;
 				ZERO_LINK = NO;
@@ -686,7 +694,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "Chipmunk-iPhone";
-				SDKROOT = iphoneos4.1;
+				SDKROOT = iphoneos;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -694,13 +702,12 @@
 		D3E5F01B0AA32EAC004E361B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = ../include/chipmunk;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
-				SDKROOT = macosx10.5;
+				SDKROOT = "";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-W",
@@ -717,11 +724,10 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = ../include/chipmunk;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = "-DNDEBUG";
-				SDKROOT = macosx10.5;
+				SDKROOT = "";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-W",

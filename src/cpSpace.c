@@ -49,7 +49,7 @@ contactSetTrans(cpShape **shapes, cpSpace *space)
 		int count = CP_BUFFER_BYTES/sizeof(cpArbiter);
 		cpAssert(count, "Buffer size too small.");
 		
-		cpArbiter *buffer = (cpArbiter *)cpmalloc(CP_BUFFER_BYTES);
+		cpArbiter *buffer = (cpArbiter *)cpcalloc(1, CP_BUFFER_BYTES);
 		cpArrayPush(space->allocatedBuffers, buffer);
 		
 		for(int i=0; i<count; i++) cpArrayPush(space->pooledArbiters, buffer + i);
@@ -71,7 +71,7 @@ collFuncSetEql(cpCollisionHandler *check, cpCollisionHandler *pair)
 static void *
 collFuncSetTrans(cpCollisionHandler *handler, void *unused)
 {
-	cpCollisionHandler *copy = (cpCollisionHandler *)cpmalloc(sizeof(cpCollisionHandler));
+	cpCollisionHandler *copy = (cpCollisionHandler *)cpcalloc(1, sizeof(cpCollisionHandler));
 	(*copy) = (*handler);
 	
 	return copy;
@@ -105,7 +105,7 @@ cpSpaceAlloc(void)
 #define DEFAULT_ITERATIONS 10
 #define DEFAULT_ELASTIC_ITERATIONS 0
 
-cpCollisionHandler defaultHandler = {0, 0, alwaysCollide, alwaysCollide, nothing, nothing, NULL};
+cpCollisionHandler cpSpaceDefaultHandler = {0, 0, alwaysCollide, alwaysCollide, nothing, nothing, NULL};
 
 cpSpace*
 cpSpaceInit(cpSpace *space)
@@ -127,6 +127,8 @@ cpSpaceInit(cpSpace *space)
 	
 	space->bodies = cpArrayNew(0);
 	space->sleepingComponents = cpArrayNew(0);
+	space->rousedBodies = cpArrayNew(0);
+	
 	space->sleepTimeThreshold = INFINITY;
 	space->idleSpeedThreshold = 0.0f;
 	
@@ -138,9 +140,9 @@ cpSpaceInit(cpSpace *space)
 	
 	space->constraints = cpArrayNew(0);
 	
-	space->defaultHandler = defaultHandler;
+	space->defaultHandler = cpSpaceDefaultHandler;
 	space->collFuncSet = cpHashSetNew(0, (cpHashSetEqlFunc)collFuncSetEql, (cpHashSetTransFunc)collFuncSetTrans);
-	space->collFuncSet->default_value = &space->defaultHandler;
+	space->collFuncSet->default_value = &cpSpaceDefaultHandler;
 	
 	space->postStepCallbacks = NULL;
 	
@@ -163,6 +165,7 @@ cpSpaceDestroy(cpSpace *space)
 	
 	cpArrayFree(space->bodies);
 	cpArrayFree(space->sleepingComponents);
+	cpArrayFree(space->rousedBodies);
 	
 	cpArrayFree(space->constraints);
 	
@@ -171,20 +174,14 @@ cpSpaceDestroy(cpSpace *space)
 	cpArrayFree(space->arbiters);
 	cpArrayFree(space->pooledArbiters);
 	
-	if(space->allocatedBuffers){
-		cpArrayEach(space->allocatedBuffers, freeWrap, NULL);
-		cpArrayFree(space->allocatedBuffers);
-	}
+	if(space->allocatedBuffers) cpArrayEach(space->allocatedBuffers, freeWrap, NULL);
+	cpArrayFree(space->allocatedBuffers);
 	
-	if(space->postStepCallbacks){
-		cpHashSetEach(space->postStepCallbacks, freeWrap, NULL);
-		cpHashSetFree(space->postStepCallbacks);
-	}
+	if(space->postStepCallbacks) cpHashSetEach(space->postStepCallbacks, freeWrap, NULL);
+	cpHashSetFree(space->postStepCallbacks);
 	
-	if(space->collFuncSet){
-		cpHashSetEach(space->collFuncSet, freeWrap, NULL);
-		cpHashSetFree(space->collFuncSet);
-	}
+	if(space->collFuncSet) cpHashSetEach(space->collFuncSet, freeWrap, NULL);
+	cpHashSetFree(space->collFuncSet);
 }
 
 void
@@ -208,6 +205,12 @@ cpSpaceFreeChildren(cpSpace *space)
 	cpArrayEach(space->constraints,      (cpArrayIter)&constraintFreeWrap,    NULL);
 }
 
+#define cpAssertSpaceUnlocked(space) \
+	cpAssert(!space->locked, \
+		"This addition/removal cannot be done safely during a call to cpSpaceStep() or during a query. " \
+		"Put these calls into a post-step callback." \
+	);
+
 #pragma mark Collision Handler Function Management
 
 void
@@ -220,6 +223,8 @@ cpSpaceAddCollisionHandler(
 	cpCollisionSeparateFunc separate,
 	void *data
 ){
+	cpAssertSpaceUnlocked(space);
+	
 	// Remove any old function so the new one will get added.
 	cpSpaceRemoveCollisionHandler(space, a, b);
 	
@@ -238,6 +243,8 @@ cpSpaceAddCollisionHandler(
 void
 cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
+	cpAssertSpaceUnlocked(space);
+	
 	struct{cpCollisionType a, b;} ids = {a, b};
 	cpCollisionHandler *old_handler = (cpCollisionHandler *) cpHashSetRemove(space->collFuncSet, CP_HASH_PAIR(a, b), &ids);
 	cpfree(old_handler);
@@ -252,6 +259,8 @@ cpSpaceSetDefaultCollisionHandler(
 	cpCollisionSeparateFunc separate,
 	void *data
 ){
+	cpAssertSpaceUnlocked(space);
+	
 	cpCollisionHandler handler = {
 		0, 0,
 		begin ? begin : alwaysCollide,
@@ -262,16 +271,10 @@ cpSpaceSetDefaultCollisionHandler(
 	};
 	
 	space->defaultHandler = handler;
+	space->collFuncSet->default_value = &space->defaultHandler;
 }
 
 #pragma mark Body, Shape, and Joint Management
-
-#define cpAssertSpaceUnlocked(space) \
-	cpAssert(!space->locked, \
-		"This addition/removal cannot be done safely during a call to cpSpaceStep() or during a query. " \
-		"Put these calls into a post-step callback." \
-	);
-
 static void
 cpBodyAddShape(cpBody *body, cpShape *shape)
 {
@@ -298,7 +301,7 @@ cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
 	cpBody *body = shape->body;
-	if(!body || body == &space->staticBody) return cpSpaceAddStaticShape(space, shape);
+	if(!body || cpBodyIsStatic(body)) return cpSpaceAddStaticShape(space, shape);
 	
 	cpAssert(!cpHashSetFind(space->activeShapes->handleSet, shape->hashid, shape),
 		"Cannot add the same shape more than once.");
@@ -472,3 +475,27 @@ cpSpaceRehashShape(cpSpace *space, cpShape *shape)
 	cpSpaceHashRehashObject(space->activeShapes, shape, shape->hashid);
 	cpSpaceHashRehashObject(space->staticShapes, shape, shape->hashid);
 }
+
+void
+cpSpaceEachBody(cpSpace *space, cpSpaceBodyIterator func, void *data)
+{
+	cpSpaceLock(space); {
+		cpArray *bodies = space->bodies;
+		
+		for(int i=0; i<bodies->num; i++){
+			func((cpBody *)bodies->arr[i], data);
+		}
+		
+		cpArray *components = space->sleepingComponents;
+		for(int i=0; i<components->num; i++){
+			cpBody *root = (cpBody *)components->arr[i];
+			cpBody *body = root, *next;
+			do {
+				next = body->node.next;
+				func(body, data);
+			} while((body = next) != root);
+		}
+	} cpSpaceUnlock(space);
+}
+
+

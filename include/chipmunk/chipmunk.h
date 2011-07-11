@@ -51,26 +51,6 @@ void cpMessage(const char *message, const char *condition, const char *file, int
 
 #include "chipmunk_types.h"
 	
-#ifndef INFINITY
-	#ifdef _MSC_VER
-		union MSVC_EVIL_FLOAT_HACK
-		{
-			unsigned __int8 Bytes[4];
-			float Value;
-		};
-		static union MSVC_EVIL_FLOAT_HACK INFINITY_HACK = {{0x00, 0x00, 0x80, 0x7F}};
-		#define INFINITY (INFINITY_HACK.Value)
-	#endif
-	
-	#ifdef __GNUC__
-		#define INFINITY (__builtin_inf())
-	#endif
-	
-	#ifndef INFINITY
-		#define INFINITY (1e1000)
-	#endif
-#endif
-
 // Maximum allocated size for various Chipmunk buffers
 #define CP_BUFFER_BYTES (32*1024)
 
@@ -151,6 +131,13 @@ cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height);
 
 #ifdef __cplusplus
 }
+
+static inline cpVect operator *(const cpVect v, const cpFloat s){return cpvmult(v, s);}
+static inline cpVect operator +(const cpVect v1, const cpVect v2){return cpvadd(v1, v2);}
+static inline cpVect operator -(const cpVect v1, const cpVect v2){return cpvsub(v1, v2);}
+static inline cpBool operator ==(const cpVect v1, const cpVect v2){return cpveql(v1, v2);}
+static inline cpVect operator -(const cpVect v){return cpvneg(v);}
+
 #endif
 
 #endif

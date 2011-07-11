@@ -38,7 +38,7 @@
 	#include <GL/glut.h>
 #endif
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 #include "drawSpace.h"
 
 /*

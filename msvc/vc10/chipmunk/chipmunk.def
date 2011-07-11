@@ -1,0 +1,190 @@
+LIBRARY	chipmunk
+
+EXPORTS
+	cpInitCollisionFuncs
+	
+	cpInitChipmunk
+	cpMomentForCircle
+	cpMomentForSegment
+	cpMomentForPoly
+	cpMomentForBox
+
+	cpContactInit
+	cpArbiterInit
+	cpArbiterUpdate
+	cpArbiterPreStep
+	cpArbiterApplyCachedImpulse
+	cpArbiterApplyImpulse
+	cpArbiterTotalImpulse
+	cpArbiterTotalImpulseWithFriction
+	cpArbiterIgnore
+	
+	cpArrayAlloc
+	cpArrayInit
+	cpArrayNew
+	cpArrayDestroy
+	cpArrayFree
+	cpArrayPush
+	cpArrayPop
+	cpArrayDeleteIndex
+	cpArrayDeleteObj
+	cpArrayAppend
+	cpArrayEach
+	cpArrayContains
+	
+	cpBBClampVect
+	cpBBWrapVect
+	
+	cpBodyAlloc
+	cpBodyInit
+	cpBodyNew
+	cpBodyDestroy
+	cpBodyFree
+	cpBodyActivate
+	cpBodySleep
+	cpBodySetMass
+	cpBodySetMoment
+	cpBodySetAngle
+	cpBodySlew
+	cpBodyUpdateVelocity
+	cpBodyUpdatePosition
+	cpBodyResetForces
+	cpBodyApplyForce
+	cpApplyDampedSpring
+	
+	cpCollideShapes
+	
+	cpHashSetDestroy
+	cpHashSetFree
+	cpHashSetAlloc
+	cpHashSetInit
+	cpHashSetNew
+	cpHashSetInsert
+	cpHashSetRemove
+	cpHashSetFind
+	cpHashSetEach
+	cpHashSetFilter
+	
+	cpPolyShapeAlloc
+	cpPolyShapeInit
+	cpPolyShapeNew
+	cpBoxShapeInit
+	cpBoxShapeNew
+	cpPolyValidate
+	cpPolyShapeGetNumVerts
+	cpPolyShapeGetVert
+	
+	cpShapeInit
+	cpShapeDestroy
+	cpShapeFree
+	cpShapeCacheBB
+	cpShapePointQuery
+	cpCircleShapeAlloc
+	cpCircleShapeInit
+	cpCircleShapeNew
+	cpSegmentShapeAlloc
+	cpSegmentShapeInit
+	cpSegmentShapeNew
+	cpResetShapeIdCounter
+	cpSegmentQueryInfoPrint
+	cpShapeSegmentQuery
+	
+	cpSpaceAlloc
+	cpSpaceInit
+	cpSpaceNew
+	cpSpaceDestroy
+	cpSpaceFree
+	cpSpaceFreeChildren
+	cpSpaceSetDefaultCollisionHandler
+	cpSpaceAddCollisionHandler
+	cpSpaceRemoveCollisionHandler
+	cpSpaceAddShape
+	cpSpaceAddStaticShape
+	cpSpaceAddBody
+	cpSpaceAddConstraint
+	cpSpaceRemoveShape
+	cpSpaceRemoveStaticShape
+	cpSpaceRemoveBody
+	cpSpaceRemoveConstraint
+	cpSpaceAddPostStepCallback
+	cpSpacePointQuery
+	cpSpacePointQueryFirst
+	cpSpaceSegmentQuery
+	cpSpaceSegmentQueryFirst
+	cpSpaceBBQuery
+	cpSpaceEachBody
+	cpSpaceResizeStaticHash
+	cpSpaceResizeActiveHash
+	cpSpaceRehashStatic
+	cpSpaceRehashShape
+	cpSpaceStep
+	
+	cpSpaceHashAlloc
+	cpSpaceHashInit
+	cpSpaceHashNew
+	cpSpaceHashDestroy
+	cpSpaceHashFree
+	cpSpaceHashResize
+	cpSpaceHashInsert
+	cpSpaceHashRemove
+	cpSpaceHashEach
+	cpSpaceHashRehash
+	cpSpaceHashRehashObject
+	cpSpaceHashPointQuery
+	cpSpaceHashQuery
+	cpSpaceHashQueryRehash
+	cpSpaceHashSegmentQuery
+	
+	cpvlength
+	cpvslerp
+	cpvslerpconst
+	cpvforangle
+	cpvtoangle
+	cpvstr
+	
+	cpConstraintDestroy
+	cpConstraintFree
+	
+	cpDampedRotarySpringAlloc
+	cpDampedRotarySpringInit
+	cpDampedRotarySpringNew
+	
+	cpDampedSpringAlloc
+	cpDampedSpringInit
+	cpDampedSpringNew
+	
+	cpGearJointAlloc
+	cpGearJointInit
+	cpGearJointNew
+	cpGearJointSetRatio
+	
+	cpGrooveJointAlloc
+	cpGrooveJointInit
+	cpGrooveJointNew
+	cpGrooveJointSetGrooveA
+	cpGrooveJointSetGrooveB
+	
+	cpPinJointAlloc
+	cpPinJointInit
+	cpPinJointNew
+	
+	cpPivotJointAlloc
+	cpPivotJointInit
+	cpPivotJointNew
+	cpPivotJointNew2
+	
+	cpRatchetJointAlloc
+	cpRatchetJointInit
+	cpRatchetJointNew
+	
+	cpRotaryLimitJointAlloc
+	cpRotaryLimitJointInit
+	cpRotaryLimitJointNew
+	
+	cpSimpleMotorAlloc
+	cpSimpleMotorInit
+	cpSimpleMotorNew
+	
+	cpSlideJointAlloc
+	cpSlideJointInit
+	cpSlideJointNew
