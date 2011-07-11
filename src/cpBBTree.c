@@ -24,15 +24,7 @@
 
 #include "chipmunk_private.h"
 
-#ifdef _MSC_VER
-// Are you freaking kidding me?
-// Can it really not tell the difference between a declaration and a definition?
-// Have I ever mentioned how much I hate MSVC?
-extern
-#else
-static
-#endif
-cpSpatialIndexClass klass;
+static inline cpSpatialIndexClass *Klass();
 
 typedef struct Node Node;
 typedef struct Pair Pair;
@@ -105,12 +97,12 @@ GetBB(cpBBTree *tree, void *obj)
 static inline cpBBTree *
 GetTree(cpSpatialIndex *index)
 {
-	return (index && index->klass == &klass ? (cpBBTree *)index : NULL);
+	return (index && index->klass == Klass() ? (cpBBTree *)index : NULL);
 }
 
 static inline Node *
 GetRootIfTree(cpSpatialIndex *index){
-	return (index && index->klass == &klass ? ((cpBBTree *)index)->root : NULL);
+	return (index && index->klass == Klass() ? ((cpBBTree *)index)->root : NULL);
 }
 
 static inline cpTimestamp
@@ -541,7 +533,7 @@ leafSetTrans(void *obj, cpBBTree *tree)
 cpSpatialIndex *
 cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex)
 {
-	cpSpatialIndexInit((cpSpatialIndex *)tree, &klass, bbfunc, staticIndex);
+	cpSpatialIndexInit((cpSpatialIndex *)tree, Klass(), bbfunc, staticIndex);
 	
 	tree->velocityFunc = NULL;
 	
@@ -559,7 +551,7 @@ cpBBTreeInit(cpBBTree *tree, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *static
 void
 cpBBTreeSetVelocityFunc(cpSpatialIndex *index, cpBBTreeVelocityFunc func)
 {
-	if(index->klass != &klass){
+	if(index->klass != Klass()){
 		cpAssertWarn(cpFalse, "Ignoring cpBBTreeSetVelocityFunc() call to non-tree spatial index.");
 		return;
 	}
@@ -624,7 +616,7 @@ cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryFunc func, void *data)
 	cpHashSetEach(tree->leaves, (cpHashSetIteratorFunc)LeafUpdate, tree);
 	
 	cpSpatialIndex *staticIndex = tree->spatialIndex.staticIndex;
-	Node *staticRoot = (staticIndex && staticIndex->klass == &klass ? ((cpBBTree *)staticIndex)->root : NULL);
+	Node *staticRoot = (staticIndex && staticIndex->klass == Klass() ? ((cpBBTree *)staticIndex)->root : NULL);
 	
 	MarkContext context = {tree, staticRoot, func, data};
 	MarkSubtree(tree->root, &context);
@@ -711,6 +703,9 @@ static cpSpatialIndexClass klass = {
 	(cpSpatialIndexSegmentQueryImpl)cpBBTreeSegmentQuery,
 	(cpSpatialIndexQueryImpl)cpBBTreeQuery,
 };
+
+static inline cpSpatialIndexClass *Klass(){return &klass;}
+
 
 #pragma mark Tree Optimization
 
