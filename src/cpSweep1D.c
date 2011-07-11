@@ -24,15 +24,7 @@
 
 #include "chipmunk_private.h"
 
-#ifdef _MSC_VER
-// Are you freaking kidding me?
-// Can it really not tell the difference between a declaration and a definition?
-// Have I ever mentioned how much I hate MSVC?
-extern
-#else
-static
-#endif
-cpSpatialIndexClass klass;
+static inline cpSpatialIndexClass *Klass();
 
 #pragma mark Basic Structures
 
@@ -92,7 +84,7 @@ ResizeTable(cpSweep1D *sweep, int size)
 cpSpatialIndex *
 cpSweep1DInit(cpSweep1D *sweep, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex)
 {
-	cpSpatialIndexInit((cpSpatialIndex *)sweep, &klass, bbfunc, staticIndex);
+	cpSpatialIndexInit((cpSpatialIndex *)sweep, Klass(), bbfunc, staticIndex);
 	
 	sweep->num = 0;
 	ResizeTable(sweep, 32);
@@ -267,3 +259,6 @@ static cpSpatialIndexClass klass = {
 	(cpSpatialIndexSegmentQueryImpl)cpSweep1DSegmentQuery,
 	(cpSpatialIndexQueryImpl)cpSweep1DQuery,
 };
+
+static inline cpSpatialIndexClass *Klass(){return &klass;}
+
