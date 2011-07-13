@@ -19,6 +19,10 @@
  * SOFTWARE.
  */
 
+// These are utility routines to use when creating custom constraints.
+// I'm not sure if this should be part of the private API or not.
+// I should probably clean up the naming conventions if it is...
+
 #define CP_DefineClassGetter(t) const cpConstraintClass * t##GetClass(){return (cpConstraintClass *)&klass;}
 
 void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b);
@@ -54,8 +58,8 @@ apply_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
 static inline void
 apply_bias_impulse(cpBody *body, cpVect j, cpVect r)
 {
-	body->v_bias = cpvadd(body->v_bias, cpvmult(j, body->m_inv));
-	body->w_bias += body->i_inv*cpvcross(r, j);
+	body->CP_PRIVATE(v_bias) = cpvadd(body->CP_PRIVATE(v_bias), cpvmult(j, body->m_inv));
+	body->CP_PRIVATE(w_bias) += body->i_inv*cpvcross(r, j);
 }
 
 static inline void

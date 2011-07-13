@@ -23,6 +23,8 @@
 #include <math.h>
 
 #include "chipmunk.h"
+#include "constraints/util.h"
+
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -46,6 +48,7 @@ static cpBool
 waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 {
 	CP_ARBITER_GET_SHAPES(arb, water, poly);
+	char *messageCursor = messageBuffer;
 	
 	// Get the top of the water sensor bounding box to use as the water level.
 	cpFloat level = cpShapeGetBB(water).t;
@@ -80,7 +83,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpFloat clippedArea = cpfabs(cpAreaForPoly(clippedCount, clipped));
 	cpVect r = cpvsub(cpCentroidForPoly(clippedCount, clipped), body->p);
 	
-	sprintf(messageBuffer, "area: %5.2f, clipped: %5.2f, count %d\n", area, clippedArea, clippedCount);
+	messageCursor += sprintf(messageBuffer, "area: %5.2f, clipped: %5.2f, count %d\n", area, clippedArea, clippedCount);
 	ChipmunkDebugDrawPolygon(clippedCount, clipped, RGBAColor(0, 0, 1, 1), LAColor(0,0));
 	cpVect centroid = cpvadd(r, cpBodyGetPos(body));
 	ChipmunkDebugDrawPoints(5, 1, &centroid, RGBAColor(0, 0, 1, 1));
@@ -90,6 +93,33 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpBodyResetForces(body);
 	cpBodyApplyForce(body, bouyancy, r);
 	
+	cpVect v = cpBodyGetVel(body);
+	cpVect vn = cpvnormalize_safe(v);
+	
+	cpFloat min = INFINITY;
+	cpFloat max = -INFINITY;
+	for(int i=0; i<clippedCount; i++){
+		cpFloat dot = cpvcross(vn, clipped[i]);
+		min = cpfmin(min, dot);
+		max = cpfmax(max, dot);
+	}
+	
+	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
+	cpFloat k = k_scalar(body, space->staticBody, r, cpvzero, vn);
+	cpFloat damping = (max - min)*0.04;
+	cpFloat v_coef = cpfexp(-damping*dt*k);
+	messageCursor += sprintf(messageBuffer, "dt: %5.2f, k: %5.2f, damping: %5.2f, v_coef: %f\n", dt, k, damping, v_coef);
+	
+	cpBodySetVel(body, cpvmult(v, v_coef));
+	
+//	cpFloat drag = (max - min)*cpvlengthsq(v)*0.001f;
+//	cpFloat mass_sum = a->m_inv + b->m_inv;
+//	cpFloat r1cn = cpvcross(r1, n);
+//	cpFloat r2cn = cpvcross(r2, n);
+//	
+//	cpFloat value = mass_sum + a->i_inv*r1cn*r1cn + b->i_inv*r2cn*r2cn;
+//1.0f - cpfexp(-spring->damping*dt*k);
+//	
 //	cpFloat v_coef = cpfpow(0.97f, clippedArea/area);
 //	cpVect v_centroid = cpvadd(body->v, cpvmult(cpvperp(r), body->w));
 //	
@@ -107,7 +137,7 @@ init(void)
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -100));
-	cpSpaceSetDamping(space, 0.5);
+//	cpSpaceSetDamping(space, 0.5);
 	cpSpaceSetSleepTimeThreshold(space, 0.5f);
 	cpSpaceSetCollisionSlop(space, 0.5f);
 	
@@ -163,10 +193,11 @@ init(void)
 
 
 	{
-		cpFloat mass = 1.0f;
 		cpFloat size = 60.0f;
+		cpFloat mass = 1.0f;
+		cpFloat moment = cpMomentForBox(mass, size, 2*size);
 		
-		body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, 2*size)));
+		body = cpSpaceAddBody(space, cpBodyNew(mass, INFINITY));
 		cpBodySetPos(body, cpv(280, -200));
 		
 		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, 2*size));

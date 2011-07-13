@@ -1,0 +1,5 @@
+.DS_Store
+doc/index.html
+macosx/Chipmunk6.xcodeproj/*.pbxuser
+macosx/Chipmunk6.xcodeproj/*.perspectivev3
+build
