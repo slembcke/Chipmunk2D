@@ -2,4 +2,7 @@
 doc/index.html
 macosx/Chipmunk6.xcodeproj/*.pbxuser
 macosx/Chipmunk6.xcodeproj/*.perspectivev3
+macosx/Chipmunk6.xcodeproj/xcuserdata
+macosx/Chipmunk6.xcodeproj/project.xcworkspace
+macosx/DerivedData
 build
