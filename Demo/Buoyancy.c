@@ -55,6 +55,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	
 	cpBody *body = cpShapeGetBody(poly);
 	
+	// Clip the polygon against the water level
 	int count = cpPolyShapeGetNumVerts(poly);
 	int clippedCount = 0;
 	cpVect clipped[count + 1];
@@ -79,11 +80,12 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 		}
 	}
 	
+	// Calculate buoyancy from the clipped polygon area
 	cpFloat area = cpfabs(cpAreaForPoly(count, ((cpPolyShape *)poly)->tVerts));
 	cpFloat clippedArea = cpfabs(cpAreaForPoly(clippedCount, clipped));
 	cpVect r = cpvsub(cpCentroidForPoly(clippedCount, clipped), body->p);
 	
-	messageCursor += sprintf(messageBuffer, "area: %5.2f, clipped: %5.2f, count %d\n", area, clippedArea, clippedCount);
+	messageCursor += sprintf(messageCursor, "area: %5.2f, clipped: %5.2f, count %d\n", area, clippedArea, clippedCount);
 	ChipmunkDebugDrawPolygon(clippedCount, clipped, RGBAColor(0, 0, 1, 1), LAColor(0,0));
 	cpVect centroid = cpvadd(r, cpBodyGetPos(body));
 	ChipmunkDebugDrawPoints(5, 1, &centroid, RGBAColor(0, 0, 1, 1));
@@ -93,6 +95,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpBodyResetForces(body);
 	cpBodyApplyForce(body, bouyancy, r);
 	
+	// Calculate the linear drag (NOT FINISHED)
 	cpVect v = cpBodyGetVel(body);
 	cpVect vn = cpvnormalize_safe(v);
 	
@@ -108,7 +111,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpFloat k = k_scalar(body, space->staticBody, r, cpvzero, vn);
 	cpFloat damping = (max - min)*0.04;
 	cpFloat v_coef = cpfexp(-damping*dt*k);
-	messageCursor += sprintf(messageBuffer, "dt: %5.2f, k: %5.2f, damping: %5.2f, v_coef: %f\n", dt, k, damping, v_coef);
+	messageCursor += sprintf(messageCursor, "dt: %5.2f, k: %5.2f, damping: %5.2f, v_coef: %f\n", dt, k, damping, v_coef);
 	
 	cpBodySetVel(body, cpvmult(v, v_coef));
 	
