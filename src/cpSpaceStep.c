@@ -339,7 +339,10 @@ cpShapeUpdateFunc(cpShape *shape, void *unused)
 void
 cpSpaceStep(cpSpace *space, cpFloat dt)
 {
-	if(dt == 0.0f) return; // don't step if the timestep is 0!
+	// don't step if the timestep is 0!
+	if(dt == 0.0f) return;
+	
+	space->stamp++;
 	
 	cpFloat prev_dt = space->curr_dt;
 	space->curr_dt = dt;
@@ -401,7 +404,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	}
 	
 	// Apply cached impulses
-	cpFloat dt_coef = (space->stamp ? dt/prev_dt : 0.0f);
+	cpFloat dt_coef = (prev_dt == 0.0f ? 0.0f : dt/prev_dt);
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiterApplyCachedImpulse((cpArbiter *)arbiters->arr[i], dt_coef);
 	}
@@ -432,7 +435,4 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		handler->postSolve(arb, space, handler->data);
 	}
 	cpSpaceUnlock(space, cpTrue);
-	
-	// Increment the stamp.
-	space->stamp++;
 }

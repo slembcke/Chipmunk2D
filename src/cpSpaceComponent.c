@@ -124,6 +124,7 @@ ComponentActivate(cpBody *root)
 	while(body){
 		cpBody *next = body->node.next;
 		
+		body->node.idleTime = 0.0f;
 		body->node.root = NULL;
 		body->node.next = NULL;
 		cpSpaceActivateBody(space, body);

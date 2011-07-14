@@ -34,6 +34,7 @@ CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
 CHANGES SINCE 6.0.0:
+* BUG: Calling cpBodySetPos() on a sleeping body was delaying the separate() handler call if one existed.
 * API: Added cpSpaceEachConstraint().
 
 CHANGES SINCE 5.x:
