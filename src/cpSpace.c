@@ -316,15 +316,28 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 struct arbiterFilterContext {
 	cpSpace *space;
 	cpBody *body;
+	cpShape *shape;
 };
 
 static cpBool
-contactSetFilterRemovedBody(cpArbiter *arb, struct arbiterFilterContext *context)
+cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 {
+	cpShape *shape = context->shape;
 	cpBody *body = context->body;
-	if(body == arb->body_a || body == arb->body_b){
+	
+	
+	// Match on the filter shape, or if it's NULL the filter body
+	if(
+		(body == arb->body_a && (shape == arb->a || shape == NULL)) ||
+		(body == arb->body_b && (shape == arb->b || shape == NULL))
+	){
+		// Call separate when removing shapes.
+		if(shape && arb->state != cpArbiterStateCached) cpArbiterCallSeparate(arb, context->space);
+		
+		cpArbiterUnthread(arb);
 		cpArrayDeleteObj(context->space->arbiters, arb);
 		cpArrayPush(context->space->pooledArbiters, arb);
+		
 		return cpFalse;
 	}
 	
@@ -334,24 +347,25 @@ contactSetFilterRemovedBody(cpArbiter *arb, struct arbiterFilterContext *context
 void
 cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter)
 {
-	cpArbiter *arb = body->arbiterList;
-	while(arb){
-		cpArbiter *next = cpArbiterNext(arb, body);
-		if(filter == NULL || filter == arb->a || filter == arb->b){
-			if(arb->state != cpArbiterStateCached) cpArbiterCallSeparate(arb, space);
-			
-			cpArbiterUnthread(arb);
-			cpSpaceUncacheArbiter(space, arb);
-			cpArrayPush(space->pooledArbiters, arb);
-		}
-		arb = next;
-	}
+//	cpArbiter *arb = body->arbiterList;
+//	while(arb){
+//		cpArbiter *next = cpArbiterNext(arb, body);
+//		if(filter == NULL || filter == arb->a || filter == arb->b){
+//			if(arb->state != cpArbiterStateCached) cpArbiterCallSeparate(arb, space);
+//			
+//			cpArbiterUnthread(arb);
+//			cpSpaceUncacheArbiter(space, arb);
+//			cpArrayPush(space->pooledArbiters, arb);
+//		}
+//		arb = next;
+//	}
 	
 	// TODO see note at cpSpaceArbiterSetFilter()
 	// When just removing the body, so we need to filter all cached arbiters to avoid dangling pointers.
-	if(filter == NULL){
-		struct arbiterFilterContext context = {space, body};
-		cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)contactSetFilterRemovedBody, &context);
+	//if(filter == NULL)
+	{
+		struct arbiterFilterContext context = {space, body, filter};
+		cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)cachedArbitersFilter, &context);
 	}
 }
 

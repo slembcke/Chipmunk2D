@@ -50,15 +50,21 @@ struct Node {
 	
 	union {
 		// Internal nodes
-		struct { Node *a, *b; };
+		struct { Node *a, *b; } children;
 		
 		// Leaves
 		struct {
 			cpTimestamp stamp;
 			Pair *pairs;
-		};
-	};
+		} leaf;
+	} node;
 };
+
+// Can't use anonymous unions and still get good x-compiler compatability
+#define A node.children.a
+#define B node.children.b
+#define STAMP node.leaf.stamp
+#define PAIRS node.leaf.pairs
 
 typedef struct Thread {
 	Pair *prev;
@@ -167,15 +173,15 @@ ThreadUnlink(Thread thread)
 	if(prev){
 		if(prev->a.leaf == thread.leaf) prev->a.next = next; else prev->b.next = next;
 	} else {
-		thread.leaf->pairs = next;
+		thread.leaf->PAIRS = next;
 	}
 }
 
 static void
 PairsClear(Node *leaf, cpBBTree *tree)
 {
-	Pair *pair = leaf->pairs;
-	leaf->pairs = NULL;
+	Pair *pair = leaf->PAIRS;
+	leaf->PAIRS = NULL;
 	
 	while(pair){
 		if(pair->a.leaf == leaf){
@@ -195,11 +201,11 @@ PairsClear(Node *leaf, cpBBTree *tree)
 static void
 PairInsert(Node *a, Node *b, cpBBTree *tree)
 {
-	Pair *nextA = a->pairs, *nextB = b->pairs;
+	Pair *nextA = a->PAIRS, *nextB = b->PAIRS;
 	Pair *pair = PairFromPool(tree);
 	Pair temp = {{NULL, a, nextA},{NULL, b, nextB}};
 	
-	a->pairs = b->pairs = pair;
+	a->PAIRS = b->PAIRS = pair;
 	*pair = temp;
 	
 	if(nextA){
@@ -246,14 +252,14 @@ NodeFromPool(cpBBTree *tree)
 static inline void
 NodeSetA(Node *node, Node *value)
 {
-	node->a = value;
+	node->A = value;
 	value->parent = node;
 }
 
 static inline void
 NodeSetB(Node *node, Node *value)
 {
-	node->b = value;
+	node->B = value;
 	value->parent = node;
 }
 
@@ -281,25 +287,25 @@ NodeIsLeaf(Node *node)
 static inline Node *
 NodeOther(Node *node, Node *child)
 {
-	return (node->a == child ? node->b : node->a);
+	return (node->A == child ? node->B : node->A);
 }
 
 static inline void
 NodeReplaceChild(Node *parent, Node *child, Node *value, cpBBTree *tree)
 {
 	cpAssertSoft(!NodeIsLeaf(parent), "Cannot replace child of a leaf.");
-	cpAssertSoft(child == parent->a || child == parent->b, "Node is not a child of parent.");
+	cpAssertSoft(child == parent->A || child == parent->B, "Node is not a child of parent.");
 	
-	if(parent->a == child){
-		NodeRecycle(tree, parent->a);
+	if(parent->A == child){
+		NodeRecycle(tree, parent->A);
 		NodeSetA(parent, value);
 	} else {
-		NodeRecycle(tree, parent->b);
+		NodeRecycle(tree, parent->B);
 		NodeSetB(parent, value);
 	}
 	
 	for(Node *node=parent; node; node = node->parent){
-		node->bb = cpBBMerge(node->a->bb, node->b->bb);
+		node->bb = cpBBMerge(node->A->bb, node->B->bb);
 	}
 }
 
@@ -313,16 +319,16 @@ SubtreeInsert(Node *subtree, Node *leaf, cpBBTree *tree)
 	} else if(NodeIsLeaf(subtree)){
 		return NodeNew(tree, leaf, subtree);
 	} else {
-		cpFloat cost_a = cpBBArea(subtree->b->bb) + cpBBMergedArea(subtree->a->bb, leaf->bb);
-		cpFloat cost_b = cpBBArea(subtree->a->bb) + cpBBMergedArea(subtree->b->bb, leaf->bb);
+		cpFloat cost_a = cpBBArea(subtree->B->bb) + cpBBMergedArea(subtree->A->bb, leaf->bb);
+		cpFloat cost_b = cpBBArea(subtree->A->bb) + cpBBMergedArea(subtree->B->bb, leaf->bb);
 		
 //		cpFloat cost_a = cpBBProximity(subtree->a->bb, leaf->bb);
 //		cpFloat cost_b = cpBBProximity(subtree->b->bb, leaf->bb);
 		
 		if(cost_b < cost_a){
-			NodeSetB(subtree, SubtreeInsert(subtree->b, leaf, tree));
+			NodeSetB(subtree, SubtreeInsert(subtree->B, leaf, tree));
 		} else {
-			NodeSetA(subtree, SubtreeInsert(subtree->a, leaf, tree));
+			NodeSetA(subtree, SubtreeInsert(subtree->A, leaf, tree));
 		}
 		
 		subtree->bb = cpBBMerge(subtree->bb, leaf->bb);
@@ -337,8 +343,8 @@ SubtreeQuery(Node *subtree, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, vo
 		if(NodeIsLeaf(subtree)){
 			func(obj, subtree->obj, data);
 		} else {
-			SubtreeQuery(subtree->a, obj, bb, func, data);
-			SubtreeQuery(subtree->b, obj, bb, func, data);
+			SubtreeQuery(subtree->A, obj, bb, func, data);
+			SubtreeQuery(subtree->B, obj, bb, func, data);
 		}
 	}
 }
@@ -352,8 +358,8 @@ SubtreeSegmentQuery(Node *subtree, void *obj, cpVect a, cpVect b, cpSpatialIndex
 		if(NodeIsLeaf(subtree)){
 			func(obj, subtree->obj, data);
 		} else {
-			SubtreeSegmentQuery(subtree->a, obj, a, b, func, data);
-			SubtreeSegmentQuery(subtree->b, obj, a, b, func, data);
+			SubtreeSegmentQuery(subtree->A, obj, a, b, func, data);
+			SubtreeSegmentQuery(subtree->B, obj, a, b, func, data);
 		}
 	}
 }
@@ -362,8 +368,8 @@ static void
 SubtreeRecycle(cpBBTree *tree, Node *node)
 {
 	if(!NodeIsLeaf(node)){
-		SubtreeRecycle(tree, node->a);
-		SubtreeRecycle(tree, node->b);
+		SubtreeRecycle(tree, node->A);
+		SubtreeRecycle(tree, node->B);
 		NodeRecycle(tree, node);
 	}
 }
@@ -404,12 +410,12 @@ MarkLeafQuery(Node *subtree, Node *leaf, cpBool left, MarkContext *context)
 			if(left){
 				PairInsert(leaf, subtree, context->tree);
 			} else {
-				if(subtree->stamp < leaf->stamp) PairInsert(subtree, leaf, context->tree);
+				if(subtree->STAMP < leaf->STAMP) PairInsert(subtree, leaf, context->tree);
 				context->func(leaf->obj, subtree->obj, context->data);
 			}
 		} else {
-			MarkLeafQuery(subtree->a, leaf, left, context);
-			MarkLeafQuery(subtree->b, leaf, left, context);
+			MarkLeafQuery(subtree->A, leaf, left, context);
+			MarkLeafQuery(subtree->B, leaf, left, context);
 		}
 	}
 }
@@ -418,19 +424,19 @@ static void
 MarkLeaf(Node *leaf, MarkContext *context)
 {
 	cpBBTree *tree = context->tree;
-	if(leaf->stamp == GetStamp(tree)){
+	if(leaf->STAMP == GetStamp(tree)){
 		Node *staticRoot = context->staticRoot;
 		if(staticRoot) MarkLeafQuery(staticRoot, leaf, cpFalse, context);
 		
 		for(Node *node = leaf; node->parent; node = node->parent){
-			if(node == node->parent->a){
-				MarkLeafQuery(node->parent->b, leaf, cpTrue, context);
+			if(node == node->parent->A){
+				MarkLeafQuery(node->parent->B, leaf, cpTrue, context);
 			} else {
-				MarkLeafQuery(node->parent->a, leaf, cpFalse, context);
+				MarkLeafQuery(node->parent->A, leaf, cpFalse, context);
 			}
 		}
 	} else {
-		Pair *pair = leaf->pairs;
+		Pair *pair = leaf->PAIRS;
 		while(pair){
 			if(leaf == pair->b.leaf){
 				context->func(pair->a.leaf->obj, leaf->obj, context->data);
@@ -448,8 +454,8 @@ MarkSubtree(Node *subtree, MarkContext *context)
 	if(NodeIsLeaf(subtree)){
 		MarkLeaf(subtree, context);
 	} else {
-		MarkSubtree(subtree->a, context);
-		MarkSubtree(subtree->b, context);
+		MarkSubtree(subtree->A, context);
+		MarkSubtree(subtree->B, context);
 	}
 }
 
@@ -463,8 +469,8 @@ LeafNew(cpBBTree *tree, void *obj, cpBB bb)
 	node->bb = GetBB(tree, obj);
 	
 	node->parent = NULL;
-	node->stamp = 0;
-	node->pairs = NULL;
+	node->STAMP = 0;
+	node->PAIRS = NULL;
 	
 	return node;
 }
@@ -482,7 +488,7 @@ LeafUpdate(Node *leaf, cpBBTree *tree)
 		tree->root = SubtreeInsert(root, leaf, tree);
 		
 		PairsClear(leaf, tree);
-		leaf->stamp = GetStamp(tree);
+		leaf->STAMP = GetStamp(tree);
 		
 		return cpTrue;
 	}
@@ -584,7 +590,7 @@ cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
 	Node *root = tree->root;
 	tree->root = SubtreeInsert(root, leaf, tree);
 	
-	leaf->stamp = GetStamp(tree);
+	leaf->STAMP = GetStamp(tree);
 	LeafAddPairs(leaf, tree);
 	IncrementStamp(tree);
 }

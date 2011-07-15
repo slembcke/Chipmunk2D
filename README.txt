@@ -34,8 +34,10 @@ CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
 CHANGES SINCE 6.0.0:
-* BUG: Calling cpBodySetPos() on a sleeping body was delaying the separate() handler call if one existed.
+* BUG: Calling cpBodySetPos() on a sleeping body was delaying the Separate() handler callback if one existed.
+* BUG: Fixed a bug where Separate() handler callbacks were not occuring when removing shapes.
 * API: Added cpSpaceEachConstraint().
+* MISC: Got rid of anonymous unions so that it is C99 clean again.
 
 CHANGES SINCE 5.x:
 Chipmunk 6.x's API is not quite 100% compatible with 5.x. Make sure you read the list of changes carefully.
