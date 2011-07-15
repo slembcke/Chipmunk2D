@@ -47,6 +47,7 @@
 		D36D87841012D63600DB5078 /* cpRatchetJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D36D87821012D63600DB5078 /* cpRatchetJoint.h */; };
 		D37282AD13C6432F00FFFA3F /* Crane.c in Sources */ = {isa = PBXBuildFile; fileRef = D37282AC13C6432F00FFFA3F /* Crane.c */; };
 		D37282D413C76C1B00FFFA3F /* Buoyancy.c in Sources */ = {isa = PBXBuildFile; fileRef = D37282D313C76C1B00FFFA3F /* Buoyancy.c */; };
+		D373FF1013D0D66E000EDB87 /* ContactGraph.c in Sources */ = {isa = PBXBuildFile; fileRef = D373FF0F13D0D66E000EDB87 /* ContactGraph.c */; };
 		D37697200B50C53900BB33CC /* LogoSmash.c in Sources */ = {isa = PBXBuildFile; fileRef = D3CCDF460AE35D920080442F /* LogoSmash.c */; };
 		D37BB76E0EAADA6300C70958 /* cpRotaryLimitJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D37BB76C0EAADA6300C70958 /* cpRotaryLimitJoint.c */; };
 		D37BB76F0EAADA6300C70958 /* cpRotaryLimitJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = D37BB76D0EAADA6300C70958 /* cpRotaryLimitJoint.h */; };
@@ -140,6 +141,7 @@
 		D36D87821012D63600DB5078 /* cpRatchetJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpRatchetJoint.h; path = ../../include/chipmunk/constraints/cpRatchetJoint.h; sourceTree = "<group>"; };
 		D37282AC13C6432F00FFFA3F /* Crane.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Crane.c; sourceTree = "<group>"; };
 		D37282D313C76C1B00FFFA3F /* Buoyancy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Buoyancy.c; sourceTree = "<group>"; };
+		D373FF0F13D0D66E000EDB87 /* ContactGraph.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ContactGraph.c; sourceTree = "<group>"; };
 		D37BB76C0EAADA6300C70958 /* cpRotaryLimitJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpRotaryLimitJoint.c; sourceTree = "<group>"; };
 		D37BB76D0EAADA6300C70958 /* cpRotaryLimitJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpRotaryLimitJoint.h; path = ../../include/chipmunk/constraints/cpRotaryLimitJoint.h; sourceTree = "<group>"; };
 		D37BB8B10EAB01E400C70958 /* cpGearJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpGearJoint.c; sourceTree = "<group>"; };
@@ -321,6 +323,7 @@
 				D3F52BD213C509DC00EB67D9 /* Chains.c */,
 				D37282AC13C6432F00FFFA3F /* Crane.c */,
 				D37282D313C76C1B00FFFA3F /* Buoyancy.c */,
+				D373FF0F13D0D66E000EDB87 /* ContactGraph.c */,
 				D3E4867513175AE000A00840 /* Bench.c */,
 			);
 			name = Demo;
@@ -609,6 +612,7 @@
 				D3F52BD313C509DC00EB67D9 /* Chains.c in Sources */,
 				D37282AD13C6432F00FFFA3F /* Crane.c in Sources */,
 				D37282D413C76C1B00FFFA3F /* Buoyancy.c in Sources */,
+				D373FF1013D0D66E000EDB87 /* ContactGraph.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -120,8 +120,8 @@ cpArbiterTotalImpulse(const cpArbiter *arb)
 		cpContact *con = &contacts[i];
 		sum = cpvadd(sum, cpvmult(con->n, con->jnAcc));
 	}
-		
-	return sum;
+	
+	return (arb->swappedColl ? cpvneg(sum) : sum);
 }
 
 cpVect
@@ -135,7 +135,7 @@ cpArbiterTotalImpulseWithFriction(const cpArbiter *arb)
 		sum = cpvadd(sum, cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc)));
 	}
 		
-	return sum;
+	return (arb->swappedColl ? cpvneg(sum) : sum);
 }
 
 //cpFloat

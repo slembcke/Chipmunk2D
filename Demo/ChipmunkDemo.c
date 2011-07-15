@@ -474,6 +474,7 @@ extern ChipmunkDemo Tank;
 extern ChipmunkDemo Chains;
 extern ChipmunkDemo Crane;
 extern ChipmunkDemo Buoyancy;
+extern ChipmunkDemo ContactGraph;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -499,6 +500,7 @@ main(int argc, const char **argv)
 		Tank,
 		Chains,
 		Crane,
+		ContactGraph,
 	};
 	
 	demos = demo_list;
