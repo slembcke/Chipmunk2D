@@ -411,7 +411,7 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
-	cpSpaceFilterArbiters(space, body, NULL);
+//	cpSpaceFilterArbiters(space, body, NULL);
 	cpArrayDeleteObj(space->bodies, body);
 	body->space = NULL;
 }
