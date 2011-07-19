@@ -34,9 +34,16 @@
 //#endif
 
 void
-cpMessage(const char *message, const char *condition, const char *file, int line, int isError)
+cpMessage(const char *condition, const char *file, int line, int isError, const char *message, ...)
 {
-	fprintf(stderr, (isError ? "Aborting due to Chipmunk error: %s\n" : "Chipmunk warning: %s\n"), message);
+	fprintf(stderr, (isError ? "Aborting due to Chipmunk error: " : "Chipmunk warning: "));
+	
+	va_list vargs;
+	va_start(vargs, message); {
+		vfprintf(stderr, message, vargs);
+		fprintf(stderr, "\n");
+	} va_end(vargs);
+	
 	fprintf(stderr, "\tFailed condition: %s\n", condition);
 	fprintf(stderr, "\tSource:%s:%d\n", file, line);
 	
