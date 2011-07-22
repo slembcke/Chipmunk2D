@@ -38,6 +38,10 @@ struct cpConstraintClass {
 };
 
 
+typedef void (*cpConstraintPreSolveFunc)(cpConstraint *constraint, cpSpace *space);
+typedef void (*cpConstraintPostSolveFunc)(cpConstraint *constraint, cpSpace *space);
+
+
 /// Opaque cpConstraint struct.
 struct cpConstraint {
 	CP_PRIVATE(const cpConstraintClass *klass);
@@ -62,6 +66,14 @@ struct cpConstraint {
 	/// The maximum rate at which joint error is corrected.
 	/// Defaults to infinity.
 	cpFloat maxBias;
+	
+	/// Function called before the solver runs.
+	/// Animate your joint anchors, update your motor torque, etc.
+	cpConstraintPreSolveFunc preSolve;
+	
+	/// Function called after the solver runs.
+	/// Use the applied impulse to perform effects like breakable joints.
+	cpConstraintPostSolveFunc postSolve;
 	
 	/// User definable data pointer.
 	/// Generally this points to your the game object class so you can access it
@@ -99,6 +111,8 @@ CP_DefineConstraintStructGetter(cpBody *, b, B);
 CP_DefineConstraintStructProperty(cpFloat, maxForce, MaxForce);
 CP_DefineConstraintStructProperty(cpFloat, errorBias, ErrorBias);
 CP_DefineConstraintStructProperty(cpFloat, maxBias, MaxBias);
+CP_DefineConstraintStructProperty(cpConstraintPreSolveFunc, preSolve, PreSolveFunc);
+CP_DefineConstraintStructProperty(cpConstraintPostSolveFunc, postSolve, PostSolveFunc);
 CP_DefineConstraintStructProperty(cpDataPointer, data, UserData);
 
 /// Get the last impulse applied by this constraint.

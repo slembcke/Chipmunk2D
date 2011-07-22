@@ -392,6 +392,10 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	cpArray *constraints = space->constraints;
 	for(int i=0; i<constraints->num; i++){
 		cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
+		
+		cpConstraintPreSolveFunc preSolve = constraint->preSolve;
+		if(preSolve) preSolve(constraint, space);
+		
 		constraint->klass->preStep(constraint, dt);
 	}
 
@@ -424,6 +428,14 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 			cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
 			constraint->klass->applyImpulse(constraint);
 		}
+	}
+	
+	// Run the constraint post-solve callbacks
+	for(int i=0; i<constraints->num; i++){
+		cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
+		
+		cpConstraintPostSolveFunc postSolve = constraint->postSolve;
+		if(postSolve) postSolve(constraint, space);
 	}
 	
 	// run the post-solve callbacks

@@ -29,8 +29,28 @@ static cpSpace *space;
 
 #define CHAIN_COUNT 8
 #define LINK_COUNT 10
-#define JOINT_COUNT (CHAIN_COUNT*LINK_COUNT)
-cpConstraint *breakableJoints[JOINT_COUNT] = {};
+
+static void
+BreakablejointPostStepRemove(cpSpace *space, cpConstraint *joint, void *unused)
+{
+	cpSpaceRemoveConstraint(space, joint);
+	cpConstraintFree(joint);
+}
+
+static void
+BreakableJointPostSolve(cpConstraint *joint, cpSpace *space)
+{
+	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
+	
+	// Convert the impulse to a force by dividing it by the timestep.
+	cpFloat force = cpConstraintGetImpulse(joint)/dt;
+	cpFloat maxForce = cpConstraintGetMaxForce(joint);
+
+	// If the force is almost as big as the joint's max force, break it.
+	if(force > 0.9*maxForce){
+		cpSpaceAddPostStepCallback(space, (cpPostStepFunc)BreakablejointPostStepRemove, joint, NULL);
+	}
+}
 
 static void
 update(int ticks)
@@ -40,22 +60,6 @@ update(int ticks)
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
-		
-		for(int i=0; i<JOINT_COUNT; i++){
-			cpConstraint *joint = breakableJoints[i];
-			if(joint == NULL) continue;
-			
-			// Convert the impulse to a force by dividing it by the timestep.
-			cpFloat force = cpConstraintGetImpulse(joint)/dt;
-			cpFloat maxForce = cpConstraintGetMaxForce(joint);
-
-			// If the force is almost as big as the joint's max force, break it.
-			if(force > 0.9*maxForce){
-				cpSpaceRemoveConstraint(space, joint);
-				cpConstraintFree(joint);
-				breakableJoints[i] = NULL;
-			}
-		}
 	}
 }
 
@@ -120,7 +124,7 @@ init(void)
 			}
 			
 			cpConstraintSetMaxForce(constraint, breakingForce);
-			breakableJoints[i + j*CHAIN_COUNT] = constraint;
+			cpConstraintSetPostSolveFunc(constraint, BreakableJointPostSolve);
 			
 			prev = body;
 		}

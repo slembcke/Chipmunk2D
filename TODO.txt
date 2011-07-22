@@ -3,7 +3,10 @@ cpSpaceGetPrevTimeStep doc
 touch joint (Objective-Chipmunk)
 
 Tutorial ideas:
+	Blob example (with grab code)
+	Multitouch grabbing example (Cocos2D)
 	Player grounding example.
+	Fishing
 	Bouyancy example.
 	OpenGL transform example.
 
