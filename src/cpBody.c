@@ -251,6 +251,7 @@ cpBodyUpdatePosition(cpBody *body, cpFloat dt)
 void
 cpBodyResetForces(cpBody *body)
 {
+	cpBodyActivate(body);
 	body->f = cpvzero;
 	body->t = 0.0f;
 }
@@ -258,6 +259,7 @@ cpBodyResetForces(cpBody *body)
 void
 cpBodyApplyForce(cpBody *body, cpVect force, cpVect r)
 {
+	cpBodyActivate(body);
 	body->f = cpvadd(body->f, force);
 	body->t += cpvcross(r, force);
 }
