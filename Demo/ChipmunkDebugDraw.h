@@ -40,6 +40,9 @@ void ChipmunkDebugDrawPolygon(int count, cpVect *verts, Color lineColor, Color f
 void ChipmunkDebugDrawPoints(cpFloat size, int count, cpVect *verts, Color color);
 void ChipmunkDebugDrawBB(cpBB bb, Color color);
 
+void ChipmunkDebugDrawConstraint(cpConstraint *constraint);
+void ChipmunkDebugDrawShape(cpShape *shape);
+
 void ChipmunkDebugDrawShapes(cpSpace *space);
 void ChipmunkDebugDrawConstraints(cpSpace *space);
 void ChipmunkDebugDrawCollisionPoints(cpSpace *space);

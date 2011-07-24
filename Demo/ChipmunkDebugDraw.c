@@ -306,6 +306,11 @@ drawShape(cpShape *shape, void *unused)
 	}
 }
 
+void ChipmunkDebugDrawShape(cpShape *shape)
+{
+	drawShape(shape, NULL);
+}
+
 void ChipmunkDebugDrawShapes(cpSpace *space)
 {
 	cpSpaceEachShape(space, drawShape, NULL);
@@ -406,6 +411,11 @@ drawConstraint(cpConstraint *constraint, void *unused)
 	} else if(klass == cpDampedSpringGetClass()){
 		drawSpring((cpDampedSpring *)constraint, body_a, body_b);
 	}
+}
+
+void ChipmunkDebugDrawConstraint(cpConstraint *constraint)
+{
+	drawConstraint(constraint, NULL);
 }
 
 void ChipmunkDebugDrawConstraints(cpSpace *space)
