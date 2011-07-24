@@ -660,6 +660,10 @@ void cpSpaceSetEnableContactGraph(cpSpace *space, cpBool value)</code></pre>
 
 p(expl). In order to use the @cpBodyEachArbiter()@ function, you must tell Chipmunk to generate the contact graph. Disabled by default as it incurrs a small 5-10% overhead. Enabling the sleeping feature also enables the contact graph.
 
+<pre><code>cpFloat cpSpaceGetCurrentTimeSTep(const cpSpace *space)</code></pre>
+
+p(expl). Retrieves the current (if you are in a callback from @cpSpaceStep()@) or most recent (outside of a @cpSpaceStep()@ call) timestep.
+
 <pre><code>cpDataPointer cpSpaceGetUserData(const cpSpace *space)
 void cpSpaceSetUserData(cpSpace *space, cpDataPointer value)</code></pre>
 
