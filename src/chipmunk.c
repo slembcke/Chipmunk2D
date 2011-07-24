@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdarg.h>
 
 #include "chipmunk_private.h"
 
