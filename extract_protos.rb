@@ -1,3 +1,6 @@
+# extract function prototypes from the headers for making FFIs, etc.
+# use like this: find include/ -name "*.h" | xargs cat | ruby extract_protos.rb
+
 FORMAT = ARGV[0]
 
 # match 0 is the whole function proto

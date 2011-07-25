@@ -4,8 +4,8 @@ Chipmunk is a simple, lightweight, fast and portable 2D rigid body physics libra
 CONTRACTING:
 Howling Moon Software (my company) is available for contracting if you want to make the physics in your game really stand out. Given our unique experience with the library, we can help you use Chipmunk to it's fullest potential. Feel free to contact us through our webpage: http://howlingmoonsoftware.com/contracting.php
 
-Objective-Chipmunk:
-The Objective-Chipmunk directory contains an Objective-C wrapper for the Chipmunk Physics Library as well as some sample code from shipping iPhone Apps. One reason Chipmunk was written in C was to allow easy wrapping for other languages. The primary advantages of a native Objective-C API include integrating with the Cocoa memory management model and the Chipmunk Object protocol. The Chipmunk Object protocol unifies the basic Chipmunk types as well as making it easy to create and manage custom composite collections of the basic types. Additionally, the wrapper adds many convenience methods for doing common setup tasks as well as helper methods that integrate it with the rest of the Cocoa Touch API and basic datatypes used on the iPhone. The wrapper tries to do things the Objective-C way, adding useful method variations where it makes sense to do so. If you are an iPhone developer, Objective-Chipmunk will definitely save you time.
+Chipmunk Pro: http://chipmunk-physics.net/chipmunkPro.php
+We also make a bunch of extra for Chipmunk called Chipmunk Pro. Currently we have a nice Objective-C wrapper that should be of particular interest to Mac and iPhone developers. We are also working on auto-geometry features and multithreading/SIMD optimizations as well. Check out the link above for more information!
 
 To try Objective-Chipmunk in your own projects see Objective-Chipmunk/Objective-Chipmunk/Readme.rtf.
 
