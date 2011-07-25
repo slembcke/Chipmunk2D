@@ -483,7 +483,7 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
-//		Buoyancy,
+		Buoyancy,
 		LogoSmash,
 		PyramidStack,
 		Plink,

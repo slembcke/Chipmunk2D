@@ -40,7 +40,7 @@ update(int ticks)
 	}
 }
 
-#define FLUID_DENSITY 0.0002f
+#define FLUID_DENSITY 0.00014f
 
 char messageBuffer[1024] = {};
 
@@ -90,13 +90,17 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpVect centroid = cpvadd(r, cpBodyGetPos(body));
 	ChipmunkDebugDrawPoints(5, 1, &centroid, RGBAColor(0, 0, 1, 1));
 	
-	cpVect bouyancy = cpvmult(cpSpaceGetGravity(space), -clippedArea*FLUID_DENSITY);
+	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
+	cpVect g = cpSpaceGetGravity(space);
 	
-	cpBodyResetForces(body);
-	cpBodyApplyForce(body, bouyancy, r);
+	cpFloat mass = cpBodyGetMass(body);
+	cpFloat displacedMass = clippedArea*FLUID_DENSITY;
+	
+	// Integrate the buoyancy forces right here.
+	cpBodySetVel(body, cpvadd(cpBodyGetVel(body), cpvmult(g, -displacedMass/mass*dt)));
 	
 	// Calculate the linear drag (NOT FINISHED)
-	cpVect v = cpBodyGetVel(body);
+	cpVect v = cpvadd(body->v, cpvmult(cpvperp(r), body->w));
 	cpVect vn = cpvnormalize_safe(v);
 	
 	cpFloat min = INFINITY;
@@ -107,13 +111,14 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 		max = cpfmax(max, dot);
 	}
 	
-	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
-	cpFloat k = k_scalar(body, space->staticBody, r, cpvzero, vn);
-	cpFloat damping = (max - min)*0.04;
+	cpFloat k = k_scalar_body(body, r, vn);
+	cpFloat damping = (max - min)*0.02;
 	cpFloat v_coef = cpfexp(-damping*dt*k);
 	messageCursor += sprintf(messageCursor, "dt: %5.2f, k: %5.2f, damping: %5.2f, v_coef: %f\n", dt, k, damping, v_coef);
 	
-	cpBodySetVel(body, cpvmult(v, v_coef));
+	//cpBodySetVel(body, cpvmult(v, v_coef));
+	cpVect v_target = cpvmult(v, v_coef);
+	apply_impulse(body, cpvmult(cpvsub(v_target, v), k), r);
 	
 //	cpFloat drag = (max - min)*cpvlengthsq(v)*0.001f;
 //	cpFloat mass_sum = a->m_inv + b->m_inv;
@@ -170,7 +175,7 @@ init(void)
 	
 	{
 		// Add the edges of the bucket
-		cpBB bb = cpBBNew(-200, -100, 200, 100);
+		cpBB bb = cpBBNew(-300, -200, 100, 0);
 		cpFloat radius = 5.0f;
 		
 		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(bb.l, bb.b), cpv(bb.l, bb.t), radius));
@@ -197,11 +202,12 @@ init(void)
 
 	{
 		cpFloat size = 60.0f;
-		cpFloat mass = 1.0f;
-		cpFloat moment = cpMomentForBox(mass, size, 2*size);
+		cpFloat mass = FLUID_DENSITY*size*size*2.0;
+		cpFloat moment = cpMomentForBox(mass, size, 2.0*size);
 		
-		body = cpSpaceAddBody(space, cpBodyNew(mass, INFINITY));
-		cpBodySetPos(body, cpv(280, -200));
+		body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
+		cpBodySetPos(body, cpv(-100, -0));
+		cpBodySetVel(body, cpv(-100, 0));
 		
 		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, 2*size));
 		cpShapeSetFriction(shape, 0.8f);

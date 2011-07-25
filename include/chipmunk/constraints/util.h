@@ -70,13 +70,16 @@ apply_bias_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
 }
 
 static inline cpFloat
+k_scalar_body(cpBody *body, cpVect r, cpVect n)
+{
+	cpFloat rcn = cpvcross(r, n);
+	return body->m_inv + body->i_inv*rcn*rcn;
+}
+
+static inline cpFloat
 k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n)
 {
-	cpFloat mass_sum = a->m_inv + b->m_inv;
-	cpFloat r1cn = cpvcross(r1, n);
-	cpFloat r2cn = cpvcross(r2, n);
-	
-	cpFloat value = mass_sum + a->i_inv*r1cn*r1cn + b->i_inv*r2cn*r2cn;
+	cpFloat value = k_scalar_body(a, r1, n) + k_scalar_body(b, r2, n);
 	cpAssertSoft(value != 0.0, "Unsolvable collision or constraint.");
 	
 	return value;
