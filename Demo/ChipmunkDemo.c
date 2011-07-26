@@ -204,6 +204,8 @@ drawShapeBB(cpShape *shape, void *unused)
 static void
 display(void)
 {
+	demos[demoIndex].drawFunc();
+	
 	if(!paused || step){
 		cpVect newPoint = cpvlerp(mouseBody->p, ChipmunkDemoMouse, 0.25f);
 		mouseBody->v = cpvmult(cpvsub(newPoint, mouseBody->p), 60.0f);
@@ -215,7 +217,6 @@ display(void)
 		step = cpFalse;
 	}
   
-	demos[demoIndex].drawFunc();
 	if(drawBBs) cpSpaceEachShape(space, drawShapeBB, NULL);
 	
 	drawInstructions();
@@ -375,7 +376,8 @@ static void
 initGL(void)
 {
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-
+	glClear(GL_COLOR_BUFFER_BIT);
+	
 	glEnableClientState(GL_VERTEX_ARRAY);
 	
 	glEnable(GL_LINE_SMOOTH);
@@ -483,7 +485,6 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
-		Buoyancy,
 		LogoSmash,
 		PyramidStack,
 		Plink,
@@ -501,6 +502,7 @@ main(int argc, const char **argv)
 		Chains,
 		Crane,
 		ContactGraph,
+		Buoyancy,
 	};
 	
 	demos = demo_list;

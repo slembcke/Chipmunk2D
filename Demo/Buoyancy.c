@@ -40,7 +40,8 @@ update(int ticks)
 	}
 }
 
-#define FLUID_DENSITY 0.00014f
+#define FLUID_DENSITY 0.00014
+#define FLUID_DRAG 2.0
 
 char messageBuffer[1024] = {};
 
@@ -48,12 +49,10 @@ static cpBool
 waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 {
 	CP_ARBITER_GET_SHAPES(arb, water, poly);
-	char *messageCursor = messageBuffer;
+	cpBody *body = cpShapeGetBody(poly);
 	
 	// Get the top of the water sensor bounding box to use as the water level.
 	cpFloat level = cpShapeGetBB(water).t;
-	
-	cpBody *body = cpShapeGetBody(poly);
 	
 	// Clip the polygon against the water level
 	int count = cpPolyShapeGetNumVerts(poly);
@@ -81,45 +80,31 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	}
 	
 	// Calculate buoyancy from the clipped polygon area
-	cpFloat area = cpAreaForPoly(count, ((cpPolyShape *)poly)->tVerts);
 	cpFloat clippedArea = cpAreaForPoly(clippedCount, clipped);
-	cpVect r = cpvsub(cpCentroidForPoly(clippedCount, clipped), body->p);
+	cpFloat displacedMass = clippedArea*FLUID_DENSITY;
+	cpVect centroid = cpCentroidForPoly(clippedCount, clipped);
+	cpVect r = cpvsub(centroid, cpBodyGetPos(body));
 	
-	messageCursor += sprintf(messageCursor, "area: %5.2f, clipped: %5.2f, count %d\n", area, clippedArea, clippedCount);
-	ChipmunkDebugDrawPolygon(clippedCount, clipped, RGBAColor(0, 0, 1, 1), LAColor(0,0));
-	cpVect centroid = cpvadd(r, cpBodyGetPos(body));
+	ChipmunkDebugDrawPolygon(clippedCount, clipped, RGBAColor(0, 0, 1, 1), RGBAColor(0, 0, 1, 0.1));
 	ChipmunkDebugDrawPoints(5, 1, &centroid, RGBAColor(0, 0, 1, 1));
 	
 	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
 	cpVect g = cpSpaceGetGravity(space);
 	
-	cpFloat mass = cpBodyGetMass(body);
-	cpFloat displacedMass = clippedArea*FLUID_DENSITY;
-	
 	// Apply the buoyancy force as an impulse.
-	cpVect j = cpvmult(g, -displacedMass*dt);
-	cpBodySetVel(body, cpvadd(cpBodyGetVel(body), cpvmult(j, body->m_inv)));
-	cpBodySetAngVel(body, cpBodyGetAngVel(body) + cpvcross(r, j)*body->i_inv);
+	apply_impulse(body, cpvmult(g, -displacedMass*dt), r);
 	
-	cpVect v = cpvadd(body->v, cpvmult(cpvperp(r), body->w));
-	cpVect vn = cpvnormalize_safe(v);
-	
-	cpFloat drag = 2.0;
-	
-	cpFloat k = k_scalar_body(body, r, vn);
-	cpFloat damping = clippedArea*drag*FLUID_DENSITY;
+	// Apply linear damping for the fluid drag.
+	cpVect v_centroid = cpvadd(body->v, cpvmult(cpvperp(r), body->w));
+	cpFloat k = k_scalar_body(body, r, cpvnormalize_safe(v_centroid));
+	cpFloat damping = clippedArea*FLUID_DRAG*FLUID_DENSITY;
 	cpFloat v_coef = cpfexp(-damping*dt*k); // linear drag
 //	cpFloat v_coef = 1.0/(1.0 + damping*dt*cpvlength(v)*k); // quadratic drag
-	messageCursor += sprintf(messageCursor, "dt: %5.2f, k: %5.2f, damping: %5.2f, v_coef: %f\n", dt, k, damping, v_coef);
+	apply_impulse(body, cpvmult(cpvsub(cpvmult(v_centroid, v_coef), v_centroid), 1.0/k), r);
 	
-	cpVect v_target = cpvmult(v, v_coef);
-	apply_impulse(body, cpvmult(cpvsub(v_target, v), 1.0/k), r);
-	
-	// angular bits
-	cpFloat w_damping = cpMomentForPoly(FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(body->p))*drag;
-	cpFloat w_coef = cpfexp(-w_damping*dt*body->i_inv);
-	messageCursor += sprintf(messageCursor, "dt: %5.2f, i_inv: %5.2f, w_damping: %5.2f, w_coef: %f\n", dt, body->i_inv, w_damping, w_coef);
-	body->w *= w_coef;
+	// Apply angular damping for the fluid drag.
+	cpFloat w_damping = cpMomentForPoly(FLUID_DRAG*FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(body->p));
+	body->w *= cpfexp(-w_damping*dt*body->i_inv);
 	
 	return TRUE;
 }
