@@ -220,7 +220,7 @@ display(void)
 	
 	drawInstructions();
 	drawInfo();
-	drawString(-300, -210, ChipmunkDemoMessageString);
+	drawString(-300, -200, ChipmunkDemoMessageString);
 		
 	glutSwapBuffers();
 	glClear(GL_COLOR_BUFFER_BIT);

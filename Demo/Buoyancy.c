@@ -81,8 +81,8 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	}
 	
 	// Calculate buoyancy from the clipped polygon area
-	cpFloat area = cpfabs(cpAreaForPoly(count, ((cpPolyShape *)poly)->tVerts));
-	cpFloat clippedArea = cpfabs(cpAreaForPoly(clippedCount, clipped));
+	cpFloat area = cpAreaForPoly(count, ((cpPolyShape *)poly)->tVerts);
+	cpFloat clippedArea = cpAreaForPoly(clippedCount, clipped);
 	cpVect r = cpvsub(cpCentroidForPoly(clippedCount, clipped), body->p);
 	
 	messageCursor += sprintf(messageCursor, "area: %5.2f, clipped: %5.2f, count %d\n", area, clippedArea, clippedCount);
@@ -112,27 +112,18 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	}
 	
 	cpFloat k = k_scalar_body(body, r, vn);
-	cpFloat damping = (max - min)*0.02;
+	cpFloat damping = (max - min)*0.01;
 	cpFloat v_coef = cpfexp(-damping*dt*k);
 	messageCursor += sprintf(messageCursor, "dt: %5.2f, k: %5.2f, damping: %5.2f, v_coef: %f\n", dt, k, damping, v_coef);
 	
-	//cpBodySetVel(body, cpvmult(v, v_coef));
 	cpVect v_target = cpvmult(v, v_coef);
-	apply_impulse(body, cpvmult(cpvsub(v_target, v), k), r);
+	apply_impulse(body, cpvmult(cpvsub(v_target, v), 1.0/k), r);
 	
-//	cpFloat drag = (max - min)*cpvlengthsq(v)*0.001f;
-//	cpFloat mass_sum = a->m_inv + b->m_inv;
-//	cpFloat r1cn = cpvcross(r1, n);
-//	cpFloat r2cn = cpvcross(r2, n);
-//	
-//	cpFloat value = mass_sum + a->i_inv*r1cn*r1cn + b->i_inv*r2cn*r2cn;
-//1.0f - cpfexp(-spring->damping*dt*k);
-//	
-//	cpFloat v_coef = cpfpow(0.97f, clippedArea/area);
-//	cpVect v_centroid = cpvadd(body->v, cpvmult(cpvperp(r), body->w));
-//	
-//	cpBodyApplyImpulse(body, cpvmult(v_centroid, v_coef - 1.0f), r);
-//	body->w *= v_coef*v_coef;
+	// angular bits
+	cpFloat w_damping = cpMomentForPoly(body->m, clippedCount, clipped, cpvzero);
+	cpFloat w_coef = cpfexp(-w_damping*dt*body->i_inv);
+	messageCursor += sprintf(messageCursor, "dt: %5.2f, i_inv: %5.2f, w_damping: %5.2f, w_coef: %f\n", dt, body->i_inv, w_damping, w_coef);
+//	body->w *= w_coef;
 	
 	return TRUE;
 }
@@ -144,7 +135,7 @@ init(void)
 	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
-	cpSpaceSetGravity(space, cpv(0, -100));
+	cpSpaceSetGravity(space, cpv(0, -500));
 //	cpSpaceSetDamping(space, 0.5);
 	cpSpaceSetSleepTimeThreshold(space, 0.5f);
 	cpSpaceSetCollisionSlop(space, 0.5f);
@@ -207,9 +198,21 @@ init(void)
 		
 		body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 		cpBodySetPos(body, cpv(-100, -0));
-		cpBodySetVel(body, cpv(-100, 0));
 		
 		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, 2*size));
+		cpShapeSetFriction(shape, 0.8f);
+	}
+	
+	{
+		cpFloat size = 40.0f;
+		cpFloat mass = 0.3*FLUID_DENSITY*size*size;
+		cpFloat moment = cpMomentForBox(mass, size, size);
+		
+		body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
+		cpBodySetPos(body, cpv(-200, -0));
+		cpBodySetVel(body, cpv(0, -100));
+		
+		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
 		cpShapeSetFriction(shape, 0.8f);
 	}
 	
