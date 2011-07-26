@@ -103,6 +103,7 @@ init(void)
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -300));
+	cpSpaceSetCollisionSlop(space, 0.5);
 	
 	// For cpBodyEachArbiter() to work you must explicitly enable the contact graph or enable sleeping.
 	// Generating the contact graph is a small but measurable ~5-10% performance hit so it's not enabled by default.
