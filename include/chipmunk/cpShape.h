@@ -117,7 +117,7 @@ static inline type cpShapeGet##name(const cpShape *shape){return shape->member;}
 
 #define CP_DefineShapeStructSetter(type, member, name, activates) \
 static inline void cpShapeSet##name(cpShape *shape, type value){ \
-	if(activates) cpBodyActivate(shape->body); \
+	if(activates && shape->body) cpBodyActivate(shape->body); \
 	shape->member = value; \
 }
 
