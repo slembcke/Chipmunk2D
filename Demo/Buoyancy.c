@@ -21,6 +21,7 @@
  
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 
 #include "chipmunk.h"
 #include "constraints/util.h"
@@ -106,7 +107,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpFloat w_damping = cpMomentForPoly(FLUID_DRAG*FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(body->p));
 	body->w *= cpfexp(-w_damping*dt*body->i_inv);
 	
-	return TRUE;
+	return cpTrue;
 }
 
 static cpSpace *
