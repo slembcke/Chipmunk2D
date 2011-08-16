@@ -27,22 +27,31 @@
 #include "ChipmunkDemo.h"
 
 #define PLAYER_VELOCITY 600.0
+
 #define PLAYER_GROUND_ACCEL_TIME 0.1
 #define PLAYER_GROUND_ACCEL (PLAYER_VELOCITY/PLAYER_GROUND_ACCEL_TIME)
+
 #define PLAYER_AIR_ACCEL_TIME 0.2
 #define PLAYER_AIR_ACCEL (PLAYER_VELOCITY/PLAYER_AIR_ACCEL_TIME)
-#define JUMP_VELOCITY 1000.0
+
+#define JUMP_HEIGHT 75.0
+#define JUMP_BOOST_HEIGHT 50.0
 #define GRAVITY 4000.0
 
 static cpSpace *space;
 
-cpBody *playerBody;
-cpShape *playerShape;
+static cpBody *playerBody = NULL;
+static cpShape *playerShape = NULL;
+static cpFloat remainingBoost = 0;
 
 static void
 playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
-	cpBodyUpdateVelocity(body, gravity, damping, dt);
+	cpBool boost = (ChipmunkDemoKeyboard.y > 0.0f && remainingBoost > 0.0f);
+	cpVect g = (boost ? cpvzero : gravity);
+	cpBodyUpdateVelocity(body, g, damping, dt);
+	
+	// TODO clamping
 //	body->v.y = cpfclamp(body->v.y, -700, -700);
 //	body->v.x = cpfclamp(body->v.x, -400, 400);
 }
@@ -80,16 +89,24 @@ update(int ticks)
 		
 		// Apply air control if not grounded
 		if(!grounded){
+			// Smoothly accelerate the velocity
 			playerBody->v.x = cpflerpconst(playerBody->v.x, target_vx, PLAYER_AIR_ACCEL*dt);
 		}
 		
 		// If the jump key was just pressed this frame, jump!
 		if(jumpState && !lastJumpState && grounded){
-			playerBody->v = cpvadd(playerBody->v, cpv(0.0, JUMP_VELOCITY));
-			cpBodyActivate(playerBody);
+			cpFloat jump_v = cpfsqrt(2.0*JUMP_HEIGHT*GRAVITY);
+			playerBody->v = cpvadd(playerBody->v, cpv(0.0, jump_v));
+			
+			remainingBoost = JUMP_BOOST_HEIGHT/jump_v;
 		}
 		
 		cpSpaceStep(space, dt);
+		
+		// Decrement the jump boosting or reset it if you bump your head.
+		remainingBoost -= dt;
+		if(groundNormal.y < 0.0f) remainingBoost = 0.0f;
+		
 		lastJumpState = jumpState;
 	}
 }
@@ -125,7 +142,7 @@ init(void)
 	
 	// Set up the player
 	cpFloat radius = 25.0f;
-	body = cpSpaceAddBody(space, cpBodyNew(10.0f, INFINITY));
+	body = cpSpaceAddBody(space, cpBodyNew(1.0f, INFINITY));
 	body->p = cpv(0, -200);
 	body->velocity_func = playerUpdateVelocity;
 	playerBody = body;
@@ -135,7 +152,16 @@ init(void)
 	shape->collision_type = 1;
 	playerShape = shape;
 	
-//	cpSpaceAddCollisionHandler(space, 1, 0, NULL, PlayerPreStep, NULL, NULL, NULL);
+	// Add some boxes to jump on
+	for(int i=0; i<6; i++){
+		for(int j=0; j<3; j++){
+			body = cpSpaceAddBody(space, cpBodyNew(2.0f, INFINITY));
+			body->p = cpv(100 + j*60, -200 + i*60);
+			
+			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 50, 50));
+			shape->e = 0.0f; shape->u = 0.7f;
+		}
+	}
 	
 	return space;
 }
@@ -148,7 +174,7 @@ destroy(void)
 }
 
 ChipmunkDemo Player = {
-	"Player",
+	"Platformer Player Controls",
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,
