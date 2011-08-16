@@ -34,8 +34,8 @@
 #define PLAYER_AIR_ACCEL_TIME 0.25
 #define PLAYER_AIR_ACCEL (PLAYER_VELOCITY/PLAYER_AIR_ACCEL_TIME)
 
-#define JUMP_HEIGHT 75.0
-#define JUMP_BOOST_HEIGHT 30.0
+#define JUMP_HEIGHT 50.0
+#define JUMP_BOOST_HEIGHT 55.0
 #define FALL_VELOCITY 900.0
 #define GRAVITY 2000.0
 
@@ -52,9 +52,7 @@ playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 	cpVect g = (boost ? cpvzero : gravity);
 	cpBodyUpdateVelocity(body, g, damping, dt);
 	
-	// TODO clamping
 	body->v.y = cpfclamp(body->v.y, -FALL_VELOCITY, INFINITY);
-//	body->v.x = cpfclamp(body->v.x, -PLAYER_VELOCITY, PLAYER_VELOCITY);
 }
 
 static void
