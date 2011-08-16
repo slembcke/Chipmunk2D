@@ -35,8 +35,8 @@
 #define PLAYER_AIR_ACCEL (PLAYER_VELOCITY/PLAYER_AIR_ACCEL_TIME)
 
 #define JUMP_HEIGHT 75.0
-#define JUMP_BOOST_HEIGHT 50.0
-#define GRAVITY 4000.0
+#define JUMP_BOOST_HEIGHT 30.0
+#define GRAVITY 3000.0
 
 static cpSpace *space;
 
