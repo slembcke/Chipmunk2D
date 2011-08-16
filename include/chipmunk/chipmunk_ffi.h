@@ -77,7 +77,7 @@ MAKE_REF(cpBodyKineticEnergy);
 
 MAKE_REF(cpShapeGetBB);
 MAKE_PROPERTIES_REF(cpShape, Body);
-MAKE_PROPERTIES_REF(cpShape, IsSensor);
+MAKE_PROPERTIES_REF(cpShape, Sensor);
 MAKE_PROPERTIES_REF(cpShape, Elasticity);
 MAKE_PROPERTIES_REF(cpShape, Friction);
 MAKE_PROPERTIES_REF(cpShape, SurfaceVelocity);
