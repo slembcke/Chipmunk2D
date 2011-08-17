@@ -35,7 +35,7 @@
 #define PLAYER_AIR_ACCEL (PLAYER_VELOCITY/PLAYER_AIR_ACCEL_TIME)
 
 #define JUMP_HEIGHT 50.0
-#define JUMP_BOOST_HEIGHT 0.0
+#define JUMP_BOOST_HEIGHT 55.0
 #define FALL_VELOCITY 900.0
 #define GRAVITY 2000.0
 
@@ -110,10 +110,10 @@ update(int ticks)
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
+		
+		remainingBoost -= dt;
+		lastJumpState = jumpState;
 	}
-	
-	remainingBoost -= dt;
-	lastJumpState = jumpState;
 }
 
 static cpSpace *
@@ -160,7 +160,7 @@ init(void)
 	// Add some boxes to jump on
 	for(int i=0; i<6; i++){
 		for(int j=0; j<3; j++){
-			body = cpSpaceAddBody(space, cpBodyNew(2.0f, INFINITY));
+			body = cpSpaceAddBody(space, cpBodyNew(4.0f, INFINITY));
 			body->p = cpv(100 + j*60, -200 + i*60);
 			
 			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 50, 50));
