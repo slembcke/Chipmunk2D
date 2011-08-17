@@ -35,7 +35,7 @@
 #define PLAYER_AIR_ACCEL (PLAYER_VELOCITY/PLAYER_AIR_ACCEL_TIME)
 
 #define JUMP_HEIGHT 50.0
-#define JUMP_BOOST_HEIGHT 55.0
+#define JUMP_BOOST_HEIGHT 0.0
 #define FALL_VELOCITY 900.0
 #define GRAVITY 2000.0
 
@@ -43,7 +43,10 @@ static cpSpace *space;
 
 static cpBody *playerBody = NULL;
 static cpShape *playerShape = NULL;
+
 static cpFloat remainingBoost = 0;
+static cpBool grounded = cpFalse;
+static cpBool lastJumpState = cpFalse;
 
 static void
 SelectPlayerGroundNormal(cpBody *body, cpArbiter *arb, cpVect *groundNormal){
@@ -57,18 +60,21 @@ SelectPlayerGroundNormal(cpBody *body, cpArbiter *arb, cpVect *groundNormal){
 static void
 playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
-	static cpBool lastJumpState = cpTrue;
 	int jumpState = (ChipmunkDemoKeyboard.y > 0.0f);
-	
-	cpBool boost = (jumpState && remainingBoost > 0.0f);
-	cpVect g = (boost ? cpvzero : gravity);
-	cpBodyUpdateVelocity(body, g, damping, dt);
 	
 	// Grab the grounding normal from last frame
 	cpVect groundNormal = cpvzero;
 	cpBodyEachArbiter(playerBody, (cpBodyArbiterIteratorFunc)SelectPlayerGroundNormal, &groundNormal);
 	
-	cpBool grounded = (groundNormal.y > 0.0);
+	grounded = (groundNormal.y > 0.0);
+	if(groundNormal.y < 0.0f) remainingBoost = 0.0f;
+	
+	// Do a normal-ish update
+	cpBool boost = (jumpState && remainingBoost > 0.0f);
+	cpVect g = (boost ? cpvzero : gravity);
+	cpBodyUpdateVelocity(body, g, damping, dt);
+	
+	// Target horizontal speed for air/ground control
 	cpFloat target_vx = PLAYER_VELOCITY*ChipmunkDemoKeyboard.x;
 	
 	// Update the surface velocity and friction
@@ -82,6 +88,14 @@ playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 		playerBody->v.x = cpflerpconst(playerBody->v.x, target_vx, PLAYER_AIR_ACCEL*dt);
 	}
 	
+	body->v.y = cpfclamp(body->v.y, -FALL_VELOCITY, INFINITY);
+}
+
+static void
+update(int ticks)
+{
+	int jumpState = (ChipmunkDemoKeyboard.y > 0.0f);
+	
 	// If the jump key was just pressed this frame, jump!
 	if(jumpState && !lastJumpState && grounded){
 		cpFloat jump_v = cpfsqrt(2.0*JUMP_HEIGHT*GRAVITY);
@@ -90,24 +104,16 @@ playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 		remainingBoost = JUMP_BOOST_HEIGHT/jump_v;
 	}
 	
-	// Decrement the jump boosting or reset it if you bump your head.
-	remainingBoost -= dt;
-	if(groundNormal.y < 0.0f) remainingBoost = 0.0f;
-	
-	lastJumpState = jumpState;
-	
-	body->v.y = cpfclamp(body->v.y, -FALL_VELOCITY, INFINITY);
-}
-
-static void
-update(int ticks)
-{
+	// Step the space
 	int steps = 3;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
 	}
+	
+	remainingBoost -= dt;
+	lastJumpState = jumpState;
 }
 
 static cpSpace *
