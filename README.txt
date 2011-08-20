@@ -34,6 +34,9 @@ CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
 CHANGES SINCE 6.0.0:
+* MISC: Changed adding a static body to a space from a warning to a hard error.
+
+CHANGES SINCE 6.0.0:
 * BUG: Calling cpBodySetPos() on a sleeping body was delaying the Separate() handler callback if one existed.
 * BUG: Fixed a bug where Separate() handler callbacks were not occuring when removing shapes.
 * BUG: Calling cpBodyApplyForce() or cpBodyResetForces() was not activating sleeping bodies.
