@@ -347,26 +347,8 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 void
 cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter)
 {
-//	cpArbiter *arb = body->arbiterList;
-//	while(arb){
-//		cpArbiter *next = cpArbiterNext(arb, body);
-//		if(filter == NULL || filter == arb->a || filter == arb->b){
-//			if(arb->state != cpArbiterStateCached) cpArbiterCallSeparate(arb, space);
-//			
-//			cpArbiterUnthread(arb);
-//			cpSpaceUncacheArbiter(space, arb);
-//			cpArrayPush(space->pooledArbiters, arb);
-//		}
-//		arb = next;
-//	}
-	
-	// TODO see note at cpSpaceArbiterSetFilter()
-	// When just removing the body, so we need to filter all cached arbiters to avoid dangling pointers.
-	//if(filter == NULL)
-	{
-		struct arbiterFilterContext context = {space, body, filter};
-		cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)cachedArbitersFilter, &context);
-	}
+	struct arbiterFilterContext context = {space, body, filter};
+	cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)cachedArbitersFilter, &context);
 }
 
 void
@@ -396,7 +378,7 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
-	cpBodyActivateStatic(body, shape);
+	if(cpBodyIsStatic(body)) cpBodyActivateStatic(body, shape);
 	cpBodyRemoveShape(body, shape);
 	cpSpaceFilterArbiters(space, body, shape);
 	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
