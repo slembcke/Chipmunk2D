@@ -19,7 +19,7 @@ cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *klass, cpSpatialI
 	index->staticIndex = staticIndex;
 	
 	if(staticIndex){
-		cpAssertHard(!staticIndex->dynamicIndex, "This static index is already is already associated with a dynamic index.");
+		cpAssertHard(!staticIndex->dynamicIndex, "This static index is already associated with a dynamic index.");
 		staticIndex->dynamicIndex = index;
 	}
 	
