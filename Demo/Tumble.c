@@ -106,8 +106,8 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(rogueBoxBody);
 	ChipmunkDemoFreeSpaceChildren(space);
+	cpBodyFree(rogueBoxBody);
 	cpSpaceFree(space);
 }
 

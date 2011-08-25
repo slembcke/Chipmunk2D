@@ -80,19 +80,39 @@ int key_right = 0;
 
 cpVect ChipmunkDemoKeyboard = {};
 
-static void shapeFreeWrap(cpShape *ptr, void *unused){cpShapeFree(ptr);}
+static void shapeFreeWrap(cpSpace *space, cpShape *shape, void *unused){
+	cpSpaceRemoveShape(space, shape);
+	cpShapeFree(shape);
+}
+
+static void postShapeFree(cpShape *shape, cpSpace *space){
+	cpSpaceAddPostStepCallback(space, (cpPostStepFunc)shapeFreeWrap, shape, NULL);
+}
+
+static void constraintFreeWrap(cpSpace *space, cpConstraint *constraint, void *unused){
+	cpSpaceRemoveConstraint(space, constraint);
+	cpConstraintFree(constraint);
+}
+
+static void postConstraintFree(cpConstraint *constraint, cpSpace *space){
+	cpSpaceAddPostStepCallback(space, (cpPostStepFunc)constraintFreeWrap, constraint, NULL);
+}
+
+static void bodyFreeWrap(cpSpace *space, cpBody *body, void *unused){
+	cpSpaceRemoveBody(space, body);
+	cpBodyFree(body);
+}
+
+static void postBodyFree(cpBody *body, cpSpace *space){
+	cpSpaceAddPostStepCallback(space, (cpPostStepFunc)bodyFreeWrap, body, NULL);
+}
 
 void
 ChipmunkDemoFreeSpaceChildren(cpSpace *space)
 {
-	cpArray *components = space->sleepingComponents;
-	while(components->num) cpBodyActivate((cpBody *)components->arr[0]);
-	
-	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)&shapeFreeWrap, NULL);
-	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)&shapeFreeWrap, NULL);
-	
-	cpArrayFreeEach(space->bodies, (void (*)(void*))cpBodyFree);
-	cpArrayFreeEach(space->constraints, (void (*)(void*))cpConstraintFree);
+	cpSpaceEachShape(space, (cpSpaceShapeIteratorFunc)postShapeFree, space);
+	cpSpaceEachConstraint(space, (cpSpaceConstraintIteratorFunc)postConstraintFree, space);
+	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)postBodyFree, space);
 }
 
 void ChipmunkDemoDefaultDrawImpl(void)

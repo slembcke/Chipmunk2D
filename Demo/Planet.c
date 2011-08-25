@@ -128,8 +128,8 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(planetBody);
 	ChipmunkDemoFreeSpaceChildren(space);
+	cpBodyFree(planetBody);
 	cpSpaceFree(space);
 }
 

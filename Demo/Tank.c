@@ -132,8 +132,8 @@ init(void)
 static void
 destroy(void)
 {
-	cpBodyFree(tankControlBody);
 	ChipmunkDemoFreeSpaceChildren(space);
+	cpBodyFree(tankControlBody);
 	cpSpaceFree(space);
 }
 

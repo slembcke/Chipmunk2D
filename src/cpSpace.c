@@ -442,6 +442,7 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 			func((cpBody *)bodies->arr[i], data);
 		}
 		
+		// TODO BUG not safe to activate sleeping bodies from here!
 		cpArray *components = space->sleepingComponents;
 		for(int i=0; i<components->num; i++){
 			cpBody *root = (cpBody *)components->arr[i];
