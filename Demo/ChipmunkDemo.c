@@ -107,11 +107,14 @@ static void postBodyFree(cpBody *body, cpSpace *space){
 	cpSpaceAddPostStepCallback(space, (cpPostStepFunc)bodyFreeWrap, body, NULL);
 }
 
+// Safe and future proof way to remove and free all objects that have been added to the space.
 void
 ChipmunkDemoFreeSpaceChildren(cpSpace *space)
 {
+	// Must remove these BEFORE freeing the body or you will access dangling pointers.
 	cpSpaceEachShape(space, (cpSpaceShapeIteratorFunc)postShapeFree, space);
 	cpSpaceEachConstraint(space, (cpSpaceConstraintIteratorFunc)postConstraintFree, space);
+	
 	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)postBodyFree, space);
 }
 

@@ -446,7 +446,13 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 		cpArray *components = space->sleepingComponents;
 		for(int i=0; i<components->num; i++){
 			cpBody *root = (cpBody *)components->arr[i];
-			CP_BODY_FOREACH_COMPONENT(root, body) func(body, data);
+			
+			cpBody *body = root;
+			while(body){
+				cpBody *next = body->node.next;
+				func(body, data);
+				body = next;
+			}
 		}
 	} cpSpaceUnlock(space, cpTrue);
 }
