@@ -174,7 +174,7 @@ typedef unsigned int cpHashValue;
 #endif
 
 #ifdef CP_LAYERS_TYPE
-	typedef CP_GROUP_TYPE cpLayers;
+	typedef CP_LAYERS_TYPE cpLayers;
 #else
 /// Type used for cpShape.layers.
 	typedef unsigned int cpLayers;
