@@ -58,6 +58,8 @@ const Color LINE_COLOR = {0, 0, 0, 1};
 const Color CONSTRAINT_COLOR = {0.0f, 0.0f, 0.5f, 1.0f};
 const float SHAPE_ALPHA = 196.0/255.0;
 
+float ChipmunkDebugDrawPointLineScale = 1.0;
+
 static Color
 ColorFromHash(cpHashValue hash, float alpha)
 {
@@ -264,7 +266,7 @@ void ChipmunkDebugDrawPoints(cpFloat size, int count, cpVect *verts, Color color
 	glVertexPointer(2, GL_FLOAT, 0, verts);
 #endif
 	
-	glPointSize(size);
+	glPointSize(size*ChipmunkDebugDrawPointLineScale);
 	glColor_from_color(color);
 	glDrawArrays(GL_POINTS, 0, count);
 }
@@ -428,7 +430,7 @@ void ChipmunkDebugDrawCollisionPoints(cpSpace *space)
 	cpArray *arbiters = space->arbiters;
 	
 	glColor3f(1.0f, 0.0f, 0.0f);
-	glPointSize(4.0f);
+	glPointSize(4.0f*ChipmunkDebugDrawPointLineScale);
 	
 	glBegin(GL_POINTS); {
 		for(int i=0; i<arbiters->num; i++){

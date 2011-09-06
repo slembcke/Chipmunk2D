@@ -208,9 +208,12 @@ reshape(int width, int height)
 {
 	glViewport(0, 0, width, height);
 	
-	double scale = 0.5/cpfmin(width/640.0, height/480.0);
-	double hw = width*scale;
-	double hh = height*scale;
+	double scale = cpfmin(width/640.0, height/480.0);
+	double hw = width*(0.5/scale);
+	double hh = height*(0.5/scale);
+	
+	ChipmunkDebugDrawPointLineScale = scale;
+	glLineWidth(scale);
 	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();

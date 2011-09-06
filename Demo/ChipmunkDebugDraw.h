@@ -33,6 +33,8 @@ static inline Color LAColor(float l, float a){
 	return color;
 }
 
+float ChipmunkDebugDrawPointLineScale;
+
 void ChipmunkDebugDrawCircle(cpVect center, cpFloat angle, cpFloat radius, Color lineColor, Color fillColor);
 void ChipmunkDebugDrawSegment(cpVect a, cpVect b, Color color);
 void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, Color lineColor, Color fillColor);
