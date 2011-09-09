@@ -61,6 +61,13 @@ circle2circle(const cpShape *shape1, const cpShape *shape2, cpContact *arr)
 	return circle2circleQuery(circ1->tc, circ2->tc, circ1->r, circ2->r, arr);
 }
 
+static int
+circle2segmentEncapQuery(cpVect p1, cpVect p2, cpFloat r1, cpFloat r2, cpContact *con, cpVect tangent)
+{
+	int count = circle2circleQuery(p1, p2, r1, r2, con);
+	return (cpvdot(con[0].n, tangent) >= 0.0 ? count : 0);
+}
+
 // Collide circles to segment shapes.
 static int
 circle2segment(const cpShape *circleShape, const cpShape *segmentShape, cpContact *con)
@@ -86,7 +93,7 @@ circle2segment(const cpShape *circleShape, const cpShape *segmentShape, cpContac
 		if(dt < (dtMin - rsum)){
 			return 0;
 		} else {
-			return circle2circleQuery(circ->tc, seg->ta, circ->r, seg->r, con);
+			return circle2segmentEncapQuery(circ->tc, seg->ta, circ->r, seg->r, con, seg->a_tangent);
 		}
 	} else {
 		if(dt < dtMax){
@@ -101,7 +108,7 @@ circle2segment(const cpShape *circleShape, const cpShape *segmentShape, cpContac
 			return 1;
 		} else {
 			if(dt < (dtMax + rsum)) {
-				return circle2circleQuery(circ->tc, seg->tb, circ->r, seg->r, con);
+				return circle2segmentEncapQuery(circ->tc, seg->tb, circ->r, seg->r, con, seg->b_tangent);
 			} else {
 				return 0;
 			}
