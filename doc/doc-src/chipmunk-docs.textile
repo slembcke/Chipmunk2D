@@ -660,7 +660,7 @@ void cpSpaceSetEnableContactGraph(cpSpace *space, cpBool value)</code></pre>
 
 p(expl). In order to use the @cpBodyEachArbiter()@ function, you must tell Chipmunk to generate the contact graph. Disabled by default as it incurrs a small 5-10% overhead. Enabling the sleeping feature also enables the contact graph.
 
-<pre><code>cpFloat cpSpaceGetCurrentTimeSTep(const cpSpace *space)</code></pre>
+<pre><code>cpFloat cpSpaceGetCurrentTimeStep(const cpSpace *space)</code></pre>
 
 p(expl). Retrieves the current (if you are in a callback from @cpSpaceStep()@) or most recent (outside of a @cpSpaceStep()@ call) timestep.
 
@@ -1315,8 +1315,32 @@ p(expl). Return the hit point in world coordinates where the segment first inter
 
 p(expl). Return the absolute distance where the segment first hit the shape.
 
-<!-- TODO shape and BB queries -->
 
+<%= h 2, "AABB Queries:", "AABBQueries" %>
+
+AABB queries give you a fast way to check roughly which shapes are in an area.
+
+<pre><code>typedef void (*cpSpaceBBQueryFunc)(cpShape *shape, void *data)
+
+void cpSpaceBBQuery(
+	cpSpace *space, cpBB bb,
+	cpLayers layers, cpGroup group,
+	cpSpaceBBQueryFunc func, void *data
+)</code></pre>
+
+p(expl). Query @space@ to find all shapes near @bb@ filtering out matches with the given @layers@ and @group@. @func@ is called for each shape whose bounding box overlaps @bb@ along with the @data@ argument passed to @cpSpaceBBQuery()@. Sensor shapes are included.
+
+<%= h 2, "Shape Queries:", "ShapeQueries" %>
+
+Shape queries allow you to check if shapes in a space are overlapping a specific area. You can use this to check if an object already exists at a location you want to add another shape, or to use as sensor queries for AI.
+
+You can either create a body/shape pair before querying, or you can create a shape passing @NULL@ for the body and position the shape using @cpShapeUpdate()@ to set the position and rotation of the shape.
+
+<pre><code>typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points, void *data);
+
+cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);</code></pre>
+
+p(expl). Query @space@ to find all shapes overlapping @shape@. Matches are filtered using the layers and group of @shape@. @func@ is called for each overlapping shape along with a pointer to a temporary cpContactPointSet and the @data@ argument passed to @cpSpaceBBQuery()@. Sensor shapes are included.
 
 <%= h 2, "Examples:", "Examples" %>
 

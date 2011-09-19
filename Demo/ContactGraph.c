@@ -36,7 +36,7 @@ static char messageString[1024];
 static void
 ScaleIterator(cpBody *body, cpArbiter *arb, cpVect *sum)
 {
-	(*sum) = cpvadd(*sum, cpArbiterTotalImpulse(arb));
+	(*sum) = cpvadd(*sum, cpArbiterTotalImpulseWithFriction(arb));
 }
 
 static void

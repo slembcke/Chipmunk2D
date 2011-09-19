@@ -189,8 +189,7 @@ FloodFillComponent(cpBody *root, cpBody *body)
 		cpBody *other_root = ComponentRoot(body);
 		if(other_root == NULL){
 			ComponentAdd(root, body);
-			CP_BODY_FOREACH_ARBITER(body, arb)
-				FloodFillComponent(root, (body == arb->body_a ? arb->body_b : arb->body_a));
+			CP_BODY_FOREACH_ARBITER(body, arb) FloodFillComponent(root, (body == arb->body_a ? arb->body_b : arb->body_a));
 			CP_BODY_FOREACH_CONSTRAINT(body, constraint) FloodFillComponent(root, (body == constraint->a ? constraint->b : constraint->a));
 		} else {
 			cpAssertSoft(other_root == root, "Internal Error: Inconsistency dectected in the contact graph.");
