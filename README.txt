@@ -33,8 +33,14 @@ http://www.slembcke.net/forums
 CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
-CHANGES SINCE 6.0.0:
+CHANGES SINCE 6.0.1:
+* BUG: Soft errors (only checked when debug mode is enabled) and warnings were disabled. Whoops.
+* BUG: cpShapeIsSensor() was incorrectly named in chipmunk_ffi.h.
+* BUG: It should be safe to call cpActivateBody() from an space iterator callback now.
+* MISC: Very nice bouyancy demo added based on callbacks.
+* MISC: Player demo updated and greatly enhanced by Chipmunk 6 features.
 * MISC: Changed adding a static body to a space from a warning to a hard error.
+* MISC: cpGroup and cpCollisionType now default to uintptr_t so you can safely use pointers instead of ints for these types.
 
 CHANGES SINCE 6.0.0:
 * BUG: Calling cpBodySetPos() on a sleeping body was delaying the Separate() handler callback if one existed.

@@ -1,23 +1,15 @@
 cpSpaceGetPrevTimeStep doc
 
-touch joint (Objective-Chipmunk)
-
 Tutorial ideas:
-	Blob example (with grab code)
-	Multitouch grabbing example (Cocos2D)
 	Player grounding example.
 	Fishing
-	Bouyancy example.
 	OpenGL transform example.
 
 Future features to think about:
 http://www.slembcke.net/forums/viewtopic.php?f=1&t=1459
-constraint callbacks?
 Building bodies from shape collections.
-Quickhull?
 Concave decomposition?
 Per body iterations and timestep?
 Per body damping and gravity coefs?
 breakable object support functions?
-Breakable joints?
 Easy callback programable joint?
