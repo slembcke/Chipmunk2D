@@ -1,7 +1,7 @@
 !http://files.slembcke.net/chipmunk/logo/logo1_med.png!
 
 <div style="float:right;">
-<wiki:video url="http://www.youtube.com/watch?v=z_Sx9N39KHk"/>
+<iframe width="420" height="315" src="http://www.youtube.com/embed/z_Sx9N39KHk" frameborder="0" allowfullscreen></iframe>
 </div>
 
 
