@@ -1,18 +1,17 @@
 !http://files.slembcke.net/chipmunk/logo/logo1_med.png!
-!http://files.slembcke.net/chipmunk/balance_chipmunk.png!
 
-ABOUT:
+h2. ABOUT:
 Chipmunk is a simple, lightweight, fast and portable 2D rigid body physics library written in C. It's licensed under the unrestrictive, OSI approved MIT license. My aim is to give 2D developers access the same quality of physics you find in newer 3D games. I hope you enjoy using Chipmunk, and please consider donating to help make it worth our time to continue to support Chipmunk with great new features.
 
-CONTRACTING:
+h2. CONTRACTING:
 Howling Moon Software (my company) is available for contracting if you want to make the physics in your game really stand out. Given our unique experience with the library, we can help you use Chipmunk to it's fullest potential. Feel free to contact us through our webpage: http://howlingmoonsoftware.com/contracting.php
 
-Chipmunk Pro: http://chipmunk-physics.net/chipmunkPro.php
+h2. Chipmunk Pro: http://chipmunk-physics.net/chipmunkPro.php
 We also make a bunch of extra for Chipmunk called Chipmunk Pro. Currently we have a nice Objective-C wrapper that should be of particular interest to Mac and iPhone developers. We are also working on auto-geometry features and multithreading/SIMD optimizations as well. Check out the link above for more information!
 
 To try Objective-Chipmunk in your own projects see Objective-Chipmunk/Objective-Chipmunk/Readme.rtf.
 
-BUILDING:
+h2. BUILDING:
 Mac OS X: There is an included XCode project file for building the static library and demo application. Alternatively you could use the CMake files. A Mac OS X version of Objective-Chipmunk is available for free upon request. We don't do regular builds as few people seem interested in it.
 
 iPhone: If you want a native Objective-C API, check out the Objective-Chipmunk directory for the Objective-C binding and some sample code from shipping iPhone Apps. It is inexpensive to license and should save you a lot of time. Otherwise, the XCode project can build a static library with all the proper compiler settings. Alternatively, you can just run iphonestatic.command in the macosx/ directory.  It will build you a fat library compiled as release for the device and debug for the simulator. After running it, you can simply drop the Chipmunk-iPhone directory into your iPhone project!
@@ -21,19 +20,17 @@ UNIXes: A forum user was kind enough to make a set of CMake files for Chipmunk. 
 
 Windows: Visual Studio projects are included in the msvc/ directory. I do not maintain these personally, but a number of forum members have assisted with them.
 
-Ruby: I've been using maintaining a Ruby extension for Chipmunk, but at this time is not up to date with all the latest changes. It has been tested and builds under Linux and OS X using CMake however 'cmake -D BUILD_RUBY_EXT=ON .; make'. A forum member has been working on an FFI based extention (http://github.com/erisdiscord/chipmunk-ffi), and that may be a better way to take advantage of Chipmunk from Ruby. Another forum user has offered to maintain the non-FFI version of the extension. Stay tuned.
-
-GETTING STARTED:
+h2. GETTING STARTED:
 First of all, you can find the C API documentation in the doc/ directory.
 
 A good starting point is to take a look at the included Demo application. The demos all just set up a Chipmunk simulation space and the demo app draws the graphics directly out of that. This makes it easy to see how the Chipmunk API works without worrying about the graphics code. You are free to use the demo drawing routines in your own projects, though it is certainly not the recommended way of drawing Chipmunk objects as it pokes around at the undocumented parts of Chipmunk.
 
 If you are looking at Objective-Chipmunk for the iPhone, we have a number of example projects and tutorials in the Objective-Chipmunk directory.
 
-FORUM:
+h2. FORUM:
 http://www.slembcke.net/forums
 
-CONTACT:
+h2. CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
 CHANGES SINCE 6.0.1:
