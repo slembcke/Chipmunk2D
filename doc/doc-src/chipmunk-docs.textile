@@ -664,6 +664,10 @@ p(expl). In order to use the @cpBodyEachArbiter()@ function, you must tell Chipm
 
 p(expl). Retrieves the current (if you are in a callback from @cpSpaceStep()@) or most recent (outside of a @cpSpaceStep()@ call) timestep.
 
+<pre><code>cpFloat cpSpaceIsLocked(const cpSpace *space)</code></pre>
+
+p(expl). Returns true when in a callback meaning that you cannot add/remove objects from the space. Can be used to choose to create a post-step callback instead.
+
 <pre><code>cpDataPointer cpSpaceGetUserData(const cpSpace *space)
 void cpSpaceSetUserData(cpSpace *space, cpDataPointer value)</code></pre>
 
@@ -1160,6 +1164,8 @@ p(expl). Function type used for @postStep()@ callbacks. @space@ is the space the
 <pre><code>void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)</code></pre>
 
 p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @obj@ and @data@ will be passed to your function. Only the last callback registered for any unique value of @obj@ will be recorded. You can add @postStep()@ callbacks from outside of other callback functions, but there isn't a good reason to and they won't be called until the next time @cpSpaceStep()@ is finishing.
+
+*Note:* Post-step callbacks are not run in any particular order. If you need to sequence a number of events, you'll need to put them in a single callback.
 
 <%= h 2, "Examples:", "Examples" %>
 

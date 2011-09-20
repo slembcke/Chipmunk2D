@@ -41,6 +41,7 @@ CHANGES SINCE 6.0.1:
 * API: Added [ChipmunkSpace smartAdd:] and [ChipmunkSpace smartRemove:] methods for a consistent API to remove objects inside and out of callbacks.
 * API: Added [ChipmunkSpace addPostStepBlock:key:] to complement [ChipmunkSpace addPostStepCallback:selector:key:].
 * API: Added [ChipmunkSpace addPostStepAddition:].
+* API: Objective-Chipmunk collision handlers no longer retain their target to avoid reference cycles.
 * BUG: Soft errors (only checked when debug mode is enabled) and warnings were disabled. Whoops.
 * BUG: cpShapeIsSensor() was incorrectly named in chipmunk_ffi.h.
 * BUG: It should be safe to call cpActivateBody() from an space iterator callback now.
