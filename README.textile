@@ -36,8 +36,6 @@ h2. Chipmunk Pro: http://chipmunk-physics.net/chipmunkPro.php
 
 We also make a bunch of extra for Chipmunk called Chipmunk Pro. Currently we have a nice Objective-C wrapper that should be of particular interest to Mac and iPhone developers. We are also working on auto-geometry features and multithreading/SIMD optimizations as well. Check out the link above for more information!
 
-To try Objective-Chipmunk in your own projects see Objective-Chipmunk/Objective-Chipmunk/Readme.rtf.
-
 
 h2. BUILDING:
 
