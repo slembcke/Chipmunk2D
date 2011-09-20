@@ -138,7 +138,7 @@ CP_DefineSpaceStructGetter(cpBody *, staticBody, StaticBody);
 CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep);
 
 /// returns true from inside a callback and objects cannot be added/removed.
-static cpBool
+static inline cpBool
 cpSpaceIsLocked(cpSpace *space)
 {
 	return space->CP_PRIVATE(locked);
