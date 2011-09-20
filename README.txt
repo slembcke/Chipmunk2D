@@ -34,6 +34,13 @@ CONTACT:
 slembcke@gmail.com (also on Google Talk)
 
 CHANGES SINCE 6.0.1:
+* API: Added cpSpaceIsLocked() to check if you are in a callback or not.
+* API: Removed the long deprecated [ChipmunkSpace addShapeAHandler:] and [ChipmunkSpace addShapeBHandler:] methods.
+* API: The largely useless ChipmunkObject protocol now can return any id<NSFastEnumeration> object instead of just an NSSet.
+* API: The [ChipmunkSpace addBaseObjects:] and [ChipmunkSpace removeBaseObjects:] methods were removed.
+* API: Added [ChipmunkSpace smartAdd:] and [ChipmunkSpace smartRemove:] methods for a consistent API to remove objects inside and out of callbacks.
+* API: Added [ChipmunkSpace addPostStepBlock:key:] to complement [ChipmunkSpace addPostStepCallback:selector:key:].
+* API: Added [ChipmunkSpace addPostStepAddition:].
 * BUG: Soft errors (only checked when debug mode is enabled) and warnings were disabled. Whoops.
 * BUG: cpShapeIsSensor() was incorrectly named in chipmunk_ffi.h.
 * BUG: It should be safe to call cpActivateBody() from an space iterator callback now.

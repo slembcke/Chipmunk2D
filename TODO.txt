@@ -1,5 +1,3 @@
-cpSpaceGetPrevTimeStep doc
-
 Tutorial ideas:
 	Player grounding example.
 	Fishing
