@@ -1,3 +1,6 @@
+!http://files.slembcke.net/chipmunk/logo/logo1_med.png!
+!http://files.slembcke.net/chipmunk/balance_chipmunk.png!
+
 ABOUT:
 Chipmunk is a simple, lightweight, fast and portable 2D rigid body physics library written in C. It's licensed under the unrestrictive, OSI approved MIT license. My aim is to give 2D developers access the same quality of physics you find in newer 3D games. I hope you enjoy using Chipmunk, and please consider donating to help make it worth our time to continue to support Chipmunk with great new features.
 
