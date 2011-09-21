@@ -45,6 +45,7 @@
     <ClInclude Include="..\..\..\include\chipmunk\cpShape.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpSpace.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpSpaceHash.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpSpatialIndex.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpVect.h" />
     <ClInclude Include="..\..\..\src\prime.h" />
   </ItemGroup>

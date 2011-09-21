@@ -158,12 +158,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Demo\Bench.c" />
-    <ClCompile Include="..\..\..\Demo\Bounce.c" />
+    <ClCompile Include="..\..\..\Demo\Buoyancy.c" />
+    <ClCompile Include="..\..\..\Demo\Chains.c" />
+    <ClCompile Include="..\..\..\Demo\ChipmunkDebugDraw.c" />
     <ClCompile Include="..\..\..\Demo\ChipmunkDemo.c" />
-    <ClCompile Include="..\..\..\Demo\drawSpace.c" />
+    <ClCompile Include="..\..\..\Demo\ContactGraph.c" />
+    <ClCompile Include="..\..\..\Demo\Crane.c" />
     <ClCompile Include="..\..\..\Demo\Joints.c" />
     <ClCompile Include="..\..\..\Demo\LogoSmash.c" />
-    <ClCompile Include="..\..\..\Demo\MagnetsElectric.c" />
     <ClCompile Include="..\..\..\Demo\OneWay.c" />
     <ClCompile Include="..\..\..\Demo\Planet.c" />
     <ClCompile Include="..\..\..\Demo\Player.c" />
@@ -172,17 +174,14 @@
     <ClCompile Include="..\..\..\Demo\PyramidStack.c" />
     <ClCompile Include="..\..\..\Demo\PyramidTopple.c" />
     <ClCompile Include="..\..\..\Demo\Query.c" />
-    <ClCompile Include="..\..\..\Demo\Sensors.c" />
-    <ClCompile Include="..\..\..\Demo\Simple.c" />
     <ClCompile Include="..\..\..\Demo\Springies.c" />
     <ClCompile Include="..\..\..\Demo\Tank.c" />
     <ClCompile Include="..\..\..\Demo\TheoJansen.c" />
     <ClCompile Include="..\..\..\Demo\Tumble.c" />
-    <ClCompile Include="..\..\..\Demo\UnsafeOps.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Demo\ChipmunkDebugDraw.h" />
     <ClInclude Include="..\..\..\Demo\ChipmunkDemo.h" />
-    <ClInclude Include="..\..\..\Demo\drawSpace.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\chipmunk\chipmunk.vcxproj">
