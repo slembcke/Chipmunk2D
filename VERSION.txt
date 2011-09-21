@@ -1,20 +1,23 @@
 CHANGES SINCE 6.0.1:
 * API: Added cpSpaceIsLocked() to check if you are in a callback or not.
 * API: Removed the long deprecated [ChipmunkSpace addShapeAHandler:] and [ChipmunkSpace addShapeBHandler:] methods.
-* API: The largely useless ChipmunkObject protocol now can return any id<NSFastEnumeration> object instead of just an NSSet.
-* API: The [ChipmunkSpace addBaseObjects:] and [ChipmunkSpace removeBaseObjects:] methods were removed.
+* API: The ChipmunkObject protocol now can return any id<NSFastEnumeration> object instead of just an NSSet.
+* API: The largely useless [ChipmunkSpace addBaseObjects:] and [ChipmunkSpace removeBaseObjects:] methods were removed.
 * API: Added [ChipmunkSpace smartAdd:] and [ChipmunkSpace smartRemove:] methods for a consistent API to remove objects inside and out of callbacks.
 * API: Added [ChipmunkSpace addPostStepBlock:key:] to complement [ChipmunkSpace addPostStepCallback:selector:key:].
 * API: Added [ChipmunkSpace addPostStepAddition:].
 * API: Objective-Chipmunk collision handlers no longer retain their target to avoid reference cycles.
+* API: Added callbacks to joints.
 * BUG: Soft errors (only checked when debug mode is enabled) and warnings were disabled. Whoops.
 * BUG: cpShapeIsSensor() was incorrectly named in chipmunk_ffi.h.
 * BUG: It should be safe to call cpActivateBody() from an space iterator callback now.
 * MISC: Very nice bouyancy demo added based on callbacks.
+* MISC: Breakable Joints demo showing how to use the new joint callbacks.
 * MISC: Player demo updated and greatly enhanced by Chipmunk 6 features.
 * MISC: Changed adding a static body to a space from a warning to a hard error.
 * MISC: cpGroup and cpCollisionType now default to uintptr_t so you can safely use pointers instead of ints for these types.
 * MISC: Updated the MSVC10 project file.
+* MISC: Updated the FFI defs.
 
 CHANGES SINCE 6.0.0:
 * BUG: Calling cpBodySetPos() on a sleeping body was delaying the Separate() handler callback if one existed.
