@@ -15,10 +15,12 @@ h2. FEATURES:
 * Supports sleeping objects that have come to rest to reduce the CPU load.
 * Support for collision event callbacks based on user definable object types types.
 * Flexible collision filtering system with layers, exclusion groups and callbacks.
+** Can be used to create all sorts of effects like one way platforms or buoyancy areas. (Examples included)
 * Supports point, segment (raycasting), shape and bounding box queries to the collision detection system.
 * Impulses amounts can be read out for gameplay effects.
 * Large variety of joints - easily make vehicles, ragdolls, and more.
-* Joint callbacks. Implement breakable or animated joints.
+* Joint callbacks.
+** Can be used to easily implement breakable or animated joints. (Examples included)
 * Maintains a contact graph of all colliding objects.
 * Lightweight C99 implementation with no external dependencies outside of the Std. C library.
 * Many language bindings available.
