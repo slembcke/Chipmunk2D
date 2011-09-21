@@ -26,7 +26,6 @@ h2. FEATURES:
 * Many language bindings available.
 * Simple, read the documentation and see!
 * Unrestrictive MIT license
-* Makes you smarter, stronger and more attractive to the opposite gender! (It worked for me anyway)
 
 
 h2. CONTRACTING:
