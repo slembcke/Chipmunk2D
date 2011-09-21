@@ -36,7 +36,7 @@ Howling Moon Software (my company) is available for contracting if you want to m
 
 h2. CHIPMUNK PRO:
 
-We also make a bunch of extra for Chipmunk called "Chipmunk Pro": http://chipmunk-physics.net/chipmunkPro.php. Currently we have a nice Objective-C wrapper that should be of particular interest to Mac and iPhone developers. We are also working on auto-geometry features and multithreading/SIMD optimizations as well. Check out the link above for more information!
+We also make a bunch of extra for Chipmunk called "Chipmunk Pro":http://chipmunk-physics.net/chipmunkPro.php. Currently we have a nice Objective-C wrapper that should be of particular interest to Mac and iPhone developers. We are also working on auto-geometry features and multithreading/SIMD optimizations as well. Check out the link above for more information!
 
 
 h2. BUILDING:
