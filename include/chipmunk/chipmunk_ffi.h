@@ -160,7 +160,6 @@ MAKE_PROPERTIES_REF(cpSpace, Gravity);
 MAKE_PROPERTIES_REF(cpSpace, Damping);
 MAKE_PROPERTIES_REF(cpSpace, IdleSpeedThreshold);
 MAKE_PROPERTIES_REF(cpSpace, SleepTimeThreshold);
-MAKE_PROPERTIES_REF(cpSpace, SleepTimeThreshold);
 MAKE_PROPERTIES_REF(cpSpace, CollisionSlop);
 MAKE_PROPERTIES_REF(cpSpace, CollisionBias);
 MAKE_PROPERTIES_REF(cpSpace, CollisionPersistence);
