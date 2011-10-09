@@ -1,3 +1,8 @@
+cpBodyActivateStatic() should also activate joints?
+AngryChipmunks
+ARC
+Blocks tutorial.
+
 Tutorial ideas:
 	Player grounding example.
 	Fishing

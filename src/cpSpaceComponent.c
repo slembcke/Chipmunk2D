@@ -154,6 +154,8 @@ cpBodyActivateStatic(cpBody *body, cpShape *filter)
 			cpBodyActivate(arb->body_a == body ? arb->body_b : arb->body_a);
 		}
 	}
+	
+	// TODO should also activate joints!
 }
 
 static inline void
