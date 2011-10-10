@@ -2,6 +2,8 @@ cpBodyActivateStatic() should also activate joints?
 AngryChipmunks
 ARC
 Blocks tutorial.
+finish smooth line collisions
+doc the KE function
 
 Tutorial ideas:
 	Player grounding example.
