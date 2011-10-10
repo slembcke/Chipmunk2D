@@ -120,6 +120,9 @@ cpVect cpArbiterTotalImpulse(const cpArbiter *arb);
 /// Calculate the total impulse including the friction that was applied by this arbiter.
 /// Calling this function from a begin or pre-solve callback is undefined.
 cpVect cpArbiterTotalImpulseWithFriction(const cpArbiter *arb);
+// Calculate the amount of energy lost in a collision not including dynamic friction.
+cpFloat cpArbiterTotalKE(const cpArbiter *arb)
+
 
 /// Causes a collision pair to be ignored as if you returned false from a begin callback.
 /// If called from a pre-step callback, you will still need to return false

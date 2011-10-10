@@ -138,6 +138,24 @@ cpArbiterTotalImpulseWithFriction(const cpArbiter *arb)
 	return (arb->swappedColl ? sum : cpvneg(sum));
 }
 
+cpFloat
+cpArbiterTotalKE(const cpArbiter *arb)
+{
+	cpFloat eCoef = (1 - arb->e)/(1 + arb->e);
+	cpFloat sum = 0.0;
+	
+	cpContact *contacts = arb->contacts;
+	for(int i=0, count=arb->numContacts; i<count; i++){
+		cpContact *con = &contacts[i];
+		cpFloat jnAcc = con->jnAcc;
+		cpFloat jtAcc = con->jtAcc;
+		
+		sum += eCoef*jnAcc*jnAcc/con->nMass + jtAcc*jtAcc/con->tMass;
+	}
+	
+	return sum;
+}
+
 //cpFloat
 //cpContactsEstimateCrushingImpulse(cpContact *contacts, int numContacts)
 //{
