@@ -4,6 +4,7 @@ ARC
 Blocks tutorial.
 finish smooth line collisions
 doc the KE function
+add CHIPMUNK_ARBITER_GET_BODIES
 
 Tutorial ideas:
 	Player grounding example.
