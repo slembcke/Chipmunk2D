@@ -2,7 +2,7 @@
 
 <%= pop_open_div("Outline") %><%%= Node::Root.outline %></div></div>
 
-<%= h 1, "Chipmunk Physics 6.0.1", "Intro" %>
+<%= h 1, "Chipmunk Physics 6.0.2", "Intro" %>
 
 First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be blazingly fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games across just about every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
 
@@ -664,6 +664,10 @@ p(expl). In order to use the @cpBodyEachArbiter()@ function, you must tell Chipm
 
 p(expl). Retrieves the current (if you are in a callback from @cpSpaceStep()@) or most recent (outside of a @cpSpaceStep()@ call) timestep.
 
+<pre><code>cpFloat cpSpaceIsLocked(const cpSpace *space)</code></pre>
+
+p(expl). Returns true when in a callback meaning that you cannot add/remove objects from the space. Can be used to choose to create a post-step callback instead.
+
 <pre><code>cpDataPointer cpSpaceGetUserData(const cpSpace *space)
 void cpSpaceSetUserData(cpSpace *space, cpDataPointer value)</code></pre>
 
@@ -1160,6 +1164,8 @@ p(expl). Function type used for @postStep()@ callbacks. @space@ is the space the
 <pre><code>void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)</code></pre>
 
 p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @obj@ and @data@ will be passed to your function. Only the last callback registered for any unique value of @obj@ will be recorded. You can add @postStep()@ callbacks from outside of other callback functions, but there isn't a good reason to and they won't be called until the next time @cpSpaceStep()@ is finishing.
+
+*Note:* Post-step callbacks are not run in any particular order. If you need to sequence a number of events, you'll need to put them in a single callback.
 
 <%= h 2, "Examples:", "Examples" %>
 
