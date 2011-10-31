@@ -379,8 +379,8 @@ Many things are defined in coordinates local to a body meaning that the (0,0) is
 People are sometimes confused by the difference between a force and an impulse. An impulse is basically a very large force applied over a very short period of time, like a ball hitting a wall or cannon firing. Chipmunk treats impulses as if they occur instantaneously by simply adding directly to the velocity of an object. Both impulses and forces are affected the mass of an object. Double the mass of the object and halve the effect.
 
 * @void cpBodyResetForces(cpBody *body)@ - Zero both the forces and torques currently applied to the body.
-* @void cpBodyApplyForce(cpBody *body, const cpVect f, const cpVect r)@ - Add the impulse @j@ to @body@ at a relative offset @r@ from the center of gravity.
-* @void cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)@ - Add the force @f@ to @body@ at a relative offset @r@ from the center of gravity.
+* @void cpBodyApplyForce(cpBody *body, const cpVect f, const cpVect r)@ - Add the force @j@ to @body@ at a relative offset @r@ from the center of gravity.
+* @void cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)@ - Add the impulse @f@ to @body@ at a relative offset @r@ from the center of gravity.
 
 *Note:* Both the @cpBodyApplyForce()@ @cpBodyApplyImpulse()@ functions take a force or impulse in absolute coordinates and applies it at a relative offset in absolute coordinates. (The offset is relative to the center of gravity, but is _not_ rotated with the body)
 
