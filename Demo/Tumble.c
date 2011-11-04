@@ -35,12 +35,12 @@ update(int ticks)
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-		
 		// Manually update the position of the box body so that the box rotates.
 		// Normally Chipmunk calls this and cpBodyUpdateVelocity() for you,
 		// but we wanted to control the angular velocity explicitly.
 		cpBodyUpdatePosition(rogueBoxBody, dt);
+		
+		cpSpaceStep(space, dt);
 	}
 }
 
