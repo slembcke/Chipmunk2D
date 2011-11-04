@@ -5,6 +5,8 @@ Blocks tutorial.
 finish smooth line collisions
 doc the KE function
 add CHIPMUNK_ARBITER_GET_BODIES
+ChipmunkShape.isStatic
+Make functions to conver C to Obj-C types
 
 Tutorial ideas:
 	Player grounding example.
