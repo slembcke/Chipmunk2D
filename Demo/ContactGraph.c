@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdio.h>
 
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
@@ -81,7 +82,7 @@ update(int ticks)
 	
 	// Weight can be found similarly from the gravity vector.
 	cpVect g = cpSpaceGetGravity(space);
-	cpFloat weight = cpvdot(g, impulseSum)/(-cpvlengthsq(g)*dt);
+	cpFloat weight = cpvdot(g, impulseSum)/(cpvlengthsq(g)*dt);
 	
 	cursor += sprintf(cursor, "Total force: %5.2f, Total weight: %5.2f. ", force, weight);
 	

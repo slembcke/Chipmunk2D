@@ -115,11 +115,15 @@ CP_DefineArbiterStructProperty(cpFloat, u, Friction);
 CP_DefineArbiterStructProperty(cpVect, surface_vr, SurfaceVelocity);
 
 /// Calculate the total impulse that was applied by this arbiter.
-/// Calling this function from a begin or pre-solve callback is undefined.
+/// This function should only be called from a post-solve, post-step or cpBodyEachArbiter callback.
 cpVect cpArbiterTotalImpulse(const cpArbiter *arb);
 /// Calculate the total impulse including the friction that was applied by this arbiter.
-/// Calling this function from a begin or pre-solve callback is undefined.
+/// This function should only be called from a post-solve, post-step or cpBodyEachArbiter callback.
 cpVect cpArbiterTotalImpulseWithFriction(const cpArbiter *arb);
+// Calculate the amount of energy lost in a collision not including dynamic friction.
+/// This function should only be called from a post-solve, post-step or cpBodyEachArbiter callback.
+cpFloat cpArbiterTotalKE(const cpArbiter *arb);
+
 
 /// Causes a collision pair to be ignored as if you returned false from a begin callback.
 /// If called from a pre-step callback, you will still need to return false

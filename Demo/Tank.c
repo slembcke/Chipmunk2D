@@ -110,7 +110,7 @@ init(void)
 		
 		cpConstraint *gear = cpSpaceAddConstraint(space, cpGearJointNew(staticBody, body, 0.0f, 1.0f));
 		cpConstraintSetMaxBias(gear, 0); // disable joint correction
-		cpConstraintSetMaxForce(pivot, 5000.0f); // emulate angular friction
+		cpConstraintSetMaxForce(gear, 5000.0f); // emulate angular friction
 	}
 	
 	// We joint the tank to the control body and control the tank indirectly by modifying the control body.
@@ -124,7 +124,7 @@ init(void)
 	cpConstraint *gear = cpSpaceAddConstraint(space, cpGearJointNew(tankControlBody, tankBody, 0.0f, 1.0f));
 	cpConstraintSetErrorBias(gear, 0); // attempt to fully correct the joint each step
 	cpConstraintSetMaxBias(gear, 1.2f);  // but limit it's angular correction rate
-	cpConstraintSetMaxForce(pivot, 50000.0f); // emulate angular friction
+	cpConstraintSetMaxForce(gear, 50000.0f); // emulate angular friction
 		
 	return space;
 }

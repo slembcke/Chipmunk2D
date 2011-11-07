@@ -121,7 +121,7 @@ cpArbiterTotalImpulse(const cpArbiter *arb)
 		sum = cpvadd(sum, cpvmult(con->n, con->jnAcc));
 	}
 	
-	return (arb->swappedColl ? cpvneg(sum) : sum);
+	return (arb->swappedColl ? sum : cpvneg(sum));
 }
 
 cpVect
@@ -135,7 +135,25 @@ cpArbiterTotalImpulseWithFriction(const cpArbiter *arb)
 		sum = cpvadd(sum, cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc)));
 	}
 		
-	return (arb->swappedColl ? cpvneg(sum) : sum);
+	return (arb->swappedColl ? sum : cpvneg(sum));
+}
+
+cpFloat
+cpArbiterTotalKE(const cpArbiter *arb)
+{
+	cpFloat eCoef = (1 - arb->e)/(1 + arb->e);
+	cpFloat sum = 0.0;
+	
+	cpContact *contacts = arb->contacts;
+	for(int i=0, count=arb->numContacts; i<count; i++){
+		cpContact *con = &contacts[i];
+		cpFloat jnAcc = con->jnAcc;
+		cpFloat jtAcc = con->jtAcc;
+		
+		sum += eCoef*jnAcc*jnAcc/con->nMass + jtAcc*jtAcc/con->tMass;
+	}
+	
+	return sum;
 }
 
 //cpFloat

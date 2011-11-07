@@ -208,7 +208,7 @@ init(void)
 		cpShapeSetFriction(shape, 0.8f);
 	}
 	
-	cpSpaceAddCollisionHandler(space, 1, 0, NULL, (cpCollisionBeginFunc)waterPreSolve, NULL, NULL, NULL);
+	cpSpaceAddCollisionHandler(space, 1, 0, NULL, (cpCollisionPreSolveFunc)waterPreSolve, NULL, NULL, NULL);
 		
 	return space;
 }
