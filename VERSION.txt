@@ -1,3 +1,6 @@
+CHANGES SINCE 6.0.2:
+* API: Added a cpBBNewForCircle() function.
+
 CHANGES SINCE 6.0.1:
 * API: Added cpSpaceIsLocked() to check if you are in a callback or not.
 * API: Removed the long deprecated [ChipmunkSpace addShapeAHandler:] and [ChipmunkSpace addShapeBHandler:] methods.

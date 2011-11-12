@@ -47,6 +47,7 @@ MAKE_REF(cpflerp);
 MAKE_REF(cpflerpconst);
 
 MAKE_REF(cpBBNew);
+MAKE_REF(cpBBNewForCircle);
 MAKE_REF(cpBBIntersects);
 MAKE_REF(cpBBContainsBB);
 MAKE_REF(cpBBContainsVect);

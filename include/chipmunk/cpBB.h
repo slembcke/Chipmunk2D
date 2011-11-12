@@ -29,11 +29,16 @@ typedef struct cpBB{
 } cpBB;
 
 /// Convenience constructor for cpBB structs.
-static inline cpBB cpBBNew(const cpFloat l, const cpFloat b,
-		const cpFloat r, const cpFloat t)
+static inline cpBB cpBBNew(const cpFloat l, const cpFloat b, const cpFloat r, const cpFloat t)
 {
 	cpBB bb = {l, b, r, t};
 	return bb;
+}
+
+/// Constructs a cpBB for a circle with the given position and radius.
+static inline cpBB cpBBNewForCircle(const cpVect p, const cpFloat r)
+{
+	return cpBBNew(p.x - r, p.y - r, p.x + r, p.y + r);
 }
 
 /// Returns true if @c a and @c b intersect.
@@ -95,7 +100,7 @@ static inline cpBool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)
 		cpVect offset = cpv((a.x + b.x - bb.r - bb.l), (a.y + b.y - bb.t - bb.b));
 		cpVect extents = cpv(bb.r - bb.l, bb.t - bb.b);
 		
-		return (cpfabs(cpvdot(axis, offset)) < cpfabs(axis.x*extents.x) + cpfabs(axis.y*extents.y));
+		return (cpfabs(cpvdot(axis, offset)) <= cpfabs(axis.x*extents.x) + cpfabs(axis.y*extents.y));
 	}
 	
 	return cpFalse;

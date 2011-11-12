@@ -231,6 +231,10 @@ p(expl). Simple bounding box struct. Stored as left, bottom, right, top values.
 
 p(expl). Convenience constructor for @cpBB@ structs. Like @cpv()@ this function returns a copy and not a malloced pointer.
 
+<pre><code>cpBB cpBBNewForCircle(const cpVect p, const cpFloat r)</code></pre>
+
+p(expl). Convenience constructor for making a @cpBB@ fitting a circle at position @p@ with radius @r@.
+
 
 <%= h 2, "Operations:", "Operations" %>
 
