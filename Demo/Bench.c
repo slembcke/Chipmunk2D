@@ -145,7 +145,7 @@ static cpSpace *init_SimpleTerrainHexagons_100(){
 
 
 // SimpleTerrain variable sized objects
-static float rand_size(){
+static cpFloat rand_size(){
 	return cpfpow(1.5, cpflerp(-1.5, 3.5, frand()));
 }
 
