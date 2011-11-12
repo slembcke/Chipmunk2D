@@ -267,27 +267,28 @@ static inline cpBool inUnitRange(cpFloat t){return (0.0f < t && t < 1.0f);}
 static void
 cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
-	cpVect seg_a = cpvsub(seg->ta, a);
-	cpVect seg_b = cpvsub(seg->tb, a);
+	cpVect n = seg->tn;
+	cpFloat d = cpvdot(cpvsub(seg->ta, a), n);
+	cpFloat r = seg->r;
+	
+	cpVect flipped_n = (d > 0.0f ? cpvneg(n) : n);
+	cpVect n_offset = cpvsub(cpvmult(flipped_n, r), a);
+	
+	cpVect seg_a = cpvadd(seg->ta, n_offset);
+	cpVect seg_b = cpvadd(seg->tb, n_offset);
 	cpVect delta = cpvsub(b, a);
 	
 	if(cpvcross(delta, seg_a)*cpvcross(delta, seg_b) <= 0.0f){
-		cpVect n = seg->tn;
-		cpFloat d = cpvdot(seg_a, n);
+		cpFloat d_offset = d + (d > 0.0f ? -r : r);
+		cpFloat ad = -d_offset;
+		cpFloat bd = cpvdot(delta, n) - d_offset;
 		
-		cpFloat d_offset = d + (d > 0.0f ? -seg->r : seg->r);
-		cpFloat ad2 = -d_offset;
-		cpFloat bd2 = cpvdot(delta, n) - d_offset;
-		if(ad2*bd2 < 0.0f){
+		if(ad*bd < 0.0f){
 			info->shape = (cpShape *)seg;
-			info->t = ad2/(ad2 - bd2);
-			info->n = (d > 0.0f ? cpvneg(n) : n);
-			
-			return; // don't continue on and check endcaps
+			info->t = ad/(ad - bd);
+			info->n = flipped_n;
 		}
-	}
-	
-	if(seg->r) {
+	} else if(r != 0.0f){
 		cpSegmentQueryInfo info1 = {NULL, 1.0f, cpvzero};
 		cpSegmentQueryInfo info2 = {NULL, 1.0f, cpvzero};
 		circleSegmentQuery((cpShape *)seg, seg->ta, seg->r, a, b, &info1);
