@@ -64,20 +64,22 @@ static cpBool step = cpFalse;
 
 static cpBool drawBBs = cpFalse;
 
-static int ticks = 0;
 static cpSpace *space;
 
+
+static int ticks = 0;
+cpFloat ChipmunkDemoTime;
+
+static cpBody *mouseBody = NULL;
+static cpConstraint *mouseJoint = NULL;
 cpVect ChipmunkDemoMouse;
-cpBody *mouseBody = NULL;
-cpConstraint *mouseJoint = NULL;
 
 char *ChipmunkDemoMessageString = NULL;
 
-int key_up = 0;
-int key_down = 0;
-int key_left = 0;
-int key_right = 0;
-
+static int key_up = 0;
+static int key_down = 0;
+static int key_left = 0;
+static int key_right = 0;
 cpVect ChipmunkDemoKeyboard = {};
 
 static void shapeFreeWrap(cpSpace *space, cpShape *shape, void *unused){
@@ -197,7 +199,7 @@ drawInfo()
 		points, maxPoints,
 		space->constraints->num, space->iterations,
 		constraints, maxConstraints,
-		ticks/60.0f, (ke < 1e-10f ? 0.0f : ke)
+		ChipmunkDemoTime, (ke < 1e-10f ? 0.0f : ke)
 	);
 	
 	drawString(0, 220, buffer);
@@ -240,6 +242,8 @@ display(void)
 		demos[demoIndex].updateFunc(ticks);
 		
 		ticks++;
+		ChipmunkDemoTime = ticks/60.0;
+		
 		step = cpFalse;
 	}
   

@@ -44,6 +44,7 @@ frand(void)
 	return (cpFloat)rand()/(cpFloat)RAND_MAX;
 }
 
+extern cpFloat ChipmunkDemoTime;
 extern cpVect ChipmunkDemoKeyboard;
 extern cpVect ChipmunkDemoMouse;
 extern char *ChipmunkDemoMessageString;
