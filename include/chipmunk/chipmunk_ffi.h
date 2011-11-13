@@ -55,6 +55,7 @@ MAKE_REF(cpBBMerge);
 MAKE_REF(cpBBExpand);
 MAKE_REF(cpBBArea);
 MAKE_REF(cpBBMergedArea);
+MAKE_REF(cpBBSegmentQuery);
 MAKE_REF(cpBBIntersectsSegment);
 
 MAKE_REF(cpBodyGetMass);
