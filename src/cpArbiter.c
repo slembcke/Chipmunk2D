@@ -295,48 +295,38 @@ cpArbiterApplyImpulse(cpArbiter *arb)
 {
 	cpBody *a = arb->body_a;
 	cpBody *b = arb->body_b;
+	cpVect surface_vr = arb->surface_vr;
+	cpFloat friction = arb->u;
 
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];
+		cpFloat nMass = con->nMass;
 		cpVect n = con->n;
 		cpVect r1 = con->r1;
 		cpVect r2 = con->r2;
 		
-		// Calculate the relative bias velocities.
 		cpVect vb1 = cpvadd(a->v_bias, cpvmult(cpvperp(r1), a->w_bias));
 		cpVect vb2 = cpvadd(b->v_bias, cpvmult(cpvperp(r2), b->w_bias));
-		cpFloat vbn = cpvdot(cpvsub(vb2, vb1), n);
+		cpVect vr = relative_velocity(a, b, r1, r2);
 		
-		// Calculate and clamp the bias impulse.
-		cpFloat jbn = (con->bias - vbn)*con->nMass;
+		cpFloat vbn = cpvdot(cpvsub(vb2, vb1), n);
+		cpFloat vrn = cpvdot(vr, n);
+		cpFloat vrt = cpvdot(cpvadd(vr, surface_vr), cpvperp(n));
+		
+		cpFloat jbn = (con->bias - vbn)*nMass;
 		cpFloat jbnOld = con->jBias;
 		con->jBias = cpfmax(jbnOld + jbn, 0.0f);
-		jbn = con->jBias - jbnOld;
 		
-		// Apply the bias impulse.
-		apply_bias_impulses(a, b, r1, r2, cpvmult(n, jbn));
-
-		// Calculate the relative velocity.
-		cpVect vr = relative_velocity(a, b, r1, r2);
-		cpFloat vrn = cpvdot(vr, n);
-		
-		// Calculate and clamp the normal impulse.
-		cpFloat jn = -(con->bounce + vrn)*con->nMass;
+		cpFloat jn = -(con->bounce + vrn)*nMass;
 		cpFloat jnOld = con->jnAcc;
 		con->jnAcc = cpfmax(jnOld + jn, 0.0f);
-		jn = con->jnAcc - jnOld;
 		
-		// Calculate the relative tangent velocity.
-		cpFloat vrt = cpvdot(cpvadd(vr, arb->surface_vr), cpvperp(n));
-		
-		// Calculate and clamp the friction impulse.
-		cpFloat jtMax = arb->u*con->jnAcc;
+		cpFloat jtMax = friction*con->jnAcc;
 		cpFloat jt = -vrt*con->tMass;
 		cpFloat jtOld = con->jtAcc;
 		con->jtAcc = cpfclamp(jtOld + jt, -jtMax, jtMax);
-		jt = con->jtAcc - jtOld;
 		
-		// Apply the final impulse.
-		apply_impulses(a, b, r1, r2, cpvrotate(n, cpv(jn, jt)));
+		apply_bias_impulses(a, b, r1, r2, cpvmult(n, con->jBias - jbnOld));
+		apply_impulses(a, b, r1, r2, cpvrotate(n, cpv(con->jnAcc - jnOld, con->jtAcc - jtOld)));
 	}
 }
