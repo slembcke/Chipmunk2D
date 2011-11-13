@@ -245,6 +245,7 @@ p(expl). Convenience constructor for making a @cpBB@ fitting a circle at positio
 * @cpBB cpBBExpand(const cpBB bb, const cpVect v)@ - Return the minimal bounding box that contains both @bb@ and @v@.
 * @cpFloat cpBBArea(cpBB bb)@ - Return the area of @bb@.
 * @cpFloat cpBBMergedArea(cpBB a, cpBB b)@ - Merges @a@ and @b@ then returns the area of the merged bounding box.
+* @cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)@ - Returns the fraction along the segment query the cpBB is hit. Returns INFINITY if it doesn't hit.
 * @cpBool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)@ - Returns true if the segment defined by endpoints @a@ and @b@ intersect @bb@.
 * @cpVect cpBBClampVect(const cpBB bb, const cpVect v)@ - Returns a copy of @v@ clamped to the bounding box.
 * @cpVect cpBBWrapVect(const cpBB bb, const cpVect v)@ - Returns a copy of @v@ wrapped to the bounding box.
