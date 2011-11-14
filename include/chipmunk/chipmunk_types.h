@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdint.h>
 
 #ifdef __APPLE__

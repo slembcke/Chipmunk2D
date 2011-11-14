@@ -23,6 +23,7 @@
 /// @{
 
 typedef struct cpContactBufferHeader cpContactBufferHeader;
+typedef void (*cpSpaceArbiterApplyImpulseFunc)(cpArbiter *arb);
 
 /// Basic Unit of Simulation in Chipmunk
 struct cpSpace {
@@ -98,6 +99,8 @@ struct cpSpace {
 	CP_PRIVATE(cpHashSet *collisionHandlers);
 	CP_PRIVATE(cpCollisionHandler defaultHandler);
 	CP_PRIVATE(cpHashSet *postStepCallbacks);
+	
+	CP_PRIVATE(cpSpaceArbiterApplyImpulseFunc arbiterApplyImpulse);
 	
 	CP_PRIVATE(cpBody _staticBody);
 };

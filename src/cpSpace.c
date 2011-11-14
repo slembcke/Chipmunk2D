@@ -126,6 +126,8 @@ cpSpaceInit(cpSpace *space)
 	
 	space->postStepCallbacks = NULL;
 	
+	space->arbiterApplyImpulse = cpArbiterApplyImpulse;
+	
 	cpBodyInitStatic(&space->_staticBody);
 	space->staticBody = &space->_staticBody;
 	

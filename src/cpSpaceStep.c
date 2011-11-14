@@ -152,7 +152,7 @@ cpContactBufferHeaderInit(cpContactBufferHeader *header, cpTimestamp stamp, cpCo
 	return header;
 }
 
-static void
+void
 cpSpacePushFreshContactBuffer(cpSpace *space)
 {
 	cpTimestamp stamp = space->stamp;
@@ -233,8 +233,8 @@ queryReject(cpShape *a, cpShape *b)
 }
 
 // Callback from the spatial hash.
-static void
-collideShapes(cpShape *a, cpShape *b, cpSpace *space)
+void
+cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space)
 {
 	// Reject any of the simple cases
 	if(queryReject(a,b)) return;
@@ -294,7 +294,7 @@ collideShapes(cpShape *a, cpShape *b, cpSpace *space)
 }
 
 // Hashset filter func to throw away old arbiters.
-static cpBool
+cpBool
 cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 {
 	cpTimestamp ticks = space->stamp - arb->stamp;
@@ -329,7 +329,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 
 #pragma mark All Important cpSpaceStep() Function
 
-static void
+void
 cpShapeUpdateFunc(cpShape *shape, void *unused)
 {
 	cpBody *body = shape->body;
@@ -373,7 +373,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		// Find colliding pairs.
 		cpSpacePushFreshContactBuffer(space);
 		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)cpShapeUpdateFunc, NULL);
-		cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryFunc)collideShapes, space);
+		cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryFunc)cpSpaceCollideShapes, space);
 	} cpSpaceUnlock(space, cpFalse);
 	
 	// If body sleeping is enabled, do that now.
@@ -421,9 +421,10 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		}
 		
 		// Run the impulse solver.
+		cpSpaceArbiterApplyImpulseFunc applyImpulse = space->arbiterApplyImpulse;
 		for(int i=0; i<space->iterations; i++){
 			for(int j=0; j<arbiters->num; j++){
-				cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j]);
+				applyImpulse((cpArbiter *)arbiters->arr[j]);
 			}
 				
 			for(int j=0; j<constraints->num; j++){

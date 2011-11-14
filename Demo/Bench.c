@@ -4,6 +4,15 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
+#if FALSE
+	#define BENCH_SPACE_NEW cpSpaceNew
+	#define BENCH_SPACE_STEP cpSpaceStep
+#else
+	#import "cpHastySpace.h"
+	#define BENCH_SPACE_NEW cpHastySpaceNew
+	#define BENCH_SPACE_STEP cpHastySpaceStep
+#endif
+
 static cpSpace *space;
 
 static cpVect simple_terrain_verts[] = {
@@ -66,7 +75,7 @@ static void add_hexagon(int i, cpFloat radius){
 
 
 static void setupSpace_simpleTerrain(){
-	space = cpSpaceNew();
+	space = BENCH_SPACE_NEW();
 	space->iterations = 10;
 	space->gravity = cpv(0, -100);
 	space->collisionSlop = 0.5f;
@@ -199,7 +208,7 @@ static cpVect complex_terrain_verts[] = {
 static int complex_terrain_count = sizeof(complex_terrain_verts)/sizeof(cpVect);
 
 static cpSpace *init_ComplexTerrainCircles_1000(){
-	space = cpSpaceNew();
+	space = BENCH_SPACE_NEW();
 	space->iterations = 10;
 	space->gravity = cpv(0, -100);
 	space->collisionSlop = 0.5f;
@@ -224,7 +233,7 @@ static cpSpace *init_ComplexTerrainCircles_1000(){
 }
 
 static cpSpace *init_ComplexTerrainHexagons_1000(){
-	space = cpSpaceNew();
+	space = BENCH_SPACE_NEW();
 	space->iterations = 10;
 	space->gravity = cpv(0, -100);
 	space->collisionSlop = 0.5f;
@@ -304,7 +313,7 @@ static cpVect bouncy_terrain_verts[] = {
 static int bouncy_terrain_count = sizeof(bouncy_terrain_verts)/sizeof(cpVect);
 
 static cpSpace *init_BouncyTerrainCircles_500(){
-	space = cpSpaceNew();
+	space = BENCH_SPACE_NEW();
 	space->iterations = 10;
 	
 	cpVect offset = cpv(-320, -240);
@@ -329,7 +338,7 @@ static cpSpace *init_BouncyTerrainCircles_500(){
 }
 
 static cpSpace *init_BouncyTerrainHexagons_500(){
-	space = cpSpaceNew();
+	space = BENCH_SPACE_NEW();
 	space->iterations = 10;
 	
 	cpVect offset = cpv(-320, -240);
@@ -370,7 +379,7 @@ static cpBool NoCollide_begin(cpArbiter *arb, cpSpace *space, void *data){
 
 
 static cpSpace *init_NoCollide(){
-	space = cpSpaceNew();
+	space = BENCH_SPACE_NEW();
 	space->iterations = 10;
 	
 	cpSpaceAddCollisionHandler(space, 2, 2, NoCollide_begin, NULL, NULL, NULL, NULL);
@@ -422,7 +431,7 @@ static cpSpace *init_NoCollide(){
 
 // Build benchmark list
 static void update(int ticks){
-	cpSpaceStep(space, 1.0f/60.0f);
+	BENCH_SPACE_STEP(space, 1.0f/60.0f);
 }
 
 static void destroy(void){

@@ -158,11 +158,13 @@ cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *k
 extern cpCollisionHandler cpDefaultCollisionHandler;
 void cpSpaceProcessComponents(cpSpace *space, cpFloat dt);
 
+void cpSpacePushFreshContactBuffer(cpSpace *space);
 cpContact *cpContactBufferGetArray(cpSpace *space);
 void cpSpacePushContacts(cpSpace *space, int count);
 
 void *cpSpaceGetPostStepData(cpSpace *space, void *obj);
 
+cpBool cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space);
 void cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter);
 
 void cpSpaceActivateBody(cpSpace *space, cpBody *body);
@@ -185,6 +187,11 @@ cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb)
 	cpHashSetRemove(space->cachedArbiters, arbHashID, shape_pair);
 	cpArrayDeleteObj(space->arbiters, arb);
 }
+
+void cpShapeUpdateFunc(cpShape *shape, void *unused);
+void cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space);
+
+
 
 #pragma mark Arbiters
 
