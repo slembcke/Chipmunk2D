@@ -502,6 +502,8 @@ updateBBCache(cpShape *shape, void *unused)
 void 
 cpSpaceReindexStatic(cpSpace *space)
 {
+	cpAssertHard(!space->locked, "You cannot manually reindex objects while the space is locked. Wait until the current query or step is complete.");
+	
 	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)&updateBBCache, NULL);
 	cpSpatialIndexReindex(space->staticShapes);
 }
@@ -509,6 +511,8 @@ cpSpaceReindexStatic(cpSpace *space)
 void
 cpSpaceReindexShape(cpSpace *space, cpShape *shape)
 {
+	cpAssertHard(!space->locked, "You cannot manually reindex objects while the space is locked. Wait until the current query or step is complete.");
+	
 	cpBody *body = shape->body;
 	cpShapeUpdate(shape, body->p, body->rot);
 	

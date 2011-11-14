@@ -108,7 +108,7 @@ cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
 	space->locked--;
 	cpAssertSoft(space->locked >= 0, "Internal Error: Space lock underflow.");
 	
-	if(!space->locked){
+	if(!space->locked && runPostStep){
 		cpArray *waking = space->rousedBodies;
 		for(int i=0, count=waking->num; i<count; i++){
 			cpSpaceActivateBody(space, (cpBody *)waking->arr[i]);
@@ -347,8 +347,11 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	cpFloat prev_dt = space->curr_dt;
 	space->curr_dt = dt;
 		
-	// Reset and empty the arbiter list.
+	cpArray *bodies = space->bodies;
+	cpArray *constraints = space->constraints;
 	cpArray *arbiters = space->arbiters;
+	
+	// Reset and empty the arbiter list.
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiter *arb = (cpArbiter *)arbiters->arr[i];
 		arb->state = cpArbiterStateNormal;
@@ -360,15 +363,14 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	}
 	arbiters->num = 0;
 
-	// Integrate positions
-	cpArray *bodies = space->bodies;
-	for(int i=0; i<bodies->num; i++){
-		cpBody *body = (cpBody *)bodies->arr[i];
-		body->position_func(body, dt);
-	}
-	
-	// Find colliding pairs.
 	cpSpaceLock(space); {
+		// Integrate positions
+		for(int i=0; i<bodies->num; i++){
+			cpBody *body = (cpBody *)bodies->arr[i];
+			body->position_func(body, dt);
+		}
+		
+		// Find colliding pairs.
 		cpSpacePushFreshContactBuffer(space);
 		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)cpShapeUpdateFunc, NULL);
 		cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryFunc)collideShapes, space);
@@ -379,72 +381,71 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpSpaceProcessComponents(space, dt);
 	}
 	
-	// Clear out old cached arbiters and call separate callbacks
-	cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)cpSpaceArbiterSetFilter, space);
+	cpSpaceLock(space); {
+		// Clear out old cached arbiters and call separate callbacks
+		cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)cpSpaceArbiterSetFilter, space);
 
-	// Prestep the arbiters and constraints.
-	cpFloat slop = space->collisionSlop;
-	cpFloat biasCoef = 1.0f - cpfpow(space->collisionBias, dt);
-	for(int i=0; i<arbiters->num; i++){
-		cpArbiterPreStep((cpArbiter *)arbiters->arr[i], dt, slop, biasCoef);
-	}
-
-	cpArray *constraints = space->constraints;
-	for(int i=0; i<constraints->num; i++){
-		cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
-		
-		cpConstraintPreSolveFunc preSolve = constraint->preSolve;
-		if(preSolve) preSolve(constraint, space);
-		
-		constraint->klass->preStep(constraint, dt);
-	}
-
-	// Integrate velocities.
-	cpFloat damping = cpfpow(space->damping, dt);
-	cpVect gravity = space->gravity;
-	for(int i=0; i<bodies->num; i++){
-		cpBody *body = (cpBody *)bodies->arr[i];
-		body->velocity_func(body, gravity, damping, dt);
-	}
-	
-	// Apply cached impulses
-	cpFloat dt_coef = (prev_dt == 0.0f ? 0.0f : dt/prev_dt);
-	for(int i=0; i<arbiters->num; i++){
-		cpArbiterApplyCachedImpulse((cpArbiter *)arbiters->arr[i], dt_coef);
-	}
-	
-	for(int i=0; i<constraints->num; i++){
-		cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
-		constraint->klass->applyCachedImpulse(constraint, dt_coef);
-	}
-	
-	// Run the impulse solver.
-	for(int i=0; i<space->iterations; i++){
-		for(int j=0; j<arbiters->num; j++){
-			cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j]);
+		// Prestep the arbiters and constraints.
+		cpFloat slop = space->collisionSlop;
+		cpFloat biasCoef = 1.0f - cpfpow(space->collisionBias, dt);
+		for(int i=0; i<arbiters->num; i++){
+			cpArbiterPreStep((cpArbiter *)arbiters->arr[i], dt, slop, biasCoef);
 		}
+
+		for(int i=0; i<constraints->num; i++){
+			cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
 			
-		for(int j=0; j<constraints->num; j++){
-			cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
-			constraint->klass->applyImpulse(constraint);
+			cpConstraintPreSolveFunc preSolve = constraint->preSolve;
+			if(preSolve) preSolve(constraint, space);
+			
+			constraint->klass->preStep(constraint, dt);
 		}
-	}
 	
-	// Run the constraint post-solve callbacks
-	for(int i=0; i<constraints->num; i++){
-		cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
+		// Integrate velocities.
+		cpFloat damping = cpfpow(space->damping, dt);
+		cpVect gravity = space->gravity;
+		for(int i=0; i<bodies->num; i++){
+			cpBody *body = (cpBody *)bodies->arr[i];
+			body->velocity_func(body, gravity, damping, dt);
+		}
 		
-		cpConstraintPostSolveFunc postSolve = constraint->postSolve;
-		if(postSolve) postSolve(constraint, space);
-	}
-	
-	// run the post-solve callbacks
-	cpSpaceLock(space);
-	for(int i=0; i<arbiters->num; i++){
-		cpArbiter *arb = (cpArbiter *) arbiters->arr[i];
+		// Apply cached impulses
+		cpFloat dt_coef = (prev_dt == 0.0f ? 0.0f : dt/prev_dt);
+		for(int i=0; i<arbiters->num; i++){
+			cpArbiterApplyCachedImpulse((cpArbiter *)arbiters->arr[i], dt_coef);
+		}
 		
-		cpCollisionHandler *handler = arb->handler;
-		handler->postSolve(arb, space, handler->data);
-	}
-	cpSpaceUnlock(space, cpTrue);
+		for(int i=0; i<constraints->num; i++){
+			cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
+			constraint->klass->applyCachedImpulse(constraint, dt_coef);
+		}
+		
+		// Run the impulse solver.
+		for(int i=0; i<space->iterations; i++){
+			for(int j=0; j<arbiters->num; j++){
+				cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j]);
+			}
+				
+			for(int j=0; j<constraints->num; j++){
+				cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
+				constraint->klass->applyImpulse(constraint);
+			}
+		}
+		
+		// Run the constraint post-solve callbacks
+		for(int i=0; i<constraints->num; i++){
+			cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
+			
+			cpConstraintPostSolveFunc postSolve = constraint->postSolve;
+			if(postSolve) postSolve(constraint, space);
+		}
+		
+		// run the post-solve callbacks
+		for(int i=0; i<arbiters->num; i++){
+			cpArbiter *arb = (cpArbiter *) arbiters->arr[i];
+			
+			cpCollisionHandler *handler = arb->handler;
+			handler->postSolve(arb, space, handler->data);
+		}
+	} cpSpaceUnlock(space, cpTrue);
 }

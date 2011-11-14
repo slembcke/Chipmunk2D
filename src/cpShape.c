@@ -126,8 +126,7 @@ static cpBB
 cpCircleShapeCacheData(cpCircleShape *circle, cpVect p, cpVect rot)
 {
 	cpVect c = circle->tc = cpvadd(p, cpvrotate(circle->c, rot));
-	cpFloat r = circle->r;
-	return cpBBNew(c.x-r, c.y-r, c.x+r, c.y+r);
+	return cpBBNewForCircle(c, circle->r);
 }
 
 static cpBool
@@ -269,34 +268,27 @@ static void
 cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
 	cpVect n = seg->tn;
-	// flip n if a is behind the axis
-	if(cpvdot(a, n) < cpvdot(seg->ta, n))
-		n = cpvneg(n);
+	cpFloat d = cpvdot(cpvsub(seg->ta, a), n);
+	cpFloat r = seg->r;
 	
-	cpFloat an = cpvdot(a, n);
-	cpFloat bn = cpvdot(b, n);
+	cpVect flipped_n = (d > 0.0f ? cpvneg(n) : n);
+	cpVect n_offset = cpvsub(cpvmult(flipped_n, r), a);
 	
-	if(an != bn){
-		cpFloat d = cpvdot(seg->ta, n) + seg->r;
-		cpFloat t = (d - an)/(bn - an);
+	cpVect seg_a = cpvadd(seg->ta, n_offset);
+	cpVect seg_b = cpvadd(seg->tb, n_offset);
+	cpVect delta = cpvsub(b, a);
+	
+	if(cpvcross(delta, seg_a)*cpvcross(delta, seg_b) <= 0.0f){
+		cpFloat d_offset = d + (d > 0.0f ? -r : r);
+		cpFloat ad = -d_offset;
+		cpFloat bd = cpvdot(delta, n) - d_offset;
 		
-		if(0.0f < t && t < 1.0f){
-			cpVect point = cpvlerp(a, b, t);
-			cpFloat dt = -cpvcross(seg->tn, point);
-			cpFloat dtMin = -cpvcross(seg->tn, seg->ta);
-			cpFloat dtMax = -cpvcross(seg->tn, seg->tb);
-			
-			if(dtMin < dt && dt < dtMax){
-				info->shape = (cpShape *)seg;
-				info->t = t;
-				info->n = n;
-				
-				return; // don't continue on and check endcaps
-			}
+		if(ad*bd < 0.0f){
+			info->shape = (cpShape *)seg;
+			info->t = ad/(ad - bd);
+			info->n = flipped_n;
 		}
-	}
-	
-	if(seg->r) {
+	} else if(r != 0.0f){
 		cpSegmentQueryInfo info1 = {NULL, 1.0f, cpvzero};
 		cpSegmentQueryInfo info2 = {NULL, 1.0f, cpvzero};
 		circleSegmentQuery((cpShape *)seg, seg->ta, seg->r, a, b, &info1);

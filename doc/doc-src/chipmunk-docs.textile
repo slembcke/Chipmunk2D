@@ -231,6 +231,10 @@ p(expl). Simple bounding box struct. Stored as left, bottom, right, top values.
 
 p(expl). Convenience constructor for @cpBB@ structs. Like @cpv()@ this function returns a copy and not a malloced pointer.
 
+<pre><code>cpBB cpBBNewForCircle(const cpVect p, const cpFloat r)</code></pre>
+
+p(expl). Convenience constructor for making a @cpBB@ fitting a circle at position @p@ with radius @r@.
+
 
 <%= h 2, "Operations:", "Operations" %>
 
@@ -241,6 +245,7 @@ p(expl). Convenience constructor for @cpBB@ structs. Like @cpv()@ this function 
 * @cpBB cpBBExpand(const cpBB bb, const cpVect v)@ - Return the minimal bounding box that contains both @bb@ and @v@.
 * @cpFloat cpBBArea(cpBB bb)@ - Return the area of @bb@.
 * @cpFloat cpBBMergedArea(cpBB a, cpBB b)@ - Merges @a@ and @b@ then returns the area of the merged bounding box.
+* @cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)@ - Returns the fraction along the segment query the cpBB is hit. Returns INFINITY if it doesn't hit.
 * @cpBool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)@ - Returns true if the segment defined by endpoints @a@ and @b@ intersect @bb@.
 * @cpVect cpBBClampVect(const cpBB bb, const cpVect v)@ - Returns a copy of @v@ clamped to the bounding box.
 * @cpVect cpBBWrapVect(const cpBB bb, const cpVect v)@ - Returns a copy of @v@ wrapped to the bounding box.
@@ -379,8 +384,8 @@ Many things are defined in coordinates local to a body meaning that the (0,0) is
 People are sometimes confused by the difference between a force and an impulse. An impulse is basically a very large force applied over a very short period of time, like a ball hitting a wall or cannon firing. Chipmunk treats impulses as if they occur instantaneously by simply adding directly to the velocity of an object. Both impulses and forces are affected the mass of an object. Double the mass of the object and halve the effect.
 
 * @void cpBodyResetForces(cpBody *body)@ - Zero both the forces and torques currently applied to the body.
-* @void cpBodyApplyForce(cpBody *body, const cpVect f, const cpVect r)@ - Add the impulse @j@ to @body@ at a relative offset @r@ from the center of gravity.
-* @void cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)@ - Add the force @f@ to @body@ at a relative offset @r@ from the center of gravity.
+* @void cpBodyApplyForce(cpBody *body, const cpVect f, const cpVect r)@ - Add the force @j@ to @body@ at a relative offset @r@ from the center of gravity.
+* @void cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)@ - Add the impulse @f@ to @body@ at a relative offset @r@ from the center of gravity.
 
 *Note:* Both the @cpBodyApplyForce()@ @cpBodyApplyImpulse()@ functions take a force or impulse in absolute coordinates and applies it at a relative offset in absolute coordinates. (The offset is relative to the center of gravity, but is _not_ rotated with the body)
 

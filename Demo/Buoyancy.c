@@ -58,8 +58,13 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	// Clip the polygon against the water level
 	int count = cpPolyShapeGetNumVerts(poly);
 	int clippedCount = 0;
+#ifdef _MSC_VER
+	// MSVC is pretty much the only compiler in existence that doesn't support variable sized arrays.
+	cpVect clipped[10];
+#else
 	cpVect clipped[count + 1];
-	
+#endif
+
 	for(int i=0, j=count-1; i<count; j=i, i++){
 		cpVect a = cpBodyLocal2World(body, cpPolyShapeGetVert(poly, j));
 		cpVect b = cpBodyLocal2World(body, cpPolyShapeGetVert(poly, i));
@@ -86,7 +91,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpVect centroid = cpCentroidForPoly(clippedCount, clipped);
 	cpVect r = cpvsub(centroid, cpBodyGetPos(body));
 	
-	ChipmunkDebugDrawPolygon(clippedCount, clipped, RGBAColor(0, 0, 1, 1), RGBAColor(0, 0, 1, 0.1));
+	ChipmunkDebugDrawPolygon(clippedCount, clipped, RGBAColor(0, 0, 1, 1), RGBAColor(0, 0, 1, 0.1f));
 	ChipmunkDebugDrawPoints(5, 1, &centroid, RGBAColor(0, 0, 1, 1));
 	
 	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
@@ -203,7 +208,7 @@ init(void)
 		cpShapeSetFriction(shape, 0.8f);
 	}
 	
-	cpSpaceAddCollisionHandler(space, 1, 0, NULL, (cpCollisionBeginFunc)waterPreSolve, NULL, NULL, NULL);
+	cpSpaceAddCollisionHandler(space, 1, 0, NULL, (cpCollisionPreSolveFunc)waterPreSolve, NULL, NULL, NULL);
 		
 	return space;
 }
