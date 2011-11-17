@@ -101,6 +101,6 @@ html = <<HTML
 	</html>
 HTML
 
-File.open('../index.html', 'w') do|f|
+File.open('../doc/index.html', 'w') do|f|
 	f.write html
 end

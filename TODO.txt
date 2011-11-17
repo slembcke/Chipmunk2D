@@ -1,12 +1,12 @@
 cpBodyActivateStatic() should also activate joints?
-AngryChipmunks
-ARC
 Blocks tutorial.
 finish smooth line collisions
 doc the KE function
 add CHIPMUNK_ARBITER_GET_BODIES
-ChipmunkShape.isStatic
-Make functions to conver C to Obj-C types
+Make functions to convert C to Obj-C types
+Make static inline functions and properties show up in doxygen again.
+Update the doxygen main page.
+Update the READMEs
 
 Tutorial ideas:
 	Player grounding example.
