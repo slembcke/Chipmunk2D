@@ -4,7 +4,7 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-#if FALSE
+#if TRUE
 	#define BENCH_SPACE_NEW cpSpaceNew
 	#define BENCH_SPACE_STEP cpSpaceStep
 #else
