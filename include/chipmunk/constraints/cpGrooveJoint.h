@@ -41,11 +41,11 @@ typedef struct cpGrooveJoint {
 } cpGrooveJoint;
 
 /// Allocate a groove joint.
-cpGrooveJoint *cpGrooveJointAlloc(void);
+cpGrooveJoint* cpGrooveJointAlloc(void);
 /// Initialize a groove joint.
-cpGrooveJoint *cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);
+cpGrooveJoint* cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);
 /// Allocate and initialize a groove joint.
-cpConstraint *cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);
+cpConstraint* cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);
 
 CP_DefineConstraintGetter(cpGrooveJoint, cpVect, grv_a, GrooveA);
 /// Set endpoint a of a groove joint's groove

@@ -100,16 +100,16 @@ struct cpBody {
 };
 
 /// Allocate a cpBody.
-cpBody *cpBodyAlloc(void);
+cpBody* cpBodyAlloc(void);
 /// Initialize a cpBody.
-cpBody *cpBodyInit(cpBody *body, cpFloat m, cpFloat i);
+cpBody* cpBodyInit(cpBody *body, cpFloat m, cpFloat i);
 /// Allocate and initialize a cpBody.
-cpBody *cpBodyNew(cpFloat m, cpFloat i);
+cpBody* cpBodyNew(cpFloat m, cpFloat i);
 
 /// Initialize a static cpBody.
-cpBody *cpBodyInitStatic(cpBody *body);
+cpBody* cpBodyInitStatic(cpBody *body);
 /// Allocate and initialize a static cpBody.
-cpBody *cpBodyNewStatic();
+cpBody* cpBodyNewStatic();
 
 /// Destroy a cpBody.
 void cpBodyDestroy(cpBody *body);

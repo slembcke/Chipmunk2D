@@ -19,9 +19,6 @@
  * SOFTWARE.
  */
 
-/// @defgroup misc Misc
-/// @{
-
 #ifndef CHIPMUNK_HEADER
 #define CHIPMUNK_HEADER
 
@@ -58,21 +55,26 @@ void cpMessage(const char *condition, const char *file, int line, int isError, i
 
 #include "chipmunk_types.h"
 	
-// Allocated size for various Chipmunk buffers
+/// @defgroup misc Misc
+/// @{
+
+/// Allocated size for various Chipmunk buffers
 #ifndef CP_BUFFER_BYTES
 	#define CP_BUFFER_BYTES (32*1024)
 #endif
 
-// Chipmunk memory function aliases.
 #ifndef cpcalloc
+	/// Chipmunk calloc() alias.
 	#define cpcalloc calloc
 #endif
 
 #ifndef cprealloc
+	/// Chipmunk realloc() alias.
 	#define cprealloc realloc
 #endif
 
 #ifndef cpfree
+	/// Chipmunk free() alias.
 	#define cpfree free
 #endif
 
@@ -146,6 +148,8 @@ cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height);
 /// Calculate the moment of inertia for a solid box.
 cpFloat cpMomentForBox2(cpFloat m, cpBB box);
 
+//@}
+
 #ifdef __cplusplus
 }
 
@@ -157,4 +161,3 @@ static inline cpVect operator -(const cpVect v){return cpvneg(v);}
 
 #endif
 #endif
-//@}

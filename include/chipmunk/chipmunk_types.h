@@ -137,8 +137,8 @@ static inline cpFloat cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 /// Hash value type.
 typedef uintptr_t cpHashValue;
 
+// Oh C, how we love to define our own boolean types to get compiler compatibility
 /// Chipmunk's boolean type.
-/// Oh C, how we love to define our own boolean types to get compiler compatibility
 #ifdef CP_BOOL_TYPE
 	typedef CP_BOOL_TYPE cpBool;
 #else

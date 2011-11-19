@@ -37,11 +37,11 @@ typedef struct cpGearJoint {
 } cpGearJoint;
 
 /// Allocate a gear joint.
-cpGearJoint *cpGearJointAlloc(void);
+cpGearJoint* cpGearJointAlloc(void);
 /// Initialize a gear joint.
-cpGearJoint *cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
+cpGearJoint* cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
 /// Allocate and initialize a gear joint.
-cpConstraint *cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
+cpConstraint* cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
 
 CP_DefineConstraintProperty(cpGearJoint, cpFloat, phase, Phase);
 CP_DefineConstraintGetter(cpGearJoint, cpFloat, ratio, Ratio);

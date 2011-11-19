@@ -39,11 +39,11 @@ typedef struct cpPinJoint {
 } cpPinJoint;
 
 /// Allocate a pin joint.
-cpPinJoint *cpPinJointAlloc(void);
+cpPinJoint* cpPinJointAlloc(void);
 /// Initialize a pin joint.
-cpPinJoint *cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
+cpPinJoint* cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
 /// Allocate and initialize a pin joint.
-cpConstraint *cpPinJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
+cpConstraint* cpPinJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
 
 CP_DefineConstraintProperty(cpPinJoint, cpVect, anchr1, Anchr1);
 CP_DefineConstraintProperty(cpPinJoint, cpVect, anchr2, Anchr2);

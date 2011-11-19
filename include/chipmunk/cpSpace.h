@@ -48,7 +48,7 @@ struct cpSpace {
 	/// The default value of INFINITY disables the sleeping algorithm.
 	cpFloat sleepTimeThreshold;
 	
-	/// Amount of encouraged penetration between colliding shapes..
+	/// Amount of encouraged penetration between colliding shapes.
 	/// Used to reduce oscillating contacts and keep the collision cache warm.
 	/// Defaults to 0.1. If you have poor simulation quality,
 	/// increase this number as much as possible without allowing visible amounts of overlap.
@@ -137,7 +137,7 @@ CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias);
 CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence);
 CP_DefineSpaceStructProperty(cpBool, enableContactGraph, EnableContactGraph);
 CP_DefineSpaceStructProperty(cpDataPointer, data, UserData);
-CP_DefineSpaceStructGetter(cpBody *, staticBody, StaticBody);
+CP_DefineSpaceStructGetter(cpBody*, staticBody, StaticBody);
 CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep);
 
 /// returns true from inside a callback and objects cannot be added/removed.
@@ -177,13 +177,13 @@ void cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisio
 
 /// Add a collision shape to the simulation.
 /// If the shape is attached to a static body, it will be added as a static shape.
-cpShape *cpSpaceAddShape(cpSpace *space, cpShape *shape);
+cpShape* cpSpaceAddShape(cpSpace *space, cpShape *shape);
 /// Explicity add a shape as a static shape to the simulation.
-cpShape *cpSpaceAddStaticShape(cpSpace *space, cpShape *shape);
+cpShape* cpSpaceAddStaticShape(cpSpace *space, cpShape *shape);
 /// Add a rigid body to the simulation.
-cpBody *cpSpaceAddBody(cpSpace *space, cpBody *body);
+cpBody* cpSpaceAddBody(cpSpace *space, cpBody *body);
 /// Add a constraint to the simulation.
-cpConstraint *cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint);
+cpConstraint* cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint);
 
 /// Remove a collision shape from the simulation.
 void cpSpaceRemoveShape(cpSpace *space, cpShape *shape);

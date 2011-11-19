@@ -36,11 +36,11 @@ typedef struct cpRotaryLimitJoint {
 } cpRotaryLimitJoint;
 
 /// Allocate a damped rotary limit joint.
-cpRotaryLimitJoint *cpRotaryLimitJointAlloc(void);
+cpRotaryLimitJoint* cpRotaryLimitJointAlloc(void);
 /// Initialize a damped rotary limit joint.
-cpRotaryLimitJoint *cpRotaryLimitJointInit(cpRotaryLimitJoint *joint, cpBody *a, cpBody *b, cpFloat min, cpFloat max);
+cpRotaryLimitJoint* cpRotaryLimitJointInit(cpRotaryLimitJoint *joint, cpBody *a, cpBody *b, cpFloat min, cpFloat max);
 /// Allocate and initialize a damped rotary limit joint.
-cpConstraint *cpRotaryLimitJointNew(cpBody *a, cpBody *b, cpFloat min, cpFloat max);
+cpConstraint* cpRotaryLimitJointNew(cpBody *a, cpBody *b, cpFloat min, cpFloat max);
 
 CP_DefineConstraintProperty(cpRotaryLimitJoint, cpFloat, min, Min);
 CP_DefineConstraintProperty(cpRotaryLimitJoint, cpFloat, max, Max);

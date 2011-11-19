@@ -125,7 +125,7 @@ static inline void cpShapeSet##name(cpShape *shape, type value){ \
 CP_DefineShapeStructGetter(type, member, name) \
 CP_DefineShapeStructSetter(type, member, name, activates)
 
-CP_DefineShapeStructGetter(cpBody *, body, Body);
+CP_DefineShapeStructGetter(cpBody*, body, Body);
 void cpShapeSetBody(cpShape *shape, cpBody *body);
 
 CP_DefineShapeStructGetter(cpBB, bb, BB);
@@ -172,11 +172,11 @@ typedef struct cpCircleShape {
 } cpCircleShape;
 
 /// Allocate a circle shape.
-cpCircleShape *cpCircleShapeAlloc(void);
+cpCircleShape* cpCircleShapeAlloc(void);
 /// Initialize a circle shape.
-cpCircleShape *cpCircleShapeInit(cpCircleShape *circle, cpBody *body, cpFloat radius, cpVect offset);
+cpCircleShape* cpCircleShapeInit(cpCircleShape *circle, cpBody *body, cpFloat radius, cpVect offset);
 /// Allocate and initialize a circle shape.
-cpShape *cpCircleShapeNew(cpBody *body, cpFloat radius, cpVect offset);
+cpShape* cpCircleShapeNew(cpBody *body, cpFloat radius, cpVect offset);
 
 CP_DeclareShapeGetter(cpCircleShape, cpVect, Offset);
 CP_DeclareShapeGetter(cpCircleShape, cpFloat, Radius);

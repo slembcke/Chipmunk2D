@@ -39,11 +39,11 @@ typedef struct cpSlideJoint {
 } cpSlideJoint;
 
 /// Allocate a slide joint.
-cpSlideJoint *cpSlideJointAlloc(void);
+cpSlideJoint* cpSlideJointAlloc(void);
 /// Initialize a slide joint.
-cpSlideJoint *cpSlideJointInit(cpSlideJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max);
+cpSlideJoint* cpSlideJointInit(cpSlideJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max);
 /// Allocate and initialize a slide joint.
-cpConstraint *cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max);
+cpConstraint* cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max);
 
 CP_DefineConstraintProperty(cpSlideJoint, cpVect, anchr1, Anchr1);
 CP_DefineConstraintProperty(cpSlideJoint, cpVect, anchr2, Anchr2);

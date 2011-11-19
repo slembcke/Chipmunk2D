@@ -37,8 +37,9 @@ struct cpConstraintClass {
 	cpConstraintGetImpulseImpl getImpulse;
 };
 
-
+/// Callback function type that gets called before solving a joint.
 typedef void (*cpConstraintPreSolveFunc)(cpConstraint *constraint, cpSpace *space);
+/// Callback function type that gets called after solving a joint.
 typedef void (*cpConstraintPostSolveFunc)(cpConstraint *constraint, cpSpace *space);
 
 
@@ -93,21 +94,24 @@ static inline void cpConstraintActivateBodies(cpConstraint *constraint)
 	cpBody *b = constraint->b; if(b) cpBodyActivate(b);
 }
 
+/// @private
 #define CP_DefineConstraintStructGetter(type, member, name) \
 static inline type cpConstraint##Get##name(const cpConstraint *constraint){return constraint->member;}
 
+/// @private
 #define CP_DefineConstraintStructSetter(type, member, name) \
 static inline void cpConstraint##Set##name(cpConstraint *constraint, type value){ \
 	cpConstraintActivateBodies(constraint); \
 	constraint->member = value; \
 }
 
+/// @private
 #define CP_DefineConstraintStructProperty(type, member, name) \
 CP_DefineConstraintStructGetter(type, member, name) \
 CP_DefineConstraintStructSetter(type, member, name)
 
-CP_DefineConstraintStructGetter(cpBody *, a, A);
-CP_DefineConstraintStructGetter(cpBody *, b, B);
+CP_DefineConstraintStructGetter(cpBody*, a, A);
+CP_DefineConstraintStructGetter(cpBody*, b, B);
 CP_DefineConstraintStructProperty(cpFloat, maxForce, MaxForce);
 CP_DefineConstraintStructProperty(cpFloat, errorBias, ErrorBias);
 CP_DefineConstraintStructProperty(cpFloat, maxBias, MaxBias);
@@ -115,7 +119,7 @@ CP_DefineConstraintStructProperty(cpConstraintPreSolveFunc, preSolve, PreSolveFu
 CP_DefineConstraintStructProperty(cpConstraintPostSolveFunc, postSolve, PostSolveFunc);
 CP_DefineConstraintStructProperty(cpDataPointer, data, UserData);
 
-/// Get the last impulse applied by this constraint.
+// Get the last impulse applied by this constraint.
 static inline cpFloat cpConstraintGetImpulse(cpConstraint *constraint)
 {
 	return constraint->CP_PRIVATE(klass)->getImpulse(constraint);

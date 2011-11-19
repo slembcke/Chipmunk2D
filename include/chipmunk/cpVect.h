@@ -51,7 +51,7 @@ cpFloat cpvtoangle(const cpVect v);
 ///	Returns a string representation of v. Intended mostly for debugging purposes and not production use.
 ///	@attention The string points to a static local and is reset every time the function is called.
 ///	If you want to print more than one vector you will have to split up your printing onto separate lines.
-char *cpvstr(const cpVect v);
+char* cpvstr(const cpVect v);
 
 /// Check if two vectors are equal. (Be careful when comparing floating point numbers!)
 static inline cpBool cpveql(const cpVect v1, const cpVect v2)
