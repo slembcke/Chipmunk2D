@@ -47,7 +47,9 @@ frand(void)
 extern cpFloat ChipmunkDemoTime;
 extern cpVect ChipmunkDemoKeyboard;
 extern cpVect ChipmunkDemoMouse;
+
 extern char *ChipmunkDemoMessageString;
+void ChipmunkDemoPrintString(char *fmt, ...);
 
 #define GRABABLE_MASK_BIT (1<<31)
 #define NOT_GRABABLE_MASK (~GRABABLE_MASK_BIT)

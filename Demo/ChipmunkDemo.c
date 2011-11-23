@@ -229,9 +229,26 @@ drawShapeBB(cpShape *shape, void *unused)
 	ChipmunkDebugDrawBB(shape->bb, RGBAColor(0.3f, 0.5f, 0.3f, 1.0f));
 }
 
+static char PrintStringBuffer[1024*8];
+static char *PrintStringCursor;
+
+void
+ChipmunkDemoPrintString(char *fmt, ...)
+{
+	ChipmunkDemoMessageString = PrintStringBuffer;
+	
+	va_list args;
+	va_start(args, fmt);
+	PrintStringCursor += vsprintf(PrintStringCursor, fmt, args);
+	va_end(args);
+}
+
 static void
 display(void)
 {
+	PrintStringBuffer[0] = 0;
+	PrintStringCursor = PrintStringBuffer;
+	
 	demos[demoIndex].drawFunc();
 	
 	if(!paused || step){

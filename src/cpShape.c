@@ -262,8 +262,6 @@ cpSegmentShapePointQuery(cpSegmentShape *seg, cpVect p){
 	return cpTrue;	
 }
 
-static inline cpBool inUnitRange(cpFloat t){return (0.0f < t && t < 1.0f);}
-
 static void
 cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
@@ -272,10 +270,11 @@ cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpSegmentQue
 	cpFloat r = seg->r;
 	
 	cpVect flipped_n = (d > 0.0f ? cpvneg(n) : n);
-	cpVect n_offset = cpvsub(cpvmult(flipped_n, r), a);
+	cpVect seg_offset = cpvsub(cpvmult(flipped_n, r), a);
 	
-	cpVect seg_a = cpvadd(seg->ta, n_offset);
-	cpVect seg_b = cpvadd(seg->tb, n_offset);
+	// Make the endpoints relative to 'a' and move them by the thickness of the segment.
+	cpVect seg_a = cpvadd(seg->ta, seg_offset);
+	cpVect seg_b = cpvadd(seg->tb, seg_offset);
 	cpVect delta = cpvsub(b, a);
 	
 	if(cpvcross(delta, seg_a)*cpvcross(delta, seg_b) <= 0.0f){
