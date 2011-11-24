@@ -22,7 +22,7 @@
 /// @defgroup cpSimpleMotor cpSimpleMotor
 /// @{
 
-const cpConstraintClass *cpSimpleMotorGetClass();
+const cpConstraintClass *cpSimpleMotorGetClass(void);
 
 /// @private
 typedef struct cpSimpleMotor {

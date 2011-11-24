@@ -22,7 +22,7 @@
 /// @defgroup cpGrooveJoint cpGrooveJoint
 /// @{
 
-const cpConstraintClass *cpGrooveJointGetClass();
+const cpConstraintClass *cpGrooveJointGetClass(void);
 
 /// @private
 typedef struct cpGrooveJoint {

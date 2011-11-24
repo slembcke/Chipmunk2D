@@ -32,7 +32,7 @@ typedef struct cpHashSetBin {
 } cpHashSetBin;
 
 struct cpHashSet {
-	int entries, size;
+	unsigned int entries, size;
 	
 	cpHashSetEqlFunc eql;
 	void *default_value;
@@ -91,7 +91,7 @@ static void
 cpHashSetResize(cpHashSet *set)
 {
 	// Get the next approximate doubled prime.
-	int newSize = next_prime(set->size + 1);
+	unsigned int newSize = next_prime(set->size + 1);
 	// Allocate a new table.
 	cpHashSetBin **newTable = (cpHashSetBin **)cpcalloc(newSize, sizeof(cpHashSetBin *));
 	
@@ -102,7 +102,7 @@ cpHashSetResize(cpHashSet *set)
 		while(bin){
 			cpHashSetBin *next = bin->next;
 			
-			int idx = bin->hash%newSize;
+			cpHashValue idx = bin->hash%newSize;
 			bin->next = newTable[idx];
 			newTable[idx] = bin;
 			
@@ -155,7 +155,7 @@ cpHashSetCount(cpHashSet *set)
 void *
 cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data, cpHashSetTransFunc trans)
 {
-	int idx = hash%set->size;
+	cpHashValue idx = hash%set->size;
 	
 	// Find the bin with the matching element.
 	cpHashSetBin *bin = set->table[idx];
@@ -181,7 +181,7 @@ cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data, cpHashS
 void *
 cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 {
-	int idx = hash%set->size;
+	cpHashValue idx = hash%set->size;
 	
 	cpHashSetBin **prev_ptr = &set->table[idx];
 	cpHashSetBin *bin = set->table[idx];
@@ -210,7 +210,7 @@ cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 void *
 cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr)
 {	
-	int idx = hash%set->size;
+	cpHashValue idx = hash%set->size;
 	cpHashSetBin *bin = set->table[idx];
 	while(bin && !set->eql(ptr, bin->elt))
 		bin = bin->next;

@@ -22,7 +22,7 @@
 /// @defgroup cpGearJoint cpGearJoint
 /// @{
 
-const cpConstraintClass *cpGearJointGetClass();
+const cpConstraintClass *cpGearJointGetClass(void);
 
 /// @private
 typedef struct cpGearJoint {

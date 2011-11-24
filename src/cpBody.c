@@ -88,7 +88,7 @@ cpBodyInitStatic(cpBody *body)
 }
 
 cpBody *
-cpBodyNewStatic()
+cpBodyNewStatic(void)
 {
 	return cpBodyInitStatic(cpBodyAlloc());
 }

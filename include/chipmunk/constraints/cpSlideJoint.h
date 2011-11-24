@@ -22,7 +22,7 @@
 /// @defgroup cpSlideJoint cpSlideJoint
 /// @{
 
-const cpConstraintClass *cpSlideJointGetClass();
+const cpConstraintClass *cpSlideJointGetClass(void);
 
 /// @private
 typedef struct cpSlideJoint {
