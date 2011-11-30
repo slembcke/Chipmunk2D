@@ -96,7 +96,7 @@ cpHashSetResize(cpHashSet *set)
 	cpHashSetBin **newTable = (cpHashSetBin **)cpcalloc(newSize, sizeof(cpHashSetBin *));
 	
 	// Iterate over the chains.
-	for(int i=0; i<set->size; i++){
+	for(unsigned int i=0; i<set->size; i++){
 		// Rehash the bins into the new table.
 		cpHashSetBin *bin = set->table[i];
 		while(bin){
@@ -221,7 +221,7 @@ cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr)
 void
 cpHashSetEach(cpHashSet *set, cpHashSetIteratorFunc func, void *data)
 {
-	for(int i=0; i<set->size; i++){
+	for(unsigned int i=0; i<set->size; i++){
 		cpHashSetBin *bin = set->table[i];
 		while(bin){
 			cpHashSetBin *next = bin->next;
@@ -234,7 +234,7 @@ cpHashSetEach(cpHashSet *set, cpHashSetIteratorFunc func, void *data)
 void
 cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data)
 {
-	for(int i=0; i<set->size; i++){
+	for(unsigned int i=0; i<set->size; i++){
 		// The rest works similarly to cpHashSetRemove() above.
 		cpHashSetBin **prev_ptr = &set->table[i];
 		cpHashSetBin *bin = set->table[i];
