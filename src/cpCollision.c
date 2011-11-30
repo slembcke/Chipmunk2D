@@ -69,54 +69,30 @@ segmentEncapQuery(cpVect p1, cpVect p2, cpFloat r1, cpFloat r2, cpContact *con, 
 	return (cpvdot(con[0].n, tangent) >= 0.0 ? count : 0);
 }
 
-// Collide circles to segment shapes.
 static int
-circle2segment(const cpShape *circleShape, const cpShape *segmentShape, cpContact *con)
+circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentShape, cpContact *con)
 {
-	cpCircleShape *circ = (cpCircleShape *)circleShape;
-	cpSegmentShape *seg = (cpSegmentShape *)segmentShape;
+	cpVect seg_a = segmentShape->ta;
+	cpVect seg_b = segmentShape->tb;
+	cpVect center = circleShape->tc;
 	
-	// Radius sum
-	cpFloat rsum = circ->r + seg->r;
+	cpVect seg_delta = cpvsub(seg_b, seg_a);
+	cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(center, seg_a))/cpvlengthsq(seg_delta));
+	cpVect closest = cpvlerp(seg_a, seg_b, closest_t);
 	
-	// Calculate normal distance from segment.
-	cpFloat dn = cpvdot(seg->tn, circ->tc) - cpvdot(seg->ta, seg->tn);
-	cpFloat dist = cpfabs(dn) - rsum;
-	if(dist > 0.0f) return 0;
-	
-	// Calculate tangential distance along segment.
-	cpFloat dt = -cpvcross(seg->tn, circ->tc);
-	cpFloat dtMin = -cpvcross(seg->tn, seg->ta);
-	cpFloat dtMax = -cpvcross(seg->tn, seg->tb);
-	
-	// Decision tree to decide which feature of the segment to collide with.
-	if(dt < dtMin){
-		if(dt < (dtMin - rsum)){
-			return 0;
-		} else {
-			return segmentEncapQuery(circ->tc, seg->ta, circ->r, seg->r, con, seg->a_tangent);
-		}
+	if(circle2circleQuery(center, closest, circleShape->r, segmentShape->r, con)){
+		cpVect n = con[0].n;
+		
+		// Reject endcap collisions if tangents are provided.
+		if(
+			(closest_t == 0.0f && cpvdot(n, segmentShape->a_tangent) < 0.0) ||
+			(closest_t == 1.0f && cpvdot(n, segmentShape->b_tangent) < 0.0)
+		) return 0;
+		
+		return 1;
 	} else {
-		if(dt < dtMax){
-			cpVect n = (dn < 0.0f) ? seg->tn : cpvneg(seg->tn);
-			cpContactInit(
-				con,
-				cpvadd(circ->tc, cpvmult(n, circ->r + dist*0.5f)),
-				n,
-				dist,
-				0				 
-			);
-			return 1;
-		} else {
-			if(dt < (dtMax + rsum)) {
-				return segmentEncapQuery(circ->tc, seg->tb, circ->r, seg->r, con, seg->b_tangent);
-			} else {
-				return 0;
-			}
-		}
+		return 0;
 	}
-	
-	return 1;
 }
 
 // Helper function for working with contact buffers
@@ -369,7 +345,7 @@ static const collisionFunc builtinCollisionFuncs[9] = {
 	circle2circle,
 	NULL,
 	NULL,
-	circle2segment,
+	(collisionFunc)circle2segment,
 	NULL,
 	NULL,
 	circle2poly,
