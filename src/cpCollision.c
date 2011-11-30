@@ -62,14 +62,6 @@ circle2circle(const cpShape *shape1, const cpShape *shape2, cpContact *arr)
 }
 
 static int
-segmentEncapQuery(cpVect p1, cpVect p2, cpFloat r1, cpFloat r2, cpContact *con, cpVect tangent)
-{
-	int count = circle2circleQuery(p1, p2, r1, r2, con);
-//	printf("dot %5.2f\n", cpvdot(con[0].n, tangent));
-	return (cpvdot(con[0].n, tangent) >= 0.0 ? count : 0);
-}
-
-static int
 circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentShape, cpContact *con)
 {
 	cpVect seg_a = segmentShape->ta;
@@ -280,17 +272,10 @@ seg2poly(const cpShape *shape1, const cpShape *shape2, cpContact *arr)
 		cpVect poly_a = poly->tVerts[mini];
 		cpVect poly_b = poly->tVerts[(mini + 1)%poly->numVerts];
 		
-		if(segmentEncapQuery(seg->ta, poly_a, seg->r, 0.0f, arr, cpvneg(seg->a_tangent)))
-			return 1;
-			
-		if(segmentEncapQuery(seg->tb, poly_a, seg->r, 0.0f, arr, cpvneg(seg->b_tangent)))
-			return 1;
-			
-		if(segmentEncapQuery(seg->ta, poly_b, seg->r, 0.0f, arr, cpvneg(seg->a_tangent)))
-			return 1;
-			
-		if(segmentEncapQuery(seg->tb, poly_b, seg->r, 0.0f, arr, cpvneg(seg->b_tangent)))
-			return 1;
+		if(circle2circleQuery(seg->ta, poly_a, seg->r, 0.0f, arr)) return 1;
+		if(circle2circleQuery(seg->tb, poly_a, seg->r, 0.0f, arr)) return 1;
+		if(circle2circleQuery(seg->ta, poly_b, seg->r, 0.0f, arr)) return 1;
+		if(circle2circleQuery(seg->tb, poly_b, seg->r, 0.0f, arr)) return 1;
 	}
 
 	return num;
