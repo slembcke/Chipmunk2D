@@ -554,6 +554,7 @@ main(int argc, const char **argv)
 	if(trial){
 //		sleep(1);
 		for(int i=0; i<demoCount; i++) time_trial(i, 1000);
+//		time_trial('d' - 'a', 10000);
 		exit(0);
 	} else {
 		mouseBody = cpBodyNew(INFINITY, INFINITY);
