@@ -139,7 +139,7 @@ cpBodySanityCheck(cpBody *body)
 void
 cpBodySetMass(cpBody *body, cpFloat mass)
 {
-	cpAssertHard(m > 0.0f, "Mass must be positive and non-zero.");
+	cpAssertHard(mass > 0.0f, "Mass must be positive and non-zero.");
 	
 	cpBodyActivate(body);
 	body->m = mass;
@@ -149,7 +149,7 @@ cpBodySetMass(cpBody *body, cpFloat mass)
 void
 cpBodySetMoment(cpBody *body, cpFloat moment)
 {
-	cpAssertHard(i > 0.0f, "Moment of Inertia must be positive and non-zero.");
+	cpAssertHard(moment > 0.0f, "Moment of Inertia must be positive and non-zero.");
 	
 	cpBodyActivate(body);
 	body->i = moment;
