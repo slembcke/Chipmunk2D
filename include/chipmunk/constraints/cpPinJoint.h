@@ -22,7 +22,7 @@
 /// @defgroup cpPinJoint cpPinJoint
 /// @{
 
-const cpConstraintClass *cpPinJointGetClass();
+const cpConstraintClass *cpPinJointGetClass(void);
 
 /// @private
 typedef struct cpPinJoint {

@@ -22,7 +22,7 @@
 /// @defgroup cpRotaryLimitJoint cpRotaryLimitJoint
 /// @{
 
-const cpConstraintClass *cpRotaryLimitJointGetClass();
+const cpConstraintClass *cpRotaryLimitJointGetClass(void);
 
 /// @private
 typedef struct cpRotaryLimitJoint {

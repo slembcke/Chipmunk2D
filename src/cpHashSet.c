@@ -32,7 +32,7 @@ typedef struct cpHashSetBin {
 } cpHashSetBin;
 
 struct cpHashSet {
-	int entries, size;
+	unsigned int entries, size;
 	
 	cpHashSetEqlFunc eql;
 	void *default_value;
@@ -91,18 +91,18 @@ static void
 cpHashSetResize(cpHashSet *set)
 {
 	// Get the next approximate doubled prime.
-	int newSize = next_prime(set->size + 1);
+	unsigned int newSize = next_prime(set->size + 1);
 	// Allocate a new table.
 	cpHashSetBin **newTable = (cpHashSetBin **)cpcalloc(newSize, sizeof(cpHashSetBin *));
 	
 	// Iterate over the chains.
-	for(int i=0; i<set->size; i++){
+	for(unsigned int i=0; i<set->size; i++){
 		// Rehash the bins into the new table.
 		cpHashSetBin *bin = set->table[i];
 		while(bin){
 			cpHashSetBin *next = bin->next;
 			
-			int idx = bin->hash%newSize;
+			cpHashValue idx = bin->hash%newSize;
 			bin->next = newTable[idx];
 			newTable[idx] = bin;
 			
@@ -155,7 +155,7 @@ cpHashSetCount(cpHashSet *set)
 void *
 cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data, cpHashSetTransFunc trans)
 {
-	int idx = hash%set->size;
+	cpHashValue idx = hash%set->size;
 	
 	// Find the bin with the matching element.
 	cpHashSetBin *bin = set->table[idx];
@@ -181,7 +181,7 @@ cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data, cpHashS
 void *
 cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 {
-	int idx = hash%set->size;
+	cpHashValue idx = hash%set->size;
 	
 	cpHashSetBin **prev_ptr = &set->table[idx];
 	cpHashSetBin *bin = set->table[idx];
@@ -210,7 +210,7 @@ cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 void *
 cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr)
 {	
-	int idx = hash%set->size;
+	cpHashValue idx = hash%set->size;
 	cpHashSetBin *bin = set->table[idx];
 	while(bin && !set->eql(ptr, bin->elt))
 		bin = bin->next;
@@ -221,7 +221,7 @@ cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr)
 void
 cpHashSetEach(cpHashSet *set, cpHashSetIteratorFunc func, void *data)
 {
-	for(int i=0; i<set->size; i++){
+	for(unsigned int i=0; i<set->size; i++){
 		cpHashSetBin *bin = set->table[i];
 		while(bin){
 			cpHashSetBin *next = bin->next;
@@ -234,7 +234,7 @@ cpHashSetEach(cpHashSet *set, cpHashSetIteratorFunc func, void *data)
 void
 cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data)
 {
-	for(int i=0; i<set->size; i++){
+	for(unsigned int i=0; i<set->size; i++){
 		// The rest works similarly to cpHashSetRemove() above.
 		cpHashSetBin **prev_ptr = &set->table[i];
 		cpHashSetBin *bin = set->table[i];

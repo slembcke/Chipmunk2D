@@ -23,7 +23,7 @@
 // I'm not sure if this should be part of the private API or not.
 // I should probably clean up the naming conventions if it is...
 
-#define CP_DefineClassGetter(t) const cpConstraintClass * t##GetClass(){return (cpConstraintClass *)&klass;}
+#define CP_DefineClassGetter(t) const cpConstraintClass * t##GetClass(void){return (cpConstraintClass *)&klass;}
 
 void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b);
 

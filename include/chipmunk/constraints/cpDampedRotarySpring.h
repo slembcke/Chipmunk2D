@@ -24,7 +24,7 @@
 
 typedef cpFloat (*cpDampedRotarySpringTorqueFunc)(struct cpConstraint *spring, cpFloat relativeAngle);
 
-const cpConstraintClass *cpDampedRotarySpringGetClass();
+const cpConstraintClass *cpDampedRotarySpringGetClass(void);
 
 /// @private
 typedef struct cpDampedRotarySpring {

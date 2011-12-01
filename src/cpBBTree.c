@@ -76,12 +76,6 @@ struct Pair { Thread a, b; };
 
 #pragma mark Misc Functions
 
-//static inline cpFloat
-//cpBBProximity(cpBB a, cpBB b)
-//{
-//	return cpfabs(a.l + a.r - b.l - b.r) + cpfabs(a.b + b.t - b.b - b.t);
-//}
-
 static inline cpBB
 GetBB(cpBBTree *tree, void *obj)
 {
@@ -311,6 +305,12 @@ NodeReplaceChild(Node *parent, Node *child, Node *value, cpBBTree *tree)
 
 #pragma mark Subtree Functions
 
+static inline cpFloat
+cpBBProximity(cpBB a, cpBB b)
+{
+	return cpfabs(a.l + a.r - b.l - b.r) + cpfabs(a.b + b.t - b.b - b.t);
+}
+
 static Node *
 SubtreeInsert(Node *subtree, Node *leaf, cpBBTree *tree)
 {
@@ -322,8 +322,10 @@ SubtreeInsert(Node *subtree, Node *leaf, cpBBTree *tree)
 		cpFloat cost_a = cpBBArea(subtree->B->bb) + cpBBMergedArea(subtree->A->bb, leaf->bb);
 		cpFloat cost_b = cpBBArea(subtree->A->bb) + cpBBMergedArea(subtree->B->bb, leaf->bb);
 		
-//		cpFloat cost_a = cpBBProximity(subtree->a->bb, leaf->bb);
-//		cpFloat cost_b = cpBBProximity(subtree->b->bb, leaf->bb);
+		if(cost_a == cost_b){
+			cost_a = cpBBProximity(subtree->A->bb, leaf->bb);
+			cost_b = cpBBProximity(subtree->B->bb, leaf->bb);
+		}
 		
 		if(cost_b < cost_a){
 			NodeSetB(subtree, SubtreeInsert(subtree->B, leaf, tree));
@@ -350,35 +352,21 @@ SubtreeQuery(Node *subtree, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, vo
 }
 
 
-//// TODO Needs early exit optimization for ray queries
-//static void
-//SubtreeSegmentQuery(Node *subtree, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryFunc func, void *data)
-//{
-//	if(cpBBIntersectsSegment(subtree->bb, a, b)){
-//		if(NodeIsLeaf(subtree)){
-//			func(obj, subtree->obj, data);
-//		} else {
-//			SubtreeSegmentQuery(subtree->A, obj, a, b, t_exit, func, data);
-//			SubtreeSegmentQuery(subtree->B, obj, a, b, t_exit, func, data);
-//		}
-//	}
-//}
-
 static cpFloat
 SubtreeSegmentQuery(Node *subtree, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryFunc func, void *data)
 {
 	if(NodeIsLeaf(subtree)){
 		return func(obj, subtree->obj, data);
 	} else {
-		cpFloat ta_bb = cpBBSegmentQuery(subtree->A->bb, a, b);
-		cpFloat tb_bb = cpBBSegmentQuery(subtree->B->bb, a, b);
+		cpFloat t_a = cpBBSegmentQuery(subtree->A->bb, a, b);
+		cpFloat t_b = cpBBSegmentQuery(subtree->B->bb, a, b);
 		
-		if(ta_bb < tb_bb){
-			if(ta_bb < t_exit) t_exit = cpfmin(t_exit, SubtreeSegmentQuery(subtree->A, obj, a, b, t_exit, func, data));
-			if(tb_bb < t_exit) t_exit = cpfmin(t_exit, SubtreeSegmentQuery(subtree->B, obj, a, b, t_exit, func, data));
+		if(t_a < t_b){
+			if(t_a < t_exit) t_exit = cpfmin(t_exit, SubtreeSegmentQuery(subtree->A, obj, a, b, t_exit, func, data));
+			if(t_b < t_exit) t_exit = cpfmin(t_exit, SubtreeSegmentQuery(subtree->B, obj, a, b, t_exit, func, data));
 		} else {
-			if(tb_bb < t_exit) t_exit = cpfmin(t_exit, SubtreeSegmentQuery(subtree->B, obj, a, b, t_exit, func, data));
-			if(ta_bb < t_exit) t_exit = cpfmin(t_exit, SubtreeSegmentQuery(subtree->A, obj, a, b, t_exit, func, data));
+			if(t_b < t_exit) t_exit = cpfmin(t_exit, SubtreeSegmentQuery(subtree->B, obj, a, b, t_exit, func, data));
+			if(t_a < t_exit) t_exit = cpfmin(t_exit, SubtreeSegmentQuery(subtree->A, obj, a, b, t_exit, func, data));
 		}
 		
 		return t_exit;

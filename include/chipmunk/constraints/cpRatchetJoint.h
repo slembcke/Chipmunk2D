@@ -22,7 +22,7 @@
 /// @defgroup cpRatchetJoint cpRatchetJoint
 /// @{
 
-const cpConstraintClass *cpRatchetJointGetClass();
+const cpConstraintClass *cpRatchetJointGetClass(void);
 
 /// @private
 typedef struct cpRatchetJoint {

@@ -5,8 +5,8 @@
    #import "TargetConditionals.h"
 #endif
 
-#if (defined TARGET_OS_IPHONE) && (!defined CP_USE_CGPOINTS)
-	#define CP_USE_CGPOINTS
+#if (TARGET_OS_IPHONE == 1) && (!defined CP_USE_CGPOINTS)
+	#define CP_USE_CGPOINTS 1
 #endif
 
 #ifdef CP_USE_CGPOINTS

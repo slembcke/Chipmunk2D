@@ -196,7 +196,7 @@ cpSweep1DPointQuery(cpSweep1D *sweep, cpVect point, cpSpatialIndexQueryFunc func
 	cpSweep1DQuery(sweep, &point, cpBBNew(point.x, point.y, point.x, point.y), func, data);
 }
 
-void
+static void
 cpSweep1DSegmentQuery(cpSweep1D *sweep, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryFunc func, void *data)
 {
 	cpBB bb = cpBBExpand(cpBBNew(a.x, a.y, a.x, a.y), b);

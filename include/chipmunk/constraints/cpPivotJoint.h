@@ -22,7 +22,7 @@
 /// @defgroup cpPivotJoint cpPivotJoint
 /// @{
 
-const cpConstraintClass *cpPivotJointGetClass();
+const cpConstraintClass *cpPivotJointGetClass(void);
 
 /// @private
 typedef struct cpPivotJoint {

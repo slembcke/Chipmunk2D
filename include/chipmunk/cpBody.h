@@ -109,7 +109,7 @@ cpBody* cpBodyNew(cpFloat m, cpFloat i);
 /// Initialize a static cpBody.
 cpBody* cpBodyInitStatic(cpBody *body);
 /// Allocate and initialize a static cpBody.
-cpBody* cpBodyNewStatic();
+cpBody* cpBodyNewStatic(void);
 
 /// Destroy a cpBody.
 void cpBodyDestroy(cpBody *body);

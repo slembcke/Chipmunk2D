@@ -26,7 +26,7 @@ typedef struct cpDampedSpring cpDampedSpring;
 
 typedef cpFloat (*cpDampedSpringForceFunc)(cpConstraint *spring, cpFloat dist);
 
-const cpConstraintClass *cpDampedSpringGetClass();
+const cpConstraintClass *cpDampedSpringGetClass(void);
 
 /// @private
 struct cpDampedSpring {

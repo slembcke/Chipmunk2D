@@ -254,7 +254,7 @@ hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 	int n = hash->numcells;
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
-			int idx = hash_func(i,j,n);
+			cpHashValue idx = hash_func(i,j,n);
 			cpSpaceHashBin *bin = hash->table[idx];
 			
 			// Don't add an object twice to the same cell.
@@ -380,7 +380,7 @@ static void
 cpSpaceHashPointQuery(cpSpaceHash *hash, cpVect point, cpSpatialIndexQueryFunc func, void *data)
 {
 	cpFloat dim = hash->celldim;
-	int idx = hash_func(floor_int(point.x/dim), floor_int(point.y/dim), hash->numcells);  // Fix by ShiftZ
+	cpHashValue idx = hash_func(floor_int(point.x/dim), floor_int(point.y/dim), hash->numcells);  // Fix by ShiftZ
 	
 	query_helper(hash, &hash->table[idx], &point, func, data);
 	hash->stamp++;
@@ -439,7 +439,7 @@ queryRehash_helper(cpHandle *hand, queryRehashContext *context)
 
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
-			int idx = hash_func(i,j,n);
+			cpHashValue idx = hash_func(i,j,n);
 			cpSpaceHashBin *bin = table[idx];
 			
 			if(containsHandle(bin, hand)) continue;
@@ -497,7 +497,7 @@ segmentQuery_helper(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSp
 }
 
 // modified from http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
-void
+static void
 cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryFunc func, void *data)
 {
 	a = cpvmult(a, 1.0f/hash->celldim);
@@ -538,7 +538,7 @@ cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpFloa
 	cpSpaceHashBin **table = hash->table;
 
 	while(t < t_exit){
-		int idx = hash_func(cell_x, cell_y, n);
+		cpHashValue idx = hash_func(cell_x, cell_y, n);
 		t_exit = cpfmin(t_exit, segmentQuery_helper(hash, &table[idx], obj, func, data));
 
 		if (next_v < next_h){
