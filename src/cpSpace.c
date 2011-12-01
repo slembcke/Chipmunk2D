@@ -255,7 +255,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	if(cpBodyIsStatic(body)) return cpSpaceAddStaticShape(space, shape);
 	
 	// TODO change these to check if it was added to a space at all.
-	cpAssertSoft(!shape->space, "This shape is already added to a space and cannot be added to another.");
+	cpAssertHard(!shape->space, "This shape is already added to a space and cannot be added to another.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
@@ -271,7 +271,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 cpShape *
 cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
-	cpAssertSoft(!shape->space, "This shape is already added to a space and cannot be added to another.");
+	cpAssertHard(!shape->space, "This shape is already added to a space and cannot be added to another.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
@@ -287,7 +287,7 @@ cpBody *
 cpSpaceAddBody(cpSpace *space, cpBody *body)
 {
 	cpAssertHard(!cpBodyIsStatic(body), "Static bodies cannot be added to a space as they are not meant to be simulated.");
-	cpAssertSoft(!body->space, "This body is already added to a space and cannot be added to another.");
+	cpAssertHard(!body->space, "This body is already added to a space and cannot be added to another.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpArrayPush(space->bodies, body);
@@ -299,7 +299,7 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 cpConstraint *
 cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
-	cpAssertSoft(!constraint->space, "This shape is already added to a space and cannot be added to another.");
+	cpAssertHard(!constraint->space, "This shape is already added to a space and cannot be added to another.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(constraint->a);
@@ -360,8 +360,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 	if(cpBodyIsStatic(body)){
 		cpSpaceRemoveStaticShape(space, shape);
 	} else {
-		cpAssertSoft(cpSpaceContainsShape(space, shape),
-			"Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
+		cpAssertHard(cpSpaceContainsShape(space, shape), "Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
 		cpAssertSpaceUnlocked(space);
 		
 		cpBodyActivate(body);
@@ -375,8 +374,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 {
-	cpAssertSoft(cpSpaceContainsShape(space, shape),
-		"Cannot remove a static or sleeping shape that was not added to the space. (Removed twice maybe?)");
+	cpAssertHard(cpSpaceContainsShape(space, shape), "Cannot remove a static or sleeping shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
@@ -390,8 +388,7 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 void
 cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 {
-	cpAssertWarn(cpSpaceContainsBody(space, body),
-		"Cannot remove a body that was not added to the space. (Removed twice maybe?)");
+	cpAssertHard(cpSpaceContainsBody(space, body), "Cannot remove a body that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
@@ -403,8 +400,7 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 void
 cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 {
-	cpAssertWarn(cpSpaceContainsConstraint(space, constraint),
-		"Cannot remove a constraint that was not added to the space. (Removed twice maybe?)");
+	cpAssertHard(cpSpaceContainsConstraint(space, constraint), "Cannot remove a constraint that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(constraint->a);

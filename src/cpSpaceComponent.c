@@ -30,7 +30,7 @@
 void
 cpSpaceActivateBody(cpSpace *space, cpBody *body)
 {
-	cpAssertSoft(!cpBodyIsRogue(body), "Internal error: Attempting to activate a rouge body.");
+	cpAssertHard(!cpBodyIsRogue(body), "Internal error: Attempting to activate a rouge body.");
 	
 	if(space->locked){
 		// cpSpaceActivateBody() is called again once the space is unlocked
@@ -79,7 +79,7 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 static void
 cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 {
-	cpAssertSoft(!cpBodyIsRogue(body), "Internal error: Attempting to deactivate a rouge body.");
+	cpAssertHard(!cpBodyIsRogue(body), "Internal error: Attempting to deactivate a rouge body.");
 	
 	cpArrayDeleteObj(space->bodies, body);
 	
@@ -117,7 +117,7 @@ static inline void
 ComponentActivate(cpBody *root)
 {
 	if(!root || !cpBodyIsSleeping(root)) return;
-	cpAssertSoft(!cpBodyIsRogue(root), "Internal Error: ComponentActivate() called on a rogue body.");
+	cpAssertHard(!cpBodyIsRogue(root), "Internal Error: ComponentActivate() called on a rogue body.");
 	
 	cpSpace *space = root->space;
 	cpBody *body = root;
