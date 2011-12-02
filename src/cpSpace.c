@@ -26,7 +26,7 @@
 
 #include "chipmunk_private.h"
 
-#pragma mark Contact Set Helpers
+//MARK: Contact Set Helpers
 
 // Equal function for arbiterSet.
 static cpBool
@@ -38,7 +38,7 @@ arbiterSetEql(cpShape **shapes, cpArbiter *arb)
 	return ((a == arb->a && b == arb->b) || (b == arb->a && a == arb->b));
 }
 
-#pragma mark Collision Handler Set HelperFunctions
+//MARK: Collision Handler Set HelperFunctions
 
 // Equals function for collisionHandlers.
 static cpBool
@@ -57,7 +57,7 @@ handlerSetTrans(cpCollisionHandler *handler, void *unused)
 	return copy;
 }
 
-#pragma mark Misc Helper Funcs
+//MARK: Misc Helper Funcs
 
 // Default collision functions.
 static cpBool alwaysCollide(cpArbiter *arb, cpSpace *space, void *data){return 1;}
@@ -68,7 +68,7 @@ static cpVect shapeVelocityFunc(cpShape *shape){return shape->body->v;}
 
 static void freeWrap(void *ptr, void *unused){cpfree(ptr);}
 
-#pragma mark Memory Management Functions
+//MARK: Memory Management Functions
 
 cpSpace *
 cpSpaceAlloc(void)
@@ -184,7 +184,7 @@ cpSpaceFree(cpSpace *space)
 		"Put these calls into a post-step callback." \
 	);
 
-#pragma mark Collision Handler Function Management
+//MARK: Collision Handler Function Management
 
 void
 cpSpaceAddCollisionHandler(
@@ -247,7 +247,7 @@ cpSpaceSetDefaultCollisionHandler(
 	cpHashSetSetDefaultValue(space->collisionHandlers, &space->defaultHandler);
 }
 
-#pragma mark Body, Shape, and Joint Management
+//MARK: Body, Shape, and Joint Management
 cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
@@ -428,7 +428,7 @@ cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)
 }
 
 
-#pragma mark Iteration
+//MARK: Iteration
 
 void
 cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
@@ -488,7 +488,7 @@ cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, void *
 	} cpSpaceUnlock(space, cpTrue);
 }
 
-#pragma mark Spatial Index Management
+//MARK: Spatial Index Management
 
 static void
 updateBBCache(cpShape *shape, void *unused)

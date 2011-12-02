@@ -25,7 +25,7 @@
 
 #include "chipmunk_private.h"
 
-#pragma mark Post Step Callback Functions
+//MARK: Post Step Callback Functions
 
 typedef struct cpPostStepCallback {
 	cpPostStepFunc func;
@@ -94,7 +94,7 @@ cpSpaceRunPostStepCallbacks(cpSpace *space)
 	}
 }
 
-#pragma mark Locking Functions
+//MARK: Locking Functions
 
 void
 cpSpaceLock(cpSpace *space)
@@ -120,7 +120,7 @@ cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
 	}
 }
 
-#pragma mark Contact Buffer Functions
+//MARK: Contact Buffer Functions
 
 struct cpContactBufferHeader {
 	cpTimestamp stamp;
@@ -198,7 +198,7 @@ cpSpacePopContacts(cpSpace *space, int count){
 	space->contactBuffersHead->numContacts -= count;
 }
 
-#pragma mark Collision Detection Functions
+//MARK: Collision Detection Functions
 
 static void *
 cpSpaceArbiterSetTrans(cpShape **shapes, cpSpace *space)
@@ -327,7 +327,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	return cpTrue;
 }
 
-#pragma mark All Important cpSpaceStep() Function
+//MARK: All Important cpSpaceStep() Function
 
 void
 cpShapeUpdateFunc(cpShape *shape, void *unused)

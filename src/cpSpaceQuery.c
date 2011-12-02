@@ -23,7 +23,7 @@
 
 #include "chipmunk_private.h"
 
-#pragma mark Point Query Functions
+//MARK: Point Query Functions
 
 typedef struct pointQueryContext {
 	cpLayers layers;
@@ -70,7 +70,7 @@ cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpGroup gr
 }
 
 
-#pragma mark Segment Query Functions
+//MARK: Segment Query Functions
 
 typedef struct segQueryContext {
 	cpVect start, end;
@@ -153,7 +153,7 @@ cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers laye
 	return out->shape;
 }
 
-#pragma mark BB Query Functions
+//MARK: BB Query Functions
 
 typedef struct bbQueryContext {
 	cpLayers layers;
@@ -184,7 +184,7 @@ cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceB
 	} cpSpaceUnlock(space, cpTrue);
 }
 
-#pragma mark Shape Query Functions
+//MARK: Shape Query Functions
 
 typedef struct shapeQueryContext {
 	cpSpaceShapeQueryFunc func;

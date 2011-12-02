@@ -25,7 +25,7 @@
 #define CP_HASH_COEF (3344921057ul)
 #define CP_HASH_PAIR(A, B) ((cpHashValue)(A)*CP_HASH_COEF ^ (cpHashValue)(B)*CP_HASH_COEF)
 
-#pragma mark cpArray
+//MARK: cpArray
 
 struct cpArray {
 	int num, max;
@@ -43,7 +43,7 @@ cpBool cpArrayContains(cpArray *arr, void *ptr);
 
 void cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*));
 
-#pragma mark Foreach loops
+//MARK: Foreach loops
 
 static inline cpConstraint *
 cpConstraintNext(cpConstraint *node, cpBody *body)
@@ -69,7 +69,7 @@ cpArbiterNext(cpArbiter *node, cpBody *body)
 #define CP_BODY_FOREACH_COMPONENT(root, var)\
 	for(cpBody *var = root; var; var = var->node.next)
 
-#pragma mark cpHashSet
+//MARK: cpHashSet
 
 typedef cpBool (*cpHashSetEqlFunc)(void *ptr, void *elt);
 typedef void *(*cpHashSetTransFunc)(void *ptr, void *data);
@@ -90,14 +90,14 @@ void cpHashSetEach(cpHashSet *set, cpHashSetIteratorFunc func, void *data);
 typedef cpBool (*cpHashSetFilterFunc)(void *elt, void *data);
 void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);
 
-#pragma mark Body Functions
+//MARK: Body Functions
 
 void cpBodyAddShape(cpBody *body, cpShape *shape);
 void cpBodyRemoveShape(cpBody *body, cpShape *shape);
 void cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint);
 
 
-#pragma mark Shape/Collision Functions
+//MARK: Shape/Collision Functions
 
 cpShape* cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body);
 
@@ -149,11 +149,11 @@ cpPolyShapeContainsVertPartial(const cpPolyShape *poly, const cpVect v, const cp
 	return cpTrue;
 }
 
-#pragma mark Spatial Index Functions
+//MARK: Spatial Index Functions
 
 cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *klass, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
 
-#pragma mark Space Functions
+//MARK: Space Functions
 
 extern cpCollisionHandler cpDefaultCollisionHandler;
 void cpSpaceProcessComponents(cpSpace *space, cpFloat dt);
@@ -193,7 +193,7 @@ void cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space);
 
 
 
-#pragma mark Arbiters
+//MARK: Arbiters
 
 struct cpContact {
 	cpVect p, n;

@@ -26,7 +26,7 @@
 
 static inline cpSpatialIndexClass *Klass();
 
-#pragma mark Basic Structures
+//MARK: Basic Structures
 
 typedef struct Bounds {
 	cpFloat min, max;
@@ -66,7 +66,7 @@ MakeTableCell(cpSweep1D *sweep, void *obj)
 	return cell;
 }
 
-#pragma mark Memory Management Functions
+//MARK: Memory Management Functions
 
 cpSweep1D *
 cpSweep1DAlloc(void)
@@ -105,7 +105,7 @@ cpSweep1DDestroy(cpSweep1D *sweep)
 	sweep->table = NULL;
 }
 
-#pragma mark Misc
+//MARK: Misc
 
 static int
 cpSweep1DCount(cpSweep1D *sweep)
@@ -131,7 +131,7 @@ cpSweep1DContains(cpSweep1D *sweep, void *obj, cpHashValue hashid)
 	return cpFalse;
 }
 
-#pragma mark Basic Operations
+//MARK: Basic Operations
 
 static void
 cpSweep1DInsert(cpSweep1D *sweep, void *obj, cpHashValue hashid)
@@ -158,7 +158,7 @@ cpSweep1DRemove(cpSweep1D *sweep, void *obj, cpHashValue hashid)
 	}
 }
 
-#pragma mark Reindexing Functions
+//MARK: Reindexing Functions
 
 static void
 cpSweep1DReindexObject(cpSweep1D *sweep, void *obj, cpHashValue hashid)
@@ -173,7 +173,7 @@ cpSweep1DReindex(cpSweep1D *sweep)
 	// Could perform a sort, but queries are not accelerated anyway.
 }
 
-#pragma mark Query Functions
+//MARK: Query Functions
 
 static void
 cpSweep1DQuery(cpSweep1D *sweep, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, void *data)
@@ -209,7 +209,7 @@ cpSweep1DSegmentQuery(cpSweep1D *sweep, void *obj, cpVect a, cpVect b, cpFloat t
 	}
 }
 
-#pragma mark Reindex/Query
+//MARK: Reindex/Query
 
 static int
 TableSort(TableCell *a, TableCell *b)

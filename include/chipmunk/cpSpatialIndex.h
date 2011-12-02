@@ -37,7 +37,7 @@
 	@{
 */
 
-#pragma mark Spatial Index
+//MARK: Spatial Index
 
 /// Spatial index bounding box callback function type.
 /// The spatial index calls this function and passes you a pointer to an object you added
@@ -64,7 +64,7 @@ struct cpSpatialIndex {
 };
 
 
-#pragma mark Spatial Hash
+//MARK: Spatial Hash
 
 typedef struct cpSpaceHash cpSpaceHash;
 
@@ -81,7 +81,7 @@ cpSpatialIndex* cpSpaceHashNew(cpFloat celldim, int cells, cpSpatialIndexBBFunc 
 /// Some trial and error is required to find the optimum numbers for efficiency.
 void cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells);
 
-#pragma mark AABB Tree
+//MARK: AABB Tree
 
 typedef struct cpBBTree cpBBTree;
 
@@ -101,7 +101,7 @@ typedef cpVect (*cpBBTreeVelocityFunc)(void *obj);
 /// Set the velocity function for the bounding box tree to enable temporal coherence.
 void cpBBTreeSetVelocityFunc(cpSpatialIndex *index, cpBBTreeVelocityFunc func);
 
-#pragma mark Single Axis Sweep
+//MARK: Single Axis Sweep
 
 typedef struct cpSweep1D cpSweep1D;
 
@@ -112,7 +112,7 @@ cpSpatialIndex* cpSweep1DInit(cpSweep1D *sweep, cpSpatialIndexBBFunc bbfunc, cpS
 /// Allocate and initialize a 1D sort and sweep broadphase.
 cpSpatialIndex* cpSweep1DNew(cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
 
-#pragma mark Spatial Index Implementation
+//MARK: Spatial Index Implementation
 
 typedef void (*cpSpatialIndexDestroyImpl)(cpSpatialIndex *index);
 

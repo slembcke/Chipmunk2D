@@ -25,7 +25,7 @@
 
 #include "chipmunk_private.h"
 
-#pragma mark Sleeping Functions
+//MARK: Sleeping Functions
 
 void
 cpSpaceActivateBody(cpSpace *space, cpBody *body)

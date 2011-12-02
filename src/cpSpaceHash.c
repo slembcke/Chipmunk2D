@@ -45,7 +45,7 @@ struct cpSpaceHash {
 };
 
 
-#pragma mark Handle Functions
+//MARK: Handle Functions
 
 struct cpHandle {
 	void *obj;
@@ -94,7 +94,7 @@ handleSetTrans(void *obj, cpSpaceHash *hash)
 	return hand;
 }
 
-#pragma mark Bin Functions
+//MARK: Bin Functions
 
 struct cpSpaceHashBin {
 	cpHandle *handle;
@@ -153,7 +153,7 @@ getEmptyBin(cpSpaceHash *hash)
 	}
 }
 
-#pragma mark Memory Management Functions
+//MARK: Memory Management Functions
 
 cpSpaceHash *
 cpSpaceHashAlloc(void)
@@ -212,7 +212,7 @@ cpSpaceHashDestroy(cpSpaceHash *hash)
 	cpArrayFree(hash->pooledHandles);
 }
 
-#pragma mark Helper Functions
+//MARK: Helper Functions
 
 static inline cpBool
 containsHandle(cpSpaceHashBin *bin, cpHandle *hand)
@@ -270,7 +270,7 @@ hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 	}
 }
 
-#pragma mark Basic Operations
+//MARK: Basic Operations
 
 static void
 cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue hashid)
@@ -352,7 +352,7 @@ remove_orphaned_handles(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr)
 	}
 }
 
-#pragma mark Query Functions
+//MARK: Query Functions
 
 static inline void
 query_helper(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpatialIndexQueryFunc func, void *data)
@@ -555,7 +555,7 @@ cpSpaceHashSegmentQuery(cpSpaceHash *hash, void *obj, cpVect a, cpVect b, cpFloa
 	hash->stamp++;
 }
 
-#pragma mark Misc
+//MARK: Misc
 
 void
 cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells)
@@ -604,7 +604,7 @@ static cpSpatialIndexClass klass = {
 
 static inline cpSpatialIndexClass *Klass(){return &klass;}
 
-#pragma mark Debug Drawing
+//MARK: Debug Drawing
 
 //#define CP_BBTREE_DEBUG_DRAW
 #ifdef CP_BBTREE_DEBUG_DRAW

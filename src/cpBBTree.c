@@ -74,7 +74,7 @@ typedef struct Thread {
 
 struct Pair { Thread a, b; };
 
-#pragma mark Misc Functions
+//MARK: Misc Functions
 
 static inline cpBB
 GetBB(cpBBTree *tree, void *obj)
@@ -123,7 +123,7 @@ IncrementStamp(cpBBTree *tree)
 	}
 }
 
-#pragma mark Pair/Thread Functions
+//MARK: Pair/Thread Functions
 
 static void
 PairRecycle(cpBBTree *tree, Pair *pair)
@@ -212,7 +212,7 @@ PairInsert(Node *a, Node *b, cpBBTree *tree)
 }
 
 
-#pragma mark Node Functions
+//MARK: Node Functions
 
 static void
 NodeRecycle(cpBBTree *tree, Node *node)
@@ -303,7 +303,7 @@ NodeReplaceChild(Node *parent, Node *child, Node *value, cpBBTree *tree)
 	}
 }
 
-#pragma mark Subtree Functions
+//MARK: Subtree Functions
 
 static inline cpFloat
 cpBBProximity(cpBB a, cpBB b)
@@ -402,7 +402,7 @@ SubtreeRemove(Node *subtree, Node *leaf, cpBBTree *tree)
 	}
 }
 
-#pragma mark Marking Functions
+//MARK: Marking Functions
 
 typedef struct MarkContext {
 	cpBBTree *tree;
@@ -468,7 +468,7 @@ MarkSubtree(Node *subtree, MarkContext *context)
 	}
 }
 
-#pragma mark Leaf Functions
+//MARK: Leaf Functions
 
 static Node *
 LeafNew(cpBBTree *tree, void *obj, cpBB bb)
@@ -525,7 +525,7 @@ LeafAddPairs(Node *leaf, cpBBTree *tree)
 	}
 }
 
-#pragma mark Memory Management Functions
+//MARK: Memory Management Functions
 
 cpBBTree *
 cpBBTreeAlloc(void)
@@ -589,7 +589,7 @@ cpBBTreeDestroy(cpBBTree *tree)
 	cpArrayFree(tree->allocatedBuffers);
 }
 
-#pragma mark Insert/Remove
+//MARK: Insert/Remove
 
 static void
 cpBBTreeInsert(cpBBTree *tree, void *obj, cpHashValue hashid)
@@ -620,7 +620,7 @@ cpBBTreeContains(cpBBTree *tree, void *obj, cpHashValue hashid)
 	return (cpHashSetFind(tree->leaves, hashid, obj) != NULL);
 }
 
-#pragma mark Reindex
+//MARK: Reindex
 
 static void
 cpBBTreeReindexQuery(cpBBTree *tree, cpSpatialIndexQueryFunc func, void *data)
@@ -656,7 +656,7 @@ cpBBTreeReindexObject(cpBBTree *tree, void *obj, cpHashValue hashid)
 	}
 }
 
-#pragma mark Query
+//MARK: Query
 
 static void
 cpBBTreePointQuery(cpBBTree *tree, cpVect point, cpSpatialIndexQueryFunc func, void *data)
@@ -678,7 +678,7 @@ cpBBTreeQuery(cpBBTree *tree, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, 
 	if(tree->root) SubtreeQuery(tree->root, obj, bb, func, data);
 }
 
-#pragma mark Misc
+//MARK: Misc
 
 static int
 cpBBTreeCount(cpBBTree *tree)
@@ -722,7 +722,7 @@ static cpSpatialIndexClass klass = {
 static inline cpSpatialIndexClass *Klass(){return &klass;}
 
 
-#pragma mark Tree Optimization
+//MARK: Tree Optimization
 
 static int
 cpfcompare(const cpFloat *a, const cpFloat *b){
@@ -842,7 +842,7 @@ cpBBTreeOptimize(cpSpatialIndex *index)
 	cpfree(nodes);
 }
 
-#pragma mark Debug Draw
+//MARK: Debug Draw
 
 //#define CP_BBTREE_DEBUG_DRAW
 #ifdef CP_BBTREE_DEBUG_DRAW
