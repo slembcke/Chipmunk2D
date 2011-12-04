@@ -36,6 +36,7 @@
 #include <string.h>
 #include <math.h>
 #include <limits.h>
+#include <stdarg.h>
 
 #ifdef __APPLE__
 	#include "OpenGL/gl.h"
@@ -524,6 +525,7 @@ extern ChipmunkDemo Chains;
 extern ChipmunkDemo Crane;
 extern ChipmunkDemo Buoyancy;
 extern ChipmunkDemo ContactGraph;
+extern ChipmunkDemo Slice;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -532,6 +534,7 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
+		Slice,
 		LogoSmash,
 		PyramidStack,
 		Plink,
