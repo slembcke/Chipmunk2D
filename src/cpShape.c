@@ -103,14 +103,23 @@ cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot)
 }
 
 cpBool
+cpShapePointQueryExtended(cpShape *shape, cpVect p, cpPointQueryExtendedInfo *info){
+	cpPointQueryExtendedInfo blank = {NULL, 0.0f, cpvzero};
+	if(info){(*info) = blank;} else {info = &blank;}
+	
+	shape->klass->pointQuery(shape, p, info);
+	return (info->shape != NULL);
+}
+
+cpBool
 cpShapePointQuery(cpShape *shape, cpVect p){
-	return shape->klass->pointQuery(shape, p);
+	return cpShapePointQueryExtended(shape, p, NULL);
 }
 
 cpBool
 cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info){
 	cpSegmentQueryInfo blank = {NULL, 0.0f, cpvzero};
-	(*info) = blank;
+	if(info){(*info) = blank;} else {info = &blank;}
 	
 	shape->klass->segmentQuery(shape, a, b, info);
 	return (info->shape != NULL);
@@ -129,9 +138,19 @@ cpCircleShapeCacheData(cpCircleShape *circle, cpVect p, cpVect rot)
 	return cpBBNewForCircle(c, circle->r);
 }
 
-static cpBool
-cpCircleShapePointQuery(cpCircleShape *circle, cpVect p){
-	return cpvnear(circle->tc, p, circle->r);
+static void
+cpCircleShapePointQuery(cpCircleShape *circle, cpVect p, cpPointQueryExtendedInfo *info){
+	cpVect delta = cpvsub(p, circle->tc);
+	cpFloat distsq = cpvlengthsq(delta);
+	cpFloat r = circle->r;
+	
+	if(distsq < r*r){
+		info->shape = (cpShape *)circle;
+		
+		cpFloat dist = cpfsqrt(distsq);
+		info->d = r - dist;
+		info->n = cpvmult(delta, 1.0/dist);
+	}
 }
 
 static void
@@ -167,7 +186,7 @@ static const cpShapeClass cpCircleShapeClass = {
 	CP_CIRCLE_SHAPE,
 	(cpShapeCacheDataImpl)cpCircleShapeCacheData,
 	NULL,
-	(cpShapePointQueryImpl)cpCircleShapePointQuery,
+	(cpShapePointQueryExtendedImpl)cpCircleShapePointQuery,
 	(cpShapeSegmentQueryImpl)cpCircleShapeSegmentQuery,
 };
 
@@ -226,40 +245,29 @@ cpSegmentShapeCacheData(cpSegmentShape *seg, cpVect p, cpVect rot)
 	return cpBBNew(l - rad, b - rad, r + rad, t + rad);
 }
 
-static cpBool
-cpSegmentShapePointQuery(cpSegmentShape *seg, cpVect p){
-	if(!cpBBContainsVect(seg->shape.bb, p)) return cpFalse;
+static void
+cpSegmentShapePointQuery(cpSegmentShape *seg, cpVect p, cpPointQueryExtendedInfo *info){
+	if(!cpBBContainsVect(seg->shape.bb, p)) return;
 	
-	// Calculate normal distance from segment.
-	cpFloat dn = cpvdot(seg->tn, p) - cpvdot(seg->ta, seg->tn);
-	cpFloat dist = cpfabs(dn) - seg->r;
-	if(dist > 0.0f) return cpFalse;
+	cpVect a = seg->ta;
+	cpVect b = seg->tb;
 	
-	// Calculate tangential distance along segment.
-	cpFloat dt = -cpvcross(seg->tn, p);
-	cpFloat dtMin = -cpvcross(seg->tn, seg->ta);
-	cpFloat dtMax = -cpvcross(seg->tn, seg->tb);
+	cpVect seg_delta = cpvsub(b, a);
+	cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(p, a))/cpvlengthsq(seg_delta));
+	cpVect closest = cpvadd(a, cpvmult(seg_delta, closest_t));
 	
-	// Decision tree to decide which feature of the segment to collide with.
-	if(dt <= dtMin){
-		if(dt < (dtMin - seg->r)){
-			return cpFalse;
-		} else {
-			return cpvlengthsq(cpvsub(seg->ta, p)) < (seg->r*seg->r);
-		}
-	} else {
-		if(dt < dtMax){
-			return cpTrue;
-		} else {
-			if(dt < (dtMax + seg->r)) {
-				return cpvlengthsq(cpvsub(seg->tb, p)) < (seg->r*seg->r);
-			} else {
-				return cpFalse;
-			}
-		}
+	cpVect delta = cpvsub(p, closest);
+	cpFloat distsq = cpvlengthsq(delta);
+	cpFloat r = seg->r;
+	
+	if(distsq < r*r){
+		info->shape = (cpShape *)seg;
+		
+		cpFloat dist = cpfsqrt(distsq);
+		info->d = r - dist;
+		info->n = cpvmult(delta, 1.0/dist);
 	}
-	
-	return cpTrue;	
+
 }
 
 static void
@@ -305,7 +313,7 @@ static const cpShapeClass cpSegmentShapeClass = {
 	CP_SEGMENT_SHAPE,
 	(cpShapeCacheDataImpl)cpSegmentShapeCacheData,
 	NULL,
-	(cpShapePointQueryImpl)cpSegmentShapePointQuery,
+	(cpShapePointQueryExtendedImpl)cpSegmentShapePointQuery,
 	(cpShapeSegmentQueryImpl)cpSegmentShapeSegmentQuery,
 };
 

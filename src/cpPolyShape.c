@@ -84,9 +84,26 @@ cpPolyShapeDestroy(cpPolyShape *poly)
 	cpfree(poly->tAxes);
 }
 
-static cpBool
-cpPolyShapePointQuery(cpPolyShape *poly, cpVect p){
-	return cpBBContainsVect(poly->shape.bb, p) && cpPolyShapeContainsVert(poly, p);
+static void
+cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryExtendedInfo *info){
+	if(!cpBBContainsVect(poly->shape.bb, p)) return;
+	
+	cpPointQueryExtendedInfo min = {(cpShape *)poly, INFINITY, cpvzero};
+	
+	cpPolyShapeAxis *axes = poly->tAxes;
+	for(int i=0; i<poly->numVerts; i++){
+		cpVect n = axes[i].n;
+		cpFloat dist = axes[i].d - cpvdot(n, p);
+		
+		if(dist < 0.0f){
+			return;
+		} else if(dist < min.d){
+			min.d = dist;
+			min.n = n;
+		}
+	}
+	
+	(*info) = min;
 }
 
 static void
@@ -122,7 +139,7 @@ static const cpShapeClass polyClass = {
 	CP_POLY_SHAPE,
 	(cpShapeCacheDataImpl)cpPolyShapeCacheData,
 	(cpShapeDestroyImpl)cpPolyShapeDestroy,
-	(cpShapePointQueryImpl)cpPolyShapePointQuery,
+	(cpShapePointQueryExtendedImpl)cpPolyShapePointQuery,
 	(cpShapeSegmentQueryImpl)cpPolyShapeSegmentQuery,
 };
 

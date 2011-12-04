@@ -25,6 +25,16 @@
 
 typedef struct cpShapeClass cpShapeClass;
 
+/// Extended point query info struct.
+typedef struct cpPointQueryExtendedInfo {
+	/// Shape that was hit, NULL if no collision occurred.
+	cpShape *shape;
+	/// Depth of the point inside the shape.
+	cpFloat d;
+	/// Direction of minimum norm to the shape's surface.
+	cpVect n;
+} cpPointQueryExtendedInfo;
+
 /// Segment query info struct.
 typedef struct cpSegmentQueryInfo {
 	/// The shape that was hit, NULL if no collision occured.
@@ -45,7 +55,7 @@ typedef enum cpShapeType{
 
 typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpVect p, cpVect rot);
 typedef void (*cpShapeDestroyImpl)(cpShape *shape);
-typedef cpBool (*cpShapePointQueryImpl)(cpShape *shape, cpVect p);
+typedef void (*cpShapePointQueryExtendedImpl)(cpShape *shape, cpVect p, cpPointQueryExtendedInfo *info);
 typedef void (*cpShapeSegmentQueryImpl)(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
 
 /// @private
@@ -54,7 +64,7 @@ struct cpShapeClass {
 	
 	cpShapeCacheDataImpl cacheData;
 	cpShapeDestroyImpl destroy;
-	cpShapePointQueryImpl pointQuery;
+	cpShapePointQueryExtendedImpl pointQuery;
 	cpShapeSegmentQueryImpl segmentQuery;
 };
 
@@ -109,6 +119,10 @@ cpBB cpShapeCacheBB(cpShape *shape);
 /// Update, cache and return the bounding box of a shape with an explicit transformation.
 cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot);
 
+/// Test if a point lies within a shape.
+cpBool cpShapePointQueryExtended(cpShape *shape, cpVect p, cpPointQueryExtendedInfo *info);
+
+/// @deprecated Use cpShapePointQueryExtended() instead.
 /// Test if a point lies within a shape.
 cpBool cpShapePointQuery(cpShape *shape, cpVect p);
 

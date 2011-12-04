@@ -33,14 +33,6 @@
 
 static cpSpace *space;
 
-// TODO add this to the main API?
-static cpVect
-cpBodyGetVelAtPoint(cpBody *body, cpVect point)
-{
-	cpVect r = cpvsub(point, body->p);
-	return cpvadd(body->v, cpvmult(cpvperp(r), body->w));
-}
-
 static void
 ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 {
@@ -82,7 +74,7 @@ ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 	
 	cpBody *new_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 	cpBodySetPos(new_body, centroid);
-	cpBodySetVel(new_body, cpBodyGetVelAtPoint(body, centroid));
+	cpBodySetVel(new_body, cpBodyGetVelAtWorldPoint(body, centroid));
 	cpBodySetAngVel(new_body, cpBodyGetAngVel(body));
 	
 	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, clippedCount, clipped, cpvneg(centroid)));
@@ -204,7 +196,7 @@ destroy(void)
 }
 
 ChipmunkDemo Slice = {
-	"Slicing.",
+	"Slice.",
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,
