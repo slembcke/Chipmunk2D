@@ -159,7 +159,7 @@ update(int ticks)
 	}
 	
 	if(ChipmunkDemoRightClick){
-		ChipmunkDebugDrawSegment(sliceStart, ChipmunkDemoMouse, RGBAColor(0, 0, 1, 1));
+		ChipmunkDebugDrawSegment(sliceStart, ChipmunkDemoMouse, RGBAColor(1, 0, 0, 1));
 	}
 }
 
@@ -189,7 +189,6 @@ init(void)
 	cpFloat moment = cpMomentForBox(mass, width, height);
 	
 	body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-	cpBodySetPos(body, cpv(-50, -100));
 	
 	shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
 	cpShapeSetFriction(shape, 0.6f);
