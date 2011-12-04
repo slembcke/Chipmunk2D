@@ -36,6 +36,7 @@
 #include <string.h>
 #include <math.h>
 #include <limits.h>
+#include <stdarg.h>
 
 #ifdef __APPLE__
 	#include "OpenGL/gl.h"
@@ -73,6 +74,7 @@ cpFloat ChipmunkDemoTime;
 static cpBody *mouseBody = NULL;
 static cpConstraint *mouseJoint = NULL;
 cpVect ChipmunkDemoMouse;
+cpBool ChipmunkDemoRightClick = cpFalse;
 
 char *ChipmunkDemoMessageString = NULL;
 
@@ -367,6 +369,8 @@ click(int button, int state, int x, int y)
 			cpConstraintFree(mouseJoint);
 			mouseJoint = NULL;
 		}
+	} else if(button == GLUT_RIGHT_BUTTON){
+		ChipmunkDemoRightClick = (state == GLUT_DOWN);
 	}
 }
 
@@ -524,6 +528,7 @@ extern ChipmunkDemo Chains;
 extern ChipmunkDemo Crane;
 extern ChipmunkDemo Buoyancy;
 extern ChipmunkDemo ContactGraph;
+extern ChipmunkDemo Slice;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -551,6 +556,7 @@ main(int argc, const char **argv)
 		ContactGraph,
 		Buoyancy,
 		Player,
+		Slice,
 	};
 	
 	demos = demo_list;
