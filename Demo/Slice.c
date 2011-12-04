@@ -35,9 +35,9 @@ static cpSpace *space;
 
 // TODO add this to the main API?
 static cpVect
-cpBodyGetVelyAtPoint(cpBody *body, cpVect point)
+cpBodyGetVelAtPoint(cpBody *body, cpVect point)
 {
-	cpVect r = cpvsub(point, cpBodyGetPos(body));
+	cpVect r = cpvsub(point, body->p);
 	return cpvadd(body->v, cpvmult(cpvperp(r), body->w));
 }
 
@@ -82,7 +82,7 @@ ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 	
 	cpBody *new_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 	cpBodySetPos(new_body, centroid);
-	cpBodySetVel(new_body, cpBodyGetVelyAtPoint(body, centroid));
+	cpBodySetVel(new_body, cpBodyGetVelAtPoint(body, centroid));
 	cpBodySetAngVel(new_body, cpBodyGetAngVel(body));
 	
 	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, clippedCount, clipped, cpvneg(centroid)));
@@ -145,9 +145,8 @@ update(int ticks)
 	
 	// Annoying state tracking code that you wouldn't need
 	// in a real event driven system.
-	cpBool clickState = (ChipmunkDemoKeyboard.y == 1.0);
-	if(clickState != lastClickState){
-		if(clickState){
+	if(ChipmunkDemoRightClick != lastClickState){
+		if(ChipmunkDemoRightClick){
 			// MouseDown
 			sliceStart = ChipmunkDemoMouse;
 		} else {
@@ -156,10 +155,10 @@ update(int ticks)
 			cpSpaceSegmentQuery(space, sliceStart, ChipmunkDemoMouse, GRABABLE_MASK_BIT, CP_NO_GROUP, (cpSpaceSegmentQueryFunc)SliceQuery, &context);
 		}
 		
-		lastClickState = clickState;
+		lastClickState = ChipmunkDemoRightClick;
 	}
 	
-	if(clickState){
+	if(ChipmunkDemoRightClick){
 		ChipmunkDebugDrawSegment(sliceStart, ChipmunkDemoMouse, RGBAColor(0, 0, 1, 1));
 	}
 }
@@ -167,6 +166,8 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
+	ChipmunkDemoMessageString = "Right click and drag to slice up the block.";
+	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -500));

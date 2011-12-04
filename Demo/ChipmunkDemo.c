@@ -74,6 +74,7 @@ cpFloat ChipmunkDemoTime;
 static cpBody *mouseBody = NULL;
 static cpConstraint *mouseJoint = NULL;
 cpVect ChipmunkDemoMouse;
+cpBool ChipmunkDemoRightClick = cpFalse;
 
 char *ChipmunkDemoMessageString = NULL;
 
@@ -368,6 +369,8 @@ click(int button, int state, int x, int y)
 			cpConstraintFree(mouseJoint);
 			mouseJoint = NULL;
 		}
+	} else if(button == GLUT_RIGHT_BUTTON){
+		ChipmunkDemoRightClick = (state == GLUT_DOWN);
 	}
 }
 
@@ -534,7 +537,6 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
-		Slice,
 		LogoSmash,
 		PyramidStack,
 		Plink,
@@ -554,6 +556,7 @@ main(int argc, const char **argv)
 		ContactGraph,
 		Buoyancy,
 		Player,
+		Slice,
 	};
 	
 	demos = demo_list;

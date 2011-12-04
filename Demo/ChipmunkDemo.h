@@ -47,6 +47,7 @@ frand(void)
 extern cpFloat ChipmunkDemoTime;
 extern cpVect ChipmunkDemoKeyboard;
 extern cpVect ChipmunkDemoMouse;
+extern cpBool ChipmunkDemoRightClick;
 
 extern char *ChipmunkDemoMessageString;
 void ChipmunkDemoPrintString(char *fmt, ...);
