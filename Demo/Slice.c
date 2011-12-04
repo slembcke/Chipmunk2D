@@ -29,85 +29,24 @@
 #include "ChipmunkDemo.h"
 
 
-#define DENSITY (1.0/1000.0)
+#define DENSITY (1.0/10000.0)
 
 static cpSpace *space;
 
-//static cpBool
-//waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
-//{
-//	CP_ARBITER_GET_SHAPES(arb, water, poly);
-//	cpBody *body = cpShapeGetBody(poly);
-//	
-//	// Get the top of the water sensor bounding box to use as the water level.
-//	cpFloat level = cpShapeGetBB(water).t;
-//	
-//	// Clip the polygon against the water level
-//	int count = cpPolyShapeGetNumVerts(poly);
-//	int clippedCount = 0;
-//#ifdef _MSC_VER
-//	// MSVC is pretty much the only compiler in existence that doesn't support variable sized arrays.
-//	cpVect clipped[10];
-//#else
-//	cpVect clipped[count + 1];
-//#endif
-//
-//	for(int i=0, j=count-1; i<count; j=i, i++){
-//		cpVect a = cpBodyLocal2World(body, cpPolyShapeGetVert(poly, j));
-//		cpVect b = cpBodyLocal2World(body, cpPolyShapeGetVert(poly, i));
-//		
-//		if(a.y < level){
-//			clipped[clippedCount] = a;
-//			clippedCount++;
-//		}
-//		
-//		cpFloat a_level = a.y - level;
-//		cpFloat b_level = b.y - level;
-//		
-//		if(a_level*b_level < 0.0f){
-//			cpFloat t = cpfabs(a_level)/(cpfabs(a_level) + cpfabs(b_level));
-//			
-//			clipped[clippedCount] = cpvlerp(a, b, t);
-//			clippedCount++;
-//		}
-//	}
-//	
-//	// Calculate buoyancy from the clipped polygon area
-//	cpFloat clippedArea = cpAreaForPoly(clippedCount, clipped);
-//	cpFloat displacedMass = clippedArea*FLUID_DENSITY;
-//	cpVect centroid = cpCentroidForPoly(clippedCount, clipped);
-//	cpVect r = cpvsub(centroid, cpBodyGetPos(body));
-//	
-//	ChipmunkDebugDrawPolygon(clippedCount, clipped, RGBAColor(0, 0, 1, 1), RGBAColor(0, 0, 1, 0.1f));
-//	ChipmunkDebugDrawPoints(5, 1, &centroid, RGBAColor(0, 0, 1, 1));
-//	
-//	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
-//	cpVect g = cpSpaceGetGravity(space);
-//	
-//	// Apply the buoyancy force as an impulse.
-//	apply_impulse(body, cpvmult(g, -displacedMass*dt), r);
-//	
-//	// Apply linear damping for the fluid drag.
-//	cpVect v_centroid = cpvadd(body->v, cpvmult(cpvperp(r), body->w));
-//	cpFloat k = k_scalar_body(body, r, cpvnormalize_safe(v_centroid));
-//	cpFloat damping = clippedArea*FLUID_DRAG*FLUID_DENSITY;
-//	cpFloat v_coef = cpfexp(-damping*dt*k); // linear drag
-////	cpFloat v_coef = 1.0/(1.0 + damping*dt*cpvlength(v_centroid)*k); // quadratic drag
-//	apply_impulse(body, cpvmult(cpvsub(cpvmult(v_centroid, v_coef), v_centroid), 1.0/k), r);
-//	
-//	// Apply angular damping for the fluid drag.
-//	cpFloat w_damping = cpMomentForPoly(FLUID_DRAG*FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(body->p));
-//	body->w *= cpfexp(-w_damping*dt*body->i_inv);
-//	
-//	return cpTrue;
-//}
+// TODO add this to the main API?
+static cpVect
+cpBodyGetVelyAtPoint(cpBody *body, cpVect point)
+{
+	cpVect r = cpvsub(point, cpBodyGetPos(body));
+	return cpvadd(body->v, cpvmult(cpvperp(r), body->w));
+}
 
 static void
-ClipPoly(cpSpace *space, cpShape *poly, cpVect n, cpFloat dist)
+ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 {
-	cpBody *body = cpShapeGetBody(poly);
+	cpBody *body = cpShapeGetBody(shape);
 	
-	int count = cpPolyShapeGetNumVerts(poly);
+	int count = cpPolyShapeGetNumVerts(shape);
 	int clippedCount = 0;
 	
 #ifdef _MSC_VER
@@ -118,7 +57,7 @@ ClipPoly(cpSpace *space, cpShape *poly, cpVect n, cpFloat dist)
 #endif
 
 	for(int i=0, j=count-1; i<count; j=i, i++){
-		cpVect a = cpBodyLocal2World(body, cpPolyShapeGetVert(poly, j));
+		cpVect a = cpBodyLocal2World(body, cpPolyShapeGetVert(shape, j));
 		cpFloat a_dist = cpvdot(a, n) - dist;
 		
 		if(a_dist < 0.0){
@@ -126,7 +65,7 @@ ClipPoly(cpSpace *space, cpShape *poly, cpVect n, cpFloat dist)
 			clippedCount++;
 		}
 		
-		cpVect b = cpBodyLocal2World(body, cpPolyShapeGetVert(poly, i));
+		cpVect b = cpBodyLocal2World(body, cpPolyShapeGetVert(shape, i));
 		cpFloat b_dist = cpvdot(b, n) - dist;
 		
 		if(a_dist*b_dist < 0.0f){
@@ -137,12 +76,18 @@ ClipPoly(cpSpace *space, cpShape *poly, cpVect n, cpFloat dist)
 		}
 	}
 	
-//	cpFloat clippedArea = cpAreaForPoly(clippedCount, clipped);
-//	cpFloat displacedMass = clippedArea*DENSITY;
 	cpVect centroid = cpCentroidForPoly(clippedCount, clipped);
+	cpFloat mass = cpAreaForPoly(clippedCount, clipped)*DENSITY;
+	cpFloat moment = cpMomentForPoly(mass, clippedCount, clipped, cpvneg(centroid));
 	
-	ChipmunkDebugDrawPolygon(clippedCount, clipped, RGBAColor(0, 0, 1, 1), RGBAColor(0, 0, 1, 0.1f));
-	ChipmunkDebugDrawPoints(5, 1, &centroid, RGBAColor(0, 0, 1, 1));
+	cpBody *new_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
+	cpBodySetPos(new_body, centroid);
+	cpBodySetVel(new_body, cpBodyGetVelyAtPoint(body, centroid));
+	cpBodySetAngVel(new_body, cpBodyGetAngVel(body));
+	
+	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, clippedCount, clipped, cpvneg(centroid)));
+	// Copy whatever properties you have set on the original shape that are important
+	cpShapeSetFriction(new_shape, cpShapeGetFriction(shape));
 }
 
 // Context strcts are annoying, use blocks or closures instead if your compiler supports them.
@@ -154,8 +99,6 @@ struct SliceContext {
 static void
 SliceShapePostStep(cpSpace *space, cpShape *shape, struct SliceContext *context)
 {
-	ChipmunkDemoPrintString("Slicing shape %p\n");
-	
 	cpVect a = context->a;
 	cpVect b = context->b;
 	
@@ -163,8 +106,14 @@ SliceShapePostStep(cpSpace *space, cpShape *shape, struct SliceContext *context)
 	cpVect n = cpvnormalize(cpvperp(cpvsub(b, a)));
 	cpFloat dist = cpvdot(a, n);
 	
-//	ClipPoly(space, shape, n, dist);
+	ClipPoly(space, shape, n, dist);
 	ClipPoly(space, shape, cpvneg(n), -dist);
+	
+	cpBody *body = cpShapeGetBody(shape);
+	cpSpaceRemoveShape(space, shape);
+	cpSpaceRemoveBody(space, body);
+	cpShapeFree(shape);
+	cpBodyFree(body);
 }
 
 static void
@@ -191,10 +140,28 @@ update(int ticks)
 		cpSpaceStep(space, dt);
 	}
 	
-	cpVect a = cpv(0,0);
-	cpVect b = cpv(320, 240);
-	ChipmunkDebugDrawSegment(a, b, RGBAColor(0, 0, 1, 1));
-	cpSpaceSegmentQuery(space, a, b, GRABABLE_MASK_BIT, CP_NO_GROUP, (cpSpaceSegmentQueryFunc)SliceQuery, &(struct SliceContext){a, b, space});
+	static cpBool lastClickState = cpFalse;
+	static cpVect sliceStart = {0.0, 0.0};
+	
+	// Annoying state tracking code that you wouldn't need
+	// in a real event driven system.
+	cpBool clickState = (ChipmunkDemoKeyboard.y == 1.0);
+	if(clickState != lastClickState){
+		if(clickState){
+			// MouseDown
+			sliceStart = ChipmunkDemoMouse;
+		} else {
+			// MouseUp
+			struct SliceContext context = {sliceStart, ChipmunkDemoMouse, space};
+			cpSpaceSegmentQuery(space, sliceStart, ChipmunkDemoMouse, GRABABLE_MASK_BIT, CP_NO_GROUP, (cpSpaceSegmentQueryFunc)SliceQuery, &context);
+		}
+		
+		lastClickState = clickState;
+	}
+	
+	if(clickState){
+		ChipmunkDebugDrawSegment(sliceStart, ChipmunkDemoMouse, RGBAColor(0, 0, 1, 1));
+	}
 }
 
 static cpSpace *
@@ -224,7 +191,7 @@ init(void)
 	cpBodySetPos(body, cpv(-50, -100));
 	
 	shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
-	cpShapeSetFriction(shape, 0.8f);
+	cpShapeSetFriction(shape, 0.6f);
 		
 	return space;
 }
