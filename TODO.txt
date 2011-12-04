@@ -8,6 +8,7 @@ Make static inline functions and properties show up in doxygen again.
 Update the doxygen main page.
 Update the READMEs
 Tests for the query methods
+Change docs about seg queries and spatial hash.
 
 Tutorial ideas:
 	Player grounding example.
