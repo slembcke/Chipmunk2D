@@ -29,7 +29,7 @@
 #include "ChipmunkDemo.h"
 
 #define DENSITY (1.0/10000.0)
-#define CHUNK_SIZE 10.0
+#define CHUNK_SIZE 5.0
 #define CHUNK_JITTER 0.5
 
 static cpSpace *space;
@@ -39,7 +39,8 @@ CrumbleShape(cpSpace *space, cpShape *shape)
 {
 	cpBB bb = cpShapeGetBB(shape);
 	
-	if(cpBBArea(bb) < CHUNK_SIZE*CHUNK_SIZE) return;
+	// TODO need better ignore criteria
+	if(cpBBArea(bb) < 4.0*CHUNK_SIZE*CHUNK_SIZE) return;
 	
 	cpBody *body = cpShapeGetBody(shape);
 	cpSpaceRemoveShape(space, shape);
