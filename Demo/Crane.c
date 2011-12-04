@@ -51,7 +51,7 @@ update(int ticks)
 		// Set the max length of the winch servo to match the mouse's height.
 		cpSlideJointSetMax(winchServo, cpfmax(100 - ChipmunkDemoMouse.y, 50));
 		
-		if(hookJoint && ChipmunkDemoKeyboard.y < 0){
+		if(hookJoint && ChipmunkDemoRightClick){
 			cpSpaceRemoveConstraint(space, hookJoint);
 			cpConstraintFree(hookJoint);
 			hookJoint = NULL;
@@ -95,7 +95,7 @@ HookCrate(cpArbiter *arb, cpSpace *space, void *data)
 static cpSpace *
 init(void)
 {
-	ChipmunkDemoMessageString = "Control the crane by moving the mouse. Press the down arrow to release.";
+	ChipmunkDemoMessageString = "Control the crane by moving the mouse. Right click to release.";
 	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
