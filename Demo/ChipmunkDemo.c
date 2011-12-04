@@ -529,6 +529,7 @@ extern ChipmunkDemo Crane;
 extern ChipmunkDemo Buoyancy;
 extern ChipmunkDemo ContactGraph;
 extern ChipmunkDemo Slice;
+extern ChipmunkDemo Crumble;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -557,6 +558,7 @@ main(int argc, const char **argv)
 		Buoyancy,
 		Player,
 		Slice,
+		Crumble,
 	};
 	
 	demos = demo_list;

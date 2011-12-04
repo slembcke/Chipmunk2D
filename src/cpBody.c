@@ -275,6 +275,24 @@ cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)
 	apply_impulse(body, j, r);
 }
 
+static inline cpVect
+cpBodyGetVelAtPoint(cpBody *body, cpVect r)
+{
+	return cpvadd(body->v, cpvmult(cpvperp(r), body->w));
+}
+
+cpVect
+cpBodyGetVelAtWorldPoint(cpBody *body, cpVect point)
+{
+	return cpBodyGetVelAtPoint(body, cpvsub(point, body->p));
+}
+
+cpVect
+cpBodyGetVelAtLocalPoint(cpBody *body, cpVect point)
+{
+	return cpBodyGetVelAtPoint(body, cpvrotate(point, body->rot));
+}
+
 void
 cpBodyEachShape(cpBody *body, cpBodyShapeIteratorFunc func, void *data)
 {

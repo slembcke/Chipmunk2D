@@ -207,12 +207,18 @@ typedef void (*cpPostStepFunc)(cpSpace *space, void *obj, void *data);
 /// @c obj is used a key, you can only register one callback per unique value for @c obj
 void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data);
 
-/// Point query callback function type.
-typedef void (*cpSpacePointQueryFunc)(cpShape *shape, void *data);
+/// Point query extended callback function type.
+typedef void (*cpSpacePointQueryExtendedFunc)(cpShape *shape, cpFloat d, cpVect n, void *data);
 /// Query the space at a point and call @c func for each shape found.
-void cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data);
+void cpSpacePointQueryExtended(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, cpSpacePointQueryExtendedFunc func, void *data);
 /// Query the space at a point and return the first shape found. Returns NULL if no shapes were found.
 cpShape *cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpGroup group);
+
+/// Point query callback function type.
+typedef void (*cpSpacePointQueryFunc)(cpShape *shape, void *data);
+/// @deprecated Use cpSpacePointQueryExtended() instead.
+/// Query the space at a point and call @c func for each shape found.
+void cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data);
 
 /// Segment query callback function type.
 typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, void *data);
@@ -232,6 +238,7 @@ typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points,
 /// Query a space for any shapes overlapping the given shape and call @c func for each shape found.
 cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
 
+/// @deprecated Was created to solve a problem that no longer exists. Use cpSpaceShapeQuery() and cpBodyActivate() instead.
 /// Call cpBodyActivate() for any shape that is overlaps the given shape.
 void cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape);
 
