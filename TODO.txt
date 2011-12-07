@@ -2,13 +2,12 @@ cpBodyActivateStatic() should also activate joints?
 Blocks tutorial.
 finish smooth line collisions
 doc the KE function
-add CHIPMUNK_ARBITER_GET_BODIES
 Make functions to convert C to Obj-C types
-Make static inline functions and properties show up in doxygen again.
 Update the doxygen main page.
 Update the READMEs
 Tests for the query methods
 Change docs about seg queries and spatial hash.
+Make the ACD code not suck.
 
 Tutorial ideas:
 	Player grounding example.
@@ -18,7 +17,6 @@ Tutorial ideas:
 Future features to think about:
 http://www.slembcke.net/forums/viewtopic.php?f=1&t=1459
 Building bodies from shape collections.
-Concave decomposition?
 Per body iterations and timestep?
 Per body damping and gravity coefs?
 breakable object support functions?
