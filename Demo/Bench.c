@@ -323,7 +323,7 @@ static cpSpace *init_BouncyTerrainCircles_500(){
 		shape->e = 1.0f;
 	}
 	
-	for(int i=0; i<400; i++){
+	for(int i=0; i<500; i++){
 		cpFloat radius = 5.0f;
 		cpFloat mass = radius*radius;
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero)));
@@ -355,7 +355,7 @@ static cpSpace *init_BouncyTerrainHexagons_500(){
 		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
 	}
 	
-	for(int i=0; i<400; i++){
+	for(int i=0; i<500; i++){
 		cpFloat mass = radius*radius;
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 6, hexagon, cpvzero)));
 		body->p = cpvadd(cpvmult(frand_unit_circle(), 130.0f), cpvzero);
