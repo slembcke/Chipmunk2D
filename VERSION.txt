@@ -1,3 +1,21 @@
+CHANGES SINCE 6.0.3:
+* API: Added a cpBBForCircle() convenience function.
+* API: Added cpBBSegmentQuery() to check where a segment hits a cpBB.
+* API: Added cpBodyGetVelAtWorldPoint() and cpBodyGetVelAtLocalPoint() to get point velocities on a body.
+* API: Added cpArbiterTotalKE() to calculate the energy lost due to a collision. Great for calculating damage accurately.
+* API: Added methods to get an ObjC pointer from a C chipmunk struct.
+* API: Added a CHIPMUNK_ARBITER_GET_BODIES() macro for Objective-Chipmunk.
+* API: The Objective-Chipmunk headers are now ARC compatible.
+* API: Added a [ChipmunkSpace contains:] method to check if a ChipmunkObject has been added to the space or not.
+* BUG: Fixed a regression with ChipmunkSpace.bodies and ChipmunkSpace.shapes that caused crashes.
+* BUG: Fixed a rare bug with postStep() callbacks and iterators.
+* BUG: Fixed a border case in cpBBIntersectsSegment() that could cause missed segment queries.
+* MISC: Added some new assertions for error conditions that were previously uncaught.
+* MISC: Accelerated segment queries in cpBBTree by sorting the nodes.
+* MISC: Added a new "Slice" demo that lets you cut up a polygon.
+* MISC: Added NEON optimizations for Chipmunk Pro. Expect running on most ARM platforms to be 25-35% faster for contact heavy simulations.
+* MISC: All ChipmunkObject instances added to a space are now retained, even composite ones.
+
 CHANGES SINCE 6.0.2:
 * API: Added a cpBBNewForCircle() function.
 * API: Added a cpBBSegmentQuery() function for raycasting againsts AABBs.
