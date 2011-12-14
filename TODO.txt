@@ -1,18 +1,13 @@
-cpBodyActivateStatic() should also activate joints?
-Blocks tutorial.
-finish smooth line collisions
-doc the KE function
-Make functions to convert C to Obj-C types
 Update the doxygen main page.
 Update the READMEs
 Tests for the query methods
-Change docs about seg queries and spatial hash.
 Make the ACD code not suck.
+Finish smooth line collisions
+Make functions to convert C to Obj-C types?
 
 Tutorial ideas:
-	Player grounding example.
+	C/Blocks tutorial.
 	Fishing
-	OpenGL transform example.
 
 Future features to think about:
 http://www.slembcke.net/forums/viewtopic.php?f=1&t=1459
@@ -21,3 +16,6 @@ Per body iterations and timestep?
 Per body damping and gravity coefs?
 breakable object support functions?
 Easy callback programable joint?
+Serialization.
+cpBodyActivateStatic() should also activate joints?
+Redo Logosmash with more particles?! :D

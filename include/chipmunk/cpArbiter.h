@@ -120,7 +120,7 @@ cpVect cpArbiterTotalImpulse(const cpArbiter *arb);
 /// Calculate the total impulse including the friction that was applied by this arbiter.
 /// This function should only be called from a post-solve, post-step or cpBodyEachArbiter callback.
 cpVect cpArbiterTotalImpulseWithFriction(const cpArbiter *arb);
-// Calculate the amount of energy lost in a collision not including dynamic friction.
+/// Calculate the amount of energy lost in a collision including static, but not dynamic friction.
 /// This function should only be called from a post-solve, post-step or cpBodyEachArbiter callback.
 cpFloat cpArbiterTotalKE(const cpArbiter *arb);
 

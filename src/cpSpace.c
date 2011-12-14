@@ -82,8 +82,12 @@ cpSpace*
 cpSpaceInit(cpSpace *space)
 {
 #ifndef NDEBUG
-	printf("Initializing cpSpace - Chipmunk v%s (Debug Enabled)\n", cpVersionString);
-	printf("Compile with -DNDEBUG defined to disable debug mode and runtime assertion checks\n");
+	static cpBool done = cpFalse;
+	if(!done){
+		printf("Initializing cpSpace - Chipmunk v%s (Debug Enabled)\n", cpVersionString);
+		printf("Compile with -DNDEBUG defined to disable debug mode and runtime assertion checks\n");
+		done = cpTrue;
+	}
 #endif
 
 	space->iterations = 10;
@@ -254,7 +258,6 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	cpBody *body = shape->body;
 	if(cpBodyIsStatic(body)) return cpSpaceAddStaticShape(space, shape);
 	
-	// TODO change these to check if it was added to a space at all.
 	cpAssertHard(!shape->space, "This shape is already added to a space and cannot be added to another.");
 	cpAssertSpaceUnlocked(space);
 	
@@ -440,7 +443,6 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 			func((cpBody *)bodies->arr[i], data);
 		}
 		
-		// TODO BUG not safe to activate sleeping bodies from here!
 		cpArray *components = space->sleepingComponents;
 		for(int i=0; i<components->num; i++){
 			cpBody *root = (cpBody *)components->arr[i];

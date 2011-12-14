@@ -271,7 +271,7 @@ cpBody *cpBodyNew(cpFloat m, cpFloat i)
 void cpBodyDestroy(cpBody *body)
 void cpBodyFree(cpBody *body)</code></pre>
 
-p(expl). Standard set of Chipmunk memory management functions. @m@ and @i@ are the mass and moment of inertia for the body. Guessing the mass for a body is usually fine, but guessing a moment of inertia can lead to a very poor simulation.
+p(expl). Standard set of Chipmunk memory management functions. @m@ and @i@ are the mass and moment of inertia for the body. Guessing the mass for a body is usually fine, but guessing a moment of inertia can lead to a very poor simulation. Be careful not to free a body before any shapes or constraints attached to it have been removed from a space.
 
 
 <%= h 2, "Creating Additional Static Bodies:", "StaticBodies" %>
@@ -713,7 +713,7 @@ cpBool cpSpaceContainsShape(cpSpace *space, cpShape *shape)
 cpBool cpSpaceContainsBody(cpSpace *space, cpBody *body)
 cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)</code></pre>
 
-p(expl). These functions add and remove shapes, bodies and constraints from @space@. The add/remove functions cannot be called from within a callback other than a @postStep()@ callback _(which is different than a postSolve() callback!)_. Attempting to add or remove objects from the space while @cpSpaceStep()@ is still executing will throw an assertion. See the "callbacks section":#Callbacks for more information. The add functions return the thing being added so that you can create and add something in one line. The contains functions allow you to check if an object has been added to the space or not.
+p(expl). These functions add and remove shapes, bodies and constraints from @space@. The add/remove functions cannot be called from within a callback other than a @postStep()@ callback _(which is different than a postSolve() callback!)_. Attempting to add or remove objects from the space while @cpSpaceStep()@ is still executing will throw an assertion. See the "callbacks section":#Callbacks for more information. The add functions return the thing being added so that you can create and add something in one line. Be careful not to free bodies before removing shapes and constraints attached to them or you will cause crashes.. The contains functions allow you to check if an object has been added to the space or not.
 
 
 <%= h 3, "Deprecated:", "Deprecated" %>
@@ -1251,10 +1251,14 @@ p(expl). Get the shapes (or their bodies) in the order that they were defined in
 
 p(expl). Shortcut macros for defining variables for and retrieving the shapes/bodies for an arbiter.
 
-<pre><code>cpVect cpArbiterTotalImpulse(cpArbiter *arb);
-cpVect cpArbiterTotalImpulseWithFriction(cpArbiter *arb);</code></pre>
+<pre><code>cpVect cpArbiterTotalImpulseWithFriction(cpArbiter *arb);
+cpVect cpArbiterTotalImpulse(cpArbiter *arb);</code></pre>
 
-p(expl). Returns the impulse that was applied this step to resolve the collision. These functions should only be called from a @postStep()@ or @cpBodyEachArbiter()@ callback, otherwise the result is undefined.
+p(expl). Returns the impulse that was applied this step to resolve the collision. These functions should only be called from a @postStep()@ or @cpBodyEachArbiter()@ callback, otherwise the result is undefined. If in doubt which function to use, use @cpArbiterTotalImpulseWithFriction()@.
+
+<pre><code>cpFloat cpArbiterTotalKE(const cpArbiter *arb);</code></pre>
+
+p(expl). Calculate the amount of energy lost in a collision including static, but not dynamic friction. This function should only be called from a @postSolve()@, @postStep()@ or @cpBodyEachArbiter()@ callback.
 
 <%= h 1, "Queries:", "Queries" %>
 
@@ -1284,7 +1288,7 @@ p(expl). Query @space@ at @point@ and return the first shape found matching the 
 
 <%= h 2, "Segment Queries:", "SegmentQueries" %>
 
-Segment queries are like ray casting, but because Chipmunk uses a spatial hash to process collisions, it cannot process infinitely long queries like a ray. In practice this is still very fast and you don't need to worry too much about the performance as long as you aren't using extremely long segments for your queries.
+Segment queries are like ray casting, but because not all spatial indexes allow processing infinitely long ray queries it is limited to segments. In practice this is still very fast and you don't need to worry too much about the performance as long as you aren't using extremely long segments for your queries.
 
 <pre><code>typedef struct cpSegmentQueryInfo{
 	struct cpShape *shape; // shape that was hit, NULL if no collision

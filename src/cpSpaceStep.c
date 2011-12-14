@@ -303,6 +303,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	
 	// TODO should make an arbiter state for this so it doesn't require filtering arbiters for dangling body pointers on body removal.
 	// Preserve arbiters on sensors and rejected arbiters for sleeping objects.
+	// This prevents errant separate callbacks from happenening.
 	if(
 		(cpBodyIsStatic(a) || cpBodyIsSleeping(a)) &&
 		(cpBodyIsStatic(b) || cpBodyIsSleeping(b))
