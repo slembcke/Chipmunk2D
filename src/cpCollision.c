@@ -70,7 +70,7 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 	
 	cpVect seg_delta = cpvsub(seg_b, seg_a);
 	cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(center, seg_a))/cpvlengthsq(seg_delta));
-	cpVect closest = cpvlerp(seg_a, seg_b, closest_t);
+	cpVect closest = cpvadd(seg_a, cpvmult(seg_delta, closest_t));
 	
 	if(circle2circleQuery(center, closest, circleShape->r, segmentShape->r, con)){
 		cpVect n = con[0].n;
