@@ -57,7 +57,7 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 				// Reinsert the arbiter into the arbiter cache
 				cpShape *a = arb->a, *b = arb->b;
 				cpShape *shape_pair[] = {a, b};
-				cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
+				cpHashValue arbHashID = CP_HASH_PAIR((cpHashValue)a, (cpHashValue)b);
 				cpHashSetInsert(space->cachedArbiters, arbHashID, shape_pair, arb, NULL);
 				
 				// Update the arbiter's state

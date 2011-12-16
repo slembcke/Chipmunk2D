@@ -59,7 +59,7 @@ cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void 
 	}
 	
 	cpPostStepCallback callback = {func, obj, data};
-	cpHashSetInsert(space->postStepCallbacks, (cpHashValue)(size_t)obj, &callback, NULL, (cpHashSetTransFunc)postStepFuncSetTrans);
+	cpHashSetInsert(space->postStepCallbacks, (cpHashValue)obj, &callback, NULL, (cpHashSetTransFunc)postStepFuncSetTrans);
 }
 
 void *
@@ -67,7 +67,7 @@ cpSpaceGetPostStepData(cpSpace *space, void *obj)
 {
 	if(space->postStepCallbacks){
 		cpPostStepCallback query = {NULL, obj, NULL};
-		cpPostStepCallback *callback = (cpPostStepCallback *)cpHashSetFind(space->postStepCallbacks, (cpHashValue)(size_t)obj, &query);
+		cpPostStepCallback *callback = (cpPostStepCallback *)cpHashSetFind(space->postStepCallbacks, (cpHashValue)obj, &query);
 		return (callback ? callback->data : NULL);
 	} else {
 		return NULL;
@@ -260,7 +260,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space)
 	// Get an arbiter from space->arbiterSet for the two shapes.
 	// This is where the persistant contact magic comes from.
 	cpShape *shape_pair[] = {a, b};
-	cpHashValue arbHashID = CP_HASH_PAIR((size_t)a, (size_t)b);
+	cpHashValue arbHashID = CP_HASH_PAIR((cpHashValue)a, (cpHashValue)b);
 	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->cachedArbiters, arbHashID, shape_pair, space, (cpHashSetTransFunc)cpSpaceArbiterSetTrans);
 	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b);
 	
