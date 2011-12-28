@@ -42,7 +42,6 @@ preStep(cpSlideJoint *joint, cpFloat dt)
 		joint->n = cpvnormalize_safe(delta);
 	} else if(dist < joint->min) {
 		pdist = joint->min - dist;
-		dist = -dist;
 		joint->n = cpvneg(cpvnormalize_safe(delta));
 	} else {
 		joint->n = cpvzero;
