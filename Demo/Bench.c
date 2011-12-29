@@ -6,10 +6,12 @@
 
 #if 1
 	#define BENCH_SPACE_NEW cpSpaceNew
+	#define BENCH_SPACE_FREE cpSpaceFree
 	#define BENCH_SPACE_STEP cpSpaceStep
 #else
 	#import "cpHastySpace.h"
 	#define BENCH_SPACE_NEW cpHastySpaceNew
+	#define BENCH_SPACE_FREE cpHastySpaceFree
 	#define BENCH_SPACE_STEP cpHastySpaceStep
 #endif
 
@@ -436,7 +438,7 @@ static void update(int ticks){
 
 static void destroy(void){
 	ChipmunkDemoFreeSpaceChildren(space);
-	cpSpaceFree(space);
+	BENCH_SPACE_FREE(space);
 }
 
 // Make a second demo declaration for this demo to use in the regular demo set.

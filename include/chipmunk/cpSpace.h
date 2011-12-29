@@ -100,8 +100,6 @@ struct cpSpace {
 	CP_PRIVATE(cpCollisionHandler defaultHandler);
 	CP_PRIVATE(cpHashSet *postStepCallbacks);
 	
-	CP_PRIVATE(cpSpaceArbiterApplyImpulseFunc arbiterApplyImpulse);
-	
 	CP_PRIVATE(cpBody _staticBody);
 };
 
