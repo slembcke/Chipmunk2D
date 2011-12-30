@@ -352,7 +352,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	cpArray *constraints = space->constraints;
 	cpArray *arbiters = space->arbiters;
 	
-	// Reset and empty the arbiter list.
+	// Reset and empty the arbiter lists.
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiter *arb = (cpArbiter *)arbiters->arr[i];
 		arb->state = cpArbiterStateNormal;
@@ -377,10 +377,8 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryFunc)cpSpaceCollideShapes, space);
 	} cpSpaceUnlock(space, cpFalse);
 	
-	// If body sleeping is enabled, do that now.
-	if(space->sleepTimeThreshold != INFINITY || space->enableContactGraph){
-		cpSpaceProcessComponents(space, dt);
-	}
+	// Rebuild the contact graph (and detect sleeping components if sleeping is enabled)
+	cpSpaceProcessComponents(space, dt);
 	
 	cpSpaceLock(space); {
 		// Clear out old cached arbiters and call separate callbacks

@@ -420,7 +420,7 @@ p(expl). Call @func@ once for each constraint that is attached to @body@ and add
 <pre><code>typedef void (*cpBodyArbiterIteratorFunc)(cpBody *body, cpArbiter *arbiter, void *data)
 void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)</code></pre>
 
-p(expl). This one is more interesting. Calls @func@ once for each collision pair that @body@ is involved in. Calling @cpArbiterGet[Bodies|Shapes]()@ or @CP_ARBITER_GET_[BODIES|SHAPES]()@  will return the body or shape for @body@ as the first argument. You can use this to check all sorts of collision information for a body like if it's touching the ground, another particular object, how much collision force is being applied to an object, etc. *Note:* This function only works if the contact graph is enabled either by enabling the sleeping feature of a space or by enabling the contact graph. Sensor shapes and arbiters that have been rejected by a collision handler callback or @cpArbiterIgnore()@ are not tracked by the contact graph.
+p(expl). This one is more interesting. Calls @func@ once for each collision pair that @body@ is involved in. Calling @cpArbiterGet[Bodies|Shapes]()@ or @CP_ARBITER_GET_[BODIES|SHAPES]()@  will return the body or shape for @body@ as the first argument. You can use this to check all sorts of collision information for a body like if it's touching the ground, another particular object, how much collision force is being applied to an object, etc. Sensor shapes and arbiters that have been rejected by a collision handler callback or @cpArbiterIgnore()@ are not tracked by the contact graph.
 
 <%= h 2, "Integration Callbacks:", "Integration Callbacks" %>
 
@@ -659,11 +659,6 @@ p(expl). Chipmunk allows fast moving objects to overlap, then fixes the overlap 
 void cpSpaceSetCollisionPersistence(cpSpace *space, cpTimestamp value)</code></pre>
 
 p(expl). The number of frames the space keeps collision solutions around for. Helps prevent jittering contacts from getting worse. This defaults to 3 and very very _very_ few games will need to change this value.
-
-<pre><code>cpBool cpSpaceGetEnableContactGraph(const cpSpace *space)
-void cpSpaceSetEnableContactGraph(cpSpace *space, cpBool value)</code></pre>
-
-p(expl). In order to use the @cpBodyEachArbiter()@ function, you must tell Chipmunk to generate the contact graph. Disabled by default as it incurrs a small 5-10% overhead. Enabling the sleeping feature also enables the contact graph.
 
 <pre><code>cpFloat cpSpaceGetCurrentTimeStep(const cpSpace *space)</code></pre>
 

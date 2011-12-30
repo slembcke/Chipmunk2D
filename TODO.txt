@@ -16,7 +16,7 @@ Demo Ideas:
 	Redo Logosmash with more particles?! :D
 	Motorcycle in a spinning cage
 
-Future features to think about:
+Future things to think about:
 	Tests for the query methods
 	Building bodies from shape collections.
 	Make functions to convert C to Obj-C types?
@@ -28,4 +28,5 @@ Future features to think about:
 	GJK or other closest points algorithm?
 	Extreme vertex BSP search for polys
 	Redo poly-poly contact manifold
+	Figure out why poly contacts can sometimes be unstable when driven by a strong constraint
 	Implement segment-segment collisions
