@@ -1,21 +1,31 @@
-Update the doxygen main page.
-Update the READMEs
-Tests for the query methods
-Make the ACD code not suck.
-Finish smooth line collisions
-Make functions to convert C to Obj-C types?
+High Priority:
+	Make the ACD code not suck
+	Finish smooth line collisions
+	Serialization
 
 Tutorial ideas:
-	C/Blocks tutorial.
+	C/Blocks tutorial
+	AG tilemap tutorial
+	AG CCRenderTexture example
+	AG CGContext example
 	Fishing
+	Crayon Ball clone
+
+Demo Ideas:
+	Crane demo
+	Redo Logosmash with more particles?! :D
+	Motorcycle in a spinning cage
 
 Future features to think about:
-http://www.slembcke.net/forums/viewtopic.php?f=1&t=1459
-Building bodies from shape collections.
-Per body iterations and timestep?
-Per body damping and gravity coefs?
-breakable object support functions?
-Easy callback programable joint?
-Serialization.
-cpBodyActivateStatic() should also activate joints?
-Redo Logosmash with more particles?! :D
+	Tests for the query methods
+	Building bodies from shape collections.
+	Make functions to convert C to Obj-C types?
+	Per body iterations and timestep?
+	Per body damping and gravity coefs?
+	breakable object support functions?
+	Easy callback programable joint?
+	cpBodyActivateStatic() should also activate joints?
+	GJK or other closest points algorithm?
+	Accelerated extreme point lookup for polys
+	Redo poly-poly contact manifold
+	Implement segment-segment collisions
