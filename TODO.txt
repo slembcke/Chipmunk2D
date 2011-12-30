@@ -26,6 +26,6 @@ Future features to think about:
 	Easy callback programable joint?
 	cpBodyActivateStatic() should also activate joints?
 	GJK or other closest points algorithm?
-	Accelerated extreme point lookup for polys
+	Extreme vertex BSP search for polys
 	Redo poly-poly contact manifold
 	Implement segment-segment collisions
