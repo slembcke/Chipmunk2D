@@ -436,8 +436,8 @@ void ChipmunkDebugDrawCollisionPoints(cpSpace *space)
 		for(int i=0; i<arbiters->num; i++){
 			cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
 			
-			for(int i=0; i<arb->numContacts; i++){
-				cpVect v = arb->contacts[i].p;
+			for(int j=0; j<arb->numContacts; j++){
+				cpVect v = arb->contacts[j].p;
 				glVertex2f(v.x, v.y);
 			}
 		}
