@@ -648,6 +648,7 @@
 					"-ffast-math",
 				);
 				PRODUCT_NAME = Chipmunk;
+				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -664,6 +665,7 @@
 					"-ffast-math",
 				);
 				PRODUCT_NAME = Chipmunk;
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
@@ -683,6 +685,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = "Chipmunk-iPhone";
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -704,6 +707,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = "Chipmunk-iPhone";
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
 				ZERO_LINK = NO;
 			};
 			name = Release;

@@ -15,6 +15,7 @@ Demo Ideas:
 	Crane demo
 	Redo Logosmash with more particles?! :D
 	Motorcycle in a spinning cage
+	Squid thingy like TomorrowPlusX
 
 Future things to think about:
 	Tests for the query methods
