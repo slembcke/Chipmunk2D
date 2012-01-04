@@ -125,6 +125,8 @@ static inline void cpShapeSet##name(cpShape *shape, type value){ \
 CP_DefineShapeStructGetter(type, member, name) \
 CP_DefineShapeStructSetter(type, member, name, activates)
 
+CP_DefineShapeStructGetter(cpSpace*, CP_PRIVATE(space), Space);
+
 CP_DefineShapeStructGetter(cpBody*, body, Body);
 void cpShapeSetBody(cpShape *shape, cpBody *body);
 

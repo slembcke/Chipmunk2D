@@ -1,4 +1,5 @@
 High Priority:
+	Add the cp*GetSpace() functions to the docs.
 	Make the ACD code not suck
 	Finish smooth line collisions
 	Serialization
