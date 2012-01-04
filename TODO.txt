@@ -18,6 +18,7 @@ Demo Ideas:
 	Squid thingy like TomorrowPlusX
 
 Future things to think about:
+	Convert body between static/dynamic.
 	Tests for the query methods
 	Building bodies from shape collections.
 	Make functions to convert C to Obj-C types?

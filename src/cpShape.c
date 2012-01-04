@@ -85,7 +85,7 @@ cpShapeFree(cpShape *shape)
 void
 cpShapeSetBody(cpShape *shape, cpBody *body)
 {
-	cpAssertHard(!cpShapeActive(shape), "You cannot change the body on an active shape. You must remove the shape, then ");
+	cpAssertHard(!cpShapeActive(shape), "You cannot change the body on an active shape. You must remove the shape from the space before changing the body.");
 	shape->body = body;
 }
 
