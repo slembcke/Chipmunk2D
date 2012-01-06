@@ -164,6 +164,7 @@ cpMomentForBox2(cpFloat m, cpBB box)
 	cpFloat height = box.t - box.b;
 	cpVect offset = cpvmult(cpv(box.l + box.r, box.b + box.t), 0.5f);
 	
+	// TODO NaN when offset is 0 and m is INFINITY
 	return cpMomentForBox(m, width, height) + m*cpvlengthsq(offset);
 }
 
