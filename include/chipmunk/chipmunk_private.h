@@ -104,7 +104,7 @@ cpShape* cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body);
 static inline cpBool
 cpShapeActive(cpShape *shape)
 {
-	return shape->prev || shape->body->shapeList == shape;
+	return shape->prev || (shape->body && shape->body->shapeList == shape);
 }
 
 int cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr);
