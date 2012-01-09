@@ -61,6 +61,9 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 	shape->layers = CP_ALL_LAYERS;
 	
 	shape->data = NULL;
+	
+	shape->space = NULL;
+	
 	shape->next = NULL;
 	shape->prev = NULL;
 	
