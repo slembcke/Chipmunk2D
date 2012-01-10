@@ -47,6 +47,7 @@ cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBod
 	
 	constraint->a = a;
 	constraint->b = b;
+	constraint->space = NULL;
 	
 	constraint->next_a = NULL;
 	constraint->next_b = NULL;
