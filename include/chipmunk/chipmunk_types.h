@@ -5,11 +5,11 @@
    #import "TargetConditionals.h"
 #endif
 
-#if (TARGET_OS_IPHONE == 1) && (!defined CP_USE_CGPOINTS)
+#if (TARGET_OS_IPHONE == 1) || (TARGET_OS_MAC == 1) && (!defined CP_USE_CGPOINTS)
 	#define CP_USE_CGPOINTS 1
 #endif
 
-#ifdef CP_USE_CGPOINTS
+#if CP_USE_CGPOINTS == 1
 	#if TARGET_OS_IPHONE
 		#import <CoreGraphics/CGGeometry.h>
 	#elif TARGET_OS_MAC
