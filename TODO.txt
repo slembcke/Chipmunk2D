@@ -17,6 +17,7 @@ Demo Ideas:
 	Redo Logosmash with more particles?! :D
 	Motorcycle in a spinning cage
 	Squid thingy like TomorrowPlusX
+	Sticky surfaces
 
 Future things to think about:
 	Convert body between static/dynamic.
@@ -33,3 +34,4 @@ Future things to think about:
 	Redo poly-poly contact manifold
 	Figure out why poly contacts can sometimes be unstable when driven by a strong constraint
 	Implement segment-segment collisions
+	Assertion for destroying a body with things still attached
