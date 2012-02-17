@@ -74,6 +74,9 @@
     <ClCompile Include="..\..\..\Demo\Chains.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Demo\Slice.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Demo\ChipmunkDemo.h">
