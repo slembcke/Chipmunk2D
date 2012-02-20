@@ -78,17 +78,21 @@ ColorFromHash(cpHashValue hash, float alpha)
 	GLfloat b = (val>>16) & 0xFF;
 	
 	float max = cpfmax(cpfmax(r, g), b);
+	float min = cpfmin(cpfmin(r, g), b);
 	
-	// saturate and scale the colors
-	const GLfloat mult = 1.0;
-	const GLfloat add = 0.0;
-	
-	return RGBAColor(
-		r = (r*mult)/max + add,
-		g = (g*mult)/max + add,
-		b = (b*mult)/max + add,
-		alpha
-	);
+	if(min == max){
+		return RGBAColor(1.0, 0.0, 0.0, alpha);
+	} else {
+		// saturate and scale the colors
+		const GLfloat mult = 1.0/(max - min);
+		
+		return RGBAColor(
+			(r - min)*mult,
+			(g - min)*mult,
+			(b - min)*mult,
+			alpha
+		);
+	}
 }
 
 static inline void
