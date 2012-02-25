@@ -529,6 +529,7 @@ extern ChipmunkDemo Crane;
 extern ChipmunkDemo Buoyancy;
 extern ChipmunkDemo ContactGraph;
 extern ChipmunkDemo Slice;
+extern ChipmunkDemo Balance;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -537,6 +538,7 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
+		Balance,
 		LogoSmash,
 		PyramidStack,
 		Plink,
