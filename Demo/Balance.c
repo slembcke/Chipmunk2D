@@ -25,9 +25,12 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
+#include "util.h"
+
 static cpSpace *space;
 
 static cpBody *balanceBody;
+static cpFloat lastW = 0.0;
 static cpConstraint *counterweightServo;
 
 #define LENGTH 400.0
@@ -42,14 +45,28 @@ update(int ticks)
 	for(int i=0; i<steps; i++){
 		cpVect anchr1 = cpBodyLocal2World(cpConstraintGetA(counterweightServo), cpPinJointGetAnchr1(counterweightServo));
 		cpVect anchr2 = cpBodyLocal2World(cpConstraintGetB(counterweightServo), cpPinJointGetAnchr2(counterweightServo));
-		cpFloat currentLength = cpvdist(anchr1, anchr2);
+		cpFloat currentOffset = cpvdist(anchr1, anchr2) - LENGTH/2.0;
 		
-//		cpFloat desiredLength = cpfclamp(ChipmunkDemoMouse.x + LENGTH*0.5, LENGTH*0.25, LENGTH*0.75);
-		cpFloat correctionFactor = cpBodyGetAngVel(balanceBody);
-		cpFloat desiredLength = currentLength + correctionFactor*cpConstraintGetMaxBias(counterweightServo);
+		cpFloat a = cpBodyGetAngle(balanceBody);
+		cpFloat w = cpBodyGetAngVel(balanceBody);
+		cpFloat aa = (w - lastW)/dt;
+		lastW = w;
+		
+		cpFloat target_a = 0.0;
+		cpFloat target_w = bias_coef(0.1, dt)*(target_a - a)/dt;
+		cpFloat target_aa = bias_coef(0.1, dt)*(target_w - w)/dt;
+		ChipmunkDemoPrintString("a:%f, target_a:%f\n", a, target_a);
+		ChipmunkDemoPrintString("w:%f, target_w:%f\n", w, target_w);
+		ChipmunkDemoPrintString("aa:%f, target_aa:%f\n", aa, target_aa);
+		
+		cpFloat correctionFactor = (target_aa - aa)*-1.0;
+		cpFloat desiredOffset = currentOffset + correctionFactor;
+		ChipmunkDemoPrintString("correction: %f\n", correctionFactor);
 
-		ChipmunkDemoPrintString("current: %5.2f desired: %5.2f", currentLength, desiredLength);
-		cpPinJointSetDist(counterweightServo, cpfclamp(desiredLength, LENGTH*0.25, LENGTH*0.75));
+//		cpConstraintSetMaxForce(counterweightServo, 1e5);
+//		cpConstraintSetMaxBias(counterweightServo, 10000.0);
+		cpConstraintSetErrorBias(counterweightServo, 0.0);
+		cpPinJointSetDist(counterweightServo, cpfclamp(desiredOffset + LENGTH/2.0, LENGTH*0.05, LENGTH*0.95));
 		
 		cpSpaceStep(space, dt);
 	}
@@ -62,8 +79,8 @@ init(void)
 	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
-	cpSpaceSetGravity(space, cpv(0, -100));
-	cpSpaceSetDamping(space, 0.8);
+	cpSpaceSetGravity(space, cpv(0, -1));
+//	cpSpaceSetDamping(space, 0.8);
 	
 	cpVect a = cpv(-LENGTH/2.0, 0.0);
 	cpVect b = cpv( LENGTH/2.0, 0.0);
@@ -72,9 +89,10 @@ init(void)
 	{
 		cpFloat mass = 10.0;
 		balanceBody = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
+		cpBodySetAngle(balanceBody, 1.0);
 		
 		cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(balanceBody, a, b, 10.0));
-		shape->group = 1;
+		cpShapeSetFriction(shape, 1.0);
 		
 		cpSpaceAddConstraint(space, cpPivotJointNew(space->staticBody, balanceBody, cpvzero));
 	}
@@ -85,16 +103,21 @@ init(void)
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, INFINITY));
 		
 		cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, 20.0, cpvzero));
-		shape->group = 1;
+		cpShapeSetLayers(shape, 0);
 		
 		// A pin joint is a little annoying for this, but the constraint needs to be monodirectional. 
 		counterweightServo = cpSpaceAddConstraint(space, cpPinJointNew(balanceBody, body, a, cpvzero));
-		cpConstraintSetMaxForce(counterweightServo, 1e5);
-		cpConstraintSetMaxBias(counterweightServo, 100.0);
-		cpConstraintSetErrorBias(counterweightServo, 0.5);
 		
 		cpSpaceAddConstraint(space, cpGrooveJointNew(balanceBody, body, a, b, cpvzero));
 	}
+	
+//	{
+//		cpBody *boxBody = cpSpaceAddBody(space, cpBodyNew(20, cpMomentForBox(30, 50, 50)));
+//		cpBodySetPos(boxBody, cpv(0, 100));
+//		
+//		cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, 50, 50));
+//		cpShapeSetFriction(shape, 1.0);
+//	}
 	
 	return space;
 }
