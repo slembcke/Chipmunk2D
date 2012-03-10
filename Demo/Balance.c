@@ -33,9 +33,14 @@ static cpBody *balance_body;
 static cpBody *wheel_body;
 static cpConstraint *motor;
 
-static void motor_preSolve(cpConstraint *motor, cpFloat dt)
+static void motor_preSolve(cpConstraint *motor, cpSpace *space)
 {
-	cpSimpleMotorSetRate(motor, wheel_body->w + balance_body->w);
+	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
+	
+	cpFloat target_a = 0.0;
+	cpFloat target_w = bias_coef(0.01, dt)*(target_a - balance_body->a)/dt;
+	
+	cpSimpleMotorSetRate(motor, wheel_body->w + balance_body->w - target_w);
 	cpConstraintSetMaxForce(motor, 1.0e6);
 }
 
