@@ -29,11 +29,15 @@
 
 static cpSpace *space;
 
-static cpBody *balanceBody;
-static cpFloat lastW = 0.0;
-static cpConstraint *counterweightServo;
+static cpBody *balance_body;
+static cpBody *wheel_body;
+static cpConstraint *motor;
 
-#define LENGTH 400.0
+static void motor_preSolve(cpConstraint *motor, cpFloat dt)
+{
+	cpSimpleMotorSetRate(motor, wheel_body->w + balance_body->w);
+	cpConstraintSetMaxForce(motor, 1.0e6);
+}
 
 
 static void
@@ -43,31 +47,6 @@ update(int ticks)
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
-		cpVect anchr1 = cpBodyLocal2World(cpConstraintGetA(counterweightServo), cpPinJointGetAnchr1(counterweightServo));
-		cpVect anchr2 = cpBodyLocal2World(cpConstraintGetB(counterweightServo), cpPinJointGetAnchr2(counterweightServo));
-		cpFloat currentOffset = cpvdist(anchr1, anchr2) - LENGTH/2.0;
-		
-		cpFloat a = cpBodyGetAngle(balanceBody);
-		cpFloat w = cpBodyGetAngVel(balanceBody);
-		cpFloat aa = (w - lastW)/dt;
-		lastW = w;
-		
-		cpFloat target_a = 0.0;
-		cpFloat target_w = bias_coef(0.1, dt)*(target_a - a)/dt;
-		cpFloat target_aa = bias_coef(0.1, dt)*(target_w - w)/dt;
-		ChipmunkDemoPrintString("a:%f, target_a:%f\n", a, target_a);
-		ChipmunkDemoPrintString("w:%f, target_w:%f\n", w, target_w);
-		ChipmunkDemoPrintString("aa:%f, target_aa:%f\n", aa, target_aa);
-		
-		cpFloat correctionFactor = (target_aa - aa)*-1.0;
-		cpFloat desiredOffset = currentOffset + correctionFactor;
-		ChipmunkDemoPrintString("correction: %f\n", correctionFactor);
-
-//		cpConstraintSetMaxForce(counterweightServo, 1e5);
-//		cpConstraintSetMaxBias(counterweightServo, 10000.0);
-		cpConstraintSetErrorBias(counterweightServo, 0.0);
-		cpPinJointSetDist(counterweightServo, cpfclamp(desiredOffset + LENGTH/2.0, LENGTH*0.05, LENGTH*0.95));
-		
 		cpSpaceStep(space, dt);
 	}
 }
@@ -79,45 +58,48 @@ init(void)
 	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
-	cpSpaceSetGravity(space, cpv(0, -1));
-//	cpSpaceSetDamping(space, 0.8);
+	cpSpaceSetGravity(space, cpv(0, -500));
 	
-	cpVect a = cpv(-LENGTH/2.0, 0.0);
-	cpVect b = cpv( LENGTH/2.0, 0.0);
-	
-	// Balance bar
 	{
+		cpShape *ground = cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpv(-1000.0, -240.0), cpv(1000.0, -240.0), 0.0));
+		ground->u = 1.0;
+	}
+	
+	
+	cpFloat wheel_radius = 30.0;
+	
+	{
+		cpFloat mass = 1.0;
+		
+		cpFloat moment = cpMomentForCircle(mass, 0.0, wheel_radius, cpvzero);
+		wheel_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
+		wheel_body->p = cpv(0.0, -240.0 + wheel_radius);
+		
+		cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(wheel_body, wheel_radius, cpvzero));
+		shape->u = 1.0;
+		shape->group = 1;
+	}
+	
+	{
+		cpFloat length = 200.0;
+		cpVect a = cpv(0.0,  length/2.0);
+		cpVect b = cpv(0.0, -length/2.0);
+		
 		cpFloat mass = 10.0;
-		balanceBody = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
-		cpBodySetAngle(balanceBody, 1.0);
+		cpFloat moment = cpMomentForSegment(mass, a, b);
 		
-		cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(balanceBody, a, b, 10.0));
-		cpShapeSetFriction(shape, 1.0);
+		balance_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
+		balance_body->p = cpv(0.0, -240.0 + length/2.0 + wheel_radius);
 		
-		cpSpaceAddConstraint(space, cpPivotJointNew(space->staticBody, balanceBody, cpvzero));
+		cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(balance_body, a, b, 10.0));
+		shape->u = 1.0;
+		shape->group = 1;
 	}
 	
-	// Counterweight
-	{
-		cpFloat mass = 30.0;
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, INFINITY));
-		
-		cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, 20.0, cpvzero));
-		cpShapeSetLayers(shape, 0);
-		
-		// A pin joint is a little annoying for this, but the constraint needs to be monodirectional. 
-		counterweightServo = cpSpaceAddConstraint(space, cpPinJointNew(balanceBody, body, a, cpvzero));
-		
-		cpSpaceAddConstraint(space, cpGrooveJointNew(balanceBody, body, a, b, cpvzero));
-	}
+	cpSpaceAddConstraint(space, cpPivotJointNew(wheel_body, balance_body, wheel_body->p));
 	
-//	{
-//		cpBody *boxBody = cpSpaceAddBody(space, cpBodyNew(20, cpMomentForBox(30, 50, 50)));
-//		cpBodySetPos(boxBody, cpv(0, 100));
-//		
-//		cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, 50, 50));
-//		cpShapeSetFriction(shape, 1.0);
-//	}
+	motor = cpSpaceAddConstraint(space, cpSimpleMotorNew(wheel_body, balance_body, 0.0));
+	motor->preSolve = motor_preSolve;
 	
 	return space;
 }
