@@ -37,7 +37,7 @@ static void motor_preSolve(cpConstraint *motor, cpSpace *space)
 {
 	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
 	
-	cpFloat target_a = 0.0;
+	cpFloat target_a = -0.4*ChipmunkDemoKeyboard.x;
 	cpFloat target_w = bias_coef(0.01, dt)*(target_a - balance_body->a)/dt;
 	
 	cpSimpleMotorSetRate(motor, wheel_body->w + balance_body->w - target_w);
