@@ -40,21 +40,18 @@ static void motor_preSolve(cpConstraint *motor, cpSpace *space)
 	cpFloat mouse = ChipmunkDemoMouse.x/320.0;
 	cpFloat key = ChipmunkDemoKeyboard.x;
 	
-	cpFloat target_v = 100.0*key;
-	cpFloat value = bias_coef(0.7, dt)*(target_v - balance_body->v.x);
+	cpFloat target_v = 300.0*key;
+	cpFloat value = bias_coef(0.8, dt)*(target_v - balance_body->v.x);
 	
-	ChipmunkDemoPrintString("target_v: %5.3f v: %5.3f value: %5.3f\n", target_v, balance_body->v.x, value);
-	
-	cpFloat max_sin = cpfsin(0.7);
+	cpFloat max_sin = cpfsin(0.5);
 	cpFloat target_a = asin(cpfclamp(-value, -max_sin, max_sin));
-	cpFloat target_w = bias_coef(0.01, dt)*(target_a - balance_body->a)/dt;
+	cpFloat angular_diff = asin(cpvcross(balance_body->rot, cpvforangle(target_a))); // simplify?
+	cpFloat target_w = bias_coef(0.01, dt)*angular_diff/dt;
 	
-	ChipmunkDemoPrintString("target_a: %5.3f a: %5.3f\n", target_a, balance_body->a);
-	
-	cpFloat max_rate = 100.0;
+	cpFloat max_rate = 50.0;
 	cpFloat rate = cpfclamp(wheel_body->w + balance_body->w - target_w, -max_rate, max_rate);
 	cpSimpleMotorSetRate(motor, rate);
-	cpConstraintSetMaxForce(motor, 5.0e4);
+	cpConstraintSetMaxForce(motor, 8.0e4);
 }
 
 
@@ -99,39 +96,61 @@ init(void)
 	}
 	
 	
-	cpFloat wheel_radius = 10.0;
-	
 	{
+		cpFloat radius = 20.0;
 		cpFloat mass = 1.0;
 		
-		cpFloat moment = cpMomentForCircle(mass, 0.0, wheel_radius, cpvzero);
+		cpFloat moment = cpMomentForCircle(mass, 0.0, radius, cpvzero);
 		wheel_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-		wheel_body->p = cpv(0.0, -240.0 + wheel_radius);
+		wheel_body->p = cpv(0.0, -160.0 + radius);
 		
-		cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(wheel_body, wheel_radius, cpvzero));
-		shape->u = 1.0;
+		cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(wheel_body, radius, cpvzero));
+		shape->u = 0.7;
 		shape->group = 1;
 	}
 	
 	{
-		cpFloat width = 10.0;
-		cpFloat height = 50.0;
+		cpFloat cog_offset = 50.0;
+		
+		cpBB bb1 = cpBBNew(-5.0, 0.0 - cog_offset, 5.0, 50.0 - cog_offset);
+		cpBB bb2 = cpBBNew(-50.0, 50.0 - cog_offset, 50.0, 60.0 - cog_offset);
 		
 		cpFloat mass = 10.0;
-		cpFloat moment = cpMomentForBox(mass, width, height);
+		cpFloat moment = cpMomentForBox2(mass, bb1) + cpMomentForBox2(mass, bb2);
 		
 		balance_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-		balance_body->p = cpv(0.0, -240.0 + height/2.0 + wheel_radius);
+		balance_body->p = cpv(0.0, wheel_body->p.y + cog_offset);
 		
-		cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(balance_body, width, height));
+		cpShape *shape = NULL;
+		
+		shape = cpSpaceAddShape(space, cpBoxShapeNew2(balance_body, bb1));
+		shape->u = 1.0;
+		shape->group = 1;
+		
+		shape = cpSpaceAddShape(space, cpBoxShapeNew2(balance_body, bb2));
 		shape->u = 1.0;
 		shape->group = 1;
 	}
 	
-	cpSpaceAddConstraint(space, cpPivotJointNew(wheel_body, balance_body, wheel_body->p));
+	cpVect anchr1 = cpBodyWorld2Local(balance_body, wheel_body->p);
+	cpVect groove_a = cpvadd(anchr1, cpv(0.0,  30.0));
+	cpVect groove_b = cpvadd(anchr1, cpv(0.0, -10.0));
+	cpSpaceAddConstraint(space, cpGrooveJointNew(balance_body, wheel_body, groove_a, groove_b, cpvzero));
+	cpSpaceAddConstraint(space, cpDampedSpringNew(balance_body, wheel_body, anchr1, cpvzero, 0.0, 6.0e2, 30.0));
 	
 	motor = cpSpaceAddConstraint(space, cpSimpleMotorNew(wheel_body, balance_body, 0.0));
 	motor->preSolve = motor_preSolve;
+	
+	{
+		cpFloat size = 20.0;
+		cpFloat mass = 3.0;
+		
+		cpBody *boxBody = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
+		cpBodySetPos(boxBody, cpv(200, -200));
+		
+		cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, 50, 50));
+		cpShapeSetFriction(shape, 0.7);
+	}
 	
 	return space;
 }
