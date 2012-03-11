@@ -37,11 +37,24 @@ static void motor_preSolve(cpConstraint *motor, cpSpace *space)
 {
 	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
 	
-	cpFloat target_a = -0.4*ChipmunkDemoKeyboard.x;
+	cpFloat mouse = ChipmunkDemoMouse.x/320.0;
+	cpFloat key = ChipmunkDemoKeyboard.x;
+	
+	cpFloat target_v = 100.0*key;
+	cpFloat value = bias_coef(0.7, dt)*(target_v - balance_body->v.x);
+	
+	ChipmunkDemoPrintString("target_v: %5.3f v: %5.3f value: %5.3f\n", target_v, balance_body->v.x, value);
+	
+	cpFloat max_sin = cpfsin(0.7);
+	cpFloat target_a = asin(cpfclamp(-value, -max_sin, max_sin));
 	cpFloat target_w = bias_coef(0.01, dt)*(target_a - balance_body->a)/dt;
 	
-	cpSimpleMotorSetRate(motor, wheel_body->w + balance_body->w - target_w);
-	cpConstraintSetMaxForce(motor, 1.0e6);
+	ChipmunkDemoPrintString("target_a: %5.3f a: %5.3f\n", target_a, balance_body->a);
+	
+	cpFloat max_rate = 100.0;
+	cpFloat rate = cpfclamp(wheel_body->w + balance_body->w - target_w, -max_rate, max_rate);
+	cpSimpleMotorSetRate(motor, rate);
+	cpConstraintSetMaxForce(motor, 5.0e4);
 }
 
 
@@ -66,12 +79,27 @@ init(void)
 	cpSpaceSetGravity(space, cpv(0, -500));
 	
 	{
-		cpShape *ground = cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpv(-1000.0, -240.0), cpv(1000.0, -240.0), 0.0));
-		ground->u = 1.0;
+		cpShape *shape = NULL;
+		cpBody *staticBody = space->staticBody;
+		
+		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
+		cpShapeSetElasticity(shape, 1.0f);
+		cpShapeSetFriction(shape, 1.0f);
+		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+
+		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
+		cpShapeSetElasticity(shape, 1.0f);
+		cpShapeSetFriction(shape, 1.0f);
+		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+
+		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
+		cpShapeSetElasticity(shape, 1.0f);
+		cpShapeSetFriction(shape, 1.0f);
+		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	}
 	
 	
-	cpFloat wheel_radius = 30.0;
+	cpFloat wheel_radius = 10.0;
 	
 	{
 		cpFloat mass = 1.0;
@@ -86,17 +114,16 @@ init(void)
 	}
 	
 	{
-		cpFloat length = 200.0;
-		cpVect a = cpv(0.0,  length/2.0);
-		cpVect b = cpv(0.0, -length/2.0);
+		cpFloat width = 10.0;
+		cpFloat height = 50.0;
 		
 		cpFloat mass = 10.0;
-		cpFloat moment = cpMomentForSegment(mass, a, b);
+		cpFloat moment = cpMomentForBox(mass, width, height);
 		
 		balance_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-		balance_body->p = cpv(0.0, -240.0 + length/2.0 + wheel_radius);
+		balance_body->p = cpv(0.0, -240.0 + height/2.0 + wheel_radius);
 		
-		cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(balance_body, a, b, 10.0));
+		cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(balance_body, width, height));
 		shape->u = 1.0;
 		shape->group = 1;
 	}
