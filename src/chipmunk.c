@@ -82,10 +82,8 @@ cpAreaForCircle(cpFloat r1, cpFloat r2)
 cpFloat
 cpMomentForSegment(cpFloat m, cpVect a, cpVect b)
 {
-	cpFloat length = cpvlength(cpvsub(b, a));
-	cpVect offset = cpvmult(cpvadd(a, b), 1.0f/2.0f);
-	
-	return m*(length*length/12.0f + cpvlengthsq(offset));
+	cpVect offset = cpvmult(cpvadd(a, b), 0.5f);
+	return m*(cpvdistsq(b, a)/12.0f + cpvlengthsq(offset));
 }
 
 cpFloat

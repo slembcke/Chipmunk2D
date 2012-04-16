@@ -308,7 +308,7 @@ NodeReplaceChild(Node *parent, Node *child, Node *value, cpBBTree *tree)
 static inline cpFloat
 cpBBProximity(cpBB a, cpBB b)
 {
-	return cpfabs(a.l + a.r - b.l - b.r) + cpfabs(a.b + b.t - b.b - b.t);
+	return cpfabs(a.l + a.r - b.l - b.r) + cpfabs(a.b + a.t - b.b - b.t);
 }
 
 static Node *
