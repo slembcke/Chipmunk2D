@@ -116,21 +116,21 @@ init(void)
 		cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpv(0, 300), cpv(300, 0), 0.0f));
 	}
 	
-//	{ // add a pentagon
-//		cpFloat mass = 1.0f;
-//		const int NUM_VERTS = 5;
-//		
-//		cpVect verts[NUM_VERTS];
-//		for(int i=0; i<NUM_VERTS; i++){
-//			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
-//			verts[i] = cpv(30*cos(angle), 30*sin(angle));
-//		}
-//		
-//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-//		cpBodySetPos(body, cpv(50.0f, 50.0f));
-//		
-//		cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
-//	}
+	{ // add a pentagon
+		cpFloat mass = 1.0f;
+		const int NUM_VERTS = 5;
+		
+		cpVect verts[NUM_VERTS];
+		for(int i=0; i<NUM_VERTS; i++){
+			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
+			verts[i] = cpv(30*cos(angle), 30*sin(angle));
+		}
+		
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
+		cpBodySetPos(body, cpv(50.0f, 50.0f));
+		
+		cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
+	}
 	
 	{ // add a circle
 		cpFloat mass = 1.0f;

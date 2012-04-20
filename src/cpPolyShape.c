@@ -84,15 +84,37 @@ cpPolyShapeDestroy(cpPolyShape *poly)
 	cpfree(poly->tAxes);
 }
 
-static cpBool
-cpPolyShapePointQuery(cpPolyShape *poly, cpVect p){
-	return cpBBContainsVect(poly->shape.bb, p) && cpPolyShapeContainsVert(poly, p);
-}
-
-static cpBool
-tempNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *info)
-{
-	return FALSE;
+static void
+cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInfo *info){
+	int count = poly->numVerts;
+	cpPolyShapeAxis *axes = poly->tAxes;
+	cpVect *verts = poly->tVerts;
+	
+	cpVect prev = verts[count - 1];
+	cpFloat minDist = INFINITY;
+	cpVect closestPoint = cpvzero;
+	cpBool outside = cpFalse;
+	
+	for(int i=0; i<count; i++){
+		if(cpvdot(axes[i].n, p) - axes[i].d > 0.0f) outside = cpTrue;
+		
+		cpVect v = verts[i];
+		cpVect seg_delta = cpvsub(prev, v);
+		cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(p, v))/cpvlengthsq(seg_delta));
+		cpVect closest = cpvadd(v, cpvmult(seg_delta, closest_t));
+		
+		cpFloat dist = cpvdist(p, closest);
+		if(dist < minDist){
+			minDist = dist;
+			closestPoint = closest;
+		}
+		
+		prev = v;
+	}
+	
+	info->shape = (cpShape *)poly;
+	info->p = closestPoint; // TODO div/0
+	info->d = (outside ? minDist : -minDist);
 }
 
 static void
@@ -128,8 +150,7 @@ static const cpShapeClass polyClass = {
 	CP_POLY_SHAPE,
 	(cpShapeCacheDataImpl)cpPolyShapeCacheData,
 	(cpShapeDestroyImpl)cpPolyShapeDestroy,
-	(cpShapePointQueryImpl)cpPolyShapePointQuery,
-	(cpShapeNearestPointQueryImpl)tempNearestPointQuery,
+	(cpShapeNearestPointQueryImpl)cpPolyShapeNearestPointQuery,
 	(cpShapeSegmentQueryImpl)cpPolyShapeSegmentQuery,
 };
 

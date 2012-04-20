@@ -51,7 +51,6 @@ typedef enum cpShapeType{
 
 typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpVect p, cpVect rot);
 typedef void (*cpShapeDestroyImpl)(cpShape *shape);
-typedef cpBool (*cpShapePointQueryImpl)(cpShape *shape, cpVect p);
 typedef void (*cpShapeNearestPointQueryImpl)(cpShape *shape, cpVect p, cpNearestPointQueryInfo *info);
 typedef void (*cpShapeSegmentQueryImpl)(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
 
@@ -61,7 +60,6 @@ struct cpShapeClass {
 	
 	cpShapeCacheDataImpl cacheData;
 	cpShapeDestroyImpl destroy;
-	cpShapePointQueryImpl pointQuery;
 	cpShapeNearestPointQueryImpl nearestPointQuery;
 	cpShapeSegmentQueryImpl segmentQuery;
 };

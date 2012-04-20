@@ -26,6 +26,7 @@
 //MARK: Point Query Functions
 
 typedef struct pointQueryContext {
+	cpVect point;
 	cpLayers layers;
 	cpGroup group;
 	cpSpacePointQueryFunc func;
@@ -33,11 +34,11 @@ typedef struct pointQueryContext {
 } pointQueryContext;
 
 static void 
-pointQueryHelper(cpVect *point, cpShape *shape, pointQueryContext *context)
+pointQueryHelper(pointQueryContext *context, cpShape *shape, void *data)
 {
 	if(
 		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
-		cpShapePointQuery(shape, *point)
+		cpShapePointQuery(shape, context->point)
 	){
 		context->func(shape, context->data);
 	}
@@ -46,11 +47,12 @@ pointQueryHelper(cpVect *point, cpShape *shape, pointQueryContext *context)
 void
 cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data)
 {
-	pointQueryContext context = {layers, group, func, data};
+	pointQueryContext context = {point, layers, group, func, data};
+	cpBB bb = cpBBNewForCircle(point, 0.0f);
 	
 	cpSpaceLock(space); {
-    cpSpatialIndexPointQuery(space->activeShapes, point, (cpSpatialIndexQueryFunc)pointQueryHelper, &context);
-    cpSpatialIndexPointQuery(space->staticShapes, point, (cpSpatialIndexQueryFunc)pointQueryHelper, &context);
+    cpSpatialIndexQuery(space->activeShapes, &context, bb, (cpSpatialIndexQueryFunc)pointQueryHelper, data);
+    cpSpatialIndexQuery(space->staticShapes, &context, bb, (cpSpatialIndexQueryFunc)pointQueryHelper, data);
 	} cpSpaceUnlock(space, cpTrue);
 }
 

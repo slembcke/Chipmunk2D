@@ -107,13 +107,16 @@ cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot)
 
 cpBool
 cpShapePointQuery(cpShape *shape, cpVect p){
-	return shape->klass->pointQuery(shape, p);
+	cpNearestPointQueryInfo info = {};
+	cpShapeNearestPointQuery(shape, p, &info);
+	
+	return (info.d < 0.0f);
 }
 
 void
 cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *info)
 {
-	cpNearestPointQueryInfo blank = {NULL, cpvzero, 0.0f};
+	cpNearestPointQueryInfo blank = {NULL, cpvzero, INFINITY};
 	(*info) = blank;
 	
 	shape->klass->nearestPointQuery(shape, p, info);
@@ -140,11 +143,6 @@ cpCircleShapeCacheData(cpCircleShape *circle, cpVect p, cpVect rot)
 {
 	cpVect c = circle->tc = cpvadd(p, cpvrotate(circle->c, rot));
 	return cpBBNewForCircle(c, circle->r);
-}
-
-static cpBool
-cpCircleShapePointQuery(cpCircleShape *circle, cpVect p){
-	return cpvnear(circle->tc, p, circle->r);
 }
 
 static void
@@ -192,7 +190,6 @@ static const cpShapeClass cpCircleShapeClass = {
 	CP_CIRCLE_SHAPE,
 	(cpShapeCacheDataImpl)cpCircleShapeCacheData,
 	NULL,
-	(cpShapePointQueryImpl)cpCircleShapePointQuery,
 	(cpShapeNearestPointQueryImpl)cpCicleShapeNearestPointQuery,
 	(cpShapeSegmentQueryImpl)cpCircleShapeSegmentQuery,
 };
@@ -250,42 +247,6 @@ cpSegmentShapeCacheData(cpSegmentShape *seg, cpVect p, cpVect rot)
 	
 	cpFloat rad = seg->r;
 	return cpBBNew(l - rad, b - rad, r + rad, t + rad);
-}
-
-static cpBool
-cpSegmentShapePointQuery(cpSegmentShape *seg, cpVect p){
-	if(!cpBBContainsVect(seg->shape.bb, p)) return cpFalse;
-	
-	// Calculate normal distance from segment.
-	cpFloat dn = cpvdot(seg->tn, p) - cpvdot(seg->ta, seg->tn);
-	cpFloat dist = cpfabs(dn) - seg->r;
-	if(dist > 0.0f) return cpFalse;
-	
-	// Calculate tangential distance along segment.
-	cpFloat dt = -cpvcross(seg->tn, p);
-	cpFloat dtMin = -cpvcross(seg->tn, seg->ta);
-	cpFloat dtMax = -cpvcross(seg->tn, seg->tb);
-	
-	// Decision tree to decide which feature of the segment to collide with.
-	if(dt <= dtMin){
-		if(dt < (dtMin - seg->r)){
-			return cpFalse;
-		} else {
-			return cpvlengthsq(cpvsub(seg->ta, p)) < (seg->r*seg->r);
-		}
-	} else {
-		if(dt < dtMax){
-			return cpTrue;
-		} else {
-			if(dt < (dtMax + seg->r)) {
-				return cpvlengthsq(cpvsub(seg->tb, p)) < (seg->r*seg->r);
-			} else {
-				return cpFalse;
-			}
-		}
-	}
-	
-	return cpTrue;	
 }
 
 static void
@@ -350,7 +311,6 @@ static const cpShapeClass cpSegmentShapeClass = {
 	CP_SEGMENT_SHAPE,
 	(cpShapeCacheDataImpl)cpSegmentShapeCacheData,
 	NULL,
-	(cpShapePointQueryImpl)cpSegmentShapePointQuery,
 	(cpShapeNearestPointQueryImpl)cpSegmentShapeNearestPointQuery,
 	(cpShapeSegmentQueryImpl)cpSegmentShapeSegmentQuery,
 };
