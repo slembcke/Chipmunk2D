@@ -69,6 +69,85 @@ cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpGroup gr
 	return shape;
 }
 
+//MARK: Nearest Point Query Functions
+
+struct NearestPointQueryContext {
+	cpVect point;
+	cpFloat maxDistance;
+	cpLayers layers;
+	cpGroup group;
+	cpSpaceNearestPointQueryFunc func;
+};
+
+static void 
+NearestPointQueryHelper(struct NearestPointQueryContext *context, cpShape *shape, void *data)
+{
+	if(
+		!(shape->group && context->group == shape->group) && (context->layers&shape->layers)
+	){
+		cpNearestPointQueryInfo info;
+		cpShapeNearestPointQuery(shape, context->point, &info);
+		
+		if(info.shape && info.d < context->maxDistance) context->func(shape, info.d, info.p, data);
+	}
+}
+
+void
+cpSpaceNearestPointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpaceNearestPointQueryFunc func, void *data)
+{
+	struct NearestPointQueryContext context = {point, maxDistance, layers, group, func};
+	cpBB bb = cpBBNewForCircle(point, maxDistance);
+	
+	cpSpaceLock(space); {
+		cpSpatialIndexQuery(space->activeShapes, &context, bb, (cpSpatialIndexQueryFunc)NearestPointQueryHelper, data);
+		cpSpatialIndexQuery(space->staticShapes, &context, bb, (cpSpatialIndexQueryFunc)NearestPointQueryHelper, data);
+	} cpSpaceUnlock(space, cpTrue);
+}
+
+struct NearestPointQueryNearestContext {
+	cpVect point;
+	cpFloat maxDistance;
+	cpLayers layers;
+	cpGroup group;
+};
+
+static void
+NearestPointQueryNearest(struct NearestPointQueryContext *context, cpShape *shape, cpNearestPointQueryInfo *out)
+{
+	if(
+		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) && !shape->sensor
+	){
+		cpNearestPointQueryInfo info;
+		cpShapeNearestPointQuery(shape, context->point, &info);
+		
+		if(info.d < context->maxDistance && info.d < out->d) (*out) = info;
+	}
+}
+
+cpShape *
+cpSpaceNearestPointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpNearestPointQueryInfo *out)
+{
+	cpNearestPointQueryInfo info = {NULL, cpvzero, INFINITY};
+	if(out){
+		(*out) = info;
+  } else {
+		out = &info;
+	}
+	
+	struct NearestPointQueryNearestContext context = {
+		point, maxDistance,
+		layers, group,
+	};
+	
+	cpBB bb = cpBBNewForCircle(point, maxDistance);
+	cpSpatialIndexQuery(space->activeShapes, &context, bb, (cpSpatialIndexQueryFunc)NearestPointQueryNearest, out);
+	cpSpatialIndexQuery(space->staticShapes, &context, bb, (cpSpatialIndexQueryFunc)NearestPointQueryNearest, out);
+//	cpSpatialIndexSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryFunc)segQueryFirst, out);
+//	cpSpatialIndexSegmentQuery(space->activeShapes, &context, start, end, out->t, (cpSpatialIndexSegmentQueryFunc)segQueryFirst, out);
+	
+	return out->shape;
+}
+
 
 //MARK: Segment Query Functions
 
@@ -126,7 +205,7 @@ segQueryFirst(segQueryFirstContext *context, cpShape *shape, cpSegmentQueryInfo 
 		cpShapeSegmentQuery(shape, context->start, context->end, &info) &&
 		info.t < out->t
 	){
-		*out = info;
+		(*out) = info;
 	}
 	
 	return out->t;

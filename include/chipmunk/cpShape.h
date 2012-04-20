@@ -25,6 +25,12 @@
 
 typedef struct cpShapeClass cpShapeClass;
 
+typedef struct cpNearestPointQueryInfo {
+	cpShape *shape;
+	cpVect p;
+	cpFloat d;
+} cpNearestPointQueryInfo;
+
 /// Segment query info struct.
 typedef struct cpSegmentQueryInfo {
 	/// The shape that was hit, NULL if no collision occured.
@@ -46,6 +52,7 @@ typedef enum cpShapeType{
 typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpVect p, cpVect rot);
 typedef void (*cpShapeDestroyImpl)(cpShape *shape);
 typedef cpBool (*cpShapePointQueryImpl)(cpShape *shape, cpVect p);
+typedef void (*cpShapeNearestPointQueryImpl)(cpShape *shape, cpVect p, cpNearestPointQueryInfo *info);
 typedef void (*cpShapeSegmentQueryImpl)(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
 
 /// @private
@@ -55,6 +62,7 @@ struct cpShapeClass {
 	cpShapeCacheDataImpl cacheData;
 	cpShapeDestroyImpl destroy;
 	cpShapePointQueryImpl pointQuery;
+	cpShapeNearestPointQueryImpl nearestPointQuery;
 	cpShapeSegmentQueryImpl segmentQuery;
 };
 
@@ -111,6 +119,8 @@ cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot);
 
 /// Test if a point lies within a shape.
 cpBool cpShapePointQuery(cpShape *shape, cpVect p);
+
+void cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *out);
 
 #define CP_DefineShapeStructGetter(type, member, name) \
 static inline type cpShapeGet##name(const cpShape *shape){return shape->member;}

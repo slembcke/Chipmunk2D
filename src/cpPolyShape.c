@@ -89,6 +89,12 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p){
 	return cpBBContainsVect(poly->shape.bb, p) && cpPolyShapeContainsVert(poly, p);
 }
 
+static cpBool
+tempNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *info)
+{
+	return FALSE;
+}
+
 static void
 cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
@@ -123,6 +129,7 @@ static const cpShapeClass polyClass = {
 	(cpShapeCacheDataImpl)cpPolyShapeCacheData,
 	(cpShapeDestroyImpl)cpPolyShapeDestroy,
 	(cpShapePointQueryImpl)cpPolyShapePointQuery,
+	(cpShapeNearestPointQueryImpl)tempNearestPointQuery,
 	(cpShapeSegmentQueryImpl)cpPolyShapeSegmentQuery,
 };
 
