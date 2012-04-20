@@ -25,9 +25,13 @@
 
 typedef struct cpShapeClass cpShapeClass;
 
+/// Nearest point query info struct.
 typedef struct cpNearestPointQueryInfo {
+	/// The nearest shape, NULL if no shape was within range.
 	cpShape *shape;
+	/// The closest point on the shape's surface. (in world space coordinates)
 	cpVect p;
+	/// The distance to the point. The distance is negative if the point is inside the shape.
 	cpFloat d;
 } cpNearestPointQueryInfo;
 
@@ -118,7 +122,24 @@ cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot);
 /// Test if a point lies within a shape.
 cpBool cpShapePointQuery(cpShape *shape, cpVect p);
 
-void cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *out);
+/// Perform a nearest point query. It finds the closest point on the surface of shape to a specific point.
+/// The value returned is the distance between the points. A negative distance means the point is inside the shape.
+cpFloat cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *out);
+
+/// Perform a segment query against a shape. @c info must be a pointer to a valid cpSegmentQueryInfo structure.
+cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+
+/// Get the hit point for a segment query.
+static inline cpVect cpSegmentQueryHitPoint(const cpVect start, const cpVect end, const cpSegmentQueryInfo info)
+{
+	return cpvlerp(start, end, info.t);
+}
+
+/// Get the hit distance for a segment query.
+static inline cpFloat cpSegmentQueryHitDist(const cpVect start, const cpVect end, const cpSegmentQueryInfo info)
+{
+	return cpvdist(start, end)*info.t;
+}
 
 #define CP_DefineShapeStructGetter(type, member, name) \
 static inline type cpShapeGet##name(const cpShape *shape){return shape->member;}
@@ -152,21 +173,6 @@ CP_DefineShapeStructProperty(cpLayers, layers, Layers, cpTrue);
 /// Because the hash value may affect iteration order, you can reset the shape ID counter
 /// when recreating a space. This will make the simulation be deterministic.
 void cpResetShapeIdCounter(void);
-
-/// Perform a segment query against a shape. @c info must be a pointer to a valid cpSegmentQueryInfo structure.
-cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
-
-/// Get the hit point for a segment query.
-static inline cpVect cpSegmentQueryHitPoint(const cpVect start, const cpVect end, const cpSegmentQueryInfo info)
-{
-	return cpvlerp(start, end, info.t);
-}
-
-/// Get the hit distance for a segment query.
-static inline cpFloat cpSegmentQueryHitDist(const cpVect start, const cpVect end, const cpSegmentQueryInfo info)
-{
-	return cpvdist(start, end)*info.t;
-}
 
 #define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(const cpShape *shape)
 

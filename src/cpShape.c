@@ -113,13 +113,14 @@ cpShapePointQuery(cpShape *shape, cpVect p){
 	return (info.d < 0.0f);
 }
 
-void
+cpFloat
 cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *info)
 {
 	cpNearestPointQueryInfo blank = {NULL, cpvzero, INFINITY};
 	(*info) = blank;
 	
 	shape->klass->nearestPointQuery(shape, p, info);
+	return info->d;
 }
 
 

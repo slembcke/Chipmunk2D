@@ -216,7 +216,7 @@ cpShape *cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, c
 typedef void (*cpSpaceNearestPointQueryFunc)(cpShape *shape, cpFloat distance, cpVect point, void *data);
 /// Query the space at a point and call @c func for each shape found.
 void cpSpaceNearestPointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpaceNearestPointQueryFunc func, void *data);
-/// Query the space at a point and return the first shape found. Returns NULL if no shapes were found.
+/// Query the space at a point and return the nearest shape found. Returns NULL if no shapes were found.
 cpShape *cpSpaceNearestPointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpNearestPointQueryInfo *out);
 
 /// Segment query callback function type.
