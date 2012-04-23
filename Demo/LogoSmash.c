@@ -101,7 +101,7 @@ draw()
 	cpVect *cursor = verts;
 	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)PushBodyPos, &cursor);
 	
-	ChipmunkDebugDrawPoints(3, bodyCount, verts, LAColor(0, 1));
+	ChipmunkDebugDrawPoints(3, bodyCount, verts, RGBAColor(200.0/255.0, 210.0/255.0, 230.0/255.0, 1.0));
 	cpfree(verts);
 	
 	ChipmunkDebugDrawCollisionPoints(space);

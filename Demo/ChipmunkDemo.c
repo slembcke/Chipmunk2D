@@ -134,7 +134,7 @@ void ChipmunkDemoDefaultDrawImpl(void)
 static void
 drawString(int x, int y, const char *str)
 {
-	glColor3f(0.0f, 0.0f, 0.0f);
+	glColor3f(1.0f, 1.0f, 1.0f);
 	glRasterPos2i(x, y);
 	
 	for(int i=0, len=strlen(str); i<len; i++){
@@ -426,7 +426,7 @@ arrowKeyUpFunc(int key, int x, int y)
 static void
 initGL(void)
 {
-	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+	glClearColor(52.0/255.0, 62.0/255.0, 72.0/255.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	glEnableClientState(GL_VERTEX_ARRAY);
