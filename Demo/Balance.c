@@ -52,7 +52,7 @@ static void motor_preSolve(cpConstraint *motor, cpSpace *space)
 	
 	cpFloat torque = cpConstraintGetImpulse(motor)/cpSpaceGetCurrentTimeStep(space);
 	cpFloat max_torque = cpConstraintGetMaxForce(motor);
-	ChipmunkDemoPrintString("torque: %3.0f%% ", 100.0*torque/max_torque);
+//	ChipmunkDemoPrintString("torque: %3.0f%% ", 100.0*torque/max_torque);
 	
 //	cpFloat v = balance_body->v.x;
 //	ChipmunkDemoPrintString("a/sin: %5.2f\n", (v - last_v)/dt/(balance_body->a));
@@ -62,19 +62,18 @@ static void motor_preSolve(cpConstraint *motor, cpSpace *space)
 	cpFloat target_x = ChipmunkDemoMouse.x;
 	ChipmunkDebugDrawSegment(cpv(target_x, -1000.0), cpv(target_x, 1000.0), RGBAColor(1.0, 0.0, 0.0, 1.0));
 	
-	cpFloat target_v = bias_coef(0.5, dt/1.2)*(target_x - balance_body->p.x)/dt;
+	cpFloat max_v = 500.0;
+	cpFloat target_v = cpfclamp(bias_coef(0.5, dt/1.2)*(target_x - balance_body->p.x)/dt, -max_v, max_v);
 	cpFloat error_v = (target_v - balance_body->v.x);
 	cpFloat target_sin = 3.0e-3*bias_coef(0.1, dt)*error_v/dt;
-	ChipmunkDemoPrintString("v: %5.2f target_v: %5.2f\n", balance_body->v.x, target_v);
-	
-	cpFloat max_balance = 0.6;
-	balance_sin = cpfclamp(balance_sin - 6.0e-5*bias_coef(0.2, dt)*error_v/dt, -max_balance, max_balance);
+//	ChipmunkDemoPrintString("v: %5.2f target_v: %5.2f\n", balance_body->v.x, target_v);
 	
 	cpFloat max_sin = cpfsin(0.6);
+	balance_sin = cpfclamp(balance_sin - 6.0e-5*bias_coef(0.2, dt)*error_v/dt, -max_sin, max_sin);
 	cpFloat target_a = asin(cpfclamp(-target_sin + balance_sin, -max_sin, max_sin));
 	cpFloat angular_diff = asin(cpvcross(balance_body->rot, cpvforangle(target_a)));
 	cpFloat target_w = bias_coef(0.1, dt/0.4)*(angular_diff)/dt;
-	ChipmunkDemoPrintString("a: %.7f target_a: %.7f balance_sin: %.7f\n", balance_body->a, target_a, balance_sin);
+//	ChipmunkDemoPrintString("a: %.7f target_a: %.7f balance_sin: %.7f\n", balance_body->a, target_a, balance_sin);
 	
 	cpFloat max_rate = 50.0;
 	cpFloat rate = cpfclamp(wheel_body->w + balance_body->w - target_w, -max_rate, max_rate);
@@ -122,12 +121,12 @@ init(void)
 		cpShapeSetFriction(shape, 1.0f);
 		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
-		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(0,-240), cpv(320,-200), 0.0f));
+		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(0,-200), cpv(240,-240), 0.0f));
 		cpShapeSetElasticity(shape, 1.0f);
 		cpShapeSetFriction(shape, 1.0f);
 		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
-		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(160,-240), cpv(320,-160), 0.0f));
+		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-240,-240), cpv(0,-200), 0.0f));
 		cpShapeSetElasticity(shape, 1.0f);
 		cpShapeSetFriction(shape, 1.0f);
 		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
@@ -150,10 +149,10 @@ init(void)
 	{
 		cpFloat cog_offset = 30.0;
 		
-		cpBB bb1 = cpBBNew(-5.0, 0.0 - cog_offset, 5.0, 40.0 - cog_offset);
+		cpBB bb1 = cpBBNew(-5.0, 0.0 - cog_offset, 5.0, cog_offset*1.2 - cog_offset);
 		cpBB bb2 = cpBBNew(-25.0, bb1.t, 25.0, bb1.t + 10.0);
 		
-		cpFloat mass = 10.0;
+		cpFloat mass = 3.0;
 		cpFloat moment = cpMomentForBox2(mass, bb1) + cpMomentForBox2(mass, bb2);
 		
 		balance_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
@@ -180,13 +179,14 @@ init(void)
 	motor->preSolve = motor_preSolve;
 	
 	{
-		cpFloat size = 20.0;
+		cpFloat width = 100.0;
+		cpFloat height = 20.0;
 		cpFloat mass = 3.0;
 		
-		cpBody *boxBody = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
+		cpBody *boxBody = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, width, height)));
 		cpBodySetPos(boxBody, cpv(200, -100));
 		
-		cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, 50, 50));
+		cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, width, height));
 		cpShapeSetFriction(shape, 0.7);
 	}
 	
