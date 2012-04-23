@@ -90,7 +90,7 @@ cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInf
 	cpPolyShapeAxis *axes = poly->tAxes;
 	cpVect *verts = poly->tVerts;
 	
-	cpVect prev = verts[count - 1];
+	cpVect v0 = verts[count - 1];
 	cpFloat minDist = INFINITY;
 	cpVect closestPoint = cpvzero;
 	cpBool outside = cpFalse;
@@ -98,10 +98,8 @@ cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInf
 	for(int i=0; i<count; i++){
 		if(cpvdot(axes[i].n, p) - axes[i].d > 0.0f) outside = cpTrue;
 		
-		cpVect v = verts[i];
-		cpVect seg_delta = cpvsub(prev, v);
-		cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(p, v))/cpvlengthsq(seg_delta));
-		cpVect closest = cpvadd(v, cpvmult(seg_delta, closest_t));
+		cpVect v1 = verts[i];
+		cpVect closest = cpClosetPointOnSegment(p, v0, v1);
 		
 		cpFloat dist = cpvdist(p, closest);
 		if(dist < minDist){
@@ -109,7 +107,7 @@ cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInf
 			closestPoint = closest;
 		}
 		
-		prev = v;
+		v0 = v1;
 	}
 	
 	info->shape = (cpShape *)poly;

@@ -99,6 +99,15 @@ void cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint);
 
 //MARK: Shape/Collision Functions
 
+// TODO should move this to the cpVect API. It's pretty useful.
+static inline cpVect
+cpClosetPointOnSegment(const cpVect p, const cpVect a, const cpVect b)
+{
+	cpVect delta = cpvsub(a, b);
+	cpFloat t = cpfclamp01(cpvdot(delta, cpvsub(p, b))/cpvlengthsq(delta));
+	return cpvadd(b, cpvmult(delta, t));
+}
+
 cpShape* cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body);
 
 static inline cpBool

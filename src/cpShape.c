@@ -253,19 +253,14 @@ cpSegmentShapeCacheData(cpSegmentShape *seg, cpVect p, cpVect rot)
 static void
 cpSegmentShapeNearestPointQuery(cpSegmentShape *seg, cpVect p, cpNearestPointQueryInfo *info)
 {
-	cpVect seg_a = seg->ta;
-	cpVect seg_b = seg->tb;
-	
-	cpVect seg_delta = cpvsub(seg_b, seg_a);
-	cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(p, seg_a))/cpvlengthsq(seg_delta));
-	cpVect closest = cpvadd(seg_a, cpvmult(seg_delta, closest_t));
+	cpVect closest = cpClosetPointOnSegment(p, seg->ta, seg->tb);
 	
 	cpVect delta = cpvsub(p, closest);
 	cpFloat d = cpvlength(delta);
 	cpFloat r = seg->r;
 	
 	info->shape = (cpShape *)seg;
-	info->p = cpvadd(closest, cpvmult(delta, r/d)); // TODO div/0
+	info->p = (d ? cpvadd(closest, cpvmult(delta, r/d)) : closest);
 	info->d = d - r;
 }
 
