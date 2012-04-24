@@ -107,8 +107,22 @@ cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot)
 
 cpBool
 cpShapePointQuery(cpShape *shape, cpVect p){
-	return shape->klass->pointQuery(shape, p);
+	cpNearestPointQueryInfo info = {};
+	cpShapeNearestPointQuery(shape, p, &info);
+	
+	return (info.d < 0.0f);
 }
+
+cpFloat
+cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *info)
+{
+	cpNearestPointQueryInfo blank = {NULL, cpvzero, INFINITY};
+	(*info) = blank;
+	
+	shape->klass->nearestPointQuery(shape, p, info);
+	return info->d;
+}
+
 
 cpBool
 cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info){
@@ -132,9 +146,16 @@ cpCircleShapeCacheData(cpCircleShape *circle, cpVect p, cpVect rot)
 	return cpBBNewForCircle(c, circle->r);
 }
 
-static cpBool
-cpCircleShapePointQuery(cpCircleShape *circle, cpVect p){
-	return cpvnear(circle->tc, p, circle->r);
+static void
+cpCicleShapeNearestPointQuery(cpCircleShape *circle, cpVect p, cpNearestPointQueryInfo *info)
+{
+	cpVect delta = cpvsub(p, circle->tc);
+	cpFloat d = cpvlength(delta);
+	cpFloat r = circle->r;
+	
+	info->shape = (cpShape *)circle;
+	info->p = cpvadd(circle->tc, cpvmult(delta, r/d)); // TODO div/0
+	info->d = d - r;
 }
 
 static void
@@ -170,7 +191,7 @@ static const cpShapeClass cpCircleShapeClass = {
 	CP_CIRCLE_SHAPE,
 	(cpShapeCacheDataImpl)cpCircleShapeCacheData,
 	NULL,
-	(cpShapePointQueryImpl)cpCircleShapePointQuery,
+	(cpShapeNearestPointQueryImpl)cpCicleShapeNearestPointQuery,
 	(cpShapeSegmentQueryImpl)cpCircleShapeSegmentQuery,
 };
 
@@ -229,40 +250,18 @@ cpSegmentShapeCacheData(cpSegmentShape *seg, cpVect p, cpVect rot)
 	return cpBBNew(l - rad, b - rad, r + rad, t + rad);
 }
 
-static cpBool
-cpSegmentShapePointQuery(cpSegmentShape *seg, cpVect p){
-	if(!cpBBContainsVect(seg->shape.bb, p)) return cpFalse;
+static void
+cpSegmentShapeNearestPointQuery(cpSegmentShape *seg, cpVect p, cpNearestPointQueryInfo *info)
+{
+	cpVect closest = cpClosetPointOnSegment(p, seg->ta, seg->tb);
 	
-	// Calculate normal distance from segment.
-	cpFloat dn = cpvdot(seg->tn, p) - cpvdot(seg->ta, seg->tn);
-	cpFloat dist = cpfabs(dn) - seg->r;
-	if(dist > 0.0f) return cpFalse;
+	cpVect delta = cpvsub(p, closest);
+	cpFloat d = cpvlength(delta);
+	cpFloat r = seg->r;
 	
-	// Calculate tangential distance along segment.
-	cpFloat dt = -cpvcross(seg->tn, p);
-	cpFloat dtMin = -cpvcross(seg->tn, seg->ta);
-	cpFloat dtMax = -cpvcross(seg->tn, seg->tb);
-	
-	// Decision tree to decide which feature of the segment to collide with.
-	if(dt <= dtMin){
-		if(dt < (dtMin - seg->r)){
-			return cpFalse;
-		} else {
-			return cpvlengthsq(cpvsub(seg->ta, p)) < (seg->r*seg->r);
-		}
-	} else {
-		if(dt < dtMax){
-			return cpTrue;
-		} else {
-			if(dt < (dtMax + seg->r)) {
-				return cpvlengthsq(cpvsub(seg->tb, p)) < (seg->r*seg->r);
-			} else {
-				return cpFalse;
-			}
-		}
-	}
-	
-	return cpTrue;	
+	info->shape = (cpShape *)seg;
+	info->p = (d ? cpvadd(closest, cpvmult(delta, r/d)) : closest);
+	info->d = d - r;
 }
 
 static void
@@ -308,7 +307,7 @@ static const cpShapeClass cpSegmentShapeClass = {
 	CP_SEGMENT_SHAPE,
 	(cpShapeCacheDataImpl)cpSegmentShapeCacheData,
 	NULL,
-	(cpShapePointQueryImpl)cpSegmentShapePointQuery,
+	(cpShapeNearestPointQueryImpl)cpSegmentShapeNearestPointQuery,
 	(cpShapeSegmentQueryImpl)cpSegmentShapeSegmentQuery,
 };
 

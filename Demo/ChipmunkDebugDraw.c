@@ -54,9 +54,9 @@
 	about Chipmunk which may change with little to no warning.
 */
 
-const Color LINE_COLOR = {0, 0, 0, 1};
-const Color CONSTRAINT_COLOR = {0.0f, 0.0f, 0.5f, 1.0f};
-const float SHAPE_ALPHA = 196.0/255.0;
+const Color LINE_COLOR = {200.0/255.0, 210.0/255.0, 230.0/255.0, 1.0};
+const Color CONSTRAINT_COLOR = {0.0, 0.75, 0.0, 1.0};
+const float SHAPE_ALPHA = 1.0;
 
 float ChipmunkDebugDrawPointLineScale = 1.0;
 
@@ -77,21 +77,21 @@ ColorFromHash(cpHashValue hash, float alpha)
 	GLfloat g = (val>>8) & 0xFF;
 	GLfloat b = (val>>16) & 0xFF;
 	
-	float max = cpfmax(cpfmax(r, g), b);
-	float min = cpfmin(cpfmin(r, g), b);
+	GLfloat max = cpfmax(cpfmax(r, g), b);
+	GLfloat min = cpfmin(cpfmin(r, g), b);
+	GLfloat intensity = 0.75;
 	
+	// Saturate and scale the color
 	if(min == max){
-		return RGBAColor(1.0, 0.0, 0.0, alpha);
+		return RGBAColor(intensity, 0.0, 0.0, alpha);
 	} else {
-		// saturate and scale the colors
-		const GLfloat mult = 1.0/(max - min);
-		
-		return RGBAColor(
-			(r - min)*mult,
-			(g - min)*mult,
-			(b - min)*mult,
+		GLfloat coef = alpha*intensity/(max - min);
+		return (Color){
+			(r - min)*coef,
+			(g - min)*coef,
+			(b - min)*coef,
 			alpha
-		);
+		};
 	}
 }
 

@@ -29,9 +29,15 @@
 
 static cpSpace *space;
 
+static cpVect QUERY_START = {0,0};
+
 static void
 update(int ticks)
 {
+	if(ChipmunkDemoRightClick){
+		QUERY_START = ChipmunkDemoMouse;
+	}
+	
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
@@ -50,39 +56,45 @@ draw(void)
 	char *messageCursor = messageScratchSpace;
 	messageCursor[0] = '\0';
 	
-	cpVect start = cpvzero;
+	cpVect start = QUERY_START;
 	cpVect end = ChipmunkDemoMouse;
 	ChipmunkDebugDrawSegment(start, end, RGBAColor(0,1,0,1));
 	
 	messageCursor += sprintf(messageCursor, "Query: Dist(%f) Point%s, ", cpvdist(start, end), cpvstr(end));
 	
-	cpSegmentQueryInfo info = {};
-	if(cpSpaceSegmentQueryFirst(space, start, end, CP_ALL_LAYERS, CP_NO_GROUP, &info)){
-		cpVect point = cpSegmentQueryHitPoint(start, end, info);
+	cpSegmentQueryInfo segInfo = {};
+	if(cpSpaceSegmentQueryFirst(space, start, end, CP_ALL_LAYERS, CP_NO_GROUP, &segInfo)){
+		cpVect point = cpSegmentQueryHitPoint(start, end, segInfo);
 		
 		// Draw red over the occluded part of the query
 		ChipmunkDebugDrawSegment(point, end, RGBAColor(1,0,0,1));
 		
 		// Draw a little blue surface normal
-		ChipmunkDebugDrawSegment(point, cpvadd(point, cpvmult(info.n, 16)), RGBAColor(0,0,1,1));
+		ChipmunkDebugDrawSegment(point, cpvadd(point, cpvmult(segInfo.n, 16)), RGBAColor(0,0,1,1));
 		
 		// Draw a little red dot on the hit point.
 		ChipmunkDebugDrawPoints(3, 1, &point, RGBAColor(1,0,0,1));
 
 		
-		messageCursor += sprintf(messageCursor, "Segment Query: Dist(%f) Normal%s", cpSegmentQueryHitDist(start, end, info), cpvstr(info.n));
+		messageCursor += sprintf(messageCursor, "Segment Query: Dist(%f) Normal%s", cpSegmentQueryHitDist(start, end, segInfo), cpvstr(segInfo.n));
 	} else {
 		messageCursor += sprintf(messageCursor, "Segment Query (None)");
 	}
 	
 	// Draw a red bounding box around the shape under the mouse.
-	cpShape *mouseShape = cpSpacePointQueryFirst(space, ChipmunkDemoMouse, CP_ALL_LAYERS, CP_NO_GROUP);
-	if(mouseShape) ChipmunkDebugDrawBB(cpShapeGetBB(mouseShape), RGBAColor(1,0,0,1));
+	cpNearestPointQueryInfo nearestInfo = {};
+	cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 100.0, CP_ALL_LAYERS, CP_NO_GROUP, &nearestInfo);
+	if(nearestInfo.shape){
+		ChipmunkDebugDrawSegment(ChipmunkDemoMouse, nearestInfo.p, RGBAColor(0.5, 0.5, 0.5, 1.0));
+		if(nearestInfo.d < 0) ChipmunkDebugDrawBB(cpShapeGetBB(nearestInfo.shape), RGBAColor(1,0,0,1));
+	}
 }
 
 static cpSpace *
 init(void)
 {
+	QUERY_START = cpvzero;
+	
 	messageScratchSpace[0] = '\0';
 	ChipmunkDemoMessageString = messageScratchSpace;
 	
