@@ -84,6 +84,10 @@ static int key_left = 0;
 static int key_right = 0;
 cpVect ChipmunkDemoKeyboard = {};
 
+GLfloat translate_x = 0.0;
+GLfloat translate_y = 0.0;
+GLfloat scale = 1.0;
+
 static void shapeFreeWrap(cpSpace *space, cpShape *shape, void *unused){
 	cpSpaceRemoveShape(space, shape);
 	cpShapeFree(shape);
@@ -251,6 +255,11 @@ display(void)
 	PrintStringBuffer[0] = 0;
 	PrintStringCursor = PrintStringBuffer;
 	
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glScalef(scale, scale, 1.0);
+	glTranslatef(translate_x, translate_y, 0.0);
+	
 	demos[demoIndex].drawFunc();
 	
 	if(!paused || step){
@@ -268,9 +277,16 @@ display(void)
   
 	if(drawBBs) cpSpaceEachShape(space, drawShapeBB, NULL);
 	
-	drawInstructions();
-	drawInfo();
-	drawString(-300, -200, ChipmunkDemoMessageString);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix(); {
+		// Draw the text at fixed positions,
+		// but save the drawing matrix for the mouse picking
+		glLoadIdentity();
+		
+		drawInstructions();
+		drawInfo();
+		drawString(-300, -200, ChipmunkDemoMessageString);
+	} glPopMatrix();
 		
 	glutSwapBuffers();
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -322,6 +338,26 @@ keyboard(unsigned char key, int x, int y)
 	} else if(key == '\\'){
 		glDisable(GL_LINE_SMOOTH);
 		glDisable(GL_POINT_SMOOTH);
+	}
+	
+	GLfloat translate_increment = 50.0/scale;
+	GLfloat scale_increment = 1.2;
+	if(key == '5'){
+		translate_x = 0.0;
+		translate_y = 0.0;
+		scale = 1.0;
+	}else if(key == '4'){
+		translate_x += translate_increment;
+	}else if(key == '6'){
+		translate_x -= translate_increment;
+	}else if(key == '2'){
+		translate_y += translate_increment;
+	}else if(key == '8'){
+		translate_y -= translate_increment;
+	}else if(key == '7'){
+		scale /= scale_increment;
+	}else if(key == '9'){
+		scale *= scale_increment;
 	}
 }
 
