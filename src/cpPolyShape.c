@@ -20,6 +20,7 @@
  */
  
 #include <stdlib.h>
+#include <string.h>
 
 #include "chipmunk_private.h"
 #include "chipmunk_unsafe.h"
@@ -266,3 +267,122 @@ cpPolyShapeSetVerts(cpShape *shape, int numVerts, cpVect *verts, cpVect offset)
 	cpPolyShapeDestroy((cpPolyShape *)shape);
 	setUpVerts((cpPolyShape *)shape, numVerts, verts, offset);
 }
+
+//MARK: Quick Hull
+
+struct LoopIndexes {int start, end;};
+
+static struct LoopIndexes
+QHullLoopIndexes(cpVect *verts, int count, cpVect axis)
+{
+  struct LoopIndexes indexes = {0, 0};
+	cpFloat min = cpvdot(verts[0], axis);
+	cpFloat max = min;
+	
+  for(int i=1; i<count; i++){
+    cpFloat d = cpvdot(verts[i], axis);
+		
+    if(d < min){
+      min = d;
+      indexes.start = i;
+    } else if(d > max){
+			max = d;
+			indexes.end = i;
+		}
+	}
+		
+  return indexes;
+}
+
+#define SWAP(__A__, __B__) {__typeof(__A__) __TMP__ = __A__; __A__ = __B__; __B__ = __TMP__;}
+
+static int
+QHullPartition(cpVect *verts, int count, cpVect a, cpVect b, cpFloat tol)
+{
+	if(count == 0) return 0;
+	
+	cpVect n = cpvnormalize(cpvperp(cpvsub(b, a)));
+	cpFloat d = cpvdot(n, a);
+	
+	cpFloat max = cpvdot(n, verts[0]) - d;
+	int maxi = 0;
+	
+	int head = 0;
+	for(int tail = count-1; head <= tail;){
+		cpFloat dist = cpvdot(n, verts[head]) - d;
+		if(dist > tol){
+			if(dist > max){
+				max = dist;
+				maxi = head;
+			}
+			
+			head++;
+		} else {
+			SWAP(verts[head], verts[tail]);
+			tail--;
+		}
+	}
+	
+	// move the new pivot to the front
+	SWAP(verts[0], verts[maxi]);
+	
+	return head;
+}
+
+static int
+QHullReduce(cpFloat tol, cpVect *verts, int count, cpVect a, cpVect b, cpVect pivot, cpVect *result)
+{
+	if(count > 0){
+		int left_count = QHullPartition(verts, count, a, pivot, tol);
+		int right_count = QHullPartition(verts + left_count, count - left_count, pivot, b, tol);
+		
+		int index = QHullReduce(tol, verts + 1, left_count - 1, a, pivot, verts[0], result);
+		result[index++] = pivot;
+		index += QHullReduce(tol, verts + left_count + 1, right_count - 1, pivot, b, verts[left_count], result + index);
+		return index;
+	} else if(count == 0) {
+		result[0] = pivot;
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+
+// QuickHull seemed like a neat algorithm, and efficient-ish for large input sets.
+// My implementation performs an in place reduction using the result array as scratch space.
+int
+cpQuickHull(int count, cpVect *verts, cpFloat tol, cpVect *result, int *first)
+{
+	// Copy the line vertexes into the empty part of the result polyline to use as a scratch buffer.
+	memcpy(result, verts, count*sizeof(cpVect));
+	
+	// Trivial cases
+	if(count <= 2){
+		if(first) (*first) = 0;
+		return count;
+	}
+	
+	struct LoopIndexes indexes = QHullLoopIndexes(verts, count, cpv(1.0f, 0.0f));
+	if(indexes.start == indexes.end){
+		indexes = QHullLoopIndexes(verts, count, cpv(0.0f, 1.0f));
+		
+		// Degenerate hull, all points are same.
+		if(indexes.start == indexes.end){
+			if(first) (*first) = 0;
+			return 1;
+		}
+	}
+	
+	// TODO Why do I push these to the front again? To make scratch space available?
+	SWAP(result[0], result[indexes.start]);
+	SWAP(result[1], result[indexes.end ?: indexes.start]);
+	
+	cpVect a = result[0];
+	cpVect b = result[1];
+	
+	result[0] = a;
+	if(first) (*first) = indexes.start;
+	return QHullReduce(tol, result + 2, count - 2, a, a, b, result + 1) + 1;
+}
+
