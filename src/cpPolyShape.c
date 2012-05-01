@@ -20,7 +20,6 @@
  */
  
 #include <stdlib.h>
-#include <string.h>
 
 #include "chipmunk_private.h"
 #include "chipmunk_unsafe.h"
@@ -79,10 +78,7 @@ static void
 cpPolyShapeDestroy(cpPolyShape *poly)
 {
 	cpfree(poly->verts);
-	cpfree(poly->tVerts);
-	
 	cpfree(poly->planes);
-	cpfree(poly->tPlanes);
 }
 
 static void
@@ -188,16 +184,16 @@ cpPolyShapeGetVert(cpShape *shape, int idx)
 static void
 setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 {
-	poly->numVerts = numVerts;
-
-	poly->verts = (cpVect *)cpcalloc(numVerts, sizeof(cpVect));
-	poly->tVerts = (cpVect *)cpcalloc(numVerts, sizeof(cpVect));
-	poly->planes = (cpSplittingPlane *)cpcalloc(numVerts, sizeof(cpSplittingPlane));
-	poly->tPlanes = (cpSplittingPlane *)cpcalloc(numVerts, sizeof(cpSplittingPlane));
+	poly->verts = (cpVect *)cpcalloc(2*numVerts, sizeof(cpVect));
+	poly->planes = (cpSplittingPlane *)cpcalloc(2*numVerts, sizeof(cpSplittingPlane));
+	poly->tVerts = poly->verts + numVerts;
+	poly->tPlanes = poly->planes + numVerts;
+	
+	poly->numVerts = cpQuickHull(numVerts, verts, 0.0, poly->verts, NULL);
 	
 	for(int i=0; i<numVerts; i++){
 		cpVect a = cpvadd(offset, verts[i]);
-		cpVect b = cpvadd(offset, verts[(i+1)%numVerts]);
+		cpVect b = (i+1 == numVerts ? verts[0] : cpvadd(offset, verts[i+1]));
 
 		poly->verts[i] = a;
 		poly->planes[i] = cpSplittingPlaneNew(a, b);
@@ -207,9 +203,6 @@ setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 cpPolyShape *
 cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, cpVect *verts, cpVect offset)
 {
-	// Fail if the user attempts to pass a concave poly, or a bad winding.
-	cpAssertHard(cpPolyValidate(verts, numVerts), "Polygon is concave or has a reversed winding.");
-	
 	setUpVerts(poly, numVerts, verts, offset);
 	cpShapeInit((cpShape *)poly, &polyClass, body);
 
@@ -265,114 +258,3 @@ cpPolyShapeSetVerts(cpShape *shape, int numVerts, cpVect *verts, cpVect offset)
 	cpPolyShapeDestroy((cpPolyShape *)shape);
 	setUpVerts((cpPolyShape *)shape, numVerts, verts, offset);
 }
-
-//MARK: Quick Hull
-
-struct LoopIndexes {int start, end;};
-
-static struct LoopIndexes
-QHullLoopIndexes(cpVect *verts, int count)
-{
-  struct LoopIndexes indexes = {0, 0};
-	cpVect min = verts[0];
-	cpVect max = min;
-	
-  for(int i=1; i<count; i++){
-    cpVect v = verts[i];
-		
-    if(v.x < min.x || (v.x == min.x && v.y < min.y)){
-      min = v;
-      indexes.start = i;
-    } else if(v.x > max.x || (v.x == max.x && v.y > max.y)){
-			max = v;
-			indexes.end = i;
-		}
-	}
-		
-  return indexes;
-}
-
-#define SWAP(__A__, __B__) {__typeof(__A__) __TMP__ = __A__; __A__ = __B__; __B__ = __TMP__;}
-
-static int
-QHullPartition(cpVect *verts, int count, cpSplittingPlane plane, cpFloat tol)
-{
-	if(count == 0) return 0;
-	
-	cpFloat max = cpSplittingPlaneCompare(plane, verts[0]);
-	int maxi = 0;
-	
-	int head = 0;
-	for(int tail = count-1; head <= tail;){
-		cpFloat dist = cpSplittingPlaneCompare(plane, verts[head]);
-		if(dist > tol){
-			if(dist > max){
-				max = dist;
-				maxi = head;
-			}
-			
-			head++;
-		} else {
-			SWAP(verts[head], verts[tail]);
-			tail--;
-		}
-	}
-	
-	// move the new pivot to the front
-	SWAP(verts[0], verts[maxi]);
-	
-	return head;
-}
-
-static int
-QHullReduce(cpFloat tol, cpVect *verts, int count, cpVect a, cpVect pivot, cpVect b, cpVect *result)
-{
-	if(count > 0){
-		int left_count = QHullPartition(verts, count, cpSplittingPlaneNew(a, pivot), tol);
-		int index = QHullReduce(tol, verts + 1, left_count - 1, a, verts[0], pivot, result);
-		
-		result[index++] = pivot;
-		
-		int right_count = QHullPartition(verts + left_count, count - left_count, cpSplittingPlaneNew(pivot, b), tol);
-		return index + QHullReduce(tol, verts + left_count + 1, right_count - 1, pivot, verts[left_count], b, result + index);
-	} else if(count == 0) {
-		result[0] = pivot;
-		return 1;
-	} else {
-		return 0;
-	}
-}
-
-
-// QuickHull seemed like a neat algorithm, and efficient-ish for large input sets.
-// My implementation performs an in place reduction using the result array as scratch space.
-int
-cpQuickHull(int count, cpVect *verts, cpFloat tol, cpVect *result, int *first)
-{
-	// Copy the line vertexes into the empty part of the result polyline to use as a scratch buffer.
-	memcpy(result, verts, count*sizeof(cpVect));
-	
-	// Trivial cases
-	if(count <= 2){
-		if(first) (*first) = 0;
-		return count;
-	}
-	
-	struct LoopIndexes indexes = QHullLoopIndexes(verts, count);
-	if(indexes.start == indexes.end){
-		if(first) (*first) = 0;
-		return 1;
-	}
-	
-	// TODO Why do I push these to the front again? To make scratch space available?
-	SWAP(result[0], result[indexes.start]);
-	SWAP(result[1], result[indexes.end ?: indexes.start]);
-	
-	cpVect a = result[0];
-	cpVect b = result[1];
-	
-	result[0] = a;
-	if(first) (*first) = indexes.start;
-	return QHullReduce(tol, result + 2, count - 2, a, b, a, result + 1) + 1;
-}
-

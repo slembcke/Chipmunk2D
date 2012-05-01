@@ -148,6 +148,13 @@ cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height);
 /// Calculate the moment of inertia for a solid box.
 cpFloat cpMomentForBox2(cpFloat m, cpBB box);
 
+/// Calculate the convex hull of a given set of points. Returns the count of points in the hull.
+/// @c tol is the allowed amount to shrink the hull when simplifying it.
+/// @c result must be a pointer to an array with at least @c count elements.
+/// @c first is an optional pointer to an integer to store where the first vertex in the hull came from (i.e. verts[first] == result[0])
+int cpQuickHull(int count, cpVect *verts, cpFloat tol, cpVect *result, int *first);
+
+
 //@}
 
 #ifdef __cplusplus
