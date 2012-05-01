@@ -56,8 +56,8 @@ cpPolyShapeTransformVerts(cpPolyShape *poly, cpVect p, cpVect rot)
 static void
 cpPolyShapeTransformAxes(cpPolyShape *poly, cpVect p, cpVect rot)
 {
-	cpPolyShapeAxis *src = poly->axes;
-	cpPolyShapeAxis *dst = poly->tAxes;
+	cpSplittingPlane *src = poly->planes;
+	cpSplittingPlane *dst = poly->tPlanes;
 	
 	for(int i=0; i<poly->numVerts; i++){
 		cpVect n = cpvrotate(src[i].n, rot);
@@ -81,14 +81,14 @@ cpPolyShapeDestroy(cpPolyShape *poly)
 	cpfree(poly->verts);
 	cpfree(poly->tVerts);
 	
-	cpfree(poly->axes);
-	cpfree(poly->tAxes);
+	cpfree(poly->planes);
+	cpfree(poly->tPlanes);
 }
 
 static void
 cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInfo *info){
 	int count = poly->numVerts;
-	cpPolyShapeAxis *axes = poly->tAxes;
+	cpSplittingPlane *planes = poly->tPlanes;
 	cpVect *verts = poly->tVerts;
 	
 	cpVect v0 = verts[count - 1];
@@ -97,7 +97,7 @@ cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInf
 	cpBool outside = cpFalse;
 	
 	for(int i=0; i<count; i++){
-		if(cpvdot(axes[i].n, p) - axes[i].d > 0.0f) outside = cpTrue;
+		if(cpSplittingPlaneCompare(planes[i], p) > 0.0f) outside = cpTrue;
 		
 		cpVect v1 = verts[i];
 		cpVect closest = cpClosetPointOnSegment(p, v0, v1);
@@ -119,7 +119,7 @@ cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInf
 static void
 cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
-	cpPolyShapeAxis *axes = poly->tAxes;
+	cpSplittingPlane *axes = poly->tPlanes;
 	cpVect *verts = poly->tVerts;
 	int numVerts = poly->numVerts;
 	
@@ -192,17 +192,15 @@ setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 
 	poly->verts = (cpVect *)cpcalloc(numVerts, sizeof(cpVect));
 	poly->tVerts = (cpVect *)cpcalloc(numVerts, sizeof(cpVect));
-	poly->axes = (cpPolyShapeAxis *)cpcalloc(numVerts, sizeof(cpPolyShapeAxis));
-	poly->tAxes = (cpPolyShapeAxis *)cpcalloc(numVerts, sizeof(cpPolyShapeAxis));
+	poly->planes = (cpSplittingPlane *)cpcalloc(numVerts, sizeof(cpSplittingPlane));
+	poly->tPlanes = (cpSplittingPlane *)cpcalloc(numVerts, sizeof(cpSplittingPlane));
 	
 	for(int i=0; i<numVerts; i++){
 		cpVect a = cpvadd(offset, verts[i]);
 		cpVect b = cpvadd(offset, verts[(i+1)%numVerts]);
-		cpVect n = cpvnormalize(cpvperp(cpvsub(b, a)));
 
 		poly->verts[i] = a;
-		poly->axes[i].n = n;
-		poly->axes[i].d = cpvdot(n, a);
+		poly->planes[i] = cpSplittingPlaneNew(a, b);
 	}
 }
 
@@ -297,19 +295,16 @@ QHullLoopIndexes(cpVect *verts, int count)
 #define SWAP(__A__, __B__) {__typeof(__A__) __TMP__ = __A__; __A__ = __B__; __B__ = __TMP__;}
 
 static int
-QHullPartition(cpVect *verts, int count, cpVect a, cpVect b, cpFloat tol)
+QHullPartition(cpVect *verts, int count, cpSplittingPlane plane, cpFloat tol)
 {
 	if(count == 0) return 0;
 	
-	cpVect n = cpvnormalize(cpvperp(cpvsub(b, a)));
-	cpFloat d = cpvdot(n, a);
-	
-	cpFloat max = cpvdot(n, verts[0]) - d;
+	cpFloat max = cpSplittingPlaneCompare(plane, verts[0]);
 	int maxi = 0;
 	
 	int head = 0;
 	for(int tail = count-1; head <= tail;){
-		cpFloat dist = cpvdot(n, verts[head]) - d;
+		cpFloat dist = cpSplittingPlaneCompare(plane, verts[head]);
 		if(dist > tol){
 			if(dist > max){
 				max = dist;
@@ -333,12 +328,12 @@ static int
 QHullReduce(cpFloat tol, cpVect *verts, int count, cpVect a, cpVect pivot, cpVect b, cpVect *result)
 {
 	if(count > 0){
-		int left_count = QHullPartition(verts, count, a, pivot, tol);
+		int left_count = QHullPartition(verts, count, cpSplittingPlaneNew(a, pivot), tol);
 		int index = QHullReduce(tol, verts + 1, left_count - 1, a, verts[0], pivot, result);
 		
 		result[index++] = pivot;
 		
-		int right_count = QHullPartition(verts + left_count, count - left_count, pivot, b, tol);
+		int right_count = QHullPartition(verts + left_count, count - left_count, cpSplittingPlaneNew(pivot, b), tol);
 		return index + QHullReduce(tol, verts + left_count + 1, right_count - 1, pivot, verts[left_count], b, result + index);
 	} else if(count == 0) {
 		result[0] = pivot;

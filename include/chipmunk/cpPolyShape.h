@@ -23,10 +23,10 @@
 /// @{
 
 /// @private
-typedef struct cpPolyShapeAxis {
+typedef struct cpSplittingPlane {
 	cpVect n;
 	cpFloat d;
-} cpPolyShapeAxis;
+} cpSplittingPlane;
 
 /// @private
 typedef struct cpPolyShape {
@@ -34,7 +34,7 @@ typedef struct cpPolyShape {
 	
 	int numVerts;
 	cpVect *verts, *tVerts;
-	cpPolyShapeAxis *axes, *tAxes;
+	cpSplittingPlane *planes, *tPlanes;
 } cpPolyShape;
 
 /// Allocate a polygon shape.

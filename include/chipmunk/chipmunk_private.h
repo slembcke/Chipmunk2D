@@ -118,6 +118,21 @@ cpShapeActive(cpShape *shape)
 
 int cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr);
 
+// TODO doesn't really need to be inline, but need a better place to put this function
+static inline cpSplittingPlane
+cpSplittingPlaneNew(cpVect a, cpVect b)
+{
+	cpVect n = cpvnormalize(cpvperp(cpvsub(b, a)));
+	cpSplittingPlane plane = {n, cpvdot(n, a)};
+	return plane;
+}
+
+static inline cpFloat
+cpSplittingPlaneCompare(cpSplittingPlane plane, cpVect v)
+{
+	return cpvdot(plane.n, v) - plane.d;
+}
+
 static inline cpFloat
 cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
 {
@@ -134,10 +149,10 @@ cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
 static inline cpBool
 cpPolyShapeContainsVert(const cpPolyShape *poly, const cpVect v)
 {
-	cpPolyShapeAxis *axes = poly->tAxes;
+	cpSplittingPlane *planes = poly->tPlanes;
 	
 	for(int i=0; i<poly->numVerts; i++){
-		cpFloat dist = cpvdot(axes[i].n, v) - axes[i].d;
+		cpFloat dist = cpSplittingPlaneCompare(planes[i], v);
 		if(dist > 0.0f) return cpFalse;
 	}
 	
@@ -147,11 +162,11 @@ cpPolyShapeContainsVert(const cpPolyShape *poly, const cpVect v)
 static inline cpBool
 cpPolyShapeContainsVertPartial(const cpPolyShape *poly, const cpVect v, const cpVect n)
 {
-	cpPolyShapeAxis *axes = poly->tAxes;
+	cpSplittingPlane *planes = poly->tPlanes;
 	
 	for(int i=0; i<poly->numVerts; i++){
-		if(cpvdot(axes[i].n, n) < 0.0f) continue;
-		cpFloat dist = cpvdot(axes[i].n, v) - axes[i].d;
+		if(cpvdot(planes[i].n, n) < 0.0f) continue;
+		cpFloat dist = cpSplittingPlaneCompare(planes[i], v);
 		if(dist > 0.0f) return cpFalse;
 	}
 	
