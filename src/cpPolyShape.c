@@ -273,20 +273,20 @@ cpPolyShapeSetVerts(cpShape *shape, int numVerts, cpVect *verts, cpVect offset)
 struct LoopIndexes {int start, end;};
 
 static struct LoopIndexes
-QHullLoopIndexes(cpVect *verts, int count, cpVect axis)
+QHullLoopIndexes(cpVect *verts, int count)
 {
   struct LoopIndexes indexes = {0, 0};
-	cpFloat min = cpvdot(verts[0], axis);
-	cpFloat max = min;
+	cpVect min = verts[0];
+	cpVect max = min;
 	
   for(int i=1; i<count; i++){
-    cpFloat d = cpvdot(verts[i], axis);
+    cpVect v = verts[i];
 		
-    if(d < min){
-      min = d;
+    if(v.x < min.x || (v.x == min.x && v.y < min.y)){
+      min = v;
       indexes.start = i;
-    } else if(d > max){
-			max = d;
+    } else if(v.x > max.x || (v.x == max.x && v.y > max.y)){
+			max = v;
 			indexes.end = i;
 		}
 	}
@@ -363,15 +363,10 @@ cpQuickHull(int count, cpVect *verts, cpFloat tol, cpVect *result, int *first)
 		return count;
 	}
 	
-	struct LoopIndexes indexes = QHullLoopIndexes(verts, count, cpv(1.0f, 0.0f));
+	struct LoopIndexes indexes = QHullLoopIndexes(verts, count);
 	if(indexes.start == indexes.end){
-		indexes = QHullLoopIndexes(verts, count, cpv(0.0f, 1.0f));
-		
-		// Degenerate hull, all points are same.
-		if(indexes.start == indexes.end){
-			if(first) (*first) = 0;
-			return 1;
-		}
+		if(first) (*first) = 0;
+		return 1;
 	}
 	
 	// TODO Why do I push these to the front again? To make scratch space available?
