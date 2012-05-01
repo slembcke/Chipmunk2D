@@ -49,7 +49,7 @@ cpMessage(const char *condition, const char *file, int line, cpBool isError, cpB
 	fprintf(stderr, "\tFailed condition: %s\n", condition);
 	fprintf(stderr, "\tSource:%s:%d\n", file, line);
 	
-	if(isHardError) abort();
+	if(isError) abort();
 }
 
 #define STR(s) #s
@@ -250,16 +250,16 @@ QHullReduce(cpFloat tol, cpVect *verts, int count, cpVect a, cpVect pivot, cpVec
 // QuickHull seemed like a neat algorithm, and efficient-ish for large input sets.
 // My implementation performs an in place reduction using the result array as scratch space.
 int
-cpQuickHull(int count, cpVect *verts, cpFloat tol, cpVect *result, int *first)
+cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)
 {
 	// Copy the line vertexes into the empty part of the result polyline to use as a scratch buffer.
 	memcpy(result, verts, count*sizeof(cpVect));
 	
 	// Trivial cases
-	if(count <= 2){
-		if(first) (*first) = 0;
-		return count;
-	}
+//	if(count <= 2){
+//		if(first) (*first) = 0;
+//		return count;
+//	}
 	
 	// Degenerate case, all poins are the same.
 	struct LoopIndexes indexes = QHullLoopIndexes(verts, count);

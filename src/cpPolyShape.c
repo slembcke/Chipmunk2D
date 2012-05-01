@@ -189,7 +189,7 @@ setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 	poly->tVerts = poly->verts + numVerts;
 	poly->tPlanes = poly->planes + numVerts;
 	
-	poly->numVerts = cpQuickHull(numVerts, verts, 0.0, poly->verts, NULL);
+	poly->numVerts = cpConvexHull(numVerts, verts, poly->verts, NULL, 0.0);
 	
 	for(int i=0; i<numVerts; i++){
 		cpVect a = cpvadd(offset, verts[i]);
