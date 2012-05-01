@@ -330,16 +330,16 @@ QHullPartition(cpVect *verts, int count, cpVect a, cpVect b, cpFloat tol)
 }
 
 static int
-QHullReduce(cpFloat tol, cpVect *verts, int count, cpVect a, cpVect b, cpVect pivot, cpVect *result)
+QHullReduce(cpFloat tol, cpVect *verts, int count, cpVect a, cpVect pivot, cpVect b, cpVect *result)
 {
 	if(count > 0){
 		int left_count = QHullPartition(verts, count, a, pivot, tol);
-		int right_count = QHullPartition(verts + left_count, count - left_count, pivot, b, tol);
+		int index = QHullReduce(tol, verts + 1, left_count - 1, a, verts[0], pivot, result);
 		
-		int index = QHullReduce(tol, verts + 1, left_count - 1, a, pivot, verts[0], result);
 		result[index++] = pivot;
-		index += QHullReduce(tol, verts + left_count + 1, right_count - 1, pivot, b, verts[left_count], result + index);
-		return index;
+		
+		int right_count = QHullPartition(verts + left_count, count - left_count, pivot, b, tol);
+		return index + QHullReduce(tol, verts + left_count + 1, right_count - 1, pivot, verts[left_count], b, result + index);
 	} else if(count == 0) {
 		result[0] = pivot;
 		return 1;
@@ -378,6 +378,6 @@ cpQuickHull(int count, cpVect *verts, cpFloat tol, cpVect *result, int *first)
 	
 	result[0] = a;
 	if(first) (*first) = indexes.start;
-	return QHullReduce(tol, result + 2, count - 2, a, a, b, result + 1) + 1;
+	return QHullReduce(tol, result + 2, count - 2, a, b, a, result + 1) + 1;
 }
 
