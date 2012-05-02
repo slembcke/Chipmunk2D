@@ -171,12 +171,10 @@ cpMomentForBox2(cpFloat m, cpBB box)
 
 //MARK: Quick Hull
 
-struct LoopIndexes {int start, end;};
-
-static struct LoopIndexes
-QHullLoopIndexes(cpVect *verts, int count)
+void
+cpLoopIndexes(cpVect *verts, int count, int *start, int *end)
 {
-  struct LoopIndexes indexes = {0, 0};
+	(*start) = (*end) = 0;
 	cpVect min = verts[0];
 	cpVect max = min;
 	
@@ -185,14 +183,12 @@ QHullLoopIndexes(cpVect *verts, int count)
 		
     if(v.x < min.x || (v.x == min.x && v.y < min.y)){
       min = v;
-      indexes.start = i;
+      (*start) = i;
     } else if(v.x > max.x || (v.x == max.x && v.y > max.y)){
 			max = v;
-			indexes.end = i;
+			(*end) = i;
 		}
 	}
-		
-  return indexes;
 }
 
 #define SWAP(__A__, __B__) {__typeof(__A__) __TMP__ = __A__; __A__ = __B__; __B__ = __TMP__;}
@@ -255,21 +251,22 @@ cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)
 	memcpy(result, verts, count*sizeof(cpVect));
 	
 	// Degenerate case, all poins are the same.
-	struct LoopIndexes indexes = QHullLoopIndexes(verts, count);
-	if(indexes.start == indexes.end){
+	int start, end;
+	cpLoopIndexes(verts, count, &start, &end);
+	if(start == end){
 		if(first) (*first) = 0;
 		return 1;
 	}
 	
 	// TODO Why do I push these to the front again? To make scratch space available?
-	SWAP(result[0], result[indexes.start]);
-	SWAP(result[1], result[indexes.end ?: indexes.start]);
+	SWAP(result[0], result[start]);
+	SWAP(result[1], result[end ?: start]);
 	
 	cpVect a = result[0];
 	cpVect b = result[1];
 	
 	result[0] = a;
-	if(first) (*first) = indexes.start;
+	if(first) (*first) = start;
 	return QHullReduce(tol, result + 2, count - 2, a, b, a, result + 1) + 1;
 }
 

@@ -133,6 +133,8 @@ cpSplittingPlaneCompare(cpSplittingPlane plane, cpVect v)
 	return cpvdot(plane.n, v) - plane.d;
 }
 
+void cpLoopIndexes(cpVect *verts, int count, int *start, int *end);
+
 static inline cpFloat
 cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
 {
