@@ -185,18 +185,20 @@ static void
 setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 {
 	poly->verts = (cpVect *)cpcalloc(2*numVerts, sizeof(cpVect));
+	numVerts = cpConvexHull(numVerts, verts, poly->verts, NULL, 0.0);
+	
+	poly->numVerts = numVerts;
+	poly->verts = cprealloc(poly->verts, 2*numVerts*sizeof(cpVect));
 	poly->planes = (cpSplittingPlane *)cpcalloc(2*numVerts, sizeof(cpSplittingPlane));
 	poly->tVerts = poly->verts + numVerts;
 	poly->tPlanes = poly->planes + numVerts;
 	
-	poly->numVerts = cpConvexHull(numVerts, verts, poly->verts, NULL, 0.0);
+	for(int i=0; i<numVerts; i++){
+		poly->verts[i] = cpvadd(offset, poly->verts[i]);
+	}
 	
 	for(int i=0; i<numVerts; i++){
-		cpVect a = cpvadd(offset, verts[i]);
-		cpVect b = (i+1 == numVerts ? verts[0] : cpvadd(offset, verts[i+1]));
-
-		poly->verts[i] = a;
-		poly->planes[i] = cpSplittingPlaneNew(a, b);
+		poly->planes[i] = cpSplittingPlaneNew(poly->verts[i], poly->verts[(i+1)%numVerts]);
 	}
 }
 
