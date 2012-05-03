@@ -86,12 +86,12 @@ ColorFromHash(cpHashValue hash, float alpha)
 		return RGBAColor(intensity, 0.0, 0.0, alpha);
 	} else {
 		GLfloat coef = alpha*intensity/(max - min);
-		return (Color){
+		return RGBAColor(
 			(r - min)*coef,
 			(g - min)*coef,
 			(b - min)*coef,
 			alpha
-		};
+		);
 	}
 }
 
