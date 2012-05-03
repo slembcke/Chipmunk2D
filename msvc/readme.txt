@@ -8,6 +8,10 @@ number. Here are the correspondences:
     MSVC 2008: vc9
     MSVC 2010: vc10
 
+The MSVC 2008 project was contributed by a user and may be very out of date.
+I am unable to verify that it still works or update it. It should be a simple
+matter of adding/removing/updating file references though.
+
 The demo suite uses the external GLUT (OpenGL Utility Toolkit) library for
 rendering.  A copy is included in the glut subdirectory.  The demo program
 will look for glut.dll at load time, so you'll need to ensure it is findable.
