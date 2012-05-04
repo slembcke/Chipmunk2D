@@ -1,8 +1,10 @@
 High Priority:
 	Add the cp*GetSpace() functions to the docs. (add to Obj-C)
-	Make the ACD code not suck
+	Document the new nearest point query functions.
+	Add rotary friction and grab radius support to multi-grab.
 	Finish smooth line collisions
 	Serialization
+	Improve the ACD splitting plane algorithm.
 
 Tutorial ideas:
 	C/Blocks tutorial
@@ -13,24 +15,24 @@ Tutorial ideas:
 	Crayon Ball clone
 
 Demo Ideas:
-	Crane demo
 	Redo Logosmash with more particles?! :D
 	Motorcycle in a spinning cage
-	Squid thingy like TomorrowPlusX
+	Squid thingy like TomorrowPlusX. (Would be better with seg/seg collisions)
 	Sticky surfaces
+	Simple top down player controls.
+	Top down racing game. (Need the callback constraint)
 
 Future things to think about:
 	Convert body between static/dynamic.
 	Tests for the query methods
 	Building bodies from shape collections.
-	Make functions to convert C to Obj-C types?
 	Per body iterations and timestep?
 	Per body damping and gravity coefs?
 	breakable object support functions?
 	Easy callback programable joint?
 	cpBodyActivateStatic() should also activate joints?
-	GJK or other closest points algorithm?
 	Extreme vertex BSP search for polys
+	GJK or other closest points algorithm?
 	Redo poly-poly contact manifold
 	Figure out why poly contacts can sometimes be unstable when driven by a strong constraint
 	Implement segment-segment collisions
