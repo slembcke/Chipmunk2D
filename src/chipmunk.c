@@ -259,13 +259,12 @@ cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)
 	}
 	
 	// TODO Why do I push these to the front again? To make scratch space available?
-	SWAP(result[0], result[indexes.start]);
-	SWAP(result[1], result[indexes.end ? indexes.end : indexes.start]);
+	SWAP(result[0], result[start]);
+	SWAP(result[1], result[end == 0 ? start : end]);
 	
 	cpVect a = result[0];
 	cpVect b = result[1];
 	
-	result[0] = a;
 	if(first) (*first) = start;
 	return QHullReduce(tol, result + 2, count - 2, a, b, a, result + 1) + 1;
 }
