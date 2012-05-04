@@ -191,7 +191,7 @@ cpLoopIndexes(cpVect *verts, int count, int *start, int *end)
 	}
 }
 
-#define SWAP(__A__, __B__) {__typeof(__A__) __TMP__ = __A__; __A__ = __B__; __B__ = __TMP__;}
+#define SWAP(__A__, __B__) {cpVect __TMP__ = __A__; __A__ = __B__; __B__ = __TMP__;}
 
 static int
 QHullPartition(cpVect *verts, int count, cpSplittingPlane plane, cpFloat tol)
@@ -259,8 +259,8 @@ cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)
 	}
 	
 	// TODO Why do I push these to the front again? To make scratch space available?
-	SWAP(result[0], result[start]);
-	SWAP(result[1], result[end ?: start]);
+	SWAP(result[0], result[indexes.start]);
+	SWAP(result[1], result[indexes.end ? indexes.end : indexes.start]);
 	
 	cpVect a = result[0];
 	cpVect b = result[1];
