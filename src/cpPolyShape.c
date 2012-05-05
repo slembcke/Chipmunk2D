@@ -188,7 +188,7 @@ setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 	numVerts = cpConvexHull(numVerts, verts, poly->verts, NULL, 0.0);
 	
 	poly->numVerts = numVerts;
-	poly->verts = cprealloc(poly->verts, 2*numVerts*sizeof(cpVect));
+	poly->verts = (cpVect *)cprealloc(poly->verts, 2*numVerts*sizeof(cpVect));
 	poly->planes = (cpSplittingPlane *)cpcalloc(2*numVerts, sizeof(cpSplittingPlane));
 	poly->tVerts = poly->verts + numVerts;
 	poly->tPlanes = poly->planes + numVerts;
