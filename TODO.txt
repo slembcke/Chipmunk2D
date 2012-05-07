@@ -1,9 +1,9 @@
 High Priority:
 	Document the new nearest point query functions. (review)
 	Fix the issues on GitHub
+	Add rotary friction and grab radius support to multi-grab.
 	Make a blog post about the new block based callbacks.
 	Make a video about the nearest point queries.
-	Add rotary friction and grab radius support to multi-grab.
 	Make a Cocos2D helper pack (ChipmunkSprite, ChipmunkDebugNode, ES2 renderer)
 	Investigate getting better PhysicsEditor support.
 	Finish smooth line collisions

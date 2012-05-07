@@ -128,7 +128,8 @@ cpSpaceInit(cpSpace *space)
 	space->collisionHandlers = cpHashSetNew(0, (cpHashSetEqlFunc)handlerSetEql);
 	cpHashSetSetDefaultValue(space->collisionHandlers, &cpDefaultCollisionHandler);
 	
-	space->postStepCallbacks = NULL;
+	space->postStepCallbacks = cpArrayNew(0);
+	space->skipPostStep = cpFalse;
 	
 	cpBodyInitStatic(&space->_staticBody);
 	space->staticBody = &space->_staticBody;
@@ -166,8 +167,10 @@ cpSpaceDestroy(cpSpace *space)
 		cpArrayFree(space->allocatedBuffers);
 	}
 	
-	if(space->postStepCallbacks) cpHashSetEach(space->postStepCallbacks, freeWrap, NULL);
-	cpHashSetFree(space->postStepCallbacks);
+	if(space->postStepCallbacks){
+		cpArrayFreeEach(space->postStepCallbacks, cpfree);
+		cpArrayFree(space->postStepCallbacks);
+	}
 	
 	if(space->collisionHandlers) cpHashSetEach(space->collisionHandlers, freeWrap, NULL);
 	cpHashSetFree(space->collisionHandlers);
@@ -352,8 +355,10 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 void
 cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter)
 {
-	struct arbiterFilterContext context = {space, body, filter};
-	cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)cachedArbitersFilter, &context);
+	cpSpaceLock(space); {
+		struct arbiterFilterContext context = {space, body, filter};
+		cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)cachedArbitersFilter, &context);
+	} cpSpaceUnlock(space, cpTrue);
 }
 
 void

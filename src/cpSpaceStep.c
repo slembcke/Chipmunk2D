@@ -29,68 +29,36 @@
 
 typedef struct cpPostStepCallback {
 	cpPostStepFunc func;
-	void *obj;
+	void *key;
 	void *data;
 } cpPostStepCallback;
 
-static cpBool
-postStepFuncSetEql(cpPostStepCallback *a, cpPostStepCallback *b){
-	return a->obj == b->obj;
-}
-
-static void *
-postStepFuncSetTrans(cpPostStepCallback *callback, void *ignored)
+void *
+cpSpaceGetPostStepData(cpSpace *space, void *key)
 {
-	cpPostStepCallback *value = (cpPostStepCallback *)cpcalloc(1, sizeof(cpPostStepCallback));
-	(*value) = (*callback);
+	cpArray *arr = space->postStepCallbacks;
+	for(int i=0; i<arr->num; i++){
+		cpPostStepCallback *callback = (cpPostStepCallback *)arr->arr[i];
+		if(callback->key == key) return callback->data;
+	}
 	
-	return value;
+	return NULL;
 }
 
 void
-cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)
+cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data)
 {
 	cpAssertWarn(space->locked,
 		"Adding a post-step callback when the space is not locked is unnecessary. "
 		"Post-step callbacks will not called until the end of the next call to cpSpaceStep() or the next query.");
 	
-	if(!space->postStepCallbacks){
-		space->postStepCallbacks = cpHashSetNew(0, (cpHashSetEqlFunc)postStepFuncSetEql);
-	}
-	
-	cpPostStepCallback callback = {func, obj, data};
-	cpHashSetInsert(space->postStepCallbacks, (cpHashValue)obj, &callback, NULL, (cpHashSetTransFunc)postStepFuncSetTrans);
-}
-
-void *
-cpSpaceGetPostStepData(cpSpace *space, void *obj)
-{
-	if(space->postStepCallbacks){
-		cpPostStepCallback query = {NULL, obj, NULL};
-		cpPostStepCallback *callback = (cpPostStepCallback *)cpHashSetFind(space->postStepCallbacks, (cpHashValue)obj, &query);
-		return (callback ? callback->data : NULL);
-	} else {
-		return NULL;
-	}
-}
-
-static void
-cpSpacePostStepCallbackSetIter(cpPostStepCallback *callback, cpSpace *space)
-{
-	callback->func(space, callback->obj, callback->data);
-	cpfree(callback);
-}
-
-static void
-cpSpaceRunPostStepCallbacks(cpSpace *space)
-{
-	// Loop because post step callbacks may add more post step callbacks directly or indirectly.
-	while(space->postStepCallbacks){
-		cpHashSet *callbacks = space->postStepCallbacks;
-		space->postStepCallbacks = NULL;
+	if(!cpSpaceGetPostStepData(space, key)){
+		cpPostStepCallback *callback = (cpPostStepCallback *)cpcalloc(1, sizeof(cpPostStepCallback));
+		callback->func = func;
+		callback->key = key;
+		callback->data = data;
 		
-		cpHashSetEach(callbacks, (cpHashSetIteratorFunc)cpSpacePostStepCallbackSetIter, space);
-		cpHashSetFree(callbacks);
+		cpArrayPush(space->postStepCallbacks, callback);
 	}
 }
 
@@ -108,16 +76,31 @@ cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
 	space->locked--;
 	cpAssertHard(space->locked >= 0, "Internal Error: Space lock underflow.");
 	
-	if(space->locked == 0 && runPostStep){
+	if(space->locked == 0 && runPostStep && !space->skipPostStep){
+		space->skipPostStep = cpTrue;
+		
 		cpArray *waking = space->rousedBodies;
 		for(int i=0, count=waking->num; i<count; i++){
 			cpSpaceActivateBody(space, (cpBody *)waking->arr[i]);
 			waking->arr[i] = NULL;
 		}
 		
-		waking->num = 0;
+		cpArray *arr = space->postStepCallbacks;
+		for(int i=0; i<arr->num; i++){
+			cpPostStepCallback *callback = (cpPostStepCallback *)arr->arr[i];
+			cpPostStepFunc func = callback->func;
+			
+			// Mark the func as NULL in case calling it calls cpSpaceRunPostStepCallbacks() again.
+			callback->func = NULL;
+			if(func) func(space, callback->key, callback->data);
+			
+			arr->arr[i] = NULL;
+			cpfree(callback);
+		}
 		
-		cpSpaceRunPostStepCallbacks(space);
+		waking->num = 0;
+		arr->num = 0;
+		space->skipPostStep = cpFalse;
 	}
 }
 

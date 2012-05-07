@@ -98,7 +98,9 @@ struct cpSpace {
 	
 	CP_PRIVATE(cpHashSet *collisionHandlers);
 	CP_PRIVATE(cpCollisionHandler defaultHandler);
-	CP_PRIVATE(cpHashSet *postStepCallbacks);
+	
+	CP_PRIVATE(cpBool skipPostStep);
+	CP_PRIVATE(cpArray *postStepCallbacks);
 	
 	CP_PRIVATE(cpBody _staticBody);
 };
@@ -202,8 +204,8 @@ cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint);
 /// Post Step callback function type.
 typedef void (*cpPostStepFunc)(cpSpace *space, void *obj, void *data);
 /// Schedule a post-step callback to be called when cpSpaceStep() finishes.
-/// @c obj is used a key, you can only register one callback per unique value for @c obj
-void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data);
+/// You can only register one callback per unique value for @c key.
+void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data);
 
 /// Point query callback function type.
 typedef void (*cpSpacePointQueryFunc)(cpShape *shape, void *data);
