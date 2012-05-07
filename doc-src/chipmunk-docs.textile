@@ -422,6 +422,8 @@ void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 
 p(expl). This one is more interesting. Calls @func@ once for each collision pair that @body@ is involved in. Calling @cpArbiterGet[Bodies|Shapes]()@ or @CP_ARBITER_GET_[BODIES|SHAPES]()@  will return the body or shape for @body@ as the first argument. You can use this to check all sorts of collision information for a body like if it's touching the ground, another particular object, how much collision force is being applied to an object, etc. Sensor shapes and arbiters that have been rejected by a collision handler callback or @cpArbiterIgnore()@ are not tracked by the contact graph.
 
+*Note:* If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpBodyEachShapeBlock()@, etc. See @chipmunk.h@ for more information.
+
 <%= h 2, "Integration Callbacks:", "Integration Callbacks" %>
 
 This section is a stub. For now you can look at the Planet demo for an example of how to use integration callbacks to implement planetary gravity.
@@ -749,7 +751,9 @@ p(expl). Call @func@ for each shape in the space also passing along your data po
 <pre><code>typedef void (*cpSpaceConstraintIteratorFunc)(cpConstraint *constraint, void *data)
 void cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, void *data)</code></pre>
 
-p(expl). Call @func@ for each constraint in the space also passing along your data pointer.	
+p(expl). Call @func@ for each constraint in the space also passing along your data pointer.
+
+*Note:* If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpSpaceEachBodyBlock()@, etc. See @chipmunk.h@ for more information.
 
 <%= h 2, "Simulating the Space:", "Simulating" %>
 
@@ -1365,6 +1369,10 @@ You can either create a body/shape pair before querying, or you can create a sha
 cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);</code></pre>
 
 p(expl). Query @space@ to find all shapes overlapping @shape@. Matches are filtered using the layers and group of @shape@. @func@ is called for each overlapping shape along with a pointer to a temporary cpContactPointSet and the @data@ argument passed to @cpSpaceBBQuery()@. Sensor shapes are included.
+
+<%= h 2, "Blocks:", "Blocks" %>
+
+If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpSpaceNearestPointQueryBlock()@, etc. See @chipmunk.h@ for more information.
 
 <%= h 2, "Examples:", "Examples" %>
 
