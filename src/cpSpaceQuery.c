@@ -98,7 +98,7 @@ void
 cpSpaceNearestPointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpaceNearestPointQueryFunc func, void *data)
 {
 	struct NearestPointQueryContext context = {point, maxDistance, layers, group, func};
-	cpBB bb = cpBBNewForCircle(point, maxDistance);
+	cpBB bb = cpBBNewForCircle(point, cpfmax(maxDistance, 0.0f));
 	
 	cpSpaceLock(space); {
 		cpSpatialIndexQuery(space->activeShapes, &context, bb, (cpSpatialIndexQueryFunc)NearestPointQuery, data);
@@ -115,14 +115,14 @@ NearestPointQueryNearest(struct NearestPointQueryContext *context, cpShape *shap
 		cpNearestPointQueryInfo info;
 		cpShapeNearestPointQuery(shape, context->point, &info);
 		
-		if(info.d < context->maxDistance && info.d < out->d) (*out) = info;
+		if(info.d < out->d) (*out) = info;
 	}
 }
 
 cpShape *
 cpSpaceNearestPointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpNearestPointQueryInfo *out)
 {
-	cpNearestPointQueryInfo info = {NULL, cpvzero, INFINITY};
+	cpNearestPointQueryInfo info = {NULL, cpvzero, maxDistance};
 	if(out){
 		(*out) = info;
   } else {
@@ -135,7 +135,7 @@ cpSpaceNearestPointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistanc
 		NULL
 	};
 	
-	cpBB bb = cpBBNewForCircle(point, maxDistance);
+	cpBB bb = cpBBNewForCircle(point, cpfmax(maxDistance, 0.0f));
 	cpSpatialIndexQuery(space->activeShapes, &context, bb, (cpSpatialIndexQueryFunc)NearestPointQueryNearest, out);
 	cpSpatialIndexQuery(space->staticShapes, &context, bb, (cpSpatialIndexQueryFunc)NearestPointQueryNearest, out);
 	

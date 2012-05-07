@@ -1,9 +1,7 @@
 High Priority:
-	Add the cp*GetSpace() functions to the docs.
-	Document the new nearest point query functions. (add to Obj-C)
-	Document that the the contact graph is always enabled.
+	Document the new nearest point query functions. (review)
 	Document the new block based convenience iterators.
-	Fix the issue on GitHub
+	Fix the issues on GitHub
 	Make a blog post about the new block based callbacks.
 	Make a video about the nearest point queries.
 	Add rotary friction and grab radius support to multi-grab.

@@ -1257,38 +1257,52 @@ p(expl). Calculate the amount of energy lost in a collision including static, bu
 
 <%= h 1, "Queries:", "Queries" %>
 
-Chipmunk spaces support four kinds of spatial queries, point, segment, shape and fast bounding box queries. Any type can be performed efficiently against an entire space, and point and segment queries can be performed against individual shapes. All types of queries take a collision group and layer that are used to filter matches out using the same rules used for filtering collisions between shapes. See "cpShape":#cpShape for more information. If you don't want to filter out any matches, use @CP_ALL_LAYERS@ for the layers and @CP_NO_GROUP@ as the group.
+Chipmunk spaces support four kinds of spatial queries, nearest point, segment, shape and fast bounding box queries. Any type can be performed efficiently against an entire space, and point and segment queries can be performed against individual shapes. All types of queries take a collision group and layer that are used to filter matches out using the same rules used for filtering collisions between shapes. See "cpShape":#cpShape for more information. If you don't want to filter out any matches, use @CP_ALL_LAYERS@ for the layers and @CP_NO_GROUP@ as the group.
 
-<%= h 2, "Point Queries:", "PointQueries" %>
+<%= h 2, "Nearest Point Queries:", "PointQueries" %>
 
-Point queries are useful for things like mouse picking and simple sensors.
+Point queries are useful for things like mouse picking and simple sensors. It allows you to check if there are shapes within a certain distance of a point, find the closest point on a shape to a given point or find the closest shape to a point.
 
-<pre><code>cpBool cpShapePointQuery(cpShape *shape, cpVect p)</code></pre>
+<pre><code>typedef struct cpNearestPointQueryInfo {
+	/// The nearest shape, NULL if no shape was within range.
+	cpShape *shape;
+	/// The closest point on the shape's surface. (in world space coordinates)
+	cpVect p;
+	/// The distance to the point. The distance is negative if the point is inside the shape.
+	cpFloat d;
+} cpNearestPointQueryInfo;</code></pre>
 
-p(expl). Check if the given point lies within the shape.
+p(expl). Nearest point queries can give you additional information about the closest point on a shape's surface to the point and the distance between the points.
 
-<pre><code>typedef void (*cpSpacePointQueryFunc)(cpShape *shape, void *data);
+<pre><code>cpFloat cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *out)</code></pre>
 
-void cpSpacePointQuery(
-	cpSpace *space, cpVect point,
+p(expl). Find the distance from @point@ to @shape@. If the point is inside of the shape, the distance will be negative and equal to the depth of the point. 
+
+<pre><code>typedef void (*cpSpaceNearestPointQueryFunc)(cpShape *shape, cpFloat distance, cpVect point, void *data);
+
+void cpSpaceNearestPointQuery(
+	cpSpace *space, cpVect point, cpFloat maxDistance,
 	cpLayers layers, cpGroup group,
-	cpSpacePointQueryFunc func, void *data
+	cpSpaceNearestPointQueryFunc func, void *data
 )</code></pre>
 
-p(expl). Query @space@ at @point@ filtering out matches with the given @layers@ and @group@. @func@ is called for each shape found along with the @data@ argument passed to @cpSpacePointQuery()@. Sensor shapes are included.
+p(expl). Query @space@ at @point@ for shapes within the given distance range filtering out matches with the given @layers@ and @group@. @func@ is called for each shape found along with the distance to the closest point on the shape's surface, the distance to that point and the @data@ argument passed to @cpSpaceNearestPointQuery()@. Sensor shapes are included. If a @maxDistance@ of @0.0@ is used, the point must lie inside a shape. Negative @maxDistance@ is also allowed meaning that the point must be a under a certain depth within a shape to be considered a match.
 
-<pre><code>cpShape *cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpGroup group)</code></pre>
+<pre><code>cpShape *cpSpaceNearestPointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpNearestPointQueryInfo *out)</code></pre>
 
-p(expl). Query @space@ at @point@ and return the first shape found matching the given @layers@ and @group@. Returns @NULL@ if no shape was found.  Sensor shapes are ignored.
+p(expl). Query @space@ at @point@ and return the closest shape within @maxDistance@. @out@ is an optional pointer to a @cpNearestPointQueryInfo@ if you want additional information about the match.
 
 <%= h 2, "Segment Queries:", "SegmentQueries" %>
 
 Segment queries are like ray casting, but because not all spatial indexes allow processing infinitely long ray queries it is limited to segments. In practice this is still very fast and you don't need to worry too much about the performance as long as you aren't using extremely long segments for your queries.
 
-<pre><code>typedef struct cpSegmentQueryInfo{
-	struct cpShape *shape; // shape that was hit, NULL if no collision
-	cpFloat t; // Distance along query segment, will always be in the range "1":0,.
-	cpVect n; // normal of hit surface
+<pre><code>typedef struct cpSegmentQueryInfo {
+	/// The shape that was hit, NULL if no collision occured.
+	cpShape *shape;
+	/// The normalized distance along the query segment in the range [0, 1].
+	cpFloat t;
+	/// The normal of the surface hit.
+	cpVect n;
 } cpSegmentQueryInfo;</code></pre>
 
 p(expl). Segment queries return more information than just a simple yes or no, they also return where a shape was hit and it's surface normal at the hit point. @t@ is the percentage between the query start and end points. If you need the hit point in world space or the absolute distance from start, see the segment query helper functions farther down.
