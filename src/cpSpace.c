@@ -145,6 +145,8 @@ cpSpaceNew(void)
 void
 cpSpaceDestroy(cpSpace *space)
 {
+	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)cpBodyActivate, NULL);
+	
 	cpSpatialIndexFree(space->staticShapes);
 	cpSpatialIndexFree(space->activeShapes);
 	

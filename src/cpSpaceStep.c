@@ -108,10 +108,11 @@ cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
 	space->locked--;
 	cpAssertHard(space->locked >= 0, "Internal Error: Space lock underflow.");
 	
-	if(!space->locked && runPostStep){
+	if(space->locked == 0 && runPostStep){
 		cpArray *waking = space->rousedBodies;
 		for(int i=0, count=waking->num; i<count; i++){
 			cpSpaceActivateBody(space, (cpBody *)waking->arr[i]);
+			waking->arr[i] = NULL;
 		}
 		
 		waking->num = 0;
