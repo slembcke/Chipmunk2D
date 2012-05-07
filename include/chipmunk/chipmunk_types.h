@@ -203,7 +203,7 @@ typedef uintptr_t cpHashValue;
 
 // CGPoints are structurally the same, and allow
 // easy interoperability with other Cocoa libraries
-#ifdef CP_USE_CGPOINTS
+#if CP_USE_CGPOINTS
 	typedef CGPoint cpVect;
 #else
 /// Chipmunk's 2D vector type.
