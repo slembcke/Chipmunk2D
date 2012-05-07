@@ -314,8 +314,8 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	
 	// Arbiter was used last frame, but not this one
 	if(ticks >= 1 && arb->state != cpArbiterStateCached){
-		cpArbiterCallSeparate(arb, space);
 		arb->state = cpArbiterStateCached;
+		cpArbiterCallSeparate(arb, space);
 	}
 	
 	if(ticks >= space->collisionPersistence){
