@@ -27,14 +27,6 @@
 
 #include "chipmunk_private.h"
 
-//#ifdef __cplusplus
-//extern "C" {
-//#endif
-//	void cpInitCollisionFuncs(void);
-//#ifdef __cplusplus
-//}
-//#endif
-
 void
 cpMessage(const char *condition, const char *file, int line, cpBool isError, cpBool isHardError, const char *message, ...)
 {
@@ -60,12 +52,7 @@ const char *cpVersionString = XSTR(CP_VERSION_MAJOR)"."XSTR(CP_VERSION_MINOR)"."
 void
 cpInitChipmunk(void)
 {
-//#ifndef NDEBUG
-//	printf("Initializing Chipmunk v%s (Debug Enabled)\n", cpVersionString);
-//	printf("Compile with -DNDEBUG defined to disable debug mode and runtime assertion checks\n");
-//#endif
-//	
-//	cpInitCollisionFuncs();
+	cpAssertWarn(FALSE, "cpInitChipmunk is deprecated and no longer required. It will be removed in the future.");
 }
 
 //MARK: Misc Functions
