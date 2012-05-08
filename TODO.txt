@@ -1,14 +1,9 @@
 High Priority:
 	Document the new nearest point query functions. (review)
-	Fix the issues on GitHub
-	Add rotary friction and grab radius support to multi-grab.
 	Make a blog post about the new block based callbacks.
 	Make a video about the nearest point queries.
 	Make a Cocos2D helper pack (ChipmunkSprite, ChipmunkDebugNode, ES2 renderer)
 	Investigate getting better PhysicsEditor support.
-	Finish smooth line collisions
-	Serialization
-	Improve the ACD splitting plane algorithm.
 
 Tutorial ideas:
 	C/Blocks tutorial
@@ -19,6 +14,7 @@ Tutorial ideas:
 	Crayon Ball clone
 
 Demo Ideas:
+	More UIKit examples? There are a surprising number of questions on this.
 	Redo Logosmash with more particles?! :D
 	Motorcycle in a spinning cage
 	Squid thingy like TomorrowPlusX. (Would be better with seg/seg collisions)
@@ -27,6 +23,9 @@ Demo Ideas:
 	Top down racing game. (Need the callback constraint)
 
 Future things to think about:
+	Finish smooth line collisions
+	Serialization
+	Improve the ACD splitting plane algorithm.
 	Convert body between static/dynamic.
 	Tests for the query methods
 	Building bodies from shape collections.
