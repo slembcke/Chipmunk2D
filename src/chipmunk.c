@@ -52,7 +52,7 @@ const char *cpVersionString = XSTR(CP_VERSION_MAJOR)"."XSTR(CP_VERSION_MINOR)"."
 void
 cpInitChipmunk(void)
 {
-	cpAssertWarn(FALSE, "cpInitChipmunk is deprecated and no longer required. It will be removed in the future.");
+	cpAssertWarn(cpFalse, "cpInitChipmunk is deprecated and no longer required. It will be removed in the future.");
 }
 
 //MARK: Misc Functions
