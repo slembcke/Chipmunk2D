@@ -35,6 +35,20 @@ static cpBody *ballBody;
 
 static char messageString[1024];
 
+
+// If your compiler supports blocks (Clang or some GCC versions),
+// You can use the block based iterators instead of the function ones to make your life easier.
+#if defined(__has_extension)
+#if __has_extension(blocks)
+
+#define USE_BLOCKS 1
+
+#endif
+#endif
+
+
+#if !USE_BLOCKS
+
 static void
 ScaleIterator(cpBody *body, cpArbiter *arb, cpVect *sum)
 {
@@ -60,6 +74,9 @@ BallIterator(cpBody *body, cpArbiter *arb, int *count)
 	(*count)++;
 }
 
+#endif
+
+
 static void
 update(int ticks)
 {
@@ -74,12 +91,21 @@ update(int ticks)
 	cursor += sprintf(cursor, "Place objects on the scale to weigh them. The ball marks the shapes it's sitting on.\n");
 	
 	// Sum the total impulse applied to the scale from all collision pairs in the contact graph.
-	cpVect impulseSum = cpvzero;
-	cpBodyEachArbiter(scaleStaticBody, (cpBodyArbiterIteratorFunc)ScaleIterator, &impulseSum);
+	// If your compiler supports blocks, your life is a little easier.
+	// You can use the "Block" versions of the functions without needing the callbacks above.
+	#if USE_BLOCKS
+		__block cpVect impulseSum = cpvzero;
+		cpBodyEachArbiterBlock(scaleStaticBody, ^(cpArbiter *arb){
+			impulseSum = cpvadd(impulseSum, cpArbiterTotalImpulseWithFriction(arb));
+		});
+	#else
+		cpVect impulseSum = cpvzero;
+		cpBodyEachArbiter(scaleStaticBody, (cpBodyArbiterIteratorFunc)ScaleIterator, &impulseSum);
+	#endif
 	
 	// Force is the impulse divided by the timestep.
 	cpFloat force = cpvlength(impulseSum)/dt;
-	
+		
 	// Weight can be found similarly from the gravity vector.
 	cpVect g = cpSpaceGetGravity(space);
 	cpFloat weight = cpvdot(g, impulseSum)/(cpvlengthsq(g)*dt);
@@ -88,8 +114,28 @@ update(int ticks)
 	
 	
 	// Highlight and count the number of shapes the ball is touching.
-	int count = 0;
-	cpBodyEachArbiter(ballBody, (cpBodyArbiterIteratorFunc)BallIterator, &count);
+	#if USE_BLOCKS
+		__block int count = 0;
+		cpBodyEachArbiterBlock(ballBody, ^(cpArbiter *arb){
+			// body is the body we are iterating the arbiters for.
+			// CP_ARBITER_GET_*() in an arbiter iterator always returns the body/shape for the iterated body first.
+			CP_ARBITER_GET_SHAPES(arb, ball, other);
+			
+			// Grab the bounding box, expand it slightly (for visibility) and draw it.
+			cpBB bb = cpShapeGetBB(other);
+			bb.l -= 5.0;
+			bb.b -= 5.0;
+			bb.r += 5.0;
+			bb.t += 5.0;
+			
+			ChipmunkDebugDrawBB(bb, RGBAColor(1, 0, 0, 1));
+			
+			count++;
+		});
+	#else
+		int count = 0;
+		cpBodyEachArbiter(ballBody, (cpBodyArbiterIteratorFunc)BallIterator, &count);
+	#endif
 	
 	cursor += sprintf(cursor, "The ball is touching %d shapes.\n", count);
 }

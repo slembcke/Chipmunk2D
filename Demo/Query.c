@@ -81,11 +81,14 @@ draw(void)
 		messageCursor += sprintf(messageCursor, "Segment Query (None)");
 	}
 	
-	// Draw a red bounding box around the shape under the mouse.
 	cpNearestPointQueryInfo nearestInfo = {};
 	cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 100.0, CP_ALL_LAYERS, CP_NO_GROUP, &nearestInfo);
 	if(nearestInfo.shape){
-		ChipmunkDebugDrawSegment(ChipmunkDemoMouse, nearestInfo.p, RGBAColor(0.5, 0.5, 0.5, 1.0));
+		// Draw a grey line to the closest shape.
+		ChipmunkDebugDrawPoints(3, 1, &ChipmunkDemoMouse, RGBAColor(0.5, 0.5, 0.5, 1.0));
+		ChipmunkDebugDrawSegment(ChipmunkDemoMouse, nearestInfo.p, 	RGBAColor(0.5, 0.5, 0.5, 1.0));
+		
+		// Draw a red bounding box around the shape under the mouse.
 		if(nearestInfo.d < 0) ChipmunkDebugDrawBB(cpShapeGetBB(nearestInfo.shape), RGBAColor(1,0,0,1));
 	}
 }

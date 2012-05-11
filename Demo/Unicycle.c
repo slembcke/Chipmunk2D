@@ -25,7 +25,7 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-#include "util.h"
+#include "constraints/util.h"
 
 static cpSpace *space;
 

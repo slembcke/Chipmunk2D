@@ -179,6 +179,7 @@
     <ClCompile Include="..\..\..\Demo\Tank.c" />
     <ClCompile Include="..\..\..\Demo\TheoJansen.c" />
     <ClCompile Include="..\..\..\Demo\Tumble.c" />
+    <ClCompile Include="..\..\..\Demo\Unicycle.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Demo\ChipmunkDebugDraw.h" />
