@@ -46,7 +46,7 @@ update(int ticks)
 	}
 }
 
-char messageScratchSpace[1024] = {};
+static char messageScratchSpace[1024] = {};
 
 static void
 draw(void)
