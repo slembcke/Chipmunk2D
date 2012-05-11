@@ -63,27 +63,20 @@ Support(cpShape *shape1, cpShape *shape2, cpVect n)
 	return point;
 }
 
-static cpVect
-Barycentric(cpVect a, cpVect b, cpVect c, cpVect p)
-{
-	cpVect v0 = cpvsub(a, b);
-	cpVect v1 = cpvsub(c, b);
-	cpVect v = cpvsub(p, b);
-
-	cpFloat dot00 = cpvdot(v0, v0);
-	cpFloat dot01 = cpvdot(v0, v1);
-	cpFloat dot0v = cpvdot(v0, v);
-	cpFloat dot11 = cpvdot(v1, v1);
-	cpFloat dot1v = cpvdot(v1, v);
-
-	cpFloat det = dot00*dot11 - dot01*dot01;
-	return cpvmult(cpv(dot11*dot0v - dot01*dot1v, dot00*dot1v - dot01*dot0v), 1.0/det);
-}
-
 static cpBool
 ContainsOrigin(cpVect a, cpVect b, cpVect c)
 {
-	cpVect v = Barycentric(a, b, c, cpvzero);
+	cpVect v0 = cpvsub(a, b);
+	cpVect v1 = cpvsub(c, b);
+
+	cpFloat dot00 = cpvdot(v0, v0);
+	cpFloat dot01 = cpvdot(v0, v1);
+	cpFloat dot0v = cpvdot(v0, cpvneg(b));
+	cpFloat dot11 = cpvdot(v1, v1);
+	cpFloat dot1v = cpvdot(v1, cpvneg(b));
+
+	cpFloat det = dot00*dot11 - dot01*dot01;
+	cpVect v = cpvmult(cpv(dot11*dot0v - dot01*dot1v, dot00*dot1v - dot01*dot0v), 1.0/det);
 	return (v.x >= 0.0 && v.y >= 0.0 && v.x + v.y <= 1.0);
 }
 
@@ -92,6 +85,50 @@ ClosestT(cpVect a, cpVect b, cpVect p)
 {
 	cpVect delta = cpvsub(b, a);
 	return cpfclamp01(cpvdot(delta, cpvsub(p, a))/cpvlengthsq(delta));
+}
+
+struct ClosestPoints {
+	cpVect a, b;
+	cpFloat d;
+};
+
+static struct ClosestPoints
+EPARecurse(cpShape *a, cpShape *b)
+{
+	struct ClosestPoints points = {a->body->p, b->body->p, cpvdist(a->body->p, b->body->p)};
+	return points;
+}
+
+static struct ClosestPoints
+GJKRecurse(cpShape *a, cpShape *b, struct MinkowskiPoint v0, struct MinkowskiPoint v1)
+{
+	cpFloat t = ClosestT(v0.ab, v1.ab, cpvzero);
+	cpVect closest = cpvlerp(v0.ab, v1.ab, t);
+	struct MinkowskiPoint p = Support(a, b, cpvneg(closest));
+	
+	cpFloat d1 = cpvdot(closest, p.ab);
+	if(d1 <= 0.0 && ContainsOrigin(v0.ab, v1.ab, p.ab)){
+		return EPARecurse(a, b);
+	} else if(d1 < cpfmin(cpvdot(closest, v0.ab), cpvdot(closest, v1.ab))){
+		if(cpvlengthsq(v0.ab) < cpvlengthsq(v1.ab)){
+			return GJKRecurse(a, b, v0, p);
+		} else {
+			return GJKRecurse(a, b, p, v1);
+		}
+	} else {
+		cpVect pa = cpvlerp(v0.a, v1.a, t);
+		cpVect pb = cpvlerp(v0.b, v1.b, t);
+		
+		struct ClosestPoints points = {pa, pb, cpvdist(pa, pb)};
+		return points;
+	}
+}
+
+static struct ClosestPoints
+ClosestPoints(cpShape *a, cpShape *b)
+{
+	cpVect axis = cpvperp(cpvsub(a->body->p, b->body->p));
+	return GJKRecurse(a, b, Support(a, b, axis), Support(a, b, cpvneg(axis)));
 }
 
 static void
@@ -103,71 +140,6 @@ update(int ticks)
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
 	}
-}
-
-struct ClosestPoints {
-	cpVect a, b;
-	cpFloat d;
-};
-
-static struct ClosestPoints
-GJKRecurse(cpShape *a, cpShape *b, struct MinkowskiPoint v0, struct MinkowskiPoint v1)
-{
-//	for(int i=0; i<10; i++){
-//		ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 0.5));
-		
-		cpFloat t = ClosestT(v0.ab, v1.ab, cpvzero);
-		cpVect closest = cpvlerp(v0.ab, v1.ab, t);
-//		ChipmunkDebugDrawPoints(3.0, 1, &closest, RGBAColor(1, 1, 1, 1));
-		
-		struct MinkowskiPoint p = Support(a, b, cpvneg(closest));
-//		ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 1, 0, 1));
-		
-//		cpVect tri[] = {v0.ab, v1.ab, p.ab};
-		if(ContainsOrigin(v0.ab, v1.ab, p.ab)){
-//			ChipmunkDebugDrawPolygon(3, tri, RGBAColor(1, 1, 1, 0.5), RGBAColor(0, 0, 1, 0.5));
-//			ChipmunkDemoPrintString("Colliding.");
-			struct ClosestPoints points = {a->body->p, b->body->p, cpvdist(a->body->p, b->body->p)};
-			return points;
-		} else {
-//			ChipmunkDebugDrawPolygon(3, tri, RGBAColor(1, 1, 1, 0.5), RGBAColor(1, 1, 1, 0.1));
-		}
-		
-		cpVect n = cpvnormalize(closest);
-		cpFloat d1 = cpvdot(n, p.ab);
-		cpFloat d2 = d1 - cpfmin(cpvdot(n, v0.ab), cpvdot(n, v1.ab));
-		
-//		ChipmunkDemoPrintString("iteration %d, (%5.1f, %5.1f) - (%5.1f, %5.1f) : (%5.1f, %5.1f), %.2e, %.2e", i, v0.ab.x, v0.ab.y, v1.ab.x, v1.ab.y, closest.x, closest.y, d1, d2);
-//		ChipmunkDemoPrintString(i%2 == 0 ? "    " : "\n");
-		
-		if(d2 < 0.0){
-//			ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 1, 0, 1));
-			if(cpvlengthsq(v0.ab) < cpvlengthsq(v1.ab)){
-				return GJKRecurse(a, b, v0, p);
-			} else {
-				return GJKRecurse(a, b, p, v1);
-			}
-		} else {
-//			ChipmunkDemoPrintString("Not colliding.");
-//			
-//			cpVect points[] = {cpvlerp(v0.a, v1.a, t), cpvlerp(v0.b, v1.b, t)};
-//			ChipmunkDebugDrawPoints(3.0, 2, points, RGBAColor(1, 1, 1, 1));
-//			ChipmunkDebugDrawSegment(points[0], points[1], RGBAColor(1, 1, 1, 1));
-			
-			cpVect pa = cpvlerp(v0.a, v1.a, t);
-			cpVect pb = cpvlerp(v0.b, v1.b, t);
-			
-			struct ClosestPoints points = {pa, pb, cpvdist(pa, pb)};
-			return points;
-		}
-//	}
-}
-
-static struct ClosestPoints
-ClosestPoints(cpShape *a, cpShape *b)
-{
-	cpVect axis = cpvperp(cpvsub(a->body->p, b->body->p));
-	return GJKRecurse(a, b, Support(a, b, axis), Support(a, b, cpvneg(axis)));
 }
 
 static void
