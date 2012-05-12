@@ -2,6 +2,7 @@ High Priority:
 	Disable HastySpace threads by default.
 	Document the new nearest point query functions. (review)
 	Make a video for ACD and nearest point queries.
+	Make a blog post/video about (QHull, ACD, NPQ, and blocks)
 	Make a Cocos2D helper pack (ChipmunkSprite, ChipmunkDebugNode, ES2 renderer)
 	Investigate getting better PhysicsEditor support.
 

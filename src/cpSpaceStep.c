@@ -213,6 +213,8 @@ queryReject(cpShape *a, cpShape *b)
 		|| (a->group && a->group == b->group)
 		// Don't collide objects that don't share at least on layer.
 		|| !(a->layers & b->layers)
+		// Don't collide infinite mass objects
+		|| (a->body->m == INFINITY && b->body->m == INFINITY)
 	);
 }
 
