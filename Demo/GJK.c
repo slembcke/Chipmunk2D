@@ -106,6 +106,11 @@ GJKRecurse(cpShape *a, cpShape *b, struct MinkowskiPoint v0, struct MinkowskiPoi
 	cpVect closest = cpvlerp(v0.ab, v1.ab, t);
 	struct MinkowskiPoint p = Support(a, b, cpvneg(closest));
 	
+//	ChipmunkDebugDrawPolygon(3, (cpVect[]){v0.ab, v1.ab, p.ab}, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
+//	ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 1));
+//	ChipmunkDebugDrawPoints(3.0, 1, &closest, RGBAColor(1, 1, 1, 1));
+//	ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 1, 0, 1));
+	
 	cpFloat d1 = cpvdot(closest, p.ab);
 	if(d1 <= 0.0 && ContainsOrigin(v0.ab, v1.ab, p.ab)){
 		return EPARecurse(a, b);
@@ -147,30 +152,30 @@ draw(void)
 {
 	ChipmunkDemoDefaultDrawImpl();
 	
-//	// draw the minkowski difference origin
-//	cpVect origin = cpvzero;
-//	ChipmunkDebugDrawPoints(5.0, 1, &origin, RGBAColor(1,0,0,1));
-//	
-//	// draw the minkowski difference
-//	int shape1Count = cpPolyShapeGetNumVerts(shape1);
-//	int shape2Count = cpPolyShapeGetNumVerts(shape2);
-//	
-//	int mdiffCount = shape1Count*shape2Count;
-//	cpVect *mdiffVerts = alloca(mdiffCount*sizeof(cpVect));
-//	
-//	for(int i=0; i<shape1Count; i++){
-//		for(int j=0; j<shape2Count; j++){
-//			cpVect v1 = cpBodyLocal2World(shape1->body, cpPolyShapeGetVert(shape1, i));
-//			cpVect v2 = cpBodyLocal2World(shape2->body, cpPolyShapeGetVert(shape2, j));
-//			mdiffVerts[i*shape2Count + j] = cpvsub(v2, v1);
-//		}
-//	}
-//	
-//	cpVect *hullVerts = alloca(mdiffCount*sizeof(cpVect));
-//	int hullCount = cpConvexHull(mdiffCount, mdiffVerts, hullVerts, NULL, 0.0);
-//	
-//	ChipmunkDebugDrawPolygon(hullCount, hullVerts, RGBAColor(1, 0, 0, 1), RGBAColor(1, 0, 0, 0.25));
-//	ChipmunkDebugDrawPoints(2.0, mdiffCount, mdiffVerts, RGBAColor(1, 0, 0, 1));
+	// draw the minkowski difference origin
+	cpVect origin = cpvzero;
+	ChipmunkDebugDrawPoints(5.0, 1, &origin, RGBAColor(1,0,0,1));
+	
+	// draw the minkowski difference
+	int shape1Count = cpPolyShapeGetNumVerts(shape1);
+	int shape2Count = cpPolyShapeGetNumVerts(shape2);
+	
+	int mdiffCount = shape1Count*shape2Count;
+	cpVect *mdiffVerts = alloca(mdiffCount*sizeof(cpVect));
+	
+	for(int i=0; i<shape1Count; i++){
+		for(int j=0; j<shape2Count; j++){
+			cpVect v1 = cpBodyLocal2World(shape1->body, cpPolyShapeGetVert(shape1, i));
+			cpVect v2 = cpBodyLocal2World(shape2->body, cpPolyShapeGetVert(shape2, j));
+			mdiffVerts[i*shape2Count + j] = cpvsub(v2, v1);
+		}
+	}
+	
+	cpVect *hullVerts = alloca(mdiffCount*sizeof(cpVect));
+	int hullCount = cpConvexHull(mdiffCount, mdiffVerts, hullVerts, NULL, 0.0);
+	
+	ChipmunkDebugDrawPolygon(hullCount, hullVerts, RGBAColor(1, 0, 0, 1), RGBAColor(1, 0, 0, 0.25));
+	ChipmunkDebugDrawPoints(2.0, mdiffCount, mdiffVerts, RGBAColor(1, 0, 0, 1));
 	
 	// Draw the axis between the bodies
 //	ChipmunkDebugDrawSegment(shape2->body->p, shape1->body->p, RGBAColor(1, 1, 1, 0.5));
@@ -219,12 +224,13 @@ init(void)
 	
 	{
 		cpFloat mass = 1.0f;
-		const int NUM_VERTS = 5;
+		const int NUM_VERTS = 3;
 		
 		cpVect verts[NUM_VERTS];
 		for(int i=0; i<NUM_VERTS; i++){
+			cpFloat radius = 30.0;
 			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
-			verts[i] = cpv(30*cos(angle), 30*sin(angle));
+			verts[i] = cpv(radius*cos(angle), radius*sin(angle));
 		}
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
@@ -236,12 +242,13 @@ init(void)
 	
 	{
 		cpFloat mass = 1.0f;
-		const int NUM_VERTS = 7;
+		const int NUM_VERTS = 10;
 		
 		cpVect verts[NUM_VERTS];
 		for(int i=0; i<NUM_VERTS; i++){
+			cpFloat radius = 60.0;
 			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
-			verts[i] = cpv(30*cos(angle), 30*sin(angle));
+			verts[i] = cpv(radius*cos(angle), radius*sin(angle));
 		}
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
