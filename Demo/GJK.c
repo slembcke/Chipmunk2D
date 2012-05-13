@@ -93,7 +93,7 @@ struct ClosestPoints {
 };
 
 static struct ClosestPoints
-EPARecurse(cpShape *a, cpShape *b)
+EPARecurse(cpShape *a, cpShape *b, struct MinkowskiPoint v0, struct MinkowskiPoint v1, struct MinkowskiPoint p)
 {
 	struct ClosestPoints points = {a->body->p, b->body->p, cpvdist(a->body->p, b->body->p)};
 	return points;
@@ -113,7 +113,7 @@ GJKRecurse(cpShape *a, cpShape *b, struct MinkowskiPoint v0, struct MinkowskiPoi
 	
 	cpFloat d1 = cpvdot(closest, p.ab);
 	if(d1 <= 0.0 && ContainsOrigin(v0.ab, v1.ab, p.ab)){
-		return EPARecurse(a, b);
+		return EPARecurse(a, b, v0, v1, p);
 	} else if(d1 < cpfmin(cpvdot(closest, v0.ab), cpvdot(closest, v1.ab))){
 		if(cpvlengthsq(v0.ab) < cpvlengthsq(v1.ab)){
 			return GJKRecurse(a, b, v0, p);
