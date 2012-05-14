@@ -333,9 +333,22 @@ ClipContacts(struct Edge ref, struct Edge inc, cpFloat flipped)
 		ChipmunkDebugDrawPoints(5.0, 1, &point.v, RGBAColor(1, 0, 1, 1));
 		ChipmunkDemoPrintString("2:{depth:%.2f, hash:%X}\n", d2, point.hash);
 	}
+}
+
+static void
+ContactPoints(cpShape *a, cpShape *b, struct ClosestPoints points)
+{
+	if(points.d > 0.0) return;
 	
-//	ChipmunkDemoPrintString("hash1:%x, hash2:%x\n", result_a.hash, result_b.hash);
+	cpVect n = cpvmult(cpvsub(points.b, points.a), 1.0f/points.d);
+	struct Edge f1 = SupportEdge(shape1, n);
+	struct Edge f2 = SupportEdge(shape2, cpvneg(n));
 	
+	if(cpvdot(f1.n, n) > -cpvdot(f2.n, n)){
+		ClipContacts(f1, f2, 1.0);
+	} else {
+		ClipContacts(f2, f1, -1.0);
+	}
 }
 
 static void
@@ -386,17 +399,7 @@ draw(void)
 	ChipmunkDemoPrintString("Distance: %.2f\n", pair.d);
 	
 //	if(pair.d < 0.0)
-	{
-		cpVect n = cpvmult(cpvsub(pair.b, pair.a), 1.0f/pair.d);
-		struct Edge f1 = SupportEdge(shape1, n);
-		struct Edge f2 = SupportEdge(shape2, cpvneg(n));
-		
-		if(cpvdot(f1.n, n) > -cpvdot(f2.n, n)){
-			ClipContacts(f1, f2, 1.0);
-		} else {
-			ClipContacts(f2, f1, -1.0);
-		}
-	}
+	ContactPoints(shape1, shape2, pair);
 }
 
 static cpSpace *
