@@ -31,14 +31,14 @@ static cpSpace *space;
 static cpShape *shape1, *shape2;
 
 static cpVect
-SupportPoint(cpShape *shape, cpVect n)
+SupportPoint_reference(cpShape *shape, cpVect n)
 {
 	cpFloat max = -INFINITY;
 	cpVect point = cpvzero;
 	
 	int count = cpPolyShapeGetNumVerts(shape);
 	for(int i=0; i<count; i++){
-		cpVect v = cpBodyLocal2World(shape->body, cpPolyShapeGetVert(shape, i));;
+		cpVect v = cpBodyLocal2World(shape->body, cpPolyShapeGetVert(shape, i));
 		cpFloat d = cpvdot(v, n);
 		if(d > max){
 			max = d;
@@ -46,6 +46,38 @@ SupportPoint(cpShape *shape, cpVect n)
 		}
 	}
 	
+	return point;
+}
+
+static cpVect
+SupportPoint(cpShape *shape, cpVect n)
+{
+	cpPolyShape *poly = (cpPolyShape *)shape;
+	
+	int min, max;
+	if(cpvcross(poly->tPlanes[0].n, n) < 0.0){
+		min = 0;
+		max = poly->splitLeft;
+	} else {
+		min = poly->splitRight;
+		max = poly->numVerts - 1;
+	}
+	
+	while(min < max){
+		int mid = (min + max + 1)/2;
+		if(cpvcross(poly->tPlanes[mid].n, n) > 0.0){
+			max = mid - 1;
+		} else {
+			min = mid;
+		}
+	}
+	
+	cpVect point = poly->tVerts[min];
+	cpVect point2 = SupportPoint_reference(shape, n);
+//	printf("point:%s, ", cpvstr(cpvsub(point, shape->body->p)));
+//	printf("point2:%s ", cpvstr(cpvsub(point2, shape->body->p)));
+//	printf("n:%s\n", cpvstr(n));
+	cpAssertHard(cpfabs(cpvdot(point, n) - cpvdot(point2, n)) < 1e-5, "Support points not equal.");
 	return point;
 }
 
@@ -118,7 +150,6 @@ EPANodeInit(struct EPANode *node, struct MinkowskiPoint v0, struct MinkowskiPoin
 	node->v0 = v0;
 	node->v1 = v1;
 	node->best = node;
-	node->left = node->right = node->parent = NULL; // TEMP
 	node->closest = closest;
 	node->t = t;
 	node->dist = cpvlength(closest);
@@ -139,8 +170,6 @@ EPANodeSplit(struct EPANode *parent, struct EPANode *left, struct EPANode *right
 			node->dist = node->right->dist;
 			node->best = node->right->best;
 		}
-		
-		// TODO short circuit?
 	}
 }
 
@@ -152,12 +181,12 @@ EPARecurse(cpShape *a, cpShape *b, struct EPANode *root, int i)
 	struct MinkowskiPoint p = Support(a, b, closest);
 	
 	if(cpvdot(closest, p.ab) > cpfmax(cpvdot(closest, best->v0.ab), cpvdot(closest, best->v1.ab))){
-		ChipmunkDebugDrawPolygon(3, (cpVect[]){best->v0.ab, best->v1.ab, p.ab}, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
-		ChipmunkDebugDrawPoints(3.0, 1, &closest, RGBAColor(1, 1, 0, 1));
-		ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 0, 1, 1));
+//		ChipmunkDebugDrawPolygon(3, (cpVect[]){best->v0.ab, best->v1.ab, p.ab}, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
+//		ChipmunkDebugDrawPoints(3.0, 1, &closest, RGBAColor(1, 1, 0, 1));
+//		ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 0, 1, 1));
 		
-		struct EPANode left = {}; EPANodeInit(&left, best->v0, p);
-		struct EPANode right = {}; EPANodeInit(&right, p, best->v1);
+		struct EPANode left; EPANodeInit(&left, best->v0, p);
+		struct EPANode right; EPANodeInit(&right, p, best->v1);
 		EPANodeSplit(best, &left, &right);
 		
 		return EPARecurse(a, b, root, i+1);
@@ -170,13 +199,13 @@ EPARecurse(cpShape *a, cpShape *b, struct EPANode *root, int i)
 static struct ClosestPoints
 EPA(cpShape *a, cpShape *b, struct MinkowskiPoint v0, struct MinkowskiPoint v1, struct MinkowskiPoint v2)
 {
-	ChipmunkDebugDrawPolygon(3, (cpVect[]){v0.ab, v1.ab, v2.ab}, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
+//	ChipmunkDebugDrawPolygon(3, (cpVect[]){v0.ab, v1.ab, v2.ab}, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
 		
-	struct EPANode n01 = {}; EPANodeInit(&n01, v0, v1);
-	struct EPANode n12 = {}; EPANodeInit(&n12, v1, v2);
-	struct EPANode n20 = {}; EPANodeInit(&n20, v2, v0);
+	struct EPANode n01; EPANodeInit(&n01, v0, v1);
+	struct EPANode n12; EPANodeInit(&n12, v1, v2);
+	struct EPANode n20; EPANodeInit(&n20, v2, v0);
 	
-	struct EPANode inner = {}, root = {};
+	struct EPANode inner, root = {};
 	EPANodeSplit(&inner, &n01, &n12);
 	EPANodeSplit(&root, &inner, &n20);
 	
@@ -233,33 +262,30 @@ draw(void)
 {
 	ChipmunkDemoDefaultDrawImpl();
 	
-	// draw the minkowski difference origin
-	cpVect origin = cpvzero;
-	ChipmunkDebugDrawPoints(5.0, 1, &origin, RGBAColor(1,0,0,1));
-	
-	// draw the minkowski difference
-	int shape1Count = cpPolyShapeGetNumVerts(shape1);
-	int shape2Count = cpPolyShapeGetNumVerts(shape2);
-	
-	int mdiffCount = shape1Count*shape2Count;
-	cpVect *mdiffVerts = alloca(mdiffCount*sizeof(cpVect));
-	
-	for(int i=0; i<shape1Count; i++){
-		for(int j=0; j<shape2Count; j++){
-			cpVect v1 = cpBodyLocal2World(shape1->body, cpPolyShapeGetVert(shape1, i));
-			cpVect v2 = cpBodyLocal2World(shape2->body, cpPolyShapeGetVert(shape2, j));
-			mdiffVerts[i*shape2Count + j] = cpvsub(v2, v1);
-		}
-	}
-	
-	cpVect *hullVerts = alloca(mdiffCount*sizeof(cpVect));
-	int hullCount = cpConvexHull(mdiffCount, mdiffVerts, hullVerts, NULL, 0.0);
-	
-	ChipmunkDebugDrawPolygon(hullCount, hullVerts, RGBAColor(1, 0, 0, 1), RGBAColor(1, 0, 0, 0.25));
-	ChipmunkDebugDrawPoints(2.0, mdiffCount, mdiffVerts, RGBAColor(1, 0, 0, 1));
-	
-	// Draw the axis between the bodies
-//	ChipmunkDebugDrawSegment(shape2->body->p, shape1->body->p, RGBAColor(1, 1, 1, 0.5));
+//	// draw the minkowski difference origin
+//	cpVect origin = cpvzero;
+//	ChipmunkDebugDrawPoints(5.0, 1, &origin, RGBAColor(1,0,0,1));
+//	
+//	// draw the minkowski difference
+//	int shape1Count = cpPolyShapeGetNumVerts(shape1);
+//	int shape2Count = cpPolyShapeGetNumVerts(shape2);
+//	
+//	int mdiffCount = shape1Count*shape2Count;
+//	cpVect *mdiffVerts = alloca(mdiffCount*sizeof(cpVect));
+//	
+//	for(int i=0; i<shape1Count; i++){
+//		for(int j=0; j<shape2Count; j++){
+//			cpVect v1 = cpBodyLocal2World(shape1->body, cpPolyShapeGetVert(shape1, i));
+//			cpVect v2 = cpBodyLocal2World(shape2->body, cpPolyShapeGetVert(shape2, j));
+//			mdiffVerts[i*shape2Count + j] = cpvsub(v2, v1);
+//		}
+//	}
+//	
+//	cpVect *hullVerts = alloca(mdiffCount*sizeof(cpVect));
+//	int hullCount = cpConvexHull(mdiffCount, mdiffVerts, hullVerts, NULL, 0.0);
+//	
+//	ChipmunkDebugDrawPolygon(hullCount, hullVerts, RGBAColor(1, 0, 0, 1), RGBAColor(1, 0, 0, 0.25));
+//	ChipmunkDebugDrawPoints(2.0, mdiffCount, mdiffVerts, RGBAColor(1, 0, 0, 1));
 	
 	struct ClosestPoints pair = ClosestPoints(shape1, shape2);
 	cpVect points[] = {pair.a, pair.b};
@@ -278,21 +304,32 @@ init(void)
 	
 	{
 		cpFloat mass = 1.0f;
-		const int NUM_VERTS = 4;
+		cpFloat size = 100.0f;
 		
-		cpVect verts[NUM_VERTS];
-		for(int i=0; i<NUM_VERTS; i++){
-			cpFloat radius = 40.0;
-			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
-			verts[i] = cpv(radius*cos(angle), radius*sin(angle));
-		}
-		
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
 		cpBodySetPos(body, cpv(50.0f, 0.0f));
 		
-		shape1 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
+		shape1 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
 		shape1->group = 1;
 	}
+	
+//	{
+//		cpFloat mass = 1.0f;
+//		const int NUM_VERTS = 4;
+//		
+//		cpVect verts[NUM_VERTS];
+//		for(int i=0; i<NUM_VERTS; i++){
+//			cpFloat radius = 40.0;
+//			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
+//			verts[i] = cpv(radius*cos(angle), radius*sin(angle));
+//		}
+//		
+//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
+//		cpBodySetPos(body, cpv(50.0f, 0.0f));
+//		
+//		shape1 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
+//		shape1->group = 1;
+//	}
 	
 	{
 		cpFloat mass = 1.0f;
@@ -311,6 +348,14 @@ init(void)
 		shape2 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 		shape2->group = 1;
 	}
+	
+//	cpBodySetAngle(shape1->body, 34.48);
+//	cpShapeCacheBB(shape1);
+//	int num = 40;
+//	for(int i=0; i<num; i++){
+//		SupportPoint(shape2, cpvforangle((cpFloat)i/(cpFloat)num*2.0*M_PI));
+//	}
+//	abort();
 	
 	return space;
 }

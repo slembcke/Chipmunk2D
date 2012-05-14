@@ -290,9 +290,10 @@ circle2poly(const cpShape *shape1, const cpShape *shape2, cpContact *con)
 	cpPolyShape *poly = (cpPolyShape *)shape2;
 	cpSplittingPlane *planes = poly->tPlanes;
 	
+	int numVerts = poly->numVerts;
 	int mini = 0;
 	cpFloat min = cpSplittingPlaneCompare(planes[0], circ->tc) - circ->r;
-	for(int i=0; i<poly->numVerts; i++){
+	for(int i=0; i<numVerts; i++){
 		cpFloat dist = cpSplittingPlaneCompare(planes[i], circ->tc) - circ->r;
 		if(dist > 0.0f){
 			return 0;
@@ -303,8 +304,8 @@ circle2poly(const cpShape *shape1, const cpShape *shape2, cpContact *con)
 	}
 	
 	cpVect n = planes[mini].n;
-	cpVect a = poly->tVerts[mini];
-	cpVect b = poly->tVerts[(mini + 1)%poly->numVerts];
+	cpVect a = poly->tVerts[(mini - 1 + numVerts)%numVerts];
+	cpVect b = poly->tVerts[mini];
 	cpFloat dta = cpvcross(n, a);
 	cpFloat dtb = cpvcross(n, b);
 	cpFloat dt = cpvcross(n, circ->tc);
@@ -338,37 +339,6 @@ static const collisionFunc builtinCollisionFuncs[9] = {
 	poly2poly,
 };
 static const collisionFunc *colfuncs = builtinCollisionFuncs;
-
-//static collisionFunc *colfuncs = NULL;
-//
-//static void
-//addColFunc(const cpShapeType a, const cpShapeType b, const collisionFunc func)
-//{
-//	colfuncs[a + b*CP_NUM_SHAPES] = func;
-//}
-//
-//#ifdef __cplusplus
-//extern "C" {
-//#endif
-//	void cpInitCollisionFuncs(void);
-//	
-//	// Initializes the array of collision functions.
-//	// Called by cpInitChipmunk().
-//	void
-//	cpInitCollisionFuncs(void)
-//	{
-//		if(!colfuncs)
-//			colfuncs = (collisionFunc *)cpcalloc(CP_NUM_SHAPES*CP_NUM_SHAPES, sizeof(collisionFunc));
-//		
-//		addColFunc(CP_CIRCLE_SHAPE,  CP_CIRCLE_SHAPE,  circle2circle);
-//		addColFunc(CP_CIRCLE_SHAPE,  CP_SEGMENT_SHAPE, circle2segment);
-//		addColFunc(CP_SEGMENT_SHAPE, CP_POLY_SHAPE,    seg2poly);
-//		addColFunc(CP_CIRCLE_SHAPE,  CP_POLY_SHAPE,    circle2poly);
-//		addColFunc(CP_POLY_SHAPE,    CP_POLY_SHAPE,    poly2poly);
-//	}	
-//#ifdef __cplusplus
-//}
-//#endif
 
 int
 cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr)
