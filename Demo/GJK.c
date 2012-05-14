@@ -49,8 +49,8 @@ SupportPoint_reference(cpShape *shape, cpVect n)
 	return point;
 }
 
-static cpVect
-SupportPoint(cpShape *shape, cpVect n)
+static int
+SupportPointIndex(cpShape *shape, cpVect n)
 {
 	cpPolyShape *poly = (cpPolyShape *)shape;
 	
@@ -63,7 +63,7 @@ SupportPoint(cpShape *shape, cpVect n)
 		max = poly->numVerts - 1;
 	}
 	
-	while(min < max){
+	while(min != max){
 		int mid = (min + max + 1)/2;
 		if(cpvcross(poly->tPlanes[mid].n, n) > 0.0){
 			max = mid - 1;
@@ -72,13 +72,40 @@ SupportPoint(cpShape *shape, cpVect n)
 		}
 	}
 	
-	cpVect point = poly->tVerts[min];
+	return min;
+}
+
+static cpVect
+SupportPoint(cpShape *shape, cpVect n)
+{
+	cpPolyShape *poly = (cpPolyShape *)shape;
+	
+	cpVect point = poly->tVerts[SupportPointIndex(shape, n)];
 	cpVect point2 = SupportPoint_reference(shape, n);
 //	printf("point:%s, ", cpvstr(cpvsub(point, shape->body->p)));
 //	printf("point2:%s ", cpvstr(cpvsub(point2, shape->body->p)));
 //	printf("n:%s\n", cpvstr(n));
 	cpAssertHard(cpfabs(cpvdot(point, n) - cpvdot(point2, n)) < 1e-5, "Support points not equal.");
 	return point;
+}
+
+struct Feature {
+	cpVect a, b;
+};
+
+static struct Feature
+SupportFeature(cpShape *shape, cpVect n)
+{
+	cpPolyShape *poly = (cpPolyShape *)shape;
+	int numVerts = poly->numVerts;
+	
+	int i = SupportPointIndex(shape, n);
+	cpVect v0 = poly->tVerts[(i - 1 + numVerts)%numVerts];
+	cpVect v1 = poly->tVerts[i];
+	cpVect v2 = poly->tVerts[(i + 1)%numVerts];
+	
+	struct Feature feature = {v1, (cpvdot(n, cpvsub(v1, v0)) < cpvdot(n, cpvsub(v1, v2)) ? v0 : v2)};
+	return feature;
 }
 
 struct MinkowskiPoint {
@@ -291,6 +318,15 @@ draw(void)
 	cpVect points[] = {pair.a, pair.b};
 	ChipmunkDebugDrawPoints(3.0, 2, points, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points[0], points[1], RGBAColor(1, 1, 1, 1));
+	
+	if(pair.d < 0.0){
+		cpVect n = cpvnormalize(cpvsub(pair.b, pair.a));
+		struct Feature f1 = SupportFeature(shape1, cpvneg(n));
+		struct Feature f2 = SupportFeature(shape2, n);
+		
+		ChipmunkDebugDrawSegment(f1.a, f1.b, RGBAColor(1, 0, 0, 1));
+		ChipmunkDebugDrawSegment(f2.a, f2.b, RGBAColor(1, 0, 0, 1));
+	}
 	
 	ChipmunkDemoPrintString("Distance: %f", pair.d);
 }
