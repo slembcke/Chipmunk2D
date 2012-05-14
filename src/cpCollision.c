@@ -25,26 +25,26 @@
 
 #include "chipmunk_private.h"
 
-static cpVect
-SupportPoint_reference(const cpShape *shape, const cpVect n)
-{
-	cpFloat max = -INFINITY;
-	cpVect point = cpvzero;
-	
-	int count = cpPolyShapeGetNumVerts(shape);
-	for(int i=0; i<count; i++){
-		cpVect v = cpBodyLocal2World(shape->body, cpPolyShapeGetVert(shape, i));
-		cpFloat d = cpvdot(v, n);
-		if(d > max){
-			max = d;
-			point = v;
-		}
-	}
-	
-	return point;
-}
+//static cpVect
+//SupportPoint_reference(const cpShape *shape, const cpVect n)
+//{
+//	cpFloat max = -INFINITY;
+//	cpVect point = cpvzero;
+//	
+//	int count = cpPolyShapeGetNumVerts(shape);
+//	for(int i=0; i<count; i++){
+//		cpVect v = cpBodyLocal2World(shape->body, cpPolyShapeGetVert(shape, i));
+//		cpFloat d = cpvdot(v, n);
+//		if(d > max){
+//			max = d;
+//			point = v;
+//		}
+//	}
+//	
+//	return point;
+//}
 
-static int
+static inline int
 SupportPointIndex(const cpShape *shape, const cpVect n)
 {
 	cpPolyShape *poly = (cpPolyShape *)shape;
@@ -76,8 +76,22 @@ SupportPoint(const cpShape *shape, const cpVect n)
 	cpPolyShape *poly = (cpPolyShape *)shape;
 	
 	cpVect point = poly->tVerts[SupportPointIndex(shape, n)];
-	cpVect point2 = SupportPoint_reference(shape, n);
-	cpAssertHard(cpfabs(cpvdot(point, n) - cpvdot(point2, n)) < 1e-5, "Support points not equal.");
+//	cpVect point2 = SupportPoint_reference(shape, n);
+//	cpAssertHard(cpfabs(cpvdot(point, n) - cpvdot(point2, n)) < 1e-5, "Support points not equal.");
+	return point;
+}
+
+struct MinkowskiPoint {
+	cpVect a, b, ab;
+};
+
+static inline struct MinkowskiPoint
+Support(const cpShape *shape1, const cpShape *shape2, const cpVect n)
+{
+	cpVect a = SupportPoint(shape1, cpvneg(n));
+	cpVect b = SupportPoint(shape2, n);
+	
+	struct MinkowskiPoint point = {a, b, cpvsub(b, a)};
 	return point;
 }
 
@@ -117,20 +131,6 @@ SupportEdge(const cpShape *shape, const cpVect n)
 	} else {
 		return EdgeNew(v1, v2, CP_HASH_PAIR(shape, i1), CP_HASH_PAIR(shape, i2));
 	}
-}
-
-struct MinkowskiPoint {
-	cpVect a, b, ab;
-};
-
-static struct MinkowskiPoint
-Support(const cpShape *shape1, const cpShape *shape2, const cpVect n)
-{
-	cpVect a = SupportPoint(shape1, cpvneg(n));
-	cpVect b = SupportPoint(shape2, n);
-	
-	struct MinkowskiPoint point = {a, b, cpvsub(b, a)};
-	return point;
 }
 
 static cpBool
@@ -212,19 +212,26 @@ EPANodeSplit(struct EPANode *parent, struct EPANode *left, struct EPANode *right
 }
 
 static struct ClosestPoints
-EPARecurse(const cpShape *a, const cpShape *b, struct EPANode *root)
+EPARecurse(const cpShape *a, const cpShape *b, struct EPANode *root)//, int i)
 {
+//	cpAssertHard(i < 20, "Stuck in recursion?");
+	
 	struct EPANode *best = root->best;
 	cpVect closest = best->closest;
 	struct MinkowskiPoint p = Support(a, b, closest);
 	
-	if(cpvdot(closest, p.ab) > cpfmax(cpvdot(closest, best->v0.ab), cpvdot(closest, best->v1.ab))){
+	cpFloat dp = cpvdot(closest, p.ab);
+	cpFloat d2 = cpfmax(cpvdot(closest, best->v0.ab), cpvdot(closest, best->v1.ab));
+	
+//	if(dp > d2){
+	if(dp - d2 > 1e-5){ // TODO eww, magic number
 		struct EPANode left; EPANodeInit(&left, best->v0, p);
 		struct EPANode right; EPANodeInit(&right, p, best->v1);
 		EPANodeSplit(best, &left, &right);
 		
-		return EPARecurse(a, b, root);
+		return EPARecurse(a, b, root);//, i+1);
 	} else {
+//		printf("EPA iterations %d\n", i);
 		return ClosestPointsNew(best->v0, best->v1, best->t, -1.0f);
 	}
 }
@@ -240,26 +247,34 @@ EPA(const cpShape *a, const cpShape *b, const struct MinkowskiPoint v0, const st
 	EPANodeSplit(&inner, &n01, &n12);
 	EPANodeSplit(&root, &inner, &n20);
 	
-	return EPARecurse(a, b, &root);
+	return EPARecurse(a, b, &root);//, 1);
 }
 
 static struct ClosestPoints
-GJKRecurse(const cpShape *a, const cpShape *b, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
+GJKRecurse(const cpShape *a, const cpShape *b, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)//, int i)
 {
+//	cpAssertHard(i < 20, "Stuck in recursion?");
+	
 	cpFloat t = ClosestT(v0.ab, v1.ab);
 	cpVect closest = cpvlerp(v0.ab, v1.ab, t);
 	struct MinkowskiPoint p = Support(a, b, cpvneg(closest));
 	
-	cpFloat d1 = cpvdot(closest, p.ab);
-	if(d1 <= 0.0 && ContainsOrigin(v0.ab, v1.ab, p.ab)){
+	cpFloat dp = cpvdot(closest, p.ab);
+	cpFloat d2 = cpfmin(cpvdot(closest, v0.ab), cpvdot(closest, v1.ab));
+//	cpFloat area = cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab));
+//	printf("dp:%f, d2:%f, area:%f\n", dp, d2, area);
+	if(dp <= 0.0 && ContainsOrigin(v0.ab, v1.ab, p.ab)){
+//		printf("GJK iterations %d\n", i);
 		return EPA(a, b, v0, v1, p);
-	} else if(d1 < cpfmin(cpvdot(closest, v0.ab), cpvdot(closest, v1.ab))){
-		if(cpvlengthsq(v0.ab) < cpvlengthsq(v1.ab)){
-			return GJKRecurse(a, b, v0, p);
+//	} else if(dp < cpfmin(cpvdot(closest, v0.ab), cpvdot(closest, v1.ab))){
+	} else if(dp - d2 > 1e-5){ // TODO eww, magic number
+		if(cpvlengthsq(v0.ab) <= cpvlengthsq(v1.ab)){
+			return GJKRecurse(a, b, v0, p);//, i+1);
 		} else {
-			return GJKRecurse(a, b, p, v1);
+			return GJKRecurse(a, b, p, v1);//, i+1);
 		}
 	} else {
+//		printf("GJK iterations %d\n", i);
 		return ClosestPointsNew(v0, v1, t, 1.0);
 	}
 }
@@ -268,7 +283,7 @@ static struct ClosestPoints
 ClosestPoints(const cpShape *a, const cpShape *b)
 {
 	cpVect axis = cpvperp(cpvsub(a->body->p, b->body->p));
-	return GJKRecurse(a, b, Support(a, b, axis), Support(a, b, cpvneg(axis)));
+	return GJKRecurse(a, b, Support(a, b, axis), Support(a, b, cpvneg(axis)));//, 1);
 }
 
 // Helper function for working with contact buffers

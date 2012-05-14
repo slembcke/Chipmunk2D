@@ -464,7 +464,7 @@ MarkSubtree(Node *subtree, MarkContext *context)
 		MarkLeaf(subtree, context);
 	} else {
 		MarkSubtree(subtree->A, context);
-		MarkSubtree(subtree->B, context);
+		MarkSubtree(subtree->B, context); // Force TCO here?
 	}
 }
 
