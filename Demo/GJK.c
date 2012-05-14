@@ -89,23 +89,42 @@ SupportPoint(cpShape *shape, cpVect n)
 	return point;
 }
 
-struct Feature {
-	cpVect a, b;
+struct EdgePoint {
+	cpVect v;
+	int hash;
 };
 
-static struct Feature
-SupportFeature(cpShape *shape, cpVect n)
+struct Edge {
+	struct EdgePoint a, b;
+	cpVect n;
+};
+
+static inline struct Edge
+EdgeNew(cpVect va, cpVect vb, int ha, int hb)
+{
+	struct Edge edge = {{va, ha}, {vb, hb}, cpvnormalize(cpvperp(cpvsub(vb, va)))};
+	return edge;
+}
+
+static struct Edge
+SupportEdge(cpShape *shape, cpVect n)
 {
 	cpPolyShape *poly = (cpPolyShape *)shape;
 	int numVerts = poly->numVerts;
 	
-	int i = SupportPointIndex(shape, n);
-	cpVect v0 = poly->tVerts[(i - 1 + numVerts)%numVerts];
-	cpVect v1 = poly->tVerts[i];
-	cpVect v2 = poly->tVerts[(i + 1)%numVerts];
+	int i1 = SupportPointIndex(shape, n);
+	int i0 = (i1 - 1 + numVerts)%numVerts;
+	int i2 = (i1 + 1)%numVerts;
 	
-	struct Feature feature = {v1, (cpvdot(n, cpvsub(v1, v0)) < cpvdot(n, cpvsub(v1, v2)) ? v0 : v2)};
-	return feature;
+	cpVect v0 = poly->tVerts[i0];
+	cpVect v1 = poly->tVerts[i1];
+	cpVect v2 = poly->tVerts[i2];
+	
+	if(cpvdot(n, cpvsub(v1, v0)) < cpvdot(n, cpvsub(v1, v2))){
+		return EdgeNew(v0, v1, CP_HASH_PAIR(shape, i0), CP_HASH_PAIR(shape, i1));
+	} else {
+		return EdgeNew(v1, v2, CP_HASH_PAIR(shape, i1), CP_HASH_PAIR(shape, i2));
+	}
 }
 
 struct MinkowskiPoint {
@@ -274,6 +293,52 @@ ClosestPoints(cpShape *a, cpShape *b)
 }
 
 static void
+ClipContacts(struct Edge ref, struct Edge inc, cpFloat flipped)
+{
+	cpVect midref = cpvlerp(ref.a.v, ref.b.v, 0.5);
+	ChipmunkDebugDrawSegment(ref.a.v, ref.b.v, RGBAColor(1, 0, 0, 1));
+	ChipmunkDebugDrawSegment(midref, cpvadd(midref, cpvmult(ref.n, 10.0)), RGBAColor(1, 0, 0, 1));
+	
+	cpVect midinc = cpvlerp(inc.a.v, inc.b.v, 0.5);
+	ChipmunkDebugDrawSegment(inc.a.v, inc.b.v, RGBAColor(0, 1, 0, 1));
+	ChipmunkDebugDrawSegment(midinc, cpvadd(midinc, cpvmult(inc.n, 10.0)), RGBAColor(0, 1, 0, 1));
+	
+	ChipmunkDebugDrawPoints(5.0, 1, &ref.a.v, RGBAColor(1, 1, 0, 1));
+	ChipmunkDebugDrawPoints(5.0, 1, &ref.b.v, RGBAColor(0, 1, 1, 1));
+	
+	ChipmunkDebugDrawPoints(5.0, 1, &inc.a.v, RGBAColor(1, 1, 0, 1));
+	ChipmunkDebugDrawPoints(5.0, 1, &inc.b.v, RGBAColor(0, 1, 1, 1));
+	
+	cpFloat cian = cpvcross(inc.a.v, ref.n);
+	cpFloat cibn = cpvcross(inc.b.v, ref.n);
+	cpFloat cran = cpvcross(ref.a.v, ref.n);
+	cpFloat crbn = cpvcross(ref.b.v, ref.n);
+	
+	cpFloat dran = cpvdot(ref.a.v, ref.n);
+	cpFloat dian = cpvdot(inc.a.v, ref.n) - dran;
+	cpFloat dibn = cpvdot(inc.b.v, ref.n) - dran;
+	
+	cpFloat t1 = cpfclamp01((cian - cran)/(cian - cibn));
+	cpFloat d1 = cpflerp(dian, dibn, t1);
+	if(d1 < 0.0){
+		struct EdgePoint point = {t1 < 1.0 ? ref.a.v : inc.b.v, CP_HASH_PAIR(ref.a.hash, inc.b.hash)};
+		ChipmunkDebugDrawPoints(5.0, 1, &point.v, RGBAColor(1, 0, 1, 1));
+		ChipmunkDemoPrintString("1:{depth:%.2f, hash:%X}, ", d1, point.hash);
+	}
+	
+	cpFloat t2 = cpfclamp01((cibn - crbn)/(cibn - cian));
+	cpFloat d2 = cpflerp(dibn, dian, t2);
+	if(d2 < 0.0){
+		struct EdgePoint point = {t2 < 1.0 ? ref.b.v : inc.a.v, CP_HASH_PAIR(ref.b.hash, inc.a.hash)};
+		ChipmunkDebugDrawPoints(5.0, 1, &point.v, RGBAColor(1, 0, 1, 1));
+		ChipmunkDemoPrintString("2:{depth:%.2f, hash:%X}\n", d2, point.hash);
+	}
+	
+//	ChipmunkDemoPrintString("hash1:%x, hash2:%x\n", result_a.hash, result_b.hash);
+	
+}
+
+static void
 update(int ticks)
 {
 	int steps = 1;
@@ -318,17 +383,20 @@ draw(void)
 	cpVect points[] = {pair.a, pair.b};
 	ChipmunkDebugDrawPoints(3.0, 2, points, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points[0], points[1], RGBAColor(1, 1, 1, 1));
+	ChipmunkDemoPrintString("Distance: %.2f\n", pair.d);
 	
-	if(pair.d < 0.0){
-		cpVect n = cpvnormalize(cpvsub(pair.b, pair.a));
-		struct Feature f1 = SupportFeature(shape1, cpvneg(n));
-		struct Feature f2 = SupportFeature(shape2, n);
+//	if(pair.d < 0.0)
+	{
+		cpVect n = cpvmult(cpvsub(pair.b, pair.a), 1.0f/pair.d);
+		struct Edge f1 = SupportEdge(shape1, n);
+		struct Edge f2 = SupportEdge(shape2, cpvneg(n));
 		
-		ChipmunkDebugDrawSegment(f1.a, f1.b, RGBAColor(1, 0, 0, 1));
-		ChipmunkDebugDrawSegment(f2.a, f2.b, RGBAColor(1, 0, 0, 1));
+		if(cpvdot(f1.n, n) > -cpvdot(f2.n, n)){
+			ClipContacts(f1, f2, 1.0);
+		} else {
+			ClipContacts(f2, f1, -1.0);
+		}
 	}
-	
-	ChipmunkDemoPrintString("Distance: %f", pair.d);
 }
 
 static cpSpace *
