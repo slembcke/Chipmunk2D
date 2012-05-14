@@ -224,7 +224,7 @@ EPARecurse(const cpShape *a, const cpShape *b, struct EPANode *root)//, int i)
 	cpFloat d2 = cpfmax(cpvdot(closest, best->v0.ab), cpvdot(closest, best->v1.ab));
 	
 //	if(dp > d2){
-	if(dp - d2 > 1e-5){ // TODO eww, magic number
+	if(dp - d2 > 1e-5f){ // TODO eww, magic number
 		struct EPANode left; EPANodeInit(&left, best->v0, p);
 		struct EPANode right; EPANodeInit(&right, p, best->v1);
 		EPANodeSplit(best, &left, &right);
@@ -267,7 +267,7 @@ GJKRecurse(const cpShape *a, const cpShape *b, const struct MinkowskiPoint v0, c
 //		printf("GJK iterations %d\n", i);
 		return EPA(a, b, v0, v1, p);
 //	} else if(dp < cpfmin(cpvdot(closest, v0.ab), cpvdot(closest, v1.ab))){
-	} else if(dp - d2 > 1e-5){ // TODO eww, magic number
+	} else if(dp - d2 < -1e-5f){ // TODO eww, magic number
 		if(cpvlengthsq(v0.ab) <= cpvlengthsq(v1.ab)){
 			return GJKRecurse(a, b, v0, p);//, i+1);
 		} else {
@@ -327,7 +327,7 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpFloat flipped, cpCo
 		cpContactInit(nextContactPoint(arr, &numContacts), t2 < 1.0 ? ref.b.v : inc.a.v, cpvmult(ref.n, flipped), d2, CP_HASH_PAIR(ref.b.hash, inc.a.hash));
 	}
 	
-	cpAssertHard(numContacts > 0, "No contacts?");
+	cpAssertWarn(numContacts > 0, "No contacts?");
 	return numContacts;
 }
 
