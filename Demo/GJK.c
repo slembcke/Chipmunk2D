@@ -252,7 +252,7 @@ EPA(cpShape *a, cpShape *b, struct MinkowskiPoint v0, struct MinkowskiPoint v1, 
 	struct EPANode n12; EPANodeInit(&n12, v1, v2);
 	struct EPANode n20; EPANodeInit(&n20, v2, v0);
 	
-	struct EPANode inner, root = {};
+	struct EPANode inner = {}, root = {};
 	EPANodeSplit(&inner, &n01, &n12);
 	EPANodeSplit(&root, &inner, &n20);
 	
@@ -266,9 +266,9 @@ GJKRecurse(cpShape *a, cpShape *b, struct MinkowskiPoint v0, struct MinkowskiPoi
 	cpVect closest = cpvlerp(v0.ab, v1.ab, t);
 	struct MinkowskiPoint p = Support(a, b, cpvneg(closest));
 	
-	ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 1));
-	ChipmunkDebugDrawPoints(3.0, 1, &closest, RGBAColor(1, 1, 1, 1));
-	ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 1, 0, 1));
+//	ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 1));
+//	ChipmunkDebugDrawPoints(3.0, 1, &closest, RGBAColor(1, 1, 1, 1));
+//	ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 1, 0, 1));
 	
 	cpFloat dp = cpvdot(closest, p.ab);
 	cpFloat d2 = cpfmin(cpvdot(closest, v0.ab), cpvdot(closest, v1.ab));
@@ -301,19 +301,19 @@ ClosestPoints(cpShape *a, cpShape *b)
 static void
 ClipContacts(struct Edge ref, struct Edge inc, cpFloat flipped)
 {
-	cpVect midref = cpvlerp(ref.a.v, ref.b.v, 0.5);
-	ChipmunkDebugDrawSegment(ref.a.v, ref.b.v, RGBAColor(1, 0, 0, 1));
-	ChipmunkDebugDrawSegment(midref, cpvadd(midref, cpvmult(ref.n, 10.0)), RGBAColor(1, 0, 0, 1));
-	
-	cpVect midinc = cpvlerp(inc.a.v, inc.b.v, 0.5);
-	ChipmunkDebugDrawSegment(inc.a.v, inc.b.v, RGBAColor(0, 1, 0, 1));
-	ChipmunkDebugDrawSegment(midinc, cpvadd(midinc, cpvmult(inc.n, 10.0)), RGBAColor(0, 1, 0, 1));
-	
-	ChipmunkDebugDrawPoints(5.0, 1, &ref.a.v, RGBAColor(1, 1, 0, 1));
-	ChipmunkDebugDrawPoints(5.0, 1, &ref.b.v, RGBAColor(0, 1, 1, 1));
-	
-	ChipmunkDebugDrawPoints(5.0, 1, &inc.a.v, RGBAColor(1, 1, 0, 1));
-	ChipmunkDebugDrawPoints(5.0, 1, &inc.b.v, RGBAColor(0, 1, 1, 1));
+//	cpVect midref = cpvlerp(ref.a.v, ref.b.v, 0.5);
+//	ChipmunkDebugDrawSegment(ref.a.v, ref.b.v, RGBAColor(1, 0, 0, 1));
+//	ChipmunkDebugDrawSegment(midref, cpvadd(midref, cpvmult(ref.n, 10.0)), RGBAColor(1, 0, 0, 1));
+//	
+//	cpVect midinc = cpvlerp(inc.a.v, inc.b.v, 0.5);
+//	ChipmunkDebugDrawSegment(inc.a.v, inc.b.v, RGBAColor(0, 1, 0, 1));
+//	ChipmunkDebugDrawSegment(midinc, cpvadd(midinc, cpvmult(inc.n, 10.0)), RGBAColor(0, 1, 0, 1));
+//	
+//	ChipmunkDebugDrawPoints(5.0, 1, &ref.a.v, RGBAColor(1, 1, 0, 1));
+//	ChipmunkDebugDrawPoints(5.0, 1, &ref.b.v, RGBAColor(0, 1, 1, 1));
+//	
+//	ChipmunkDebugDrawPoints(5.0, 1, &inc.a.v, RGBAColor(1, 1, 0, 1));
+//	ChipmunkDebugDrawPoints(5.0, 1, &inc.b.v, RGBAColor(0, 1, 1, 1));
 	
 	cpFloat cian = cpvcross(inc.a.v, ref.n);
 	cpFloat cibn = cpvcross(inc.b.v, ref.n);
@@ -328,16 +328,16 @@ ClipContacts(struct Edge ref, struct Edge inc, cpFloat flipped)
 	cpFloat d1 = cpflerp(dian, dibn, t1);
 	if(d1 < 0.0){
 		struct EdgePoint point = {t1 < 1.0 ? ref.a.v : inc.b.v, CP_HASH_PAIR(ref.a.hash, inc.b.hash)};
-		ChipmunkDebugDrawPoints(5.0, 1, &point.v, RGBAColor(1, 0, 1, 1));
-		ChipmunkDemoPrintString("1:{depth:%.2f, hash:%X}, ", d1, point.hash);
+//		ChipmunkDebugDrawPoints(5.0, 1, &point.v, RGBAColor(1, 0, 1, 1));
+//		ChipmunkDemoPrintString("1:{depth:%.2f, hash:%X}, ", d1, point.hash);
 	}
 	
 	cpFloat t2 = cpfclamp01((cibn - crbn)/(cibn - cian));
 	cpFloat d2 = cpflerp(dibn, dian, t2);
 	if(d2 < 0.0){
 		struct EdgePoint point = {t2 < 1.0 ? ref.b.v : inc.a.v, CP_HASH_PAIR(ref.b.hash, inc.a.hash)};
-		ChipmunkDebugDrawPoints(5.0, 1, &point.v, RGBAColor(1, 0, 1, 1));
-		ChipmunkDemoPrintString("2:{depth:%.2f, hash:%X}\n", d2, point.hash);
+//		ChipmunkDebugDrawPoints(5.0, 1, &point.v, RGBAColor(1, 0, 1, 1));
+//		ChipmunkDemoPrintString("2:{depth:%.2f, hash:%X}\n", d2, point.hash);
 	}
 }
 
@@ -376,30 +376,30 @@ draw(void)
 {
 	ChipmunkDemoDefaultDrawImpl();
 	
-	// draw the minkowski difference origin
-	cpVect origin = cpvzero;
-	ChipmunkDebugDrawPoints(5.0, 1, &origin, RGBAColor(1,0,0,1));
-	
-	// draw the minkowski difference
-	int shape1Count = cpPolyShapeGetNumVerts(shape1);
-	int shape2Count = cpPolyShapeGetNumVerts(shape2);
-	
-	int mdiffCount = shape1Count*shape2Count;
-	cpVect *mdiffVerts = alloca(mdiffCount*sizeof(cpVect));
-	
-	for(int i=0; i<shape1Count; i++){
-		for(int j=0; j<shape2Count; j++){
-			cpVect v1 = cpBodyLocal2World(shape1->body, cpPolyShapeGetVert(shape1, i));
-			cpVect v2 = cpBodyLocal2World(shape2->body, cpPolyShapeGetVert(shape2, j));
-			mdiffVerts[i*shape2Count + j] = cpvsub(v2, v1);
-		}
-	}
-	
-	cpVect *hullVerts = alloca(mdiffCount*sizeof(cpVect));
-	int hullCount = cpConvexHull(mdiffCount, mdiffVerts, hullVerts, NULL, 0.0);
-	
-	ChipmunkDebugDrawPolygon(hullCount, hullVerts, RGBAColor(1, 0, 0, 1), RGBAColor(1, 0, 0, 0.25));
-	ChipmunkDebugDrawPoints(2.0, mdiffCount, mdiffVerts, RGBAColor(1, 0, 0, 1));
+//	// draw the minkowski difference origin
+//	cpVect origin = cpvzero;
+//	ChipmunkDebugDrawPoints(5.0, 1, &origin, RGBAColor(1,0,0,1));
+//	
+//	// draw the minkowski difference
+//	int shape1Count = cpPolyShapeGetNumVerts(shape1);
+//	int shape2Count = cpPolyShapeGetNumVerts(shape2);
+//	
+//	int mdiffCount = shape1Count*shape2Count;
+//	cpVect *mdiffVerts = alloca(mdiffCount*sizeof(cpVect));
+//	
+//	for(int i=0; i<shape1Count; i++){
+//		for(int j=0; j<shape2Count; j++){
+//			cpVect v1 = cpBodyLocal2World(shape1->body, cpPolyShapeGetVert(shape1, i));
+//			cpVect v2 = cpBodyLocal2World(shape2->body, cpPolyShapeGetVert(shape2, j));
+//			mdiffVerts[i*shape2Count + j] = cpvsub(v2, v1);
+//		}
+//	}
+//	
+//	cpVect *hullVerts = alloca(mdiffCount*sizeof(cpVect));
+//	int hullCount = cpConvexHull(mdiffCount, mdiffVerts, hullVerts, NULL, 0.0);
+//	
+//	ChipmunkDebugDrawPolygon(hullCount, hullVerts, RGBAColor(1, 0, 0, 1), RGBAColor(1, 0, 0, 0.25));
+//	ChipmunkDebugDrawPoints(2.0, mdiffCount, mdiffVerts, RGBAColor(1, 0, 0, 1));
 	
 	struct ClosestPoints pair = ClosestPoints(shape1, shape2);
 	cpVect points[] = {pair.a, pair.b};
