@@ -27,9 +27,6 @@
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-static cpShape *shape1, *shape2;
-
 static cpVect
 SupportPoint_reference(cpShape *shape, cpVect n)
 {
@@ -341,8 +338,8 @@ ContactPoints(cpShape *a, cpShape *b, struct ClosestPoints points)
 	if(points.d > 0.0) return;
 	
 	cpVect n = cpvmult(cpvsub(points.b, points.a), 1.0f/points.d);
-	struct Edge f1 = SupportEdge(shape1, n);
-	struct Edge f2 = SupportEdge(shape2, cpvneg(n));
+	struct Edge f1 = SupportEdge(a, n);
+	struct Edge f2 = SupportEdge(b, cpvneg(n));
 	
 	if(cpvdot(f1.n, n) > -cpvdot(f2.n, n)){
 		ClipContacts(f1, f2, 1.0);
@@ -350,6 +347,9 @@ ContactPoints(cpShape *a, cpShape *b, struct ClosestPoints points)
 		ClipContacts(f2, f1, -1.0);
 	}
 }
+
+static cpSpace *space;
+static cpShape *shape1, *shape2;
 
 static void
 update(int ticks)
@@ -398,7 +398,6 @@ draw(void)
 	ChipmunkDebugDrawSegment(points[0], points[1], RGBAColor(1, 1, 1, 1));
 	ChipmunkDemoPrintString("Distance: %.2f\n", pair.d);
 	
-//	if(pair.d < 0.0)
 	ContactPoints(shape1, shape2, pair);
 }
 

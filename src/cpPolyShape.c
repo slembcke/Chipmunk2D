@@ -165,14 +165,14 @@ cpPolyValidate(const cpVect *verts, const int numVerts)
 }
 
 int
-cpPolyShapeGetNumVerts(cpShape *shape)
+cpPolyShapeGetNumVerts(const cpShape *shape)
 {
 	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
 	return ((cpPolyShape *)shape)->numVerts;
 }
 
 cpVect
-cpPolyShapeGetVert(cpShape *shape, int idx)
+cpPolyShapeGetVert(const cpShape *shape, int idx)
 {
 	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
 	cpAssertHard(0 <= idx && idx < cpPolyShapeGetNumVerts(shape), "Index out of range.");

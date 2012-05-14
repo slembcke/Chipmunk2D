@@ -64,8 +64,8 @@ cpShape* cpBoxShapeNew2(cpBody *body, cpBB box);
 cpBool cpPolyValidate(const cpVect *verts, const int numVerts);
 
 /// Get the number of verts in a polygon shape.
-int cpPolyShapeGetNumVerts(cpShape *shape);
+int cpPolyShapeGetNumVerts(const cpShape *shape);
 /// Get the @c ith vertex of a polygon shape.
-cpVect cpPolyShapeGetVert(cpShape *shape, int idx);
+cpVect cpPolyShapeGetVert(const cpShape *shape, int idx);
 
 /// @}
