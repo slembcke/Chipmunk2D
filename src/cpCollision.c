@@ -119,7 +119,7 @@ SupportEdge(const cpShape *shape, const cpVect n)
 	int numVerts = poly->numVerts;
 	
 	int i1 = SupportPointIndex(shape, n);
-	int i0 = (i1 - 1 + numVerts)%numVerts;
+	int i0 = (i1 - 1 + numVerts)%numVerts; // TODO get rid of mod, very expensive on ARM
 	int i2 = (i1 + 1)%numVerts;
 	
 	cpVect v0 = poly->tVerts[i0];
