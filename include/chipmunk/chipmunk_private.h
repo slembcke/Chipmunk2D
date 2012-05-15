@@ -135,18 +135,49 @@ cpSplittingPlaneCompare(cpSplittingPlane plane, cpVect v)
 
 void cpLoopIndexes(cpVect *verts, int count, int *start, int *end);
 
+static inline int
+cpSupportPointIndex(const cpPolyShape *poly, const cpVect n)
+{
+	int min, max;
+	if(cpvcross(poly->tPlanes[0].n, n) < 0.0){
+		min = 0;
+		max = poly->splitLeft;
+	} else {
+		min = poly->splitRight;
+		max = poly->numVerts - 1;
+	}
+	
+	while(min != max){
+		int mid = (min + max + 1)/2;
+		if(cpvcross(poly->tPlanes[mid].n, n) > 0.0){
+			max = mid - 1;
+		} else {
+			min = mid;
+		}
+	}
+	
+	return min;
+}
+
 static inline cpFloat
 cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
 {
-	cpVect *verts = poly->tVerts;
-	cpFloat min = cpvdot(n, verts[0]);
-	
-	for(int i=1; i<poly->numVerts; i++){
-		min = cpfmin(min, cpvdot(n, verts[i]));
-	}
-	
-	return min - d;
+	cpVect p = poly->tVerts[cpSupportPointIndex(poly, cpvneg(n))];
+	return cpvdot(n, p) - d;
 }
+
+//static inline cpFloat
+//cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
+//{
+//	cpVect *verts = poly->tVerts;
+//	cpFloat min = cpvdot(n, verts[0]);
+//	
+//	for(int i=1; i<poly->numVerts; i++){
+//		min = cpfmin(min, cpvdot(n, verts[i]));
+//	}
+//	
+//	return min - d;
+//}
 
 static inline cpBool
 cpPolyShapeContainsVert(const cpPolyShape *poly, const cpVect v)
@@ -161,19 +192,19 @@ cpPolyShapeContainsVert(const cpPolyShape *poly, const cpVect v)
 	return cpTrue;
 }
 
-static inline cpBool
-cpPolyShapeContainsVertPartial(const cpPolyShape *poly, const cpVect v, const cpVect n)
-{
-	cpSplittingPlane *planes = poly->tPlanes;
-	
-	for(int i=0; i<poly->numVerts; i++){
-		if(cpvdot(planes[i].n, n) < 0.0f) continue;
-		cpFloat dist = cpSplittingPlaneCompare(planes[i], v);
-		if(dist > 0.0f) return cpFalse;
-	}
-	
-	return cpTrue;
-}
+//static inline cpBool
+//cpPolyShapeContainsVertPartial(const cpPolyShape *poly, const cpVect v, const cpVect n)
+//{
+//	cpSplittingPlane *planes = poly->tPlanes;
+//	
+//	for(int i=0; i<poly->numVerts; i++){
+//		if(cpvdot(planes[i].n, n) < 0.0f) continue;
+//		cpFloat dist = cpSplittingPlaneCompare(planes[i], v);
+//		if(dist > 0.0f) return cpFalse;
+//	}
+//	
+//	return cpTrue;
+//}
 
 //MARK: Spatial Index Functions
 

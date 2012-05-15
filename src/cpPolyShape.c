@@ -130,8 +130,8 @@ cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpSegmentQueryInf
 		
 		cpVect point = cpvlerp(a, b, t);
 		cpFloat dt = -cpvcross(n, point);
-		cpFloat dtMin = -cpvcross(n, verts[i]);
-		cpFloat dtMax = -cpvcross(n, verts[(i+1)%numVerts]);
+		cpFloat dtMin = -cpvcross(n, verts[(i - 1 + numVerts)%numVerts]);
+		cpFloat dtMax = -cpvcross(n, verts[i]);
 		
 		if(dtMin <= dt && dt <= dtMax){
 			info->shape = (cpShape *)poly;
@@ -192,13 +192,24 @@ setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 	poly->planes = (cpSplittingPlane *)cpcalloc(2*numVerts, sizeof(cpSplittingPlane));
 	poly->tVerts = poly->verts + numVerts;
 	poly->tPlanes = poly->planes + numVerts;
+	poly->centroid = cpvadd(offset, cpCentroidForPoly(numVerts, poly->verts));
 	
 	for(int i=0; i<numVerts; i++){
 		poly->verts[i] = cpvadd(offset, poly->verts[i]);
 	}
 	
 	for(int i=0; i<numVerts; i++){
-		poly->planes[i] = cpSplittingPlaneNew(poly->verts[i], poly->verts[(i+1)%numVerts]);
+		poly->planes[i] = cpSplittingPlaneNew(poly->verts[(i - 1 + numVerts)%numVerts], poly->verts[i]);
+	}
+	
+	cpVect n0 = poly->planes[0].n;
+	for(int i=1; i<numVerts; i++){
+		cpFloat cross = cpvcross(n0, poly->planes[i].n);
+		if(cross >= 0.0f){
+			poly->splitLeft = i - 1;
+			poly->splitRight = i - (cross != 0.0f);
+			break;
+		}
 	}
 }
 

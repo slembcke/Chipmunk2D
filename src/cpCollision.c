@@ -127,47 +127,130 @@ findMSA(const cpPolyShape *poly, const cpSplittingPlane *planes, const int num, 
 // Add contacts for probably penetrating vertexes.
 // This handles the degenerate case where an overlap was detected, but no vertexes fall inside
 // the opposing polygon. (like a star of david)
-static inline int
-findVertsFallback(cpContact *arr, const cpPolyShape *poly1, const cpPolyShape *poly2, const cpVect n, const cpFloat dist)
+//static inline int
+//findVertsFallback(cpContact *arr, const cpPolyShape *poly1, const cpPolyShape *poly2, const cpVect n, const cpFloat dist)
+//{
+//	int num = 0;
+//	
+//	for(int i=0; i<poly1->numVerts; i++){
+//		cpVect v = poly1->tVerts[i];
+//		if(cpPolyShapeContainsVertPartial(poly2, v, cpvneg(n)))
+//			cpContactInit(nextContactPoint(arr, &num), v, n, dist, CP_HASH_PAIR(poly1->shape.hashid, i));
+//	}
+//	
+//	for(int i=0; i<poly2->numVerts; i++){
+//		cpVect v = poly2->tVerts[i];
+//		if(cpPolyShapeContainsVertPartial(poly1, v, n))
+//			cpContactInit(nextContactPoint(arr, &num), v, n, dist, CP_HASH_PAIR(poly2->shape.hashid, i));
+//	}
+//	
+//	return num;
+//}
+//
+//// Add contacts for penetrating vertexes.
+//static inline int
+//findVerts(cpContact *arr, const cpPolyShape *poly1, const cpPolyShape *poly2, const cpVect n, const cpFloat dist)
+//{
+//	int num = 0;
+//	
+//	for(int i=0; i<poly1->numVerts; i++){
+//		cpVect v = poly1->tVerts[i];
+//		if(cpPolyShapeContainsVert(poly2, v))
+//			cpContactInit(nextContactPoint(arr, &num), v, n, dist, CP_HASH_PAIR(poly1->shape.hashid, i));
+//	}
+//	
+//	for(int i=0; i<poly2->numVerts; i++){
+//		cpVect v = poly2->tVerts[i];
+//		if(cpPolyShapeContainsVert(poly1, v))
+//			cpContactInit(nextContactPoint(arr, &num), v, n, dist, CP_HASH_PAIR(poly2->shape.hashid, i));
+//	}
+//	
+//	return (num ? num : findVertsFallback(arr, poly1, poly2, n, dist));
+//}
+
+struct EdgePoint {
+	cpVect v;
+	int hash;
+};
+
+struct Edge {
+	struct EdgePoint a, b;
+	cpVect n;
+};
+
+static inline struct Edge
+EdgeNew(cpVect va, cpVect vb, int ha, int hb)
 {
-	int num = 0;
-	
-	for(int i=0; i<poly1->numVerts; i++){
-		cpVect v = poly1->tVerts[i];
-		if(cpPolyShapeContainsVertPartial(poly2, v, cpvneg(n)))
-			cpContactInit(nextContactPoint(arr, &num), v, n, dist, CP_HASH_PAIR(poly1->shape.hashid, i));
-	}
-	
-	for(int i=0; i<poly2->numVerts; i++){
-		cpVect v = poly2->tVerts[i];
-		if(cpPolyShapeContainsVertPartial(poly1, v, n))
-			cpContactInit(nextContactPoint(arr, &num), v, n, dist, CP_HASH_PAIR(poly2->shape.hashid, i));
-	}
-	
-	return num;
+	struct Edge edge = {{va, ha}, {vb, hb}, cpvnormalize(cpvperp(cpvsub(vb, va)))};
+	return edge;
 }
 
-// Add contacts for penetrating vertexes.
-static inline int
-findVerts(cpContact *arr, const cpPolyShape *poly1, const cpPolyShape *poly2, const cpVect n, const cpFloat dist)
+static struct Edge
+SupportEdge(const cpPolyShape *poly, const cpVect n)
 {
-	int num = 0;
+	int numVerts = poly->numVerts;
 	
-	for(int i=0; i<poly1->numVerts; i++){
-		cpVect v = poly1->tVerts[i];
-		if(cpPolyShapeContainsVert(poly2, v))
-			cpContactInit(nextContactPoint(arr, &num), v, n, dist, CP_HASH_PAIR(poly1->shape.hashid, i));
+	int i1 = cpSupportPointIndex(poly, n);
+	int i0 = (i1 - 1 + numVerts)%numVerts;
+	int i2 = (i1 + 1)%numVerts;
+	
+	cpVect v0 = poly->tVerts[i0];
+	cpVect v1 = poly->tVerts[i1];
+	cpVect v2 = poly->tVerts[i2];
+	
+	if(cpvdot(n, cpvsub(v1, v0)) < cpvdot(n, cpvsub(v1, v2))){
+		return EdgeNew(v0, v1, CP_HASH_PAIR(poly, i0), CP_HASH_PAIR(poly, i1));
+	} else {
+		return EdgeNew(v1, v2, CP_HASH_PAIR(poly, i1), CP_HASH_PAIR(poly, i2));
 	}
-	
-	for(int i=0; i<poly2->numVerts; i++){
-		cpVect v = poly2->tVerts[i];
-		if(cpPolyShapeContainsVert(poly1, v))
-			cpContactInit(nextContactPoint(arr, &num), v, n, dist, CP_HASH_PAIR(poly2->shape.hashid, i));
-	}
-	
-	return (num ? num : findVertsFallback(arr, poly1, poly2, n, dist));
 }
 
+static int
+ClipContacts(const struct Edge ref, const struct Edge inc, cpFloat flipped, cpContact *arr)
+{
+	cpFloat cian = cpvcross(inc.a.v, ref.n);
+	cpFloat cibn = cpvcross(inc.b.v, ref.n);
+	cpFloat cran = cpvcross(ref.a.v, ref.n);
+	cpFloat crbn = cpvcross(ref.b.v, ref.n);
+	
+	cpFloat dran = cpvdot(ref.a.v, ref.n);
+	cpFloat dian = cpvdot(inc.a.v, ref.n) - dran;
+	cpFloat dibn = cpvdot(inc.b.v, ref.n) - dran;
+	
+	int numContacts = 0;
+	
+	cpFloat t1 = cpfclamp01((cian - cran)/(cian - cibn));
+	cpFloat d1 = cpflerp(dian, dibn, t1);
+	if(d1 <= 0.0){
+		cpContactInit(nextContactPoint(arr, &numContacts), t1 < 1.0 ? ref.a.v : inc.b.v, cpvmult(ref.n, flipped), d1, CP_HASH_PAIR(ref.a.hash, inc.b.hash));
+	}
+	
+	cpFloat t2 = cpfclamp01((cibn - crbn)/(cibn - cian));
+	cpFloat d2 = cpflerp(dibn, dian, t2);
+	if(d2 <= 0.0){
+		cpContactInit(nextContactPoint(arr, &numContacts), t2 < 1.0 ? ref.b.v : inc.a.v, cpvmult(ref.n, flipped), d2, CP_HASH_PAIR(ref.b.hash, inc.a.hash));
+	}
+	
+	cpAssertWarn(numContacts > 0, "No contacts?");
+	return numContacts;
+}
+
+static int
+ContactPoints(const cpPolyShape *a, const cpPolyShape *b, cpVect n, cpContact *arr)
+{
+//	if(points.d > 0.0) return 0;
+//	
+//	cpVect n = cpvmult(cpvsub(points.b, points.a), 1.0f/points.d);
+	
+	struct Edge f1 = SupportEdge(a, n);
+	struct Edge f2 = SupportEdge(b, cpvneg(n));
+	
+	if(cpvdot(f1.n, n) > -cpvdot(f2.n, n)){
+		return ClipContacts(f1, f2,  1.0, arr);
+	} else {
+		return ClipContacts(f2, f1, -1.0, arr);
+	}
+}
 // Collide poly shapes together.
 static int
 poly2poly(const cpShape *shape1, const cpShape *shape2, cpContact *arr)
@@ -184,10 +267,17 @@ poly2poly(const cpShape *shape1, const cpShape *shape2, cpContact *arr)
 	if(mini2 == -1) return 0;
 	
 	// There is overlap, find the penetrating verts
-	if(min1 > min2)
-		return findVerts(arr, poly1, poly2, poly1->tPlanes[mini1].n, min1);
-	else
-		return findVerts(arr, poly1, poly2, cpvneg(poly2->tPlanes[mini2].n), min2);
+	if(min1 > min2){
+		return ContactPoints(poly1, poly2, poly1->tPlanes[mini1].n, arr);
+	} else {
+		return ContactPoints(poly1, poly2, cpvneg(poly2->tPlanes[mini2].n), arr);
+	}
+	
+//	// There is overlap, find the penetrating verts
+//	if(min1 > min2)
+//		return findVerts(arr, poly1, poly2, poly1->tPlanes[mini1].n, min1);
+//	else
+//		return findVerts(arr, poly1, poly2, cpvneg(poly2->tPlanes[mini2].n), min2);
 }
 
 // Like cpPolyValueOnAxis(), but for segments.
@@ -303,8 +393,8 @@ circle2poly(const cpShape *shape1, const cpShape *shape2, cpContact *con)
 	}
 	
 	cpVect n = planes[mini].n;
-	cpVect a = poly->tVerts[mini];
-	cpVect b = poly->tVerts[(mini + 1)%poly->numVerts];
+	cpVect a = poly->tVerts[(mini - 1 + poly->numVerts)%poly->numVerts];
+	cpVect b = poly->tVerts[mini];
 	cpFloat dta = cpvcross(n, a);
 	cpFloat dtb = cpvcross(n, b);
 	cpFloat dt = cpvcross(n, circ->tc);
