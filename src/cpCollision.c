@@ -83,7 +83,7 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 }
 
 struct EdgePoint {
-	cpVect v;
+	cpVect p;
 	int hash;
 };
 
@@ -104,7 +104,6 @@ static struct Edge
 SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 {
 	int numVerts = poly->numVerts;
-	
 	int i1 = cpSupportPointIndex(poly, n);
 	int i0 = (i1 - 1 + numVerts)%numVerts;
 	int i2 = (i1 + 1)%numVerts;
@@ -130,35 +129,37 @@ SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
 	}
 }
 
+static inline int
+ClipContact(const cpFloat d, const cpFloat t, const struct EdgePoint p1, const struct EdgePoint p2, cpVect refn, cpVect n, cpContact *arr)
+{
+	if(d <= 0.0){
+		cpVect point = t < 1.0 ? cpvadd(p1.p, cpvmult(refn, d*0.5f)) : cpvadd(p2.p, cpvmult(refn, -d*0.5f));
+		cpContactInit(arr, point, n, d, CP_HASH_PAIR(p1.hash, p2.hash));
+		return 1;
+	} else {
+		return 0;
+	}
+}
 
 static int
 ClipContacts(const struct Edge ref, const struct Edge inc, cpFloat flipped, cpContact *arr)
 {
-	int numContacts = 0;
+	cpFloat cian = cpvcross(inc.a.p, ref.n);
+	cpFloat cibn = cpvcross(inc.b.p, ref.n);
+	cpFloat cran = cpvcross(ref.a.p, ref.n);
+	cpFloat crbn = cpvcross(ref.b.p, ref.n);
 	
-	cpFloat cian = cpvcross(inc.a.v, ref.n);
-	cpFloat cibn = cpvcross(inc.b.v, ref.n);
-	cpFloat cran = cpvcross(ref.a.v, ref.n);
-	cpFloat crbn = cpvcross(ref.b.v, ref.n);
+	cpFloat dran = cpvdot(ref.a.p, ref.n) + ref.r + inc.r;
+	cpFloat dian = cpvdot(inc.a.p, ref.n) - dran;
+	cpFloat dibn = cpvdot(inc.b.p, ref.n) - dran;
 	
-	cpFloat dran = cpvdot(ref.a.v, ref.n) + ref.r + inc.r;
-	cpFloat dian = cpvdot(inc.a.v, ref.n) - dran;
-	cpFloat dibn = cpvdot(inc.b.v, ref.n) - dran;
-	
+	cpVect n = cpvmult(ref.n, flipped);
 	cpFloat t1 = cpfclamp01((cian - cran)/(cian - cibn));
-	cpFloat d1 = cpflerp(dian, dibn, t1);
-	if(d1 <= 0.0){
-		cpContactInit(&arr[numContacts++], t1 < 1.0 ? ref.a.v : inc.b.v, cpvmult(ref.n, flipped), d1, CP_HASH_PAIR(ref.a.hash, inc.b.hash));
-	}
-	
 	cpFloat t2 = cpfclamp01((cibn - crbn)/(cibn - cian));
-	cpFloat d2 = cpflerp(dibn, dian, t2);
-	if(d2 <= 0.0){
-		cpContactInit(&arr[numContacts++], t2 < 1.0 ? ref.b.v : inc.a.v, cpvmult(ref.n, flipped), d2, CP_HASH_PAIR(ref.b.hash, inc.a.hash));
-	}
 	
-//	cpAssertWarn(numContacts > 0, "No contacts?");
-	return numContacts;
+	int count = ClipContact(cpflerp(dian, dibn, t1), t1, ref.a, inc.b,ref.n, n, arr);
+	count += ClipContact(cpflerp(dibn, dian, t2), t2, ref.b, inc.a, ref.n, n, arr + count);
+	return count;
 }
 
 static int
@@ -248,9 +249,7 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpContact *arr)
 		}
 	}
 	
-	struct Edge segmentEdge = SupportEdgeForSegment(seg, n);
-	struct Edge polyEdge = SupportEdgeForPoly(poly, cpvneg(n));
-	return ContactPoints(segmentEdge, polyEdge, n, arr);
+	return ContactPoints(SupportEdgeForSegment(seg, n), SupportEdgeForPoly(poly, cpvneg(n)), n, arr);
 }
 
 // This one is less gross, but still gross.

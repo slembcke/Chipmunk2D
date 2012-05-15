@@ -35,15 +35,17 @@ static cpBool PreSolve(cpArbiter *arb, cpSpace *space, void *data)
 	ChipmunkDemoPrintString("Contacts: %d", set.count);
 	
 	for(int i=0; i<set.count; i++){
-		cpVect point = set.points[i].point;
-		ChipmunkDebugDrawPoints(5.0, 1, &point, RGBAColor(1, 0, 0, 1));
+		cpVect p = set.points[i].point;
+		ChipmunkDebugDrawPoints(5.0, 1, &p, RGBAColor(1, 0, 0, 1));
 		
-		cpFloat depth = -set.points[i].dist;
-		ChipmunkDebugDrawSegment(point, cpvadd(point, cpvmult(set.points[i].normal, depth)), RGBAColor(1, 0, 0, 1));
+		cpVect n = set.points[i].normal;
+		cpFloat d = -set.points[i].dist;
+		ChipmunkDebugDrawSegment(cpvadd(p, cpvmult(n, d)), cpvadd(p, cpvmult(n, -d)), RGBAColor(1, 0, 0, 1));
 		
-		ChipmunkDemoPrintString(" d%d: %.2f", i, depth);
+		ChipmunkDemoPrintString(" depth(%d): %.2f", i + 1, d);
 	}
 	
+	ChipmunkDemoPrintString("\n");
 	return cpFalse;
 }
 
