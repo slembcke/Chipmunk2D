@@ -35,30 +35,23 @@ circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpF
 	cpFloat mindist = r1 + r2;
 	cpVect delta = cpvsub(p2, p1);
 	cpFloat distsq = cpvlengthsq(delta);
-	if(distsq >= mindist*mindist) return 0;
 	
-	cpFloat dist = cpfsqrt(distsq);
-
-	// Allocate and initialize the contact.
-	cpContactInit(
-		con,
-		cpvadd(p1, cpvmult(delta, 0.5f + (r1 - 0.5f*mindist)/(dist ? dist : INFINITY))),
-		(dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f)),
-		dist - mindist,
-		0
-	);
-	
-	return 1;
+	if(distsq < mindist*mindist){
+		cpFloat dist = cpfsqrt(distsq);
+		cpVect n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
+		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist, 0);
+		
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 // Collide circle shapes.
 static int
-circle2circle(const cpShape *shape1, const cpShape *shape2, cpContact *arr)
+circle2circle(const cpCircleShape *c1, const cpCircleShape *c2, cpContact *arr)
 {
-	cpCircleShape *circ1 = (cpCircleShape *)shape1; //TODO
-	cpCircleShape *circ2 = (cpCircleShape *)shape2;
-	
-	return circle2circleQuery(circ1->tc, circ2->tc, circ1->r, circ2->r, arr);
+	return circle2circleQuery(c1->tc, c2->tc, c1->r, c2->r, arr);
 }
 
 static int
@@ -79,26 +72,102 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 		if(
 			(closest_t == 0.0f && cpvdot(n, segmentShape->a_tangent) < 0.0) ||
 			(closest_t == 1.0f && cpvdot(n, segmentShape->b_tangent) < 0.0)
-		) return 0;
-		
-		return 1;
+		){
+			return 0;
+		} else {
+			return 1;
+		}
 	} else {
 		return 0;
 	}
 }
 
-// Helper function for working with contact buffers
-// This used to malloc/realloc memory on the fly but was repurposed.
-static cpContact *
-nextContactPoint(cpContact *arr, int *numPtr)
+struct EdgePoint {
+	cpVect v;
+	int hash;
+};
+
+struct Edge {
+	struct EdgePoint a, b;
+	cpFloat r;
+	cpVect n;
+};
+
+static inline struct Edge
+EdgeNew(cpVect va, cpVect vb, int ha, int hb, cpFloat r)
 {
-	int index = *numPtr;
+	struct Edge edge = {{va, ha}, {vb, hb}, r, cpvnormalize(cpvperp(cpvsub(vb, va)))};
+	return edge;
+}
+
+static struct Edge
+SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
+{
+	int numVerts = poly->numVerts;
 	
-	if(index < CP_MAX_CONTACTS_PER_ARBITER){
-		(*numPtr) = index + 1;
-		return &arr[index];
+	int i1 = cpSupportPointIndex(poly, n);
+	int i0 = (i1 - 1 + numVerts)%numVerts;
+	int i2 = (i1 + 1)%numVerts;
+	
+	cpVect v0 = poly->tVerts[i0];
+	cpVect v1 = poly->tVerts[i1];
+	cpVect v2 = poly->tVerts[i2];
+	
+	if(cpvdot(n, cpvsub(v1, v0)) < cpvdot(n, cpvsub(v1, v2))){
+		return EdgeNew(v0, v1, CP_HASH_PAIR(poly, i0), CP_HASH_PAIR(poly, i1), 0.0f);
 	} else {
-		return &arr[CP_MAX_CONTACTS_PER_ARBITER - 1];
+		return EdgeNew(v1, v2, CP_HASH_PAIR(poly, i1), CP_HASH_PAIR(poly, i2), 0.0f);
+	}
+}
+
+static struct Edge
+SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
+{
+	if(cpvdot(seg->tn, n) > 0.0){
+		return EdgeNew(seg->ta, seg->tb, CP_HASH_PAIR(seg, 0), CP_HASH_PAIR(seg, 1), seg->r);
+	} else {
+		return EdgeNew(seg->tb, seg->ta, CP_HASH_PAIR(seg, 1), CP_HASH_PAIR(seg, 0), seg->r);
+	}
+}
+
+
+static int
+ClipContacts(const struct Edge ref, const struct Edge inc, cpFloat flipped, cpContact *arr)
+{
+	int numContacts = 0;
+	
+	cpFloat cian = cpvcross(inc.a.v, ref.n);
+	cpFloat cibn = cpvcross(inc.b.v, ref.n);
+	cpFloat cran = cpvcross(ref.a.v, ref.n);
+	cpFloat crbn = cpvcross(ref.b.v, ref.n);
+	
+	cpFloat dran = cpvdot(ref.a.v, ref.n) + ref.r + inc.r;
+	cpFloat dian = cpvdot(inc.a.v, ref.n) - dran;
+	cpFloat dibn = cpvdot(inc.b.v, ref.n) - dran;
+	
+	cpFloat t1 = cpfclamp01((cian - cran)/(cian - cibn));
+	cpFloat d1 = cpflerp(dian, dibn, t1);
+	if(d1 <= 0.0){
+		cpContactInit(&arr[numContacts++], t1 < 1.0 ? ref.a.v : inc.b.v, cpvmult(ref.n, flipped), d1, CP_HASH_PAIR(ref.a.hash, inc.b.hash));
+	}
+	
+	cpFloat t2 = cpfclamp01((cibn - crbn)/(cibn - cian));
+	cpFloat d2 = cpflerp(dibn, dian, t2);
+	if(d2 <= 0.0){
+		cpContactInit(&arr[numContacts++], t2 < 1.0 ? ref.b.v : inc.a.v, cpvmult(ref.n, flipped), d2, CP_HASH_PAIR(ref.b.hash, inc.a.hash));
+	}
+	
+//	cpAssertWarn(numContacts > 0, "No contacts?");
+	return numContacts;
+}
+
+static int
+ContactPoints(const struct Edge e1, const struct Edge e2, const cpVect n, cpContact *arr)
+{
+	if(cpvdot(e1.n, n) > -cpvdot(e2.n, n)){
+		return ClipContacts(e1, e2,  1.0, arr);
+	} else {
+		return ClipContacts(e2, e1, -1.0, arr);
 	}
 }
 
@@ -124,139 +193,12 @@ findMSA(const cpPolyShape *poly, const cpSplittingPlane *planes, const int num, 
 	return min_index;
 }
 
-// Add contacts for probably penetrating vertexes.
-// This handles the degenerate case where an overlap was detected, but no vertexes fall inside
-// the opposing polygon. (like a star of david)
-//static inline int
-//findVertsFallback(cpContact *arr, const cpPolyShape *poly1, const cpPolyShape *poly2, const cpVect n, const cpFloat dist)
-//{
-//	int num = 0;
-//	
-//	for(int i=0; i<poly1->numVerts; i++){
-//		cpVect v = poly1->tVerts[i];
-//		if(cpPolyShapeContainsVertPartial(poly2, v, cpvneg(n)))
-//			cpContactInit(nextContactPoint(arr, &num), v, n, dist, CP_HASH_PAIR(poly1->shape.hashid, i));
-//	}
-//	
-//	for(int i=0; i<poly2->numVerts; i++){
-//		cpVect v = poly2->tVerts[i];
-//		if(cpPolyShapeContainsVertPartial(poly1, v, n))
-//			cpContactInit(nextContactPoint(arr, &num), v, n, dist, CP_HASH_PAIR(poly2->shape.hashid, i));
-//	}
-//	
-//	return num;
-//}
-//
-//// Add contacts for penetrating vertexes.
-//static inline int
-//findVerts(cpContact *arr, const cpPolyShape *poly1, const cpPolyShape *poly2, const cpVect n, const cpFloat dist)
-//{
-//	int num = 0;
-//	
-//	for(int i=0; i<poly1->numVerts; i++){
-//		cpVect v = poly1->tVerts[i];
-//		if(cpPolyShapeContainsVert(poly2, v))
-//			cpContactInit(nextContactPoint(arr, &num), v, n, dist, CP_HASH_PAIR(poly1->shape.hashid, i));
-//	}
-//	
-//	for(int i=0; i<poly2->numVerts; i++){
-//		cpVect v = poly2->tVerts[i];
-//		if(cpPolyShapeContainsVert(poly1, v))
-//			cpContactInit(nextContactPoint(arr, &num), v, n, dist, CP_HASH_PAIR(poly2->shape.hashid, i));
-//	}
-//	
-//	return (num ? num : findVertsFallback(arr, poly1, poly2, n, dist));
-//}
-
-struct EdgePoint {
-	cpVect v;
-	int hash;
-};
-
-struct Edge {
-	struct EdgePoint a, b;
-	cpVect n;
-};
-
-static inline struct Edge
-EdgeNew(cpVect va, cpVect vb, int ha, int hb)
-{
-	struct Edge edge = {{va, ha}, {vb, hb}, cpvnormalize(cpvperp(cpvsub(vb, va)))};
-	return edge;
-}
-
-static struct Edge
-SupportEdge(const cpPolyShape *poly, const cpVect n)
-{
-	int numVerts = poly->numVerts;
-	
-	int i1 = cpSupportPointIndex(poly, n);
-	int i0 = (i1 - 1 + numVerts)%numVerts;
-	int i2 = (i1 + 1)%numVerts;
-	
-	cpVect v0 = poly->tVerts[i0];
-	cpVect v1 = poly->tVerts[i1];
-	cpVect v2 = poly->tVerts[i2];
-	
-	if(cpvdot(n, cpvsub(v1, v0)) < cpvdot(n, cpvsub(v1, v2))){
-		return EdgeNew(v0, v1, CP_HASH_PAIR(poly, i0), CP_HASH_PAIR(poly, i1));
-	} else {
-		return EdgeNew(v1, v2, CP_HASH_PAIR(poly, i1), CP_HASH_PAIR(poly, i2));
-	}
-}
-
-static int
-ClipContacts(const struct Edge ref, const struct Edge inc, cpFloat flipped, cpContact *arr)
-{
-	cpFloat cian = cpvcross(inc.a.v, ref.n);
-	cpFloat cibn = cpvcross(inc.b.v, ref.n);
-	cpFloat cran = cpvcross(ref.a.v, ref.n);
-	cpFloat crbn = cpvcross(ref.b.v, ref.n);
-	
-	cpFloat dran = cpvdot(ref.a.v, ref.n);
-	cpFloat dian = cpvdot(inc.a.v, ref.n) - dran;
-	cpFloat dibn = cpvdot(inc.b.v, ref.n) - dran;
-	
-	int numContacts = 0;
-	
-	cpFloat t1 = cpfclamp01((cian - cran)/(cian - cibn));
-	cpFloat d1 = cpflerp(dian, dibn, t1);
-	if(d1 <= 0.0){
-		cpContactInit(nextContactPoint(arr, &numContacts), t1 < 1.0 ? ref.a.v : inc.b.v, cpvmult(ref.n, flipped), d1, CP_HASH_PAIR(ref.a.hash, inc.b.hash));
-	}
-	
-	cpFloat t2 = cpfclamp01((cibn - crbn)/(cibn - cian));
-	cpFloat d2 = cpflerp(dibn, dian, t2);
-	if(d2 <= 0.0){
-		cpContactInit(nextContactPoint(arr, &numContacts), t2 < 1.0 ? ref.b.v : inc.a.v, cpvmult(ref.n, flipped), d2, CP_HASH_PAIR(ref.b.hash, inc.a.hash));
-	}
-	
-	cpAssertWarn(numContacts > 0, "No contacts?");
-	return numContacts;
-}
-
-static int
-ContactPoints(const cpPolyShape *a, const cpPolyShape *b, cpVect n, cpContact *arr)
-{
-//	if(points.d > 0.0) return 0;
-//	
-//	cpVect n = cpvmult(cpvsub(points.b, points.a), 1.0f/points.d);
-	
-	struct Edge f1 = SupportEdge(a, n);
-	struct Edge f2 = SupportEdge(b, cpvneg(n));
-	
-	if(cpvdot(f1.n, n) > -cpvdot(f2.n, n)){
-		return ClipContacts(f1, f2,  1.0, arr);
-	} else {
-		return ClipContacts(f2, f1, -1.0, arr);
-	}
-}
 // Collide poly shapes together.
 static int
-poly2poly(const cpShape *shape1, const cpShape *shape2, cpContact *arr)
+poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpContact *arr)
 {
-	cpPolyShape *poly1 = (cpPolyShape *)shape1;
-	cpPolyShape *poly2 = (cpPolyShape *)shape2;
+	// TODO use the support point to find a good starting axis?
+	// Does the MSA have to lie along the support vertex?
 	
 	cpFloat min1;
 	int mini1 = findMSA(poly2, poly1->tPlanes, poly1->numVerts, &min1);
@@ -267,17 +209,8 @@ poly2poly(const cpShape *shape1, const cpShape *shape2, cpContact *arr)
 	if(mini2 == -1) return 0;
 	
 	// There is overlap, find the penetrating verts
-	if(min1 > min2){
-		return ContactPoints(poly1, poly2, poly1->tPlanes[mini1].n, arr);
-	} else {
-		return ContactPoints(poly1, poly2, cpvneg(poly2->tPlanes[mini2].n), arr);
-	}
-	
-//	// There is overlap, find the penetrating verts
-//	if(min1 > min2)
-//		return findVerts(arr, poly1, poly2, poly1->tPlanes[mini1].n, min1);
-//	else
-//		return findVerts(arr, poly1, poly2, cpvneg(poly2->tPlanes[mini2].n), min2);
+	cpVect n = (min1 > min2 ? poly1->tPlanes[mini1].n : cpvneg(poly2->tPlanes[mini2].n));
+	return ContactPoints(SupportEdgeForPoly(poly1, n), SupportEdgeForPoly(poly2, cpvneg(n)), n, arr);
 }
 
 // Like cpPolyValueOnAxis(), but for segments.
@@ -289,101 +222,48 @@ segValueOnAxis(const cpSegmentShape *seg, const cpVect n, const cpFloat d)
 	return cpfmin(a, b) - d;
 }
 
-// Identify vertexes that have penetrated the segment.
-static inline void
-findPointsBehindSeg(cpContact *arr, int *num, const cpSegmentShape *seg, const cpPolyShape *poly, const cpFloat pDist, const cpFloat coef) 
-{
-	cpFloat dta = cpvcross(seg->tn, seg->ta);
-	cpFloat dtb = cpvcross(seg->tn, seg->tb);
-	cpVect n = cpvmult(seg->tn, coef);
-	
-	for(int i=0; i<poly->numVerts; i++){
-		cpVect v = poly->tVerts[i];
-		if(cpvdot(v, n) < cpvdot(seg->tn, seg->ta)*coef + seg->r){
-			cpFloat dt = cpvcross(seg->tn, v);
-			if(dta >= dt && dt >= dtb){
-				cpContactInit(nextContactPoint(arr, num), v, n, pDist, CP_HASH_PAIR(poly->shape.hashid, i));
-			}
-		}
-	}
-}
-
-// This one is complicated and gross. Just don't go there...
 // TODO: Comment me!
 static int
-seg2poly(const cpShape *shape1, const cpShape *shape2, cpContact *arr)
+seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpContact *arr)
 {
-	cpSegmentShape *seg = (cpSegmentShape *)shape1;
-	cpPolyShape *poly = (cpPolyShape *)shape2;
 	cpSplittingPlane *planes = poly->tPlanes;
 	
 	cpFloat segD = cpvdot(seg->tn, seg->ta);
 	cpFloat minNorm = cpPolyShapeValueOnAxis(poly, seg->tn, segD) - seg->r;
 	cpFloat minNeg = cpPolyShapeValueOnAxis(poly, cpvneg(seg->tn), -segD) - seg->r;
-	if(minNeg > 0.0f || minNorm > 0.0f) return 0;
 	
-	int mini = 0;
-	cpFloat poly_min = segValueOnAxis(seg, planes->n, planes->d);
-	if(poly_min > 0.0f) return 0;
-	for(int i=0; i<poly->numVerts; i++){
+	cpFloat sepDist = cpfmax(minNorm, minNeg);
+	if(sepDist > 0.0f) return 0;
+	
+	cpVect n = (sepDist == minNorm ? seg->tn : cpvneg(seg->tn));
+	
+	int numVerts = poly->numVerts;
+	for(int i=0; i<numVerts; i++){
 		cpFloat dist = segValueOnAxis(seg, planes[i].n, planes[i].d);
 		if(dist > 0.0f){
 			return 0;
-		} else if(dist > poly_min){
-			poly_min = dist;
-			mini = i;
+		} else if(dist > sepDist){
+			sepDist = dist;
+			n = cpvneg(planes[i].n);
 		}
 	}
 	
-	int num = 0;
-	
-	cpVect poly_n = cpvneg(planes[mini].n);
-	
-	cpVect va = cpvadd(seg->ta, cpvmult(poly_n, seg->r));
-	cpVect vb = cpvadd(seg->tb, cpvmult(poly_n, seg->r));
-	if(cpPolyShapeContainsVert(poly, va))
-		cpContactInit(nextContactPoint(arr, &num), va, poly_n, poly_min, CP_HASH_PAIR(seg->shape.hashid, 0));
-	if(cpPolyShapeContainsVert(poly, vb))
-		cpContactInit(nextContactPoint(arr, &num), vb, poly_n, poly_min, CP_HASH_PAIR(seg->shape.hashid, 1));
-	
-	// Floating point precision problems here.
-	// This will have to do for now.
-//	poly_min -= cp_collision_slop; // TODO is this needed anymore?
-	
-	if(minNorm >= poly_min || minNeg >= poly_min) {
-		if(minNorm > minNeg)
-			findPointsBehindSeg(arr, &num, seg, poly, minNorm, 1.0f);
-		else
-			findPointsBehindSeg(arr, &num, seg, poly, minNeg, -1.0f);
-	}
-	
-	// If no other collision points are found, try colliding endpoints.
-	if(num == 0){
-		cpVect poly_a = poly->tVerts[mini];
-		cpVect poly_b = poly->tVerts[(mini + 1)%poly->numVerts];
-		
-		if(circle2circleQuery(seg->ta, poly_a, seg->r, 0.0f, arr)) return 1;
-		if(circle2circleQuery(seg->tb, poly_a, seg->r, 0.0f, arr)) return 1;
-		if(circle2circleQuery(seg->ta, poly_b, seg->r, 0.0f, arr)) return 1;
-		if(circle2circleQuery(seg->tb, poly_b, seg->r, 0.0f, arr)) return 1;
-	}
-
-	return num;
+	struct Edge segmentEdge = SupportEdgeForSegment(seg, n);
+	struct Edge polyEdge = SupportEdgeForPoly(poly, cpvneg(n));
+	return ContactPoints(segmentEdge, polyEdge, n, arr);
 }
 
 // This one is less gross, but still gross.
 // TODO: Comment me!
 static int
-circle2poly(const cpShape *shape1, const cpShape *shape2, cpContact *con)
+circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpContact *con)
 {
-	cpCircleShape *circ = (cpCircleShape *)shape1;
-	cpPolyShape *poly = (cpPolyShape *)shape2;
 	cpSplittingPlane *planes = poly->tPlanes;
 	
 	int mini = 0;
-	cpFloat min = cpSplittingPlaneCompare(planes[0], circ->tc) - circ->r;
+	cpFloat min = cpSplittingPlaneCompare(planes[0], circle->tc) - circle->r;
 	for(int i=0; i<poly->numVerts; i++){
-		cpFloat dist = cpSplittingPlaneCompare(planes[i], circ->tc) - circ->r;
+		cpFloat dist = cpSplittingPlaneCompare(planes[i], circle->tc) - circle->r;
 		if(dist > 0.0f){
 			return 0;
 		} else if(dist > min) {
@@ -397,14 +277,14 @@ circle2poly(const cpShape *shape1, const cpShape *shape2, cpContact *con)
 	cpVect b = poly->tVerts[mini];
 	cpFloat dta = cpvcross(n, a);
 	cpFloat dtb = cpvcross(n, b);
-	cpFloat dt = cpvcross(n, circ->tc);
+	cpFloat dt = cpvcross(n, circle->tc);
 		
 	if(dt < dtb){
-		return circle2circleQuery(circ->tc, b, circ->r, 0.0f, con);
+		return circle2circleQuery(circle->tc, b, circle->r, 0.0f, con);
 	} else if(dt < dta) {
 		cpContactInit(
 			con,
-			cpvsub(circ->tc, cpvmult(n, circ->r + min/2.0f)),
+			cpvsub(circle->tc, cpvmult(n, circle->r + min/2.0f)),
 			cpvneg(n),
 			min,
 			0				 
@@ -412,59 +292,28 @@ circle2poly(const cpShape *shape1, const cpShape *shape2, cpContact *con)
 	
 		return 1;
 	} else {
-		return circle2circleQuery(circ->tc, a, circ->r, 0.0f, con);
+		return circle2circleQuery(circle->tc, a, circle->r, 0.0f, con);
 	}
 }
 
 static const collisionFunc builtinCollisionFuncs[9] = {
-	circle2circle,
+	(collisionFunc)circle2circle,
 	NULL,
 	NULL,
 	(collisionFunc)circle2segment,
 	NULL,
 	NULL,
-	circle2poly,
-	seg2poly,
-	poly2poly,
+	(collisionFunc)circle2poly,
+	(collisionFunc)seg2poly,
+	(collisionFunc)poly2poly,
 };
 static const collisionFunc *colfuncs = builtinCollisionFuncs;
-
-//static collisionFunc *colfuncs = NULL;
-//
-//static void
-//addColFunc(const cpShapeType a, const cpShapeType b, const collisionFunc func)
-//{
-//	colfuncs[a + b*CP_NUM_SHAPES] = func;
-//}
-//
-//#ifdef __cplusplus
-//extern "C" {
-//#endif
-//	void cpInitCollisionFuncs(void);
-//	
-//	// Initializes the array of collision functions.
-//	// Called by cpInitChipmunk().
-//	void
-//	cpInitCollisionFuncs(void)
-//	{
-//		if(!colfuncs)
-//			colfuncs = (collisionFunc *)cpcalloc(CP_NUM_SHAPES*CP_NUM_SHAPES, sizeof(collisionFunc));
-//		
-//		addColFunc(CP_CIRCLE_SHAPE,  CP_CIRCLE_SHAPE,  circle2circle);
-//		addColFunc(CP_CIRCLE_SHAPE,  CP_SEGMENT_SHAPE, circle2segment);
-//		addColFunc(CP_SEGMENT_SHAPE, CP_POLY_SHAPE,    seg2poly);
-//		addColFunc(CP_CIRCLE_SHAPE,  CP_POLY_SHAPE,    circle2poly);
-//		addColFunc(CP_POLY_SHAPE,    CP_POLY_SHAPE,    poly2poly);
-//	}	
-//#ifdef __cplusplus
-//}
-//#endif
 
 int
 cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr)
 {
 	// Their shape types must be in order.
-	cpAssertSoft(a->klass->type <= b->klass->type, "Collision shapes passed to cpCollideShapes() are not sorted.");
+	cpAssertSoft(a->klass->type <= b->klass->type, "Internal Error: Collision shapes passed to cpCollideShapes() are not sorted.");
 	
 	collisionFunc cfunc = colfuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
 	return (cfunc) ? cfunc(a, b, arr) : 0;

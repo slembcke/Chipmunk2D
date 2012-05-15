@@ -63,6 +63,7 @@
 		D38011630E984FA400A3D7FA /* cpDampedSpring.h in Headers */ = {isa = PBXBuildFile; fileRef = D38011600E984FA400A3D7FA /* cpDampedSpring.h */; };
 		D38687D30BAFC695008B7008 /* libChipmunk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D34963BB0B56CAA300CAD239 /* libChipmunk.a */; };
 		D38996A6148B1E72006CFE0B /* Slice.c in Sources */ = {isa = PBXBuildFile; fileRef = D38996A5148B1E72006CFE0B /* Slice.c */; };
+		D38FDDD21562DF6E0055D15F /* ContactPoints.c in Sources */ = {isa = PBXBuildFile; fileRef = D38FDDD11562DF6E0055D15F /* ContactPoints.c */; };
 		D393275C0EA02C710026F6A2 /* Pump.c in Sources */ = {isa = PBXBuildFile; fileRef = D393275B0EA02C710026F6A2 /* Pump.c */; };
 		D3AA477512AF0F8900E27AAB /* cpBBTree.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AA477312AF0F8900E27AAB /* cpBBTree.c */; };
 		D3AA477612AF0F8900E27AAB /* cpSpatialIndex.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AA477412AF0F8900E27AAB /* cpSpatialIndex.c */; };
@@ -168,6 +169,7 @@
 		D38011600E984FA400A3D7FA /* cpDampedSpring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpDampedSpring.h; path = ../../include/chipmunk/constraints/cpDampedSpring.h; sourceTree = "<group>"; };
 		D38996A5148B1E72006CFE0B /* Slice.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Slice.c; sourceTree = "<group>"; };
 		D38BB1D1149933F20000EC41 /* chipmunk-docs.textile */ = {isa = PBXFileReference; lastKnownFileType = text; name = "chipmunk-docs.textile"; path = "../doc-src/chipmunk-docs.textile"; sourceTree = "<group>"; };
+		D38FDDD11562DF6E0055D15F /* ContactPoints.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ContactPoints.c; sourceTree = "<group>"; };
 		D390FDAD146EF0F8005D1E06 /* VERSION.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = VERSION.txt; path = ../VERSION.txt; sourceTree = "<group>"; };
 		D393275B0EA02C710026F6A2 /* Pump.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Pump.c; sourceTree = "<group>"; };
 		D39F478A0FD4AB4E00B244CA /* chipmunk_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_types.h; path = ../include/chipmunk/chipmunk_types.h; sourceTree = SOURCE_ROOT; };
@@ -312,6 +314,7 @@
 				D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */,
 				D3FBA1B80E9B1F6300950BCC /* ChipmunkDebugDraw.h */,
 				D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */,
+				D38FDDD11562DF6E0055D15F /* ContactPoints.c */,
 				D3CCDF460AE35D920080442F /* LogoSmash.c */,
 				D3BAF9C40E9C4F250039DD5C /* PyramidStack.c */,
 				D3BAFA030E9C52810039DD5C /* Plink.c */,
@@ -625,6 +628,7 @@
 				D373FF1013D0D66E000EDB87 /* ContactGraph.c in Sources */,
 				D38996A6148B1E72006CFE0B /* Slice.c in Sources */,
 				D3F2EE2F14F898E9005FD439 /* Unicycle.c in Sources */,
+				D38FDDD21562DF6E0055D15F /* ContactPoints.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
