@@ -27,9 +27,9 @@
 #include "ChipmunkDemo.h"
 
 #define USE_GJK 1
-#define DRAW_GJK 0
-#define DRAW_EPA 0
-#define DRAW_CLOSEST 0
+#define DRAW_GJK 1
+#define DRAW_EPA 1
+#define DRAW_CLOSEST 1
 #define DRAW_CLIP 1
 #define PRINT_LOG 1
 #define LOG_ITERATIONS 0
@@ -368,6 +368,35 @@ GJKRecurse(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction supp
 	}
 }
 
+#if DRAW_GJK || DRAW_EPA
+
+static int
+ShapePointCount(const cpShape *shape)
+{
+	switch(shape->klass->type){
+		default: return 0;
+		case CP_CIRCLE_SHAPE: return 1;
+		case CP_SEGMENT_SHAPE: return 2;
+		case CP_POLY_SHAPE: return ((cpPolyShape *)shape)->numVerts;
+	}
+}
+
+static cpVect
+ShapePoint(const cpShape *shape, int i)
+{
+	switch(shape->klass->type){
+		default: return cpvzero;
+		case CP_CIRCLE_SHAPE: return ((cpCircleShape *)shape)->tc;
+		case CP_SEGMENT_SHAPE: {
+			cpSegmentShape *seg = (void *)shape;
+			return (i == 0 ? seg->ta : seg->tb);
+		};
+		case CP_POLY_SHAPE: return ((cpPolyShape *)shape)->tVerts[i];
+	}
+}
+
+#endif
+
 static struct ClosestPoints
 GJK(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction support1, GJKSupportFunction support2)
 {
@@ -377,16 +406,16 @@ GJK(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction support1, G
 	ChipmunkDebugDrawPoints(5.0, 1, &origin, RGBAColor(1,0,0,1));
 	
 	// draw the minkowski difference
-	int shape1Count = a->numVerts;
-	int shape2Count = b->numVerts;
+	int shape1Count = ShapePointCount(shape1);
+	int shape2Count = ShapePointCount(shape2);
 	
 	int mdiffCount = shape1Count*shape2Count;
 	cpVect *mdiffVerts = alloca(mdiffCount*sizeof(cpVect));
 	
 	for(int i=0; i<shape1Count; i++){
 		for(int j=0; j<shape2Count; j++){
-			cpVect v1 = a->tVerts[i];
-			cpVect v2 = b->tVerts[j];
+			cpVect v1 = ShapePoint(shape1, i);
+			cpVect v2 = ShapePoint(shape2, j);
 			mdiffVerts[i*shape2Count + j] = cpvsub(v2, v1);
 		}
 	}
@@ -423,7 +452,7 @@ ClipContact(const cpFloat d, const cpFloat t, const struct EdgePoint p1, const s
 }
 
 static int
-ClipContacts(const struct Edge ref, const struct Edge inc, cpFloat flipped, cpContact *arr)
+ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *arr)
 {
 	cpFloat cian = cpvcross(inc.a.p, ref.n);
 	cpFloat cibn = cpvcross(inc.b.p, ref.n);
@@ -434,12 +463,13 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpFloat flipped, cpCo
 	cpFloat dian = cpvdot(inc.a.p, ref.n) - dran;
 	cpFloat dibn = cpvdot(inc.b.p, ref.n) - dran;
 	
-	cpVect n = cpvmult(ref.n, flipped);
 	cpFloat t1 = cpfclamp01((cian - cran)/(cian - cibn));
 	cpFloat t2 = cpfclamp01((cibn - crbn)/(cibn - cian));
 	
 #if DRAW_CLIP
 #if PRINT_LOG
+	cpFloat dot = 1.0 - cpfclamp01(cpfabs(cpvdot(ref.n, n)));
+	ChipmunkDemoPrintString("dot %.2e %s\n", dot, dot < 1e-5 ? "TRUE" : "FALSE");
 	ChipmunkDemoPrintString("t1: %.2f, t2: %.2f, t1xt2: %.2f    %s\n", t1, t2, t1*t2, t1*t2 == 0 ? "XXXXXX" : "");
 //	cpAssertWarn(t1*t2 != 0.0, "This?");
 //	printf("t1*t2: %.2f\n", t1*t2);
@@ -451,30 +481,33 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpFloat flipped, cpCo
 	
 	ChipmunkDebugDrawFatSegment(ref.a.p, ref.b.p, ref.r + inc.r, RGBAColor(1, 0, 0, 1), RGBAColor(0, 0, 0, 0));
 	ChipmunkDebugDrawSegment(inc.a.p, inc.b.p, RGBAColor(0, 1, 0, 1));
+	
+	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.a.p, inc.a.p}, RGBAColor(1, 1, 0, 1));
+	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.b.p, inc.b.p}, RGBAColor(0, 1, 1, 1));
 #endif
 	
-//	if(t1*t2 != 0){
+	if(t1*t2 != 0){
 		int count = ClipContact(cpflerp(dian, dibn, t1), t1, ref.a, inc.b, ref.r, inc.r, ref.n, n, arr);
 		return count + ClipContact(cpflerp(dibn, dian, t2), t2, ref.b, inc.a, ref.r, inc.r, ref.n, n, arr + count);
-//	} else {
-//		cpAssertWarn(t1 + t2 == 1.0, "These should sum to 1.0?");
-//		
-//		// TODO radii could use some tweaking here.
-//		if(t1 == 0){
-//			return circle2circleQuery(ref.a.p, inc.a.p, ref.r, inc.r, arr);
-//		} else {
-//			return circle2circleQuery(ref.b.p, inc.b.p, ref.r, inc.r, arr);
-//		}
-//	}
+	} else {
+		cpAssertWarn(t1 + t2 == 1.0, "These should sum to 1.0?");
+		
+		// TODO radii could use some tweaking here.
+		if(t1 == 0){
+			return circle2circleQuery(ref.a.p, inc.a.p, ref.r, inc.r, arr);
+		} else {
+			return circle2circleQuery(ref.b.p, inc.b.p, ref.r, inc.r, arr);
+		}
+	}
 }
 
 static int
 ContactPoints(const struct Edge e1, const struct Edge e2, const cpVect n, cpContact *arr)
 {
 	if(cpvdot(e1.n, n) > -cpvdot(e2.n, n)){
-		return ClipContacts(e1, e2,  1.0, arr);
+		return ClipContacts(e1, e2, n, arr);
 	} else {
-		return ClipContacts(e2, e1, -1.0, arr);
+		return ClipContacts(e2, e1, n, arr);
 	}
 }
 
@@ -520,6 +553,40 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 #if USE_GJK
 
 static int
+segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *arr)
+{
+	struct ClosestPoints points = GJK((cpShape *)seg1, (cpShape *)seg2, (GJKSupportFunction)cpSegmentSupportPoint, (GJKSupportFunction)cpSegmentSupportPoint);
+	
+#if DRAW_CLOSEST
+#if PRINT_LOG
+	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
+#endif
+	
+	ChipmunkDebugDrawPoints(3.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
+#endif
+	
+	if(points.d - seg1->r - seg2->r <= 0.0){
+		return ContactPoints(SupportEdgeForSegment(seg1, points.n), SupportEdgeForSegment(seg2, cpvneg(points.n)), points.n, arr);
+	} else {
+		return 0;
+	}
+}
+
+#else 
+
+static int
+segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *con)
+{
+	return 0;
+}
+
+#endif
+
+#if USE_GJK
+
+static int
 poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, const cpShape *shape, cpContact *arr)
 {
 	struct ClosestPoints points = GJK((cpShape *)poly1, (cpShape *)poly2, (GJKSupportFunction)cpPolySupportPoint, (GJKSupportFunction)cpPolySupportPoint);
@@ -533,10 +600,12 @@ poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, const cpShape *sha
 	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
-
-
-	cpVect n = points.n;
-	return ContactPoints(SupportEdgeForPoly(poly1, n), SupportEdgeForPoly(poly2, cpvneg(n)), n, arr);
+	
+	if(points.d <= 0.0){
+		return ContactPoints(SupportEdgeForPoly(poly1, points.n), SupportEdgeForPoly(poly2, cpvneg(points.n)), points.n, arr);
+	} else {
+		return 0;
+	}
 }
 
 #else
@@ -601,10 +670,12 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpContact *arr)
 	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
-
-
-	cpVect n = points.n;
-	return ContactPoints(SupportEdgeForSegment(seg, n), SupportEdgeForPoly(poly, cpvneg(n)), n, arr);
+	
+	if(points.d - seg->r <= 0.0){
+		return ContactPoints(SupportEdgeForSegment(seg, points.n), SupportEdgeForPoly(poly, cpvneg(points.n)), points.n, arr);
+	} else {
+		return 0;
+	}
 }
 
 #else
@@ -698,7 +769,7 @@ static const collisionFunc builtinCollisionFuncs[9] = {
 	NULL,
 	NULL,
 	(collisionFunc)circle2segment,
-	NULL,
+	(collisionFunc)segment2segment,
 	NULL,
 	(collisionFunc)circle2poly,
 	(collisionFunc)seg2poly,

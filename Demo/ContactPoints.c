@@ -29,6 +29,8 @@
 
 static cpSpace *space;
 
+static cpBool NeverCollide(cpArbiter *arb, cpSpace *space, void *data){return cpFalse;}
+
 static void
 update(int ticks)
 {
@@ -46,6 +48,8 @@ init(void)
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 5);
 	cpSpaceSetDamping(space, 0.1f);
+	
+	cpSpaceSetDefaultCollisionHandler(space, NeverCollide, NULL, NULL, NULL, NULL);
 	
 	{
 		cpFloat mass = 1.0f;
