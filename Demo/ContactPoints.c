@@ -24,7 +24,7 @@
 #include <math.h>
 #include <string.h>
 
-#include "chipmunk.h"
+#include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
@@ -41,8 +41,15 @@ static cpBool PreSolve(cpArbiter *arb, cpSpace *space, void *data)
 		cpVect n = set.points[i].normal;
 		cpFloat d = -set.points[i].dist;
 		ChipmunkDebugDrawSegment(cpvadd(p, cpvmult(n, d)), cpvadd(p, cpvmult(n, -d)), RGBAColor(1, 0, 0, 1));
-		
-		ChipmunkDemoPrintString(" depth(%d): %.2f", i + 1, d);
+	}
+	
+	cpAssertHard(set.count <= 2, "What the heck?");
+	if(set.count == 1){
+		ChipmunkDemoPrintString(" %X\n", arb->contacts[0].hash);
+	} else {
+		cpHashValue a = arb->contacts[0].hash;
+		cpHashValue b = arb->contacts[1].hash;
+		ChipmunkDemoPrintString(" %X %X\n", (a < b ? a : b), (a > b ? a : b));
 	}
 	
 	ChipmunkDemoPrintString("\n");

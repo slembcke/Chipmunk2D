@@ -25,10 +25,13 @@
 
 #include "chipmunk_private.h"
 
+#include "ChipmunkDemo.h"
+
 typedef int (*collisionFunc)(const cpShape *, const cpShape *, cpContact *);
 
 // Add contact points for circle to circle collisions.
 // Used by several collision tests.
+// TODO should accept hash parameter
 static int
 circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpFloat r2, cpContact *con)
 {
@@ -130,10 +133,13 @@ SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
 }
 
 static inline int
-ClipContact(const cpFloat d, const cpFloat t, const struct EdgePoint p1, const struct EdgePoint p2, cpVect refn, cpVect n, cpContact *arr)
+ClipContact(const cpFloat d, const cpFloat t, const struct EdgePoint p1, const struct EdgePoint p2, const cpFloat r1, const cpFloat r2, const cpVect refn, const cpVect n, cpContact *arr)
 {
 	if(d <= 0.0){
-		cpVect point = t < 1.0 ? cpvadd(p1.p, cpvmult(refn, d*0.5f)) : cpvadd(p2.p, cpvmult(refn, -d*0.5f));
+		cpFloat dn = d*0.5f;
+		cpVect point = t < 1.0 ? cpvadd(p1.p, cpvmult(refn, dn + r1)) : cpvadd(p2.p, cpvmult(refn, -(dn + r2)));
+//		cpFloat dn = r1 + r2;
+//		cpVect point = t < 1.0 ? cpvadd(p1.p, cpvmult(n, 0.0)) : cpvadd(p2.p, cpvmult(n, r1 + r2));
 		cpContactInit(arr, point, n, d, CP_HASH_PAIR(p1.hash, p2.hash));
 		return 1;
 	} else {
@@ -156,10 +162,30 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpFloat flipped, cpCo
 	cpVect n = cpvmult(ref.n, flipped);
 	cpFloat t1 = cpfclamp01((cian - cran)/(cian - cibn));
 	cpFloat t2 = cpfclamp01((cibn - crbn)/(cibn - cian));
+	ChipmunkDemoPrintString("t1: %.2f, t2: %.2f, t1xt2: %.2f    %s\n", t1, t2, t1*t2, t1*t2 == 0 ? "XXXXXX" : "");
+//	cpAssertWarn(t1*t2 != 0.0, "This?");
+//	printf("t1*t2: %.2f\n", t1*t2);
 	
-	int count = ClipContact(cpflerp(dian, dibn, t1), t1, ref.a, inc.b,ref.n, n, arr);
-	count += ClipContact(cpflerp(dibn, dian, t2), t2, ref.b, inc.a, ref.n, n, arr + count);
-	return count;
+	cpFloat d = -(ref.r + inc.r);
+	ChipmunkDebugDrawSegment(ref.a.p, ref.b.p, RGBAColor(1, 0, 0, 1));
+	ChipmunkDebugDrawSegment(cpvadd(inc.a.p, cpvmult(ref.n, d)), cpvadd(inc.b.p, cpvmult(ref.n, d)), RGBAColor(0, 1, 0, 1));
+	
+	ChipmunkDebugDrawFatSegment(ref.a.p, ref.b.p, ref.r + inc.r, RGBAColor(1, 0, 0, 1), RGBAColor(0, 0, 0, 0));
+	ChipmunkDebugDrawSegment(inc.a.p, inc.b.p, RGBAColor(0, 1, 0, 1));
+	
+	if(t1*t2 != 0){
+		int count = ClipContact(cpflerp(dian, dibn, t1), t1, ref.a, inc.b, ref.r, inc.r, ref.n, n, arr);
+		return count + ClipContact(cpflerp(dibn, dian, t2), t2, ref.b, inc.a, ref.r, inc.r, ref.n, n, arr + count);
+	} else {
+		cpAssertSoft(t1 + t2 == 1.0, "These should sum to 1.0?");
+		
+		// TODO radii could use some tweaking here.
+		if(t1 == 0){
+			return circle2circleQuery(ref.a.p, inc.a.p, ref.r, inc.r, arr);
+		} else {
+			return circle2circleQuery(ref.b.p, inc.b.p, ref.r, inc.r, arr);
+		}
+	}
 }
 
 static int
