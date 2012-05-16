@@ -67,23 +67,23 @@ init(void)
 //		shape1->group = 1;
 //	}
 	
-	{
-		cpFloat mass = 1.0f;
-		const int NUM_VERTS = 4;
-		
-		cpVect verts[NUM_VERTS];
-		for(int i=0; i<NUM_VERTS; i++){
-			cpFloat radius = 40.0;
-			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
-			verts[i] = cpv(radius*cos(angle), radius*sin(angle));
-		}
-		
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-		cpBodySetPos(body, cpv(-50.0f, 0.0f));
-		
-		shape1 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
-		shape1->group = 1;
-	}
+//	{
+//		cpFloat mass = 1.0f;
+//		const int NUM_VERTS = 4;
+//		
+//		cpVect verts[NUM_VERTS];
+//		for(int i=0; i<NUM_VERTS; i++){
+//			cpFloat radius = 40.0;
+//			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
+//			verts[i] = cpv(radius*cos(angle), radius*sin(angle));
+//		}
+//		
+//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
+//		cpBodySetPos(body, cpv(-50.0f, 0.0f));
+//		
+//		shape1 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
+//		shape1->group = 1;
+//	}
 	
 //	{
 //		cpFloat mass = 1.0f;
@@ -95,6 +95,18 @@ init(void)
 //		shape2 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
 //		shape2->group = 1;
 //	}
+	
+	{
+		cpFloat mass = 1.0f;
+		cpVect a = cpv( 50.0, 0.0);
+		cpVect b = cpv(-50.0, 0.0);
+		
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
+		cpBodySetPos(body, cpv(-50.0f, 0.0f));
+		
+		shape1 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 30.0));
+		shape1->group = 1;
+	}
 	
 	{
 		cpFloat mass = 1.0f;
