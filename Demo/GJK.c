@@ -56,33 +56,44 @@ init(void)
 	cpSpaceSetIterations(space, 5);
 	space->damping = 0.1;
 	
+//	{
+//		cpFloat mass = 1.0f;
+//		cpFloat size = 100.0f;
+//		
+//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
+//		cpBodySetPos(body, cpv(-50.0f, 0.0f));
+//		
+//		shape1 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
+//		shape1->group = 1;
+//	}
+	
 	{
 		cpFloat mass = 1.0f;
-		cpFloat size = 100.0f;
+		const int NUM_VERTS = 4;
 		
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
-		cpBodySetPos(body, cpv(50.0f, 0.0f));
+		cpVect verts[NUM_VERTS];
+		for(int i=0; i<NUM_VERTS; i++){
+			cpFloat radius = 40.0;
+			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
+			verts[i] = cpv(radius*cos(angle), radius*sin(angle));
+		}
 		
-		shape1 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
+		cpBodySetPos(body, cpv(-50.0f, 0.0f));
+		
+		shape1 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 		shape1->group = 1;
 	}
 	
 //	{
 //		cpFloat mass = 1.0f;
-//		const int NUM_VERTS = 4;
+//		cpFloat size = 100.0f;
 //		
-//		cpVect verts[NUM_VERTS];
-//		for(int i=0; i<NUM_VERTS; i++){
-//			cpFloat radius = 40.0;
-//			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
-//			verts[i] = cpv(radius*cos(angle), radius*sin(angle));
-//		}
-//		
-//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
+//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
 //		cpBodySetPos(body, cpv(50.0f, 0.0f));
 //		
-//		shape1 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
-//		shape1->group = 1;
+//		shape2 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
+//		shape2->group = 1;
 //	}
 	
 	{
@@ -97,7 +108,7 @@ init(void)
 		}
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-		cpBodySetPos(body, cpv(-50.0f, 0.0f));
+		cpBodySetPos(body, cpv(50.0f, 0.0f));
 		
 		shape2 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 		shape2->group = 1;

@@ -29,8 +29,8 @@
 #define USE_GJK 1
 #define DRAW_GJK 0
 #define DRAW_EPA 0
-#define DRAW_CLOSEST 0
-#define DRAW_CLIP 0
+#define DRAW_CLOSEST 1
+#define DRAW_CLIP 1
 #define LOG_ITERATIONS 0
 
 // Add contact points for circle to circle collisions.
@@ -223,6 +223,7 @@ ClosestT(const cpVect a, const cpVect b)
 struct ClosestPoints {
 	cpVect a, b;
 	cpFloat d;
+	cpVect n;
 };
 
 static struct ClosestPoints
@@ -231,7 +232,10 @@ ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1,
 	cpVect pa = cpvlerp(v0.a, v1.a, t);
 	cpVect pb = cpvlerp(v0.b, v1.b, t);
 	
-	struct ClosestPoints points = {pa, pb, coef*cpvdist(pa, pb)};
+	cpFloat d = coef*cpvdist(pa, pb);
+	cpVect n = cpvnormalize(cpvmult(d != 0.0 ? cpvsub(pb, pa) : cpvperp(cpvsub(v0.ab, v1.ab)), coef));
+	struct ClosestPoints points = {pa, pb, d, n};
+	cpAssertWarn(cpvdist(cpvadd(points.a, cpvmult(points.n, points.d)), points.b) < 1e-5, "Bad closest points?");
 	return points;
 }
 
@@ -302,7 +306,7 @@ EPARecurse(const cpPolyShape *a, const cpPolyShape *b, struct EPANode *root, int
 		
 		return EPARecurse(a, b, root, i + 1);
 	} else {
-#if LOG_ITERATIONS
+#if PRINT_LOG
 		ChipmunkDemoPrintString("EPA iterations: %d\n", i);
 #endif
 		return ClosestPointsNew(best->v0, best->v1, best->t, -1.0f);
@@ -366,8 +370,8 @@ GJKRecurse(const cpPolyShape *a, const cpPolyShape *b, const struct MinkowskiPoi
 //	cpFloat area = cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab));
 //	printf("dp:%f, d2:%f, area:%f\n", dp, d2, area);
 	if(dp <= 0.0 && ContainsOrigin(v0.ab, v1.ab, p.ab)){
-#if LOG_ITERATIONS
-		ChipmunkDemoPrintString("GJK iterations: %d\n", i);
+#if PRINT_LOG
+		ChipmunkDemoPrintString("GJK iterations: %d ", i);
 #endif
 		return EPA(a, b, v0, v1, p);
 //	} else if(dp < cpfmin(cpvdot(closest, v0.ab), cpvdot(closest, v1.ab))){
@@ -378,7 +382,7 @@ GJKRecurse(const cpPolyShape *a, const cpPolyShape *b, const struct MinkowskiPoi
 			return GJKRecurse(a, b, p, v1, i + 1);
 		}
 	} else {
-#if LOG_ITERATIONS
+#if PRINT_LOG
 		ChipmunkDemoPrintString("GJK iterations: %d\n", i);
 #endif
 		return ClosestPointsNew(v0, v1, t, 1.0);
@@ -453,11 +457,13 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpFloat flipped, cpCo
 	cpFloat t1 = cpfclamp01((cian - cran)/(cian - cibn));
 	cpFloat t2 = cpfclamp01((cibn - crbn)/(cibn - cian));
 	
-#if DRAW_CLIP
+#if PRINT_LOG
 	ChipmunkDemoPrintString("t1: %.2f, t2: %.2f, t1xt2: %.2f    %s\n", t1, t2, t1*t2, t1*t2 == 0 ? "XXXXXX" : "");
 //	cpAssertWarn(t1*t2 != 0.0, "This?");
 //	printf("t1*t2: %.2f\n", t1*t2);
-	
+#endif
+
+#if DRAW_CLIP
 	cpFloat d = -(ref.r + inc.r);
 	ChipmunkDebugDrawSegment(ref.a.p, ref.b.p, RGBAColor(1, 0, 0, 1));
 	ChipmunkDebugDrawSegment(cpvadd(inc.a.p, cpvmult(ref.n, d)), cpvadd(inc.b.p, cpvmult(ref.n, d)), RGBAColor(0, 1, 0, 1));
@@ -536,14 +542,19 @@ static int
 poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpContact *arr)
 {
 	struct ClosestPoints points = GJK(poly1, poly2);
-
+	
+#if PRINT_LOG
+	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
+#endif
+	
 #if DRAW_CLOSEST
 	ChipmunkDebugDrawPoints(3.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
-	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
+	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
 
-	cpVect n = cpvmult(cpvsub(points.b, points.a), 1.0f/points.d);
+
+	cpVect n = points.n;
 	return ContactPoints(SupportEdgeForPoly(poly1, n), SupportEdgeForPoly(poly2, cpvneg(n)), n, arr);
 }
 
@@ -697,10 +708,21 @@ cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr)
 	collisionFunc cfunc = colfuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
 	
 	int numContacts = (cfunc? cfunc(a, b, arr) : 0);
+	cpAssertHard(numContacts <= 2, "What the heck?");
 	
-#if DRAW_CLIP
+#if PRINT_LOG
 	ChipmunkDemoPrintString("Contacts: %d", numContacts);
 	
+	if(numContacts == 1){
+		ChipmunkDemoPrintString(" %X\n", arr[0].hash);
+	} else if(numContacts == 2){
+		cpHashValue a = arr[0].hash;
+		cpHashValue b = arr[1].hash;
+		ChipmunkDemoPrintString(" %X %X\n", (a < b ? a : b), (a > b ? a : b));
+	}
+#endif
+	
+#if DRAW_CLIP
 	for(int i=0; i<numContacts; i++){
 		cpVect p = arr[i].p;
 		ChipmunkDebugDrawPoints(5.0, 1, &p, RGBAColor(1, 0, 0, 1));
@@ -708,15 +730,6 @@ cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr)
 		cpVect n = arr[i].n;
 		cpFloat d = -arr[i].dist;
 		ChipmunkDebugDrawSegment(cpvadd(p, cpvmult(n, d)), cpvadd(p, cpvmult(n, -d)), RGBAColor(1, 0, 0, 1));
-	}
-	
-	cpAssertHard(numContacts <= 2, "What the heck?");
-	if(numContacts == 1){
-		ChipmunkDemoPrintString(" %X\n", arr[0].hash);
-	} else if(numContacts == 2){
-		cpHashValue a = arr[0].hash;
-		cpHashValue b = arr[1].hash;
-		ChipmunkDemoPrintString(" %X %X\n", (a < b ? a : b), (a > b ? a : b));
 	}
 #endif
 	
