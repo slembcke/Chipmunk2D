@@ -46,6 +46,7 @@
 	#define cpfpow pow
 	#define cpffloor floor
 	#define cpfceil ceil
+	#define CPFLOAT_MIN DBL_MIN
 #else
 	typedef float cpFloat;
 	#define cpfsqrt sqrtf
@@ -58,6 +59,7 @@
 	#define cpfpow powf
 	#define cpffloor floorf
 	#define cpfceil ceilf
+	#define CPFLOAT_MIN FLT_MIN
 #endif
 
 #ifndef INFINITY

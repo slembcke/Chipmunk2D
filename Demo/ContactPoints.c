@@ -28,7 +28,6 @@
 #include "ChipmunkDemo.h"
 
 static cpSpace *space;
-static cpShape *shape1, *shape2;
 
 static void
 update(int ticks)
@@ -41,49 +40,34 @@ update(int ticks)
 	}
 }
 
-static void
-draw(void)
-{
-	ChipmunkDemoDefaultDrawImpl();
-	cpContact arr[CP_MAX_CONTACTS_PER_ARBITER];
-	cpCollideShapes(shape1, shape2, arr);
-}
-
 static cpSpace *
 init(void)
 {
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 5);
-	space->damping = 0.1;
+	cpSpaceSetDamping(space, 0.1f);
 	
 	{
 		cpFloat mass = 1.0f;
-		cpFloat size = 100.0f;
+		cpFloat length = 100.0f;
+		cpVect a = cpv(-length/2.0f, 0.0f), b = cpv(length/2.0f, 0.0f);
 		
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
-		cpBodySetPos(body, cpv(50.0f, 0.0f));
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
+		cpBodySetPos(body, cpv(-160.0f, -80.0f));
 		
-		shape1 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
-		shape1->group = 1;
+		cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 30.0f));
 	}
 	
-//	{
-//		cpFloat mass = 1.0f;
-//		const int NUM_VERTS = 4;
-//		
-//		cpVect verts[NUM_VERTS];
-//		for(int i=0; i<NUM_VERTS; i++){
-//			cpFloat radius = 40.0;
-//			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
-//			verts[i] = cpv(radius*cos(angle), radius*sin(angle));
-//		}
-//		
-//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-//		cpBodySetPos(body, cpv(50.0f, 0.0f));
-//		
-//		shape1 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
-//		shape1->group = 1;
-//	}
+	{
+		cpFloat mass = 1.0f;
+		cpFloat length = 100.0f;
+		cpVect a = cpv(-length/2.0f, 0.0f), b = cpv(length/2.0f, 0.0f);
+		
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
+		cpBodySetPos(body, cpv(-160.0f, 80.0f));
+		
+		cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 20.0f));
+	}
 	
 	{
 		cpFloat mass = 1.0f;
@@ -91,25 +75,51 @@ init(void)
 		
 		cpVect verts[NUM_VERTS];
 		for(int i=0; i<NUM_VERTS; i++){
-			cpFloat radius = 60.0;
 			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
-			verts[i] = cpv(radius*cos(angle), radius*sin(angle));
+			verts[i] = cpv(40*cos(angle), 40*sin(angle));
 		}
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-		cpBodySetPos(body, cpv(-50.0f, 0.0f));
+		cpBodySetPos(body, cpv(-0.0f, -80.0f));
 		
-		shape2 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
-		shape2->group = 1;
+		cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 	}
 	
-//	cpBodySetAngle(shape1->body, 34.48);
-//	cpShapeCacheBB(shape1);
-//	int num = 40;
-//	for(int i=0; i<num; i++){
-//		SupportPoint(shape2, cpvforangle((cpFloat)i/(cpFloat)num*2.0*M_PI));
-//	}
-//	abort();
+	{
+		cpFloat mass = 1.0f;
+		const int NUM_VERTS = 4;
+		
+		cpVect verts[NUM_VERTS];
+		for(int i=0; i<NUM_VERTS; i++){
+			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
+			verts[i] = cpv(60*cos(angle), 60*sin(angle));
+		}
+		
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
+		cpBodySetPos(body, cpv(-0.0f, 80.0f));
+		
+		cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
+	}
+	
+	{
+		cpFloat mass = 1.0f;
+		cpFloat r = 60.0f;
+		
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, INFINITY));
+		cpBodySetPos(body, cpv(160.0, -80.0f));
+		
+		cpSpaceAddShape(space, cpCircleShapeNew(body, r, cpvzero));
+	}
+	
+	{
+		cpFloat mass = 1.0f;
+		cpFloat r = 40.0f;
+		
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, INFINITY));
+		cpBodySetPos(body, cpv(160.0, 80.0f));
+		
+		cpSpaceAddShape(space, cpCircleShapeNew(body, r, cpvzero));
+	}
 	
 	return space;
 }
@@ -121,10 +131,10 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-ChipmunkDemo GJK = {
-	"GJK",
+ChipmunkDemo ContactPoints = {
+	"ContactPoints",
 	init,
 	update,
-	draw,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };
