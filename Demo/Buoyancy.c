@@ -19,10 +19,6 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-#include <math.h>
-#include <stdio.h>
-
 #include "chipmunk.h"
 #include "constraints/util.h"
 

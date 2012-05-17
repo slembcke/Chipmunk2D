@@ -31,10 +31,8 @@
 	about Chipmunk which may change with little to no warning.
 */
  
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 #include <limits.h>
 #include <stdarg.h>
 

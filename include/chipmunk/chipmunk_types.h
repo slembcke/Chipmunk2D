@@ -1,4 +1,3 @@
-#include <math.h>
 #include <stdint.h>
 
 #ifdef __APPLE__
@@ -61,7 +60,6 @@
 #endif
 
 #ifndef INFINITY
-	//TODO use C++ infinity
 	#ifdef _MSC_VER
 		union MSVC_EVIL_FLOAT_HACK
 		{

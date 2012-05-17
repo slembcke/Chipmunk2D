@@ -19,15 +19,10 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-#include <math.h>
-#include <stdio.h>
-
 #include "chipmunk.h"
 #include "constraints/util.h"
 
 #include "ChipmunkDemo.h"
-
 
 #define DENSITY (1.0/10000.0)
 
@@ -41,13 +36,8 @@ ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 	int count = cpPolyShapeGetNumVerts(shape);
 	int clippedCount = 0;
 	
-#ifdef _MSC_VER
-	// MSVC is pretty much the only compiler in existence that doesn't support variable sized arrays.
-	cpVect clipped[10];
-#else
-	cpVect clipped[count + 1];
-#endif
-
+	cpVect *clipped = (cpVect *)alloca((count + 1)*sizeof(cpVect));
+	
 	for(int i=0, j=count-1; i<count; j=i, i++){
 		cpVect a = cpBodyLocal2World(body, cpPolyShapeGetVert(shape, j));
 		cpFloat a_dist = cpvdot(a, n) - dist;

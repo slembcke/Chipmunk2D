@@ -19,8 +19,6 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-
 #include "chipmunk_private.h"
 
 //MARK: Point Query Functions

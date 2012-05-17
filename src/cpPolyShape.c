@@ -19,8 +19,6 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-
 #include "chipmunk_private.h"
 #include "chipmunk_unsafe.h"
 

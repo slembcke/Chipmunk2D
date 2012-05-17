@@ -25,9 +25,6 @@
  * Read more here: http://en.wikipedia.org/wiki/Theo_Jansen
  */
  
-#include <stdlib.h>
-#include <math.h>
-
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 

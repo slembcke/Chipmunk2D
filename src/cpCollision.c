@@ -19,10 +19,6 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-#include <math.h>
-//#include <stdio.h>
-
 #include "chipmunk_private.h"
 
 typedef int (*collisionFunc)(const cpShape *, const cpShape *, cpContact *);

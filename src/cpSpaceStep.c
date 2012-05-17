@@ -19,10 +19,6 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-
 #include "chipmunk_private.h"
 
 //MARK: Post Step Callback Functions
