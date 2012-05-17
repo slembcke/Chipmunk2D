@@ -587,7 +587,7 @@ segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContac
 #if USE_GJK
 
 static int
-poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, const cpShape *shape, cpContact *arr)
+poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpContact *arr)
 {
 	struct ClosestPoints points = GJK((cpShape *)poly1, (cpShape *)poly2, (GJKSupportFunction)cpPolySupportPoint, (GJKSupportFunction)cpPolySupportPoint);
 	
