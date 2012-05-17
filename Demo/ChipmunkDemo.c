@@ -545,6 +545,7 @@ void time_trial(int index, int count)
 	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, demos[index].name);
 }
 
+extern ChipmunkDemo ContactPoints;
 extern ChipmunkDemo LogoSmash;
 extern ChipmunkDemo PyramidStack;
 extern ChipmunkDemo Plink;
@@ -575,7 +576,8 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
-//		GJK,
+		ContactPoints,
+		GJK,
 		LogoSmash,
 		PyramidStack,
 		Plink,

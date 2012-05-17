@@ -25,6 +25,7 @@
 #define CP_HASH_COEF (3344921057ul)
 #define CP_HASH_PAIR(A, B) ((cpHashValue)(A)*CP_HASH_COEF ^ (cpHashValue)(B)*CP_HASH_COEF)
 
+
 //MARK: cpArray
 
 struct cpArray {
@@ -42,6 +43,7 @@ void cpArrayDeleteObj(cpArray *arr, void *obj);
 cpBool cpArrayContains(cpArray *arr, void *ptr);
 
 void cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*));
+
 
 //MARK: Foreach loops
 
@@ -69,6 +71,7 @@ cpArbiterNext(cpArbiter *node, cpBody *body)
 #define CP_BODY_FOREACH_COMPONENT(root, var)\
 	for(cpBody *var = root; var; var = var->node.next)
 
+
 //MARK: cpHashSet
 
 typedef cpBool (*cpHashSetEqlFunc)(void *ptr, void *elt);
@@ -89,6 +92,7 @@ void cpHashSetEach(cpHashSet *set, cpHashSetIteratorFunc func, void *data);
 
 typedef cpBool (*cpHashSetFilterFunc)(void *elt, void *data);
 void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);
+
 
 //MARK: Body Functions
 
@@ -135,49 +139,11 @@ cpSplittingPlaneCompare(cpSplittingPlane plane, cpVect v)
 
 void cpLoopIndexes(cpVect *verts, int count, int *start, int *end);
 
-static inline cpFloat
-cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
-{
-	cpVect *verts = poly->tVerts;
-	cpFloat min = cpvdot(n, verts[0]);
-	
-	for(int i=1; i<poly->numVerts; i++){
-		min = cpfmin(min, cpvdot(n, verts[i]));
-	}
-	
-	return min - d;
-}
-
-static inline cpBool
-cpPolyShapeContainsVert(const cpPolyShape *poly, const cpVect v)
-{
-	cpSplittingPlane *planes = poly->tPlanes;
-	
-	for(int i=0; i<poly->numVerts; i++){
-		cpFloat dist = cpSplittingPlaneCompare(planes[i], v);
-		if(dist > 0.0f) return cpFalse;
-	}
-	
-	return cpTrue;
-}
-
-static inline cpBool
-cpPolyShapeContainsVertPartial(const cpPolyShape *poly, const cpVect v, const cpVect n)
-{
-	cpSplittingPlane *planes = poly->tPlanes;
-	
-	for(int i=0; i<poly->numVerts; i++){
-		if(cpvdot(planes[i].n, n) < 0.0f) continue;
-		cpFloat dist = cpSplittingPlaneCompare(planes[i], v);
-		if(dist > 0.0f) return cpFalse;
-	}
-	
-	return cpTrue;
-}
 
 //MARK: Spatial Index Functions
 
 cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *klass, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+
 
 //MARK: Space Functions
 
@@ -216,7 +182,6 @@ cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb)
 
 void cpShapeUpdateFunc(cpShape *shape, void *unused);
 void cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space);
-
 
 
 //MARK: Arbiters

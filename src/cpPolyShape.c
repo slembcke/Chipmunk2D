@@ -130,8 +130,8 @@ cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpSegmentQueryInf
 		
 		cpVect point = cpvlerp(a, b, t);
 		cpFloat dt = -cpvcross(n, point);
-		cpFloat dtMin = -cpvcross(n, verts[i]);
-		cpFloat dtMax = -cpvcross(n, verts[(i+1)%numVerts]);
+		cpFloat dtMin = -cpvcross(n, verts[(i - 1 + numVerts)%numVerts]);
+		cpFloat dtMax = -cpvcross(n, verts[i]);
 		
 		if(dtMin <= dt && dt <= dtMax){
 			info->shape = (cpShape *)poly;
