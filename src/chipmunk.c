@@ -179,20 +179,23 @@ cpLoopIndexes(cpVect *verts, int count, int *start, int *end)
 #define SWAP(__A__, __B__) {cpVect __TMP__ = __A__; __A__ = __B__; __B__ = __TMP__;}
 
 static int
-QHullPartition(cpVect *verts, int count, cpSplittingPlane plane, cpFloat tol)
+QHullPartition(cpVect *verts, int count, cpVect a, cpVect b, cpFloat tol)
 {
 	if(count == 0) return 0;
 	
-	cpFloat max = cpSplittingPlaneCompare(plane, verts[0]);
-	int maxi = 0;
+	cpFloat max = 0;
+	int pivot = 0;
+	
+	cpVect delta = cpvsub(b, a);
+	cpFloat valueTol = tol*cpvlength(delta);
 	
 	int head = 0;
 	for(int tail = count-1; head <= tail;){
-		cpFloat dist = cpSplittingPlaneCompare(plane, verts[head]);
-		if(dist > tol){
-			if(dist > max){
-				max = dist;
-				maxi = head;
+		cpFloat value = cpvcross(delta, cpvsub(verts[head], a));
+		if(value > valueTol){
+			if(value > max){
+				max = value;
+				pivot = head;
 			}
 			
 			head++;
@@ -203,7 +206,7 @@ QHullPartition(cpVect *verts, int count, cpSplittingPlane plane, cpFloat tol)
 	}
 	
 	// move the new pivot to the front
-	SWAP(verts[0], verts[maxi]);
+	if(pivot != 0) SWAP(verts[0], verts[pivot]);
 	
 	return head;
 }
@@ -217,12 +220,12 @@ QHullReduce(cpFloat tol, cpVect *verts, int count, cpVect a, cpVect pivot, cpVec
 		result[0] = pivot;
 		return 1;
 	} else {
-		int left_count = QHullPartition(verts, count, cpSplittingPlaneNew(a, pivot), tol);
+		int left_count = QHullPartition(verts, count, a, pivot, tol);
 		int index = QHullReduce(tol, verts + 1, left_count - 1, a, verts[0], pivot, result);
 		
 		result[index++] = pivot;
 		
-		int right_count = QHullPartition(verts + left_count, count - left_count, cpSplittingPlaneNew(pivot, b), tol);
+		int right_count = QHullPartition(verts + left_count, count - left_count, pivot, b, tol);
 		return index + QHullReduce(tol, verts + left_count + 1, right_count - 1, pivot, verts[left_count], b, result + index);
 	}
 }
