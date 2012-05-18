@@ -205,9 +205,8 @@ QHullPartition(cpVect *verts, int count, cpVect a, cpVect b, cpFloat tol)
 		}
 	}
 	
-	// move the new pivot to the front
+	// move the new pivot to the front if it's not already there.
 	if(pivot != 0) SWAP(verts[0], verts[pivot]);
-	
 	return head;
 }
 
@@ -235,8 +234,13 @@ QHullReduce(cpFloat tol, cpVect *verts, int count, cpVect a, cpVect pivot, cpVec
 int
 cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)
 {
-	// Copy the line vertexes into the empty part of the result polyline to use as a scratch buffer.
-	memcpy(result, verts, count*sizeof(cpVect));
+	if(result){
+		// Copy the line vertexes into the empty part of the result polyline to use as a scratch buffer.
+		memcpy(result, verts, count*sizeof(cpVect));
+	} else {
+		// If a result array was not specified, reduce the input instead.
+		result = verts;
+	}
 	
 	// Degenerate case, all poins are the same.
 	int start, end;
@@ -253,7 +257,11 @@ cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)
 	cpVect b = result[1];
 	
 	if(first) (*first) = start;
-	return QHullReduce(tol, result + 2, count - 2, a, b, a, result + 1) + 1;
+	int resultCount = QHullReduce(tol, result + 2, count - 2, a, b, a, result + 1) + 1;
+	cpAssertSoft(cpPolyValidate(result, resultCount),
+		"Internal error: cpConvexHull() and cpPolyValidate() did not agree."
+		"Please report this error with as much info as you can.");
+	return resultCount;
 }
 
 //MARK: Alternate Block Iterators

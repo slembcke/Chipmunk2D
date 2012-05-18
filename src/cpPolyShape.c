@@ -186,22 +186,22 @@ setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 	// Fail if the user attempts to pass a concave poly, or a bad winding.
 	cpAssertHard(cpPolyValidate(verts, numVerts), "Polygon is concave or has a reversed winding.");
 	
-	poly->verts = (cpVect *)cpcalloc(2*numVerts, sizeof(cpVect));
-	numVerts = cpConvexHull(numVerts, verts, poly->verts, NULL, 0.0);
-	
 	poly->numVerts = numVerts;
-	poly->verts = (cpVect *)cprealloc(poly->verts, 2*numVerts*sizeof(cpVect));
+	poly->verts = (cpVect *)cpcalloc(2*numVerts, sizeof(cpVect));
 	poly->planes = (cpSplittingPlane *)cpcalloc(2*numVerts, sizeof(cpSplittingPlane));
 	poly->tVerts = poly->verts + numVerts;
 	poly->tPlanes = poly->planes + numVerts;
 	
 	for(int i=0; i<numVerts; i++){
-		poly->verts[i] = cpvadd(offset, poly->verts[i]);
+		cpVect a = cpvadd(offset, verts[i]);
+		cpVect b = cpvadd(offset, verts[(i+1)%numVerts]);
+		cpVect n = cpvnormalize(cpvperp(cpvsub(b, a)));
+
+		poly->verts[i] = a;
+		poly->planes[i].n = n;
+		poly->planes[i].d = cpvdot(n, a);
 	}
 	
-	for(int i=0; i<numVerts; i++){
-		poly->planes[i] = cpSplittingPlaneNew(poly->verts[i], poly->verts[(i+1)%numVerts]);
-	}
 }
 
 cpPolyShape *
