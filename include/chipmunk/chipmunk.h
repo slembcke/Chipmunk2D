@@ -165,7 +165,7 @@ int cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat t
 /// @c count and @c verts is the input array passed to cpConvexHull().
 /// @c count_var and @c verts_var are the names of the variables the macro creates to store the result.
 /// The output vertex array is allocated on the stack using alloca() so it will be freed automatically, but cannot be returned from the current scope.
-#define CP_MAKE_CONVEX(__count__, __verts__, __count_var__, __verts_var__) \
+#define CP_CONVEX_HULL(__count__, __verts__, __count_var__, __verts_var__) \
 cpVect *__verts_var__ = (cpVect *)alloca(__count__*sizeof(cpVect)); \
 int __count_var__ = cpConvexHull(__count__, __verts__, __verts_var__, NULL, 0.0); \
 
