@@ -183,6 +183,9 @@ cpPolyShapeGetVert(cpShape *shape, int idx)
 static void
 setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 {
+	// Fail if the user attempts to pass a concave poly, or a bad winding.
+	cpAssertHard(cpPolyValidate(verts, numVerts), "Polygon is concave or has a reversed winding.");
+	
 	poly->verts = (cpVect *)cpcalloc(2*numVerts, sizeof(cpVect));
 	numVerts = cpConvexHull(numVerts, verts, poly->verts, NULL, 0.0);
 	
