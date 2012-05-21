@@ -9,8 +9,17 @@
 // If you don't care, pass NULL instead of the 'first' pointer.
 </span></em>
 cpBody *body = <span style="color:#003369;">cpBodyNew</span>(mass, <span style="color:#003369;">cpMomentForPoly</span>(mass, hullCount, hullVerts, cpvzero));
-
 cpShape *shape = <span style="color:#003369;">cpPolyShapeNew</span>(body, hullCount, hullVerts, cpvzero);
 
 <span style="color:#003369;">free</span>(hullVerts);
+
+<em><span style="color:#236e25;">// *********
+// Altenatively you can use the CP_CONVEX_HULL() macro to save yourself a little work
+</span></em>
+<em><span style="color:#236e25;">// The macro will declare the hullCount and hullVerts variables.
+// hullVerts is allocated on the stack and does not need to be freed.
+</span></em><span style="color:#003369;">CP_CONVEX_HULL</span>(count, verts, hullCount, hullVerts)
+
+cpBody *body = <span style="color:#003369;">cpBodyNew</span>(mass, <span style="color:#003369;">cpMomentForPoly</span>(mass, hullCount, hullVerts, cpvzero));
+cpShape *shape = <span style="color:#003369;">cpPolyShapeNew</span>(body, hullCount, hullVerts, cpvzero);
 </pre>

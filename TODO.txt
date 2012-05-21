@@ -1,11 +1,11 @@
 High Priority:
-	Document the new nearest point query functions. (review)
-	Document cpConvexHull().
 	Document ChipmunkMultiGrab, update example code.
 	Make a blog post/video about (QHull, ACD, NPQ, and blocks)
-	Add license to showcase code.
+	Add license to showcase code. (and example code)
+	Release new Showcase app with push mode.
 	Make a Cocos2D helper pack (ChipmunkSprite, ChipmunkDebugNode, ES2 renderer)
 	Investigate getting better PhysicsEditor support.
+	Call cpBodyAssertSane from setters.
 
 Tutorial ideas:
 	C/Blocks tutorial
@@ -36,9 +36,7 @@ Future things to think about:
 	breakable object support functions?
 	Easy callback programable joint?
 	cpBodyActivateStatic() should also activate joints?
-	Extreme vertex BSP search for polys
-	GJK or other closest points algorithm?
-	Redo poly-poly contact manifold
+	Finish the contact point generation branch.
 	Figure out why poly contacts can sometimes be unstable when driven by a strong constraint
 	Implement segment-segment collisions
 	Assertion for destroying a body with things still attached

@@ -1,4 +1,25 @@
 CHANGES SINCE 6.0.3:
+* API: Added a pthread based, multi-threaded solver to accelerate the game on multi-core systems. (Pro only)
+* API: Added cpConvexHull() and CP_CONVEX_HULL() for generating convex hulls.
+* API: Added cpPolylineConvexDecomposition_BETA() to generate an approximate concave decomposition of a polyline. (Pro only)
+* API: Added [ChipmunkPolyline toConvexHull:] to generate approximate convex hulls. (Pro only).
+* API: Added [ChipmunkPolylineSet toConvexHulls_BETA:]. (Pro only)
+* API: Added nearest point queries.
+* API: Added a push mode to ChipmunkMultiGrab so touches can interact with the scene even if they didn't initially touch a shape.
+* API: Added optional block based iterators.
+* API: Added a space property to cpBody, cpShape and cpConstraint types.
+* BUG: Fixed an issue with changing the floating point and vector type on OS X.
+* BUG: Fixed a pixel offset in ChipmunkImageSampler that could cause minor sampling artifacts. (Pro only)
+* BUG: Fixed an issue where cpShape and cpConstraint structs could have garbage space pointers if cpcalloc() was redefined.
+* BUG: Fixed assertions in cpArbiter getters to correctly reflect a contact count of 0 from separate() callbacks.
+* BUG: Fixed a regression relating to registering post-step() callbacks from other post-step() callbacks.
+* BUG: Fixed a minor memory leak for sleeping bodies when destroying a space.
+* MISC: cpSpatialIndexPointQuery() has been removed. Use cpSpatialIndexQuery() instead.
+* MISC: Point queries are now deprecated in preference to point queries.
+* MISC: The enableContactGraph property of cpSpace is deprecated and always be true.
+* MISC: Added a new demo of a self balancing Unicycle.
+
+CHANGES SINCE 6.0.2:
 * API: Added a cpBBForCircle() convenience function.
 * API: Added cpBBSegmentQuery() to check where a segment hits a cpBB.
 * API: Added cpBodyGetVelAtWorldPoint() and cpBodyGetVelAtLocalPoint() to get point velocities on a body.
@@ -7,6 +28,8 @@ CHANGES SINCE 6.0.3:
 * API: Added a CHIPMUNK_ARBITER_GET_BODIES() macro for Objective-Chipmunk.
 * API: The Objective-Chipmunk headers are now ARC compatible.
 * API: Added a [ChipmunkSpace contains:] method to check if a ChipmunkObject has been added to the space or not.
+* API: Added a cpBBNewForCircle() function.
+* API: Added a cpBBSegmentQuery() function for raycasting againsts AABBs.
 * BUG: Fixed a regression with ChipmunkSpace.bodies and ChipmunkSpace.shapes that caused crashes.
 * BUG: Fixed a rare bug with postStep() callbacks and iterators.
 * BUG: Fixed a border case in cpBBIntersectsSegment() that could cause missed segment queries.
@@ -15,10 +38,6 @@ CHANGES SINCE 6.0.3:
 * MISC: Added a new "Slice" demo that lets you cut up a polygon.
 * MISC: Added NEON optimizations for Chipmunk Pro. Expect running on most ARM platforms to be 25-35% faster for contact heavy simulations.
 * MISC: All ChipmunkObject instances added to a space are now retained, even composite ones.
-
-CHANGES SINCE 6.0.2:
-* API: Added a cpBBNewForCircle() function.
-* API: Added a cpBBSegmentQuery() function for raycasting againsts AABBs.
 
 CHANGES SINCE 6.0.1:
 * API: Added cpSpaceIsLocked() to check if you are in a callback or not.
