@@ -39,7 +39,7 @@ The included XCode project has targets for building a static library for the Mac
 
 <%= h 3, "MSVC", "MSVC" %>
 
-I rarely use MSVC, but others have chipped in to help me maintain Visual Studio project files. Let me know if there are any issues.
+I rarely use MSVC, but others have chipped in to help me maintain Visual Studio project files. The MSVC 10 project should work, as I usually remember to test that before making a stable release. The MSVC 9 project may not as I don't have access to that version. Let me know if there are any issues.
 
 <%= h 3, "Command Line", "CommandLine" %>
 
@@ -100,11 +100,10 @@ This means that you do not have to buy a license or pay to use Chipmunk in comme
 
 <%= h 2, "Links:", "Links" %>
 
-* "slembcke.net/forums":http://www.slembcke.net/forums/viewforum.php?f=1 - The official forum Chipmunk Physics forum.
+* "Chipmunk Forums":http://chipmunk-physics.net/forum - The official forum Chipmunk Physics forum.
 * "Howling Moon Software":http://howlingmoonsoftware.com/ -  My software company.
-* "Objective-Chipmunk":http://howlingmoonsoftware.com/objectiveChipmunk.php - An Objective-C wrapper that makes developing Chipmunk apps on the iPhone a snap.
-* "Games":http://code.google.com/p/chipmunk-physics/wiki/Games - A small list of games done with Chipmunk.
-* "Bindings and Ports":http://code.google.com/p/chipmunk-physics/wiki/BindingsAndPorts - A list of bindings and ports of Chipmunk to other languages.
+* "Chipmunk Pro":http://chipmunk-physics.net/chipmunkPro.php - An enhanced version of Chipmunk that we maintain with some specific optimizations for ARM or multi-core platforms, automatic geometry manipulation from images or procedural data, and API wrappers for Objective-C.
+* "Games":http://chipmunk-physics.net/games.php - A small list of games done with Chipmunk. At least a few of the ones we know of.
 
 
 <%= h 1, "Chipmunk Basics:", "Basics" %>
@@ -596,6 +595,14 @@ cpShape *cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height)</code></pre>
 * @cpBool cpPolyValidate(const cpVect *verts, const int numVerts)@ - Check if a vertex array is convex and with the correct winding.
 * @cpVect cpCentroidForPoly(const int numVerts, const cpVect *verts)@ - Calculate the centroid for a polygon.
 * @void cpRecenterPoly(const int numVerts, cpVect *verts)@ - Center a polygon to (0,0). Subtracts the centroid from each vertex.
+
+<%= h 3, "Convex Hull Helper Functions:", "ConvexHelpers" %>
+
+<pre><code>int cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)</code></pre>
+
+p(expl). Calculate the convex hull of a given set of points. Returns the count of points in the hull. @result@ must be a pointer to a @cpVect@ array with at least @count@ elements. If @result@ is @NULL@, then @verts@ array wil be reduced instead. @first@ is an optional pointer to an integer to store where the first vertex in the hull came from (i.e. @verts[first] == result[0]@) @tol@ is the allowed amount to shrink the hull when simplifying it. A tolerance of 0.0 creates an exact hull.
+
+<%= pop_open_example "cpConvexHull" %>
 
 
 <%= h 2, "Modifying cpShapes:", "Modifing" %>

@@ -1,7 +1,6 @@
 High Priority:
-	Disable HastySpace threads by default.
 	Document the new nearest point query functions. (review)
-	Document cpConvexHull() and cpPolyShapeNew().
+	Document cpConvexHull().
 	Document ChipmunkMultiGrab, update example code.
 	Make a blog post/video about (QHull, ACD, NPQ, and blocks)
 	Add license to showcase code.

@@ -152,7 +152,7 @@ cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height);
 cpFloat cpMomentForBox2(cpFloat m, cpBB box);
 
 /// Calculate the convex hull of a given set of points. Returns the count of points in the hull.
-/// @c result must be a pointer to an array with at least @c count elements. If @c result is @c NULL, the input array will be reduced instead.
+/// @c result must be a pointer to a @c cpVect array with at least @c count elements. If @c result is @c NULL, then @c verts will be reduced instead.
 /// @c first is an optional pointer to an integer to store where the first vertex in the hull came from (i.e. verts[first] == result[0])
 /// @c tol is the allowed amount to shrink the hull when simplifying it. A tolerance of 0.0 creates an exact hull.
 int cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol);
