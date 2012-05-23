@@ -163,6 +163,7 @@
     <ClCompile Include="..\..\..\Demo\ChipmunkDebugDraw.c" />
     <ClCompile Include="..\..\..\Demo\ChipmunkDemo.c" />
     <ClCompile Include="..\..\..\Demo\ContactGraph.c" />
+    <ClCompile Include="..\..\..\Demo\Convex.c" />
     <ClCompile Include="..\..\..\Demo\Crane.c" />
     <ClCompile Include="..\..\..\Demo\Joints.c" />
     <ClCompile Include="..\..\..\Demo\LogoSmash.c" />

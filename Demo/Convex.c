@@ -20,6 +20,7 @@
  */
  
 #include "chipmunk.h"
+#include "chipmunk_unsafe.h"
 
 #include "ChipmunkDemo.h"
 
