@@ -59,13 +59,9 @@ update(int ticks)
 		cpBodySetMoment(body, cpMomentForPoly(mass, hullCount, verts, cpvneg(centroid)));
 		cpBodySetPos(body, cpBodyLocal2World(body, centroid));
 		
-		// Recreate the shape.
-		// You could also use the setter functions in chipumkn_unsafe.h, but you would need to manually offset all the vertexes.
+		// Use the setter function from chipmunk_unsafe.h.
+		// You could also remove and recreate the shape if you wanted.
 		cpPolyShapeSetVerts(shape, hullCount, verts, cpvneg(centroid));
-//		cpSpaceRemoveShape(space, shape);
-//		cpShapeFree(shape);
-//		
-//		shape = cpSpaceAddShape(space, cpPolyShapeNew(body, hullCount, verts, cpvneg(centroid)));
 	}
 	
 	int steps = 1;
