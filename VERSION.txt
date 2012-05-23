@@ -14,10 +14,11 @@ CHANGES SINCE 6.0.3:
 * BUG: Fixed assertions in cpArbiter getters to correctly reflect a contact count of 0 from separate() callbacks.
 * BUG: Fixed a regression relating to registering post-step() callbacks from other post-step() callbacks.
 * BUG: Fixed a minor memory leak for sleeping bodies when destroying a space.
-* MISC: cpSpatialIndexPointQuery() has been removed. Use cpSpatialIndexQuery() instead.
 * MISC: Point queries are now deprecated in preference to point queries.
+* MISC: cpSpatialIndexPointQuery() was redundant and has been removed. Use cpSpatialIndexQuery() instead.
+* MISC: cpShape*Query() functions now accept a NULL info pointer if you don't want detailed query info.
 * MISC: The enableContactGraph property of cpSpace is deprecated and always be true.
-* MISC: Added a new demo of a self balancing Unicycle.
+* MISC: Added a new demos of the convex hull functions and a self balancing Unicycle.
 
 CHANGES SINCE 6.0.2:
 * API: Added a cpBBForCircle() convenience function.
