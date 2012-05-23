@@ -7,7 +7,16 @@
 	#define BENCH_SPACE_STEP cpSpaceStep
 #else
 	#import "cpHastySpace.h"
-	#define BENCH_SPACE_NEW cpHastySpaceNew
+	
+	static cpSpace *
+	MakeHastySpace()
+	{
+		cpSpace *space = cpHastySpaceNew();
+		cpHastySpaceSetThreads(space, 0);
+		return space;
+	}
+	
+	#define BENCH_SPACE_NEW MakeHastySpace
 	#define BENCH_SPACE_FREE cpHastySpaceFree
 	#define BENCH_SPACE_STEP cpHastySpaceStep
 #endif
