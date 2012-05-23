@@ -563,6 +563,7 @@ extern ChipmunkDemo Crane;
 extern ChipmunkDemo Buoyancy;
 extern ChipmunkDemo ContactGraph;
 extern ChipmunkDemo Slice;
+extern ChipmunkDemo Convex;
 extern ChipmunkDemo Unicycle;
 
 extern ChipmunkDemo bench_list[];
@@ -592,6 +593,7 @@ main(int argc, const char **argv)
 		Buoyancy,
 		Player,
 		Slice,
+		Convex,
 		Unicycle,
 	};
 	

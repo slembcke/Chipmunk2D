@@ -72,7 +72,7 @@ ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 	cpShapeSetFriction(new_shape, cpShapeGetFriction(shape));
 }
 
-// Context strcts are annoying, use blocks or closures instead if your compiler supports them.
+// Context structs are annoying, use blocks or closures instead if your compiler supports them.
 struct SliceContext {
 	cpVect a, b;
 	cpSpace *space;

@@ -109,6 +109,7 @@
 		D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0540AA3303F004E361B /* OpenGL.framework */; };
 		D3F2EE2F14F898E9005FD439 /* Unicycle.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F2EE2E14F898E9005FD439 /* Unicycle.c */; };
 		D3F52BD313C509DC00EB67D9 /* Chains.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F52BD213C509DC00EB67D9 /* Chains.c */; };
+		D3F6EEDF156D581300A158A8 /* Convex.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F6EEDE156D581300A158A8 /* Convex.c */; };
 		D3FBA1A70E9B1E0400950BCC /* ChipmunkDebugDraw.c in Sources */ = {isa = PBXBuildFile; fileRef = D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */; };
 /* End PBXBuildFile section */
 
@@ -210,6 +211,7 @@
 		D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpSpaceHash.c; sourceTree = "<group>"; };
 		D3F2EE2E14F898E9005FD439 /* Unicycle.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Unicycle.c; sourceTree = "<group>"; };
 		D3F52BD213C509DC00EB67D9 /* Chains.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Chains.c; sourceTree = "<group>"; };
+		D3F6EEDE156D581300A158A8 /* Convex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Convex.c; sourceTree = "<group>"; };
 		D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ChipmunkDebugDraw.c; sourceTree = "<group>"; };
 		D3FBA1B80E9B1F6300950BCC /* ChipmunkDebugDraw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChipmunkDebugDraw.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -332,6 +334,7 @@
 				D37282D313C76C1B00FFFA3F /* Buoyancy.c */,
 				D373FF0F13D0D66E000EDB87 /* ContactGraph.c */,
 				D38996A5148B1E72006CFE0B /* Slice.c */,
+				D3F6EEDE156D581300A158A8 /* Convex.c */,
 				D3E4867513175AE000A00840 /* Bench.c */,
 			);
 			name = Demo;
@@ -625,6 +628,7 @@
 				D373FF1013D0D66E000EDB87 /* ContactGraph.c in Sources */,
 				D38996A6148B1E72006CFE0B /* Slice.c in Sources */,
 				D3F2EE2F14F898E9005FD439 /* Unicycle.c in Sources */,
+				D3F6EEDF156D581300A158A8 /* Convex.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

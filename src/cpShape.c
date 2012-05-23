@@ -113,7 +113,11 @@ cpFloat
 cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *info)
 {
 	cpNearestPointQueryInfo blank = {NULL, cpvzero, INFINITY};
-	(*info) = blank;
+	if(info){
+		(*info) = blank;
+	} else {
+		info = &blank;
+	}
 	
 	shape->klass->nearestPointQuery(shape, p, info);
 	return info->d;
@@ -123,7 +127,11 @@ cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *info
 cpBool
 cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info){
 	cpSegmentQueryInfo blank = {NULL, 0.0f, cpvzero};
-	(*info) = blank;
+	if(info){
+		(*info) = blank;
+	} else {
+		info = &blank;
+	}
 	
 	shape->klass->segmentQuery(shape, a, b, info);
 	return (info->shape != NULL);

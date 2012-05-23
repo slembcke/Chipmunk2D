@@ -12,6 +12,7 @@ Tutorial ideas:
 	AG tilemap tutorial
 	AG CCRenderTexture example
 	AG CGContext example
+	ByteRacer/ChipmunkPro
 	Fishing
 	Crayon Ball clone
 
