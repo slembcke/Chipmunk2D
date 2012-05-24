@@ -5,7 +5,7 @@ CHANGES SINCE 6.0.3:
 * API: Added [ChipmunkPolyline toConvexHull:] to generate approximate convex hulls. (Pro only).
 * API: Added [ChipmunkPolylineSet toConvexHulls_BETA:]. (Pro only)
 * API: Added nearest point queries.
-* API: Added a push mode to ChipmunkMultiGrab so touches can interact with the scene even if they didn't initially touch a shape.
+* API: Added a push mode to ChipmunkMultiGrab so touches can interact with the scene even if they didn't initially touch a shape. (Pro only)
 * API: Added optional block based iterators.
 * API: Added a space property to cpBody, cpShape and cpConstraint types.
 * BUG: Fixed an issue with changing the floating point and vector type on OS X.
