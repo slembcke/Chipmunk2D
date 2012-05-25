@@ -2,7 +2,7 @@
 
 <%= pop_open_div("Outline") %><%%= Node::Root.outline %></div></div>
 
-<%= h 1, "Chipmunk Physics 6.1.0", "Intro" %>
+<%= h 1, "Chipmunk Physics 6.1.1", "Intro" %>
 
 First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be blazingly fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games across just about every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
 
@@ -425,7 +425,7 @@ void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 
 p(expl). This one is more interesting. Calls @func@ once for each collision pair that @body@ is involved in. Calling @cpArbiterGet[Bodies|Shapes]()@ or @CP_ARBITER_GET_[BODIES|SHAPES]()@  will return the body or shape for @body@ as the first argument. You can use this to check all sorts of collision information for a body like if it's touching the ground, another particular object, how much collision force is being applied to an object, etc. Sensor shapes and arbiters that have been rejected by a collision handler callback or @cpArbiterIgnore()@ are not tracked by the contact graph.
 
-*Note:* If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpBodyEachShapeBlock()@, etc. See @chipmunk.h@ for more information.
+*Note:* If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpBodyEachShape_b()@, etc. See @chipmunk.h@ for more information.
 
 <%= h 2, "Integration Callbacks:", "Integration Callbacks" %>
 
@@ -772,7 +772,7 @@ void cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, v
 
 p(expl). Call @func@ for each constraint in the space also passing along your data pointer.
 
-*Note:* If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpSpaceEachBodyBlock()@, etc. See @chipmunk.h@ for more information.
+*Note:* If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpSpaceEachBody_b()@, etc. See @chipmunk.h@ for more information.
 
 <%= h 2, "Simulating the Space:", "Simulating" %>
 
@@ -1395,7 +1395,7 @@ p(expl). Query @space@ to find all shapes overlapping @shape@. Matches are filte
 
 <%= h 2, "Blocks:", "Blocks" %>
 
-If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpSpaceNearestPointQueryBlock()@, etc. See @chipmunk.h@ for more information.
+If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpSpaceNearestPointQuery_b()@, etc. See @chipmunk.h@ for more information.
 
 <%= h 2, "Examples:", "Examples" %>
 
