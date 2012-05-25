@@ -86,7 +86,7 @@ update(int ticks)
 	// You can use the "Block" versions of the functions without needing the callbacks above.
 	#if USE_BLOCKS
 		__block cpVect impulseSum = cpvzero;
-		cpBodyEachArbiterBlock(scaleStaticBody, ^(cpArbiter *arb){
+		cpBodyEachArbiter_b(scaleStaticBody, ^(cpArbiter *arb){
 			impulseSum = cpvadd(impulseSum, cpArbiterTotalImpulseWithFriction(arb));
 		});
 	#else
@@ -107,7 +107,7 @@ update(int ticks)
 	// Highlight and count the number of shapes the ball is touching.
 	#if USE_BLOCKS
 		__block int count = 0;
-		cpBodyEachArbiterBlock(ballBody, ^(cpArbiter *arb){
+		cpBodyEachArbiter_b(ballBody, ^(cpArbiter *arb){
 			// body is the body we are iterating the arbiters for.
 			// CP_ARBITER_GET_*() in an arbiter iterator always returns the body/shape for the iterated body first.
 			CP_ARBITER_GET_SHAPES(arb, ball, other);
