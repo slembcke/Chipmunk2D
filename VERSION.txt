@@ -1,3 +1,6 @@
+CHANGES SINCE 6.1.0:
+* API: Renamed the new block based iterators as soon as possible to match the Apple convention ("_b" suffix).
+
 CHANGES SINCE 6.0.3:
 * API: Added a pthread based, multi-threaded solver to accelerate the game on multi-core systems. (Pro only)
 * API: Added cpConvexHull() and CP_CONVEX_HULL() for generating convex hulls.
