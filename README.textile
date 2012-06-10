@@ -40,13 +40,13 @@ We also make a bunch of extra for Chipmunk called "Chipmunk Pro":http://chipmunk
 
 h2. BUILDING:
 
-Mac OS X: There is an included XCode project file for building the static library and demo application. Alternatively you could use the CMake files. A Mac OS X version of Objective-Chipmunk is available for free upon request. We don't do regular builds as few people seem interested in it.
+Mac OS X: There is an included XCode project file for building the static library and demo application. Alternatively you could use the CMake files or the macstatic.command script to build a static lib and package up the headers for you.
 
-iPhone: If you want a native Objective-C API, check out the Objective-Chipmunk directory for the Objective-C binding and some sample code from shipping iPhone Apps. It is inexpensive to license and should save you a lot of time. Otherwise, the XCode project can build a static library with all the proper compiler settings. Alternatively, you can just run iphonestatic.command in the macosx/ directory.  It will build you a fat library compiled as release for the device and debug for the simulator. After running it, you can simply drop the Chipmunk-iPhone directory into your iPhone project!
+iPhone: If you want a native Objective-C API, check out Chipmunk Pro on the Chipmunk website. It is inexpensive to license and will save you a lot of time. Otherwise, the XCode project can build a static library with all the proper compiler settings. Alternatively, you can just run iphonestatic.command in the macosx/ directory.  It will build you a fat library compiled as release for the device and debug for the simulator. After running it, you can simply drop the Chipmunk-iPhone directory into your iPhone project!
 
 UNIXes: A forum user was kind enough to make a set of CMake files for Chipmunk. This will require you to have CMake installed. To build run 'cmake .' then 'make'. This should build a dynamic library, a static library, and the demo application. A number of people have had build errors on Ubuntu due to not having GLUT or libxmu installed.
 
-Windows: Visual Studio projects are included in the msvc/ directory. I do not maintain these personally, but a number of forum members have assisted with them.
+Windows: Visual Studio projects are included in the msvc/ directory. While I try to make sure the MSVC 10 project is up to date, I don't have MSVC 9 to keep that project updated regularly. It may not work. I'd appreciate a hand fixing it if that's the case.
 
 
 h2. GETTING STARTED:

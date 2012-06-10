@@ -1,17 +1,15 @@
 High Priority:
 	Document ChipmunkMultiGrab, update example code.
-	Make a blog post/video about (QHull, ACD, NPQ, and blocks)
 	Add license to showcase code. (and example code)
 	Release new Showcase app with push mode.
 	Make a Cocos2D helper pack (ChipmunkSprite, ChipmunkDebugNode, ES2 renderer)
 	Investigate getting better PhysicsEditor support.
 	Call cpBodyAssertSane from setters.
+	Reorganize Chimpnuk Pro directory structure. Too flat and confusing.
+	cpSpaceAddPostStepCallback() should return a TRUE if the callback was scheduled.
 
 Tutorial ideas:
-	C/Blocks tutorial
 	AG tilemap tutorial
-	AG CCRenderTexture example
-	AG CGContext example
 	ByteRacer/ChipmunkPro
 	Fishing
 	Crayon Ball clone
