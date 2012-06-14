@@ -160,8 +160,8 @@ static inline type cpBodyGet##name(const cpBody *body){return body->member;}
 #define CP_DefineBodyStructSetter(type, member, name) \
 static inline void cpBodySet##name(cpBody *body, const type value){ \
 	cpBodyActivate(body); \
-	cpBodyAssertSane(body); \
 	body->member = value; \
+	cpBodyAssertSane(body); \
 }
 
 #define CP_DefineBodyStructProperty(type, member, name) \
