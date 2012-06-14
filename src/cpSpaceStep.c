@@ -60,7 +60,7 @@ cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void 
 		cpArrayPush(space->postStepCallbacks, callback);
 	}
 	
-	return (prev != NULL);
+	return (prev == NULL);
 }
 
 //MARK: Locking Functions
