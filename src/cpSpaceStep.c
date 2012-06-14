@@ -41,21 +41,26 @@ cpSpaceGetPostStepData(cpSpace *space, void *key)
 	return NULL;
 }
 
-void
+static void PostStepDoNothing(cpSpace *space, void *obj, void *data){};
+
+cpBool
 cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data)
 {
 	cpAssertWarn(space->locked,
 		"Adding a post-step callback when the space is not locked is unnecessary. "
 		"Post-step callbacks will not called until the end of the next call to cpSpaceStep() or the next query.");
 	
-	if(!cpSpaceGetPostStepData(space, key)){
+	void *prev = cpSpaceGetPostStepData(space, key);
+	if(!prev){
 		cpPostStepCallback *callback = (cpPostStepCallback *)cpcalloc(1, sizeof(cpPostStepCallback));
-		callback->func = func;
+		callback->func = (func ? func : PostStepDoNothing);
 		callback->key = key;
 		callback->data = data;
 		
 		cpArrayPush(space->postStepCallbacks, callback);
 	}
+	
+	return (prev != NULL);
 }
 
 //MARK: Locking Functions

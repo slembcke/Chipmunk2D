@@ -205,7 +205,9 @@ cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint);
 typedef void (*cpPostStepFunc)(cpSpace *space, void *obj, void *data);
 /// Schedule a post-step callback to be called when cpSpaceStep() finishes.
 /// You can only register one callback per unique value for @c key.
-void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data);
+/// Returns true if a callback was previously scheduled for @c key.
+/// It's possible to pass @c NULL for @c func if you only want to mark @c key as being used already.
+cpBool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data);
 
 /// Point query callback function type.
 typedef void (*cpSpacePointQueryFunc)(cpShape *shape, void *data);
