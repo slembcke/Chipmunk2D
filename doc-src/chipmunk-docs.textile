@@ -1234,7 +1234,7 @@ p(expl). Get the number of contacts tracked by this arbiter or the specific coll
 
 <pre><code>cpBool cpArbiterIsFirstContact(const cpArbiter *arb)</code></pre>
 
-p(expl). Returns true if this is the first step the two shapes started touching. Can be used 
+p(expl). Returns true if this is the first step the two shapes started touching. This can be useful for sound effects for instance. If it's the first frame for a certain collision, check the energy of the collision in a @postStep()@ callbock and use that to determine the volume of a sound effect to play.
 
 <pre><code>void cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
 void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)</code></pre>
