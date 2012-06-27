@@ -127,18 +127,18 @@ static inline void cpSpaceSet##name(cpSpace *space, type value){space->member = 
 CP_DefineSpaceStructGetter(type, member, name) \
 CP_DefineSpaceStructSetter(type, member, name)
 
-CP_DefineSpaceStructProperty(int, iterations, Iterations);
-CP_DefineSpaceStructProperty(cpVect, gravity, Gravity);
-CP_DefineSpaceStructProperty(cpFloat, damping, Damping);
-CP_DefineSpaceStructProperty(cpFloat, idleSpeedThreshold, IdleSpeedThreshold);
-CP_DefineSpaceStructProperty(cpFloat, sleepTimeThreshold, SleepTimeThreshold);
-CP_DefineSpaceStructProperty(cpFloat, collisionSlop, CollisionSlop);
-CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias);
-CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence);
-CP_DefineSpaceStructProperty(cpBool, enableContactGraph, EnableContactGraph);
-CP_DefineSpaceStructProperty(cpDataPointer, data, UserData);
-CP_DefineSpaceStructGetter(cpBody*, staticBody, StaticBody);
-CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep);
+CP_DefineSpaceStructProperty(int, iterations, Iterations)
+CP_DefineSpaceStructProperty(cpVect, gravity, Gravity)
+CP_DefineSpaceStructProperty(cpFloat, damping, Damping)
+CP_DefineSpaceStructProperty(cpFloat, idleSpeedThreshold, IdleSpeedThreshold)
+CP_DefineSpaceStructProperty(cpFloat, sleepTimeThreshold, SleepTimeThreshold)
+CP_DefineSpaceStructProperty(cpFloat, collisionSlop, CollisionSlop)
+CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias)
+CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence)
+CP_DefineSpaceStructProperty(cpBool, enableContactGraph, EnableContactGraph)
+CP_DefineSpaceStructProperty(cpDataPointer, data, UserData)
+CP_DefineSpaceStructGetter(cpBody*, staticBody, StaticBody)
+CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep)
 
 /// returns true from inside a callback and objects cannot be added/removed.
 static inline cpBool

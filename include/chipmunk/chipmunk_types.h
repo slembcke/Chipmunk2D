@@ -1,7 +1,7 @@
 #include <stdint.h>
 
 #ifdef __APPLE__
-   #import "TargetConditionals.h"
+   #include "TargetConditionals.h"
 #endif
 
 #if (TARGET_OS_IPHONE == 1) || (TARGET_OS_MAC == 1) && (!defined CP_USE_CGPOINTS)
@@ -12,7 +12,7 @@
 	#if TARGET_OS_IPHONE
 		#import <CoreGraphics/CGGeometry.h>
 	#elif TARGET_OS_MAC
-		#import <ApplicationServices/ApplicationServices.h>
+		#include <ApplicationServices/ApplicationServices.h>
 	#endif
 	
 	#if defined(__LP64__) && __LP64__

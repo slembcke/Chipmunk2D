@@ -46,7 +46,7 @@ cpConstraint* cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot);
 /// Allocate and initialize a pivot joint with specific anchors.
 cpConstraint* cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
 
-CP_DefineConstraintProperty(cpPivotJoint, cpVect, anchr1, Anchr1);
-CP_DefineConstraintProperty(cpPivotJoint, cpVect, anchr2, Anchr2);
+CP_DefineConstraintProperty(cpPivotJoint, cpVect, anchr1, Anchr1)
+CP_DefineConstraintProperty(cpPivotJoint, cpVect, anchr2, Anchr2)
 
 /// @}

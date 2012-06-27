@@ -88,7 +88,7 @@ static const cpConstraintClass klass = {
 	(cpConstraintApplyImpulseImpl)applyImpulse,
 	(cpConstraintGetImpulseImpl)getImpulse,
 };
-CP_DefineClassGetter(cpPinJoint);
+CP_DefineClassGetter(cpPinJoint)
 
 
 cpPinJoint *
