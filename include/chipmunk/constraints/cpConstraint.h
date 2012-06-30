@@ -110,16 +110,16 @@ static inline void cpConstraint##Set##name(cpConstraint *constraint, type value)
 CP_DefineConstraintStructGetter(type, member, name) \
 CP_DefineConstraintStructSetter(type, member, name)
 
-CP_DefineConstraintStructGetter(cpSpace*, CP_PRIVATE(space), Space);
+CP_DefineConstraintStructGetter(cpSpace*, CP_PRIVATE(space), Space)
 
-CP_DefineConstraintStructGetter(cpBody*, a, A);
-CP_DefineConstraintStructGetter(cpBody*, b, B);
-CP_DefineConstraintStructProperty(cpFloat, maxForce, MaxForce);
-CP_DefineConstraintStructProperty(cpFloat, errorBias, ErrorBias);
-CP_DefineConstraintStructProperty(cpFloat, maxBias, MaxBias);
-CP_DefineConstraintStructProperty(cpConstraintPreSolveFunc, preSolve, PreSolveFunc);
-CP_DefineConstraintStructProperty(cpConstraintPostSolveFunc, postSolve, PostSolveFunc);
-CP_DefineConstraintStructProperty(cpDataPointer, data, UserData);
+CP_DefineConstraintStructGetter(cpBody*, a, A)
+CP_DefineConstraintStructGetter(cpBody*, b, B)
+CP_DefineConstraintStructProperty(cpFloat, maxForce, MaxForce)
+CP_DefineConstraintStructProperty(cpFloat, errorBias, ErrorBias)
+CP_DefineConstraintStructProperty(cpFloat, maxBias, MaxBias)
+CP_DefineConstraintStructProperty(cpConstraintPreSolveFunc, preSolve, PreSolveFunc)
+CP_DefineConstraintStructProperty(cpConstraintPostSolveFunc, postSolve, PostSolveFunc)
+CP_DefineConstraintStructProperty(cpDataPointer, data, UserData)
 
 // Get the last impulse applied by this constraint.
 static inline cpFloat cpConstraintGetImpulse(cpConstraint *constraint)
