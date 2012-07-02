@@ -51,9 +51,9 @@ cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void 
 		callback->data = data;
 		
 		cpArrayPush(space->postStepCallbacks, callback);
-		return TRUE;
+		return cpTrue;
 	} else {
-		return FALSE;
+		return cpFalse;
 	}
 }
 
