@@ -7,6 +7,8 @@ High Priority:
 	Call cpBodyAssertSane from setters.
 	Reorganize Chimpnuk Pro directory structure. Too flat and confusing.
 	cpSpaceAddPostStepCallback() should return a TRUE if the callback was scheduled.
+	Bilinearly sampled image sampler function. (override the sample method to always take bilinear samples)
+	RGB Image Sampler class.
 
 Tutorial ideas:
 	AG tilemap tutorial
