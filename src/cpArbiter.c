@@ -107,7 +107,7 @@ cpArbiterSetSurfaceVelocity(const cpArbiter *arb, int i, cpVect v)
 {
 	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
 	
-	arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(surface_vr) = v;
+	arb->contacts[i].surface_vr = (arb->swappedColl ? cpvneg(v) : v);
 }
 
 cpContactPointSet
@@ -250,7 +250,9 @@ cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisio
 	
 	if(arb->contacts){
 		for(int i=0; i<arb->numContacts; i++){
-			arb->contacts[i].surface_vr = cpvsub(a->surface_v, b->surface_v);
+			cpContact *con = &arb->contacts[i];
+			cpVect v = cpvsub(a->surface_v, b->surface_v);
+			con->surface_vr = cpvadd(v, cpvmult(con->n, -cpvdot(v, con->n)));
 		}
 	}
 
@@ -327,13 +329,11 @@ cpArbiterApplyImpulse(cpArbiter *arb)
 		
 		cpVect vb1 = cpvadd(a->v_bias, cpvmult(cpvperp(r1), a->w_bias));
 		cpVect vb2 = cpvadd(b->v_bias, cpvmult(cpvperp(r2), b->w_bias));
-		cpVect vr = relative_velocity(a, b, r1, r2);
-//		cpVect vr = cpvadd(relative_velocity(a, b, r1, r2), con->surface_vr);
+		cpVect vr = cpvadd(relative_velocity(a, b, r1, r2), con->surface_vr);
 		
 		cpFloat vbn = cpvdot(cpvsub(vb2, vb1), n);
 		cpFloat vrn = cpvdot(vr, n);
-		cpFloat vrt = cpvdot(cpvadd(vr, con->surface_vr), cpvperp(n));
-//		cpFloat vrt = cpvdot(vr, cpvperp(n));
+		cpFloat vrt = cpvdot(vr, cpvperp(n));
 		
 		cpFloat jbn = (con->bias - vbn)*nMass;
 		cpFloat jbnOld = con->jBias;
