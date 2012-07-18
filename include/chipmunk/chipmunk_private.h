@@ -230,6 +230,7 @@ void cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space);
 struct cpContact {
 	cpVect p, n;
 	cpFloat dist;
+	cpVect surface_vr;
 	
 	cpVect r1, r2;
 	cpFloat nMass, tMass, bounce;

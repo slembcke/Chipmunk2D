@@ -79,9 +79,6 @@ struct cpArbiter {
 	/// Calculated value to use for the friction coefficient.
 	/// Override in a pre-solve collision handler for custom behavior.
 	cpFloat u;
-	 /// Calculated value to use for applying surface velocities.
-	/// Override in a pre-solve collision handler for custom behavior.
-	cpVect surface_vr;
 	
 	CP_PRIVATE(cpShape *a);
 	CP_PRIVATE(cpShape *b);
@@ -112,7 +109,6 @@ CP_DefineArbiterStructSetter(type, member, name)
 
 CP_DefineArbiterStructProperty(cpFloat, e, Elasticity)
 CP_DefineArbiterStructProperty(cpFloat, u, Friction)
-CP_DefineArbiterStructProperty(cpVect, surface_vr, SurfaceVelocity)
 
 /// Calculate the total impulse that was applied by this arbiter.
 /// This function should only be called from a post-solve, post-step or cpBodyEachArbiter callback.
@@ -184,5 +180,7 @@ cpVect cpArbiterGetNormal(const cpArbiter *arb, int i);
 cpVect cpArbiterGetPoint(const cpArbiter *arb, int i);
 /// Get the depth of the @c ith contact point.
 cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i);
+/// Set the surface velocity of the @c ith contact point.
+void cpArbiterSetSurfaceVelocity(const cpArbiter *arb, int i, cpVect v);
 
 /// @}

@@ -28,6 +28,7 @@ cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash
 	con->p = p;
 	con->n = n;
 	con->dist = dist;
+	con->surface_vr = cpvzero;
 	
 	con->jnAcc = 0.0f;
 	con->jtAcc = 0.0f;
@@ -99,6 +100,14 @@ cpArbiterGetDepth(const cpArbiter *arb, int i)
 	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
 	
 	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
+}
+
+void 
+cpArbiterSetSurfaceVelocity(const cpArbiter *arb, int i, cpVect v)
+{
+	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
+	
+	arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(surface_vr) = v;
 }
 
 cpContactPointSet
@@ -196,7 +205,6 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 	
 	arb->e = 0.0f;
 	arb->u = 0.0f;
-	arb->surface_vr = cpvzero;
 	
 	arb->numContacts = 0;
 	arb->contacts = NULL;
@@ -240,12 +248,17 @@ cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisio
 	arb->contacts = contacts;
 	arb->numContacts = numContacts;
 	
+	if(arb->contacts){
+		for(int i=0; i<arb->numContacts; i++){
+			arb->contacts[i].surface_vr = cpvsub(a->surface_v, b->surface_v);
+		}
+	}
+
 	arb->handler = handler;
 	arb->swappedColl = (a->collision_type != handler->a);
 	
 	arb->e = a->e * b->e;
 	arb->u = a->u * b->u;
-	arb->surface_vr = cpvsub(a->surface_v, b->surface_v);
 	
 	// For collisions between two similar primitive types, the order could have been swapped.
 	arb->a = a; arb->body_a = a->body;
@@ -303,7 +316,6 @@ cpArbiterApplyImpulse(cpArbiter *arb)
 {
 	cpBody *a = arb->body_a;
 	cpBody *b = arb->body_b;
-	cpVect surface_vr = arb->surface_vr;
 	cpFloat friction = arb->u;
 
 	for(int i=0; i<arb->numContacts; i++){
@@ -316,10 +328,12 @@ cpArbiterApplyImpulse(cpArbiter *arb)
 		cpVect vb1 = cpvadd(a->v_bias, cpvmult(cpvperp(r1), a->w_bias));
 		cpVect vb2 = cpvadd(b->v_bias, cpvmult(cpvperp(r2), b->w_bias));
 		cpVect vr = relative_velocity(a, b, r1, r2);
+//		cpVect vr = cpvadd(relative_velocity(a, b, r1, r2), con->surface_vr);
 		
 		cpFloat vbn = cpvdot(cpvsub(vb2, vb1), n);
 		cpFloat vrn = cpvdot(vr, n);
-		cpFloat vrt = cpvdot(cpvadd(vr, surface_vr), cpvperp(n));
+		cpFloat vrt = cpvdot(cpvadd(vr, con->surface_vr), cpvperp(n));
+//		cpFloat vrt = cpvdot(vr, cpvperp(n));
 		
 		cpFloat jbn = (con->bias - vbn)*nMass;
 		cpFloat jbnOld = con->jBias;
