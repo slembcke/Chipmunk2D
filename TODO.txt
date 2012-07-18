@@ -9,6 +9,7 @@ High Priority:
 	cpSpaceAddPostStepCallback() should return a TRUE if the callback was scheduled.
 	Bilinearly sampled image sampler function. (override the sample method to always take bilinear samples)
 	RGB Image Sampler class.
+	User definable fast collision filtering.
 
 Tutorial ideas:
 	AG tilemap tutorial
