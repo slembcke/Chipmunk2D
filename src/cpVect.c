@@ -41,7 +41,7 @@ cpVect
 cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)
 {
 	cpFloat dot = cpvdot(cpvnormalize(v1), cpvnormalize(v2));
-	cpFloat omega = cpfacos(cpfclamp01(dot));
+	cpFloat omega = cpfacos(cpfclamp(dot, -1.0f, 1.0f));
 	
 	return cpvslerp(v1, v2, cpfmin(a, omega)/omega);
 }
