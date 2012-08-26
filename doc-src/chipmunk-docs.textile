@@ -205,7 +205,7 @@ p(expl). Convenience constructor for creating new @cpVect@ structs.
 * @cpVect cpvlerp(const cpVect v1, const cpVect v2, const cpFloat t)@ - Linearly interpolate between @v1@ and @v2@.
 * @cpVect cpvlerpconst(cpVect v1, cpVect v2, cpFloat d)@ - Linearly interpolate between @v1@ towards @v2@ by distance @d@.
 * @cpVect cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t)@ - Spherical linearly interpolate between @v1@ and @v2@.
-* @cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)@ - Spherical linearly interpolate between @v1@ towards @v2@ by no more than angle @a@' in radians.
+* @cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)@ - Spherical linearly interpolate between @v1@ towards @v2@ by no more than angle @a@ in radians.
 * @cpVect cpvnormalize(const cpVect v)@ - Returns a normalized copy of @v@.
 * @cpVect cpvnormalize_safe(const cpVect v)@ - Returns a normalized copy of @v@ or @cpvzero@ if @v@ was already @cpvzero@. Protects against divide by zero errors.
 * @cpVect cpvclamp(const cpVect v, const cpFloat len)@ - Clamp @v@ to length @len@.
