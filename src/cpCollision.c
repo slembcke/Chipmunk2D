@@ -38,7 +38,7 @@
 // Used by several collision tests.
 // TODO should accept hash parameter
 static int
-circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpFloat r2, cpContact *con)
+circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpFloat r2, cpHashValue hash, cpContact *con)
 {
 	cpFloat mindist = r1 + r2;
 	cpVect delta = cpvsub(p2, p1);
@@ -47,7 +47,7 @@ circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpF
 	if(distsq < mindist*mindist){
 		cpFloat dist = cpfsqrt(distsq);
 		cpVect n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
-		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist, 0);
+		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist, hash);
 		
 		return 1;
 	} else {
@@ -475,7 +475,7 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *
 #if PRINT_LOG
 //	cpFloat dot = 1.0 - cpfclamp01(cpfabs(cpvdot(ref.n, n)));
 //	ChipmunkDemoPrintString("dot %.2e %s\n", dot, dot < 1e-5 ? "TRUE" : "FALSE");
-//	ChipmunkDemoPrintString("t1: %.2f, t2: %.2f, t1xt2: %.2f    %s\n", t1, t2, t1*t2, t1*t2 == 0 ? "XXXXXX" : "");
+	ChipmunkDemoPrintString("t1: %.2f, t2: %.2f, t1xt2: %.2f    %s\n", t1, t2, t1*t2, t1*t2 == 0 ? "XXXXXX" : "");
 //	cpAssertWarn(t1*t2 != 0.0, "This?");
 //	printf("t1*t2: %.2f\n", t1*t2);
 #endif
@@ -504,17 +504,16 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *
 		return count + ClipContact(cpflerp(dibn, dian, t2), t2, ref.b, inc.a, ref.r, inc.r, ref.n, n, arr + count);
 	} else {
 		// Collide the endpoints against each other instead.
-		
-		// TODO disabling this path for now.
-		return 0;
-		
 		cpAssertWarn(t1 + t2 == 1.0, "These should sum to 1.0?");
 		
 		// TODO radii could use some tweaking here.
+		cpFloat ndot = cpvdot(ref.n, inc.n);
 		if(t1 == 0){
-			return circle2circleQuery(ref.a.p, inc.a.p, ref.r, inc.r, arr);
+			struct EdgePoint refp = (ndot < 0.0f ? ref.a : ref.b);
+			return circle2circleQuery(refp.p, inc.a.p, ref.r, inc.r, CP_HASH_PAIR(refp.hash, inc.b.hash), arr);
 		} else {
-			return circle2circleQuery(ref.b.p, inc.b.p, ref.r, inc.r, arr);
+			struct EdgePoint refp = (ndot < 0.0f ? ref.b : ref.a);
+			return circle2circleQuery(refp.p, inc.b.p, ref.r, inc.r, CP_HASH_PAIR(refp.hash, inc.a.hash), arr);
 		}
 	}
 }
@@ -537,7 +536,7 @@ typedef int (*collisionFunc)(const cpShape *, const cpShape *, cpContact *);
 static int
 circle2circle(const cpCircleShape *c1, const cpCircleShape *c2, cpContact *arr)
 {
-	return circle2circleQuery(c1->tc, c2->tc, c1->r, c2->r, arr);
+	return circle2circleQuery(c1->tc, c2->tc, c1->r, c2->r, 0, arr);
 }
 
 static int
@@ -551,7 +550,7 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 	cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(center, seg_a))/cpvlengthsq(seg_delta));
 	cpVect closest = cpvadd(seg_a, cpvmult(seg_delta, closest_t));
 	
-	if(circle2circleQuery(center, closest, circleShape->r, segmentShape->r, con)){
+	if(circle2circleQuery(center, closest, circleShape->r, segmentShape->r, 0, con)){
 		cpVect n = con[0].n;
 		
 		// Reject endcap collisions if tangents are provided.
@@ -767,7 +766,7 @@ circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpContact *con
 	cpFloat dt = cpvcross(n, circle->tc);
 		
 	if(dt < dtb){
-		return circle2circleQuery(circle->tc, b, circle->r, 0.0f, con);
+		return circle2circleQuery(circle->tc, b, circle->r, 0.0f, 0, con);
 	} else if(dt < dta) {
 		cpContactInit(
 			con,
@@ -779,7 +778,7 @@ circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpContact *con
 	
 		return 1;
 	} else {
-		return circle2circleQuery(circle->tc, a, circle->r, 0.0f, con);
+		return circle2circleQuery(circle->tc, a, circle->r, 0.0f, 0, con);
 	}
 }
 
