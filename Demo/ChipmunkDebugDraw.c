@@ -103,7 +103,6 @@ glColor_from_color(Color color){
 static Color
 ColorForShape(cpShape *shape)
 {
-	return LAColor(0, 0);
 	if(cpShapeGetSensor(shape)){
 		return LAColor(1, 0);
 	} else {

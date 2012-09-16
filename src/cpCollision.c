@@ -29,9 +29,9 @@
 #define USE_GJK 1
 #define DRAW_GJK 0
 #define DRAW_EPA 0
-#define DRAW_CLOSEST 1
-#define DRAW_CLIP 1
-#define PRINT_LOG 1
+#define DRAW_CLOSEST 0
+#define DRAW_CLIP 0
+#define PRINT_LOG 0
 #define LOG_ITERATIONS 0
 
 // Add contact points for circle to circle collisions.
@@ -444,9 +444,10 @@ ClipContact(
 	const cpVect refn, const cpVect n, cpContact *arr
 ){
 	if(pd <= 0.0){
+		// TODO could improve this for 0 radius edges.
 		cpFloat rsum = r1 + r2;
-		cpFloat alpha = (rsum + pd)/rsum;
-		cpVect point = t < 1.0 ? cpvadd(p1.p, cpvmult(refn, r1*alpha)) : cpvadd(p2.p, cpvmult(refn, -r2*alpha));
+		cpFloat alpha = (rsum > 0.0f ? (rsum + pd)/rsum : 0.0f);
+		cpVect point = (t < 1.0 ? cpvadd(p1.p, cpvmult(refn, r1*alpha)) : cpvadd(p2.p, cpvmult(refn, -r2*alpha)));
 		cpContactInit(arr, point, n, pd, CP_HASH_PAIR(p1.hash, p2.hash));
 		return 1;
 	} else {
