@@ -27,8 +27,8 @@
 #include "ChipmunkDemo.h"
 
 #define USE_GJK 1
-#define DRAW_GJK 1
-#define DRAW_EPA 1
+#define DRAW_GJK 0
+#define DRAW_EPA 0
 #define DRAW_CLOSEST 1
 #define DRAW_CLIP 1
 #define PRINT_LOG 1
@@ -437,14 +437,17 @@ GJK(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction support1, G
 //MARK: Contact Clipping
 
 static inline int
-ClipContact(const cpFloat d, const cpFloat t, const struct EdgePoint p1, const struct EdgePoint p2, const cpFloat r1, const cpFloat r2, const cpVect refn, const cpVect n, cpContact *arr)
-{
-	if(d <= 0.0){
-		cpFloat dn = d*0.5f;
-		cpVect point = t < 1.0 ? cpvadd(p1.p, cpvmult(refn, dn + r1)) : cpvadd(p2.p, cpvmult(refn, -(dn + r2)));
-//		cpFloat dn = r1 + r2;
-//		cpVect point = t < 1.0 ? cpvadd(p1.p, cpvmult(n, 0.0)) : cpvadd(p2.p, cpvmult(n, r1 + r2));
-		cpContactInit(arr, point, n, d, CP_HASH_PAIR(p1.hash, p2.hash));
+ClipContact(
+	const cpFloat pd, const cpFloat t,
+	const struct EdgePoint p1, const struct EdgePoint p2,
+	const cpFloat r1, const cpFloat r2,
+	const cpVect refn, const cpVect n, cpContact *arr
+){
+	if(pd <= 0.0){
+		cpFloat rsum = r1 + r2;
+		cpFloat alpha = (rsum + pd)/rsum;
+		cpVect point = t < 1.0 ? cpvadd(p1.p, cpvmult(refn, r1*alpha)) : cpvadd(p2.p, cpvmult(refn, -r2*alpha));
+		cpContactInit(arr, point, n, pd, CP_HASH_PAIR(p1.hash, p2.hash));
 		return 1;
 	} else {
 		return 0;
@@ -454,6 +457,7 @@ ClipContact(const cpFloat d, const cpFloat t, const struct EdgePoint p1, const s
 static int
 ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *arr)
 {
+	// Cross products of all points along the reference axis.
 	cpFloat cian = cpvcross(inc.a.p, ref.n);
 	cpFloat cibn = cpvcross(inc.b.p, ref.n);
 	cpFloat cran = cpvcross(ref.a.p, ref.n);
@@ -463,14 +467,15 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *
 	cpFloat dian = cpvdot(inc.a.p, ref.n) - dran;
 	cpFloat dibn = cpvdot(inc.b.p, ref.n) - dran;
 	
+	// t-value of the incident axis endpoints projected onto the reference segment.
 	cpFloat t1 = cpfclamp01((cian - cran)/(cian - cibn));
 	cpFloat t2 = cpfclamp01((cibn - crbn)/(cibn - cian));
 	
 #if DRAW_CLIP
 #if PRINT_LOG
-	cpFloat dot = 1.0 - cpfclamp01(cpfabs(cpvdot(ref.n, n)));
-	ChipmunkDemoPrintString("dot %.2e %s\n", dot, dot < 1e-5 ? "TRUE" : "FALSE");
-	ChipmunkDemoPrintString("t1: %.2f, t2: %.2f, t1xt2: %.2f    %s\n", t1, t2, t1*t2, t1*t2 == 0 ? "XXXXXX" : "");
+//	cpFloat dot = 1.0 - cpfclamp01(cpfabs(cpvdot(ref.n, n)));
+//	ChipmunkDemoPrintString("dot %.2e %s\n", dot, dot < 1e-5 ? "TRUE" : "FALSE");
+//	ChipmunkDemoPrintString("t1: %.2f, t2: %.2f, t1xt2: %.2f    %s\n", t1, t2, t1*t2, t1*t2 == 0 ? "XXXXXX" : "");
 //	cpAssertWarn(t1*t2 != 0.0, "This?");
 //	printf("t1*t2: %.2f\n", t1*t2);
 #endif
@@ -479,6 +484,12 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *
 	ChipmunkDebugDrawSegment(ref.a.p, ref.b.p, RGBAColor(1, 0, 0, 1));
 	ChipmunkDebugDrawSegment(cpvadd(inc.a.p, cpvmult(ref.n, d)), cpvadd(inc.b.p, cpvmult(ref.n, d)), RGBAColor(0, 1, 0, 1));
 	
+	cpVect cref = cpvlerp(ref.a.p, ref.b.p, 0.5);
+	ChipmunkDebugDrawSegment(cref, cpvadd(cref, cpvmult(ref.n, 5.0)), RGBAColor(1, 0, 0, 1));
+	
+	cpVect cinc = cpvlerp(inc.a.p, inc.b.p, 0.5);
+	ChipmunkDebugDrawSegment(cinc, cpvadd(cinc, cpvmult(inc.n, 5.0)), RGBAColor(1, 0, 0, 1));
+	
 	ChipmunkDebugDrawFatSegment(ref.a.p, ref.b.p, ref.r + inc.r, RGBAColor(1, 0, 0, 1), RGBAColor(0, 0, 0, 0));
 	ChipmunkDebugDrawSegment(inc.a.p, inc.b.p, RGBAColor(0, 1, 0, 1));
 	
@@ -486,10 +497,17 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *
 	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.b.p, inc.b.p}, RGBAColor(0, 1, 1, 1));
 #endif
 	
+	// If both end points are clipped, one of them always be 0.0 and the other 1.0.
 	if(t1*t2 != 0){
+		// One or neither endpoint is clipped. Try both.
 		int count = ClipContact(cpflerp(dian, dibn, t1), t1, ref.a, inc.b, ref.r, inc.r, ref.n, n, arr);
 		return count + ClipContact(cpflerp(dibn, dian, t2), t2, ref.b, inc.a, ref.r, inc.r, ref.n, n, arr + count);
 	} else {
+		// Collide the endpoints against each other instead.
+		
+		// TODO disabling this path for now.
+		return 0;
+		
 		cpAssertWarn(t1 + t2 == 1.0, "These should sum to 1.0?");
 		
 		// TODO radii could use some tweaking here.
@@ -562,13 +580,14 @@ segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContac
 	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
 #endif
 	
-	ChipmunkDebugDrawPoints(3.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawPoints(6.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
 	
-	if(points.d - seg1->r - seg2->r <= 0.0){
-		return ContactPoints(SupportEdgeForSegment(seg1, points.n), SupportEdgeForSegment(seg2, cpvneg(points.n)), points.n, arr);
+	cpVect n = points.n;
+	if(points.d - (seg1->r + seg2->r) <= 0.0){
+		return ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), n, arr);
 	} else {
 		return 0;
 	}

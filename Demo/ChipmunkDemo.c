@@ -576,8 +576,8 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
-		ContactPoints,
 		GJK,
+		ContactPoints,
 		LogoSmash,
 		PyramidStack,
 		Plink,
