@@ -26,11 +26,11 @@
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
 
-#define USE_GJK 1
+#define USE_GJK 0
 #define DRAW_GJK 0
 #define DRAW_EPA 0
 #define DRAW_CLOSEST 0
-#define DRAW_CLIP 0
+#define DRAW_CLIP 1
 #define PRINT_LOG 0
 #define LOG_ITERATIONS 0
 
@@ -103,6 +103,7 @@ cpSupportPointIndex(const cpPolyShape *poly, const cpVect n)
 	return min;
 }
 
+#if USE_GJK
 static cpVect
 cpPolySupportPoint(const cpPolyShape *poly, const cpVect n)
 {
@@ -115,6 +116,7 @@ cpSegmentSupportPoint(const cpSegmentShape *seg, const cpVect n)
 	cpVect a = seg->ta, b = seg->tb;
 	return (cpvdot(a, n) > cpvdot(b, n) ? a : b);
 }
+#endif
 
 //static cpVect
 //cpCircleSupportPoint(const cpCircleShape *circle, const cpVect n)
@@ -175,9 +177,12 @@ SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 	cpVect v1 = poly->tVerts[i1];
 	cpVect v2 = poly->tVerts[i2];
 	
-	if(cpvdot(n, cpvsub(v1, v0)) < cpvdot(n, cpvsub(v1, v2))){
+//	if(cpvdot(n, cpvnormalize(cpvsub(v1, v0))) < cpvdot(n, cpvnormalize(cpvsub(v1, v2)))){
+	if(cpvdot(n, poly->tPlanes[i1].n) > cpvdot(n, poly->tPlanes[(i1+1)%numVerts].n)){
+//		return (struct Edge){{v0, CP_HASH_PAIR(poly, i0)}, {v1, CP_HASH_PAIR(poly, i1)}, 0.0, poly->tPlanes[i1].n};
 		return EdgeNew(v0, v1, CP_HASH_PAIR(poly, i0), CP_HASH_PAIR(poly, i1), 0.0f);
 	} else {
+//		return (struct Edge){{v1, CP_HASH_PAIR(poly, i1)}, {v2, CP_HASH_PAIR(poly, i2)}, 0.0, poly->tPlanes[(i1+1)%numVerts].n};
 		return EdgeNew(v1, v2, CP_HASH_PAIR(poly, i1), CP_HASH_PAIR(poly, i2), 0.0f);
 	}
 }
@@ -192,6 +197,7 @@ SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
 	}
 }
 
+#if USE_GJK
 static cpFloat
 ClosestT(const cpVect a, const cpVect b)
 {
@@ -433,6 +439,7 @@ GJK(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction support1, G
 	struct MinkowskiPoint p2 = Support(shape1, shape2, support1, support2, cpvneg(axis));
 	return GJKRecurse(shape1, shape2, support1, support2, p1, p2, 1);
 }
+#endif
 
 //MARK: Contact Clipping
 
@@ -505,7 +512,11 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *
 		return count + ClipContact(cpflerp(dibn, dian, t2), t2, ref.b, inc.a, ref.r, inc.r, ref.n, n, arr + count);
 	} else {
 		// Collide the endpoints against each other instead.
-		cpAssertWarn(t1 + t2 == 1.0, "These should sum to 1.0?");
+		if(t1 + t2 != 1.0){
+			printf("Weird\n");
+			return 0;
+		}
+//		cpAssertSoft(t1 + t2 == 1.0, "These should sum to 1.0?");
 		
 		// TODO radii could use some tweaking here.
 		cpFloat ndot = cpvdot(ref.n, inc.n);
