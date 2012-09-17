@@ -110,9 +110,9 @@ static inline void cpArbiterSet##name(cpArbiter *arb, type value){arb->member = 
 CP_DefineArbiterStructGetter(type, member, name) \
 CP_DefineArbiterStructSetter(type, member, name)
 
-CP_DefineArbiterStructProperty(cpFloat, e, Elasticity);
-CP_DefineArbiterStructProperty(cpFloat, u, Friction);
-CP_DefineArbiterStructProperty(cpVect, surface_vr, SurfaceVelocity);
+CP_DefineArbiterStructProperty(cpFloat, e, Elasticity)
+CP_DefineArbiterStructProperty(cpFloat, u, Friction)
+CP_DefineArbiterStructProperty(cpVect, surface_vr, SurfaceVelocity)
 
 /// Calculate the total impulse that was applied by this arbiter.
 /// This function should only be called from a post-solve, post-step or cpBodyEachArbiter callback.

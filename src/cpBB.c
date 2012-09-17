@@ -19,18 +19,7 @@
  * SOFTWARE.
  */
  
-#include <math.h>
-#include <stdlib.h>
-
 #include "chipmunk_private.h"
-
-cpVect
-cpBBClampVect(const cpBB bb, const cpVect v)
-{
-	cpFloat x = cpfmin(cpfmax(bb.l, v.x), bb.r);
-	cpFloat y = cpfmin(cpfmax(bb.b, v.y), bb.t);
-	return cpv(x, y);
-}
 
 cpVect
 cpBBWrapVect(const cpBB bb, const cpVect v)

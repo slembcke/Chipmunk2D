@@ -2,7 +2,7 @@
 
 <%= pop_open_div("Outline") %><%%= Node::Root.outline %></div></div>
 
-<%= h 1, "Chipmunk Physics 6.0.3", "Intro" %>
+<%= h 1, "Chipmunk Physics 6.1.1", "Intro" %>
 
 First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be blazingly fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games across just about every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
 
@@ -11,9 +11,9 @@ First of all, I would like to give a Erin Catto a big thank you, as Chipmunk's i
 
 <%= h 2, "Why a C Library?", "WhyC" %>
 
-A lot of people ask me why I wrote Chipmunk in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, OOC, Lua, Io... the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I also wanted Chipmunk to be fast, portable, easy to optimize and easy to debug. Writting Chipmunk in C made it simpler to acheive all of those goals.
+A lot of people ask me why I wrote Chipmunk in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, OOC, Lua, Io... the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I also wanted Chipmunk to be fast, portable, easy to optimize and easy to debug. Writing Chipmunk in C made it simpler to acheive all of those goals.
 
-That said, I've never developed a whole game in C and I probably never will. There are much more interesting and fun languages than C with all sorts of nice features like garbage collection, closures and all sorts of unique object oriented runtimes. Check out the "Bindings and Ports":http://code.google.com/p/chipmunk-physics/wiki/BindingsAndPorts page to see if you can use Chipmunk from your language of choice. Because Chipmunk is written in a subset of C99 it compiles cleanly as C, C++, Objective-C and Objective-C++ code, making it easy to integrate into projects in those languages.
+That said, I've never developed a whole game in C and I probably never will. There are much more interesting and fun languages than C with all sorts of nice features like garbage collection, closures and all sorts of unique object oriented runtimes. Check out the "Bindings and Ports":http://chipmunk-physics.net/bindingsAndPorts.php page to see if you can use Chipmunk from your language of choice. Because Chipmunk is written in a subset of C99 it compiles cleanly as C, C++, Objective-C and Objective-C++ code, making it easy to integrate into projects in those languages.
 
 If you are writing iPhone games using Chipmunk, you should check out the Objective-Chipmunk wrapper that we've developed for Chipmunk. It integrates with the Objective-C memory model and provides a number of high level APIs that make writing physics based games for the iPhone even easier. While we do charge for Objective-Chipmunk, it will almost certainly save you more time than the small cost to license it. As a bonus, you'll be helping to ensure that we can afford to continue to work on Chipmunk improvements.
 
@@ -39,7 +39,7 @@ The included XCode project has targets for building a static library for the Mac
 
 <%= h 3, "MSVC", "MSVC" %>
 
-I rarely use MSVC, but others have chipped in to help me maintain Visual Studio project files. Let me know if there are any issues.
+I rarely use MSVC, but others have chipped in to help me maintain Visual Studio project files. The MSVC 10 project should work, as I usually remember to test that before making a stable release. The MSVC 9 project may not as I don't have access to that version. Let me know if there are any issues.
 
 <%= h 3, "Command Line", "CommandLine" %>
 
@@ -100,11 +100,10 @@ This means that you do not have to buy a license or pay to use Chipmunk in comme
 
 <%= h 2, "Links:", "Links" %>
 
-* "slembcke.net/forums":http://www.slembcke.net/forums/viewforum.php?f=1 - The official forum Chipmunk Physics forum.
+* "Chipmunk Forums":http://chipmunk-physics.net/forum - The official forum Chipmunk Physics forum.
 * "Howling Moon Software":http://howlingmoonsoftware.com/ -  My software company.
-* "Objective-Chipmunk":http://howlingmoonsoftware.com/objectiveChipmunk.php - An Objective-C wrapper that makes developing Chipmunk apps on the iPhone a snap.
-* "Games":http://code.google.com/p/chipmunk-physics/wiki/Games - A small list of games done with Chipmunk.
-* "Bindings and Ports":http://code.google.com/p/chipmunk-physics/wiki/BindingsAndPorts - A list of bindings and ports of Chipmunk to other languages.
+* "Chipmunk Pro":http://chipmunk-physics.net/chipmunkPro.php - An enhanced version of Chipmunk that we maintain with some specific optimizations for ARM or multi-core platforms, automatic geometry manipulation from images or procedural data, and API wrappers for Objective-C.
+* "Games":http://chipmunk-physics.net/games.php - A small list of games done with Chipmunk. At least a few of the ones we know of.
 
 
 <%= h 1, "Chipmunk Basics:", "Basics" %>
@@ -206,7 +205,7 @@ p(expl). Convenience constructor for creating new @cpVect@ structs.
 * @cpVect cpvlerp(const cpVect v1, const cpVect v2, const cpFloat t)@ - Linearly interpolate between @v1@ and @v2@.
 * @cpVect cpvlerpconst(cpVect v1, cpVect v2, cpFloat d)@ - Linearly interpolate between @v1@ towards @v2@ by distance @d@.
 * @cpVect cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t)@ - Spherical linearly interpolate between @v1@ and @v2@.
-* @cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)@ - Spherical linearly interpolate between @v1@ towards @v2@ by no more than angle @a@' in radians.
+* @cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)@ - Spherical linearly interpolate between @v1@ towards @v2@ by no more than angle @a@ in radians.
 * @cpVect cpvnormalize(const cpVect v)@ - Returns a normalized copy of @v@.
 * @cpVect cpvnormalize_safe(const cpVect v)@ - Returns a normalized copy of @v@ or @cpvzero@ if @v@ was already @cpvzero@. Protects against divide by zero errors.
 * @cpVect cpvclamp(const cpVect v, const cpFloat len)@ - Clamp @v@ to length @len@.
@@ -345,6 +344,10 @@ void cpBodySetAngVelLimit(cpBody *body, const cpFloat value)</code></pre>
 
 p(expl). Angular velocity limit of the body in radians per second. Defaults to @INFINITY@ unless you set it specifically.
 
+<pre><code>cpSpace* cpBodyGetSpace(const cpBody *body)</code></pre>
+
+p(expl). Get the @cpSpace@ that @body@ has been added to.
+
 <pre><code>cpDataPointer cpBodyGetUserData(const cpBody *body)
 void cpBodySetUserData(cpBody *body, const cpDataPointer value)</code></pre>
 
@@ -384,8 +387,8 @@ Many things are defined in coordinates local to a body meaning that the (0,0) is
 People are sometimes confused by the difference between a force and an impulse. An impulse is basically a very large force applied over a very short period of time, like a ball hitting a wall or cannon firing. Chipmunk treats impulses as if they occur instantaneously by simply adding directly to the velocity of an object. Both impulses and forces are affected the mass of an object. Double the mass of the object and halve the effect.
 
 * @void cpBodyResetForces(cpBody *body)@ - Zero both the forces and torques currently applied to the body.
-* @void cpBodyApplyForce(cpBody *body, const cpVect f, const cpVect r)@ - Add the force @j@ to @body@ at a relative offset @r@ from the center of gravity.
-* @void cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)@ - Add the impulse @f@ to @body@ at a relative offset @r@ from the center of gravity.
+* @void cpBodyApplyForce(cpBody *body, const cpVect f, const cpVect r)@ - Add the force @f@ to @body@ at a relative offset @r@ from the center of gravity.
+* @void cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)@ - Add the impulse @j@ to @body@ at a relative offset @r@ from the center of gravity.
 
 *Note:* Both the @cpBodyApplyForce()@ @cpBodyApplyImpulse()@ functions take a force or impulse in absolute coordinates and applies it at a relative offset in absolute coordinates. (The offset is relative to the center of gravity, but is _not_ rotated with the body)
 
@@ -422,7 +425,7 @@ void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 
 p(expl). This one is more interesting. Calls @func@ once for each collision pair that @body@ is involved in. Calling @cpArbiterGet[Bodies|Shapes]()@ or @CP_ARBITER_GET_[BODIES|SHAPES]()@  will return the body or shape for @body@ as the first argument. You can use this to check all sorts of collision information for a body like if it's touching the ground, another particular object, how much collision force is being applied to an object, etc. Sensor shapes and arbiters that have been rejected by a collision handler callback or @cpArbiterIgnore()@ are not tracked by the contact graph.
 
-*Note:* If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpBodyEachShapeBlock()@, etc. See @chipmunk.h@ for more information.
+*Note:* If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpBodyEachShape_b()@, etc. See @chipmunk.h@ for more information.
 
 <%= h 2, "Integration Callbacks:", "Integration Callbacks" %>
 
@@ -503,6 +506,10 @@ p(expl). Shapes in the same non-zero group do not generate collisions. Useful wh
 void cpShapeSetLayers(cpShape *shape, cpLayers value)</code></pre>
 
 p(expl). Shapes only collide if they are in the same bit-planes. i.e. @(a->layers & b->layers) != 0@ By default, a shape occupies all bit-planes. "Wikipedia":http://en.wikipedia.org/wiki/Mask_(computing)#top has a nice article on bitmasks if you are unfamiliar with how to use them. Defaults to @CP_ALL_LAYERS@.
+
+<pre><code>cpSpace* cpShapeGetSpace(const cpShape *shape)</code></pre>
+
+p(expl). Get the @cpSpace@ that @shape@ has been added to.
 
 <pre><code>cpDataPointer cpShapeGetUserData(const cpShape *shape)
 void cpShapeSetUserData(cpShape *shape, cpDataPointer value)</code></pre>
@@ -596,6 +603,18 @@ cpShape *cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height)</code></pre>
 * @cpBool cpPolyValidate(const cpVect *verts, const int numVerts)@ - Check if a vertex array is convex and with the correct winding.
 * @cpVect cpCentroidForPoly(const int numVerts, const cpVect *verts)@ - Calculate the centroid for a polygon.
 * @void cpRecenterPoly(const int numVerts, cpVect *verts)@ - Center a polygon to (0,0). Subtracts the centroid from each vertex.
+
+<%= h 3, "Convex Hull Helper Functions:", "ConvexHelpers" %>
+
+<pre><code>int cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)</code></pre>
+
+p(expl). Calculate the convex hull of a given set of points. Returns the count of points in the hull. @result@ must be a pointer to a @cpVect@ array with at least @count@ elements. If @result@ is @NULL@, then @verts@ array wil be reduced instead. @first@ is an optional pointer to an integer to store where the first vertex in the hull came from (i.e. @verts[first] == result[0]@) @tol@ is the allowed amount to shrink the hull when simplifying it. A tolerance of 0.0 creates an exact hull.
+
+<pre><code>#define CP_CONVEX_HULL(inputCount, inputVerts, outputCount_varName, outputVerts_varName)</code></pre>
+
+p(expl). Convenience macro for using @cpConvexHull()@. Creates an array on the stack using @alloca()@ and then calls @cpConvexHull()@. Because the output array is created on the stack it doesn't need to be freed.
+
+<%= pop_open_example "cpConvexHull" %>
 
 
 <%= h 2, "Modifying cpShapes:", "Modifing" %>
@@ -753,7 +772,7 @@ void cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, v
 
 p(expl). Call @func@ for each constraint in the space also passing along your data pointer.
 
-*Note:* If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpSpaceEachBodyBlock()@, etc. See @chipmunk.h@ for more information.
+*Note:* If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpSpaceEachBody_b()@, etc. See @chipmunk.h@ for more information.
 
 <%= h 2, "Simulating the Space:", "Simulating" %>
 
@@ -834,6 +853,10 @@ p(expl). The percentage of joint error that remains unfixed after a second. This
 void cpConstraintSetMaxBias(cpConstraint *constraint, cpFloat value)</code></pre>
 
 p(expl). The maximum speed at which the constraint can apply error correction. Defaults to INFINITY.
+
+<pre><code>cpSpace* cpConstraintGetSpace(const cpConstraint *constraint)</code></pre>
+
+p(expl). Get the @cpSpace@ that @constraint@ has been added to.
 
 <pre><code>cpDataPointer cpConstraintGetUserData(const cpConstraint *constraint)
 void cpConstraintSetUserData(cpConstraint *constraint, cpDataPointer value)</code></pre>
@@ -1211,7 +1234,7 @@ p(expl). Get the number of contacts tracked by this arbiter or the specific coll
 
 <pre><code>cpBool cpArbiterIsFirstContact(const cpArbiter *arb)</code></pre>
 
-p(expl). Returns true if this is the first step the two shapes started touching. Can be used 
+p(expl). Returns true if this is the first step the two shapes started touching. This can be useful for sound effects for instance. If it's the first frame for a certain collision, check the energy of the collision in a @postStep()@ callbock and use that to determine the volume of a sound effect to play.
 
 <pre><code>void cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
 void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)</code></pre>
@@ -1265,7 +1288,7 @@ Chipmunk spaces support four kinds of spatial queries, nearest point, segment, s
 
 <%= h 2, "Nearest Point Queries:", "PointQueries" %>
 
-Point queries are useful for things like mouse picking and simple sensors. It allows you to check if there are shapes within a certain distance of a point, find the closest point on a shape to a given point or find the closest shape to a point.
+Point queries are useful for things like mouse picking and simple sensors. They allow you to check if there are shapes within a certain distance of a point, find the closest point on a shape to a given point or find the closest shape to a point.
 
 <pre><code>typedef struct cpNearestPointQueryInfo {
 	/// The nearest shape, NULL if no shape was within range.
@@ -1276,7 +1299,7 @@ Point queries are useful for things like mouse picking and simple sensors. It al
 	cpFloat d;
 } cpNearestPointQueryInfo;</code></pre>
 
-p(expl). Nearest point queries can give you additional information about the closest point on a shape's surface to the point and the distance between the points.
+p(expl). Nearest point queries return the point on the surface of the shape as well as the distance from the query point to the surface point.
 
 <pre><code>cpFloat cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *out)</code></pre>
 
@@ -1294,7 +1317,7 @@ p(expl). Query @space@ at @point@ for shapes within the given distance range fil
 
 <pre><code>cpShape *cpSpaceNearestPointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpNearestPointQueryInfo *out)</code></pre>
 
-p(expl). Query @space@ at @point@ and return the closest shape within @maxDistance@. @out@ is an optional pointer to a @cpNearestPointQueryInfo@ if you want additional information about the match.
+p(expl). Query @space@ at @point@ and return the closest shape within @maxDistance@ units of distance. @out@ is an optional pointer to a @cpNearestPointQueryInfo@ if you want additional information about the match.
 
 <%= h 2, "Segment Queries:", "SegmentQueries" %>
 
@@ -1372,7 +1395,7 @@ p(expl). Query @space@ to find all shapes overlapping @shape@. Matches are filte
 
 <%= h 2, "Blocks:", "Blocks" %>
 
-If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpSpaceNearestPointQueryBlock()@, etc. See @chipmunk.h@ for more information.
+If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpSpaceNearestPointQuery_b()@, etc. See @chipmunk.h@ for more information.
 
 <%= h 2, "Examples:", "Examples" %>
 

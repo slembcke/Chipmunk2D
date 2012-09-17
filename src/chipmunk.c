@@ -19,9 +19,7 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
 #include <string.h>
 #include <stdarg.h>
 
@@ -183,20 +181,23 @@ cpLoopIndexes(cpVect *verts, int count, int *start, int *end)
 #define SWAP(__A__, __B__) {cpVect __TMP__ = __A__; __A__ = __B__; __B__ = __TMP__;}
 
 static int
-QHullPartition(cpVect *verts, int count, cpSplittingPlane plane, cpFloat tol)
+QHullPartition(cpVect *verts, int count, cpVect a, cpVect b, cpFloat tol)
 {
 	if(count == 0) return 0;
 	
-	cpFloat max = cpSplittingPlaneCompare(plane, verts[0]);
-	int maxi = 0;
+	cpFloat max = 0;
+	int pivot = 0;
+	
+	cpVect delta = cpvsub(b, a);
+	cpFloat valueTol = tol*cpvlength(delta);
 	
 	int head = 0;
 	for(int tail = count-1; head <= tail;){
-		cpFloat dist = cpSplittingPlaneCompare(plane, verts[head]);
-		if(dist > tol){
-			if(dist > max){
-				max = dist;
-				maxi = head;
+		cpFloat value = cpvcross(delta, cpvsub(verts[head], a));
+		if(value > valueTol){
+			if(value > max){
+				max = value;
+				pivot = head;
 			}
 			
 			head++;
@@ -206,9 +207,8 @@ QHullPartition(cpVect *verts, int count, cpSplittingPlane plane, cpFloat tol)
 		}
 	}
 	
-	// move the new pivot to the front
-	SWAP(verts[0], verts[maxi]);
-	
+	// move the new pivot to the front if it's not already there.
+	if(pivot != 0) SWAP(verts[0], verts[pivot]);
 	return head;
 }
 
@@ -221,12 +221,12 @@ QHullReduce(cpFloat tol, cpVect *verts, int count, cpVect a, cpVect pivot, cpVec
 		result[0] = pivot;
 		return 1;
 	} else {
-		int left_count = QHullPartition(verts, count, cpSplittingPlaneNew(a, pivot), tol);
+		int left_count = QHullPartition(verts, count, a, pivot, tol);
 		int index = QHullReduce(tol, verts + 1, left_count - 1, a, verts[0], pivot, result);
 		
 		result[index++] = pivot;
 		
-		int right_count = QHullPartition(verts + left_count, count - left_count, cpSplittingPlaneNew(pivot, b), tol);
+		int right_count = QHullPartition(verts + left_count, count - left_count, pivot, b, tol);
 		return index + QHullReduce(tol, verts + left_count + 1, right_count - 1, pivot, verts[left_count], b, result + index);
 	}
 }
@@ -236,8 +236,13 @@ QHullReduce(cpFloat tol, cpVect *verts, int count, cpVect a, cpVect pivot, cpVec
 int
 cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)
 {
-	// Copy the line vertexes into the empty part of the result polyline to use as a scratch buffer.
-	memcpy(result, verts, count*sizeof(cpVect));
+	if(result){
+		// Copy the line vertexes into the empty part of the result polyline to use as a scratch buffer.
+		memcpy(result, verts, count*sizeof(cpVect));
+	} else {
+		// If a result array was not specified, reduce the input instead.
+		result = verts;
+	}
 	
 	// Degenerate case, all poins are the same.
 	int start, end;
@@ -254,7 +259,11 @@ cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)
 	cpVect b = result[1];
 	
 	if(first) (*first) = start;
-	return QHullReduce(tol, result + 2, count - 2, a, b, a, result + 1) + 1;
+	int resultCount = QHullReduce(tol, result + 2, count - 2, a, b, a, result + 1) + 1;
+	cpAssertSoft(cpPolyValidate(result, resultCount),
+		"Internal error: cpConvexHull() and cpPolyValidate() did not agree."
+		"Please report this error with as much info as you can.");
+	return resultCount;
 }
 
 //MARK: Alternate Block Iterators
@@ -264,48 +273,48 @@ cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)
 
 static void IteratorFunc(void *ptr, void (^block)(void *ptr)){block(ptr);}
 
-void cpSpaceEachBodyBlock(cpSpace *space, void (^block)(cpBody *body)){
+void cpSpaceEachBody_b(cpSpace *space, void (^block)(cpBody *body)){
 	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)IteratorFunc, block);
 }
 
-void cpSpaceEachShapeBlock(cpSpace *space, void (^block)(cpShape *shape)){
+void cpSpaceEachShape_b(cpSpace *space, void (^block)(cpShape *shape)){
 	cpSpaceEachShape(space, (cpSpaceShapeIteratorFunc)IteratorFunc, block);
 }
 
-void cpSpaceEachConstraintBlock(cpSpace *space, void (^block)(cpConstraint *constraint)){
+void cpSpaceEachConstraint_b(cpSpace *space, void (^block)(cpConstraint *constraint)){
 	cpSpaceEachConstraint(space, (cpSpaceConstraintIteratorFunc)IteratorFunc, block);
 }
 
 static void BodyIteratorFunc(cpBody *body, void *ptr, void (^block)(void *ptr)){block(ptr);}
 
-void cpBodyEachShapeBlock(cpBody *body, void (^block)(cpShape *shape)){
+void cpBodyEachShape_b(cpBody *body, void (^block)(cpShape *shape)){
 	cpBodyEachShape(body, (cpBodyShapeIteratorFunc)BodyIteratorFunc, block);
 }
 
-void cpBodyEachConstraintBlock(cpBody *body, void (^block)(cpConstraint *constraint)){
+void cpBodyEachConstraint_b(cpBody *body, void (^block)(cpConstraint *constraint)){
 	cpBodyEachConstraint(body, (cpBodyConstraintIteratorFunc)BodyIteratorFunc, block);
 }
 
-void cpBodyEachArbiterBlock(cpBody *body, void (^block)(cpArbiter *arbiter)){
+void cpBodyEachArbiter_b(cpBody *body, void (^block)(cpArbiter *arbiter)){
 	cpBodyEachArbiter(body, (cpBodyArbiterIteratorFunc)BodyIteratorFunc, block);
 }
 
-static void NearestPointQueryIteratorFunc(cpShape *shape, cpFloat distance, cpVect point, cpSpaceNearestPointQueryBlockFunc block){block(shape, distance, point);}
-void cpSpaceNearestPointQueryBlock(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpaceNearestPointQueryBlockFunc block){
+static void NearestPointQueryIteratorFunc(cpShape *shape, cpFloat distance, cpVect point, cpSpaceNearestPointQueryBlock block){block(shape, distance, point);}
+void cpSpaceNearestPointQuery_b(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpaceNearestPointQueryBlock block){
 	cpSpaceNearestPointQuery(space, point, maxDistance, layers, group, (cpSpaceNearestPointQueryFunc)NearestPointQueryIteratorFunc, block);
 }
 
-static void SegmentQueryIteratorFunc(cpShape *shape, cpFloat t, cpVect n, cpSpaceSegmentQueryBlockFunc block){block(shape, t, n);}
-void cpSpaceSegmentQueryBlock(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryBlockFunc block){
+static void SegmentQueryIteratorFunc(cpShape *shape, cpFloat t, cpVect n, cpSpaceSegmentQueryBlock block){block(shape, t, n);}
+void cpSpaceSegmentQuery_b(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryBlock block){
 	cpSpaceSegmentQuery(space, start, end, layers, group, (cpSpaceSegmentQueryFunc)SegmentQueryIteratorFunc, block);
 }
 
-void cpSpaceBBQueryBlock(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryBlockFunc block){
+void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryBlock block){
 	cpSpaceBBQuery(space, bb, layers, group, (cpSpaceBBQueryFunc)IteratorFunc, block);
 }
 
-static void ShapeQueryIteratorFunc(cpShape *shape, cpContactPointSet *points, cpSpaceShapeQueryBlockFunc block){block(shape, points);}
-cpBool cpSpaceShapeQueryBlock(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlockFunc block){
+static void ShapeQueryIteratorFunc(cpShape *shape, cpContactPointSet *points, cpSpaceShapeQueryBlock block){block(shape, points);}
+cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block){
 	return cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)ShapeQueryIteratorFunc, block);
 }
 

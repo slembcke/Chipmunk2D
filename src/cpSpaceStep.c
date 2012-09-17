@@ -19,46 +19,41 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-
 #include "chipmunk_private.h"
 
 //MARK: Post Step Callback Functions
 
-typedef struct cpPostStepCallback {
-	cpPostStepFunc func;
-	void *key;
-	void *data;
-} cpPostStepCallback;
-
-void *
-cpSpaceGetPostStepData(cpSpace *space, void *key)
+cpPostStepCallback *
+cpSpaceGetPostStepCallback(cpSpace *space, void *key)
 {
 	cpArray *arr = space->postStepCallbacks;
 	for(int i=0; i<arr->num; i++){
 		cpPostStepCallback *callback = (cpPostStepCallback *)arr->arr[i];
-		if(callback->key == key) return callback->data;
+		if(callback->key == key) return callback;
 	}
 	
 	return NULL;
 }
 
-void
+static void PostStepDoNothing(cpSpace *space, void *obj, void *data){}
+
+cpBool
 cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data)
 {
 	cpAssertWarn(space->locked,
 		"Adding a post-step callback when the space is not locked is unnecessary. "
 		"Post-step callbacks will not called until the end of the next call to cpSpaceStep() or the next query.");
 	
-	if(!cpSpaceGetPostStepData(space, key)){
+	if(!cpSpaceGetPostStepCallback(space, key)){
 		cpPostStepCallback *callback = (cpPostStepCallback *)cpcalloc(1, sizeof(cpPostStepCallback));
-		callback->func = func;
+		callback->func = (func ? func : PostStepDoNothing);
 		callback->key = key;
 		callback->data = data;
 		
 		cpArrayPush(space->postStepCallbacks, callback);
+		return cpTrue;
+	} else {
+		return cpFalse;
 	}
 }
 

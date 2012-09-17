@@ -19,11 +19,6 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
@@ -46,21 +41,16 @@ update(int ticks)
 	}
 }
 
-static char messageScratchSpace[1024] = {};
-
 static void
 draw(void)
 {
 	ChipmunkDemoDefaultDrawImpl();
 	
-	char *messageCursor = messageScratchSpace;
-	messageCursor[0] = '\0';
-	
 	cpVect start = QUERY_START;
 	cpVect end = ChipmunkDemoMouse;
 	ChipmunkDebugDrawSegment(start, end, RGBAColor(0,1,0,1));
 	
-	messageCursor += sprintf(messageCursor, "Query: Dist(%f) Point%s, ", cpvdist(start, end), cpvstr(end));
+	ChipmunkDemoPrintString("Query: Dist(%f) Point%s, ", cpvdist(start, end), cpvstr(end));
 	
 	cpSegmentQueryInfo segInfo = {};
 	if(cpSpaceSegmentQueryFirst(space, start, end, CP_ALL_LAYERS, CP_NO_GROUP, &segInfo)){
@@ -76,9 +66,9 @@ draw(void)
 		ChipmunkDebugDrawPoints(3, 1, &point, RGBAColor(1,0,0,1));
 
 		
-		messageCursor += sprintf(messageCursor, "Segment Query: Dist(%f) Normal%s", cpSegmentQueryHitDist(start, end, segInfo), cpvstr(segInfo.n));
+		ChipmunkDemoPrintString("Segment Query: Dist(%f) Normal%s", cpSegmentQueryHitDist(start, end, segInfo), cpvstr(segInfo.n));
 	} else {
-		messageCursor += sprintf(messageCursor, "Segment Query (None)");
+		ChipmunkDemoPrintString("Segment Query (None)");
 	}
 	
 	cpNearestPointQueryInfo nearestInfo = {};
@@ -97,9 +87,6 @@ static cpSpace *
 init(void)
 {
 	QUERY_START = cpvzero;
-	
-	messageScratchSpace[0] = '\0';
-	ChipmunkDemoMessageString = messageScratchSpace;
 	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 5);

@@ -19,9 +19,6 @@
  * SOFTWARE.
  */
 
-#include <stdlib.h>
-#include <math.h>
-
 #include "chipmunk_private.h"
 #include "constraints/util.h"
 
@@ -91,7 +88,7 @@ static const cpConstraintClass klass = {
 	(cpConstraintApplyImpulseImpl)applyImpulse,
 	(cpConstraintGetImpulseImpl)getImpulse,
 };
-CP_DefineClassGetter(cpPinJoint);
+CP_DefineClassGetter(cpPinJoint)
 
 
 cpPinJoint *

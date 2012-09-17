@@ -19,10 +19,6 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-#include <math.h>
-
-// TODO
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
 

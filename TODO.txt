@@ -1,16 +1,21 @@
 High Priority:
-	Disable HastySpace threads by default.
-	Document the new nearest point query functions. (review)
-	Make a video for ACD and nearest point queries.
-	Make a blog post/video about (QHull, ACD, NPQ, and blocks)
+	Document ChipmunkMultiGrab, update example code.
+	Add license to showcase code. (and example code)
+	Release new Showcase app with push mode.
 	Make a Cocos2D helper pack (ChipmunkSprite, ChipmunkDebugNode, ES2 renderer)
 	Investigate getting better PhysicsEditor support.
+	Call cpBodyAssertSane from setters.
+	Reorganize Chimpnuk Pro directory structure. Too flat and confusing.
+	cpSpaceAddPostStepCallback() should return a TRUE if the callback was scheduled.
+	Bilinearly sampled image sampler function. (override the sample method to always take bilinear samples)
+	RGB Image Sampler class.
+	User definable fast collision filtering.
+	Add a user data pointer to cpArbiters!
+	Add assertions so that you can't construct (or maybe add?) a constraint with NULL bodies.
 
 Tutorial ideas:
-	C/Blocks tutorial
 	AG tilemap tutorial
-	AG CCRenderTexture example
-	AG CGContext example
+	ByteRacer/ChipmunkPro
 	Fishing
 	Crayon Ball clone
 
@@ -35,9 +40,7 @@ Future things to think about:
 	breakable object support functions?
 	Easy callback programable joint?
 	cpBodyActivateStatic() should also activate joints?
-	Extreme vertex BSP search for polys
-	GJK or other closest points algorithm?
-	Redo poly-poly contact manifold
+	Finish the contact point generation branch.
 	Figure out why poly contacts can sometimes be unstable when driven by a strong constraint
 	Implement segment-segment collisions
 	Assertion for destroying a body with things still attached

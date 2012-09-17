@@ -19,8 +19,6 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-#include <math.h>
 #include <string.h>
 
 #include "chipmunk.h"

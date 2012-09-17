@@ -20,14 +20,52 @@
  */
  
 #include "chipmunk.h"
+#include "chipmunk_unsafe.h"
+
 #include "ChipmunkDemo.h"
 
+#define DENSITY (1.0/10000.0)
+
 static cpSpace *space;
+static cpShape *shape;
 
 static void
 update(int ticks)
 {
-	int steps = 3;
+	cpFloat tolerance = 2.0;
+	
+	if(ChipmunkDemoRightClick && cpShapeNearestPointQuery(shape, ChipmunkDemoMouse, NULL) > tolerance){
+		cpBody *body = cpShapeGetBody(shape);
+		int count = cpPolyShapeGetNumVerts(shape);
+		
+		// Allocate the space for the new vertexes on the stack.
+		cpVect *verts = (cpVect *)alloca((count + 1)*sizeof(cpVect));
+		
+		for(int i=0; i<count; i++){
+			verts[i] = cpPolyShapeGetVert(shape, i);
+		}
+		
+		verts[count] = cpBodyWorld2Local(body, ChipmunkDemoMouse);
+		
+		// This function builds a convex hull for the vertexes.
+		// Because the result array is NULL, it will reduce the input array instead.
+		int hullCount = cpConvexHull(count + 1, verts, NULL, NULL, tolerance);
+		
+		// Figure out how much to shift the body by.
+		cpVect centroid = cpCentroidForPoly(hullCount, verts);
+		
+		// Recalculate the body properties to match the updated shape.
+		cpFloat mass = cpAreaForPoly(hullCount, verts)*DENSITY;
+		cpBodySetMass(body, mass);
+		cpBodySetMoment(body, cpMomentForPoly(mass, hullCount, verts, cpvneg(centroid)));
+		cpBodySetPos(body, cpBodyLocal2World(body, centroid));
+		
+		// Use the setter function from chipmunk_unsafe.h.
+		// You could also remove and recreate the shape if you wanted.
+		cpPolyShapeSetVerts(shape, hullCount, verts, cpvneg(centroid));
+	}
+	
+	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
 	for(int i=0; i<steps; i++){
@@ -38,52 +76,32 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
+	ChipmunkDemoMessageString = "Right click and drag to change the blocks's shape.";
+	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
-	cpSpaceSetGravity(space, cpv(0, -100));
+	cpSpaceSetGravity(space, cpv(0, -500));
 	cpSpaceSetSleepTimeThreshold(space, 0.5f);
 	cpSpaceSetCollisionSlop(space, 0.5f);
 	
 	cpBody *body, *staticBody = cpSpaceGetStaticBody(space);
-	cpShape *shape;
 	
 	// Create segments around the edge of the screen.
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
-	cpShapeSetElasticity(shape, 1.0f);
-	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
-
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
-	cpShapeSetElasticity(shape, 1.0f);
-	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
-
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
-	
-	// Add lots of boxes.
-	for(int i=0; i<14; i++){
-		for(int j=0; j<=i; j++){
-			body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForBox(1.0f, 30.0f, 30.0f)));
-			cpBodySetPos(body, cpv(j*32 - i*16, 300 - i*32));
-			
-			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 30.0f, 30.0f));
-			cpShapeSetElasticity(shape, 0.0f);
-			cpShapeSetFriction(shape, 0.8f);
-		}
-	}
-	
-	// Add a ball to make things more interesting
-	cpFloat radius = 15.0f;
-	body = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 0.0f, radius, cpvzero)));
-	cpBodySetPos(body, cpv(0, -240 + radius+5));
 
-	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
-	cpShapeSetElasticity(shape, 0.0f);
-	cpShapeSetFriction(shape, 0.9f);
+	cpFloat width = 50.0f;
+	cpFloat height = 70.0f;
+	cpFloat mass = width*height*DENSITY;
+	cpFloat moment = cpMomentForBox(mass, width, height);
 	
+	body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
+	
+	shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+	cpShapeSetFriction(shape, 0.6f);
+		
 	return space;
 }
 
@@ -94,8 +112,8 @@ destroy(void)
 	cpSpaceFree(space);
 }
 
-ChipmunkDemo PyramidStack = {
-	"Pyramid Stack",
+ChipmunkDemo Convex = {
+	"Convex.",
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

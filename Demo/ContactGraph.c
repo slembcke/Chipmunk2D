@@ -19,11 +19,6 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <stdio.h>
-
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
@@ -32,9 +27,6 @@ static cpSpace *space;
 // static body that we will be making into a scale
 static cpBody *scaleStaticBody;
 static cpBody *ballBody;
-
-static char messageString[1024];
-
 
 // If your compiler supports blocks (Clang or some GCC versions),
 // You can use the block based iterators instead of the function ones to make your life easier.
@@ -87,15 +79,14 @@ update(int ticks)
 		cpSpaceStep(space, dt);
 	}
 	
-	char *cursor = messageString;
-	cursor += sprintf(cursor, "Place objects on the scale to weigh them. The ball marks the shapes it's sitting on.\n");
+	ChipmunkDemoPrintString("Place objects on the scale to weigh them. The ball marks the shapes it's sitting on.\n");
 	
 	// Sum the total impulse applied to the scale from all collision pairs in the contact graph.
 	// If your compiler supports blocks, your life is a little easier.
 	// You can use the "Block" versions of the functions without needing the callbacks above.
 	#if USE_BLOCKS
 		__block cpVect impulseSum = cpvzero;
-		cpBodyEachArbiterBlock(scaleStaticBody, ^(cpArbiter *arb){
+		cpBodyEachArbiter_b(scaleStaticBody, ^(cpArbiter *arb){
 			impulseSum = cpvadd(impulseSum, cpArbiterTotalImpulseWithFriction(arb));
 		});
 	#else
@@ -110,13 +101,13 @@ update(int ticks)
 	cpVect g = cpSpaceGetGravity(space);
 	cpFloat weight = cpvdot(g, impulseSum)/(cpvlengthsq(g)*dt);
 	
-	cursor += sprintf(cursor, "Total force: %5.2f, Total weight: %5.2f. ", force, weight);
+	ChipmunkDemoPrintString("Total force: %5.2f, Total weight: %5.2f. ", force, weight);
 	
 	
 	// Highlight and count the number of shapes the ball is touching.
 	#if USE_BLOCKS
 		__block int count = 0;
-		cpBodyEachArbiterBlock(ballBody, ^(cpArbiter *arb){
+		cpBodyEachArbiter_b(ballBody, ^(cpArbiter *arb){
 			// body is the body we are iterating the arbiters for.
 			// CP_ARBITER_GET_*() in an arbiter iterator always returns the body/shape for the iterated body first.
 			CP_ARBITER_GET_SHAPES(arb, ball, other);
@@ -137,7 +128,7 @@ update(int ticks)
 		cpBodyEachArbiter(ballBody, (cpBodyArbiterIteratorFunc)BallIterator, &count);
 	#endif
 	
-	cursor += sprintf(cursor, "The ball is touching %d shapes.\n", count);
+	ChipmunkDemoPrintString("The ball is touching %d shapes.\n", count);
 }
 
 #define WIDTH 4.0f
@@ -146,8 +137,6 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	ChipmunkDemoMessageString = messageString;
-	
 	space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -300));

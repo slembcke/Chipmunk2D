@@ -31,10 +31,8 @@
 	about Chipmunk which may change with little to no warning.
 */
  
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 #include <limits.h>
 #include <stdarg.h>
 
@@ -566,6 +564,7 @@ extern ChipmunkDemo Crane;
 extern ChipmunkDemo Buoyancy;
 extern ChipmunkDemo ContactGraph;
 extern ChipmunkDemo Slice;
+extern ChipmunkDemo Convex;
 extern ChipmunkDemo Unicycle;
 extern ChipmunkDemo GJK;
 
@@ -598,6 +597,7 @@ main(int argc, const char **argv)
 		Buoyancy,
 		Player,
 		Slice,
+		Convex,
 		Unicycle,
 	};
 	

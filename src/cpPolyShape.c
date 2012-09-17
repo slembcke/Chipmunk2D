@@ -19,8 +19,6 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-
 #include "chipmunk_private.h"
 #include "chipmunk_unsafe.h"
 
@@ -157,8 +155,9 @@ cpPolyValidate(const cpVect *verts, const int numVerts)
 		cpVect b = verts[(i+1)%numVerts];
 		cpVect c = verts[(i+2)%numVerts];
 		
-		if(cpvcross(cpvsub(b, a), cpvsub(c, b)) > 0.0f)
+		if(cpvcross(cpvsub(b, a), cpvsub(c, a)) > 0.0f){
 			return cpFalse;
+		}
 	}
 	
 	return cpTrue;
@@ -182,20 +181,26 @@ cpPolyShapeGetVert(const cpShape *shape, int idx)
 
 
 static void
-setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
+setUpVerts(cpPolyShape *poly, int numVerts, const cpVect *verts, cpVect offset)
 {
-	poly->verts = (cpVect *)cpcalloc(2*numVerts, sizeof(cpVect));
-	numVerts = cpConvexHull(numVerts, verts, poly->verts, NULL, 0.0);
+	// Fail if the user attempts to pass a concave poly, or a bad winding.
+	cpAssertHard(cpPolyValidate(verts, numVerts), "Polygon is concave or has a reversed winding. Consider using cpConvexHull() or CP_CONVEX_HULL().");
 	
 	poly->numVerts = numVerts;
-	poly->verts = (cpVect *)cprealloc(poly->verts, 2*numVerts*sizeof(cpVect));
+	poly->verts = (cpVect *)cpcalloc(2*numVerts, sizeof(cpVect));
 	poly->planes = (cpSplittingPlane *)cpcalloc(2*numVerts, sizeof(cpSplittingPlane));
 	poly->tVerts = poly->verts + numVerts;
 	poly->tPlanes = poly->planes + numVerts;
 	poly->centroid = cpvadd(offset, cpCentroidForPoly(numVerts, poly->verts));
 	
 	for(int i=0; i<numVerts; i++){
-		poly->verts[i] = cpvadd(offset, poly->verts[i]);
+		cpVect a = cpvadd(offset, verts[i]);
+		cpVect b = cpvadd(offset, verts[(i+1)%numVerts]);
+		cpVect n = cpvnormalize(cpvperp(cpvsub(b, a)));
+
+		poly->verts[i] = a;
+		poly->planes[i].n = n;
+		poly->planes[i].d = cpvdot(n, a);
 	}
 	
 	for(int i=0; i<numVerts; i++){
@@ -214,7 +219,7 @@ setUpVerts(cpPolyShape *poly, int numVerts, cpVect *verts, cpVect offset)
 }
 
 cpPolyShape *
-cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, cpVect *verts, cpVect offset)
+cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset)
 {
 	setUpVerts(poly, numVerts, verts, offset);
 	cpShapeInit((cpShape *)poly, &polyClass, body);

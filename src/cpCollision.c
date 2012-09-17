@@ -19,18 +19,14 @@
  * SOFTWARE.
  */
  
-#include <stdlib.h>
-#include <math.h>
-//#include <stdio.h>
-
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
 
-#define USE_GJK 0
+#define USE_GJK 1
 #define DRAW_GJK 0
 #define DRAW_EPA 0
 #define DRAW_CLOSEST 0
-#define DRAW_CLIP 1
+#define DRAW_CLIP 0
 #define PRINT_LOG 0
 #define LOG_ITERATIONS 0
 
@@ -575,40 +571,40 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 	}
 }
 
-#if USE_GJK
-
-static int
-segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *arr)
-{
-	struct ClosestPoints points = GJK((cpShape *)seg1, (cpShape *)seg2, (GJKSupportFunction)cpSegmentSupportPoint, (GJKSupportFunction)cpSegmentSupportPoint);
-	
-#if DRAW_CLOSEST
-#if PRINT_LOG
-	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
-#endif
-	
-	ChipmunkDebugDrawPoints(6.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
-	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
-	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
-#endif
-	
-	cpVect n = points.n;
-	if(points.d - (seg1->r + seg2->r) <= 0.0){
-		return ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), n, arr);
-	} else {
-		return 0;
-	}
-}
-
-#else 
-
-static int
-segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *con)
-{
-	return 0;
-}
-
-#endif
+//#if USE_GJK
+//
+//static int
+//segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *arr)
+//{
+//	struct ClosestPoints points = GJK((cpShape *)seg1, (cpShape *)seg2, (GJKSupportFunction)cpSegmentSupportPoint, (GJKSupportFunction)cpSegmentSupportPoint);
+//	
+//#if DRAW_CLOSEST
+//#if PRINT_LOG
+//	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
+//#endif
+//	
+//	ChipmunkDebugDrawPoints(6.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
+//	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
+//	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
+//#endif
+//	
+//	cpVect n = points.n;
+//	if(points.d - (seg1->r + seg2->r) <= 0.0){
+//		return ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), n, arr);
+//	} else {
+//		return 0;
+//	}
+//}
+//
+//#else 
+//
+//static int
+//segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *con)
+//{
+//	return 0;
+//}
+//
+//#endif
 
 #if USE_GJK
 
@@ -795,7 +791,7 @@ static const collisionFunc builtinCollisionFuncs[9] = {
 	NULL,
 	NULL,
 	(collisionFunc)circle2segment,
-	(collisionFunc)segment2segment,
+	NULL,//(collisionFunc)segment2segment,
 	NULL,
 	(collisionFunc)circle2poly,
 	(collisionFunc)seg2poly,
