@@ -170,20 +170,16 @@ SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 {
 	int numVerts = poly->numVerts;
 	int i1 = cpSupportPointIndex(poly, n);
-	int i0 = (i1 - 1 + numVerts)%numVerts; // TODO get rid of mod, very expensive on ARM
+	
+	// TODO get rid of mod eventually, very expensive on ARM
+	int i0 = (i1 - 1 + numVerts)%numVerts;
 	int i2 = (i1 + 1)%numVerts;
 	
-	cpVect v0 = poly->tVerts[i0];
-	cpVect v1 = poly->tVerts[i1];
-	cpVect v2 = poly->tVerts[i2];
-	
-//	if(cpvdot(n, cpvnormalize(cpvsub(v1, v0))) < cpvdot(n, cpvnormalize(cpvsub(v1, v2)))){
-	if(cpvdot(n, poly->tPlanes[i1].n) > cpvdot(n, poly->tPlanes[(i1+1)%numVerts].n)){
-//		return (struct Edge){{v0, CP_HASH_PAIR(poly, i0)}, {v1, CP_HASH_PAIR(poly, i1)}, 0.0, poly->tPlanes[i1].n};
-		return EdgeNew(v0, v1, CP_HASH_PAIR(poly, i0), CP_HASH_PAIR(poly, i1), 0.0f);
+	cpVect *verts = poly->tVerts;
+	if(cpvdot(n, poly->tPlanes[i1].n) > cpvdot(n, poly->tPlanes[i2].n)){
+		return (struct Edge){{verts[i0], CP_HASH_PAIR(poly, i0)}, {verts[i1], CP_HASH_PAIR(poly, i1)}, 0.0, poly->tPlanes[i1].n};
 	} else {
-//		return (struct Edge){{v1, CP_HASH_PAIR(poly, i1)}, {v2, CP_HASH_PAIR(poly, i2)}, 0.0, poly->tPlanes[(i1+1)%numVerts].n};
-		return EdgeNew(v1, v2, CP_HASH_PAIR(poly, i1), CP_HASH_PAIR(poly, i2), 0.0f);
+		return (struct Edge){{verts[i1], CP_HASH_PAIR(poly, i1)}, {verts[i2], CP_HASH_PAIR(poly, i2)}, 0.0, poly->tPlanes[i2].n};
 	}
 }
 
