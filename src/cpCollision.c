@@ -435,7 +435,7 @@ GJK(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction support1, G
 	
 	struct ClosestPoints points = GJKRecurse(shape1, shape2, support1, support2, p1, p2, 1);
 	if(cpfabs(points.d) < MAGIC_EPSILON){
-		printf("Possible bad normal!\n");
+//		printf("Possible bad normal!\n");
 		
 		// If the closest points are very close together, might need to estimate the normal.
 		// TODO fix the constness to get rid of the cast.
