@@ -25,6 +25,8 @@
 #define CP_HASH_COEF (3344921057ul)
 #define CP_HASH_PAIR(A, B) ((cpHashValue)(A)*CP_HASH_COEF ^ (cpHashValue)(B)*CP_HASH_COEF)
 
+// TODO Eww. Magic numbers.
+#define MAGIC_EPSILON 1e-5
 
 //MARK: cpArray
 

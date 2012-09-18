@@ -183,9 +183,9 @@ static struct Edge
 SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
 {
 	if(cpvdot(seg->tn, n) > 0.0){
-		return EdgeNew(seg->ta, seg->tb, CP_HASH_PAIR(seg, 0), CP_HASH_PAIR(seg, 1), seg->r);
+		return (struct Edge){{seg->ta, CP_HASH_PAIR(seg, 0)}, {seg->tb, CP_HASH_PAIR(seg, 1)}, seg->r, seg->n};
 	} else {
-		return EdgeNew(seg->tb, seg->ta, CP_HASH_PAIR(seg, 1), CP_HASH_PAIR(seg, 0), seg->r);
+		return (struct Edge){{seg->tb, CP_HASH_PAIR(seg, 1)}, {seg->ta, CP_HASH_PAIR(seg, 0)}, seg->r, cpvneg(seg->n)};
 	}
 }
 
@@ -260,7 +260,7 @@ EPANodeSplit(struct EPANode *parent, struct EPANode *left, struct EPANode *right
 static struct ClosestPoints
 EPARecurse(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction support1, GJKSupportFunction support2, struct EPANode *root, int i)
 {
-//	cpAssertHard(i < 20, "Stuck in recursion?");
+	cpAssertHard(i < 20, "Stuck in recursion?");
 	
 	struct EPANode *best = root->best;
 	cpVect closest = best->closest;
@@ -276,7 +276,7 @@ EPARecurse(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction supp
 	cpFloat d2 = cpfmax(cpvdot(closest, best->v0.ab), cpvdot(closest, best->v1.ab));
 	
 //	if(dp > d2){
-	if(dp - d2 > 1e-5f){ // TODO eww, magic number
+	if(dp - d2 > MAGIC_EPSILON){
 		struct EPANode left; EPANodeInit(&left, best->v0, p);
 		struct EPANode right; EPANodeInit(&right, p, best->v1);
 		EPANodeSplit(best, &left, &right);
@@ -301,7 +301,10 @@ EPA(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction support1, G
 	struct EPANode n12; EPANodeInit(&n12, v1, v2);
 	struct EPANode n20; EPANodeInit(&n20, v2, v0);
 	
-	struct EPANode inner = {}, root = {};
+	struct EPANode inner, root;
+	bzero(&inner, sizeof(struct EPANode));
+	bzero(&root, sizeof(struct EPANode));
+	
 	EPANodeSplit(&inner, &n01, &n12);
 	EPANodeSplit(&root, &inner, &n20);
 	
@@ -352,7 +355,7 @@ GJKRecurse(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction supp
 #endif
 		return EPA(shape1, shape2, support1, support2, v0, v1, p);
 //	} else if(dp < cpfmin(cpvdot(closest, v0.ab), cpvdot(closest, v1.ab))){
-	} else if(dp - d2 < -1e-5f){ // TODO eww, magic number
+	} else if(dp - d2 < -MAGIC_EPSILON){
 		if(cpvlengthsq(v0.ab) <= cpvlengthsq(v1.ab)){
 			return GJKRecurse(shape1, shape2, support1, support2, v0, p, i + 1);
 		} else {
@@ -429,7 +432,21 @@ GJK(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction support1, G
 	cpVect axis = cpvperp(cpvsub(shape1->body->p, shape2->body->p));
 	struct MinkowskiPoint p1 = Support(shape1, shape2, support1, support2, axis);
 	struct MinkowskiPoint p2 = Support(shape1, shape2, support1, support2, cpvneg(axis));
-	return GJKRecurse(shape1, shape2, support1, support2, p1, p2, 1);
+	
+	struct ClosestPoints points = GJKRecurse(shape1, shape2, support1, support2, p1, p2, 1);
+	if(cpfabs(points.d) < MAGIC_EPSILON){
+		printf("Possible bad normal!\n");
+		
+		// If the closest points are very close together, might need to estimate the normal.
+		// TODO fix the constness to get rid of the cast.
+		cpNearestPointQueryInfo info;
+		cpShapeNearestPointQuery((cpShape *)shape1, points.b, &info);
+		points.n = info.g;
+		
+		return points;
+	} else {
+		return points;
+	}
 }
 #endif
 

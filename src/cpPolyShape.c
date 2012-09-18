@@ -88,6 +88,7 @@ cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInf
 	cpVect v0 = verts[count - 1];
 	cpFloat minDist = INFINITY;
 	cpVect closestPoint = cpvzero;
+	cpVect closestNormal = cpvzero;
 	cpBool outside = cpFalse;
 	
 	for(int i=0; i<count; i++){
@@ -100,14 +101,20 @@ cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInf
 		if(dist < minDist){
 			minDist = dist;
 			closestPoint = closest;
+			closestNormal = planes[i].n;
 		}
 		
 		v0 = v1;
 	}
 	
+	cpFloat dist = (outside ? minDist : -minDist);
+	
 	info->shape = (cpShape *)poly;
-	info->p = closestPoint; // TODO div/0
-	info->d = (outside ? minDist : -minDist);
+	info->p = closestPoint;
+	info->d = dist;
+	
+	// Use the normal of the closest segment if the distance is small.
+	info->g = (minDist > MAGIC_EPSILON ? cpvmult(cpvsub(p, closestPoint), 1.0f/dist) : closestNormal);
 }
 
 static void

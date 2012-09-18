@@ -120,7 +120,7 @@ NearestPointQueryNearest(struct NearestPointQueryContext *context, cpShape *shap
 cpShape *
 cpSpaceNearestPointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpNearestPointQueryInfo *out)
 {
-	cpNearestPointQueryInfo info = {NULL, cpvzero, maxDistance};
+	cpNearestPointQueryInfo info = {NULL, cpvzero, maxDistance, cpvzero};
 	if(out){
 		(*out) = info;
   } else {
