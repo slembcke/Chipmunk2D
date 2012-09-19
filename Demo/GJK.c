@@ -61,8 +61,8 @@ init(void)
 		cpFloat size = 100.0f;
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
-		cpBodySetPos(body, cpv(-80.0f, 0.0f));
-		cpBodySetAngle(body, M_PI_4);
+		cpBodySetPos(body, cpv(-40.0f, 0.0f));
+		cpBodySetAngle(body, 0.3);
 		
 		shape1 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
 		shape1->group = 1;
