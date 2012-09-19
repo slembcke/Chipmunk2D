@@ -25,8 +25,8 @@
 #define USE_GJK 1
 #define DRAW_GJK 0
 #define DRAW_EPA 0
-#define DRAW_CLOSEST 0
-#define DRAW_CLIP 0
+#define DRAW_CLOSEST 1
+#define DRAW_CLIP 1
 #define PRINT_LOG 0
 #define LOG_ITERATIONS 0
 
@@ -183,9 +183,9 @@ static struct Edge
 SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
 {
 	if(cpvdot(seg->tn, n) > 0.0){
-		return (struct Edge){{seg->ta, CP_HASH_PAIR(seg, 0)}, {seg->tb, CP_HASH_PAIR(seg, 1)}, seg->r, seg->n};
+		return (struct Edge){{seg->ta, CP_HASH_PAIR(seg, 0)}, {seg->tb, CP_HASH_PAIR(seg, 1)}, seg->r, seg->tn};
 	} else {
-		return (struct Edge){{seg->tb, CP_HASH_PAIR(seg, 1)}, {seg->ta, CP_HASH_PAIR(seg, 0)}, seg->r, cpvneg(seg->n)};
+		return (struct Edge){{seg->tb, CP_HASH_PAIR(seg, 1)}, {seg->ta, CP_HASH_PAIR(seg, 0)}, seg->r, cpvneg(seg->tn)};
 	}
 }
 
@@ -333,7 +333,7 @@ ContainsOrigin(const cpVect a, const cpVect b, const cpVect c)
 static struct ClosestPoints
 GJKRecurse(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction support1, GJKSupportFunction support2, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, int i)
 {
-//	cpAssertHard(i < 20, "Stuck in recursion?");
+	cpAssertHard(i < 20, "Stuck in recursion?");
 	
 	cpFloat t = ClosestT(v0.ab, v1.ab);
 	cpVect closest = cpvlerp(v0.ab, v1.ab, t);
@@ -588,40 +588,40 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 	}
 }
 
-//#if USE_GJK
-//
-//static int
-//segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *arr)
-//{
-//	struct ClosestPoints points = GJK((cpShape *)seg1, (cpShape *)seg2, (GJKSupportFunction)cpSegmentSupportPoint, (GJKSupportFunction)cpSegmentSupportPoint);
-//	
-//#if DRAW_CLOSEST
-//#if PRINT_LOG
-//	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
-//#endif
-//	
-//	ChipmunkDebugDrawPoints(6.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
-//	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
-//	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
-//#endif
-//	
-//	cpVect n = points.n;
-//	if(points.d - (seg1->r + seg2->r) <= 0.0){
-//		return ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), n, arr);
-//	} else {
-//		return 0;
-//	}
-//}
-//
-//#else 
-//
-//static int
-//segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *con)
-//{
-//	return 0;
-//}
-//
-//#endif
+#if USE_GJK
+
+static int
+segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *arr)
+{
+	struct ClosestPoints points = GJK((cpShape *)seg1, (cpShape *)seg2, (GJKSupportFunction)cpSegmentSupportPoint, (GJKSupportFunction)cpSegmentSupportPoint);
+	
+#if DRAW_CLOSEST
+#if PRINT_LOG
+	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
+#endif
+	
+	ChipmunkDebugDrawPoints(6.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
+#endif
+	
+	cpVect n = points.n;
+	if(points.d - (seg1->r + seg2->r) <= 0.0){
+		return ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), n, arr);
+	} else {
+		return 0;
+	}
+}
+
+#else 
+
+static int
+segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *con)
+{
+	return 0;
+}
+
+#endif
 
 #if USE_GJK
 
@@ -808,7 +808,7 @@ static const collisionFunc builtinCollisionFuncs[9] = {
 	NULL,
 	NULL,
 	(collisionFunc)circle2segment,
-	NULL,//(collisionFunc)segment2segment,
+	(collisionFunc)segment2segment,
 	NULL,
 	(collisionFunc)circle2poly,
 	(collisionFunc)seg2poly,
