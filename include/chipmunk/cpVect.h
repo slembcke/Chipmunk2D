@@ -151,6 +151,7 @@ static inline cpVect cpvlerp(const cpVect v1, const cpVect v2, const cpFloat t)
 /// Returns a normalized copy of v.
 static inline cpVect cpvnormalize(const cpVect v)
 {
+	// Neat trick I saw somewhere to avoid div/0.
 	return cpvmult(v, 1.0f/(cpvlength(v) + CPFLOAT_MIN));
 }
 

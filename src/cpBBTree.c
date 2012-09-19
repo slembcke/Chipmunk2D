@@ -472,7 +472,7 @@ MarkSubtree(Node *subtree, MarkContext *context)
 		MarkLeaf(subtree, context);
 	} else {
 		MarkSubtree(subtree->A, context);
-		MarkSubtree(subtree->B, context); // Force TCO here?
+		MarkSubtree(subtree->B, context); // TODO Force TCO here?
 	}
 }
 
@@ -508,9 +508,9 @@ LeafUpdate(Node *leaf, cpBBTree *tree)
 		leaf->STAMP = GetMasterTree(tree)->stamp;
 		
 		return cpTrue;
+	} else {
+		return cpFalse;
 	}
-	
-	return cpFalse;
 }
 
 static void VoidQueryFunc(void *obj1, void *obj2, void *data){}
