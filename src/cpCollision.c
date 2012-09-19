@@ -25,8 +25,8 @@
 #define USE_GJK 1
 #define DRAW_GJK 0
 #define DRAW_EPA 0
-#define DRAW_CLOSEST 1
-#define DRAW_CLIP 1
+#define DRAW_CLOSEST 0
+#define DRAW_CLIP 0
 #define PRINT_LOG 0
 #define LOG_ITERATIONS 0
 
@@ -53,11 +53,11 @@ circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpF
 
 //MARK: Support Points and Edges:
 
-//static cpVect
+//static inline int
 //cpSupportPointIndex(const cpPolyShape *poly, const cpVect n)
 //{
 //	cpFloat max = -INFINITY;
-//	cpVect point = cpvzero;
+//	int index = 0;
 //	
 //	int numVerts = poly->numVerts;
 //	cpVect *verts = poly->tVerts;
@@ -66,11 +66,11 @@ circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpF
 //		cpFloat d = cpvdot(v, n);
 //		if(d > max){
 //			max = d;
-//			point = v;
+//			index = i;
 //		}
 //	}
 //	
-//	return point;
+//	return index;
 //}
 
 static inline int
@@ -313,22 +313,22 @@ EPA(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction support1, G
 
 //MARK: GJK Functions.
 
-static cpBool
-ContainsOrigin(const cpVect a, const cpVect b, const cpVect c)
-{
-	cpVect v0 = cpvsub(a, b);
-	cpVect v1 = cpvsub(c, b);
-
-	cpFloat dot00 = cpvdot(v0, v0);
-	cpFloat dot01 = cpvdot(v0, v1);
-	cpFloat dot0v = cpvdot(v0, cpvneg(b));
-	cpFloat dot11 = cpvdot(v1, v1);
-	cpFloat dot1v = cpvdot(v1, cpvneg(b));
-
-	cpFloat det = dot00*dot11 - dot01*dot01;
-	cpVect v = cpvmult(cpv(dot11*dot0v - dot01*dot1v, dot00*dot1v - dot01*dot0v), 1.0/det);
-	return (v.x >= 0.0 && v.y >= 0.0 && v.x + v.y <= 1.0);
-}
+//static cpBool
+//ContainsOrigin(const cpVect a, const cpVect b, const cpVect c)
+//{
+//	cpVect v0 = cpvsub(a, b);
+//	cpVect v1 = cpvsub(c, b);
+//
+//	cpFloat dot00 = cpvdot(v0, v0);
+//	cpFloat dot01 = cpvdot(v0, v1);
+//	cpFloat dot0v = cpvdot(v0, cpvneg(b));
+//	cpFloat dot11 = cpvdot(v1, v1);
+//	cpFloat dot1v = cpvdot(v1, cpvneg(b));
+//
+//	cpFloat det = dot00*dot11 - dot01*dot01;
+//	cpVect v = cpvmult(cpv(dot11*dot0v - dot01*dot1v, dot00*dot1v - dot01*dot0v), 1.0/det);
+//	return (v.x >= 0.0 && v.y >= 0.0 && v.x + v.y <= 1.0);
+//}
 
 static struct ClosestPoints
 GJKRecurse(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction support1, GJKSupportFunction support2, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, int i)
@@ -344,19 +344,26 @@ GJKRecurse(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction supp
 	ChipmunkDebugDrawPoints(3.0, 1, &closest, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 1, 0, 1));
 #endif
+	
+	cpAssertSoft(cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(cpvzero, v0.ab)) >= 0.0, "Segment oriented the wrong way.");
+	cpFloat area0 = cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab));
+	cpFloat area1 = cpvcross(cpvsub(p.ab, v0.ab), cpvsub(cpvzero, v0.ab));
+	cpFloat area2 = cpvcross(cpvsub(v1.ab, p.ab), cpvsub(cpvzero, p.ab));
 
-	cpFloat dp = cpvdot(closest, p.ab);
-	cpFloat d2 = cpfmin(cpvdot(closest, v0.ab), cpvdot(closest, v1.ab));
+//	cpFloat dp = cpvdot(closest, p.ab) + 0*area0*area1*area2;
+//	cpFloat d2 = cpvlengthsq(closest);
+//	cpFloat d2 = cpfmin(cpvdot(closest, v0.ab), cpvdot(closest, v1.ab));
 //	cpFloat area = cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab));
 //	printf("dp:%f, d2:%f, area:%f\n", dp, d2, area);
-	if(dp <= 0.0 && ContainsOrigin(v0.ab, v1.ab, p.ab)){
+	if(area1 < 0.0f && area2 < 0.0f){
 #if LOG_ITERATIONS
 		ChipmunkDemoPrintString("GJK iterations: %d ", i);
 #endif
 		return EPA(shape1, shape2, support1, support2, v0, v1, p);
-//	} else if(dp < cpfmin(cpvdot(closest, v0.ab), cpvdot(closest, v1.ab))){
-	} else if(dp - d2 < -MAGIC_EPSILON){
-		if(cpvlengthsq(v0.ab) <= cpvlengthsq(v1.ab)){
+	} else if(area0 > 0.0f){
+//	} else if(dp + 1e-3 < d2){
+//	} else if(dp - d2 < -MAGIC_EPSILON){
+		if(area1 > area2){
 			return GJKRecurse(shape1, shape2, support1, support2, v0, p, i + 1);
 		} else {
 			return GJKRecurse(shape1, shape2, support1, support2, p, v1, i + 1);
@@ -432,8 +439,9 @@ GJK(const cpShape *shape1, const cpShape *shape2, GJKSupportFunction support1, G
 	cpVect axis = cpvperp(cpvsub(shape1->body->p, shape2->body->p));
 	struct MinkowskiPoint p1 = Support(shape1, shape2, support1, support2, axis);
 	struct MinkowskiPoint p2 = Support(shape1, shape2, support1, support2, cpvneg(axis));
+	cpFloat area = cpvcross(cpvsub(p2.ab, p1.ab), cpvsub(cpvzero, p1.ab));
 	
-	struct ClosestPoints points = GJKRecurse(shape1, shape2, support1, support2, p1, p2, 1);
+	struct ClosestPoints points = (area > 0.0 ? GJKRecurse(shape1, shape2, support1, support2, p1, p2, 1) : GJKRecurse(shape1, shape2, support1, support2, p2, p1, 1));
 	if(cpfabs(points.d) < MAGIC_EPSILON){
 //		printf("Possible bad normal!\n");
 		
@@ -521,11 +529,11 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *
 		return count + ClipContact(cpflerp(dibn, dian, t2), t2, ref.b, inc.a, ref.r, inc.r, ref.n, n, arr + count);
 	} else {
 		// Collide the endpoints against each other instead.
-		if(t1 + t2 != 1.0){
-			printf("Weird\n");
-			return 0;
-		}
-//		cpAssertSoft(t1 + t2 == 1.0, "These should sum to 1.0?");
+//		if(t1 + t2 != 1.0){
+//			printf("Weird\n");
+//			return 0;
+//		}
+		cpAssertSoft(t1 + t2 == 1.0, "These should sum to 1.0?");
 		
 		// TODO radii could use some tweaking here.
 		cpFloat ndot = cpvdot(ref.n, inc.n);
