@@ -130,20 +130,12 @@ cpSegmentSupportPoint(const cpSegmentShape *seg, const cpVect n)
 		return SupportPointNew(b, 1);
 	}
 }
-#endif
 
 //static cpVect
 //cpCircleSupportPoint(const cpCircleShape *circle, const cpVect n)
 //{
 //	return circle->tc;
 //}
-
-static inline cpFloat
-cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
-{
-	cpVect p = poly->tVerts[cpSupportPointIndex(poly, cpvneg(n))];
-	return cpvdot(n, p) - d;
-}
 
 typedef struct SupportPoint (*SupportFunction)(const cpShape *a, cpVect n);
 
@@ -173,9 +165,18 @@ Support(const struct SupportContext context, const cpVect n)
 	return MinkoskiPointNew(a, b);
 }
 
+#endif
+
+static inline cpFloat
+cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
+{
+	cpVect p = poly->tVerts[cpSupportPointIndex(poly, cpvneg(n))];
+	return cpvdot(n, p) - d;
+}
+
 struct EdgePoint {
 	cpVect p;
-	int hash;
+	cpHashValue hash;
 };
 
 struct Edge {
@@ -185,7 +186,7 @@ struct Edge {
 };
 
 static inline struct Edge
-EdgeNew(cpVect va, cpVect vb, int ha, int hb, cpFloat r)
+EdgeNew(cpVect va, cpVect vb, cpHashValue ha, cpHashValue hb, cpFloat r)
 {
 	struct Edge edge = {{va, ha}, {vb, hb}, r, cpvnormalize(cpvperp(cpvsub(vb, va)))};
 	return edge;
@@ -256,7 +257,7 @@ struct EPANode {
 	cpFloat t, dist;
 };
 
-static void
+static inline void
 EPANodeInit(struct EPANode *node, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
 {
 	cpFloat t = ClosestT(v0.ab, v1.ab);
@@ -270,7 +271,7 @@ EPANodeInit(struct EPANode *node, const struct MinkowskiPoint v0, const struct M
 	node->dist = cpvlength(closest);
 }
 
-static void
+static inline void
 EPANodeSplit(struct EPANode *parent, struct EPANode *left, struct EPANode *right)
 {
 	parent->left = left;
