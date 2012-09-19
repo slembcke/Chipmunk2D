@@ -41,12 +41,14 @@ update(int ticks)
 	}
 }
 
+static cpCollisionID id = 0;
+
 static void
 draw(void)
 {
 	ChipmunkDemoDefaultDrawImpl();
 	cpContact arr[CP_MAX_CONTACTS_PER_ARBITER];
-	cpCollideShapes(shape1, shape2, arr);
+	cpCollideShapes(shape1, shape2, &id, arr);
 }
 
 static cpSpace *

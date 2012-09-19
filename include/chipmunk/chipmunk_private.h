@@ -122,7 +122,7 @@ cpShapeActive(cpShape *shape)
 	return shape->prev || (shape->body && shape->body->shapeList == shape);
 }
 
-int cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr);
+int cpCollideShapes(const cpShape *a, const cpShape *b, cpCollisionID *id, cpContact *arr);
 
 // TODO doesn't really need to be inline, but need a better place to put this function
 static inline cpSplittingPlane
@@ -189,7 +189,7 @@ cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb)
 }
 
 void cpShapeUpdateFunc(cpShape *shape, void *unused);
-void cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space);
+cpCollisionID cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space);
 
 
 //MARK: Arbiters
