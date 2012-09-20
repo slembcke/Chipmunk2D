@@ -567,6 +567,7 @@ extern ChipmunkDemo Slice;
 extern ChipmunkDemo Convex;
 extern ChipmunkDemo Unicycle;
 extern ChipmunkDemo GJK;
+extern ChipmunkDemo Smooth;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -575,6 +576,7 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
+		Smooth,
 		GJK,
 		ContactPoints,
 		LogoSmash,

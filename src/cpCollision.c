@@ -22,7 +22,7 @@
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
 
-#define USE_GJK 0
+#define USE_GJK 1
 #define DRAW_GJK 0
 #define DRAW_EPA 0
 #define DRAW_CLOSEST 0
@@ -194,11 +194,11 @@ SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
 }
 
 #if USE_GJK
-static cpFloat
-ClosestT(const cpVect a, const cpVect b)
+static inline cpFloat
+ClosestT(const cpVect a, const cpVect b, const cpVect p)
 {
 	cpVect delta = cpvsub(b, a);
-	return cpfclamp01(cpvdot(delta, cpvneg(a))/cpvlengthsq(delta));
+	return cpfclamp01(cpvdot(delta, cpvsub(p, a))/cpvlengthsq(delta));
 }
 
 struct ClosestPoints {
@@ -232,7 +232,7 @@ struct EPANode {
 static void
 EPANodeInit(struct EPANode *node, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
 {
-	cpFloat t = ClosestT(v0.ab, v1.ab);
+	cpFloat t = ClosestT(v0.ab, v1.ab, cpvzero);
 	cpVect closest = cpvlerp(v0.ab, v1.ab, t);
 	
 	node->v0 = v0;
@@ -320,7 +320,7 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 //		cpAssertSoft(cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(cpvzero, v0.ab)) >= 0.0, "Segment oriented the wrong way.");
 		cpAssertSoft(i < 100, "Stuck in GJK recursion");
 		
-		cpFloat t = ClosestT(v0.ab, v1.ab);
+		cpFloat t = ClosestT(v0.ab, v1.ab, cpvzero);
 		cpVect closest = cpvlerp(v0.ab, v1.ab, t);
 		struct MinkowskiPoint p = Support(context, cpvneg(closest));
 		
@@ -330,19 +330,18 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 		ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 1, 0, 1));
 #endif
 		
-		cpFloat area_01p = cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab));
-		cpFloat area_0pO = cpvcross(cpvsub(p.ab, v0.ab), cpvsub(cpvzero, v0.ab));
-		cpFloat area_1pO = cpvcross(cpvsub(v1.ab, p.ab), cpvsub(cpvzero, p.ab));
+		cpFloat area0 = cpvcross(cpvsub(p.ab, v0.ab), cpvsub(cpvzero, v0.ab));
+		cpFloat area1 = cpvcross(cpvsub(v1.ab, p.ab), cpvsub(cpvzero, p.ab));
 
-		if(area_0pO <= 0.0f && area_1pO <= 0.0f){
+		if(area0 <= 0.0f && area1 <= 0.0f){
 			return EPA(context, v0, v1, p);
-		} else if(area_01p <= 0.0f){
+		} else if(cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab)) <= 0.0f){
 			return ClosestPointsNew(v0, v1, t, 1.0);
 		} else {
-			if(area_0pO > area_1pO){
-				v1 = p;
-			} else {
+			if(ClosestT(v0.ab, v1.ab, p.ab) < t){
 				v0 = p;
+			} else {
+				v1 = p;
 			}
 		}
 	}
@@ -502,16 +501,16 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *
 		return count + ClipContact(cpflerp(dibn, dian, t2), t2, ref.b, inc.a, ref.r, inc.r, ref.n, n, arr + count);
 	} else {
 		// Collide the endpoints against each other instead.
-		cpAssertSoft(t1 + t2 == 1.0, "These should sum to 1.0?");
+		cpAssertWarn(t1 + t2 == 1.0, "These should sum to 1.0?");
 		
 		// TODO radii could use some tweaking here.
 		cpFloat ndot = cpvdot(ref.n, inc.n);
 		if(t1 == 0){
 			struct EdgePoint refp = (ndot < 0.0f ? ref.a : ref.b);
-			return circle2circleQuery(refp.p, inc.a.p, ref.r, inc.r, CP_HASH_PAIR(refp.hash, inc.b.hash), arr);
+			return circle2circleQuery(inc.a.p, refp.p, inc.r, ref.r, CP_HASH_PAIR(refp.hash, inc.b.hash), arr);
 		} else {
 			struct EdgePoint refp = (ndot < 0.0f ? ref.b : ref.a);
-			return circle2circleQuery(refp.p, inc.b.p, ref.r, inc.r, CP_HASH_PAIR(refp.hash, inc.a.hash), arr);
+			return circle2circleQuery(inc.b.p, refp.p, inc.r, ref.r, CP_HASH_PAIR(refp.hash, inc.a.hash), arr);
 		}
 	}
 }
@@ -553,16 +552,14 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 		
 		// Reject endcap collisions if tangents are provided.
 		if(
-			(closest_t == 0.0f && cpvdot(n, segmentShape->a_tangent) < 0.0) ||
-			(closest_t == 1.0f && cpvdot(n, segmentShape->b_tangent) < 0.0)
+			(closest_t != 0.0f || cpvdot(n, cpvrotate(segmentShape->a_tangent, segmentShape->shape.body->rot)) >= 0.0) &&
+			(closest_t != 1.0f || cpvdot(n, cpvrotate(segmentShape->b_tangent, segmentShape->shape.body->rot)) >= 0.0)
 		){
-			return 0;
-		} else {
 			return 1;
 		}
-	} else {
-		return 0;
 	}
+	
+	return 0;
 }
 
 #if USE_GJK
@@ -583,7 +580,15 @@ segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContac
 #endif
 	
 	cpVect n = points.n;
-	if(points.d - (seg1->r + seg2->r) <= 0.0){
+	if(
+		points.d <= (seg1->r + seg2->r) //&&
+//		(
+//			(!cpveql(points.a, seg1->ta) || cpvdot(n, cpvrotate(seg1->a_tangent, seg1->shape.body->rot)) <= 0.0) &&
+//			(!cpveql(points.a, seg1->tb) || cpvdot(n, cpvrotate(seg1->b_tangent, seg1->shape.body->rot)) <= 0.0) &&
+//			(!cpveql(points.b, seg2->ta) || cpvdot(n, cpvrotate(seg2->a_tangent, seg2->shape.body->rot)) >= 0.0) &&
+//			(!cpveql(points.b, seg2->tb) || cpvdot(n, cpvrotate(seg2->b_tangent, seg2->shape.body->rot)) >= 0.0)
+//		)
+	){
 		return ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), n, arr);
 	} else {
 		return 0;
@@ -687,8 +692,14 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpContact *arr)
 	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
 	
-	if(points.d - seg->r <= 0.0){
-		return ContactPoints(SupportEdgeForSegment(seg, points.n), SupportEdgeForPoly(poly, cpvneg(points.n)), points.n, arr);
+	// Reject endcap collisions if tangents are provided.
+	cpVect n = points.n;
+	if(
+		points.d - seg->r <= 0.0 //&&
+//		(!cpveql(points.a, seg->ta) || cpvdot(n, cpvrotate(seg->a_tangent, seg->shape.body->rot)) >= 0.0) &&
+//		(!cpveql(points.a, seg->tb) || cpvdot(n, cpvrotate(seg->b_tangent, seg->shape.body->rot)) >= 0.0)
+	){
+		return ContactPoints(SupportEdgeForSegment(seg, n), SupportEdgeForPoly(poly, cpvneg(n)), n, arr);
 	} else {
 		return 0;
 	}
