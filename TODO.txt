@@ -1,10 +1,10 @@
 High Priority:
 	Document ChipmunkMultiGrab, update example code.
 	Add license to showcase code. (and example code)
+	Redo AngryChipmunks as Cocos2D 2.x
+	Check that SpacePatrol and CloudBomber work when Cocos2D 2.1 is released.
 	Release new Showcase app with push mode.
-	Make a Cocos2D helper pack (ChipmunkSprite, ChipmunkDebugNode, ES2 renderer)
 	Investigate getting better PhysicsEditor support.
-	Call cpBodyAssertSane from setters.
 	Reorganize Chimpnuk Pro directory structure. Too flat and confusing.
 	cpSpaceAddPostStepCallback() should return a TRUE if the callback was scheduled.
 	Bilinearly sampled image sampler function. (override the sample method to always take bilinear samples)

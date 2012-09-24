@@ -1188,9 +1188,9 @@ Post step callbacks are registered as a function and a pointer that is used as a
 
 p(expl). Function type used for @postStep()@ callbacks. @space@ is the space the callback was registered on, @obj@ is the pointer value you supplied as the key, and @data@ is a user definable pointer you can use to pass in as a context value.
 
-<pre><code>void cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *obj, void *data)</code></pre>
+<pre><code>cpBool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data);</code></pre>
 
-p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @obj@ and @data@ will be passed to your function. Only the last callback registered for any unique value of @obj@ will be recorded. You can add @postStep()@ callbacks from outside of other callback functions, but there isn't a good reason to and they won't be called until the next time @cpSpaceStep()@ is finishing.
+p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @key@ and @data@ will be passed to your function. Only the first callback registered for any unique value of @key@ will be recorded. It returns @true@ if the callback is scheduled and @false@ when the @key@ has already been used. You can add @postStep()@ callbacks from outside of other callback functions, but there isn't a good reason to and they won't be called until the next time @cpSpaceStep()@ is finishing.
 
 *Note:* Post-step callbacks are not run in any particular order. If you need to sequence a number of events, you'll need to put them in a single callback.
 
@@ -1202,7 +1202,7 @@ See the "callback examples":examples.html#CollisionCallbacks for more informatio
 
 Chipmunk's @cpArbiter@ struct encapsulates a pair of colliding shapes and all of the data about their collision. 
 
-Why are they called arbiters? The short answer is that Box2D called them that way back in 2006 when I was looking at the source for it's solver. An arbiter is like a judge, a person that has authority to settle disputes between two people. It was a fun, fitting name and was shorter to type than CollisionPair which I had been using. It was originally meant to be a private internal structure only, but evolved to be useful from callbacks.
+Why are they called arbiters? The short answer is that I kept using the word "arbitrates" to describe the way that collisions were resolved and then I saw that Box2D actually called them arbiters way back in 2006 when I was looking at its solver. An arbiter is like a judge, a person that has authority to settle disputes between two people. It was a fun, fitting name and was shorter to type than CollisionPair which I had been using. It was originally meant to be a private internal structure only, but evolved to be useful from callbacks.
 
 <%= h 2, "Memory Management:", "Memory" %>
 
@@ -1224,6 +1224,14 @@ p(expl). The calculated friction for this collision pair. Setting the value in a
 void cpArbiterSetSurfaceVelocity(cpArbiter *arb, cpVect value)</code></pre>
 
 p(expl). The calculated surface velocity for this collision pair. Setting the value in a @preSolve()@ callback will override the value calculated by the space.
+
+<pre><code>cpDataPointer cpArbiterGetUserData(const cpArbiter *arb)
+void cpArbiterSetUserData(cpArbiter *arb, cpDataPointer data)</code></pre>
+
+p(expl). A user definable pointer. The value will persist for the pair of shapes until the @separate()@ callback is called.
+
+*NOTE:* If you need to clean up this pointer, you should implement the @separate()@ callback to do it.
+
 
 <pre><code>int cpArbiterGetCount(const cpArbiter *arb)
 cpVect cpArbiterGetNormal(const cpArbiter *arb, int i)
