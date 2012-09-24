@@ -1230,7 +1230,7 @@ void cpArbiterSetUserData(cpArbiter *arb, cpDataPointer data)</code></pre>
 
 p(expl). A user definable pointer. The value will persist for the pair of shapes until the @separate()@ callback is called.
 
-*NOTE:* If you need to clean up this pointer, you should implement the @separate()@ callback to do it.
+*NOTE:* If you need to clean up this pointer, you should implement the @separate()@ callback to do it. Also be careful when destroying the space as there may be active collisions still. In order to trigger the @separate()@ callbacks, youll need to remove all the shapes from the space before disposing of it. This is something I'd suggest doing anyway. See ChipmunkDemo.c:ChipmunkDemoFreeSpaceChildren() for an example of how to do it easily.
 
 
 <pre><code>int cpArbiterGetCount(const cpArbiter *arb)
