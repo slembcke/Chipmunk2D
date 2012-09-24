@@ -6,19 +6,13 @@ High Priority:
 	Release new Showcase app with push mode.
 	Investigate getting better PhysicsEditor support.
 	Reorganize Chimpnuk Pro directory structure. Too flat and confusing.
-	cpSpaceAddPostStepCallback() should return a TRUE if the callback was scheduled.
 	Bilinearly sampled image sampler function. (override the sample method to always take bilinear samples)
 	RGB Image Sampler class.
 	User definable fast collision filtering.
-	Add a user data pointer to cpArbiters!
 	Add assertions so that you can't construct (or maybe add?) a constraint with NULL bodies.
-	http://chipmunk-physics.net/forum/posting.php?mode=reply&f=6&t=2310
-	Add Graham Perks: http://itunes.apple.com/us/app/ultrinium/id313811176?mt=8
-	Add Thomas Eichman: http://www.zoo-hero.com
 
 Tutorial ideas:
 	AG tilemap tutorial
-	ByteRacer/ChipmunkPro
 	Fishing
 	Crayon Ball clone
 
