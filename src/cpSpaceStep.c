@@ -226,7 +226,8 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpSpace *space)
 	if(sensor && handler == &cpDefaultCollisionHandler) return;
 	
 	// Shape 'a' should have the lower shape type. (required by cpCollideShapes() )
-	if(a->klass->type > b->klass->type){
+	// TODO remove me: a < b comparison is for debugging collisions
+	if(a->klass->type > b->klass->type || (a->klass->type == b->klass->type && a < b)){
 		cpShape *temp = a;
 		a = b;
 		b = temp;

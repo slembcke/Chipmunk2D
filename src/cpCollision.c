@@ -22,12 +22,14 @@
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
 
+#if DEBUG
 #define USE_GJK 1
-#define DRAW_GJK 0
+#define DRAW_GJK 1
 #define DRAW_EPA 0
-#define DRAW_CLOSEST 0
+#define DRAW_CLOSEST 1
 #define DRAW_CLIP 0
 #define PRINT_LOG 0
+#endif
 
 // Add contact points for circle to circle collisions.
 // Used by several collision tests.
