@@ -444,7 +444,8 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 	struct SupportContext context = {shape1, shape2, support1, support2};
 	
 	// TODO use centroids as the starting axis
-	cpVect axis = cpvperp(cpvsub(shape1->body->p, shape2->body->p));
+//	cpVect axis = cpvperp(cpvsub(shape1->body->p, shape2->body->p));
+	cpVect axis = cpvperp(cpvsub(cpBBCenter(shape1->bb), cpBBCenter(shape2->bb)));
 	struct MinkowskiPoint p1 = Support(context, axis);
 	struct MinkowskiPoint p2 = Support(context, cpvneg(axis));
 	
