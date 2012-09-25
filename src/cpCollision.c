@@ -25,11 +25,11 @@
 #define USE_GJK 1
 
 #if DEBUG
-#define DRAW_ALL 0
+#define DRAW_ALL 1
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
-#define DRAW_CLOSEST (0 || DRAW_ALL)
-#define DRAW_CLIP (0 || DRAW_ALL)
+#define DRAW_CLOSEST (1 || DRAW_ALL)
+#define DRAW_CLIP (1 || DRAW_ALL)
 
 #define PRINT_LOG 0
 #endif
@@ -540,7 +540,7 @@ ClipContacts(const struct Edge ref, struct Edge inc, cpVect n, cpContact *arr)
 //	cpAssertWarn(t1*t2 != 0.0, "This?");
 //	printf("t1*t2: %.2f\n", t1*t2);
 #endif
-
+	
 	ChipmunkDebugDrawSegment(ref.a.p, ref.b.p, RGBAColor(1, 0, 0, 1));
 	ChipmunkDebugDrawSegment(inc.a.p, inc.b.p, RGBAColor(0, 1, 0, 1));
 	ChipmunkDebugDrawSegment(refa, refb, RGBAColor(1, 0, 0, 1));
