@@ -25,13 +25,13 @@
 #if DEBUG
 #define USE_GJK 1
 
-#define DRAW_ALL 1
+#define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
 #define DRAW_CLOSEST (0 || DRAW_ALL)
-#define DRAW_CLIP (0 || DRAW_ALL)
+#define DRAW_CLIP (1 || DRAW_ALL)
 
-#define PRINT_LOG 1
+#define PRINT_LOG 0
 #endif
 
 // Add contact points for circle to circle collisions.
@@ -466,10 +466,34 @@ ClipContact(
 	const cpVect refn, const cpVect n, cpContact *arr
 ){
 	if(pd <= 0.0){
+//		cpFloat rsum = r1 + r2;
+//		cpFloat alpha = (rsum > 0.0f ? (rsum + pd)/rsum : 0.0f);
+//		cpVect point = (t < 1.0 ? cpvadd(p1.p, cpvmult(refn, r1*alpha)) : cpvadd(p2.p, cpvmult(refn, -r2*alpha)));
+		cpVect point = (t < 1.0 ? cpvadd(p1.p, cpvmult(refn, 0.0)) : cpvadd(p2.p, cpvmult(refn, -0.0)));
+		ChipmunkDebugDrawPoints(5.0, 1, &point, RGBAColor(1, 0, 0, 1.0));
+//		cpContactInit(arr, point, n, pd, CP_HASH_PAIR(p1.hash, p2.hash));
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+static inline int
+ClipContact2(
+	cpFloat t,
+	cpFloat d1, cpFloat d2,
+	cpVect p1, cpVect p2,
+	cpFloat r1, cpFloat r2,
+	cpVect refn, cpVect n,
+	cpContact *arr
+){
+	cpFloat pd = cpflerp(d1, d2, t);
+	if(pd < 0.0f){
+		cpVect p = cpvlerp(p1, p2, t);
 		cpFloat rsum = r1 + r2;
-		cpFloat alpha = (rsum > 0.0f ? (rsum + pd)/rsum : 0.0f);
-		cpVect point = (t < 1.0 ? cpvadd(p1.p, cpvmult(refn, r1*alpha)) : cpvadd(p2.p, cpvmult(refn, -r2*alpha)));
-		cpContactInit(arr, point, n, pd, CP_HASH_PAIR(p1.hash, p2.hash));
+		cpFloat alpha = (rsum > 0.0f ? r2*(1.0f - (rsum + pd)/rsum) : -0.5f*pd);
+//		ChipmunkDebugDrawPoints(6.0, 2, (cpVect[]){p, cpvadd(p, cpvmult(refn, -pd))}, RGBAColor(1, 0, 1, 1));
+		cpContactInit(arr, cpvadd(p, cpvmult(refn, alpha)), n, pd, 0);
 		return 1;
 	} else {
 		return 0;
@@ -477,17 +501,26 @@ ClipContact(
 }
 
 static int
-ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *arr)
+ClipContacts(const struct Edge ref, struct Edge inc, cpVect n, cpContact *arr)
 {
+//	cpVect fooi = cpvmult(ref.n, inc.r/cpvdot(inc.n, ref.n));
+	cpVect fooi = cpvmult(inc.n, inc.r);
+	cpVect inca = cpvadd(inc.a.p, fooi);
+	cpVect incb = cpvadd(inc.b.p, fooi);
+	
+	cpVect foor = cpvmult(ref.n, ref.r);
+	cpVect refa = cpvadd(ref.a.p, foor);
+	cpVect refb = cpvadd(ref.b.p, foor);
+	
 	// Cross products of all points along the reference axis.
-	cpFloat inca = cpvcross(inc.a.p, ref.n);
-	cpFloat incb = cpvcross(inc.b.p, ref.n);
-	cpFloat refa = cpvcross(ref.a.p, ref.n);
-	cpFloat refb = cpvcross(ref.b.p, ref.n);
+	cpFloat cian = cpvcross(inca, ref.n);
+	cpFloat cibn = cpvcross(incb, ref.n);
+	cpFloat cran = cpvcross(refa, ref.n);
+	cpFloat crbn = cpvcross(refb, ref.n);
 	
 	// t-value of the incident axis endpoints projected onto the reference segment.
-	cpFloat t1 = cpfclamp01((inca - refa)/(inca - incb));
-	cpFloat t2 = cpfclamp01((incb - refb)/(incb - inca));
+	cpFloat t1 = cpfclamp01((cian - cran)/(cian - cibn));
+	cpFloat t2 = cpfclamp01((cibn - crbn)/(cibn - cian));
 	
 #if DRAW_CLIP
 #if PRINT_LOG
@@ -498,9 +531,10 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *
 //	printf("t1*t2: %.2f\n", t1*t2);
 #endif
 
-	cpFloat d = -(ref.r + inc.r);
 	ChipmunkDebugDrawSegment(ref.a.p, ref.b.p, RGBAColor(1, 0, 0, 1));
-	ChipmunkDebugDrawSegment(cpvadd(inc.a.p, cpvmult(ref.n, d)), cpvadd(inc.b.p, cpvmult(ref.n, d)), RGBAColor(0, 1, 0, 1));
+	ChipmunkDebugDrawSegment(inc.a.p, inc.b.p, RGBAColor(0, 1, 0, 1));
+	ChipmunkDebugDrawSegment(refa, refb, RGBAColor(1, 0, 0, 1));
+	ChipmunkDebugDrawSegment(inca, incb, RGBAColor(0, 1, 0, 1));
 	
 	cpVect cref = cpvlerp(ref.a.p, ref.b.p, 0.5);
 	ChipmunkDebugDrawSegment(cref, cpvadd(cref, cpvmult(ref.n, 5.0)), RGBAColor(1, 0, 0, 1));
@@ -508,45 +542,47 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *
 	cpVect cinc = cpvlerp(inc.a.p, inc.b.p, 0.5);
 	ChipmunkDebugDrawSegment(cinc, cpvadd(cinc, cpvmult(inc.n, 5.0)), RGBAColor(1, 0, 0, 1));
 	
-	ChipmunkDebugDrawFatSegment(ref.a.p, ref.b.p, ref.r + inc.r, RGBAColor(1, 0, 0, 1), RGBAColor(0, 0, 0, 0));
-	ChipmunkDebugDrawSegment(inc.a.p, inc.b.p, RGBAColor(0, 1, 0, 1));
+//	ChipmunkDebugDrawFatSegment(ref.a.p, ref.b.p, ref.r + inc.r, RGBAColor(1, 0, 0, 1), RGBAColor(0, 0, 0, 0));
+//	ChipmunkDebugDrawSegment(inc.a.p, inc.b.p, RGBAColor(0, 1, 0, 1));
 	
 	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.a.p, inc.a.p}, RGBAColor(1, 1, 0, 1));
 	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.b.p, inc.b.p}, RGBAColor(0, 1, 1, 1));
 #endif
 	
-	// If both end points are clipped, one of them always be 0.0 and the other 1.0.
-	if(t1*t2 != 0){
-		cpFloat dran = cpvdot(ref.a.p, ref.n) + ref.r + inc.r;
-		cpFloat dian = cpvdot(inc.a.p, ref.n) - dran;
-		cpFloat dibn = cpvdot(inc.b.p, ref.n) - dran;
+	if(t1*t2 != 0.0f){
+		cpFloat dran = cpvdot(ref.a.p, ref.n) + ref.r;
+		cpFloat dian = cpvdot(inca, ref.n) - dran;
+		cpFloat dibn = cpvdot(incb, ref.n) - dran;
 		
-		// One or neither endpoint is clipped. Try both.
-		int count = ClipContact(cpflerp(dian, dibn, t1), t1, ref.a, inc.b, ref.r, inc.r, ref.n, n, arr);
-		return count + ClipContact(cpflerp(dibn, dian, t2), t2, ref.b, inc.a, ref.r, inc.r, ref.n, n, arr + count);
-	} else {
-		// Collide the endpoints against each other instead.
-		cpAssertWarn(t1 + t2 == 1.0, "These should sum to 1.0?");
+//		ChipmunkDemoPrintString("dran: %5.2f, dian: %5.2f, dibn: %5.2f\n", dran, cpflerp(dian, dibn, t1), cpflerp(dibn, dian, t2));
 		
-		// TODO radii could use some tweaking here.
-		cpFloat ndot = cpvdot(ref.n, inc.n);
-		if(t1 == 0){
-			struct EdgePoint refp = (ndot < 0.0f ? ref.a : ref.b);
-			return circle2circleQuery(inc.a.p, refp.p, inc.r, ref.r, CP_HASH_PAIR(refp.hash, inc.b.hash), arr);
+		if(dian < dibn){
+			return ClipContact2(t1, dian, dibn, inca, incb, ref.r, inc.r, ref.n, n, arr);
 		} else {
-			struct EdgePoint refp = (ndot < 0.0f ? ref.b : ref.a);
-			return circle2circleQuery(inc.b.p, refp.p, inc.r, ref.r, CP_HASH_PAIR(refp.hash, inc.a.hash), arr);
+			return ClipContact2(t2, dibn, dian, incb, inca, ref.r, inc.r, ref.n, n, arr);
 		}
+	} else {
+		return 0;
 	}
 }
 
 static int
-ContactPoints(const struct Edge e1, const struct Edge e2, const cpVect n, cpContact *arr)
+ContactPoints(const struct Edge e1, const struct Edge e2, struct ClosestPoints points, cpContact *arr)
 {
-	if(cpvdot(e1.n, n) > -cpvdot(e2.n, n)){
-		return ClipContacts(e1, e2, n, arr);
+	cpFloat mindist = e1.r + e2.r;
+	if(points.d < mindist){
+		cpFloat alpha = (mindist > 0.0f ? e1.r/mindist : 0.5f);
+		cpVect point = cpvlerp(points.a, points.b, alpha);
+		
+		cpContactInit(arr, point, points.n, points.d - mindist, 0);
+		
+		if(cpvdot(e1.n, points.n) > -cpvdot(e2.n, points.n)){
+			return ClipContacts(e1, e2, points.n, arr + 1) + 1;
+		} else {
+			return ClipContacts(e2, e1, points.n, arr + 1) + 1;
+		}
 	} else {
-		return ClipContacts(e2, e1, n, arr);
+		return 0;
 	}
 }
 
@@ -596,7 +632,7 @@ segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContac
 	
 #if DRAW_CLOSEST
 #if PRINT_LOG
-	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
+//	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
 #endif
 	
 	ChipmunkDebugDrawPoints(6.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
@@ -614,7 +650,7 @@ segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContac
 //			(!cpveql(points.b, seg2->tb) || cpvdot(n, cpvrotate(seg2->b_tangent, seg2->shape.body->rot)) >= 0.0)
 //		)
 	){
-		return ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), n, arr);
+		return ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), points, arr);
 	} else {
 		return 0;
 	}
@@ -639,7 +675,7 @@ poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpContact *arr)
 	
 #if DRAW_CLOSEST
 #if PRINT_LOG
-	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
+//	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
 #endif
 	
 	ChipmunkDebugDrawPoints(3.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
@@ -648,7 +684,7 @@ poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpContact *arr)
 #endif
 	
 	if(points.d <= 0.0){
-		return ContactPoints(SupportEdgeForPoly(poly1, points.n), SupportEdgeForPoly(poly2, cpvneg(points.n)), points.n, arr);
+		return ContactPoints(SupportEdgeForPoly(poly1, points.n), SupportEdgeForPoly(poly2, cpvneg(points.n)), points, arr);
 	} else {
 		return 0;
 	}
@@ -709,7 +745,7 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpContact *arr)
 	
 #if DRAW_CLOSEST
 #if PRINT_LOG
-	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
+//	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
 #endif
 	
 	ChipmunkDebugDrawPoints(3.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
@@ -724,7 +760,7 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpContact *arr)
 //		(!cpveql(points.a, seg->ta) || cpvdot(n, cpvrotate(seg->a_tangent, seg->shape.body->rot)) >= 0.0) &&
 //		(!cpveql(points.a, seg->tb) || cpvdot(n, cpvrotate(seg->b_tangent, seg->shape.body->rot)) >= 0.0)
 	){
-		return ContactPoints(SupportEdgeForSegment(seg, n), SupportEdgeForPoly(poly, cpvneg(n)), n, arr);
+		return ContactPoints(SupportEdgeForSegment(seg, n), SupportEdgeForPoly(poly, cpvneg(n)), points, arr);
 	} else {
 		return 0;
 	}
