@@ -103,9 +103,9 @@ init(void)
 		cpVect b = cpv(-75.0, 0.0);
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
-		cpBodySetPos(body, cpv(-70.0f, 0.0f));
+		cpBodySetPos(body, cpv(-170.0f, -100.0f));
 		
-		shape1 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 5.0));
+		shape1 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 0.0));
 		shape1->group = 1;
 	}
 
@@ -125,8 +125,8 @@ init(void)
 		
 		cpVect a = cpv( 50.0, 0.0);
 		cpVect b = cpv(-50.0, 0.0);
-		shape2 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 5.0));
-//		shape2 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
+//		shape2 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 5.0));
+		shape2 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 		shape2->group = 1;
 	}
 	

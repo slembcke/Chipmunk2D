@@ -29,7 +29,7 @@
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
 #define DRAW_CLOSEST (0 || DRAW_ALL)
-#define DRAW_CLIP (1 || DRAW_ALL)
+#define DRAW_CLIP (0 || DRAW_ALL)
 
 #define PRINT_LOG 0
 #endif
@@ -200,10 +200,10 @@ SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
 
 #if USE_GJK
 static inline cpFloat
-ClosestT(const cpVect a, const cpVect b, const cpVect p)
+ClosestT(const cpVect a, const cpVect b)
 {
 	cpVect delta = cpvsub(b, a);
-	return cpfclamp01(cpvdot(delta, cpvsub(p, a))/cpvlengthsq(delta));
+	return cpfclamp01(cpvdot(delta, cpvneg(a))/cpvlengthsq(delta));
 }
 
 struct ClosestPoints {
@@ -237,7 +237,7 @@ struct EPANode {
 static void
 EPANodeInit(struct EPANode *node, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
 {
-	cpFloat t = ClosestT(v0.ab, v1.ab, cpvzero);
+	cpFloat t = ClosestT(v0.ab, v1.ab);
 	cpVect closest = cpvlerp(v0.ab, v1.ab, t);
 	
 	node->v0 = v0;
@@ -301,10 +301,19 @@ EPA(const struct SupportContext context, const struct MinkowskiPoint v0, const s
 #if DRAW_EPA || DRAW_GJK
 	ChipmunkDebugDrawPolygon(3, (cpVect[]){v0.ab, v1.ab, v2.ab}, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
 #endif
-
-	struct EPANode n01; EPANodeInit(&n01, v0, v1);
-	struct EPANode n12; EPANodeInit(&n12, v1, v2);
-	struct EPANode n20; EPANodeInit(&n20, v2, v0);
+	
+	
+	struct EPANode n01, n12, n20;
+	
+	if(cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(v2.ab, v0.ab)) > 0.0){
+		EPANodeInit(&n01, v0, v1);
+		EPANodeInit(&n12, v1, v2);
+		EPANodeInit(&n20, v2, v0);
+	} else {
+		EPANodeInit(&n01, v1, v0);
+		EPANodeInit(&n12, v0, v2);
+		EPANodeInit(&n20, v2, v1);
+	}
 	
 	struct EPANode inner, root;
 	bzero(&inner, sizeof(struct EPANode));
@@ -343,7 +352,7 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 		cpAssertSoft(i < 100, "Stuck in GJK recursion");
 		
 		// Move to arg
-		cpFloat t = ClosestT(v0.ab, v1.ab, cpvzero);
+		cpFloat t = ClosestT(v0.ab, v1.ab);
 		cpVect closest = cpvlerp(v0.ab, v1.ab, t);
 		struct MinkowskiPoint p = Support(context, cpvneg(closest));
 		
@@ -353,8 +362,8 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 		ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 1, 0, 1));
 #endif
 		
-		cpFloat t0 = ClosestT(v0.ab, p.ab, cpvzero);
-		cpFloat t1 = ClosestT(p.ab, v1.ab, cpvzero);
+		cpFloat t0 = ClosestT(v0.ab, p.ab);
+		cpFloat t1 = ClosestT(p.ab, v1.ab);
 		
 		cpFloat d0 = cpvlengthsq(cpvlerp(v0.ab, p.ab, t0));
 		cpFloat d1 = cpvlengthsq(cpvlerp(p.ab, v1.ab, t1));
@@ -439,7 +448,7 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 	struct MinkowskiPoint p1 = Support(context, axis);
 	struct MinkowskiPoint p2 = Support(context, cpvneg(axis));
 	
-	cpFloat t = ClosestT(p1.ab, p2.ab, cpvzero);
+	cpFloat t = ClosestT(p1.ab, p2.ab);
 	struct ClosestPoints points = GJKRecurse(context, p1, p2, t, cpvlengthsq(cpvlerp(p1.ab, p2.ab, t)));
 	
 	if(cpfabs(points.d) < MAGIC_EPSILON){
