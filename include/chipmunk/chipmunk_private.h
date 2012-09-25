@@ -203,11 +203,9 @@ struct cpContact {
 
 	cpFloat jnAcc, jtAcc, jBias;
 	cpFloat bias;
-	
-	cpHashValue hash;
 };
 
-cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash);
+cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist);
 cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
 
 static inline void
