@@ -22,9 +22,9 @@
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
 
-#if DEBUG
 #define USE_GJK 1
 
+#if DEBUG
 #define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
