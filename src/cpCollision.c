@@ -47,7 +47,7 @@ circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpF
 	if(distsq < mindist*mindist){
 		cpFloat dist = cpfsqrt(distsq);
 		cpVect n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
-		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist, hash);
+		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist);
 		
 		return 1;
 	} else {
@@ -269,7 +269,7 @@ EPANodeSplit(struct EPANode *parent, struct EPANode *left, struct EPANode *right
 static struct ClosestPoints
 EPARecurse(const struct SupportContext context, struct EPANode *root, int i)
 {
-	cpAssertHard(i < 20, "Stuck in recursion?");
+	cpAssertHard(i < 100, "Stuck in recursion?");
 	
 	struct EPANode *best = root->best;
 	cpVect closest = best->closest;
@@ -497,12 +497,12 @@ ClipContact2(
 	cpContact *arr
 ){
 	cpFloat pd = cpflerp(d1, d2, t);
-	if(pd < 0.0f){
+	if(pd <= 0.0f){
 		cpVect p = cpvlerp(p1, p2, t);
 		cpFloat rsum = r1 + r2;
 		cpFloat alpha = (rsum > 0.0f ? r2*(1.0f - (rsum + pd)/rsum) : -0.5f*pd);
 //		ChipmunkDebugDrawPoints(6.0, 2, (cpVect[]){p, cpvadd(p, cpvmult(refn, -pd))}, RGBAColor(1, 0, 1, 1));
-		cpContactInit(arr, cpvadd(p, cpvmult(refn, alpha)), n, pd, 0);
+		cpContactInit(arr, cpvadd(p, cpvmult(refn, alpha)), n, pd);
 		return 1;
 	} else {
 		return 0;
@@ -579,11 +579,11 @@ static int
 ContactPoints(const struct Edge e1, const struct Edge e2, struct ClosestPoints points, cpContact *arr)
 {
 	cpFloat mindist = e1.r + e2.r;
-	if(points.d < mindist){
+	if(points.d <= mindist){
 		cpFloat alpha = (mindist > 0.0f ? e1.r/mindist : 0.5f);
 		cpVect point = cpvlerp(points.a, points.b, alpha);
 		
-		cpContactInit(arr, point, points.n, points.d - mindist, 0);
+		cpContactInit(arr, point, points.n, points.d - mindist);
 		
 		if(cpvdot(e1.n, points.n) > -cpvdot(e2.n, points.n)){
 			return ClipContacts(e1, e2, points.n, arr + 1) + 1;
@@ -847,13 +847,8 @@ circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpContact *con
 	if(dt < dtb){
 		return circle2circleQuery(circle->tc, b, circle->r, 0.0f, 0, con);
 	} else if(dt < dta) {
-		cpContactInit(
-			con,
-			cpvsub(circle->tc, cpvmult(n, circle->r + min/2.0f)),
-			cpvneg(n),
-			min,
-			0				 
-		);
+		cpVect point = cpvsub(circle->tc, cpvmult(n, circle->r + min/2.0f));
+		cpContactInit(con, point, cpvneg(n), min);
 	
 		return 1;
 	} else {
