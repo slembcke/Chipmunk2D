@@ -24,11 +24,14 @@
 
 #if DEBUG
 #define USE_GJK 1
-#define DRAW_GJK 1
-#define DRAW_EPA 0
-#define DRAW_CLOSEST 1
-#define DRAW_CLIP 0
-#define PRINT_LOG 0
+
+#define DRAW_ALL 1
+#define DRAW_GJK (0 || DRAW_ALL)
+#define DRAW_EPA (0 || DRAW_ALL)
+#define DRAW_CLOSEST (0 || DRAW_ALL)
+#define DRAW_CLIP (0 || DRAW_ALL)
+
+#define PRINT_LOG 1
 #endif
 
 // Add contact points for circle to circle collisions.
@@ -315,13 +318,31 @@ EPA(const struct SupportContext context, const struct MinkowskiPoint v0, const s
 
 //MARK: GJK Functions.
 
+static cpBool
+ContainsOrigin(const cpVect a, const cpVect b, const cpVect c)
+{
+	cpVect v0 = cpvsub(a, b);
+	cpVect v1 = cpvsub(c, b);
+
+	cpFloat dot00 = cpvdot(v0, v0);
+	cpFloat dot01 = cpvdot(v0, v1);
+	cpFloat dot0v = cpvdot(v0, cpvneg(b));
+	cpFloat dot11 = cpvdot(v1, v1);
+	cpFloat dot1v = cpvdot(v1, cpvneg(b));
+
+	cpFloat det = dot00*dot11 - dot01*dot01;
+	cpVect v = cpvmult(cpv(dot11*dot0v - dot01*dot1v, dot00*dot1v - dot01*dot0v), 1.0/det);
+	return (v.x >= 0.0 && v.y >= 0.0 && v.x + v.y <= 1.0);
+}
+
 static inline struct ClosestPoints
-GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct MinkowskiPoint v1)
+GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct MinkowskiPoint v1, cpFloat t, cpFloat d)
 {
 	for(int i=1;; i++){
 //		cpAssertSoft(cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(cpvzero, v0.ab)) >= 0.0, "Segment oriented the wrong way.");
 		cpAssertSoft(i < 100, "Stuck in GJK recursion");
 		
+		// Move to arg
 		cpFloat t = ClosestT(v0.ab, v1.ab, cpvzero);
 		cpVect closest = cpvlerp(v0.ab, v1.ab, t);
 		struct MinkowskiPoint p = Support(context, cpvneg(closest));
@@ -332,18 +353,21 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 		ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 1, 0, 1));
 #endif
 		
-		cpFloat area0 = cpvcross(cpvsub(p.ab, v0.ab), cpvsub(cpvzero, v0.ab));
-		cpFloat area1 = cpvcross(cpvsub(v1.ab, p.ab), cpvsub(cpvzero, p.ab));
+		cpFloat t0 = ClosestT(v0.ab, p.ab, cpvzero);
+		cpFloat t1 = ClosestT(p.ab, v1.ab, cpvzero);
+		
+		cpFloat d0 = cpvlengthsq(cpvlerp(v0.ab, p.ab, t0));
+		cpFloat d1 = cpvlengthsq(cpvlerp(p.ab, v1.ab, t1));
 
-		if(area0 <= 0.0f && area1 <= 0.0f){
+		if(ContainsOrigin(v0.ab, v1.ab, p.ab)){
 			return EPA(context, v0, v1, p);
-		} else if(cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab)) <= 0.0f){
+		} else if(d <= cpfmin(d0, d1)){
 			return ClosestPointsNew(v0, v1, t, 1.0);
 		} else {
-			if(ClosestT(v0.ab, v1.ab, p.ab) < t){
-				v0 = p;
+			if(d0 < d1){
+				v1 = p; t = t0; d = d0;
 			} else {
-				v1 = p;
+				v0 = p; t = t1; d = d1;
 			}
 		}
 	}
@@ -415,9 +439,8 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 	struct MinkowskiPoint p1 = Support(context, axis);
 	struct MinkowskiPoint p2 = Support(context, cpvneg(axis));
 	
-	// GJKRecurse requires a specific winding.
-	cpFloat area = cpvcross(cpvsub(p2.ab, p1.ab), cpvsub(cpvzero, p1.ab));
-	struct ClosestPoints points = (area > 0.0 ? GJKRecurse(context, p1, p2) : GJKRecurse(context, p2, p1));
+	cpFloat t = ClosestT(p1.ab, p2.ab, cpvzero);
+	struct ClosestPoints points = GJKRecurse(context, p1, p2, t, cpvlengthsq(cpvlerp(p1.ab, p2.ab, t)));
 	
 	if(cpfabs(points.d) < MAGIC_EPSILON){
 		// If the closest points are very close together, might need to estimate the normal.
@@ -457,18 +480,14 @@ static int
 ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *arr)
 {
 	// Cross products of all points along the reference axis.
-	cpFloat cian = cpvcross(inc.a.p, ref.n);
-	cpFloat cibn = cpvcross(inc.b.p, ref.n);
-	cpFloat cran = cpvcross(ref.a.p, ref.n);
-	cpFloat crbn = cpvcross(ref.b.p, ref.n);
-	
-	cpFloat dran = cpvdot(ref.a.p, ref.n) + ref.r + inc.r;
-	cpFloat dian = cpvdot(inc.a.p, ref.n) - dran;
-	cpFloat dibn = cpvdot(inc.b.p, ref.n) - dran;
+	cpFloat inca = cpvcross(inc.a.p, ref.n);
+	cpFloat incb = cpvcross(inc.b.p, ref.n);
+	cpFloat refa = cpvcross(ref.a.p, ref.n);
+	cpFloat refb = cpvcross(ref.b.p, ref.n);
 	
 	// t-value of the incident axis endpoints projected onto the reference segment.
-	cpFloat t1 = cpfclamp01((cian - cran)/(cian - cibn));
-	cpFloat t2 = cpfclamp01((cibn - crbn)/(cibn - cian));
+	cpFloat t1 = cpfclamp01((inca - refa)/(inca - incb));
+	cpFloat t2 = cpfclamp01((incb - refb)/(incb - inca));
 	
 #if DRAW_CLIP
 #if PRINT_LOG
@@ -498,6 +517,10 @@ ClipContacts(const struct Edge ref, const struct Edge inc, cpVect n, cpContact *
 	
 	// If both end points are clipped, one of them always be 0.0 and the other 1.0.
 	if(t1*t2 != 0){
+		cpFloat dran = cpvdot(ref.a.p, ref.n) + ref.r + inc.r;
+		cpFloat dian = cpvdot(inc.a.p, ref.n) - dran;
+		cpFloat dibn = cpvdot(inc.b.p, ref.n) - dran;
+		
 		// One or neither endpoint is clipped. Try both.
 		int count = ClipContact(cpflerp(dian, dibn, t1), t1, ref.a, inc.b, ref.r, inc.r, ref.n, n, arr);
 		return count + ClipContact(cpflerp(dibn, dian, t2), t2, ref.b, inc.a, ref.r, inc.r, ref.n, n, arr + count);
