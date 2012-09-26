@@ -565,6 +565,7 @@ extern ChipmunkDemo ContactGraph;
 extern ChipmunkDemo Slice;
 extern ChipmunkDemo Convex;
 extern ChipmunkDemo Unicycle;
+extern ChipmunkDemo Sticky;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -595,6 +596,7 @@ main(int argc, const char **argv)
 		Slice,
 		Convex,
 		Unicycle,
+		Sticky,
 	};
 	
 	demos = demo_list;

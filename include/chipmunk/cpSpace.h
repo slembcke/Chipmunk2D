@@ -202,7 +202,7 @@ cpBool cpSpaceContainsBody(cpSpace *space, cpBody *body);
 cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint);
 
 /// Post Step callback function type.
-typedef void (*cpPostStepFunc)(cpSpace *space, void *obj, void *data);
+typedef void (*cpPostStepFunc)(cpSpace *space, void *key, void *data);
 /// Schedule a post-step callback to be called when cpSpaceStep() finishes.
 /// You can only register one callback per unique value for @c key.
 /// Returns true only if @c key has never been scheduled before.
