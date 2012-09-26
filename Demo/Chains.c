@@ -22,8 +22,6 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 #define CHAIN_COUNT 8
 #define LINK_COUNT 10
 
@@ -50,7 +48,7 @@ BreakableJointPostSolve(cpConstraint *joint, cpSpace *space)
 }
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 3;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -63,7 +61,7 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -100));
 	cpSpaceSetSleepTimeThreshold(space, 0.5f);
@@ -140,7 +138,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

@@ -24,8 +24,6 @@
 
 #include "constraints/util.h"
 
-static cpSpace *space;
-
 static cpBody *balance_body;
 static cpFloat balance_sin = 0.0;
 //static cpFloat last_v = 0.0;
@@ -65,7 +63,7 @@ static void motor_preSolve(cpConstraint *motor, cpSpace *space)
 
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -80,7 +78,7 @@ init(void)
 {
 	ChipmunkDemoMessageString = "This unicycle is completely driven and balanced by a single cpSimpleMotor.\nMove the mouse to make the unicycle follow it.";
 	
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -500));
 	
@@ -166,7 +164,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

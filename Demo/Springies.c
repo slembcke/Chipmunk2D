@@ -24,8 +24,6 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 static cpFloat
 springForce(cpConstraint *spring, cpFloat dist)
 {
@@ -43,7 +41,7 @@ new_spring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLengt
 }
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -54,7 +52,7 @@ update(int ticks)
 }
 
 static cpBody *
-add_bar(cpVect a, cpVect b, int group)
+add_bar(cpSpace *space, cpVect a, cpVect b, int group)
 {
 	cpVect center = cpvmult(cpvadd(a, b), 1.0f/2.0f);
 	cpFloat length = cpvlength(cpvsub(b, a));
@@ -72,23 +70,23 @@ add_bar(cpVect a, cpVect b, int group)
 static cpSpace *
 init(void)
 {
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpBody *staticBody = cpSpaceGetStaticBody(space);
 	
-	cpBody *body1  = add_bar(cpv(-240,  160), cpv(-160,   80), 1);
-	cpBody *body2  = add_bar(cpv(-160,   80), cpv( -80,  160), 1);
-	cpBody *body3  = add_bar(cpv(   0,  160), cpv(  80,    0), 0);
-	cpBody *body4  = add_bar(cpv( 160,  160), cpv( 240,  160), 0);
-	cpBody *body5  = add_bar(cpv(-240,    0), cpv(-160,  -80), 2);
-	cpBody *body6  = add_bar(cpv(-160,  -80), cpv( -80,    0), 2);
-	cpBody *body7  = add_bar(cpv( -80,    0), cpv(   0,    0), 2);
-	cpBody *body8  = add_bar(cpv(   0,  -80), cpv(  80,  -80), 0);
-	cpBody *body9  = add_bar(cpv( 240,   80), cpv( 160,    0), 3);
-	cpBody *body10 = add_bar(cpv( 160,    0), cpv( 240,  -80), 3);
-	cpBody *body11 = add_bar(cpv(-240,  -80), cpv(-160, -160), 4);
-	cpBody *body12 = add_bar(cpv(-160, -160), cpv( -80, -160), 0);
-	cpBody *body13 = add_bar(cpv(   0, -160), cpv(  80, -160), 0);
-	cpBody *body14 = add_bar(cpv( 160, -160), cpv( 240, -160), 0);
+	cpBody *body1  = add_bar(space, cpv(-240,  160), cpv(-160,   80), 1);
+	cpBody *body2  = add_bar(space, cpv(-160,   80), cpv( -80,  160), 1);
+	cpBody *body3  = add_bar(space, cpv(   0,  160), cpv(  80,    0), 0);
+	cpBody *body4  = add_bar(space, cpv( 160,  160), cpv( 240,  160), 0);
+	cpBody *body5  = add_bar(space, cpv(-240,    0), cpv(-160,  -80), 2);
+	cpBody *body6  = add_bar(space, cpv(-160,  -80), cpv( -80,    0), 2);
+	cpBody *body7  = add_bar(space, cpv( -80,    0), cpv(   0,    0), 2);
+	cpBody *body8  = add_bar(space, cpv(   0,  -80), cpv(  80,  -80), 0);
+	cpBody *body9  = add_bar(space, cpv( 240,   80), cpv( 160,    0), 3);
+	cpBody *body10 = add_bar(space, cpv( 160,    0), cpv( 240,  -80), 3);
+	cpBody *body11 = add_bar(space, cpv(-240,  -80), cpv(-160, -160), 4);
+	cpBody *body12 = add_bar(space, cpv(-160, -160), cpv( -80, -160), 0);
+	cpBody *body13 = add_bar(space, cpv(   0, -160), cpv(  80, -160), 0);
+	cpBody *body14 = add_bar(space, cpv( 160, -160), cpv( 240, -160), 0);
 	
 	cpSpaceAddConstraint(space, cpPivotJointNew2( body1,  body2, cpv( 40,-40), cpv(-40,-40)));
 	cpSpaceAddConstraint(space, cpPivotJointNew2( body5,  body6, cpv( 40,-40), cpv(-40,-40)));
@@ -153,7 +151,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

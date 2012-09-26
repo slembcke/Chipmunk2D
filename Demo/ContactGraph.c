@@ -22,8 +22,6 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 // static body that we will be making into a scale
 static cpBody *scaleStaticBody;
 static cpBody *ballBody;
@@ -70,7 +68,7 @@ BallIterator(cpBody *body, cpArbiter *arb, int *count)
 
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -137,7 +135,7 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -300));
 	cpSpaceSetCollisionSlop(space, 0.5);
@@ -195,7 +193,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

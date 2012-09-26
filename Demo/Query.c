@@ -22,12 +22,10 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 static cpVect QUERY_START = {0,0};
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	if(ChipmunkDemoRightClick){
 		QUERY_START = ChipmunkDemoMouse;
@@ -42,9 +40,9 @@ update(int ticks)
 }
 
 static void
-draw(void)
+draw(cpSpace *space)
 {
-	ChipmunkDemoDefaultDrawImpl();
+	ChipmunkDemoDefaultDrawImpl(space);
 	
 	cpVect start = QUERY_START;
 	cpVect end = ChipmunkDemoMouse;
@@ -88,7 +86,7 @@ init(void)
 {
 	QUERY_START = cpvzero;
 	
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 5);
 	
 	{ // add a fat segment
@@ -136,7 +134,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

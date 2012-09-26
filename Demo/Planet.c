@@ -22,13 +22,12 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
 static cpBody *planetBody;
 
 static cpFloat gravityStrength = 5.0e6f;
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -66,7 +65,7 @@ rand_pos(cpFloat radius)
 }
 
 static void
-add_box()
+add_box(cpSpace *space)
 {
 	const cpFloat size = 10.0f;
 	const cpFloat mass = 1.0f;
@@ -108,11 +107,11 @@ init(void)
 	planetBody = cpBodyNew(INFINITY, INFINITY);
 	cpBodySetAngVel(planetBody, 0.2f);
 	
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 20);
 	
 	for(int i=0; i<30; i++)
-		add_box();
+		add_box(space);
 	
 	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(planetBody, 70.0f, cpvzero));
 	cpShapeSetElasticity(shape, 1.0f);
@@ -123,7 +122,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpBodyFree(planetBody);

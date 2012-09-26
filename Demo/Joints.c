@@ -22,10 +22,8 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 static cpBody *
-addBall(cpVect pos, cpVect boxOffset)
+addBall(cpSpace *space, cpVect pos, cpVect boxOffset)
 {
 	cpFloat radius = 15.0f;
 	cpFloat mass = 1.0f;
@@ -40,7 +38,7 @@ addBall(cpVect pos, cpVect boxOffset)
 }
 
 static cpBody *
-addLever(cpVect pos, cpVect boxOffset)
+addLever(cpSpace *space, cpVect pos, cpVect boxOffset)
 {
 	cpFloat mass = 1.0f;
 	cpVect a = cpv(0,  15);
@@ -57,7 +55,7 @@ addLever(cpVect pos, cpVect boxOffset)
 }
 
 static cpBody *
-addBar(cpVect pos, cpVect boxOffset)
+addBar(cpSpace *space, cpVect pos, cpVect boxOffset)
 {
 	cpFloat mass = 2.0f;
 	cpVect a = cpv(0,  30);
@@ -74,7 +72,7 @@ addBar(cpVect pos, cpVect boxOffset)
 }
 
 static cpBody *
-addWheel(cpVect pos, cpVect boxOffset)
+addWheel(cpSpace *space, cpVect pos, cpVect boxOffset)
 {
 	cpFloat radius = 15.0f;
 	cpFloat mass = 1.0f;
@@ -90,7 +88,7 @@ addWheel(cpVect pos, cpVect boxOffset)
 }
 
 static cpBody *
-addChassis(cpVect pos, cpVect boxOffset)
+addChassis(cpSpace *space, cpVect pos, cpVect boxOffset)
 {
 	cpFloat mass = 5.0f;
 	cpFloat width = 80;
@@ -110,7 +108,7 @@ addChassis(cpVect pos, cpVect boxOffset)
 static cpSpace *
 init(void)
 {
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 10);
 	cpSpaceSetGravity(space, cpv(0, -100));
 	cpSpaceSetSleepTimeThreshold(space, 0.5f);
@@ -181,41 +179,41 @@ init(void)
 	// Pin Joints - Link shapes with a solid bar or pin.
 	// Keeps the anchor points the same distance apart from when the joint was created.
 	boxOffset = cpv(-320, -240);
-	body1 = addBall(posA, boxOffset);
-	body2 = addBall(posB, boxOffset);
+	body1 = addBall(space, posA, boxOffset);
+	body2 = addBall(space, posB, boxOffset);
 	cpSpaceAddConstraint(space, cpPinJointNew(body1, body2, cpv(15,0), cpv(-15,0)));
 	
 	// Slide Joints - Like pin joints but with a min/max distance.
 	// Can be used for a cheap approximation of a rope.
 	boxOffset = cpv(-160, -240);
-	body1 = addBall(posA, boxOffset);
-	body2 = addBall(posB, boxOffset);
+	body1 = addBall(space, posA, boxOffset);
+	body2 = addBall(space, posB, boxOffset);
 	cpSpaceAddConstraint(space, cpSlideJointNew(body1, body2, cpv(15,0), cpv(-15,0), 20.0f, 40.0f));
 	
 	// Pivot Joints - Holds the two anchor points together. Like a swivel.
 	boxOffset = cpv(0, -240);
-	body1 = addBall(posA, boxOffset);
-	body2 = addBall(posB, boxOffset);
+	body1 = addBall(space, posA, boxOffset);
+	body2 = addBall(space, posB, boxOffset);
 	cpSpaceAddConstraint(space, cpPivotJointNew(body1, body2, cpvadd(boxOffset, cpv(80,60))));
 	// cpPivotJointNew() takes it's anchor parameter in world coordinates. The anchors are calculated from that
 	// cpPivotJointNew2() lets you specify the two anchor points explicitly
 	
 	// Groove Joints - Like a pivot joint, but one of the anchors is a line segment that the pivot can slide in
 	boxOffset = cpv(160, -240);
-	body1 = addBall(posA, boxOffset);
-	body2 = addBall(posB, boxOffset);
+	body1 = addBall(space, posA, boxOffset);
+	body2 = addBall(space, posB, boxOffset);
 	cpSpaceAddConstraint(space, cpGrooveJointNew(body1, body2, cpv(30,30), cpv(30,-30), cpv(-30,0)));
 	
 	// Damped Springs
 	boxOffset = cpv(-320, -120);
-	body1 = addBall(posA, boxOffset);
-	body2 = addBall(posB, boxOffset);
+	body1 = addBall(space, posA, boxOffset);
+	body2 = addBall(space, posB, boxOffset);
 	cpSpaceAddConstraint(space, cpDampedSpringNew(body1, body2, cpv(15,0), cpv(-15,0), 20.0f, 5.0f, 0.3f));
 	
 	// Damped Rotary Springs
 	boxOffset = cpv(-160, -120);
-	body1 = addBar(posA, boxOffset);
-	body2 = addBar(posB, boxOffset);
+	body1 = addBar(space, posA, boxOffset);
+	body2 = addBar(space, posB, boxOffset);
 	// Add some pin joints to hold the circles in place.
 	cpSpaceAddConstraint(space, cpPivotJointNew(body1, staticBody, POS_A));
 	cpSpaceAddConstraint(space, cpPivotJointNew(body2, staticBody, POS_B));
@@ -223,8 +221,8 @@ init(void)
 	
 	// Rotary Limit Joint
 	boxOffset = cpv(0, -120);
-	body1 = addLever(posA, boxOffset);
-	body2 = addLever(posB, boxOffset);
+	body1 = addLever(space, posA, boxOffset);
+	body2 = addLever(space, posB, boxOffset);
 	// Add some pin joints to hold the circles in place.
 	cpSpaceAddConstraint(space, cpPivotJointNew(body1, staticBody, POS_A));
 	cpSpaceAddConstraint(space, cpPivotJointNew(body2, staticBody, POS_B));
@@ -233,8 +231,8 @@ init(void)
 	
 	// Ratchet Joint - A rotary ratchet, like a socket wrench
 	boxOffset = cpv(160, -120);
-	body1 = addLever(posA, boxOffset);
-	body2 = addLever(posB, boxOffset);
+	body1 = addLever(space, posA, boxOffset);
+	body2 = addLever(space, posB, boxOffset);
 	// Add some pin joints to hold the circles in place.
 	cpSpaceAddConstraint(space, cpPivotJointNew(body1, staticBody, POS_A));
 	cpSpaceAddConstraint(space, cpPivotJointNew(body2, staticBody, POS_B));
@@ -243,8 +241,8 @@ init(void)
 	
 	// Gear Joint - Maintain a specific angular velocity ratio
 	boxOffset = cpv(-320, 0);
-	body1 = addBar(posA, boxOffset);
-	body2 = addBar(posB, boxOffset);
+	body1 = addBar(space, posA, boxOffset);
+	body2 = addBar(space, posB, boxOffset);
 	// Add some pin joints to hold the circles in place.
 	cpSpaceAddConstraint(space, cpPivotJointNew(body1, staticBody, POS_A));
 	cpSpaceAddConstraint(space, cpPivotJointNew(body2, staticBody, POS_B));
@@ -253,8 +251,8 @@ init(void)
 	
 	// Simple Motor - Maintain a specific angular relative velocity
 	boxOffset = cpv(-160, 0);
-	body1 = addBar(posA, boxOffset);
-	body2 = addBar(posB, boxOffset);
+	body1 = addBar(space, posA, boxOffset);
+	body2 = addBar(space, posB, boxOffset);
 	// Add some pin joints to hold the circles in place.
 	cpSpaceAddConstraint(space, cpPivotJointNew(body1, staticBody, POS_A));
 	cpSpaceAddConstraint(space, cpPivotJointNew(body2, staticBody, POS_B));
@@ -263,9 +261,9 @@ init(void)
 	
 	// Make a car with some nice soft suspension
 	boxOffset = cpv(0, 0);
-	cpBody *wheel1 = addWheel(posA, boxOffset);
-	cpBody *wheel2 = addWheel(posB, boxOffset);
-	cpBody *chassis = addChassis(cpv(80, 100), boxOffset);
+	cpBody *wheel1 = addWheel(space, posA, boxOffset);
+	cpBody *wheel2 = addWheel(space, posB, boxOffset);
+	cpBody *chassis = addChassis(space, cpv(80, 100), boxOffset);
 	
 	cpSpaceAddConstraint(space, cpGrooveJointNew(chassis, wheel1, cpv(-30, -10), cpv(-30, -40), cpvzero));
 	cpSpaceAddConstraint(space, cpGrooveJointNew(chassis, wheel2, cpv( 30, -10), cpv( 30, -40), cpvzero));
@@ -277,13 +275,13 @@ init(void)
 }
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	cpSpaceStep(space, 1.0f/60.0f);
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

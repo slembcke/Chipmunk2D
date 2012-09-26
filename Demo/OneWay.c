@@ -22,8 +22,6 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 typedef struct OneWayPlatform {
 	cpVect n; // direction objects may pass through
 } OneWayPlatform;
@@ -45,7 +43,7 @@ preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 }
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -60,7 +58,7 @@ init(void)
 {
 	ChipmunkDemoMessageString = "One way platforms are trivial in Chipmunk using a very simple collision callback.";
 	
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 10);
 	cpSpaceSetGravity(space, cpv(0, -100));
 
@@ -112,7 +110,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

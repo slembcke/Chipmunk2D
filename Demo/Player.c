@@ -35,8 +35,6 @@
 #define FALL_VELOCITY 900.0
 #define GRAVITY 2000.0
 
-static cpSpace *space;
-
 static cpBody *playerBody = NULL;
 static cpShape *playerShape = NULL;
 
@@ -88,7 +86,7 @@ playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 }
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int jumpState = (ChipmunkDemoKeyboard.y > 0.0f);
 	
@@ -115,7 +113,7 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	space->iterations = 10;
 	space->gravity = cpv(0, -GRAVITY);
 //	space->sleepTimeThreshold = 1000;
@@ -168,7 +166,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

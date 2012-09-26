@@ -26,11 +26,10 @@
 
 #define DENSITY (1.0/10000.0)
 
-static cpSpace *space;
 static cpShape *shape;
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	cpFloat tolerance = 2.0;
 	
@@ -78,7 +77,7 @@ init(void)
 {
 	ChipmunkDemoMessageString = "Right click and drag to change the blocks's shape.";
 	
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -500));
 	cpSpaceSetSleepTimeThreshold(space, 0.5f);
@@ -106,7 +105,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

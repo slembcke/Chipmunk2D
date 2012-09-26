@@ -26,8 +26,6 @@
 
 #define DENSITY (1.0/10000.0)
 
-static cpSpace *space;
-
 static void
 ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 {
@@ -108,12 +106,12 @@ SliceQuery(cpShape *shape, cpFloat t, cpVect n, struct SliceContext *context)
 	if(!cpShapePointQuery(shape, a) && !cpShapePointQuery(shape, b)){
 		// Can't modify the space during a query.
 		// Must make a post-step callback to do the actual slicing.
-		cpSpaceAddPostStepCallback(space, (cpPostStepFunc)SliceShapePostStep, shape, context);
+		cpSpaceAddPostStepCallback(context->space, (cpPostStepFunc)SliceShapePostStep, shape, context);
 	}
 }
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -150,7 +148,7 @@ init(void)
 {
 	ChipmunkDemoMessageString = "Right click and drag to slice up the block.";
 	
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -500));
 	cpSpaceSetSleepTimeThreshold(space, 0.5f);
@@ -179,7 +177,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

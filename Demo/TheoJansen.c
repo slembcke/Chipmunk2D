@@ -28,12 +28,10 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 static cpConstraint *motor;
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	cpFloat coef = (2.0f + ChipmunkDemoKeyboard.y)/3.0f;
 	cpFloat rate = ChipmunkDemoKeyboard.x*10.0f*coef;
@@ -51,7 +49,7 @@ update(int ticks)
 static cpFloat seg_radius = 3.0f;
 
 static void
-make_leg(cpFloat side, cpFloat offset, cpBody *chassis, cpBody *crank, cpVect anchor)
+make_leg(cpSpace *space, cpFloat side, cpFloat offset, cpBody *chassis, cpBody *crank, cpVect anchor)
 {
 	cpVect a, b;
 	cpShape *shape;
@@ -98,7 +96,7 @@ init(void)
 {
 	ChipmunkDemoMessageString = "Use the arrow keys to control the machine.";
 	
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 20);
 	cpSpaceSetGravity(space, cpv(0,-500));
 	
@@ -146,8 +144,8 @@ init(void)
 	
 	int num_legs = 2;
 	for(int i=0; i<num_legs; i++){
-		make_leg(side,  offset, chassis, crank, cpvmult(cpvforangle((cpFloat)(2*i+0)/(cpFloat)num_legs*M_PI), crank_radius));
-		make_leg(side, -offset, chassis, crank, cpvmult(cpvforangle((cpFloat)(2*i+1)/(cpFloat)num_legs*M_PI), crank_radius));
+		make_leg(space, side,  offset, chassis, crank, cpvmult(cpvforangle((cpFloat)(2*i+0)/(cpFloat)num_legs*M_PI), crank_radius));
+		make_leg(space, side, -offset, chassis, crank, cpvmult(cpvforangle((cpFloat)(2*i+1)/(cpFloat)num_legs*M_PI), crank_radius));
 	}
 	
 	motor = cpSpaceAddConstraint(space, cpSimpleMotorNew(chassis, crank, 6.0f));
@@ -156,7 +154,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

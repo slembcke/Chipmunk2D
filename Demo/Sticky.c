@@ -22,8 +22,6 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 enum {
 	COLLIDE_STICK_SENSOR = 1,
 };
@@ -42,6 +40,10 @@ PostStepAddJoint(cpSpace *space, void *key, void *data)
 static cpBool
 StickyPreSolve(cpArbiter *arb, cpSpace *space, void *data)
 {
+	// All the sticky surfaces are covered by sensor shapes.
+	// The sensor shapes give everything a little thicknes 
+	
+	// If sensor pairs don't already
 	if(!cpArbiterGetUserData(arb) && cpArbiterGetDepth(arb, 0) <= -2.0f*STICK_SENSOR_THICKNESS){
 		CP_ARBITER_GET_BODIES(arb, bodyA, bodyB);
 		cpVect point = cpArbiterGetPoint(arb, 0);
@@ -93,7 +95,7 @@ StickySeparate(cpArbiter *arb, cpSpace *space, void *data)
 }
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -108,7 +110,7 @@ init(void)
 {
 	ChipmunkDemoMessageString = "Sticky collisions using the cpArbiter data pointer.";
 	
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 10);
 	cpSpaceSetGravity(space, cpv(0, -1000));
 	cpSpaceSetCollisionSlop(space, 2.0);
@@ -166,7 +168,8 @@ init(void)
 
 			shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
 			cpShapeSetFriction(shape, 0.9f);
-
+			
+			// Add on the thickened sensor shapes.
 			shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius + STICK_SENSOR_THICKNESS, cpvzero));
 			cpShapeSetSensor(shape, cpTrue);
 			cpShapeSetCollisionType(shape, COLLIDE_STICK_SENSOR);
@@ -179,7 +182,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

@@ -22,8 +22,6 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 static cpBody *dollyBody = NULL;
 // Constraint used as a servo motor to move the dolly back and forth.
 static cpConstraint *dollyServo = NULL;
@@ -36,7 +34,7 @@ static cpConstraint *hookJoint = NULL;
 
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -94,7 +92,7 @@ init(void)
 {
 	ChipmunkDemoMessageString = "Control the crane by moving the mouse. Right click to release.";
 	
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -100));
 	cpSpaceSetDamping(space, 0.8);
@@ -161,7 +159,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
