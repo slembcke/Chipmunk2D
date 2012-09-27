@@ -19,13 +19,13 @@
  * SOFTWARE.
  */
 
-/// @defgroup cpPivotJoint cpPivotJoint
+/// @defgroup cpCustomConstraint cpCustomConstraint
 /// @{
 
-const cpConstraintClass *cpPivotJointGetClass(void);
+const cpConstraintClass *cpCustomConstraintGetClass(void);
 
 /// @private
-typedef struct cpPivotJoint {
+typedef struct cpCustomJoint {
 	cpConstraint constraint;
 	cpVect anchr1, anchr2;
 	
@@ -35,18 +35,13 @@ typedef struct cpPivotJoint {
 	cpVect jAcc;
 	cpFloat jMaxLen;
 	cpVect bias;
-} cpPivotJoint;
+} cpCustomConstraint;
 
-/// Allocate a pivot joint
-cpPivotJoint* cpPivotJointAlloc(void);
-/// Initialize a pivot joint.
-cpPivotJoint* cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
-/// Allocate and initialize a pivot joint.
-cpConstraint* cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot);
-/// Allocate and initialize a pivot joint with specific anchors.
-cpConstraint* cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
-
-CP_DefineConstraintProperty(cpPivotJoint, cpVect, anchr1, Anchr1)
-CP_DefineConstraintProperty(cpPivotJoint, cpVect, anchr2, Anchr2)
+/// Allocate a custom constraint.
+cpCustomConstraint* cpCustomConstraintAlloc(void);
+/// Initialize a custom constraint.
+cpCustomConstraint* cpCustomConstraintInit(cpCustomConstraint *joint, cpBody *a, cpBody *b);
+/// Allocate and initialize a custom constraint.
+cpConstraint* cpCustomConstraintNew(cpBody *a, cpBody *b);
 
 /// @}

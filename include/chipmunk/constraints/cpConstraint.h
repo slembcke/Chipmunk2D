@@ -159,3 +159,4 @@ CP_DefineConstraintSetter(struct, type, member, name)
 #include "cpRatchetJoint.h"
 #include "cpGearJoint.h"
 #include "cpSimpleMotor.h"
+#include "cpCustomConstraint.h"

@@ -102,6 +102,11 @@
 		D3C3790A11063C57003EF1D9 /* cpSimpleMotor.c in Sources */ = {isa = PBXBuildFile; fileRef = D37BB8F00EAB06B600C70958 /* cpSimpleMotor.c */; };
 		D3C3790B11063C57003EF1D9 /* cpRatchetJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D36D87811012D63600DB5078 /* cpRatchetJoint.c */; };
 		D3DFB55D1613765700162F19 /* Sticky.c in Sources */ = {isa = PBXBuildFile; fileRef = D3DFB55C1613765700162F19 /* Sticky.c */; };
+		D3DFB5601613CAEB00162F19 /* CustomConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3DFB55F1613CAEA00162F19 /* CustomConstraint.c */; };
+		D3DFB5641613CD0000162F19 /* cpCustomConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D3DFB5631613CD0000162F19 /* cpCustomConstraint.h */; };
+		D3DFB5651613CD0000162F19 /* cpCustomConstraint.h in Headers */ = {isa = PBXBuildFile; fileRef = D3DFB5631613CD0000162F19 /* cpCustomConstraint.h */; };
+		D3DFB5671613CD5C00162F19 /* cpCustomConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3DFB5661613CD5C00162F19 /* cpCustomConstraint.c */; };
+		D3DFB5681613CD5C00162F19 /* cpCustomConstraint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3DFB5661613CD5C00162F19 /* cpCustomConstraint.c */; };
 		D3E4867613175AE000A00840 /* Bench.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E4867513175AE000A00840 /* Bench.c */; };
 		D3E4A9C80E99683200EE08BA /* cpSlideJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA60E98260200A3D7FA /* cpSlideJoint.c */; };
 		D3E4A9CA0E99683200EE08BA /* cpPivotJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA40E98260200A3D7FA /* cpPivotJoint.c */; };
@@ -193,6 +198,9 @@
 		D3CCDF460AE35D920080442F /* LogoSmash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LogoSmash.c; sourceTree = "<group>"; };
 		D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemo.h; sourceTree = "<group>"; };
 		D3DFB55C1613765700162F19 /* Sticky.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Sticky.c; sourceTree = "<group>"; };
+		D3DFB55F1613CAEA00162F19 /* CustomConstraint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CustomConstraint.c; sourceTree = "<group>"; };
+		D3DFB5631613CD0000162F19 /* cpCustomConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpCustomConstraint.h; path = ../../include/chipmunk/constraints/cpCustomConstraint.h; sourceTree = "<group>"; };
+		D3DFB5661613CD5C00162F19 /* cpCustomConstraint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpCustomConstraint.c; sourceTree = "<group>"; };
 		D3E4867513175AE000A00840 /* Bench.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Bench.c; sourceTree = "<group>"; };
 		D3E5F0260AA32F15004E361B /* cpVect.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpVect.c; sourceTree = "<group>"; };
 		D3E5F0270AA32F16004E361B /* cpVect.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpVect.h; path = ../include/chipmunk/cpVect.h; sourceTree = "<group>"; };
@@ -304,6 +312,8 @@
 				D37BB8B10EAB01E400C70958 /* cpGearJoint.c */,
 				D37BB8EF0EAB06B600C70958 /* cpSimpleMotor.h */,
 				D37BB8F00EAB06B600C70958 /* cpSimpleMotor.c */,
+				D3DFB5631613CD0000162F19 /* cpCustomConstraint.h */,
+				D3DFB5661613CD5C00162F19 /* cpCustomConstraint.c */,
 			);
 			name = constraints;
 			path = ../src/constraints;
@@ -339,6 +349,7 @@
 				D3F6EEDE156D581300A158A8 /* Convex.c */,
 				D3DFB55C1613765700162F19 /* Sticky.c */,
 				D3E4867513175AE000A00840 /* Bench.c */,
+				D3DFB55F1613CAEA00162F19 /* CustomConstraint.c */,
 			);
 			name = Demo;
 			path = ../Demo;
@@ -428,6 +439,7 @@
 				D35420C00F4E1FD70017F4F7 /* chipmunk_unsafe.h in Headers */,
 				D36D87841012D63600DB5078 /* cpRatchetJoint.h in Headers */,
 				D3AA477C12AF0F9B00E27AAB /* cpSpatialIndex.h in Headers */,
+				D3DFB5641613CD0000162F19 /* cpCustomConstraint.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -436,6 +448,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D3AA477E12AF0F9B00E27AAB /* cpSpatialIndex.h in Headers */,
+				D3DFB5651613CD0000162F19 /* cpCustomConstraint.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -565,6 +578,7 @@
 				D3AA477512AF0F8900E27AAB /* cpBBTree.c in Sources */,
 				D3AA477612AF0F8900E27AAB /* cpSpatialIndex.c in Sources */,
 				D317246613280FC900752CBE /* cpSweep1D.c in Sources */,
+				D3DFB5671613CD5C00162F19 /* cpCustomConstraint.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -601,6 +615,7 @@
 				D3AA477712AF0F8900E27AAB /* cpBBTree.c in Sources */,
 				D3AA477812AF0F8900E27AAB /* cpSpatialIndex.c in Sources */,
 				D317246713280FC900752CBE /* cpSweep1D.c in Sources */,
+				D3DFB5681613CD5C00162F19 /* cpCustomConstraint.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -633,6 +648,7 @@
 				D3F2EE2F14F898E9005FD439 /* Unicycle.c in Sources */,
 				D3F6EEDF156D581300A158A8 /* Convex.c in Sources */,
 				D3DFB55D1613765700162F19 /* Sticky.c in Sources */,
+				D3DFB5601613CAEB00162F19 /* CustomConstraint.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

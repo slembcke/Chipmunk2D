@@ -18,35 +18,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+ 
+#include "chipmunk.h"
+#include "ChipmunkDemo.h"
 
-/// @defgroup cpPivotJoint cpPivotJoint
-/// @{
-
-const cpConstraintClass *cpPivotJointGetClass(void);
-
-/// @private
-typedef struct cpPivotJoint {
-	cpConstraint constraint;
-	cpVect anchr1, anchr2;
+static void
+update(cpSpace *space)
+{
+	int steps = 1;
+	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
-	cpVect r1, r2;
-	cpMat2x2 k;
+	for(int i=0; i<steps; i++){
+		cpSpaceStep(space, dt);
+	}
+}
+
+#define NUM_VERTS 5
+
+static cpSpace *
+init(void)
+{
+	cpSpace *space = cpSpaceNew();
 	
-	cpVect jAcc;
-	cpFloat jMaxLen;
-	cpVect bias;
-} cpPivotJoint;
+	cpFloat width = 100.0;
+	cpFloat height = 50.0;
+	cpFloat mass = 1.0;
+	
+	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, width, height)));
+	
+	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+	
+	return space;
+}
 
-/// Allocate a pivot joint
-cpPivotJoint* cpPivotJointAlloc(void);
-/// Initialize a pivot joint.
-cpPivotJoint* cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
-/// Allocate and initialize a pivot joint.
-cpConstraint* cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot);
-/// Allocate and initialize a pivot joint with specific anchors.
-cpConstraint* cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
+static void
+destroy(cpSpace *space)
+{
+	ChipmunkDemoFreeSpaceChildren(space);
+	cpSpaceFree(space);
+}
 
-CP_DefineConstraintProperty(cpPivotJoint, cpVect, anchr1, Anchr1)
-CP_DefineConstraintProperty(cpPivotJoint, cpVect, anchr2, Anchr2)
-
-/// @}
+ChipmunkDemo CustomConstraint = {
+	"CustomConstraint",
+	init,
+	update,
+	ChipmunkDemoDefaultDrawImpl,
+	destroy,
+};
