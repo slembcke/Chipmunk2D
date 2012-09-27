@@ -32,7 +32,7 @@ typedef struct cpRotaryLimitJoint {
 	cpFloat iSum;
 		
 	cpFloat bias;
-	cpFloat jAcc, jMax;
+	cpFloat jAcc;
 } cpRotaryLimitJoint;
 
 /// Allocate a damped rotary limit joint.

@@ -26,7 +26,7 @@ typedef struct cpConstraintClass cpConstraintClass;
 
 typedef void (*cpConstraintPreStepImpl)(cpConstraint *constraint, cpFloat dt);
 typedef void (*cpConstraintApplyCachedImpulseImpl)(cpConstraint *constraint, cpFloat dt_coef);
-typedef void (*cpConstraintApplyImpulseImpl)(cpConstraint *constraint);
+typedef void (*cpConstraintApplyImpulseImpl)(cpConstraint *constraint, cpFloat dt);
 typedef cpFloat (*cpConstraintGetImpulseImpl)(cpConstraint *constraint);
 
 /// @private

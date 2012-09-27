@@ -27,8 +27,6 @@
 
 void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b);
 
-#define J_MAX(constraint, dt) (((cpConstraint *)constraint)->maxForce*(dt))
-
 static inline cpVect
 relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2){
 	cpVect v1_sum = cpvadd(a->v, cpvmult(cpvperp(r1), a->w));

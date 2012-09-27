@@ -31,7 +31,7 @@ typedef struct cpSimpleMotor {
 	
 	cpFloat iSum;
 		
-	cpFloat jAcc, jMax;
+	cpFloat jAcc;
 } cpSimpleMotor;
 
 /// Allocate a simple motor.

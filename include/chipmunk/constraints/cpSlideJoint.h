@@ -34,7 +34,7 @@ typedef struct cpSlideJoint {
 	cpVect n;
 	cpFloat nMass;
 	
-	cpFloat jnAcc, jnMax;
+	cpFloat jnAcc;
 	cpFloat bias;
 } cpSlideJoint;
 

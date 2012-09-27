@@ -33,7 +33,7 @@ typedef struct cpGearJoint {
 	cpFloat iSum;
 		
 	cpFloat bias;
-	cpFloat jAcc, jMax;
+	cpFloat jAcc;
 } cpGearJoint;
 
 /// Allocate a gear joint.

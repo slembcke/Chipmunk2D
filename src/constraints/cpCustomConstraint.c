@@ -23,60 +23,63 @@
 #include "constraints/util.h"
 
 static void
-preStep(cpCustomConstraint *constraint, cpFloat dt)
+preStep(cpCustomConstraint *custom, cpFloat dt)
 {
-	cpBody *a = constraint->constraint.a;
-	cpBody *b = constraint->constraint.b;
+	cpBody *a = custom->constraint.a;
+	cpBody *b = custom->constraint.b;
 	
-	constraint->r1 = cpvrotate(constraint->anchr1, a->rot);
-	constraint->r2 = cpvrotate(constraint->anchr2, b->rot);
+	cpVect r1 = custom->r1 = cpvrotate(custom->anchr1, a->rot);
+	cpVect r2 = custom->r2 = cpvrotate(custom->anchr2, b->rot);
 	
 	// Calculate mass tensor
-	constraint->k = k_tensor(a, b, constraint->r1, constraint->r2);
-	
-	// compute max impulse
-	constraint->jMaxLen = J_MAX(constraint, dt);
+	custom->k = k_tensor(a, b, r1, r2);
 	
 	// calculate bias velocity
-	cpVect delta = cpvsub(cpvadd(b->p, constraint->r2), cpvadd(a->p, constraint->r1));
-	constraint->bias = cpvclamp(cpvmult(delta, -bias_coef(constraint->constraint.errorBias, dt)/dt), constraint->constraint.maxBias);
+	cpVect delta = cpvsub(cpvadd(b->p, r2), cpvadd(a->p, r1));
+	custom->bias = cpvclamp(cpvmult(delta, -bias_coef(custom->constraint.errorBias, dt)/dt), custom->constraint.maxBias);
 }
 
 static void
-applyCachedImpulse(cpCustomConstraint *constraint, cpFloat dt_coef)
+applyCachedImpulse(cpCustomConstraint *custom, cpFloat dt_coef)
 {
-	cpBody *a = constraint->constraint.a;
-	cpBody *b = constraint->constraint.b;
+	cpBody *a = custom->constraint.a;
+	cpBody *b = custom->constraint.b;
 	
-	apply_impulses(a, b, constraint->r1, constraint->r2, cpvmult(constraint->jAcc, dt_coef));
+	apply_impulses(a, b, custom->r1, custom->r2, cpvmult(custom->jAcc, dt_coef));
+}
+
+static cpVect
+CLAMP(cpConstraint *custom, cpVect j, cpFloat dt)
+{
+	return cpvclamp(j, cpConstraintGetMaxForce(custom)*dt);
 }
 
 static void
-applyImpulse(cpCustomConstraint *constraint)
+applyImpulse(cpCustomConstraint *custom, cpFloat dt)
 {
-	cpBody *a = constraint->constraint.a;
-	cpBody *b = constraint->constraint.b;
+	cpBody *a = custom->constraint.a;
+	cpBody *b = custom->constraint.b;
 	
-	cpVect r1 = constraint->r1;
-	cpVect r2 = constraint->r2;
+	cpVect r1 = custom->r1;
+	cpVect r2 = custom->r2;
 		
 	// compute relative velocity
 	cpVect vr = relative_velocity(a, b, r1, r2);
 	
 	// compute normal impulse
-	cpVect j = cpMat2x2Transform(constraint->k, cpvsub(constraint->bias, vr));
-	cpVect jOld = constraint->jAcc;
-	constraint->jAcc = cpvclamp(cpvadd(constraint->jAcc, j), constraint->jMaxLen);
-	j = cpvsub(constraint->jAcc, jOld);
+	cpVect j = cpMat2x2Transform(custom->k, cpvsub(custom->bias, vr));
+	cpVect jOld = custom->jAcc;
+	custom->jAcc = CLAMP((cpConstraint *)custom, cpvadd(custom->jAcc, j), dt);
+	j = cpvsub(custom->jAcc, jOld);
 	
 	// apply impulse
-	apply_impulses(a, b, constraint->r1, constraint->r2, j);
+	apply_impulses(a, b, r1, r2, j);
 }
 
 static cpFloat
-getImpulse(cpConstraint *constraint)
+getImpulse(cpConstraint *custom)
 {
-	return cpvlength(((cpCustomConstraint *)constraint)->jAcc);
+	return cpvlength(((cpCustomConstraint *)custom)->jAcc);
 }
 
 static const cpConstraintClass klass = {
@@ -94,13 +97,13 @@ cpCustomConstraintAlloc(void)
 }
 
 cpCustomConstraint *
-cpCustomConstraintInit(cpCustomConstraint *constraint, cpBody *a, cpBody *b)
+cpCustomConstraintInit(cpCustomConstraint *custom, cpBody *a, cpBody *b)
 {
-	cpConstraintInit((cpConstraint *)constraint, &klass, a, b);
+	cpConstraintInit((cpConstraint *)custom, &klass, a, b);
 	
-	constraint->jAcc = cpvzero;
+	custom->jAcc = cpvzero;
 	
-	return constraint;
+	return custom;
 }
 
 cpConstraint *

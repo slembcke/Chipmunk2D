@@ -408,7 +408,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 				
 			for(int j=0; j<constraints->num; j++){
 				cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
-				constraint->klass->applyImpulse(constraint);
+				constraint->klass->applyImpulse(constraint, dt);
 			}
 		}
 		

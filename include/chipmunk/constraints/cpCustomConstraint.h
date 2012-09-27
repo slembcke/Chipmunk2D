@@ -27,14 +27,13 @@ const cpConstraintClass *cpCustomConstraintGetClass(void);
 /// @private
 typedef struct cpCustomJoint {
 	cpConstraint constraint;
-	cpVect anchr1, anchr2;
 	
+	cpVect anchr1, anchr2;
 	cpVect r1, r2;
 	cpMat2x2 k;
 	
-	cpVect jAcc;
-	cpFloat jMaxLen;
-	cpVect bias;
+	cpVect jAcc, bias;
+	cpFloat jwAcc, wBias;
 } cpCustomConstraint;
 
 /// Allocate a custom constraint.

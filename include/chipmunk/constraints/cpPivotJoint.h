@@ -33,7 +33,6 @@ typedef struct cpPivotJoint {
 	cpMat2x2 k;
 	
 	cpVect jAcc;
-	cpFloat jMaxLen;
 	cpVect bias;
 } cpPivotJoint;
 
