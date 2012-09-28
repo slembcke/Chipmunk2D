@@ -566,7 +566,6 @@ extern ChipmunkDemo Slice;
 extern ChipmunkDemo Convex;
 extern ChipmunkDemo Unicycle;
 extern ChipmunkDemo Sticky;
-extern ChipmunkDemo CustomConstraint;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -575,7 +574,6 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
-		CustomConstraint,
 		LogoSmash,
 		PyramidStack,
 		Plink,
