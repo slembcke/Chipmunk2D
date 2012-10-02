@@ -26,18 +26,18 @@ Demo Ideas:
 	Top down racing game. (Need the callback constraint)
 
 Future things to think about:
+	Convert body between static/dynamic.
+	breakable object support functions?
+	Finish the contact point generation branch.
+	Implement segment-segment collisions
 	Finish smooth line collisions
 	Serialization
 	Improve the ACD splitting plane algorithm.
-	Convert body between static/dynamic.
 	Tests for the query methods
 	Building bodies from shape collections.
 	Per body iterations and timestep?
 	Per body damping and gravity coefs?
-	breakable object support functions?
 	Easy callback programable joint?
 	cpBodyActivateStatic() should also activate joints?
-	Finish the contact point generation branch.
 	Figure out why poly contacts can sometimes be unstable when driven by a strong constraint
-	Implement segment-segment collisions
 	Assertion for destroying a body with things still attached
