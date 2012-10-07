@@ -34,19 +34,10 @@
     <ClInclude Include="..\..\..\include\chipmunk\cpArbiter.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\chipmunk\cpArray.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\chipmunk\cpBB.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\chipmunk\cpBody.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\chipmunk\cpCollision.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\chipmunk\cpHashSet.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\chipmunk\cpPolyShape.h">
@@ -56,9 +47,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\chipmunk\cpSpace.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\chipmunk\cpSpaceHash.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\chipmunk\cpVect.h">
