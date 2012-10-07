@@ -36,15 +36,11 @@
     <ClInclude Include="..\..\..\include\chipmunk\constraints\cpSlideJoint.h" />
     <ClInclude Include="..\..\..\include\chipmunk\constraints\util.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpArbiter.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\cpArray.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpBB.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpBody.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\cpCollision.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\cpHashSet.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpPolyShape.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpShape.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpSpace.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\cpSpaceHash.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpSpatialIndex.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpVect.h" />
     <ClInclude Include="..\..\..\src\prime.h" />
