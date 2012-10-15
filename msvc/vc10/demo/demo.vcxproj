@@ -177,6 +177,7 @@
     <ClCompile Include="..\..\..\Demo\Query.c" />
     <ClCompile Include="..\..\..\Demo\Slice.c" />
     <ClCompile Include="..\..\..\Demo\Springies.c" />
+    <ClCompile Include="..\..\..\Demo\Sticky.c" />
     <ClCompile Include="..\..\..\Demo\Tank.c" />
     <ClCompile Include="..\..\..\Demo\TheoJansen.c" />
     <ClCompile Include="..\..\..\Demo\Tumble.c" />
