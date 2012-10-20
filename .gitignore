@@ -9,8 +9,6 @@ xcode/DerivedData
 
 build
 
-msvc/vc9/
-
 msvc/vc10/ipch/
 msvc/vc10/*.opensdf
 msvc/vc10/*.sdf
