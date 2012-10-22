@@ -10,6 +10,7 @@ High Priority:
 	RGB Image Sampler class.
 	User definable fast collision filtering.
 	Add assertions so that you can't construct (or maybe add?) a constraint with NULL bodies.
+	http://chipmunk-physics.net/forum/viewtopic.php?f=1&t=2395&p=10501#p10501
 
 Tutorial ideas:
 	AG tilemap tutorial
