@@ -117,6 +117,10 @@ extern const char *cpVersionString;
 /// @deprecated
 void cpInitChipmunk(void);
 
+/// Enables segment to segment shape collisions.
+void cpEnableSegmentToSegmentCollisions(void);
+
+
 /// Calculate the moment of inertia for a circle.
 /// @c r1 and @c r2 are the inner and outer diameters. A solid circle has an inner diameter of 0.
 cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset);
