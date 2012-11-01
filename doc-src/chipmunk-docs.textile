@@ -451,12 +451,16 @@ This section is a stub. For now you can look at the Planet demo for an example o
 There are currently 3 collision shape types:
 
 * *Circles*: Fastest and simplest collision shape.
-* *Line segments*: Meant mainly as a static shape. They can be attached to moving bodies, but they don't currently generate collisions with other line segments. Can be beveled in order to give them a thickness.
+* *Line segments*: Meant mainly as a static shape. Can be beveled in order to give them a thickness.
 * *Convex polygons*: Slowest, but most flexible collision shape.
 
 You can add as many shapes to a body as you wish. That is why the two types are separate. This should give you the flexibility to make any shape you want as well providing different areas of the same object with different friction, elasticity or callback values.
 
 When creating different types of shapes, you will always be given a @cpShape*@ pointer back. This is because Chipmunk shapes are meant to be opaque types. Think of the specific collision types such as @cpCircleShape@, @cpSegmentShape@ and @cpPolyShape@ as private subclasses of @cpShape@. You can still read some properties from them using the getter functions, but you are not intended to cast @cpShape@ pointers to their specific types.
+
+<%= h 2, "Notes:", "Notes" %>
+
+* Chipmunk didn't support segment/segment collisions until v6.1.2. For compatibility reasons, you must explicitly and globally enable them by calling @cpEnableSegmentToSegmentCollisions()@. (Thanks to LegoCylon for his help with this)
 
 
 <%= h 2, "Properties:", "Properties" %>
