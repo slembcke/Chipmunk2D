@@ -28,7 +28,7 @@
 #define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
-#define DRAW_CLOSEST (0 || DRAW_ALL)
+#define DRAW_CLOSEST (1 || DRAW_ALL)
 #define DRAW_CLIP (1 || DRAW_ALL)
 #define DRAW_CONTACTS (1 || DRAW_ALL)
 
@@ -512,8 +512,10 @@ ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestP
 	
 	cpVect closest_inca = cpClosetPointOnSegment(inc.a.p, ref.a.p, ref.b.p);
 	cpVect closest_incb = cpClosetPointOnSegment(inc.b.p, ref.a.p, ref.b.p);
-	cpFloat cost_a = cpfabs(cpvdot(cpvsub(inc.a.p, closest_inca), points.n) - nflip*points.d);
-	cpFloat cost_b = cpfabs(cpvdot(cpvsub(inc.b.p, closest_incb), points.n) - nflip*points.d);
+	
+	cpVect msa = cpvmult(points.n, nflip*points.d);
+	cpFloat cost_a = cpvdistsq(cpvsub(inc.a.p, closest_inca), msa);
+	cpFloat cost_b = cpvdistsq(cpvsub(inc.b.p, closest_incb), msa);
 	
 #if DRAW_CLIP
 	ChipmunkDebugDrawSegment(ref.a.p, ref.b.p, RGBAColor(1, 0, 0, 1));
