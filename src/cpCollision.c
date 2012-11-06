@@ -46,7 +46,7 @@ circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpF
 	if(distsq < mindist*mindist){
 		cpFloat dist = cpfsqrt(distsq);
 		cpVect n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
-		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist);
+		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist, hash);
 		
 		return 1;
 	} else {
@@ -485,17 +485,17 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 //MARK: Contact Clipping
 
 static inline void
-Contact1(cpFloat dist, cpVect a, cpVect b, cpFloat refr, cpFloat incr, cpVect refn, cpVect n, cpContact *arr)
+Contact1(cpFloat dist, cpVect a, cpVect b, cpFloat refr, cpFloat incr, cpVect refn, cpVect n, cpHashValue hash, cpContact *arr)
 {
 	cpFloat rsum = refr + incr;
 	cpFloat alpha = (rsum > 0.0f ? refr/rsum : 0.5f);
 	cpVect point = cpvadd(cpvlerp(a, b, alpha), cpvmult(refn, alpha));
 	
-	cpContactInit(arr, point, n, dist - rsum);
+	cpContactInit(arr, point, n, dist - rsum, hash);
 }
 
 static inline int
-Contact2(cpVect refp, cpVect inca, cpVect incb, cpFloat refr, cpFloat incr, cpVect refn, cpVect n, cpContact *arr)
+Contact2(cpVect refp, cpVect inca, cpVect incb, cpFloat refr, cpFloat incr, cpVect refn, cpVect n, cpHashValue hash, cpContact *arr)
 {
 	cpFloat cian = cpvcross(inca, refn);
 	cpFloat cibn = cpvcross(incb, refn);
@@ -509,7 +509,7 @@ Contact2(cpVect refp, cpVect inca, cpVect incb, cpFloat refr, cpFloat incr, cpVe
 		cpFloat rsum = refr + incr;
 		cpFloat alpha = (rsum > 0.0f ? incr*(1.0f - (rsum + pd)/rsum) : -0.5f*pd);
 				
-		cpContactInit(arr, cpvadd(point, cpvmult(refn, alpha)), n, pd);
+		cpContactInit(arr, cpvadd(point, cpvmult(refn, alpha)), n, pd, hash);
 		return 1;
 	} else {
 		return 0;
@@ -554,14 +554,17 @@ ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestP
 	}
 #endif
 	
+	cpHashValue hash_iarb = CP_HASH_PAIR(inc.a.hash, ref.b.hash);
+	cpHashValue hash_ibra = CP_HASH_PAIR(inc.b.hash, ref.a.hash);
+	
 	if(cost_a < cost_b){
 		cpVect refp = cpvadd(ref.a.p, ref_offs);
-		Contact1(points.d, closest_inca, inc.a.p, ref.r, inc.r, ref.n, points.n, arr);
-		return Contact2(refp, inca, incb, ref.r, inc.r, ref.n, points.n, arr + 1) + 1;
+		Contact1(points.d, closest_inca, inc.a.p, ref.r, inc.r, ref.n, points.n, hash_iarb, arr);
+		return Contact2(refp, inca, incb, ref.r, inc.r, ref.n, points.n, hash_ibra, arr + 1) + 1;
 	} else {
 		cpVect refp = cpvadd(ref.b.p, ref_offs);
-		Contact1(points.d, closest_incb, inc.b.p, ref.r, inc.r, ref.n, points.n, arr);
-		return Contact2(refp, incb, inca, ref.r, inc.r, ref.n, points.n, arr + 1) + 1;
+		Contact1(points.d, closest_incb, inc.b.p, ref.r, inc.r, ref.n, points.n, hash_ibra, arr);
+		return Contact2(refp, incb, inca, ref.r, inc.r, ref.n, points.n, hash_iarb, arr + 1) + 1;
 	}
 }
 
@@ -736,12 +739,12 @@ circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionID 
 	cpFloat dta = cpvcross(n, a);
 	cpFloat dtb = cpvcross(n, b);
 	cpFloat dt = cpvcross(n, circle->tc);
-		
+	
 	if(dt < dtb){
 		return circle2circleQuery(circle->tc, b, circle->r, 0.0f, 0, con);
 	} else if(dt < dta) {
 		cpVect point = cpvsub(circle->tc, cpvmult(n, circle->r + min/2.0f));
-		cpContactInit(con, point, cpvneg(n), min);
+		cpContactInit(con, point, cpvneg(n), min, 0);
 	
 		return 1;
 	} else {
@@ -789,11 +792,11 @@ cpCollideShapes(const cpShape *a, const cpShape *b, cpCollisionID *id, cpContact
 	CollisionFunc cfunc = colfuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
 	
 	int numContacts = (cfunc? cfunc(a, b, id, arr) : 0);
-	cpAssertHard(numContacts <= 2, "What the heck?");
+	cpAssertSoft(numContacts <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error: Too many contact points returned.");
 	
 #if DRAW_CONTACTS
 #if PRINT_LOG
-	ChipmunkDemoPrintString("Contacts: %d", numContacts);
+	ChipmunkDemoPrintString("Contacts(%d):", numContacts);
 #endif
 	
 	for(int i=0; i<numContacts; i++){
@@ -803,7 +806,15 @@ cpCollideShapes(const cpShape *a, const cpShape *b, cpCollisionID *id, cpContact
 		cpVect n = arr[i].n;
 		cpFloat d = -arr[i].dist/2.0;
 		ChipmunkDebugDrawSegment(cpvadd(p, cpvmult(n, d)), cpvadd(p, cpvmult(n, -d)), RGBAColor(1, 0, 0, 1));
+		
+#if PRINT_LOG
+		ChipmunkDemoPrintString(" %08X", arr[i].hash);
+#endif
 	}
+#endif
+
+#if PRINT_LOG
+		ChipmunkDemoPrintString("\n");
 #endif
 	
 	return numContacts;

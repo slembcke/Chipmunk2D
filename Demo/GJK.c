@@ -92,7 +92,7 @@ init(void)
 		cpBodySetPos(body, cpv(0.0f, -0.0f));
 		
 		shape2 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
-//		shape2->group = 1;
+		shape2->group = 1;
 	}
 	
 //	{

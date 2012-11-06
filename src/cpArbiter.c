@@ -23,7 +23,7 @@
 #include "constraints/util.h"
 
 cpContact*
-cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist)
+cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash)
 {
 	con->p = p;
 	con->n = n;
@@ -33,6 +33,8 @@ cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist)
 	con->jtAcc = 0.0f;
 	con->jBias = 0.0f;
 	
+	con->hash = hash;
+		
 	return con;
 }
 
@@ -218,38 +220,21 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 void
 cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisionHandler *handler, cpShape *a, cpShape *b)
 {
-//	// Arbiters without contact data may exist if a collision function rejected the collision.
-//	if(arb->contacts){
-//		// Iterate over the possible pairs to look for hash value matches.
-//		for(int i=0; i<arb->numContacts; i++){
-//			cpContact *old = &arb->contacts[i];
-//			
-//			for(int j=0; j<numContacts; j++){
-//				cpContact *new_contact = &contacts[j];
-//				
-//				// This could trigger false positives, but is fairly unlikely nor serious if it does.
-//				if(new_contact->hash == old->hash){
-//					// Copy the persistant contact information.
-//					new_contact->jnAcc = old->jnAcc;
-//					new_contact->jtAcc = old->jtAcc;
-//				}
-//			}
-//		}
-//	}
-	
-	if(arb->numContacts == 1){
-		for(int i=0; i<numContacts; i++){
-			contacts[i].jnAcc = arb->contacts[0].jnAcc;
-			contacts[i].jtAcc = arb->contacts[0].jtAcc;
-		}
-	} else if(arb->numContacts == 2){
-		for(int i=0; i<numContacts; i++){
-			if(cpvdistsq(contacts[i].p, arb->contacts[0].p) < cpvdistsq(contacts[i].p, arb->contacts[1].p)){
-				contacts[i].jnAcc = arb->contacts[0].jnAcc;
-				contacts[i].jtAcc = arb->contacts[0].jtAcc;
-			} else {
-				contacts[i].jnAcc = arb->contacts[1].jnAcc;
-				contacts[i].jtAcc = arb->contacts[1].jtAcc;
+	// Arbiters without contact data may exist if a collision function rejected the collision.
+	if(arb->contacts){
+		// Iterate over the possible pairs to look for hash value matches.
+		for(int i=0; i<arb->numContacts; i++){
+			cpContact *old = &arb->contacts[i];
+			
+			for(int j=0; j<numContacts; j++){
+				cpContact *new_contact = &contacts[j];
+				
+				// This could trigger false positives, but is fairly unlikely nor serious if it does.
+				if(new_contact->hash == old->hash){
+					// Copy the persistant contact information.
+					new_contact->jnAcc = old->jnAcc;
+					new_contact->jtAcc = old->jtAcc;
+				}
 			}
 		}
 	}
