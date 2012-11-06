@@ -211,4 +211,7 @@ typedef uintptr_t cpHashValue;
 	typedef struct cpVect{cpFloat x,y;} cpVect;
 #endif
 
-
+typedef struct cpMat2x2 {
+	// Row major [[a, b][c d]]
+	cpFloat a, b, c, d;
+} cpMat2x2;

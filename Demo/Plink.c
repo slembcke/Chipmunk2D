@@ -22,8 +22,6 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 // Iterate over all of the bodies and reset the ones that have fallen offscreen.
 static void
 eachBody(cpBody *body, void *unused)
@@ -36,7 +34,7 @@ eachBody(cpBody *body, void *unused)
 }
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -52,7 +50,7 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 5);
 	cpSpaceSetGravity(space, cpv(0, -100));
 		
@@ -100,7 +98,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

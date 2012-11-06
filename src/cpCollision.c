@@ -733,13 +733,31 @@ static const collisionFunc builtinCollisionFuncs[9] = {
 	NULL,
 	NULL,
 	(collisionFunc)circle2segment,
-	(collisionFunc)segment2segment,
+	NULL,
 	NULL,
 	(collisionFunc)circle2poly,
 	(collisionFunc)seg2poly,
 	(collisionFunc)poly2poly,
 };
 static const collisionFunc *colfuncs = builtinCollisionFuncs;
+
+static const collisionFunc segmentCollisions[9] = {
+	(collisionFunc)circle2circle,
+	NULL,
+	NULL,
+	(collisionFunc)circle2segment,
+	(collisionFunc)segment2segment,
+	NULL,
+	(collisionFunc)circle2poly,
+	(collisionFunc)seg2poly,
+	(collisionFunc)poly2poly,
+};
+
+void
+cpEnableSegmentToSegmentCollisions(void)
+{
+	colfuncs = segmentCollisions;
+}
 
 int
 cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr)

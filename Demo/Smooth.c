@@ -27,8 +27,6 @@
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 static cpBool DrawContacts(cpArbiter *arb, cpSpace *space, void *data){
 	cpContactPointSet set = cpArbiterGetContactPointSet(arb);
 	
@@ -43,7 +41,7 @@ static cpBool DrawContacts(cpArbiter *arb, cpSpace *space, void *data){
 }
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -59,7 +57,7 @@ update(int ticks)
 static cpSpace *
 init(void)
 {
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 5);
 	cpSpaceSetDamping(space, 0.1f);
 	
@@ -127,7 +125,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

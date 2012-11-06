@@ -27,11 +27,10 @@
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
 static cpShape *shape1, *shape2;
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -42,9 +41,9 @@ update(int ticks)
 }
 
 static void
-draw(void)
+draw(cpSpace *space)
 {
-	ChipmunkDemoDefaultDrawImpl();
+	ChipmunkDemoDefaultDrawImpl(space);
 	cpContact arr[CP_MAX_CONTACTS_PER_ARBITER];
 	cpCollideShapes(shape1, shape2, arr);
 }
@@ -52,7 +51,7 @@ draw(void)
 static cpSpace *
 init(void)
 {
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 5);
 	space->damping = 0.1;
 	
@@ -141,7 +140,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

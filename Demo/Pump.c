@@ -22,14 +22,13 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
 static cpConstraint *motor;
 
 #define numBalls 5
 static cpBody *balls[numBalls];
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	cpFloat coef = (2.0f + ChipmunkDemoKeyboard.y)/3.0f;
 	cpFloat rate = ChipmunkDemoKeyboard.x*30.0f*coef;
@@ -56,7 +55,7 @@ update(int ticks)
 }
 
 static cpBody *
-add_ball(cpVect pos)
+add_ball(cpSpace *space, cpVect pos)
 {
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForCircle(1.0f, 30, 0, cpvzero)));
 	cpBodySetPos(body, pos);
@@ -73,7 +72,7 @@ init(void)
 {
 	ChipmunkDemoMessageString = "Use the arrow keys to control the machine.";
 	
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetGravity(space, cpv(0, -600));
 	
 	cpBody *staticBody = cpSpaceGetStaticBody(space);
@@ -132,7 +131,7 @@ init(void)
 	
 	// add balls to hopper
 	for(int i=0; i<numBalls; i++)
-		balls[i] = add_ball(cpv(-224 + i,80 + 64*i));
+		balls[i] = add_ball(space, cpv(-224 + i,80 + 64*i));
 	
 	// add small gear
 	cpBody *smallGear = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 80, 0, cpvzero)));
@@ -181,7 +180,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

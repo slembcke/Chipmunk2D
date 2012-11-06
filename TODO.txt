@@ -1,46 +1,45 @@
-High Priority:
+Priorities:
 	Document ChipmunkMultiGrab, update example code.
 	Add license to showcase code. (and example code)
 	Release new Showcase app with push mode.
-	Make a Cocos2D helper pack (ChipmunkSprite, ChipmunkDebugNode, ES2 renderer)
-	Investigate getting better PhysicsEditor support.
-	Call cpBodyAssertSane from setters.
-	Reorganize Chimpnuk Pro directory structure. Too flat and confusing.
-	cpSpaceAddPostStepCallback() should return a TRUE if the callback was scheduled.
+	Finish AG tilemap tutorial
+	Simple top down player controls.
+	* test tiny omega bug in cpvslerp().
+	User definable default winding.
+	Return 0/invalid normal when beginnig a raycast inside a shape.
+	User definable fast collision filtering.
+	Assertion (or warning?) for destroying a body with things still attached
+	Add assertions so that you can't construct (or maybe add?) a constraint with NULL bodies.
 	Bilinearly sampled image sampler function. (override the sample method to always take bilinear samples)
 	RGB Image Sampler class.
-	User definable fast collision filtering.
-	Add a user data pointer to cpArbiters!
-	Add assertions so that you can't construct (or maybe add?) a constraint with NULL bodies.
-
-Tutorial ideas:
-	AG tilemap tutorial
-	ByteRacer/ChipmunkPro
-	Fishing
-	Crayon Ball clone
-
-Demo Ideas:
+	Convert body between static/dynamic.
 	More UIKit examples? There are a surprising number of questions on this.
+	Reorganize Chimpnuk Pro directory structure. Too flat and confusing.
+	Finish the GJK branch.
+	Finish smooth line collisions
+	Improve the ACD splitting plane algorithm.
+	Fishing game
+	Crayon Ball tutorial
 	Redo Logosmash with more particles?! :D
 	Motorcycle in a spinning cage
 	Squid thingy like TomorrowPlusX. (Would be better with seg/seg collisions)
-	Sticky surfaces
-	Simple top down player controls.
-	Top down racing game. (Need the callback constraint)
+
+	Redo AngryChipmunks as Cocos2D 2.x
+	Check that SpacePatrol and CloudBomber work when Cocos2D 2.1 is released.
+	Investigate getting better PhysicsEditor support.
+
+Unordered
+	Fix solver issues with the groove joint.
+	Use a slop tolerance on joint boundaries.
 
 Future things to think about:
-	Finish smooth line collisions
+	breakable object support functions?
 	Serialization
-	Improve the ACD splitting plane algorithm.
-	Convert body between static/dynamic.
 	Tests for the query methods
 	Building bodies from shape collections.
 	Per body iterations and timestep?
 	Per body damping and gravity coefs?
-	breakable object support functions?
 	Easy callback programable joint?
+	Top down racing game. (Need the callback constraint)
 	cpBodyActivateStatic() should also activate joints?
-	Finish the contact point generation branch.
 	Figure out why poly contacts can sometimes be unstable when driven by a strong constraint
-	Implement segment-segment collisions
-	Assertion for destroying a body with things still attached

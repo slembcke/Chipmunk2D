@@ -16,15 +16,15 @@ h2. FEATURES:
 * Support for collision event callbacks based on user definable object types types.
 * Flexible collision filtering system with layers, exclusion groups and callbacks.
 ** Can be used to create all sorts of effects like one way platforms or buoyancy areas. (Examples included)
-* Supports point, segment (raycasting), shape and bounding box queries to the collision detection system.
-* Impulses amounts can be read out for gameplay effects.
+* Supports nearest point, segment (raycasting), shape and bounding box queries to the collision detection system.
+* Collision impulses amounts can be retrieved for gameplay effects, sound effects, etc.
 * Large variety of joints - easily make vehicles, ragdolls, and more.
 * Joint callbacks.
 ** Can be used to easily implement breakable or animated joints. (Examples included)
 * Maintains a contact graph of all colliding objects.
 * Lightweight C99 implementation with no external dependencies outside of the Std. C library.
-* Many language bindings available.
-* Simple, read the documentation and see!
+* "Many language bindings available":http://chipmunk-physics.net/bindingsAndPorts.php.
+* Simple, read the "documentation":http://chipmunk-physics.net/documentation.php and see!
 * Unrestrictive MIT license
 
 
@@ -35,7 +35,7 @@ Howling Moon Software (my company) is available for contracting if you want to m
 
 h2. CHIPMUNK PRO:
 
-We also make a bunch of extra for Chipmunk called "Chipmunk Pro":http://chipmunk-physics.net/chipmunkPro.php. Currently we have a nice Objective-C wrapper that should be of particular interest to Mac and iPhone developers. We are also working on auto-geometry features and multithreading/SIMD optimizations as well. Check out the link above for more information!
+We also make a bunch of extra for Chipmunk called "Chipmunk Pro":http://chipmunk-physics.net/chipmunkPro.php. Currently we have a nice Objective-C wrapper that should be of particular interest to Mac and iPhone developers. It also offers auto-geometry features and multithreading/SIMD optimizations as well. Check out the link above for more information!
 
 
 h2. BUILDING:
@@ -58,4 +58,4 @@ A good starting point is to take a look at the included Demo application. The de
 
 h2. SUPPORT:
 
-The best way to get support is to visit the "Chipmunk Forums":http://chipmunk-physics.net/forum/. There are plenty of people around using Chipmunk on the just about every platform I've ever heard of. If you are working on a commercial project, Howling Moon Software is also available for "contracting":http://howlingmoonsoftware.com/contracting.php.
+The best way to get support is to visit the "Chipmunk Forums":http://chipmunk-physics.net/forum/. There are plenty of people around using Chipmunk on the just about every platform I've ever heard of. If you are working on a commercial project and want some more direct help, Howling Moon Software is also available for "contracting":http://howlingmoonsoftware.com/contracting.php.

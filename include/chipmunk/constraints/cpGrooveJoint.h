@@ -33,10 +33,9 @@ typedef struct cpGrooveJoint {
 	cpVect grv_tn;
 	cpFloat clamp;
 	cpVect r1, r2;
-	cpVect k1, k2;
+	cpMat2x2 k;
 	
 	cpVect jAcc;
-	cpFloat jMaxLen;
 	cpVect bias;
 } cpGrooveJoint;
 

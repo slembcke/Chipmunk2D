@@ -32,7 +32,7 @@ typedef struct cpRatchetJoint {
 	cpFloat iSum;
 		
 	cpFloat bias;
-	cpFloat jAcc, jMax;
+	cpFloat jAcc;
 } cpRatchetJoint;
 
 /// Allocate a ratchet joint.

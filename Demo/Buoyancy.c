@@ -24,10 +24,8 @@
 
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 3;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -116,7 +114,7 @@ init(void)
 {
 	ChipmunkDemoMessageString = messageBuffer;
 	
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -500));
 //	cpSpaceSetDamping(space, 0.5);
@@ -210,7 +208,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

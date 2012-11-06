@@ -24,9 +24,9 @@
 typedef struct ChipmunkDemo ChipmunkDemo;
 
 typedef cpSpace *(*ChipmunkDemoInitFunc)(void);
-typedef void (*ChipmunkDemoUpdateFunc)(int ticks);
-typedef void (*ChipmunkDemoDrawFunc)(void);
-typedef void (*ChipmunkDemoDestroyFunc)(void);
+typedef void (*ChipmunkDemoUpdateFunc)(cpSpace *space);
+typedef void (*ChipmunkDemoDrawFunc)(cpSpace *space);
+typedef void (*ChipmunkDemoDestroyFunc)(cpSpace *space);
 
 struct ChipmunkDemo {
 	const char *name;
@@ -44,6 +44,7 @@ frand(void)
 	return (cpFloat)rand()/(cpFloat)RAND_MAX;
 }
 
+extern int ChipmunkDemoTicks;
 extern cpFloat ChipmunkDemoTime;
 extern cpVect ChipmunkDemoKeyboard;
 extern cpVect ChipmunkDemoMouse;
@@ -55,5 +56,5 @@ void ChipmunkDemoPrintString(char *fmt, ...);
 #define GRABABLE_MASK_BIT (1<<31)
 #define NOT_GRABABLE_MASK (~GRABABLE_MASK_BIT)
 
-void ChipmunkDemoDefaultDrawImpl(void);
+void ChipmunkDemoDefaultDrawImpl(cpSpace *space);
 void ChipmunkDemoFreeSpaceChildren(cpSpace *space);

@@ -190,4 +190,24 @@ static inline cpBool cpvnear(const cpVect v1, const cpVect v2, const cpFloat dis
 {
 	return cpvdistsq(v1, v2) < dist*dist;
 }
+
 /// @}
+
+/// @defgroup cpMat2x2 cpMat2x2
+/// 2x2 matrix type used for tensors and such.
+/// @{
+
+static inline cpMat2x2
+cpMat2x2New(cpFloat a, cpFloat b, cpFloat c, cpFloat d)
+{
+	cpMat2x2 m = {a, b, c, d};
+	return m;
+}
+
+static inline cpVect
+cpMat2x2Transform(cpMat2x2 m, cpVect v)
+{
+	return cpv(v.x*m.a + v.y*m.b, v.x*m.c + v.y*m.d);
+}
+
+///@}

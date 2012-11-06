@@ -68,11 +68,10 @@ get_pixel(int x, int y)
 	return (image_bitmap[(x>>3) + y*image_row_length]>>(~x&0x7)) & 1;
 }
 
-static cpSpace *space;
 static int bodyCount = 0;
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -90,7 +89,7 @@ PushBodyPos(cpBody *body, cpVect **cursor)
 }
 
 static void
-draw()
+draw(cpSpace *space)
 {
 	// Make an array with all the body positions to draw dots
 	cpVect *verts = (cpVect *)cpcalloc(bodyCount, sizeof(cpVect));
@@ -98,7 +97,7 @@ draw()
 	cpVect *cursor = verts;
 	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)PushBodyPos, &cursor);
 	
-	ChipmunkDebugDrawPoints(3, bodyCount, verts, RGBAColor(200.0/255.0, 210.0/255.0, 230.0/255.0, 1.0));
+	ChipmunkDebugDrawPoints(3, bodyCount, verts, RGBAColor(200.0f/255.0f, 210.0f/255.0f, 230.0f/255.0f, 1.0f));
 	cpfree(verts);
 	
 	ChipmunkDebugDrawCollisionPoints(space);
@@ -120,7 +119,7 @@ make_ball(cpFloat x, cpFloat y)
 static cpSpace *
 init(void)
 {
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 1);
 	
 	// The space will contain a very large number of similary sized objects.
@@ -163,7 +162,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);

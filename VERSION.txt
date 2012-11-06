@@ -1,3 +1,20 @@
+CHANGES SINCE 6.1.1:
+* API: Added a cpArbiter.data pointer. Now you can tag collisions with custom persistent data.
+* API: Added segment to segment collisions (thanks to LegoCylon)
+* API: cpSpaceAddPostStepCallback() now returns false if the callback was a duplicate.
+* API: Added the ChipmunkAbstractSampler.marchThreshold property instead of hardcoding it to 0.5.
+* API: Added ChipmunkGrooveJoint properties for the groove and joint anchors.
+* API: ChipmunkMultiGrab now returns information about grabbed shapes.
+* BUG: Fixed a minor (non-crashing, non-leaking) memory pooling issue with reindexing lots of static shapes.
+* BUG: Fixed an issue with the slerp functions that would cause them to return incorrect results when given non-unit length input.
+* BUG: Fixed a precision bug with the ChipmunkImage sampler classes that could cause artifacts or miss small features.
+* BUG: Fixed a number of properties in Objective-Chipmunk that should have been nonatomic.
+* BUG: Fixed a number of types in Objective-Chipmunk that were incorrectly id that should have been cpGroup, cpCollisionType etc. It's now possible to redefine them at compile time if you wish.
+* MISC: Dropped armv6 support in favor of armv7s on iOS. (You can switch it back easily if you need.)
+* MISC: Updated iOS build scripts to guess the latest SDK.
+* MISC: Added the "Sticky Surfaces" demo as a cpArbiter.data example.
+* MISC: Updated Objective-Chipmunk build scripts to always use the latest iOS SDK.
+
 CHANGES SINCE 6.1.0:
 * API: Renamed the new block based iterators as soon as possible to match the Apple convention ("_b" suffix).
 

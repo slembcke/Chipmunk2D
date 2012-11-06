@@ -66,7 +66,7 @@ static cpBool drawBBs = cpFalse;
 static cpSpace *space;
 
 
-static int ticks = 0;
+int ChipmunkDemoTicks = 0;
 cpFloat ChipmunkDemoTime;
 
 static cpBody *mouseBody = NULL;
@@ -124,7 +124,7 @@ ChipmunkDemoFreeSpaceChildren(cpSpace *space)
 	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)postBodyFree, space);
 }
 
-void ChipmunkDemoDefaultDrawImpl(void)
+void ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 {
 	ChipmunkDebugDrawShapes(space);
 	ChipmunkDebugDrawConstraints(space);
@@ -258,17 +258,17 @@ display(void)
 	glScalef(scale, scale, 1.0);
 	glTranslatef(translate_x, translate_y, 0.0);
 	
-	demos[demoIndex].drawFunc();
+	demos[demoIndex].drawFunc(space);
 	
 	if(!paused || step){
 		cpVect newPoint = cpvlerp(mouseBody->p, ChipmunkDemoMouse, 0.25f);
 		mouseBody->v = cpvmult(cpvsub(newPoint, mouseBody->p), 60.0f);
 		mouseBody->p = newPoint;
 		
-		demos[demoIndex].updateFunc(ticks);
+		demos[demoIndex].updateFunc(space);
 		
-		ticks++;
-		ChipmunkDemoTime = ticks/60.0;
+		ChipmunkDemoTicks++;
+		ChipmunkDemoTime = ChipmunkDemoTicks/60.0;
 		
 		step = cpFalse;
 	}
@@ -305,7 +305,7 @@ runDemo(int index)
 	srand(45073);
 	
 	demoIndex = index;
-	ticks = 0;
+	ChipmunkDemoTicks = 0;
 	mouseJoint = NULL;
 	ChipmunkDemoMessageString = "";
 	maxArbiters = 0;
@@ -322,10 +322,10 @@ keyboard(unsigned char key, int x, int y)
 	int index = key - 'a';
 	
 	if(0 <= index && index < demoCount){
-		demos[demoIndex].destroyFunc();
+		demos[demoIndex].destroyFunc(space);
 		runDemo(index);
 	} else if(key == '\r'){
-		demos[demoIndex].destroyFunc();
+		demos[demoIndex].destroyFunc(space);
 		runDemo(demoIndex);
   } else if(key == '`'){
 		paused = !paused;
@@ -534,11 +534,11 @@ void time_trial(int index, int count)
 	double start_time = GetMilliseconds();
 	
 	for(int i=0; i<count; i++)
-		demos[index].updateFunc(i);
+		demos[index].updateFunc(space);
 	
 	double end_time = GetMilliseconds();
 	
-	demos[index].destroyFunc();
+	demos[index].destroyFunc(space);
 	
 	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, demos[index].name);
 }
@@ -568,6 +568,7 @@ extern ChipmunkDemo Convex;
 extern ChipmunkDemo Unicycle;
 extern ChipmunkDemo GJK;
 extern ChipmunkDemo Smooth;
+extern ChipmunkDemo Sticky;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -575,6 +576,10 @@ extern int bench_count;
 int
 main(int argc, const char **argv)
 {
+	// Segment/segment collisions need to be explicitly enabled currently.
+	// This will becoume enabled by default in future versions of Chipmunk.
+	cpEnableSegmentToSegmentCollisions();
+	
 	ChipmunkDemo demo_list[] = {
 		GJK,
 		Smooth,
@@ -601,6 +606,7 @@ main(int argc, const char **argv)
 		Slice,
 		Convex,
 		Unicycle,
+		Sticky,
 	};
 	
 	demos = demo_list;

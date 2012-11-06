@@ -22,12 +22,10 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-static cpSpace *space;
-
 static cpBody *tankBody, *tankControlBody;
 
 static void
-update(int ticks)
+update(cpSpace *space)
 {
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
@@ -51,7 +49,7 @@ update(int ticks)
 }
 
 static cpBody *
-add_box(cpFloat size, cpFloat mass)
+add_box(cpSpace *space, cpFloat size, cpFloat mass)
 {
 	cpFloat radius = cpvlength(cpv(size, size));
 
@@ -70,7 +68,7 @@ init(void)
 {
 	ChipmunkDemoMessageString = "Use the mouse to drive the tank, it will follow the cursor.";
 	
-	space = cpSpaceNew();
+	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 10);
 	cpSpaceSetSleepTimeThreshold(space, 0.5f);
 	
@@ -99,7 +97,7 @@ init(void)
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
 	for(int i=0; i<50; i++){
-		cpBody *body = add_box(20, 1);
+		cpBody *body = add_box(space, 20, 1);
 		
 		cpConstraint *pivot = cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, body, cpvzero, cpvzero));
 		cpConstraintSetMaxBias(pivot, 0); // disable joint correction
@@ -112,11 +110,11 @@ init(void)
 	
 	// We joint the tank to the control body and control the tank indirectly by modifying the control body.
 	tankControlBody = cpBodyNew(INFINITY, INFINITY);
-	tankBody = add_box(30, 10);
+	tankBody = add_box(space, 30, 10);
 	
 	cpConstraint *pivot = cpSpaceAddConstraint(space, cpPivotJointNew2(tankControlBody, tankBody, cpvzero, cpvzero));
-		cpConstraintSetMaxBias(pivot, 0); // disable joint correction
-		cpConstraintSetMaxForce(pivot, 10000.0f); // emulate linear friction
+	cpConstraintSetMaxBias(pivot, 0); // disable joint correction
+	cpConstraintSetMaxForce(pivot, 10000.0f); // emulate linear friction
 	
 	cpConstraint *gear = cpSpaceAddConstraint(space, cpGearJointNew(tankControlBody, tankBody, 0.0f, 1.0f));
 	cpConstraintSetErrorBias(gear, 0); // attempt to fully correct the joint each step
@@ -127,7 +125,7 @@ init(void)
 }
 
 static void
-destroy(void)
+destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpBodyFree(tankControlBody);
