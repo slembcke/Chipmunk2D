@@ -102,37 +102,50 @@ cpSupportPointIndex(const cpPolyShape *poly, const cpVect n)
 	return min;
 }
 
-static cpVect
-cpPolySupportPoint(const cpPolyShape *poly, const cpVect n)
+struct SupportPoint {
+	cpVect p;
+	cpCollisionID id;
+};
+
+static inline struct SupportPoint
+SupportPointNew(cpVect p, cpCollisionID id)
 {
-	return poly->tVerts[cpSupportPointIndex(poly, n)];
+	struct SupportPoint point = {p, id};
+	return point;
 }
 
-static cpVect
+static struct SupportPoint
+cpPolySupportPoint(const cpPolyShape *poly, const cpVect n)
+{
+	int i = cpSupportPointIndex(poly, n);
+	return SupportPointNew(poly->tVerts[i], i);
+}
+
+static struct SupportPoint
 cpSegmentSupportPoint(const cpSegmentShape *seg, const cpVect n)
 {
 	cpVect a = seg->ta, b = seg->tb;
-	return (cpvdot(a, n) > cpvdot(b, n) ? a : b);
+	if(cpvdot(a, n) > cpvdot(b, n)){
+		return SupportPointNew(a, 0);
+	} else {
+		return SupportPointNew(b, 1);
+	}
 }
 
-//static cpVect
-//cpCircleSupportPoint(const cpCircleShape *circle, const cpVect n)
-//{
-//	return circle->tc;
-//}
-
-static inline cpFloat
-cpPolyShapeValueOnAxis(const cpPolyShape *poly, const cpVect n, const cpFloat d)
-{
-	cpVect p = poly->tVerts[cpSupportPointIndex(poly, cpvneg(n))];
-	return cpvdot(n, p) - d;
-}
+typedef struct SupportPoint (*SupportFunction)(const cpShape *a, cpVect n);
 
 struct MinkowskiPoint {
-	cpVect a, b, ab;
+	cpVect a, b;
+	cpVect ab;
+	cpCollisionID id;
 };
 
-typedef cpVect (*SupportFunction)(const cpShape *a, cpVect n);
+static inline struct MinkowskiPoint
+MinkoskiPointNew(const struct SupportPoint a, const struct SupportPoint b)
+{
+	struct MinkowskiPoint point = {a.p, b.p, cpvsub(b.p, a.p), (a.id & 0xFF)<<8 | (b.id & 0xFF)};
+	return point;
+}
 
 struct SupportContext {
 	const cpShape *shape1, *shape2;
@@ -142,16 +155,14 @@ struct SupportContext {
 static inline struct MinkowskiPoint
 Support(const struct SupportContext context, const cpVect n)
 {
-	cpVect a = context.support1(context.shape1, cpvneg(n));
-	cpVect b = context.support2(context.shape2, n);
-	
-	struct MinkowskiPoint point = {a, b, cpvsub(b, a)};
-	return point;
+	struct SupportPoint a = context.support1(context.shape1, cpvneg(n));
+	struct SupportPoint b = context.support2(context.shape2, n);
+	return MinkoskiPointNew(a, b);
 }
 
 struct EdgePoint {
 	cpVect p;
-	int hash;
+	cpHashValue hash;
 };
 
 struct Edge {
@@ -161,7 +172,7 @@ struct Edge {
 };
 
 static inline struct Edge
-EdgeNew(cpVect va, cpVect vb, int ha, int hb, cpFloat r)
+EdgeNew(cpVect va, cpVect vb, cpHashValue ha, cpHashValue hb, cpFloat r)
 {
 	struct Edge edge = {{va, ha}, {vb, hb}, r, cpvnormalize(cpvperp(cpvsub(vb, va)))};
 	return edge;
@@ -204,8 +215,9 @@ ClosestT(const cpVect a, const cpVect b)
 
 struct ClosestPoints {
 	cpVect a, b;
-	cpFloat d;
 	cpVect n;
+	cpFloat d;
+	cpCollisionID id;
 };
 
 static struct ClosestPoints
@@ -216,7 +228,7 @@ ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1,
 	
 	cpFloat d = coef*cpvdist(pa, pb);
 	cpVect n = cpvnormalize(cpvmult(d != 0.0 ? cpvsub(pb, pa) : cpvperp(cpvsub(v0.ab, v1.ab)), coef));
-	struct ClosestPoints points = {pa, pb, d, n};
+	struct ClosestPoints points = {pa, pb, n, d, (v0.id & 0xFFFF)<<16 | (v1.id & 0xFFFF)};
 	cpAssertWarn(cpvdist(cpvadd(points.a, cpvmult(points.n, points.d)), points.b) < 1e-5, "Bad closest points?");
 	return points;
 }
@@ -230,7 +242,7 @@ struct EPANode {
 	cpFloat t, dist;
 };
 
-static void
+static inline void
 EPANodeInit(struct EPANode *node, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
 {
 	cpFloat t = ClosestT(v0.ab, v1.ab);
@@ -244,7 +256,7 @@ EPANodeInit(struct EPANode *node, const struct MinkowskiPoint v0, const struct M
 	node->dist = cpvlength(closest);
 }
 
-static void
+static inline void
 EPANodeSplit(struct EPANode *parent, struct EPANode *left, struct EPANode *right)
 {
 	parent->left = left;
@@ -265,7 +277,7 @@ EPANodeSplit(struct EPANode *parent, struct EPANode *left, struct EPANode *right
 static struct ClosestPoints
 EPARecurse(const struct SupportContext context, struct EPANode *root, int i)
 {
-	cpAssertHard(i < 100, "Stuck in recursion?");
+	cpAssertSoft(i < 100, "Stuck in EPA recursion.");
 	
 	struct EPANode *best = root->best;
 	cpVect closest = best->closest;
@@ -391,24 +403,24 @@ ShapePointCount(const cpShape *shape)
 	}
 }
 
-static cpVect
+#endif
+
+static struct SupportPoint
 ShapePoint(const cpShape *shape, int i)
 {
 	switch(shape->klass->type){
-		default: return cpvzero;
-		case CP_CIRCLE_SHAPE: return ((cpCircleShape *)shape)->tc;
+		default: return SupportPointNew(cpvzero, i);
+		case CP_CIRCLE_SHAPE: return SupportPointNew(((cpCircleShape *)shape)->tc, i);
 		case CP_SEGMENT_SHAPE: {
 			cpSegmentShape *seg = (void *)shape;
-			return (i == 0 ? seg->ta : seg->tb);
+			return SupportPointNew(i == 0 ? seg->ta : seg->tb, i);
 		};
-		case CP_POLY_SHAPE: return ((cpPolyShape *)shape)->tVerts[i];
+		case CP_POLY_SHAPE: return SupportPointNew(((cpPolyShape *)shape)->tVerts[i], i);
 	}
 }
 
-#endif
-
 static struct ClosestPoints
-GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, SupportFunction support2)
+GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, SupportFunction support2, cpCollisionID *id)
 {
 #if DRAW_GJK || DRAW_EPA
 	// draw the minkowski difference origin
@@ -424,8 +436,8 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 	
 	for(int i=0; i<shape1Count; i++){
 		for(int j=0; j<shape2Count; j++){
-			cpVect v1 = ShapePoint(shape1, i);
-			cpVect v2 = ShapePoint(shape2, j);
+			cpVect v1 = ShapePoint(shape1, i).p;
+			cpVect v2 = ShapePoint(shape2, j).p;
 			mdiffVerts[i*shape2Count + j] = cpvsub(v2, v1);
 		}
 	}
@@ -439,14 +451,23 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 	
 	struct SupportContext context = {shape1, shape2, support1, support2};
 	
-	// TODO use centroids as the starting axis
-//	cpVect axis = cpvperp(cpvsub(shape1->body->p, shape2->body->p));
-	cpVect axis = cpvperp(cpvsub(cpBBCenter(shape1->bb), cpBBCenter(shape2->bb)));
-	struct MinkowskiPoint p1 = Support(context, axis);
-	struct MinkowskiPoint p2 = Support(context, cpvneg(axis));
+	struct MinkowskiPoint p1, p2;
+	if(*id){
+//		ChipmunkDemoPrintString("Cached collision ID was %08X\n", *id);
+		
+		p1 = MinkoskiPointNew(ShapePoint(shape1, (*id>>24)&0xFF), ShapePoint(shape2, (*id>>16)&0xFF));
+		p2 = MinkoskiPointNew(ShapePoint(shape1, (*id>> 8)&0xFF), ShapePoint(shape2, (*id    )&0xFF));
+//		ChipmunkDebugDrawFatSegment(p1.ab, p2.ab, 5.0, RGBAColor(0.0, 1.0, 1.0, 1.0), RGBAColor(0, 0, 0, 0));
+	} else {
+		// TODO use centroids as the starting axis
+		cpVect axis = cpvperp(cpvsub(cpBBCenter(shape1->bb), cpBBCenter(shape2->bb)));
+		p1 = Support(context, axis);
+		p2 = Support(context, cpvneg(axis));
+	}
 	
 	cpFloat t = ClosestT(p1.ab, p2.ab);
 	struct ClosestPoints points = GJKRecurse(context, p1, p2, t, cpvlengthsq(cpvlerp(p1.ab, p2.ab, t)));
+	*id = points.id;
 	
 	if(cpfabs(points.d) < MAGIC_EPSILON){
 		// If the closest points are very close together, might need to estimate the normal.
@@ -573,17 +594,17 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 
 //MARK: Collision Functions
 
-typedef int (*collisionFunc)(const cpShape *, const cpShape *, cpContact *);
+typedef int (*CollisionFunc)(const cpShape *a, const cpShape *b, cpCollisionID *id, cpContact *arr);
 
 // Collide circle shapes.
 static int
-circle2circle(const cpCircleShape *c1, const cpCircleShape *c2, cpContact *arr)
+circle2circle(const cpCircleShape *c1, const cpCircleShape *c2, cpCollisionID *id, cpContact *arr)
 {
 	return circle2circleQuery(c1->tc, c2->tc, c1->r, c2->r, 0, arr);
 }
 
 static int
-circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentShape, cpContact *con)
+circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentShape, cpCollisionID *id, cpContact *con)
 {
 	cpVect seg_a = segmentShape->ta;
 	cpVect seg_b = segmentShape->tb;
@@ -609,9 +630,9 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 }
 
 static int
-segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *arr)
+segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollisionID *id, cpContact *arr)
 {
-	struct ClosestPoints points = GJK((cpShape *)seg1, (cpShape *)seg2, (SupportFunction)cpSegmentSupportPoint, (SupportFunction)cpSegmentSupportPoint);
+	struct ClosestPoints points = GJK((cpShape *)seg1, (cpShape *)seg2, (SupportFunction)cpSegmentSupportPoint, (SupportFunction)cpSegmentSupportPoint, id);
 	
 #if DRAW_CLOSEST
 #if PRINT_LOG
@@ -640,9 +661,9 @@ segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContac
 }
 
 static int
-poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpContact *arr)
+poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionID *id, cpContact *arr)
 {
-	struct ClosestPoints points = GJK((cpShape *)poly1, (cpShape *)poly2, (SupportFunction)cpPolySupportPoint, (SupportFunction)cpPolySupportPoint);
+	struct ClosestPoints points = GJK((cpShape *)poly1, (cpShape *)poly2, (SupportFunction)cpPolySupportPoint, (SupportFunction)cpPolySupportPoint, id);
 	
 #if DRAW_CLOSEST
 #if PRINT_LOG
@@ -662,9 +683,9 @@ poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpContact *arr)
 }
 
 static int
-seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpContact *arr)
+seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionID *id, cpContact *arr)
 {
-	struct ClosestPoints points = GJK((cpShape *)seg, (cpShape *)poly, (SupportFunction)cpSegmentSupportPoint, (SupportFunction)cpPolySupportPoint);
+	struct ClosestPoints points = GJK((cpShape *)seg, (cpShape *)poly, (SupportFunction)cpSegmentSupportPoint, (SupportFunction)cpPolySupportPoint, id);
 	
 #if DRAW_CLOSEST
 #if PRINT_LOG
@@ -692,7 +713,7 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpContact *arr)
 // This one is less gross, but still gross.
 // TODO: Comment me!
 static int
-circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpContact *con)
+circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionID *id, cpContact *con)
 {
 	cpSplittingPlane *planes = poly->tPlanes;
 	
@@ -728,29 +749,29 @@ circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpContact *con
 	}
 }
 
-static const collisionFunc builtinCollisionFuncs[9] = {
-	(collisionFunc)circle2circle,
+static const CollisionFunc builtinCollisionFuncs[9] = {
+	(CollisionFunc)circle2circle,
 	NULL,
 	NULL,
-	(collisionFunc)circle2segment,
+	(CollisionFunc)circle2segment,
 	NULL,
 	NULL,
-	(collisionFunc)circle2poly,
-	(collisionFunc)seg2poly,
-	(collisionFunc)poly2poly,
+	(CollisionFunc)circle2poly,
+	(CollisionFunc)seg2poly,
+	(CollisionFunc)poly2poly,
 };
-static const collisionFunc *colfuncs = builtinCollisionFuncs;
+static const CollisionFunc *colfuncs = builtinCollisionFuncs;
 
-static const collisionFunc segmentCollisions[9] = {
-	(collisionFunc)circle2circle,
+static const CollisionFunc segmentCollisions[9] = {
+	(CollisionFunc)circle2circle,
 	NULL,
 	NULL,
-	(collisionFunc)circle2segment,
-	(collisionFunc)segment2segment,
+	(CollisionFunc)circle2segment,
+	(CollisionFunc)segment2segment,
 	NULL,
-	(collisionFunc)circle2poly,
-	(collisionFunc)seg2poly,
-	(collisionFunc)poly2poly,
+	(CollisionFunc)circle2poly,
+	(CollisionFunc)seg2poly,
+	(CollisionFunc)poly2poly,
 };
 
 void
@@ -760,14 +781,14 @@ cpEnableSegmentToSegmentCollisions(void)
 }
 
 int
-cpCollideShapes(const cpShape *a, const cpShape *b, cpContact *arr)
+cpCollideShapes(const cpShape *a, const cpShape *b, cpCollisionID *id, cpContact *arr)
 {
 	// Their shape types must be in order.
 	cpAssertSoft(a->klass->type <= b->klass->type, "Internal Error: Collision shapes passed to cpCollideShapes() are not sorted.");
 	
-	collisionFunc cfunc = colfuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
+	CollisionFunc cfunc = colfuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
 	
-	int numContacts = (cfunc? cfunc(a, b, arr) : 0);
+	int numContacts = (cfunc? cfunc(a, b, id, arr) : 0);
 	cpAssertHard(numContacts <= 2, "What the heck?");
 	
 #if DRAW_CONTACTS
