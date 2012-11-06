@@ -1,11 +1,10 @@
 Priorities:
-	Publish Chipmunk 6.1.2
 	Document ChipmunkMultiGrab, update example code.
 	Add license to showcase code. (and example code)
 	Release new Showcase app with push mode.
 	Finish AG tilemap tutorial
 	Simple top down player controls.
-	Fix tiny omega bug in cpvslerp().
+	* test tiny omega bug in cpvslerp().
 	User definable default winding.
 	Return 0/invalid normal when beginnig a raycast inside a shape.
 	User definable fast collision filtering.
@@ -30,6 +29,8 @@ Priorities:
 	Investigate getting better PhysicsEditor support.
 
 Unordered
+	Fix solver issues with the groove joint.
+	Use a slop tolerance on joint boundaries.
 
 Future things to think about:
 	breakable object support functions?
