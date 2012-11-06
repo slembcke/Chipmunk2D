@@ -122,10 +122,10 @@ init(void)
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
 		cpBodySetPos(body, cpv(0, 25.0f));
 		
-		cpVect a = cpv( 50.0, 0.0);
-		cpVect b = cpv(-50.0, 0.0);
-		shape2 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 50.0));
-//		shape2 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
+//		cpVect a = cpv( 50.0, 0.0);
+//		cpVect b = cpv(-50.0, 0.0);
+//		shape2 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 50.0));
+		shape2 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 		shape2->group = 1;
 	}
 	
