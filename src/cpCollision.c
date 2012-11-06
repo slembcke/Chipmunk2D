@@ -22,8 +22,6 @@
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
 
-#define USE_GJK 1
-
 #if DEBUG
 #define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
@@ -104,7 +102,6 @@ cpSupportPointIndex(const cpPolyShape *poly, const cpVect n)
 	return min;
 }
 
-#if USE_GJK
 static cpVect
 cpPolySupportPoint(const cpPolyShape *poly, const cpVect n)
 {
@@ -117,7 +114,6 @@ cpSegmentSupportPoint(const cpSegmentShape *seg, const cpVect n)
 	cpVect a = seg->ta, b = seg->tb;
 	return (cpvdot(a, n) > cpvdot(b, n) ? a : b);
 }
-#endif
 
 //static cpVect
 //cpCircleSupportPoint(const cpCircleShape *circle, const cpVect n)
@@ -199,7 +195,6 @@ SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
 	}
 }
 
-#if USE_GJK
 static inline cpFloat
 ClosestT(const cpVect a, const cpVect b)
 {
@@ -465,7 +460,6 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 		return points;
 	}
 }
-#endif
 
 //MARK: Contact Clipping
 
@@ -614,8 +608,6 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 	return 0;
 }
 
-#if USE_GJK
-
 static int
 segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *arr)
 {
@@ -647,18 +639,6 @@ segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContac
 	}
 }
 
-#else 
-
-static int
-segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpContact *con)
-{
-	return 0;
-}
-
-#endif
-
-#if USE_GJK
-
 static int
 poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpContact *arr)
 {
@@ -680,54 +660,6 @@ poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpContact *arr)
 		return 0;
 	}
 }
-
-#else
-
-// Find the minimum separating axis for the give poly and axis list.
-static inline int
-findMSA(const cpPolyShape *poly, const cpSplittingPlane *planes, const int num, cpFloat *min_out)
-{
-	int min_index = 0;
-	cpFloat min = cpPolyShapeValueOnAxis(poly, planes->n, planes->d);
-	if(min > 0.0f) return -1;
-	
-	for(int i=1; i<num; i++){
-		cpFloat dist = cpPolyShapeValueOnAxis(poly, planes[i].n, planes[i].d);
-		if(dist > 0.0f) {
-			return -1;
-		} else if(dist > min){
-			min = dist;
-			min_index = i;
-		}
-	}
-	
-	(*min_out) = min;
-	return min_index;
-}
-
-// Collide poly shapes together.
-static int
-poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpContact *arr)
-{
-	// TODO use the support point to find a good starting axis?
-	// Does the MSA have to lie along the support vertex?
-	
-	cpFloat min1;
-	int mini1 = findMSA(poly2, poly1->tPlanes, poly1->numVerts, &min1);
-	if(mini1 == -1) return 0;
-	
-	cpFloat min2;
-	int mini2 = findMSA(poly1, poly2->tPlanes, poly2->numVerts, &min2);
-	if(mini2 == -1) return 0;
-	
-	// There is overlap, find the penetrating verts
-	cpVect n = (min1 > min2 ? poly1->tPlanes[mini1].n : cpvneg(poly2->tPlanes[mini2].n));
-	return ContactPoints(SupportEdgeForPoly(poly1, n), SupportEdgeForPoly(poly2, cpvneg(n)), n, arr);
-}
-
-#endif
-
-#if USE_GJK
 
 static int
 seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpContact *arr)
@@ -756,48 +688,6 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpContact *arr)
 		return 0;
 	}
 }
-
-#else
-
-// Like cpPolyValueOnAxis(), but for segments.
-static inline cpFloat
-segValueOnAxis(const cpSegmentShape *seg, const cpVect n, const cpFloat d)
-{
-	cpFloat a = cpvdot(n, seg->ta) - seg->r;
-	cpFloat b = cpvdot(n, seg->tb) - seg->r;
-	return cpfmin(a, b) - d;
-}
-
-// TODO: Comment me!
-static int
-seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpContact *arr)
-{
-	cpSplittingPlane *planes = poly->tPlanes;
-	
-	cpFloat segD = cpvdot(seg->tn, seg->ta);
-	cpFloat minNorm = cpPolyShapeValueOnAxis(poly, seg->tn, segD) - seg->r;
-	cpFloat minNeg = cpPolyShapeValueOnAxis(poly, cpvneg(seg->tn), -segD) - seg->r;
-	
-	cpFloat sepDist = cpfmax(minNorm, minNeg);
-	if(sepDist > 0.0f) return 0;
-	
-	cpVect n = (sepDist == minNorm ? seg->tn : cpvneg(seg->tn));
-	
-	int numVerts = poly->numVerts;
-	for(int i=0; i<numVerts; i++){
-		cpFloat dist = segValueOnAxis(seg, planes[i].n, planes[i].d);
-		if(dist > 0.0f){
-			return 0;
-		} else if(dist > sepDist){
-			sepDist = dist;
-			n = cpvneg(planes[i].n);
-		}
-	}
-	
-	return ContactPoints(SupportEdgeForSegment(seg, n), SupportEdgeForPoly(poly, cpvneg(n)), n, arr);
-}
-
-#endif
 
 // This one is less gross, but still gross.
 // TODO: Comment me!
