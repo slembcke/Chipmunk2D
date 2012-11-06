@@ -543,7 +543,6 @@ void time_trial(int index, int count)
 	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, demos[index].name);
 }
 
-extern ChipmunkDemo ContactPoints;
 extern ChipmunkDemo LogoSmash;
 extern ChipmunkDemo PyramidStack;
 extern ChipmunkDemo Plink;
@@ -566,9 +565,11 @@ extern ChipmunkDemo ContactGraph;
 extern ChipmunkDemo Slice;
 extern ChipmunkDemo Convex;
 extern ChipmunkDemo Unicycle;
+extern ChipmunkDemo Sticky;
+
+extern ChipmunkDemo ContactPoints;
 extern ChipmunkDemo GJK;
 extern ChipmunkDemo Smooth;
-extern ChipmunkDemo Sticky;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -581,9 +582,9 @@ main(int argc, const char **argv)
 	cpEnableSegmentToSegmentCollisions();
 	
 	ChipmunkDemo demo_list[] = {
-		GJK,
-		Smooth,
-		ContactPoints,
+//		GJK,
+//		Smooth,
+//		ContactPoints,
 		LogoSmash,
 		PyramidStack,
 		Plink,
