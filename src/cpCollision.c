@@ -28,8 +28,8 @@
 #define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
-#define DRAW_CLOSEST (1 || DRAW_ALL)
-#define DRAW_CLIP (1 || DRAW_ALL)
+#define DRAW_CLOSEST (0 || DRAW_ALL)
+#define DRAW_CLIP (0 || DRAW_ALL)
 #define DRAW_CONTACTS (0 || DRAW_ALL)
 
 #define PRINT_LOG 0
@@ -512,8 +512,8 @@ ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestP
 	
 	cpVect closest_inca = cpClosetPointOnSegment(inc.a.p, ref.a.p, ref.b.p);
 	cpVect closest_incb = cpClosetPointOnSegment(inc.b.p, ref.a.p, ref.b.p);
-	cpFloat cost_a = cpfabs(cpvdot(cpvsub(inc.a.p, closest_inca), points.n) - points.d);
-	cpFloat cost_b = cpfabs(cpvdot(cpvsub(inc.b.p, closest_incb), points.n) - points.d);
+	cpFloat cost_a = cpfabs(cpvdot(cpvsub(inc.a.p, closest_inca), points.n) - nflip*points.d);
+	cpFloat cost_b = cpfabs(cpvdot(cpvsub(inc.b.p, closest_incb), points.n) - nflip*points.d);
 	
 #if DRAW_CLIP
 	ChipmunkDebugDrawSegment(ref.a.p, ref.b.p, RGBAColor(1, 0, 0, 1));
@@ -529,7 +529,7 @@ ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestP
 	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.a.p, inc.a.p}, RGBAColor(1, 1, 0, 1));
 	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.b.p, inc.b.p}, RGBAColor(0, 1, 1, 1));
 	
-//	if(cpvdistsq(closest_inca, inc.a.p) < cpvdistsq(closest_incb, inc.b.p)){
+//	ChipmunkDemoPrintString("cost_a: %5.2f, cost_b: %5.2f\n", cost_a, cost_b);
 	if(cost_a < cost_b){
 		ChipmunkDebugDrawSegment(closest_inca, inc.a.p, RGBAColor(1, 0, 1, 1));
 	} else {
