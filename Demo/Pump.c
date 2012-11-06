@@ -167,7 +167,8 @@ init(void)
 	cpBodySetPos(feeder, cpv(-224, (bottom + top)/2.0f));
 	
 	cpFloat len = top - bottom;
-	cpSpaceAddShape(space, cpSegmentShapeNew(feeder, cpv(0.0f, len/2.0f), cpv(0.0f, -len/2.0f), 20.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(feeder, cpv(0.0f, len/2.0f), cpv(0.0f, -len/2.0f), 20.0f));
+	cpShapeSetLayers(shape, GRABABLE_MASK_BIT);
 	
 	cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, feeder, cpv(-224.0f, bottom), cpv(0.0f, -len/2.0f)));
 	cpVect anchr = cpBodyWorld2Local(feeder, cpv(-224.0f, -160.0f));

@@ -86,7 +86,7 @@ init(void)
 	cpBody *body9  = add_bar(cpv( 240,   80), cpv( 160,    0), 3);
 	cpBody *body10 = add_bar(cpv( 160,    0), cpv( 240,  -80), 3);
 	cpBody *body11 = add_bar(cpv(-240,  -80), cpv(-160, -160), 4);
-	cpBody *body12 = add_bar(cpv(-160, -160), cpv( -80, -160), 0);
+	cpBody *body12 = add_bar(cpv(-160, -160), cpv( -80, -160), 4);
 	cpBody *body13 = add_bar(cpv(   0, -160), cpv(  80, -160), 0);
 	cpBody *body14 = add_bar(cpv( 160, -160), cpv( 240, -160), 0);
 	
