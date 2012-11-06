@@ -90,10 +90,10 @@ init(void)
 		cpFloat size = 100.0f;
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
-		cpBodySetPos(body, cpv(0.0f, -50.0f));
+		cpBodySetPos(body, cpv(0.0f, -0.0f));
 		
 		shape2 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
-		shape2->group = 1;
+//		shape2->group = 1;
 	}
 	
 //	{
@@ -122,11 +122,11 @@ init(void)
 //		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
 //		cpBodySetPos(body, cpv(0, 25.0f));
 //		
-////		cpVect a = cpv( 50.0, 0.0);
-////		cpVect b = cpv(-50.0, 0.0);
-////		shape2 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 50.0));
-//		shape2 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
-//		shape2->group = 1;
+//		cpVect a = cpv( 50.0, 0.0);
+//		cpVect b = cpv(-50.0, 0.0);
+//		shape2 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 50.0));
+////		shape2 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
+////		shape2->group = 1;
 //	}
 	
 //	cpBodySetAngle(shape1->body, 34.48);

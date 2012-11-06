@@ -29,8 +29,8 @@
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
 #define DRAW_CLOSEST (0 || DRAW_ALL)
-#define DRAW_CLIP (0 || DRAW_ALL)
-#define DRAW_CONTACTS (0 || DRAW_ALL)
+#define DRAW_CLIP (1 || DRAW_ALL)
+#define DRAW_CONTACTS (1 || DRAW_ALL)
 
 #define PRINT_LOG 0
 #endif
@@ -470,13 +470,13 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 //MARK: Contact Clipping
 
 static inline void
-Contact1(cpVect a, cpVect b, cpFloat refr, cpFloat incr, cpVect refn, cpVect n, cpContact *arr)
+Contact1(cpFloat dist, cpVect a, cpVect b, cpFloat refr, cpFloat incr, cpVect refn, cpVect n, cpContact *arr)
 {
 	cpFloat rsum = refr + incr;
 	cpFloat alpha = (rsum > 0.0f ? refr/rsum : 0.5f);
 	cpVect point = cpvadd(cpvlerp(a, b, alpha), cpvmult(refn, alpha));
 	
-	cpContactInit(arr, point, n, cpvdist(a, b) - rsum);
+	cpContactInit(arr, point, n, dist - rsum);
 }
 
 static inline int
@@ -539,11 +539,11 @@ ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestP
 	
 	if(cost_a < cost_b){
 		cpVect refp = cpvadd(ref.a.p, ref_offs);
-		Contact1(closest_inca, inc.a.p, ref.r, inc.r, ref.n, points.n, arr);
+		Contact1(points.d, closest_inca, inc.a.p, ref.r, inc.r, ref.n, points.n, arr);
 		return Contact2(refp, inca, incb, ref.r, inc.r, ref.n, points.n, arr + 1) + 1;
 	} else {
 		cpVect refp = cpvadd(ref.b.p, ref_offs);
-		Contact1(closest_incb, inc.b.p, ref.r, inc.r, ref.n, points.n, arr);
+		Contact1(points.d, closest_incb, inc.b.p, ref.r, inc.r, ref.n, points.n, arr);
 		return Contact2(refp, incb, inca, ref.r, inc.r, ref.n, points.n, arr + 1) + 1;
 	}
 }
