@@ -223,7 +223,7 @@ CP_DefineSpaceStructProperty(cpFloat, collisionSlop, CollisionSlop)
 CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias)
 CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence)
 CP_DefineSpaceStructProperty(cpBool, enableContactGraph, EnableContactGraph)
-''CP_DefineSpaceStructProperty(cpDataPointer, data, UserData2)	'' FIXME: For some reason, this comes across as "duplicate definition"
+CP_DefineSpaceStructProperty(cpDataPointer, data, UserData_)	'' FIXME: If I remove the trailing _ from "UserData_", fbc complains about a duplicate definition
 CP_DefineSpaceStructGetter(cpBody_ ptr, staticBody, StaticBody)
 CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep)
 
