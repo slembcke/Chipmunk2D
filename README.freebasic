@@ -1,0 +1,55 @@
+Hey, FreeBASIC Community.
+
+I want to make a few notes about this distribution.
+First, this is a new header translation.  I appreciate what Lithium did a few years back, but there
+have been enough changes in chipmunk's API that it was easier for me to just retranslate files, rather
+than try and find which functions have been updated, removed, or added, and I especially took
+effort to keep the files as close to the C API as I could, just so it's easier to follow if you are
+looking to modify the headers.  I translated all of these files by hand, so if there are errors, or
+better translations, please submit a patch to me.
+
+If you encounter a problem, please let me know, specifically if you have fixed it or not, and where
+it is.  The official thread on the FreeBASIC forum is here:
+http://www.freebasic.net/forum/viewtopic.php?t=10275
+This link, however, may change, but a quick search of "chipmunk physics" on the forum should land
+you somewhere nearby.
+
+The current version of the library is Chipmunk 6.x, which was downloaded from svn via google code.
+I will also try and keep up with the SVN updates that slembcke posts, but I don't think I can keep up
+perfectly.
+
+What do you do with this distribution of chipmunk?
+ * Copy the contrib/freebasic/inc/chipmunk folder to FreeBASIC's working directory
+   (windows x:\FreeBASIC ; linux /usr/share/freebasic)
+ * If you run windows, copy the lib directory over.  Linux users, just compile the library yourself
+   (you'll need cmake).
+ * To include the library in your program, do this: #include "chipmunk/chipmunk.bi"
+ 
+I want to use the dynamic library (Linux Only)
+ * Copy the .so file from the bin directory into the working directory of your program, and ld should
+   compile against the .so instead of the .a
+
+Notes on compiling chipmunk v6.x
+ * You will need cmake (see the chipmunk-svn.tar.gz/README and other text files on compiling)
+ * Linux, need standard build utils, outside of cmake
+ * Windows, forget the Visual Studio files, because you won't be able to use the libraries from
+   FreeBASIC.  See the support directory for details on how to compile.
+   
+   
+Some other random things you may think of while going through the files in this archive
+ * Hey, Chipmunk has some newer documentation!!!
+   http://files.slembcke.net/chipmunk/release/ChipmunkLatest-Docs/
+   Give slembcke a hi-5 if you adventure to his forums for Chipmunk, because for a long time, there
+   wasn't any official documentation.
+
+Demos/Examples:
+Basically all I want to say is that contrib/freebasic/demos has some basic usage for chipmunk.  On the
+other hand, contrib/freebasic/examples has more practical examples, rather than just showing you the
+layout.  All the code in either directory is completely free for any use, and can be modified for use
+in any projects, as long as they comply with the chipmunk license agreement in the /license directory.
+
+I hope we can get some cool usage out of this. Chipmunk Physics is an amazing library for 2d physics
+handling, especially for the very few 2d physics libraries available to us.
+
+Take care,
+-Oz
