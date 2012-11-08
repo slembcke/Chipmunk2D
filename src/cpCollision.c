@@ -380,13 +380,12 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 {
 	cpFloat t = ClosestT(v0.ab, v1.ab);
 	cpFloat d = cpvlengthsq(cpvlerp(v0.ab, v1.ab, t));
+	cpVect closest = cpvlerp(v0.ab, v1.ab, t);
 	
 	for(int i=1;; i++){
 //		cpAssertSoft(cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(cpvzero, v0.ab)) >= 0.0, "Segment oriented the wrong way.");
 		cpAssertSoft(i < 100, "Stuck in GJK recursion");
 		
-		// Redundant from arg
-		cpVect closest = cpvlerp(v0.ab, v1.ab, t);
 		struct MinkowskiPoint p = Support(context, cpvneg(closest));
 		
 #if DRAW_GJK
@@ -395,22 +394,25 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 		ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 1, 0, 1));
 #endif
 		
-		cpFloat t0 = ClosestT(v0.ab, p.ab);
-		cpFloat t1 = ClosestT(p.ab, v1.ab);
-		
-		// cpvlerp() is redundant
-		cpFloat d0 = cpvlengthsq(cpvlerp(v0.ab, p.ab, t0));
-		cpFloat d1 = cpvlengthsq(cpvlerp(p.ab, v1.ab, t1));
 		
 		if(ContainsOrigin(v0.ab, v1.ab, p.ab)){
 			return EPA(context, v0, v1, p);
-		} else if(d <= cpfmin(d0, d1)){
-			return ClosestPointsNew(v0, v1, t, 1.0);
-		} else {
-			if(d0 < d1){
-				v1 = p; t = t0; d = d0;
+		} else{
+			cpFloat t0 = ClosestT(v0.ab, p.ab);
+			cpFloat t1 = ClosestT(p.ab, v1.ab);
+			cpVect closest0 = cpvlerp(v0.ab, p.ab, t0);
+			cpVect closest1 = cpvlerp(p.ab, v1.ab, t1);
+			cpFloat d0 = cpvlengthsq(closest0);
+			cpFloat d1 = cpvlengthsq(closest1);
+			
+			if(d <= cpfmin(d0, d1)){
+				return ClosestPointsNew(v0, v1, t, 1.0);
 			} else {
-				v0 = p; t = t1; d = d1;
+				if(d0 < d1){
+					v1 = p; t = t0; d = d0; closest = closest0;
+				} else {
+					v0 = p; t = t1; d = d1; closest = closest1;
+				}
 			}
 		}
 	}
