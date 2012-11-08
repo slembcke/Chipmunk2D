@@ -133,7 +133,7 @@ declare function cpvstr(byval v as const cpVect) as byte ptr
 
 ''/ Returns the length of v.
 #ifndef cpvlength
-#define cpvlength( v )	cpfsqrt( cpvdot( (v), (v) ) )
+#define cpvlength( v )	cpvsqrt( cpvdot( (v), (v) ) )
 #endif
 
 ''/ Linearly interpolate between v1 and v2.
