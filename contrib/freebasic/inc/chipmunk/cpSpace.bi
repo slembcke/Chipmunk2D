@@ -223,7 +223,7 @@ CP_DefineSpaceStructProperty(cpFloat, collisionSlop, CollisionSlop)
 CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias)
 CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence)
 CP_DefineSpaceStructProperty(cpBool, enableContactGraph, EnableContactGraph)
-CP_DefineSpaceStructProperty(cpDataPointer, data, UserData_)	'' FIXME: If I remove the trailing _ from "UserData_", fbc complains about a duplicate definition
+CP_DefineSpaceStructProperty(cpDataPointer, data, UserData_) '' FIXME: If I remove the trailing _ from "UserData_", fbc complains about a duplicate definition.  This seems to stem from the Getter macro on lines 194-200
 CP_DefineSpaceStructGetter(cpBody_ ptr, staticBody, StaticBody)
 CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep)
 
