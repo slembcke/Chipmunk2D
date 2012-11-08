@@ -47,7 +47,7 @@ type cpRatchetJoint
 
 	as cpFloat jAcc
 
-end type : type as cpRatchetJoint cpRatchetJoint
+end type
 
 
 

@@ -49,7 +49,7 @@ type cpGearJoint
 
 	as cpFloat jAcc
 
-end type : type as cpGearJoint cpGearJoint
+end type
 
 
 

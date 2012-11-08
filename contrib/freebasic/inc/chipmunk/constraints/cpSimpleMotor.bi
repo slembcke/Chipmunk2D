@@ -40,14 +40,9 @@ type cpSimpleMotor
 	as cpFloat rate
 
 	
-
 	as cpFloat iSum
-
-		
-
 	as cpFloat jAcc
-
-end type : type as cpSimpleMotor cpSimpleMotor
+end type
 
 
 

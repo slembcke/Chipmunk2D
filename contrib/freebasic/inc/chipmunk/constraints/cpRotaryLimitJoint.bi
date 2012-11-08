@@ -49,7 +49,7 @@ type cpRotaryLimitJoint
 
 	as cpFloat jAcc
 
-end type : type as cpRotaryLimitJoint cpRotaryLimitJoint
+end type
 
 
 

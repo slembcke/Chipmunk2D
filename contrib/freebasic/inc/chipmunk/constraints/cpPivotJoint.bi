@@ -51,7 +51,7 @@ type cpPivotJoint
 
 	as cpVect bias
 
-end type : type as cpPivotJoint cpPivotJoint
+end type
 
 
 

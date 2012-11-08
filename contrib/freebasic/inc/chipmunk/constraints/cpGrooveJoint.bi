@@ -57,7 +57,7 @@ type cpGrooveJoint
 
 	as cpVect bias
 
-end type : type as cpGrooveJoint cpGrooveJoint
+end type
 
 
 
@@ -78,12 +78,12 @@ declare function cpGrooveJointNew(byval a as cpBody ptr, byval b as cpBody ptr, 
 CP_DefineConstraintGetter(cpGrooveJoint, cpVect, grv_a, GrooveA)
 
 ''/ Set endpoint a of a groove joint's groove
-declare sub cpGrooveJointSetGrooveA( byval constraint as cpConstrain ptr, byval value as cpVect )
+declare sub cpGrooveJointSetGrooveA( byval constraint as cpConstraint ptr, byval value as cpVect )
 
 CP_DefineConstraintGetter(cpGrooveJoint, cpVect, grv_b, GrooveB)
 
 ''/ Set endpoint b of a groove joint's groove
-declare sub cpGrooveJointSetGrooveB( byval constraint as cpConstrain ptr, byval value as cpVect )
+declare sub cpGrooveJointSetGrooveB( byval constraint as cpConstraint ptr, byval value as cpVect )
 
 CP_DefineConstraintProperty(cpGrooveJoint, cpVect, anchr2, Anchr2)
 

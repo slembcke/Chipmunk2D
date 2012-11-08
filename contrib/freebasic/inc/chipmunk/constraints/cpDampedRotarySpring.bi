@@ -59,7 +59,7 @@ type cpDampedRotarySpring
 
 	as cpFloat iSum
 
-end type : type as cpDampedRotarySpring cpDampedRotarySpring
+end type
 
 
 

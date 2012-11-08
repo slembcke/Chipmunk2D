@@ -33,20 +33,20 @@ extern "c"
 ''/ Returning false from a begin callback causes the collision to be ignored until
 ''/ the the separate callback is called when the objects stop colliding.
 
-type as function(byval arb as cpArbiter ptr, byval space as cpSpace ptr, byval data as any ptr) as cpBool cpCollisionBeginFunc
+type as function(byval arb as cpArbiter_ ptr, byval space as cpSpace_ ptr, byval data as any ptr) as cpBool cpCollisionBeginFunc
 
 ''/ Collision pre-solve event function callback type.
 ''/ Returning false from a pre-step callback causes the collision to be ignored until the next step.
 
-type as function(byval arb as cpArbiter ptr, byval space as cpSpace ptr, byval data as any ptr) as cpBool cpCollisionPreSolveFunc
+type as function(byval arb as cpArbiter_ ptr, byval space as cpSpace_ ptr, byval data as any ptr) as cpBool cpCollisionPreSolveFunc
 
 ''/ Collision post-solve event function callback type.
 
-type as sub(byval arb as cpArbiter ptr, byval space as cpSpace ptr, byval data as any ptr) cpCollisionPostSolveFunc
+type as sub(byval arb as cpArbiter_ ptr, byval space as cpSpace_ ptr, byval data as any ptr) cpCollisionPostSolveFunc
 
 ''/ Collision separate event function callback type.
 
-type as sub(byval arb as cpArbiter ptr, byval space as cpSpace ptr, byval data as any ptr) cpCollisionSeparateFunc
+type as sub(byval arb as cpArbiter_ ptr, byval space as cpSpace_ ptr, byval data as any ptr) cpCollisionSeparateFunc
 
 
 
@@ -102,7 +102,7 @@ enum cpArbiterState
 
 	cpArbiterStateCached
 
-end enum : type as cpArbiterState cpArbiterState
+end enum
 
 
 
@@ -112,7 +112,7 @@ type cpArbiterThread
 
 	'' Links to next and previous arbiters in the contact graph.
 
-	as cpArbiter ptr next, prev
+	as cpArbiter_ ptr next, prev
 
 end type
 
@@ -152,10 +152,10 @@ type cpArbiter
 
 	
 
-	CP_PRIVATE(as cpShape ptr	a)
-	CP_PRIVATE(as cpShape ptr	b)
-	CP_PRIVATE(as cpBody ptr	body_a)
-	CP_PRIVATE(as cpBody ptr	body_b)
+	CP_PRIVATE(as cpShape_ ptr	a)
+	CP_PRIVATE(as cpShape_ ptr	b)
+	CP_PRIVATE(as cpBody_ ptr	body_a)
+	CP_PRIVATE(as cpBody_ ptr	body_b)
 	CP_PRIVATE(as cpArbiterThread thread_a)
 	CP_PRIVATE(as cpArbiterThread thread_b)
 	CP_PRIVATE(as integer 		numContacts)
@@ -170,7 +170,7 @@ end type
 #ifndef CP_DefineArbiterStructGetter
 #macro CP_DefineArbiterStructGetter( _type, _member, _name)
 function cpArbiterGet##_name ( byval arb as const cpArbiter ptr) as _type
-	return arb->(member)
+	return arb->_member
 end function
 #endmacro
 #endif
@@ -178,7 +178,7 @@ end function
 #ifndef CP_DefineArbiterStructSetter
 #macro CP_DefineArbiterStructSetter(_type, _member, _name)
 sub cpArbiterSet##_name( byval arb as cpArbiter ptr, byval value as _type )
-	arb->(member) = value
+	arb->_member = value
 end sub
 #endmacro
 #endif

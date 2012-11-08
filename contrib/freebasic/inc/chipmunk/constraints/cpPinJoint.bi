@@ -55,7 +55,7 @@ type cpPinJoint
 
 	as cpFloat bias
 
-end type : type as cpPinJoint cpPinJoint
+end type
 
 
 
@@ -73,13 +73,9 @@ declare function cpPinJointNew(byval a as cpBody ptr, byval b as cpBody ptr, byv
 
 
 
-'' TODO: translate (sorry)
 CP_DefineConstraintProperty(cpPinJoint, cpVect, anchr1, Anchr1)
-
 CP_DefineConstraintProperty(cpPinJoint, cpVect, anchr2, Anchr2)
-
 CP_DefineConstraintProperty(cpPinJoint, cpFloat, dist, Dist)
-
 
 
 ''/@}

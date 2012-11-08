@@ -32,7 +32,7 @@ extern "c"
 
 type as cpContactBufferHeader cpContactBufferHeader
 
-type as sub(byval arb as cpArbiter ptr) cpSpaceArbiterApplyImpulseFunc
+type as sub(byval arb as cpArbiter_ ptr) cpSpaceArbiterApplyImpulseFunc
 
 
 
@@ -136,81 +136,35 @@ type cpSpace
 
 	''/ By default it points to a statically allocated cpBody in the cpSpace struct.
 
-	as cpBody ptr staticBody
-
+	as cpBody_ ptr staticBody
 	
-
-	'' TODO: translate (sorry)
 	CP_PRIVATE(as cpTimestamp stamp)
-
-	'' TODO: translate (sorry)
 	CP_PRIVATE(as cpFloat curr_dt)
 
-
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpArray ptr bodies)
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpArray ptr rousedBodies)
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpArray ptr sleepingComponents)
-
+	CP_PRIVATE(as cpArray_ ptr bodies)
+	CP_PRIVATE(as cpArray_ ptr rousedBodies)
+	CP_PRIVATE(as cpArray_ ptr sleepingComponents)
 	
 
-	'' TODO: translate (sorry)
 	CP_PRIVATE(as cpSpatialIndex ptr staticShapes)
-
-	'' TODO: translate (sorry)
 	CP_PRIVATE(as cpSpatialIndex ptr activeShapes)
 
-	
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpArray ptr arbiters)
-
-	'' TODO: translate (sorry)
+	CP_PRIVATE(as cpArray_ ptr arbiters)
 	CP_PRIVATE(as cpContactBufferHeader ptr contactBuffersHead)
+	CP_PRIVATE(as cpHashSet_ ptr cachedArbiters)
+	CP_PRIVATE(as cpArray_ ptr pooledArbiters)
+	CP_PRIVATE(as cpArray_ ptr constraints)
 
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpHashSet ptr cachedArbiters)
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpArray ptr pooledArbiters)
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpArray ptr constraints)
-
-	
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpArray ptr allocatedBuffers)
-
-	'' TODO: translate (sorry)
+	CP_PRIVATE(as cpArray_ ptr allocatedBuffers)
 	CP_PRIVATE(as integer locked)
 
-	
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpHashSet ptr collisionHandlers)
-
-	'' TODO: translate (sorry)
+	CP_PRIVATE(as cpHashSet_ ptr collisionHandlers)
 	CP_PRIVATE(as cpCollisionHandler defaultHandler)
 
-	
-
-	'' TODO: translate (sorry)
 	CP_PRIVATE(as cpBool skipPostStep)
+	CP_PRIVATE(as cpArray_ ptr postStepCallbacks)
 
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpArray ptr postStepCallbacks)
-
-	
-
-	'' TODO: translate (sorry)
 	CP_PRIVATE(as cpBody _staticBody)
-
 end type
 
 
@@ -221,7 +175,7 @@ declare function cpSpaceAlloc() as cpSpace ptr
 
 ''/ Initialize a cpSpace.
 
-declare function cpSpaceInit(byval space as cpSpace ptr) as cpSpace ptr
+declare function cpSpaceInit(byval s as cpSpace ptr) as cpSpace ptr
 
 ''/ Allocate and initialize a cpSpace.
 
@@ -231,24 +185,24 @@ declare function cpSpaceNew() as cpSpace ptr
 
 ''/ Destroy a cpSpace.
 
-declare sub cpSpaceDestroy(byval space as cpSpace ptr)
+declare sub cpSpaceDestroy(byval s as cpSpace ptr)
 
 ''/ Destroy and free a cpSpace.
 
-declare sub cpSpaceFree(byval space as cpSpace ptr)
+declare sub cpSpaceFree(byval s as cpSpace ptr)
 
 #ifndef CP_DefineSpaceStructGetter
 #macro CP_DefineSpaceStructGetter( _type, _member, _name )
-function cpSpaceGet##_name( byval space as const cpSpace ptr ) as _type
-	return space->(_member)
+function cpSpaceGet##_name( byval s as const cpSpace ptr ) as _type
+	return s->_member
 end function
 #endmacro
 #endif
 
 #ifndef CP_DefineSpaceStructSetter
 #macro CP_DefineSpaceStructSetter( _type, _member, _name )
-sub cpSpaceSet##_name( byval space as cpSpace ptr, byval value as _type )
-	space->(_member) = value
+sub cpSpaceSet##_name( byval s as cpSpace ptr, byval value as _type )
+	s->_member = value
 end sub
 #endmacro
 #endif
@@ -260,7 +214,7 @@ CP_DefineSpaceStructSetter( _type, _member, _name )
 #endmacro
 #endif
 
-CP_DefineSpaceStructProperty(int, iterations, Iterations)
+CP_DefineSpaceStructProperty(integer, iterations, Iterations)
 CP_DefineSpaceStructProperty(cpVect, gravity, Gravity)
 CP_DefineSpaceStructProperty(cpFloat, damping, Damping)
 CP_DefineSpaceStructProperty(cpFloat, idleSpeedThreshold, IdleSpeedThreshold)
@@ -269,8 +223,8 @@ CP_DefineSpaceStructProperty(cpFloat, collisionSlop, CollisionSlop)
 CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias)
 CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence)
 CP_DefineSpaceStructProperty(cpBool, enableContactGraph, EnableContactGraph)
-CP_DefineSpaceStructProperty(cpDataPointer, data, UserData)
-CP_DefineSpaceStructGetter(cpBody*, staticBody, StaticBody)
+''CP_DefineSpaceStructProperty(cpDataPointer, data, UserData2)	'' FIXME: For some reason, this comes across as "duplicate definition"
+CP_DefineSpaceStructGetter(cpBody_ ptr, staticBody, StaticBody)
 CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep)
 
 
@@ -290,7 +244,7 @@ declare sub cpSpaceSetDefaultCollisionHandler( _
 	byval as cpCollisionPreSolveFunc, _
 	byval as cpCollisionPostSolveFunc, _
 	byval as cpCollisionSeparateFunc, _
-	byval as any ptr
+	byval as any ptr _
 )
 
 

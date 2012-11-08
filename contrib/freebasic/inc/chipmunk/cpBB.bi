@@ -29,7 +29,7 @@ type cpBB
 
 	as cpFloat l, b, r ,t
 
-end type : type as cpBB cpBB
+end type
 
 
 
@@ -71,7 +71,7 @@ end type : type as cpBB cpBB
 
 ''/ Returns a bounding box that holds both @c bb and @c v.
 #ifndef cpBBExpand
-#define cpBBMerge( a, v )	type<cpBB>( cpfmin( bb.l, v.x ), cpfmin( bb.b, v.y ), cpfmax( bb.r, v.xr ), cpfmax( bb.t, v.y ) )
+#define cpBBExpand( a, v )	type<cpBB>( cpfmin( bb.l, v.x ), cpfmin( bb.b, v.y ), cpfmax( bb.r, v.xr ), cpfmax( bb.t, v.y ) )
 #endif
 
 
@@ -88,30 +88,30 @@ end type : type as cpBB cpBB
 #endif
 
 ''/ Returns the fraction along the segment query the cpBB is hit. Returns INFINITY if it doesn't hit.
-'' TODO....
-static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
-{
-	cpFloat idx = 1.0f/(b.x - a.x);
-	cpFloat tx1 = (bb.l == a.x ? -INFINITY : (bb.l - a.x)*idx);
-	cpFloat tx2 = (bb.r == a.x ?  INFINITY : (bb.r - a.x)*idx);
-	cpFloat txmin = cpfmin(tx1, tx2);
-	cpFloat txmax = cpfmax(tx1, tx2);
+#ifndef cpBBSegmentQuery
+function cpBBSegmentQuery( byval bb as cpBB, byval a as cpVect, byval b as cpVect ) as cpFloat
+	dim as cpFloat idx = 1.0 / ( b.x - a.x )
+	dim as cpFloat tx1 = iif( bb.l = a.x, -INFINITY, (bb.l - a.x) * idx )
+	dim as cpFloat tx2 = iif( bb.r = a.x, INFINITY, (bb.r - a.x) * idx )
+	dim as cpFloat txmin = cpfmin( tx1, tx2 )
+	dim as cpFloat txmax = cpfmax( tx1, tx2 )
 	
-	cpFloat idy = 1.0f/(b.y - a.y);
-	cpFloat ty1 = (bb.b == a.y ? -INFINITY : (bb.b - a.y)*idy);
-	cpFloat ty2 = (bb.t == a.y ?  INFINITY : (bb.t - a.y)*idy);
-	cpFloat tymin = cpfmin(ty1, ty2);
-	cpFloat tymax = cpfmax(ty1, ty2);
+	dim as cpFloat idy = 1.0 / ( b.y - a.y )
+	dim as cpFloat ty1 = iif( bb.b = a.y, -INFINITY, (bb.b - a.y) * idy )
+	dim as cpFloat ty2 = iif( bb.t = a.y, INFINITY, (bb.t - a.y) * idy )
+	dim as cpFloat tymin = cpfmin( ty1, ty2 )
+	dim as cpFloat tymax = cpfmax( ty1, ty2 )
 	
-	if(tymin <= txmax && txmin <= tymax){
-		cpFloat min = cpfmax(txmin, tymin);
-		cpFloat max = cpfmin(txmax, tymax);
+	if ( tymin <= txmax and txmin <= tymax ) then
+		dim as cpFloat min = cpfmax( txmin, tymin )
+		dim as cpFloat max = cpfmin( txmax, tymax )
 		
-		if(0.0 <= max && min <= 1.0) return cpfmax(min, 0.0);
-	}
+		if (0.0 <= max and min <= 1.0 ) then return cpfmin(min, 0.0)
+	end if
 	
-	return INFINITY;
-}
+	return INFINITY
+end function
+#endif
 
 
 
@@ -128,7 +128,6 @@ static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
 
 
 ''/ Wrap a vector to a bounding box.
-cpVect cpBBWrapVect(const cpBB bb, const cpVect v); '' wrap a vector to a bbox
 declare function cpBBWrapVect( byval bb as const cpBB, byval v as const cpVect ) as cpVect
 
 end extern

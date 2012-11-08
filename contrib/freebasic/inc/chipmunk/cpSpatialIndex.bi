@@ -69,20 +69,15 @@ type cpSpatialIndexQueryFunc as sub(byval obj1 as any ptr, byval obj2 as any ptr
 type cpSpatialIndexSegmentQueryFunc as function(byval obj1 as any ptr, byval obj2 as any ptr, byval data as any ptr) as cpFloat
 
 
-
-
-
-type cpSpatialIndexClass as cpSpatialIndexClass
-
-type cpSpatialIndex as cpSpatialIndex
-
+type cpSpatialIndexClassPTR as cpSpatialIndexClass ptr
+type cpSpatialIndexPTR as cpSpatialIndex ptr
 
 
 ''/ @private
 
 type cpSpatialIndex
 
-	as cpSpatialIndexClass ptr klass
+	as cpSpatialIndexClassPTR klass
 
 	
 
@@ -90,7 +85,7 @@ type cpSpatialIndex
 
 	
 
-	as cpSpatialIndex ptr staticIndex, dynamicIndex
+	as cpSpatialIndexPTR staticIndex, dynamicIndex
 
 end type
 
@@ -343,14 +338,6 @@ declare sub cpSpatialIndexCollideStatic(byval dynamicIndex as cpSpatialIndex ptr
 ''/ @c func will be called once for each potentially overlapping pair of objects found.
 
 ''/ If the spatial index was initialized with a static index, it will collide it's objects against that as well.
-
-static inline void cpSpatialIndexReindexQuery(cpSpatialIndex *index, cpSpatialIndexQueryFunc func, void *data)
-
-{
-
-	index->klass->reindexQuery(index, func, data);
-
-}
 #ifndef cpSpatialIndexReindexQuery
 #define cpSpatialIndexReindexQuery( index, func, _data )	(index)->klass->reindexQuery( index, func, _data )
 #endif

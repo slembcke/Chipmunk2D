@@ -30,17 +30,17 @@ extern "c"
 
 
 
-type as cpConstraintClass cpConstraintClass
+type as cpConstraintClass cpConstraintClass_
 
 
 
-type as sub(byval constraint as cpConstraint ptr, byval dt as cpFloat) cpConstraintPreStepImpl
+type as sub(byval constraint as cpConstraint_ ptr, byval dt as cpFloat) cpConstraintPreStepImpl
 
-type as sub(byval constraint as cpConstraint ptr, byval dt_coef as cpFloat) cpConstraintApplyCachedImpulseImpl
+type as sub(byval constraint as cpConstraint_ ptr, byval dt_coef as cpFloat) cpConstraintApplyCachedImpulseImpl
 
-type as sub(byval constraint as cpConstraint ptr, byval dt as cpFloat) cpConstraintApplyImpulseImpl
+type as sub(byval constraint as cpConstraint_ ptr, byval dt as cpFloat) cpConstraintApplyImpulseImpl
 
-type as function(byval constraint as cpConstraint ptr) as cpFloat cpConstraintGetImpulseImpl
+type as function(byval constraint as cpConstraint_ ptr) as cpFloat cpConstraintGetImpulseImpl
 
 
 
@@ -62,11 +62,11 @@ end type
 
 ''/ Callback function type that gets called before solving a joint.
 
-type as sub(byval constraint as cpConstraint ptr, byval space as cpSpace ptr) cpConstraintPreSolveFunc
+type as sub(byval constraint as cpConstraint_ ptr, byval space as cpSpace_ ptr) cpConstraintPreSolveFunc
 
 ''/ Callback function type that gets called after solving a joint.
 
-type as sub(byval constraint as cpConstraint ptr, byval space as cpSpace ptr) cpConstraintPostSolveFunc
+type as sub(byval constraint as cpConstraint_ ptr, byval space as cpSpace_ ptr) cpConstraintPostSolveFunc
 
 
 
@@ -82,19 +82,19 @@ type cpConstraint
 
 	''/ The first body connected to this constraint.
 
-	as cpBody ptr a
+	as cpBody_ ptr a
 
 	''/ The second body connected to this constraint.
 
-	as cpBody ptr b
+	as cpBody_ ptr b
 
 	
 
-	CP_PRIVATE(as cpSpace ptr space)
+	CP_PRIVATE(as cpSpace_ ptr space)
 
-	CP_PRIVATE(as cpConstraint ptr next_a)
+	CP_PRIVATE(as cpConstraint_ ptr next_a)
 
-	CP_PRIVATE(as cpConstraint ptr next_b)
+	CP_PRIVATE(as cpConstraint_ ptr next_b)
 
 	
 
@@ -160,8 +160,8 @@ declare sub cpConstraintFree(byval constraint as cpConstraint ptr)
 
 ''/ @private
 
-#ifndef cpConstraintActiveBodies
-#macro cpCOnstraintActiveBodies( constraint )
+#ifndef cpConstraintActivateBodies
+#macro cpConstraintActivateBodies( constraint )
 	if ( constraint->a <> NULL ) then cpBodyActivate( constraint->a )
 	if ( constraint->b <> NULL ) then cpBodyActivate( constraint->b )
 #endmacro
@@ -173,7 +173,7 @@ declare sub cpConstraintFree(byval constraint as cpConstraint ptr)
 #ifndef CP_DefineConstraintStructGetter
 #macro CP_DefineConstraintStructGetter( _type, _member, _name )
 function cpConstraintGet##_name( byval constraint as const cpConstraint ptr ) as _type
-	return constraint->(_member)
+	return constraint->_member
 end function
 #endmacro
 #endif
@@ -184,7 +184,7 @@ end function
 #macro CP_DefineConstraintStructSetter( _type, _member, _name )
 sub cpConstraintSet##_name( byval constraint as cpConstraint ptr, byval value as _type )
 	cpConstraintActivateBodies( constraint )
-	constraint->(_member) = value
+	constraint->_member = value
 end sub
 #endmacro
 #endif
@@ -193,17 +193,17 @@ end sub
 ''/ @private
 #ifndef CP_DefineConstraintStructProperty
 #macro CP_DefineConstraintStructProperty( _type, _member, _name )
-CP_DefineConstraintGetter( _type, _member, _name )
-CP_DefineConstraintSetter( _type, _member, _name )
+CP_DefineConstraintStructGetter( _type, _member, _name )
+CP_DefineConstraintStructSetter( _type, _member, _name )
 #endmacro
 #endif
 
 
-CP_DefineConstraintStructGetter(cpSpace ptr, CP_PRIVATE(space), Space)
+CP_DefineConstraintStructGetter(cpSpace_ ptr, CP_PRIVATE(space), Space)
 
-CP_DefineConstraintStructGetter(cpBody ptr, a, A)
+CP_DefineConstraintStructGetter(cpBody_ ptr, a, A)
 
-CP_DefineConstraintStructGetter(cpBody ptr, b, B)
+CP_DefineConstraintStructGetter(cpBody_ ptr, b, B)
 
 CP_DefineConstraintStructProperty(cpFloat, maxForce, MaxForce)
 
@@ -228,15 +228,17 @@ CP_DefineConstraintStructProperty(cpDataPointer, data, UserData)
 ''/ @}
 
 
-
-#define cpConstraintCheckCast( _constraint, _struct) cpAssertHard( (_constraint)->CP_PRIVATE(klass) = _struct##GetClass(), "Constraint is not a "#_struct)
+#ifndef cpConstraintCheckCast
+#define cpConstraintCheckCast( _constraint, _struct) _
+	cpAssertHard( _constraint->CP_PRIVATE(klass) = _struct##GetClass(), strptr("Constraint is not a "#_struct) )
+#endif
 
 
 #ifndef CP_DefineConstraintGetter
 #macro CP_DefineConstraintGetter( _struct, _type, _member, _name )
 function _struct##Get##_name( byval constraint as const cpConstraint ptr ) as _type
 	cpConstraintCheckCast( constraint, _struct )
-	return cptr( _struct ptr, constraint )->(_member)
+	return cptr( _struct ptr, constraint )->_member
 end function
 #endmacro
 #endif
@@ -244,11 +246,11 @@ end function
 
 #ifndef CP_DefineConstraintSetter
 #macro CP_DefineConstraintSetter( _struct, _type, _member, _name )
-sub _struct##Set##name( byval constraint as cpConstraint ptr, byval value as _type )
+sub _struct##Set##_name( byval constraint as cpConstraint ptr, byval value as _type )
 	cpConstraintCheckCast( constraint, _struct )
 	cpConstraintActivateBodies( constraint )
 	
-	cptr( _struct ptr, constraint)->(_member) = value
+	cptr( _struct ptr, constraint)->_member = value
 end sub
 #endmacro
 #endif
@@ -261,16 +263,16 @@ CP_DefineConstraintSetter( _struct, _type, _member, _name )
 #endif
 
 
-#include "cpPinJoint.h"
-#include "cpSlideJoint.h"
-#include "cpPivotJoint.h"
-#include "cpGrooveJoint.h"
-#include "cpDampedSpring.h"
-#include "cpDampedRotarySpring.h"
-#include "cpRotaryLimitJoint.h"
-#include "cpRatchetJoint.h"
-#include "cpGearJoint.h"
-#include "cpSimpleMotor.h"
+#include "cpPinJoint.bi"
+#include "cpSlideJoint.bi"
+#include "cpPivotJoint.bi"
+#include "cpGrooveJoint.bi"
+#include "cpDampedSpring.bi"
+#include "cpDampedRotarySpring.bi"
+#include "cpRotaryLimitJoint.bi"
+#include "cpRatchetJoint.bi"
+#include "cpGearJoint.bi"
+#include "cpSimpleMotor.bi"
 
 end extern
 

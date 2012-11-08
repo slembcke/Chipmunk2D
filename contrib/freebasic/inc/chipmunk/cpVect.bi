@@ -69,10 +69,6 @@ declare function cpvstr(byval v as const cpVect) as byte ptr
 
 
 ''/ Negate a vector.
-static inline cpVect cpvneg(const cpVect v)
-{
-	return cpv(-v.x, -v.y);
-}
 #ifndef cpvneg
 #define cpvneg( v )			type<cpVect>( -(v).x, -(v).y )
 #endif
@@ -95,19 +91,11 @@ static inline cpVect cpvneg(const cpVect v)
 #endif
 
 ''/ Returns a perpendicular vector. (90 degree rotation)
-static inline cpVect cpvperp(const cpVect v)
-{
-	return cpv(-v.y, v.x);
-}
 #ifndef cpvperp
 #define cpvperp( v )	type<cpVect>( -(v).y, (v).x )
 #endif
 
 ''/ Returns a perpendicular vector. (-90 degree rotation)
-static inline cpVect cpvrperp(const cpVect v)
-{
-	return cpv(v.y, -v.x);
-}
 #ifndef cpvrperp
 #define cpvrperp( v )	type<cpVect>( (v).y, -(v).x )
 #endif
@@ -139,10 +127,6 @@ static inline cpVect cpvrperp(const cpVect v)
 #endif
 
 ''/ Returns the squared length of v. Faster than cpvlength() when you only need to compare lengths.
-static inline cpFloat cpvlengthsq(const cpVect v)
-{
-	return cpvdot(v, v);
-}
 #ifndef cpvlengthsq
 #define cpvlengthsq( v )	cpvdot( (v), (v) )
 #endif

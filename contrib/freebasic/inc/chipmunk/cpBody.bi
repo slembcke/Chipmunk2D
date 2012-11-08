@@ -25,168 +25,83 @@
 extern "c"
 
 ''/ @defgroup cpBody cpBody
-
 ''/ Chipmunk's rigid body type. Rigid bodies hold the physical properties of an object like
-
 ''/ it's mass, and position and velocity of it's center of gravity. They don't have an shape on their own.
-
 ''/ They are given a shape by creating collision shapes (cpShape) that point to the body.
-
 ''/ @{
 
-
-
 ''/ Rigid body velocity update function type.
-
-type as sub(byval body as cpBody ptr, byval gravity as cpVect, byval damping as cpFloat, byval dt as cpFloat) cpBodyVelocityFunc
-
+type as sub(byval body as cpBody_ ptr, byval gravity as cpVect, byval damping as cpFloat, byval dt as cpFloat) cpBodyVelocityFunc
 ''/ Rigid body position update function type.
-
-type as sub(byval body as cpBody ptr, byval dt as cpFloat) cpBodyPositionFunc
-
-
+type as sub(byval body as cpBody_ ptr, byval dt as cpFloat) cpBodyPositionFunc
 
 ''/ Used internally to track information on the collision graph.
-
 ''/ @private
-
 type cpComponentNode
-
-	as cpBody ptr root
-
-	as cpBody ptr next
-
+	as cpBody_ ptr root
+	as cpBody_ ptr next
 	as cpFloat idleTime
-
 end type
 
-
-
 ''/ Chipmunk's rigid body struct.
-
 type cpBody
-
 	''/ Function that is called to integrate the body's velocity. (Defaults to cpBodyUpdateVelocity)
-
 	as cpBodyVelocityFunc velocity_func
-
 	
-
 	''/ Function that is called to integrate the body's position. (Defaults to cpBodyUpdatePosition)
-
 	as cpBodyPositionFunc position_func
-
 	
-
 	''/ Mass of the body.
-
 	''/ Must agree with cpBody.m_inv! Use cpBodySetMass() when changing the mass for this reason.
-
 	as cpFloat m
-
 	''/ Mass inverse.
-
 	as cpFloat m_inv
-
 	
-
 	''/ Moment of inertia of the body.
-
 	''/ Must agree with cpBody.i_inv! Use cpBodySetMoment() when changing the moment for this reason.
-
 	as cpFloat i
-
 	''/ Moment of inertia inverse.
-
 	as cpFloat i_inv
-
 	
-
 	''/ Position of the rigid body's center of gravity.
-
 	as cpVect p
-
 	''/ Velocity of the rigid body's center of gravity.
-
 	as cpVect v
-
 	''/ Force acting on the rigid body's center of gravity.
-
 	as cpVect f
-
 	
-
 	''/ Rotation of the body around it's center of gravity in radians.
-
 	''/ Must agree with cpBody.rot! Use cpBodySetAngle() when changing the angle for this reason.
-
 	as cpFloat a
-
 	''/ Angular velocity of the body around it's center of gravity in radians/second.
-
 	as cpFloat w
-
 	''/ Torque applied to the body around it's center of gravity.
-
 	as cpFloat t
-
 	
-
 	''/ Cached unit length vector representing the angle of the body.
-
 	''/ Used for fast rotations using cpvrotate().
-
 	as cpVect rot
-
 	
-
 	''/ User definable data pointer.
-
 	''/ Generally this points to your the game object class so you can access it
-
 	''/ when given a cpBody reference in a callback.
-
 	as cpDataPointer data
-
 	
-
 	''/ Maximum velocity allowed when updating the velocity.
-
 	as cpFloat v_limit
-
 	''/ Maximum rotational rate (in radians/second) allowed when updating the angular velocity.
-
 	as cpFloat w_limit
-
 	
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpVect v_bias);
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpFloat w_bias);
-
+	CP_PRIVATE(as cpVect v_bias)
+	CP_PRIVATE(as cpFloat w_bias)
 	
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpSpace ptr space);
-
+	CP_PRIVATE(as cpSpace_ ptr space)
 	
+	CP_PRIVATE(as cpShape_ ptr shapeList)
+	CP_PRIVATE(as cpArbiter_ ptr arbiterList)
+	CP_PRIVATE(as cpConstraint_ ptr constraintList)
 
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpShape ptr shapeList);
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpArbiter ptr arbiterList);
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpConstraint ptr constraintList);
-
-	
-
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpComponentNode node);
-
+	CP_PRIVATE(as cpComponentNode node)
 end type
 
 
@@ -249,7 +164,7 @@ declare sub cpBodyActivate(byval body as cpBody ptr)
 
 ''/ Wake up any sleeping or idle bodies touching a static body.
 
-declare sub cpBodyActivateStatic(byval body as cpBody ptr, byval filter as cpShape ptr)
+declare sub cpBodyActivateStatic(byval body as cpBody ptr, byval filter as cpShape_ ptr)
 
 
 
@@ -264,8 +179,6 @@ declare sub cpBodySleepWithGroup(byval body as cpBody ptr, byval group as cpBody
 
 
 ''/ Returns true if the body is sleeping.
-
-'' TODO: translate (sorry)
 #ifndef cpBodyIsSleeping
 #define cpBodyIsSleeping( body )	iif( CP_PRIVATE(body->node).root <> cptr(cpBody ptr, NULL), cpTrue, cpFalse )
 #endif
@@ -288,7 +201,7 @@ declare sub cpBodySleepWithGroup(byval body as cpBody ptr, byval group as cpBody
 #ifndef CP_DefineBodyStructGetter
 #macro CP_DefineBodyStructGetter( _type, _member, _name )
 function cpBodyGet##_name( byval body as const cpBody ptr ) as _type
-	return body->member
+	return body->_member
 end function
 #endmacro
 #endif
@@ -297,7 +210,7 @@ end function
 #macro CP_DefineBodyStructSetter( _type, _member, _name )
 sub cpBodySet##_name( byval body as cpBody ptr, byval value as const _type )
 	cpBodyActivate( body )
-	body->(member) = value
+	body->_member = value
 	cpBodyAssertSane(body)
 end sub
 #endmacro
@@ -310,7 +223,7 @@ CP_DefineBodyStructSetter( _type, _member, _name )
 #endmacro
 #endif
 
-CP_DefineBodyStructGetter(cpSpace ptr, CP_PRIVATE(space), Space)
+CP_DefineBodyStructGetter(cpSpace_ ptr, CP_PRIVATE(space), Space)
 
 CP_DefineBodyStructGetter(cpFloat, m, Mass)
 
@@ -333,7 +246,7 @@ CP_DefineBodyStructProperty(cpVect, f, Force)
 CP_DefineBodyStructGetter(cpFloat, a, Angle)
 
 ''/ Set the angle of a body.
-declare sub cpBodySetAngle( byval body as cpBody ptr, byval a as cpFloat )void cpBodySetAngle(cpBody *body, cpFloat a);
+declare sub cpBodySetAngle( byval body as cpBody ptr, byval a as cpFloat )
 
 CP_DefineBodyStructProperty(cpFloat, w, AngVel)
 CP_DefineBodyStructProperty(cpFloat, t, Torque)
@@ -385,14 +298,14 @@ declare function cpBodyGetVelAtLocalPoint(byval body as cpBody ptr, byval point 
 
 ''/ Body/shape iterator callback function type. 
 
-type cpBodyShapeIteratorFunc as sub cdecl( byval body as cpBody ptr, byval shape as cpShape ptr, byval _data as any ptr )
+type cpBodyShapeIteratorFunc as sub cdecl( byval body as cpBody ptr, byval shape as cpShape_ ptr, byval _data as any ptr )
 
 ''/ Call @c func once for each shape attached to @c body and added to the space.
 declare sub cpBodyEachShape(byval body as cpBody ptr, byval func as cpBodyShapeIteratorFunc, byval data as any ptr)
 
 ''/ Body/constraint iterator callback function type. 
 
-type cpBodyConstraintIteratorFunc as sub(byval body as cpBody ptr, byval constraint as cpConstraint ptr, byval data as any ptr)
+type cpBodyConstraintIteratorFunc as sub(byval body as cpBody ptr, byval constraint as cpConstraint_ ptr, byval data as any ptr)
 
 ''/ Call @c func once for each constraint attached to @c body and added to the space.
 
@@ -402,7 +315,7 @@ declare sub cpBodyEachConstraint(byval body as cpBody ptr, byval func as cpBodyC
 
 ''/ Body/arbiter iterator callback function type. 
 
-type as sub(byval body as cpBody ptr, byval arbiter as cpArbiter ptr, byval data as any ptr) cpBodyArbiterIteratorFunc
+type as sub(byval body as cpBody ptr, byval arbiter as cpArbiter_ ptr, byval data as any ptr) cpBodyArbiterIteratorFunc
 
 ''/ Call @c func once for each arbiter that is currently active on the body.
 

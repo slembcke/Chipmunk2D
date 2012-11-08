@@ -27,7 +27,7 @@
 
 extern "c"
 
-type as cpDampedSpring cpDampedSpring
+type as cpDampedSpring cpDampedSpring_
 
 
 

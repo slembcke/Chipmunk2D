@@ -27,7 +27,7 @@
 #include "crt/stdlib.bi"
 #include "crt/math.bi"
 
-extern "C" 
+extern "c" 
 
 #ifndef CP_ALLOW_PRIVATE_ACCESS
 #	define CP_ALLOW_PRIVATE_ACCESS 0
@@ -40,26 +40,26 @@ extern "C"
 #	define CP_PRIVATE(symbol) symbol##_private
 #endif
 
-declare sub cpMessage(byval condition as const byte ptr, byval file as const byte ptr, byval line as integer, byval isError as integer, byval isHardError as integer, byval message as const byte ptr, ...)
+declare sub cpMessage(byval condition as const zstring ptr, byval file as const zstring ptr, byval line as integer, byval isError as integer, byval isHardError as integer, byval message as const byte ptr, ... )
 
 #ifdef NDEBUG
-#	define	cpAssertWarn(condition, ...)
+#	define	cpAssertWarn( condition, args... )
 #else
-#	define cpAssertWarn(condition, ...) if( not (condition)) then cpMessage(#condition, __FILE__, __LINE__, 0, 0, __VA_ARGS__)
+#	define cpAssertWarn( condition, args... ) if( not (condition)) then cpMessage( strptr( #condition ), __FILE__, __LINE__, 0, 0, args )
 #endif
 
 
 
 #ifdef NDEBUG
-#	define	cpAssertSoft(condition, ...)
+#	define	cpAssertSoft( condition, args... )
 #else
-#	define cpAssertSoft(condition, ...) if( not (condition)) then cpMessage(#condition, __FILE__, __LINE__, 1, 0, __VA_ARGS__)
+#	define cpAssertSoft( condition, args... ) if( not (condition)) then cpMessage( strptr( #condition ), __FILE__, __LINE__, 1, 0, args )
 #endif
 
 
 
 '' Hard assertions are important and cheap to execute. They are not disabled by compiling as debug.
-#define cpAssertHard(condition, ...) if( not (condition)) then cpMessage(#condition, __FILE__, __LINE__, 1, 1, __VA_ARGS__)
+#define cpAssertHard(condition, args...) if( not (condition)) then cpMessage( strptr( #condition ), __FILE__, __LINE__, 1, 1, args )
 
 #include "chipmunk_types.bi"
 
@@ -89,14 +89,14 @@ declare sub cpMessage(byval condition as const byte ptr, byval file as const byt
 #	define cpfree free
 #endif
 
-type as cpArray cpArray
-type as cpHashSet cpHashSet
-type as cpBody cpBody
-type as cpShape cpShape
-type as cpConstraint cpConstraint
-type as cpCollisionHandler cpCollisionHandler
-type as cpArbiter cpArbiter
-type as cpSpace cpSpace
+type as cpArray cpArray_
+type as cpHashSet cpHashSet_
+type as cpBody cpBody_
+type as cpShape cpShape_
+type as cpConstraint cpConstraint_
+type as cpCollisionHandler cpCollisionHandler_
+type as cpArbiter cpArbiter_
+type as cpSpace cpSpace_
 
 #include "cpVect.bi"
 #include "cpBB.bi"
@@ -115,7 +115,7 @@ type as cpSpace cpSpace
 
 ''/ Version string.
 
-extern as const byte ptr cpVersionString
+extern as const zstring ptr cpVersionString
 
 ''/ @deprecated
 declare sub cpInitChipmunk()
@@ -168,11 +168,10 @@ declare function cpConvexHull(byval count as integer, byval verts as cpVect ptr,
 ''/ @c count_var and @c verts_var are the names of the variables the macro creates to store the result.
 ''/ The output vertex array is allocated on the stack using alloca() so it will be freed automatically, but cannot be returned from the current scope.
 
-#define CP_CONVEX_HULL( __count, __verts, __count_var, __verts_var ) _
-	dim as cpVect ptr __verts_var = cptr( cpVect ptr, allocate( __count * sizeof(cpVect) ) ) _
-	dim as integer __count_var = cpConvexHull( __count, __verts, __verts_var, NULL, 0.0 )
-
-end extern
+#macro CP_CONVEX_HULL( __count, __verts, __count_var, __verts_var )
+dim as cpVect ptr __verts_var = cptr( cpVect ptr, allocate( __count * sizeof(cpVect) ) )
+dim as integer __count_var = cpConvexHull( __count, __verts, __verts_var, NULL, 0.0 )
+#endmacro
 
 ''static inline cpVect operator *(const cpVect v, const cpFloat s){return cpvmult(v, s);}
 operator +(byval v1 as const cpVect, byval v2 as const cpVect) as cpVect
@@ -190,10 +189,14 @@ operator =(byval v1 as const cpVect, byval v2 as const cpVect) as cpBool
 end operator
 ''static inline cpBool operator ==(const cpVect v1, const cpVect v2){return cpveql(v1, v2);}
 
-operator -(byval v as const cpVect)
-	return cpvnev(v)
+operator -(byval v as const cpVect) as cpVect
+	return cpvneg(v)
 end operator
 ''static inline cpVect operator -(const cpVect v){return cpvneg(v);}
+
+end extern
+
+#inclib "chipmunk"
 
 #endif
 

@@ -32,7 +32,7 @@ extern "c"
 
 
 
-type as cpShapeClass cpShapeClass
+type as cpShapeClass cpShapeClass_
 
 
 
@@ -42,7 +42,7 @@ type cpNearestPointQueryInfo
 
 	''/ The nearest shape, NULL if no shape was within range.
 
-	as cpShape ptr shape
+	as cpShape_ ptr shape
 
 	''/ The closest point on the shape's surface. (in world space coordinates)
 
@@ -62,7 +62,7 @@ type cpSegmentQueryInfo
 
 	''/ The shape that was hit, NULL if no collision occured.
 
-	as cpShape ptr shape
+	as cpShape_ ptr shape
 
 	''/ The normalized distance along the query segment in the range [0, 1].
 
@@ -92,13 +92,13 @@ end enum
 
 
 
-type cpShapeCacheDataImpl as function(byval shape as cpShape ptr, byval p as cpVect, byval rot as cpVect) as cpBB
+type cpShapeCacheDataImpl as function(byval shape as cpShape_ ptr, byval p as cpVect, byval rot as cpVect) as cpBB
 
-type cpShapeDestroyImpl as sub(byval shape as cpShape ptr)
+type cpShapeDestroyImpl as sub(byval shape as cpShape_ ptr)
 
-type cpShapeNearestPointQueryImpl as sub(byval shape as cpShape ptr, byval p as cpVect, byval info as cpNearestPointQueryInfo ptr)
+type cpShapeNearestPointQueryImpl as sub(byval shape as cpShape_ ptr, byval p as cpVect, byval info as cpNearestPointQueryInfo ptr)
 
-type cpShapeSegmentQueryImpl as sub(byval shape as cpShape ptr, byval a as cpVect, byval b as cpVect, byval info as cpSegmentQueryInfo ptr)
+type cpShapeSegmentQueryImpl as sub(byval shape as cpShape_ ptr, byval a as cpVect, byval b as cpVect, byval info as cpSegmentQueryInfo ptr)
 
 
 
@@ -126,7 +126,6 @@ end type
 
 type cpShape
 
-	'' TODO: translate (sorry)
 	CP_PRIVATE(as const cpShapeClass ptr klass)
 
 	
@@ -189,21 +188,17 @@ type cpShape
 
 	
 
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpSpace ptr space)
+	CP_PRIVATE(as cpSpace_ ptr space)
 
 	
 
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpShape ptr next);
+	CP_PRIVATE(as cpShape_ ptr next)
 
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpShape ptr prev);
+	CP_PRIVATE(as cpShape_ ptr prev)
 
 	
 
-	'' TODO: translate (sorry)
-	CP_PRIVATE(as cpHashValue hashid);
+	CP_PRIVATE(as cpHashValue hashid)
 
 end type
 
@@ -259,7 +254,7 @@ declare function cpShapeSegmentQuery(byval shape as cpShape ptr, byval a as cpVe
 #ifndef CP_DefineShapeStructGetter
 #macro CP_DefineShapeStructGetter( _type, _member, _name )
 function cpSpaceGet##_name( byval shape as const cpShape ptr ) as _type
-	return shape->(_member)
+	return shape->_member
 end function
 #endmacro
 #endif
@@ -267,8 +262,8 @@ end function
 #ifndef CP_DefineShapeStructSetter
 #macro CP_DefineShapeStructSetter( _type, _member, _name, _activates )
 sub cpShapeSet##_name( byval shape as cpShape ptr, byval value as _type )
-	if ( _activates and shape->body ) then cpBodyActivate( shape->body )
-	shape->(_member) = value
+	if ( (_activates = cpTrue) and (shape->body <> NULL) ) then cpBodyActivate( shape->body )
+	shape->_member = value
 end sub
 #endmacro
 #endif
@@ -281,11 +276,11 @@ CP_DefineShapeStructSetter( _type, _member, _name, _activates )
 #endif
 
 
-CP_DefineShapeStructGetter(cpSpace ptr, CP_PRIVATE(space), Space)
+CP_DefineShapeStructGetter(cpSpace_ ptr, CP_PRIVATE(space), Space)
 
-CP_DefineShapeStructGetter(cpBody ptr, body, Body)
+CP_DefineShapeStructGetter(cpBody_ ptr, body, Body)
 
-declare sub cpShapeSetBody( byval shape as cpShape ptr, byval body as cpBody ptr )
+declare sub cpShapeSetBody( byval shape as cpShape_ ptr, byval body as cpBody_ ptr )
 
 
 CP_DefineShapeStructGetter(cpBB, bb, BB)
@@ -315,12 +310,11 @@ end extern
 ''/ Because the hash value may affect iteration order, you can reset the shape ID counter
 
 ''/ when recreating a space. This will make the simulation be deterministic.
+declare sub cpResetShapeIdCounter()
 
-void cpResetShapeIdCounter(void);
-
-
-
-#define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(const cpShape *shape)
+#ifndef CP_DeclareShapeGetter
+#define CP_DeclareShapeGetter( _struct, _type, _name ) declare function _struct##Get##_name( byval shape as const cpShape ptr ) as _type
+#endif
 
 
 
@@ -342,7 +336,7 @@ type cpCircleShape
 
 	as cpFloat r
 
-end type : type as cpCircleShape cpCircleShape
+end type
 
 
 
@@ -359,12 +353,9 @@ declare function cpCircleShapeInit(byval circle as cpCircleShape ptr, byval body
 declare function cpCircleShapeNew(byval body as cpBody ptr, byval radius as cpFloat, byval offset as cpVect) as cpShape ptr
 
 
+CP_DeclareShapeGetter(cpCircleShape, cpVect, Offset)
 
-'' TODO: translate (sorry)
-CP_DeclareShapeGetter(cpCircleShape, cpVect, Offset);
-
-'' TODO: translate (sorry)
-CP_DeclareShapeGetter(cpCircleShape, cpFloat, Radius);
+CP_DeclareShapeGetter(cpCircleShape, cpFloat, Radius)
 
 
 
@@ -392,7 +383,7 @@ type cpSegmentShape
 
 	as cpVect a_tangent, b_tangent
 
-end type : type as cpSegmentShape cpSegmentShape
+end type
 
 
 
@@ -413,18 +404,10 @@ declare function cpSegmentShapeNew(byval body as cpBody ptr, byval a as cpVect, 
 declare sub cpSegmentShapeSetNeighbors(byval shape as cpShape ptr, byval prev as cpVect, byval next as cpVect)
 
 
-
-'' TODO: translate (sorry)
-CP_DeclareShapeGetter(cpSegmentShape, cpVect, A);
-
-'' TODO: translate (sorry)
-CP_DeclareShapeGetter(cpSegmentShape, cpVect, B);
-
-'' TODO: translate (sorry)
-CP_DeclareShapeGetter(cpSegmentShape, cpVect, Normal);
-
-'' TODO: translate (sorry)
-CP_DeclareShapeGetter(cpSegmentShape, cpFloat, Radius);
+CP_DeclareShapeGetter(cpSegmentShape, cpVect, A)
+CP_DeclareShapeGetter(cpSegmentShape, cpVect, B)
+CP_DeclareShapeGetter(cpSegmentShape, cpVect, Normal)
+CP_DeclareShapeGetter(cpSegmentShape, cpFloat, Radius)
 
 
 
