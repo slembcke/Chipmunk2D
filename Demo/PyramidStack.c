@@ -39,7 +39,7 @@ init(void)
 	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
 	cpSpaceSetGravity(space, cpv(0, -100));
-	cpSpaceSetSleepTimeThreshold(space, 0.5f);
+//	cpSpaceSetSleepTimeThreshold(space, 0.5f);
 	cpSpaceSetCollisionSlop(space, 0.5f);
 	
 	cpBody *body, *staticBody = cpSpaceGetStaticBody(space);

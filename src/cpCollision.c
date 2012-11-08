@@ -18,7 +18,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
+
+#include <stdio.h>
+#include <string.h>
+
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
 
@@ -223,13 +226,32 @@ struct ClosestPoints {
 static struct ClosestPoints
 ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, const cpFloat t, const cpFloat coef)
 {
+	cpVect p = cpvlerp(v0.ab, v1.ab, t);
 	cpVect pa = cpvlerp(v0.a, v1.a, t);
 	cpVect pb = cpvlerp(v0.b, v1.b, t);
+	cpCollisionID id = (v0.id & 0xFFFF)<<16 | (v1.id & 0xFFFF);
 	
-	cpFloat d = coef*cpvdist(pa, pb);
-	cpVect n = cpvnormalize(cpvmult(d != 0.0 ? cpvsub(pb, pa) : cpvperp(cpvsub(v0.ab, v1.ab)), coef));
-	struct ClosestPoints points = {pa, pb, n, d, (v0.id & 0xFFFF)<<16 | (v1.id & 0xFFFF)};
-	cpAssertWarn(cpvdist(cpvadd(points.a, cpvmult(points.n, points.d)), points.b) < 1e-5, "Bad closest points?");
+	cpVect n = cpvnormalize(cpvperp(cpvsub(v1.ab, v0.ab)));
+	cpFloat d = cpvdot(n, p);
+	
+	struct ClosestPoints points;
+	if(d*coef >= 0.0f){
+		points = (struct ClosestPoints){pa, pb, n, d, id};
+	} else {
+		points = (struct ClosestPoints){pa, pb, cpvneg(n), -d, id};
+	}
+	
+	if(t == 0.0f || t == 1.0f){
+		// If coef is negative, points.d > 0.0
+		cpFloat d = cpvlength(p);
+		cpVect n = cpvmult(p, 1.0f/(d + CPFLOAT_MIN));
+		
+		points = (struct ClosestPoints){pa, pb, n, d, id};
+	}
+	
+	if(n.x != n.x || n.y != n.y){
+		printf("crap1\n");
+	}
 	return points;
 }
 
@@ -292,7 +314,8 @@ EPARecurse(const struct SupportContext context, struct EPANode *root, int i)
 	ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 0, 1, 1));
 #endif
 	
-	if(cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab)) < 0.0f){
+	cpFloat area = cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab));
+	if(area < 0.0f){
 		struct EPANode left; EPANodeInit(&left, v0, p);
 		struct EPANode right; EPANodeInit(&right, p, v1);
 		EPANodeSplit(best, &left, &right);
@@ -353,14 +376,16 @@ ContainsOrigin(const cpVect a, const cpVect b, const cpVect c)
 }
 
 static inline struct ClosestPoints
-GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct MinkowskiPoint v1, cpFloat t, cpFloat d)
+GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct MinkowskiPoint v1)
 {
+	cpFloat t = ClosestT(v0.ab, v1.ab);
+	cpFloat d = cpvlengthsq(cpvlerp(v0.ab, v1.ab, t));
+	
 	for(int i=1;; i++){
 //		cpAssertSoft(cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(cpvzero, v0.ab)) >= 0.0, "Segment oriented the wrong way.");
 		cpAssertSoft(i < 100, "Stuck in GJK recursion");
 		
-		// Move to arg
-		cpFloat t = ClosestT(v0.ab, v1.ab);
+		// Redundant from arg
 		cpVect closest = cpvlerp(v0.ab, v1.ab, t);
 		struct MinkowskiPoint p = Support(context, cpvneg(closest));
 		
@@ -373,9 +398,10 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 		cpFloat t0 = ClosestT(v0.ab, p.ab);
 		cpFloat t1 = ClosestT(p.ab, v1.ab);
 		
+		// cpvlerp() is redundant
 		cpFloat d0 = cpvlengthsq(cpvlerp(v0.ab, p.ab, t0));
 		cpFloat d1 = cpvlengthsq(cpvlerp(p.ab, v1.ab, t1));
-
+		
 		if(ContainsOrigin(v0.ab, v1.ab, p.ab)){
 			return EPA(context, v0, v1, p);
 		} else if(d <= cpfmin(d0, d1)){
@@ -441,7 +467,7 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 			mdiffVerts[i*shape2Count + j] = cpvsub(v2, v1);
 		}
 	}
-	
+	 
 	cpVect *hullVerts = alloca(mdiffCount*sizeof(cpVect));
 	int hullCount = cpConvexHull(mdiffCount, mdiffVerts, hullVerts, NULL, 0.0);
 	
@@ -453,11 +479,8 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 	
 	struct MinkowskiPoint p1, p2;
 	if(*id){
-//		ChipmunkDemoPrintString("Cached collision ID was %08X\n", *id);
-		
 		p1 = MinkoskiPointNew(ShapePoint(shape1, (*id>>24)&0xFF), ShapePoint(shape2, (*id>>16)&0xFF));
 		p2 = MinkoskiPointNew(ShapePoint(shape1, (*id>> 8)&0xFF), ShapePoint(shape2, (*id    )&0xFF));
-//		ChipmunkDebugDrawFatSegment(p1.ab, p2.ab, 5.0, RGBAColor(0.0, 1.0, 1.0, 1.0), RGBAColor(0, 0, 0, 0));
 	} else {
 		// TODO use centroids as the starting axis
 		cpVect axis = cpvperp(cpvsub(cpBBCenter(shape1->bb), cpBBCenter(shape2->bb)));
@@ -465,31 +488,19 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 		p2 = Support(context, cpvneg(axis));
 	}
 	
-	cpFloat t = ClosestT(p1.ab, p2.ab);
-	struct ClosestPoints points = GJKRecurse(context, p1, p2, t, cpvlengthsq(cpvlerp(p1.ab, p2.ab, t)));
+	struct ClosestPoints points = GJKRecurse(context, p1, p2);
 	*id = points.id;
-	
-	if(cpfabs(points.d) < MAGIC_EPSILON){
-		// If the closest points are very close together, might need to estimate the normal.
-		// TODO fix the constness to get rid of the cast.
-		cpNearestPointQueryInfo info;
-		cpShapeNearestPointQuery((cpShape *)shape1, points.b, &info);
-		points.n = info.g;
-		
-		return points;
-	} else {
-		return points;
-	}
+	return points;
 }
 
 //MARK: Contact Clipping
 
 static inline void
-Contact1(cpFloat dist, cpVect a, cpVect b, cpFloat refr, cpFloat incr, cpVect refn, cpVect n, cpHashValue hash, cpContact *arr)
+Contact1(cpFloat dist, cpVect a, cpVect b, cpFloat refr, cpFloat incr, cpVect n, cpHashValue hash, cpContact *arr)
 {
 	cpFloat rsum = refr + incr;
 	cpFloat alpha = (rsum > 0.0f ? refr/rsum : 0.5f);
-	cpVect point = cpvadd(cpvlerp(a, b, alpha), cpvmult(refn, alpha));
+	cpVect point = cpvlerp(a, b, alpha);
 	
 	cpContactInit(arr, point, n, dist - rsum, hash);
 }
@@ -559,11 +570,11 @@ ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestP
 	
 	if(cost_a < cost_b){
 		cpVect refp = cpvadd(ref.a.p, ref_offs);
-		Contact1(points.d, closest_inca, inc.a.p, ref.r, inc.r, ref.n, points.n, hash_iarb, arr);
+		Contact1(points.d, closest_inca, inc.a.p, ref.r, inc.r, points.n, hash_iarb, arr);
 		return Contact2(refp, inca, incb, ref.r, inc.r, ref.n, points.n, hash_ibra, arr + 1) + 1;
 	} else {
 		cpVect refp = cpvadd(ref.b.p, ref_offs);
-		Contact1(points.d, closest_incb, inc.b.p, ref.r, inc.r, ref.n, points.n, hash_ibra, arr);
+		Contact1(points.d, closest_incb, inc.b.p, ref.r, inc.r, points.n, hash_ibra, arr);
 		return Contact2(refp, incb, inca, ref.r, inc.r, ref.n, points.n, hash_iarb, arr + 1) + 1;
 	}
 }

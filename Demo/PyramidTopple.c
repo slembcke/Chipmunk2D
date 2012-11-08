@@ -32,6 +32,13 @@ update(cpSpace *space)
 		cpSpaceStep(space, dt);
 }
 
+static cpBool
+Begin(cpArbiter *arb, cpSpace *space, void *data)
+{
+	return cpFalse;
+}
+
+
 #define WIDTH 4.0f
 #define HEIGHT 30.0f
 
@@ -70,6 +77,7 @@ init(void)
 	int n = 12;
 	for(int i=0; i<n; i++){
 		for(int j=0; j<(n - i); j++){
+//		int i=0, j=0; {{
 			cpVect offset = cpv((j - (n - 1 - i)*0.5f)*1.5f*HEIGHT, (i + 0.5f)*(HEIGHT + 2*WIDTH) - WIDTH - 240);
 			add_domino(space, offset, cpFalse);
 			add_domino(space, cpvadd(offset, cpv(0, (HEIGHT + WIDTH)/2.0f)), cpTrue);
@@ -85,6 +93,8 @@ init(void)
 			}
 		}
 	}
+	
+//	cpSpaceSetDefaultCollisionHandler(space, Begin, NULL, NULL, NULL, NULL);
 	
 	return space;
 }
