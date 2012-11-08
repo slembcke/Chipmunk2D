@@ -586,22 +586,18 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 {
 	cpFloat mindist = e1.r + e2.r;
 	if(points.d <= mindist){
-		cpFloat dot1 =  cpvdot(e1.n, points.n);
-		cpFloat dot2 = -cpvdot(e2.n, points.n);
+		cpFloat pick = cpvdot(cpvadd(e1.n, e2.n), points.n);
 		
-		if(dot1 > dot2){
-			return ClipContacts(e1, e2, points,  1.0, arr);
-		} else if(dot1 < dot2) {
-			return ClipContacts(e2, e1, points, -1.0, arr);
-		} else {
+		if(
+			(pick != 0.0f && pick > 0.0f) ||
 			// If the edges are both perfectly aligned weird things happen.
 			// This is *very* common at the start of a simulation.
 			// Pick the longest edge as the reference to break the tie.
-			if(cpvdistsq(e1.a.p, e1.b.p) > cpvdistsq(e2.a.p, e2.b.p)){
-				return ClipContacts(e1, e2, points,  1.0, arr);
-			} else {
-				return ClipContacts(e2, e1, points, -1.0, arr);
-			}
+			(pick == 0.0f && (cpvdistsq(e1.a.p, e1.b.p) > cpvdistsq(e2.a.p, e2.b.p)))
+		){
+			return ClipContacts(e1, e2, points,  1.0f, arr);
+		} else {
+			return ClipContacts(e2, e1, points, -1.0f, arr);
 		}
 	} else {
 		return 0;
