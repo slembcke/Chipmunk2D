@@ -24,6 +24,9 @@
 #ifndef CHIPMUNK_HEADER
 #define CHIPMUNK_HEADER
 
+#inclib "chipmunk"
+
+
 #include "crt/stdlib.bi"
 #include "crt/math.bi"
 
@@ -195,8 +198,6 @@ end operator
 ''static inline cpVect operator -(const cpVect v){return cpvneg(v);}
 
 end extern
-
-#inclib "chipmunk"
 
 #endif
 
