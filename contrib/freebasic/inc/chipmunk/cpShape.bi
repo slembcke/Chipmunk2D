@@ -253,7 +253,7 @@ declare function cpShapeSegmentQuery(byval shape as cpShape ptr, byval a as cpVe
 
 #ifndef CP_DefineShapeStructGetter
 #macro CP_DefineShapeStructGetter( _type, _member, _name )
-function cpSpaceGet##_name( byval shape as const cpShape ptr ) as _type
+function cpShapeGet##_name( byval shape as const cpShape ptr ) as _type
 	return shape->_member
 end function
 #endmacro
