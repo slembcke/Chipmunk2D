@@ -129,7 +129,7 @@ void ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 	ChipmunkDebugDrawShapes(space);
 	ChipmunkDebugDrawConstraints(space);
 	
-	ChipmunkDebugDrawCollisionPoints(space);
+//	ChipmunkDebugDrawCollisionPoints(space);
 }
 
 
@@ -581,7 +581,7 @@ main(int argc, const char **argv)
 	cpEnableSegmentToSegmentCollisions();
 	
 	ChipmunkDemo demo_list[] = {
-		PyramidTopple,
+//		PyramidTopple,
 		GJK,
 //		Smooth,
 //		ContactPoints,
