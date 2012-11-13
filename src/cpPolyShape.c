@@ -47,7 +47,8 @@ cpPolyShapeTransformVerts(cpPolyShape *poly, cpVect p, cpVect rot)
 		t = cpfmax(t, v.y);
 	}
 	
-	return cpBBNew(l, b, r, t);
+	cpFloat radius = poly->r;
+	return cpBBNew(l - radius, b - radius, r + radius, t + radius);
 }
 
 static void
@@ -186,6 +187,13 @@ cpPolyShapeGetVert(const cpShape *shape, int idx)
 	return ((cpPolyShape *)shape)->verts[idx];
 }
 
+cpFloat
+cpPolyShapeGetRadius(const cpShape *shape)
+{
+	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
+	return ((cpPolyShape *)shape)->r;
+}
+
 
 static void
 setUpVerts(cpPolyShape *poly, int numVerts, const cpVect *verts, cpVect offset)
@@ -198,7 +206,6 @@ setUpVerts(cpPolyShape *poly, int numVerts, const cpVect *verts, cpVect offset)
 	poly->planes = (cpSplittingPlane *)cpcalloc(2*numVerts, sizeof(cpSplittingPlane));
 	poly->tVerts = poly->verts + numVerts;
 	poly->tPlanes = poly->planes + numVerts;
-	poly->centroid = cpvadd(offset, cpCentroidForPoly(numVerts, poly->verts));
 	
 	for(int i=0; i<numVerts; i++){
 		cpVect a = cpvadd(offset, verts[i]);
@@ -230,6 +237,7 @@ cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *ver
 {
 	setUpVerts(poly, numVerts, verts, offset);
 	cpShapeInit((cpShape *)poly, &polyClass, body);
+	poly->r = 0.0f;
 
 	return poly;
 }
@@ -282,4 +290,11 @@ cpPolyShapeSetVerts(cpShape *shape, int numVerts, cpVect *verts, cpVect offset)
 	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
 	cpPolyShapeDestroy((cpPolyShape *)shape);
 	setUpVerts((cpPolyShape *)shape, numVerts, verts, offset);
+}
+
+void
+cpPolyShapeSetRadius(cpShape *shape, cpFloat radius)
+{
+	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
+	((cpPolyShape *)shape)->r = radius;
 }

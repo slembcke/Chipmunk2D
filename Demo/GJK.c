@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include "chipmunk_private.h"
+#include "chipmunk_unsafe.h"
 #include "ChipmunkDemo.h"
 
 static cpShape *shape1, *shape2;
@@ -65,6 +66,7 @@ init(void)
 		cpBodySetPos(body, cpv(100.0, 50.0f));
 		
 		shape1 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
+		cpPolyShapeSetRadius(shape1, 10.0);
 		shape1->group = 1;
 	}{
 		cpFloat size = 100.0;
@@ -74,6 +76,7 @@ init(void)
 		cpBodySetAngle(body, 1e-2);
 		
 		shape2 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
+		cpPolyShapeSetRadius(shape2, 20.0);
 		shape2->group = 1;
 	}
 	

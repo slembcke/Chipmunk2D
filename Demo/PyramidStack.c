@@ -21,6 +21,7 @@
  
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
+#include "chipmunk_unsafe.h"
 
 static void
 update(cpSpace *space)
@@ -68,6 +69,7 @@ init(void)
 			cpBodySetPos(body, cpv(j*32 - i*16, 300 - i*32));
 			
 			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 30.0f, 30.0f));
+			cpPolyShapeSetRadius(shape, 2.0);
 			cpShapeSetElasticity(shape, 0.0f);
 			cpShapeSetFriction(shape, 0.8f);
 		}

@@ -29,8 +29,8 @@
 #define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
-#define DRAW_CLOSEST (0 || DRAW_ALL)
-#define DRAW_CLIP (0 || DRAW_ALL)
+#define DRAW_CLOSEST (1 || DRAW_ALL)
+#define DRAW_CLIP (1 || DRAW_ALL)
 #define DRAW_CONTACTS (1 || DRAW_ALL)
 
 #define PRINT_LOG 0
@@ -193,9 +193,9 @@ SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 	
 	cpVect *verts = poly->tVerts;
 	if(cpvdot(n, poly->tPlanes[i1].n) > cpvdot(n, poly->tPlanes[i2].n)){
-		return (struct Edge){{verts[i0], CP_HASH_PAIR(poly, i0)}, {verts[i1], CP_HASH_PAIR(poly, i1)}, 0.0, poly->tPlanes[i1].n};
+		return (struct Edge){{verts[i0], CP_HASH_PAIR(poly, i0)}, {verts[i1], CP_HASH_PAIR(poly, i1)}, poly->r, poly->tPlanes[i1].n};
 	} else {
-		return (struct Edge){{verts[i1], CP_HASH_PAIR(poly, i1)}, {verts[i2], CP_HASH_PAIR(poly, i2)}, 0.0, poly->tPlanes[i2].n};
+		return (struct Edge){{verts[i1], CP_HASH_PAIR(poly, i1)}, {verts[i2], CP_HASH_PAIR(poly, i2)}, poly->r, poly->tPlanes[i2].n};
 	}
 }
 
@@ -670,7 +670,7 @@ poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionID *id,
 	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
 	
-	if(points.d <= 0.0){
+	if(points.d - poly1->r - poly2->r <= 0.0){
 		return ContactPoints(SupportEdgeForPoly(poly1, points.n), SupportEdgeForPoly(poly2, cpvneg(points.n)), points, arr);
 	} else {
 		return 0;
@@ -695,7 +695,7 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionID *id, 
 	// Reject endcap collisions if tangents are provided.
 	cpVect n = points.n;
 	if(
-		points.d - seg->r <= 0.0 //&&
+		points.d - seg->r - poly->r <= 0.0 //&&
 //		(!cpveql(points.a, seg->ta) || cpvdot(n, cpvrotate(seg->a_tangent, seg->shape.body->rot)) >= 0.0) &&
 //		(!cpveql(points.a, seg->tb) || cpvdot(n, cpvrotate(seg->b_tangent, seg->shape.body->rot)) >= 0.0)
 	){
@@ -707,6 +707,7 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionID *id, 
 
 // This one is less gross, but still gross.
 // TODO: Comment me!
+// TODO respect poly radius
 static int
 circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionID *id, cpContact *con)
 {
@@ -733,14 +734,14 @@ circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionID 
 	cpFloat dt = cpvcross(n, circle->tc);
 	
 	if(dt < dtb){
-		return circle2circleQuery(circle->tc, b, circle->r, 0.0f, 0, con);
+		return circle2circleQuery(circle->tc, b, circle->r, poly->r, 0, con);
 	} else if(dt < dta) {
 		cpVect point = cpvsub(circle->tc, cpvmult(n, circle->r + min/2.0f));
 		cpContactInit(con, point, cpvneg(n), min, 0);
 	
 		return 1;
 	} else {
-		return circle2circleQuery(circle->tc, a, circle->r, 0.0f, 0, con);
+		return circle2circleQuery(circle->tc, a, circle->r, poly->r, 0, con);
 	}
 }
 

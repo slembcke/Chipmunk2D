@@ -25,7 +25,7 @@
 
 #ifndef CP_USE_DOUBLES
 	// use doubles by default for higher precision
-	#define CP_USE_DOUBLES 1
+	#define CP_USE_DOUBLES 0
 #endif
 
 /// @defgroup basicTypes Basic Types
@@ -48,7 +48,6 @@
 	#define cpfceil ceil
 	#define CPFLOAT_MIN DBL_MIN
 #else
-	#error
 	typedef float cpFloat;
 	#define cpfsqrt sqrtf
 	#define cpfsin sinf
