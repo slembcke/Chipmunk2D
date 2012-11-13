@@ -29,7 +29,7 @@ cpSpaceGetPostStepCallback(cpSpace *space, void *key)
 	cpArray *arr = space->postStepCallbacks;
 	for(int i=0; i<arr->num; i++){
 		cpPostStepCallback *callback = (cpPostStepCallback *)arr->arr[i];
-		if(callback->key == key) return callback;
+		if(callback && callback->key == key) return callback;
 	}
 	
 	return NULL;
@@ -86,6 +86,7 @@ cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
 			cpPostStepFunc func = callback->func;
 			
 			// Mark the func as NULL in case calling it calls cpSpaceRunPostStepCallbacks() again.
+			// TODO need more tests around this case I think.
 			callback->func = NULL;
 			if(func) func(space, callback->key, callback->data);
 			
