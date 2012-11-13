@@ -88,25 +88,25 @@ playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 static void
 update(cpSpace *space)
 {
-	int jumpState = (ChipmunkDemoKeyboard.y > 0.0f);
-	
-	// If the jump key was just pressed this frame, jump!
-	if(jumpState && !lastJumpState && grounded){
-		cpFloat jump_v = cpfsqrt(2.0*JUMP_HEIGHT*GRAVITY);
-		playerBody->v = cpvadd(playerBody->v, cpv(0.0, jump_v));
-		
-		remainingBoost = JUMP_BOOST_HEIGHT/jump_v;
-	}
+//	int jumpState = (ChipmunkDemoKeyboard.y > 0.0f);
+//	
+//	// If the jump key was just pressed this frame, jump!
+//	if(jumpState && !lastJumpState && grounded){
+//		cpFloat jump_v = cpfsqrt(2.0*JUMP_HEIGHT*GRAVITY);
+//		playerBody->v = cpvadd(playerBody->v, cpv(0.0, jump_v));
+//		
+//		remainingBoost = JUMP_BOOST_HEIGHT/jump_v;
+//	}
 	
 	// Step the space
 	int steps = 3;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
-	for(int i=0; i<steps; i++){
+	for(int i=0; i<1; i++){
 		cpSpaceStep(space, dt);
 		
-		remainingBoost -= dt;
-		lastJumpState = jumpState;
+//		remainingBoost -= dt;
+//		lastJumpState = jumpState;
 	}
 }
 
@@ -114,7 +114,7 @@ static cpSpace *
 init(void)
 {
 	cpSpace *space = cpSpaceNew();
-	space->iterations = 10;
+	space->iterations = 30;
 	space->gravity = cpv(0, -GRAVITY);
 //	space->sleepTimeThreshold = 1000;
 	space->enableContactGraph = cpTrue;
@@ -135,29 +135,31 @@ init(void)
 	shape->e = 1.0f; shape->u = 1.0f;
 	shape->layers = NOT_GRABABLE_MASK;
 	
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
-	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
-	
-	// Set up the player
-	cpFloat radius = 25.0f;
-	body = cpSpaceAddBody(space, cpBodyNew(1.0f, INFINITY));
-	body->p = cpv(0, -200);
-	body->velocity_func = playerUpdateVelocity;
-	playerBody = body;
-
-	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
-	shape->e = 0.0f; shape->u = 0.0f;
-	shape->collision_type = 1;
-	playerShape = shape;
+//	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
+//	shape->e = 1.0f; shape->u = 1.0f;
+//	shape->layers = NOT_GRABABLE_MASK;
+//	
+//	// Set up the player
+//	cpFloat radius = 25.0f;
+//	body = cpSpaceAddBody(space, cpBodyNew(1.0f, INFINITY));
+//	body->p = cpv(0, -200);
+//	body->velocity_func = playerUpdateVelocity;
+//	playerBody = body;
+//
+//	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
+//	shape->e = 0.0f; shape->u = 0.0f;
+//	shape->collision_type = 1;
+//	playerShape = shape;
 	
 	// Add some boxes to jump on
-	for(int i=0; i<6; i++){
-		for(int j=0; j<3; j++){
-			body = cpSpaceAddBody(space, cpBodyNew(4.0f, INFINITY));
-			body->p = cpv(100 + j*60, -200 + i*60);
+	cpFloat mass = 4.0f;
+	cpFloat size = 30.0f;
+	for(int i=0; i<15; i++){
+		for(int j=0; j<15; j++){
+			body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
+			body->p = cpv(-220 + j*(size + 3), -200 + i*(size + 0.5*frand()));
 			
-			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 50, 50));
+			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
 			shape->e = 0.0f; shape->u = 0.7f;
 		}
 	}

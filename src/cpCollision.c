@@ -29,8 +29,8 @@
 #define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
-#define DRAW_CLOSEST (0 || DRAW_ALL)
-#define DRAW_CLIP (0 || DRAW_ALL)
+#define DRAW_CLOSEST (1 || DRAW_ALL)
+#define DRAW_CLIP (1 || DRAW_ALL)
 #define DRAW_CONTACTS (1 || DRAW_ALL)
 
 #define PRINT_LOG 0
@@ -236,7 +236,7 @@ ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
 	cpVect n = cpvnormalize(cpvperp(delta));
 	cpFloat d = -cpvdot(n, p);
 	
-	if(d > 0.0f || (0.0f < t && t < 1.0f)){
+	if(d < 0.0f || (0.0f < t && t < 1.0f)){
 		struct ClosestPoints points = (struct ClosestPoints){pa, pb, cpvneg(n), d, id};
 		if(n.x != n.x || n.y != n.y){
 			printf("crap1\n");
@@ -247,7 +247,7 @@ ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
 		cpVect n = cpvmult(p, 1.0f/(d + CPFLOAT_MIN));
 		struct ClosestPoints points = (struct ClosestPoints){pa, pb, n, d, id};
 		if(n.x != n.x || n.y != n.y){
-			printf("crap1\n");
+			printf("crap2\n");
 		}
 		return points;
 	}
@@ -326,6 +326,7 @@ EPARecurse(const struct SupportContext context, struct EPANode *root, int i)
 		
 		return EPARecurse(context, root, i + 1);
 	} else {
+		ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(0, 1, 0, 0.5));
 		return ClosestPointsNew(v0, v1);
 	}
 }
@@ -377,7 +378,11 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 {
 	cpVect delta = cpvsub(v1.ab, v0.ab);
 	cpVect n = cpvperp(delta);
-//	cpVect n = cpvneg(cpvlerp(v0.ab, v1.ab, ClosestT(v0.ab, v1.ab)));
+	if(cpvdot(n, v0.ab) > 0.0){
+		printf("foo\n");
+//		return GJKRecurse(context, v1, v0);
+	}
+	
 	struct MinkowskiPoint p = Support(context, n);
 	
 #if DRAW_GJK
@@ -391,18 +396,14 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 	if(ContainsOrigin(v0.ab, p.ab, v1.ab)){
 		return EPA(context, v0, p, v1);
 	} else {
-		cpFloat area = cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab));
-		if(area > 0.0){
+		if(cpvcross(delta, cpvsub(p.ab, v0.ab)) > 0.0f){
 			if(cpvdot(p.ab, delta) > 0.0){
 				return GJKRecurse(context, v0, p);
 			} else {
 				return GJKRecurse(context, p, v1);
 			}
 		} else {
-			if(area < 0.0){
-				printf("negative area. maybe a problem?\n");
-			}
-			
+			ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(1, 0, 0, 0.5));
 			return ClosestPointsNew(v0, v1);
 		}
 	}
@@ -470,7 +471,7 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 	struct SupportContext context = {shape1, shape2, support1, support2};
 	
 	struct MinkowskiPoint v0, v1;
-	if(*id){
+	if(*id && cpFalse){
 		v0 = MinkoskiPointNew(ShapePoint(shape1, (*id>>24)&0xFF), ShapePoint(shape2, (*id>>16)&0xFF));
 		v1 = MinkoskiPointNew(ShapePoint(shape1, (*id>> 8)&0xFF), ShapePoint(shape2, (*id    )&0xFF));
 	} else {
