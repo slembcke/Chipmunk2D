@@ -223,11 +223,9 @@ struct ClosestPoints {
 	cpCollisionID id;
 };
 
-static struct ClosestPoints
-ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
+static inline struct ClosestPoints
+ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, cpFloat t, cpVect p)
 {
-	cpFloat t = ClosestT(v0.ab, v1.ab);
-	cpVect p = cpvlerp(v0.ab, v1.ab, t);
 	cpVect pa = cpvlerp(v0.a, v1.a, t);
 	cpVect pb = cpvlerp(v0.b, v1.b, t);
 	cpCollisionID id = (v0.id & 0xFFFF)<<16 | (v1.id & 0xFFFF);
@@ -259,7 +257,7 @@ struct EPANode {
 	struct MinkowskiPoint v0, v1;
 	struct EPANode *best, *left, *right, *parent;
 	cpVect closest;
-	cpFloat dist;
+	cpFloat t, dist;
 };
 
 static inline void
@@ -272,7 +270,8 @@ EPANodeInit(struct EPANode *node, const struct MinkowskiPoint v0, const struct M
 	node->v1 = v1;
 	node->best = node;
 	node->closest = closest;
-	node->dist = cpvlengthsq(cpClosetPointOnSegment(cpvzero, v0.ab, v1.ab));
+	node->t = t;
+	node->dist = cpvlengthsq(closest);
 }
 
 static inline void
@@ -305,8 +304,7 @@ EPARecurse(const struct SupportContext context, struct EPANode *root, int i)
 	cpAssertSoft(i < 100, "Stuck in EPA recursion.");
 	
 	struct EPANode *best = root->best;
-	cpVect closest = best->closest;
-	struct MinkowskiPoint p = Support(context, closest);
+	struct MinkowskiPoint p = Support(context, best->closest);
 	
 	struct MinkowskiPoint v0 = best->v0;
 	struct MinkowskiPoint v1 = best->v1;
@@ -326,7 +324,7 @@ EPARecurse(const struct SupportContext context, struct EPANode *root, int i)
 		return EPARecurse(context, root, i + 1);
 	} else {
 //		ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(0, 1, 0, 0.5));
-		return ClosestPointsNew(v0, v1);
+		return ClosestPointsNew(v0, v1, best->t, best->closest);
 	}
 }
 
@@ -362,36 +360,42 @@ EPA(const struct SupportContext context, const struct MinkowskiPoint v0, const s
 static inline struct ClosestPoints
 GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct MinkowskiPoint v1)
 {
-	cpVect delta = cpvsub(v1.ab, v0.ab);
-	if(cpvcross(delta, cpvneg(v0.ab)) < 0.0f){
-		// Origin is behind axis. Flip and try again.
-		return GJKRecurse(context, v1, v0);
-	} else {
-		cpVect n = cpvperp(delta);
-		struct MinkowskiPoint p = Support(context, n);
+	for(int i=0;; i++){
+		cpAssertSoft(i < 100, "Stuck in GJK recursion.");
 		
-#if DRAW_GJK
-		ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 1));
-		cpVect c = cpvlerp(v0.ab, v1.ab, 0.5);
-		ChipmunkDebugDrawSegment(c, cpvadd(c, cpvmult(cpvnormalize(n), 5.0)), RGBAColor(1, 0, 0, 1));
-		
-		ChipmunkDebugDrawPoints(5.0, 1, &p.ab, RGBAColor(1, 1, 1, 1));
-#endif
-		
-		if(cpvcross(delta, cpvsub(p.ab, v0.ab)) <= 0.0f){
-//			ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(1, 0, 0, 0.5));
-			return ClosestPointsNew(v0, v1);
-		} else if(
-			cpvcross(cpvsub(v1.ab, p.ab), cpvneg(p.ab)) <= 0.0f &&
-			cpvcross(cpvsub(v0.ab, p.ab), cpvneg(p.ab)) >= 0.0f
-		){
-			// The triangle v0, v1, p contains the origin. Use EPA to find the MSA.
-			return EPA(context, v0, p, v1);
+		cpVect delta = cpvsub(v1.ab, v0.ab);
+		if(cpvcross(delta, cpvneg(v0.ab)) < 0.0f){
+			// Origin is behind axis. Flip and try again.
+			struct MinkowskiPoint tmp = v0;
+			v0 = v1; v1 = tmp;
 		} else {
-			if(cpvdot(p.ab, delta) > 0.0){
-				return GJKRecurse(context, v0, p);
+			cpVect n = cpvperp(delta);
+			struct MinkowskiPoint p = Support(context, n);
+			
+#if DRAW_GJK
+			ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 1));
+			cpVect c = cpvlerp(v0.ab, v1.ab, 0.5);
+			ChipmunkDebugDrawSegment(c, cpvadd(c, cpvmult(cpvnormalize(n), 5.0)), RGBAColor(1, 0, 0, 1));
+			
+			ChipmunkDebugDrawPoints(5.0, 1, &p.ab, RGBAColor(1, 1, 1, 1));
+#endif
+			
+			if(cpvcross(delta, cpvsub(p.ab, v0.ab)) <= 0.0f){
+//				ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(1, 0, 0, 0.5));
+				cpFloat t = ClosestT(v0.ab, v1.ab);
+				return ClosestPointsNew(v0, v1, t, cpvlerp(v0.ab, v1.ab, t));
+			} else if(
+				cpvcross(cpvsub(v1.ab, p.ab), cpvneg(p.ab)) <= 0.0f &&
+				cpvcross(cpvsub(v0.ab, p.ab), cpvneg(p.ab)) >= 0.0f
+			){
+				// The triangle v0, v1, p contains the origin. Use EPA to find the MSA.
+				return EPA(context, v0, p, v1);
 			} else {
-				return GJKRecurse(context, p, v1);
+				if(cpvdot(p.ab, delta) > 0.0){
+					v1 = p;
+				} else {
+					v0 = p;
+				}
 			}
 		}
 	}
@@ -508,7 +512,7 @@ Contact2(cpVect refp, cpVect inca, cpVect incb, cpFloat refr, cpFloat incr, cpVe
 	}
 }
 
-static int
+static inline int
 ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestPoints points, const cpFloat nflip, cpContact *arr)
 {
 	cpVect inc_offs = cpvmult(inc.n, inc.r);
@@ -560,7 +564,7 @@ ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestP
 	}
 }
 
-static int
+static inline int
 ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPoints points, cpContact *arr)
 {
 	cpFloat mindist = e1.r + e2.r;
