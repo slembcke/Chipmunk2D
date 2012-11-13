@@ -157,7 +157,7 @@ init(void)
 	for(int i=0; i<15; i++){
 		for(int j=0; j<15; j++){
 			body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
-			body->p = cpv(-220 + j*(size + 3), -200 + i*(size + 0.5*frand()));
+			body->p = cpv(-220 + j*(size + 3), -200 + i*(size + 1.1));
 			
 			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
 			shape->e = 0.0f; shape->u = 0.7f;

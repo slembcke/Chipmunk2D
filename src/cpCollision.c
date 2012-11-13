@@ -29,8 +29,8 @@
 #define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
-#define DRAW_CLOSEST (1 || DRAW_ALL)
-#define DRAW_CLIP (1 || DRAW_ALL)
+#define DRAW_CLOSEST (0 || DRAW_ALL)
+#define DRAW_CLIP (0 || DRAW_ALL)
 #define DRAW_CONTACTS (1 || DRAW_ALL)
 
 #define PRINT_LOG 0
@@ -236,19 +236,19 @@ ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
 	cpVect n = cpvnormalize(cpvperp(delta));
 	cpFloat d = -cpvdot(n, p);
 	
-	if(d < 0.0f || (0.0f < t && t < 1.0f)){
+	if(d <= 0.0f || (0.0f < t && t < 1.0f)){
 		struct ClosestPoints points = (struct ClosestPoints){pa, pb, cpvneg(n), d, id};
-		if(n.x != n.x || n.y != n.y){
-			printf("crap1\n");
-		}
+//		if(n.x != n.x || n.y != n.y){
+//			printf("crap1\n");
+//		}
 		return points;
 	} else {
-		cpFloat d = cpvlength(p);
-		cpVect n = cpvmult(p, 1.0f/(d + CPFLOAT_MIN));
-		struct ClosestPoints points = (struct ClosestPoints){pa, pb, n, d, id};
-		if(n.x != n.x || n.y != n.y){
-			printf("crap2\n");
-		}
+		cpFloat d2 = cpvlength(p);
+		cpVect n = cpvmult(p, 1.0f/(d2 + CPFLOAT_MIN));
+		struct ClosestPoints points = (struct ClosestPoints){pa, pb, n, d2, id};
+//		if(n.x != n.x || n.y != n.y || d2 == 0.0){
+//			printf("crap2\n");
+//		}
 		return points;
 	}
 }
@@ -259,7 +259,7 @@ struct EPANode {
 	struct MinkowskiPoint v0, v1;
 	struct EPANode *best, *left, *right, *parent;
 	cpVect closest;
-	cpFloat t, dist;
+	cpFloat dist;
 };
 
 static inline void
@@ -272,8 +272,7 @@ EPANodeInit(struct EPANode *node, const struct MinkowskiPoint v0, const struct M
 	node->v1 = v1;
 	node->best = node;
 	node->closest = closest;
-	node->t = t;
-	node->dist = cpvlength(closest);
+	node->dist = cpvlengthsq(cpClosetPointOnSegment(cpvzero, v0.ab, v1.ab));
 }
 
 static inline void
@@ -326,26 +325,9 @@ EPARecurse(const struct SupportContext context, struct EPANode *root, int i)
 		
 		return EPARecurse(context, root, i + 1);
 	} else {
-		ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(0, 1, 0, 0.5));
+//		ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(0, 1, 0, 0.5));
 		return ClosestPointsNew(v0, v1);
 	}
-}
-
-static cpBool
-ContainsOrigin(const cpVect a, const cpVect b, const cpVect c)
-{
-	cpVect v0 = cpvsub(a, b);
-	cpVect v1 = cpvsub(c, b);
-
-	cpFloat dot00 = cpvdot(v0, v0);
-	cpFloat dot01 = cpvdot(v0, v1);
-	cpFloat dot0v = cpvdot(v0, cpvneg(b));
-	cpFloat dot11 = cpvdot(v1, v1);
-	cpFloat dot1v = cpvdot(v1, cpvneg(b));
-
-	cpFloat det = dot00*dot11 - dot01*dot01;
-	cpVect v = cpvmult(cpv(dot11*dot0v - dot01*dot1v, dot00*dot1v - dot01*dot0v), 1.0/det);
-	return (v.x >= 0.0 && v.y >= 0.0 && v.x + v.y <= 1.0);
 }
 
 static struct ClosestPoints
@@ -355,6 +337,10 @@ EPA(const struct SupportContext context, const struct MinkowskiPoint v0, const s
 	ChipmunkDebugDrawPolygon(3, (cpVect[]){v0.ab, v1.ab, v2.ab}, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
 #endif
 	
+//	cpFloat area = cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(v2.ab, v0.ab));
+//	if(area == 0.0){
+//		printf("bad\n");
+//	}
 	
 	struct EPANode n01, n12, n20;
 	EPANodeInit(&n01, v0, v1);
@@ -377,34 +363,36 @@ static inline struct ClosestPoints
 GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct MinkowskiPoint v1)
 {
 	cpVect delta = cpvsub(v1.ab, v0.ab);
-	cpVect n = cpvperp(delta);
-	if(cpvdot(n, v0.ab) > 0.0){
-		printf("foo\n");
-//		return GJKRecurse(context, v1, v0);
-	}
-	
-	struct MinkowskiPoint p = Support(context, n);
-	
-#if DRAW_GJK
-	ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 1));
-	cpVect c = cpvlerp(v0.ab, v1.ab, 0.5);
-	ChipmunkDebugDrawSegment(c, cpvadd(c, cpvmult(cpvnormalize(n), 5.0)), RGBAColor(1, 0, 0, 1));
-	
-	ChipmunkDebugDrawPoints(5.0, 1, &p.ab, RGBAColor(1, 1, 1, 1));
-#endif
-	
-	if(ContainsOrigin(v0.ab, p.ab, v1.ab)){
-		return EPA(context, v0, p, v1);
+	if(cpvcross(delta, cpvneg(v0.ab)) < 0.0f){
+		// Origin is behind axis. Flip and try again.
+		return GJKRecurse(context, v1, v0);
 	} else {
-		if(cpvcross(delta, cpvsub(p.ab, v0.ab)) > 0.0f){
+		cpVect n = cpvperp(delta);
+		struct MinkowskiPoint p = Support(context, n);
+		
+#if DRAW_GJK
+		ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 1));
+		cpVect c = cpvlerp(v0.ab, v1.ab, 0.5);
+		ChipmunkDebugDrawSegment(c, cpvadd(c, cpvmult(cpvnormalize(n), 5.0)), RGBAColor(1, 0, 0, 1));
+		
+		ChipmunkDebugDrawPoints(5.0, 1, &p.ab, RGBAColor(1, 1, 1, 1));
+#endif
+		
+		if(cpvcross(delta, cpvsub(p.ab, v0.ab)) <= 0.0f){
+//			ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(1, 0, 0, 0.5));
+			return ClosestPointsNew(v0, v1);
+		} else if(
+			cpvcross(cpvsub(v1.ab, p.ab), cpvneg(p.ab)) <= 0.0f &&
+			cpvcross(cpvsub(v0.ab, p.ab), cpvneg(p.ab)) >= 0.0f
+		){
+			// The triangle v0, v1, p contains the origin. Use EPA to find the MSA.
+			return EPA(context, v0, p, v1);
+		} else {
 			if(cpvdot(p.ab, delta) > 0.0){
 				return GJKRecurse(context, v0, p);
 			} else {
 				return GJKRecurse(context, p, v1);
 			}
-		} else {
-			ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(1, 0, 0, 0.5));
-			return ClosestPointsNew(v0, v1);
 		}
 	}
 }
@@ -471,7 +459,7 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 	struct SupportContext context = {shape1, shape2, support1, support2};
 	
 	struct MinkowskiPoint v0, v1;
-	if(*id && cpFalse){
+	if(*id){
 		v0 = MinkoskiPointNew(ShapePoint(shape1, (*id>>24)&0xFF), ShapePoint(shape2, (*id>>16)&0xFF));
 		v1 = MinkoskiPointNew(ShapePoint(shape1, (*id>> 8)&0xFF), ShapePoint(shape2, (*id    )&0xFF));
 	} else {

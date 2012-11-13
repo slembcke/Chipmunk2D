@@ -28,7 +28,7 @@ update(cpSpace *space)
 	int steps = 3;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
-	for(int i=0; i<steps; i++)
+	for(int i=0; i<1; i++)
 		cpSpaceStep(space, dt);
 }
 
