@@ -29,9 +29,8 @@
 #define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
-#define DRAW_CLOSEST (1 || DRAW_ALL)
-#define DRAW_CLIP (1 || DRAW_ALL)
-#define DRAW_CONTACTS (1 || DRAW_ALL)
+#define DRAW_CLOSEST (0 || DRAW_ALL)
+#define DRAW_CLIP (0 || DRAW_ALL)
 
 #define PRINT_LOG 0
 #endif
@@ -373,11 +372,11 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 			struct MinkowskiPoint p = Support(context, n);
 			
 #if DRAW_GJK
-			ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 1));
-			cpVect c = cpvlerp(v0.ab, v1.ab, 0.5);
-			ChipmunkDebugDrawSegment(c, cpvadd(c, cpvmult(cpvnormalize(n), 5.0)), RGBAColor(1, 0, 0, 1));
-			
-			ChipmunkDebugDrawPoints(5.0, 1, &p.ab, RGBAColor(1, 1, 1, 1));
+//			ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 1));
+//			cpVect c = cpvlerp(v0.ab, v1.ab, 0.5);
+//			ChipmunkDebugDrawSegment(c, cpvadd(c, cpvmult(cpvnormalize(n), 5.0)), RGBAColor(1, 0, 0, 1));
+//			
+//			ChipmunkDebugDrawPoints(5.0, 1, &p.ab, RGBAColor(1, 1, 1, 1));
 #endif
 			
 			if(cpvcross(delta, cpvsub(p.ab, v0.ab)) <= 0.0f){
@@ -786,29 +785,6 @@ cpCollideShapes(const cpShape *a, const cpShape *b, cpCollisionID *id, cpContact
 	
 	int numContacts = (cfunc? cfunc(a, b, id, arr) : 0);
 	cpAssertSoft(numContacts <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error: Too many contact points returned.");
-	
-#if DRAW_CONTACTS
-#if PRINT_LOG
-	ChipmunkDemoPrintString("Contacts(%d):", numContacts);
-#endif
-	
-	for(int i=0; i<numContacts; i++){
-		cpVect p = arr[i].p;
-//		ChipmunkDebugDrawPoints(2.0, 1, &p, RGBAColor(1, 0, 0, 1));
-		
-		cpVect n = arr[i].n;
-		cpFloat d = -arr[i].dist/2.0 + 8.0;
-		ChipmunkDebugDrawSegment(cpvadd(p, cpvmult(n, d)), cpvadd(p, cpvmult(n, -d)), RGBAColor(1, 0, 0, 1));
-		
-#if PRINT_LOG
-		ChipmunkDemoPrintString(" %08X", arr[i].hash);
-#endif
-	}
-#endif
-
-#if PRINT_LOG
-		ChipmunkDemoPrintString("\n");
-#endif
 	
 	return numContacts;
 }
