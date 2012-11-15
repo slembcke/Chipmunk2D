@@ -300,8 +300,6 @@ ClosestDist(cpVect v0, cpVect v1)
 static struct ClosestPoints
 EPARecurse(const struct SupportContext context, struct EPANode *root, int i)
 {
-	cpAssertSoft(i < 100, "Stuck in EPA recursion.");
-	
 	struct EPANode *best = root->best;
 	struct MinkowskiPoint p = Support(context, best->closest);
 	
@@ -315,7 +313,7 @@ EPARecurse(const struct SupportContext context, struct EPANode *root, int i)
 #endif
 	
 	cpFloat area = cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab));
-	if(area > 0.0f){
+	if(area > 0.0f && i < 20){
 		struct EPANode left; EPANodeInit(&left, v0, p);
 		struct EPANode right; EPANodeInit(&right, p, v1);
 		EPANodeSplit(best, &left, &right);
@@ -359,9 +357,9 @@ EPA(const struct SupportContext context, const struct MinkowskiPoint v0, const s
 static inline struct ClosestPoints
 GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct MinkowskiPoint v1)
 {
-	for(int i=0;; i++){
-		cpAssertSoft(i < 100, "Stuck in GJK recursion.");
-		
+	// Turned into an iterative version for performance reasons.
+	// Break after 20 iterations to avoid possible infinite looping isuses.
+	for(int i=0; 20; i++){
 		cpVect delta = cpvsub(v1.ab, v0.ab);
 		if(cpvcross(delta, cpvneg(v0.ab)) < 0.0f){
 			// Origin is behind axis. Flip and try again.
@@ -380,9 +378,7 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 #endif
 			
 			if(cpvcross(delta, cpvsub(p.ab, v0.ab)) <= 0.0f){
-//				ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(1, 0, 0, 0.5));
-				cpFloat t = ClosestT(v0.ab, v1.ab);
-				return ClosestPointsNew(v0, v1, t, cpvlerp(v0.ab, v1.ab, t));
+				break;
 			} else if(
 				cpvcross(cpvsub(v1.ab, p.ab), cpvneg(p.ab)) <= 0.0f &&
 				cpvcross(cpvsub(v0.ab, p.ab), cpvneg(p.ab)) >= 0.0f
@@ -398,6 +394,10 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 			}
 		}
 	}
+	
+//	ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(1, 0, 0, 0.5));
+	cpFloat t = ClosestT(v0.ab, v1.ab);
+	return ClosestPointsNew(v0, v1, t, cpvlerp(v0.ab, v1.ab, t));
 }
 
 #if DRAW_GJK || DRAW_EPA

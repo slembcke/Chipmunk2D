@@ -30,11 +30,11 @@
 static cpBool DrawContacts(cpArbiter *arb, cpSpace *space, void *data){
 	cpContactPointSet set = cpArbiterGetContactPointSet(arb);
 	
-//	for(int i=0; i<set.count; i++){
-//		cpVect p = set.points[i].point;
-//		ChipmunkDebugDrawPoints(6.0, 1, &p, RGBAColor(1, 0, 0, 1));
-//		ChipmunkDebugDrawSegment(p, cpvadd(p, cpvmult(set.points[i].normal, 10.0)), RGBAColor(1, 0, 0, 1));
-//	}
+	for(int i=0; i<set.count; i++){
+		cpVect p = set.points[i].point;
+		ChipmunkDebugDrawPoints(6.0, 1, &p, RGBAColor(1, 0, 0, 1));
+		ChipmunkDebugDrawSegment(p, cpvadd(p, cpvmult(set.points[i].normal, 10.0)), RGBAColor(1, 0, 0, 1));
+	}
 	
 	return cpFalse;
 //	return cpTrue;
@@ -111,7 +111,7 @@ init(void)
 	};
 	int terrainCount = sizeof(terrain)/sizeof(*terrain);
 	
-	for(int i=1; i<2; i++){
+	for(int i=1; i<5; i++){
 		cpVect v0 = terrain[MAX(i-2, 0)];
 		cpVect v1 = terrain[i-1];
 		cpVect v2 = terrain[i];
