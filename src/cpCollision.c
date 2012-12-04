@@ -359,22 +359,23 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 {
 	// Turned into an iterative version for performance reasons.
 	// Break after 20 iterations to avoid possible infinite looping isuses.
-	for(int i=0; 20; i++){
+	for(int i=0; i<20; i++){
 		cpVect delta = cpvsub(v1.ab, v0.ab);
 		if(cpvcross(delta, cpvneg(v0.ab)) < 0.0f){
 			// Origin is behind axis. Flip and try again.
 			struct MinkowskiPoint tmp = v0;
 			v0 = v1; v1 = tmp;
 		} else {
-			cpVect n = cpvperp(delta);
+			cpFloat t = ClosestT(v0.ab, v1.ab);
+			cpVect n = (0.0f < t && t < 1.0f ? cpvperp(delta) : cpvneg(cpvlerp(v0.ab, v1.ab, t)));
 			struct MinkowskiPoint p = Support(context, n);
 			
 #if DRAW_GJK
-//			ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 1));
-//			cpVect c = cpvlerp(v0.ab, v1.ab, 0.5);
-//			ChipmunkDebugDrawSegment(c, cpvadd(c, cpvmult(cpvnormalize(n), 5.0)), RGBAColor(1, 0, 0, 1));
-//			
-//			ChipmunkDebugDrawPoints(5.0, 1, &p.ab, RGBAColor(1, 1, 1, 1));
+			ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 1));
+			cpVect c = cpvlerp(v0.ab, v1.ab, 0.5);
+			ChipmunkDebugDrawSegment(c, cpvadd(c, cpvmult(cpvnormalize(n), 5.0)), RGBAColor(1, 0, 0, 1));
+			
+			ChipmunkDebugDrawPoints(5.0, 1, &p.ab, RGBAColor(1, 1, 1, 1));
 #endif
 			
 			if(cpvcross(delta, cpvsub(p.ab, v0.ab)) <= 0.0f){
@@ -639,14 +640,16 @@ segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollis
 #endif
 	
 	cpVect n = points.n;
+	cpVect rot1 = seg1->shape.body->rot;
+	cpVect rot2 = seg2->shape.body->rot;
 	if(
-		points.d <= (seg1->r + seg2->r) //&&
-//		(
-//			(!cpveql(points.a, seg1->ta) || cpvdot(n, cpvrotate(seg1->a_tangent, seg1->shape.body->rot)) <= 0.0) &&
-//			(!cpveql(points.a, seg1->tb) || cpvdot(n, cpvrotate(seg1->b_tangent, seg1->shape.body->rot)) <= 0.0) &&
-//			(!cpveql(points.b, seg2->ta) || cpvdot(n, cpvrotate(seg2->a_tangent, seg2->shape.body->rot)) >= 0.0) &&
-//			(!cpveql(points.b, seg2->tb) || cpvdot(n, cpvrotate(seg2->b_tangent, seg2->shape.body->rot)) >= 0.0)
-//		)
+		points.d <= (seg1->r + seg2->r) &&
+		(
+			(!cpveql(points.a, seg1->ta) || cpvdot(n, cpvrotate(seg1->a_tangent, rot1)) <= 0.0) &&
+			(!cpveql(points.a, seg1->tb) || cpvdot(n, cpvrotate(seg1->b_tangent, rot1)) <= 0.0) &&
+			(!cpveql(points.b, seg2->ta) || cpvdot(n, cpvrotate(seg2->a_tangent, rot2)) >= 0.0) &&
+			(!cpveql(points.b, seg2->tb) || cpvdot(n, cpvrotate(seg2->b_tangent, rot2)) >= 0.0)
+		)
 	){
 		return ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), points, arr);
 	} else {
@@ -693,10 +696,13 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionID *id, 
 	
 	// Reject endcap collisions if tangents are provided.
 	cpVect n = points.n;
+	cpVect rot = seg->shape.body->rot;
 	if(
-		points.d - seg->r - poly->r <= 0.0 //&&
-//		(!cpveql(points.a, seg->ta) || cpvdot(n, cpvrotate(seg->a_tangent, seg->shape.body->rot)) >= 0.0) &&
-//		(!cpveql(points.a, seg->tb) || cpvdot(n, cpvrotate(seg->b_tangent, seg->shape.body->rot)) >= 0.0)
+		points.d - seg->r - poly->r <= 0.0 &&
+		(
+			(!cpveql(points.a, seg->ta) || cpvdot(n, cpvrotate(seg->a_tangent, rot)) <= 0.0) &&
+			(!cpveql(points.a, seg->tb) || cpvdot(n, cpvrotate(seg->b_tangent, rot)) <= 0.0)
+		)
 	){
 		return ContactPoints(SupportEdgeForSegment(seg, n), SupportEdgeForPoly(poly, cpvneg(n)), points, arr);
 	} else {

@@ -6,7 +6,7 @@
 #endif
 
 #if (TARGET_OS_IPHONE == 1) || (TARGET_OS_MAC == 1) && (!defined CP_USE_CGPOINTS)
-	#define CP_USE_CGPOINTS 1
+	#define CP_USE_CGPOINTS 0
 #endif
 
 #if CP_USE_CGPOINTS == 1
@@ -25,7 +25,7 @@
 
 #ifndef CP_USE_DOUBLES
 	// use doubles by default for higher precision
-	#define CP_USE_DOUBLES 1
+	#define CP_USE_DOUBLES 0
 #endif
 
 /// @defgroup basicTypes Basic Types
