@@ -221,7 +221,7 @@ void
 cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisionHandler *handler, cpShape *a, cpShape *b)
 {
 	// Arbiters without contact data may exist if a collision function rejected the collision.
-	if(arb->contacts){
+	if(!cpArbiterIsFiltered(arb)){
 		// Iterate over the possible pairs to look for hash value matches.
 		for(int i=0; i<arb->numContacts; i++){
 			cpContact *old = &arb->contacts[i];

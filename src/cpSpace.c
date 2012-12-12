@@ -340,8 +340,13 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 		// Call separate when removing shapes.
 		if(shape && arb->state != cpArbiterStateCached) cpArbiterCallSeparate(arb, context->space);
 		
-		cpArbiterUnthread(arb);
-		cpArrayDeleteObj(context->space->arbiters, arb);
+		// If the arbiter is active (non-sensor/filtered) it will have a contacts array.
+		// TODO is this too much of a hack?...
+		if(!cpArbiterIsFiltered(arb)){
+			cpArbiterUnthread(arb);
+			cpArrayDeleteObj(context->space->arbiters, arb);
+		}
+		
 		cpArrayPush(context->space->pooledArbiters, arb);
 		
 		return cpFalse;
