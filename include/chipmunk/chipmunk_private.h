@@ -257,12 +257,6 @@ cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
 	return (arb->body_a == body ? &arb->thread_a : &arb->thread_b);
 }
 
-static inline cpBool
-cpArbiterIsFiltered(cpArbiter *arb)
-{
-	return (arb->contacts == NULL);
-}
-
 void cpArbiterUnthread(cpArbiter *arb);
 
 void cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
