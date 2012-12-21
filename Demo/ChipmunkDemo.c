@@ -563,6 +563,7 @@ extern ChipmunkDemo Crane;
 extern ChipmunkDemo Buoyancy;
 extern ChipmunkDemo ContactGraph;
 extern ChipmunkDemo Slice;
+extern ChipmunkDemo Shatter;
 extern ChipmunkDemo Convex;
 extern ChipmunkDemo Unicycle;
 extern ChipmunkDemo Sticky;
@@ -574,6 +575,7 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
+		Shatter,
 		LogoSmash,
 		PyramidStack,
 		Plink,
