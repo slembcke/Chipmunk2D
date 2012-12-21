@@ -34,10 +34,12 @@ struct WorleyContex {
 static inline cpVect
 HashVect(uint32_t x, uint32_t y)
 {
+	cpFloat border = 0.21f;
 	uint32_t h = (x*1640531513 ^ y*2654435789);
+	
 	return cpv(
-		cpflerp(0.3f, 0.7f, (cpFloat)(      h & 0xFFFF)/(cpFloat)0xFFFF),
-		cpflerp(0.3f, 0.7f, (cpFloat)((h>>16) & 0xFFFF)/(cpFloat)0xFFFF)
+		cpflerp(border, 1.0f - border, (cpFloat)(      h & 0xFFFF)/(cpFloat)0xFFFF),
+		cpflerp(border, 1.0f - border, (cpFloat)((h>>16) & 0xFFFF)/(cpFloat)0xFFFF)
 	);
 }
 
@@ -132,7 +134,10 @@ ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int i, int j, struct Wo
 static void
 ShatterShape(cpSpace *space, cpShape *shape)
 {
-	struct WorleyContex context = {10, 15, cpShapeGetBB(shape)};
+	cpSpaceRemoveShape(space, shape);
+	cpSpaceRemoveBody(space, shape->body);
+	
+	struct WorleyContex context = {3, 3, cpShapeGetBB(shape)};
 	
 	for(int i=0; i<context.width; i++){
 		for(int j=0; j<context.height; j++){
@@ -142,6 +147,9 @@ ShatterShape(cpSpace *space, cpShape *shape)
 			}
 		}
 	}
+	
+	cpBodyFree(shape->body);
+	cpShapeFree(shape);
 }
 
 static void
@@ -152,6 +160,13 @@ update(cpSpace *space)
 	
 	for(int i=0; i<steps; i++){
 		cpSpaceStep(space, dt);
+	}
+	
+	if(ChipmunkDemoRightDown){
+		cpNearestPointQueryInfo info;
+		if(cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 0, GRABABLE_MASK_BIT, CP_NO_GROUP, &info)){
+			ShatterShape(space, info.shape);
+		}
 	}
 }
 
@@ -170,27 +185,20 @@ init(void)
 	cpShape *shape;
 	
 	// Create segments around the edge of the screen.
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-1000, -240), cpv( 1000, -240), 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
-	cpFloat width = 200.0f;
+	cpFloat width = 300.0f;
 	cpFloat height = 300.0f;
 	cpFloat mass = width*height*DENSITY;
 	cpFloat moment = cpMomentForBox(mass, width, height);
 	
-//	body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-//	
-//	shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
-//	cpShapeSetFriction(shape, 0.6f);
-		
-	body = cpBodyNew(mass, moment);
-	shape = cpBoxShapeNew(body, width, height);
-	cpShapeSetFriction(shape, 0.6f);
+	body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 	
-	cpShapeCacheBB(shape);
-	ShatterShape(space, shape);
+	shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+	cpShapeSetFriction(shape, 0.6f);
 		
 	return space;
 }
