@@ -26,50 +26,41 @@
 
 #define DENSITY (1.0/10000.0)
 
-//static void
-//ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
-//{
-//	cpBody *body = cpShapeGetBody(shape);
-//	
-//	int count = cpPolyShapeGetNumVerts(shape);
-//	int clippedCount = 0;
-//	
-//	cpVect *clipped = (cpVect *)alloca((count + 1)*sizeof(cpVect));
-//	
-//	for(int i=0, j=count-1; i<count; j=i, i++){
-//		cpVect a = cpBodyLocal2World(body, cpPolyShapeGetVert(shape, j));
-//		cpFloat a_dist = cpvdot(a, n) - dist;
-//		
-//		if(a_dist < 0.0){
-//			clipped[clippedCount] = a;
-//			clippedCount++;
-//		}
-//		
-//		cpVect b = cpBodyLocal2World(body, cpPolyShapeGetVert(shape, i));
-//		cpFloat b_dist = cpvdot(b, n) - dist;
-//		
-//		if(a_dist*b_dist < 0.0f){
-//			cpFloat t = cpfabs(a_dist)/(cpfabs(a_dist) + cpfabs(b_dist));
-//			
-//			clipped[clippedCount] = cpvlerp(a, b, t);
-//			clippedCount++;
-//		}
-//	}
-//}
+struct WorleyContex {
+	int width, height;
+	cpBB bb;
+};
+
+static inline cpVect
+HashVect(uint32_t x, uint32_t y)
+{
+	uint32_t h = (x*1640531513 ^ y*2654435789);
+	return cpv(
+		cpflerp(0.3f, 0.7f, (cpFloat)(      h & 0xFFFF)/(cpFloat)0xFFFF),
+		cpflerp(0.3f, 0.7f, (cpFloat)((h>>16) & 0xFFFF)/(cpFloat)0xFFFF)
+	);
+}
 
 static cpVect
-WorleyPoint(int i, int j, cpBB bb, int width, int height)
+WorleyPoint(int i, int j, struct WorleyContex *context)
 {
+	int width = context->width;
+	int height = context->height;
+	cpBB bb = context->bb;
+	
+//	cpVect fv = cpv(0.5, 0.5);
+	cpVect fv = HashVect(i, j);
+	
 	return cpv(
-		cpflerp(bb.l, bb.r, ((cpFloat)i + 0.5f)/(cpFloat)width),
-		cpflerp(bb.b, bb.t, ((cpFloat)j + 0.5f)/(cpFloat)height)
+		cpflerp(bb.l, bb.r, ((cpFloat)i + fv.x)/(cpFloat)width),
+		cpflerp(bb.b, bb.t, ((cpFloat)j + fv.y)/(cpFloat)height)
 	);
 }
 
 static int
-ClipCell(cpShape *shape, cpVect center, int i, int j, cpBB bb, int width, int height, cpVect *verts, cpVect *clipped, int count)
+ClipCell(cpShape *shape, cpVect center, int i, int j, struct WorleyContex *context, cpVect *verts, cpVect *clipped, int count)
 {
-	cpVect other = WorleyPoint(i, j, bb, width, height);
+	cpVect other = WorleyPoint(i, j, context);
 	if(cpShapeNearestPointQuery(shape, other, NULL) > 0.0f){
 		memcpy(clipped, verts, count*sizeof(cpVect));
 		return count;
@@ -103,7 +94,7 @@ ClipCell(cpShape *shape, cpVect center, int i, int j, cpBB bb, int width, int he
 }
 
 static void
-ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int i, int j, cpBB bb, int width, int height)
+ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int i, int j, struct WorleyContex *context)
 {
 	cpBody *body = cpShapeGetBody(shape);
 	
@@ -115,20 +106,15 @@ ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int i, int j, cpBB bb, 
 		ping[i] = cpBodyLocal2World(body, cpPolyShapeGetVert(shape, i));
 	}
 	
-	count = ClipCell(shape, cell, i - 1, j - 1, bb, width, height, ping, pong, count);
-	count = ClipCell(shape, cell, i    , j - 1, bb, width, height, pong, ping, count);
-	count = ClipCell(shape, cell, i + 1, j - 1, bb, width, height, ping, pong, count);
-	count = ClipCell(shape, cell, i - 1, j    , bb, width, height, pong, ping, count);
-	count = ClipCell(shape, cell, i + 1, j    , bb, width, height, ping, pong, count);
-	count = ClipCell(shape, cell, i - 1, j + 1, bb, width, height, pong, ping, count);
-	count = ClipCell(shape, cell, i    , j + 1, bb, width, height, ping, pong, count);
-	count = ClipCell(shape, cell, i + 1, j + 1, bb, width, height, pong, ping, count);
-	
-//	if(count != 4){
-//		printf("weird %d\n", count);
-//		return;
-//	}
-	
+	count = ClipCell(shape, cell, i - 1, j - 1, context, ping, pong, count);
+	count = ClipCell(shape, cell, i    , j - 1, context, pong, ping, count);
+	count = ClipCell(shape, cell, i + 1, j - 1, context, ping, pong, count);
+	count = ClipCell(shape, cell, i - 1, j    , context, pong, ping, count);
+	count = ClipCell(shape, cell, i + 1, j    , context, ping, pong, count);
+	count = ClipCell(shape, cell, i - 1, j + 1, context, pong, ping, count);
+	count = ClipCell(shape, cell, i    , j + 1, context, ping, pong, count);
+	count = ClipCell(shape, cell, i + 1, j + 1, context, pong, ping, count);
+                                                                                                                                                                                                                                                                                 	
 	cpVect centroid = cpCentroidForPoly(count, ping);
 	cpFloat mass = cpAreaForPoly(count, ping)*DENSITY;
 	cpFloat moment = cpMomentForPoly(mass, count, ping, cpvneg(centroid));
@@ -146,15 +132,13 @@ ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int i, int j, cpBB bb, 
 static void
 ShatterShape(cpSpace *space, cpShape *shape)
 {
-	cpBB bb = cpShapeGetBB(shape);
-	int width = 4;
-	int height = 2;
+	struct WorleyContex context = {10, 15, cpShapeGetBB(shape)};
 	
-	for(int i=0; i<width; i++){
-		for(int j=0; j<height; j++){
-			cpVect cell = WorleyPoint(i, j, bb, width, height);
+	for(int i=0; i<context.width; i++){
+		for(int j=0; j<context.height; j++){
+			cpVect cell = WorleyPoint(i, j, &context);
 			if(cpShapeNearestPointQuery(shape, cell, NULL) < 0.0f){
-				ShatterCell(space, shape, cell, i, j, bb, width, height);
+				ShatterCell(space, shape, cell, i, j, &context);
 			}
 		}
 	}
