@@ -32,6 +32,10 @@ Unordered
 	Fix solver issues with the groove joint.
 	Use a slop tolerance on joint boundaries.
 
+Website things
+	Google analytics
+	Make it so people can upgrade license versions
+
 Future things to think about:
 	breakable object support functions?
 	Serialization
