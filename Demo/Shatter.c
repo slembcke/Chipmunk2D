@@ -27,6 +27,7 @@
 #define DENSITY (1.0/10000.0)
 
 struct WorleyContex {
+	cpFloat cellSize;
 	int width, height;
 	cpBB bb;
 };
@@ -46,6 +47,7 @@ HashVect(uint32_t x, uint32_t y)
 static cpVect
 WorleyPoint(int i, int j, struct WorleyContex *context)
 {
+	cpFloat size = context->cellSize;
 	int width = context->width;
 	int height = context->height;
 	cpBB bb = context->bb;
@@ -54,8 +56,8 @@ WorleyPoint(int i, int j, struct WorleyContex *context)
 	cpVect fv = HashVect(i, j);
 	
 	return cpv(
-		cpflerp(bb.l, bb.r, ((cpFloat)i + fv.x)/(cpFloat)width),
-		cpflerp(bb.b, bb.t, ((cpFloat)j + fv.y)/(cpFloat)height)
+		cpflerp(bb.l, bb.r, 0.5f) + size*(i + fv.x -  width*0.5f),
+		cpflerp(bb.b, bb.t, 0.5f) + size*(j + fv.y - height*0.5f)
 	);
 }
 
@@ -63,9 +65,13 @@ static int
 ClipCell(cpShape *shape, cpVect center, int i, int j, struct WorleyContex *context, cpVect *verts, cpVect *clipped, int count)
 {
 	cpVect other = WorleyPoint(i, j, context);
+	printf("  other %dx%d: (% 5.2f, % 5.2f) ", i, j, other.x, other.y);
 	if(cpShapeNearestPointQuery(shape, other, NULL) > 0.0f){
+		printf("excluded\n");
 		memcpy(clipped, verts, count*sizeof(cpVect));
 		return count;
+	} else {
+		printf("clipped\n");
 	}
 	
 	cpVect n = cpvsub(other, center);
@@ -98,6 +104,8 @@ ClipCell(cpShape *shape, cpVect center, int i, int j, struct WorleyContex *conte
 static void
 ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int i, int j, struct WorleyContex *context)
 {
+	printf("cell %dx%d: (% 5.2f, % 5.2f)\n", i, j, cell.x, cell.y);
+	
 	cpBody *body = cpShapeGetBody(shape);
 	
 	int count = cpPolyShapeGetNumVerts(shape);
@@ -132,12 +140,16 @@ ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int i, int j, struct Wo
 }
 
 static void
-ShatterShape(cpSpace *space, cpShape *shape)
+ShatterShape(cpSpace *space, cpShape *shape, cpFloat cellSize)
 {
 	cpSpaceRemoveShape(space, shape);
 	cpSpaceRemoveBody(space, shape->body);
 	
-	struct WorleyContex context = {3, 3, cpShapeGetBB(shape)};
+	cpBB bb = cpShapeGetBB(shape);
+	int width = (bb.r - bb.l)/cellSize + 1;
+	int height = (bb.t - bb.b)/cellSize + 1;
+	printf("Splitting as %dx%d\n", width, height);
+	struct WorleyContex context = {cellSize, width, height, bb};
 	
 	for(int i=0; i<context.width; i++){
 		for(int j=0; j<context.height; j++){
@@ -165,7 +177,13 @@ update(cpSpace *space)
 	if(ChipmunkDemoRightDown){
 		cpNearestPointQueryInfo info;
 		if(cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 0, GRABABLE_MASK_BIT, CP_NO_GROUP, &info)){
-			ShatterShape(space, info.shape);
+			cpBB bb = cpShapeGetBB(info.shape);
+			cpFloat cell_size = cpfmax(bb.r - bb.l, bb.t - bb.b)/2.5f;
+			if(cell_size > 20.0f){
+				ShatterShape(space, info.shape, cell_size);
+			} else {
+				printf("Too small to splinter %f\n", cell_size);
+			}
 		}
 	}
 }
@@ -177,8 +195,8 @@ init(void)
 	
 	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 30);
-	cpSpaceSetGravity(space, cpv(0, -500));
-	cpSpaceSetSleepTimeThreshold(space, 0.5f);
+//	cpSpaceSetGravity(space, cpv(0, -500));
+//	cpSpaceSetSleepTimeThreshold(space, 0.5f);
 	cpSpaceSetCollisionSlop(space, 0.5f);
 	
 	cpBody *body, *staticBody = cpSpaceGetStaticBody(space);
@@ -190,8 +208,8 @@ init(void)
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 
-	cpFloat width = 300.0f;
-	cpFloat height = 300.0f;
+	cpFloat width = 200.0f;
+	cpFloat height = 200.0f;
 	cpFloat mass = width*height*DENSITY;
 	cpFloat moment = cpMomentForBox(mass, width, height);
 	
