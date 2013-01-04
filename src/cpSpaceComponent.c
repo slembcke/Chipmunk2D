@@ -29,11 +29,12 @@ void
 cpSpaceActivateBody(cpSpace *space, cpBody *body)
 {
 	cpAssertHard(!cpBodyIsRogue(body), "Internal error: Attempting to activate a rogue body.");
-	
+		
 	if(space->locked){
 		// cpSpaceActivateBody() is called again once the space is unlocked
 		if(!cpArrayContains(space->rousedBodies, body)) cpArrayPush(space->rousedBodies, body);
 	} else {
+		cpAssertSoft(body->node.root == NULL && body->node.next == NULL, "Internal error: Activating body non-NULL node pointers.");
 		cpArrayPush(space->bodies, body);
 
 		CP_BODY_FOREACH_SHAPE(body, shape){
