@@ -9,6 +9,7 @@ set(chipmunk_demos_include_dirs
 
 set(chipmunk_demos_libraries
   chipmunk_static
+  m
   ${GLUT_LIBRARIES}
   ${OPENGL_LIBRARIES}
 )
