@@ -28,12 +28,13 @@
 void
 cpSpaceActivateBody(cpSpace *space, cpBody *body)
 {
-	cpAssertHard(!cpBodyIsRogue(body), "Internal error: Attempting to activate a rouge body.");
-	
+	cpAssertHard(!cpBodyIsRogue(body), "Internal error: Attempting to activate a rogue body.");
+		
 	if(space->locked){
 		// cpSpaceActivateBody() is called again once the space is unlocked
 		if(!cpArrayContains(space->rousedBodies, body)) cpArrayPush(space->rousedBodies, body);
 	} else {
+		cpAssertSoft(body->node.root == NULL && body->node.next == NULL, "Internal error: Activating body non-NULL node pointers.");
 		cpArrayPush(space->bodies, body);
 
 		CP_BODY_FOREACH_SHAPE(body, shape){
@@ -43,6 +44,11 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 		
 		CP_BODY_FOREACH_ARBITER(body, arb){
 			cpBody *bodyA = arb->body_a;
+			
+			// Arbiters are shared between two bodies that are always woken up together.
+			// You only want to restore the arbiter once, so bodyA is arbitrarily chosen to own the arbiter.
+			// The edge case is when static bodies are involved as the static bodies never actually sleep.
+			// If the static body is bodyB then all is good. If the static body is bodyA, that can easily be checked.
 			if(body == bodyA || cpBodyIsStatic(bodyA)){
 				int numContacts = arb->numContacts;
 				cpContact *contacts = arb->contacts;

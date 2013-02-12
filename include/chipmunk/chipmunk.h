@@ -106,10 +106,10 @@ typedef struct cpSpace cpSpace;
 
 #include "cpSpace.h"
 
-// Chipmunk 6.1.2
+// Chipmunk 6.1.3
 #define CP_VERSION_MAJOR 6
 #define CP_VERSION_MINOR 1
-#define CP_VERSION_RELEASE 2
+#define CP_VERSION_RELEASE 3
 
 /// Version string.
 extern const char *cpVersionString;
