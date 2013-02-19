@@ -47,7 +47,7 @@ draw(cpSpace *space)
 	ChipmunkDemoDefaultDrawImpl(space);
 	cpContact arr[CP_MAX_CONTACTS_PER_ARBITER];
 //	cpCollideShapes(shape1, shape2, (cpCollisionID[]){0}, arr);
-	cpCollideShapes(shape2, shape1, (cpCollisionID[]){0}, arr);
+	cpCollideShapes(shape2, shape1, (cpCollisionID[]){0x00010101}, arr);
 }
 
 static cpSpace *
@@ -81,7 +81,7 @@ init(void)
 //	}
 	
 	{
-		cpFloat size = 20.0;
+		cpFloat size = 100.0;
 		const int NUM_VERTS = 3;
 		
 		cpVect verts[NUM_VERTS];
@@ -97,7 +97,7 @@ init(void)
 		shape1->group = 1;
 	}{
 		cpFloat size = 100.0;
-		const int NUM_VERTS = 5;
+		const int NUM_VERTS = 4;
 		
 		cpVect verts[NUM_VERTS];
 		for(int i=0; i<NUM_VERTS; i++){

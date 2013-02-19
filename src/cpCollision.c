@@ -308,6 +308,7 @@ EPARecurse(const struct SupportContext context, struct EPANode *root, int i)
 	
 #if DRAW_EPA
 	ChipmunkDebugDrawPolygon(3, (cpVect[]){v0.ab, v1.ab, p.ab}, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
+	cpVect closest = best->closest;
 	ChipmunkDebugDrawPoints(3.0, 1, &closest, RGBAColor(1, 1, 0, 1));
 	ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 0, 1, 1));
 #endif
@@ -378,19 +379,27 @@ GJKRecurse(const struct SupportContext context, struct MinkowskiPoint v0, struct
 			ChipmunkDebugDrawPoints(5.0, 1, &p.ab, RGBAColor(1, 1, 1, 1));
 #endif
 			
-			if(cpvcross(delta, cpvsub(p.ab, v0.ab)) <= 0.0f){
-				break;
-			} else if(
+			
+			if(
 				cpvcross(cpvsub(v1.ab, p.ab), cpvneg(p.ab)) <= 0.0f &&
 				cpvcross(cpvsub(v0.ab, p.ab), cpvneg(p.ab)) >= 0.0f
 			){
 				// The triangle v0, v1, p contains the origin. Use EPA to find the MSA.
 				return EPA(context, v0, p, v1);
 			} else {
-				if(cpvdot(p.ab, delta) > 0.0){
-					v1 = p;
+				// TODO: Can clean this up.
+				cpFloat d = ClosestDist(v0.ab, v1.ab);
+				cpFloat d0 = ClosestDist(v0.ab, p.ab);
+				cpFloat d1 = ClosestDist(p.ab, v1.ab);
+				
+				if(d <= cpfmin(d0, d1)){
+					break;
 				} else {
-					v0 = p;
+					if(cpvdot(cpvneg(v0.ab), delta) < cpvdot(cpvsub(p.ab, v0.ab), delta)){
+						v1 = p;
+					} else {
+						v0 = p;
+					}
 				}
 			}
 		}
@@ -467,7 +476,7 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 		v0 = MinkoskiPointNew(ShapePoint(shape1, (*id>>24)&0xFF), ShapePoint(shape2, (*id>>16)&0xFF));
 		v1 = MinkoskiPointNew(ShapePoint(shape1, (*id>> 8)&0xFF), ShapePoint(shape2, (*id    )&0xFF));
 	} else {
-		// TODO use centroids as the starting axis
+		// TODO use bounding box centers as the starting axis
 		cpVect axis = cpvperp(cpvsub(cpBBCenter(shape1->bb), cpBBCenter(shape2->bb)));
 		v0 = Support(context, axis);
 		v1 = Support(context, cpvneg(axis));
