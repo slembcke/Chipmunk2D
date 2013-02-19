@@ -316,17 +316,6 @@ EPARecurse(const struct SupportContext *context, int count, struct MinkowskiPoin
 	}
 }
 
-static struct ClosestPoints
-EPA(const struct SupportContext *context, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, const struct MinkowskiPoint v2)
-{
-#if DRAW_EPA || DRAW_GJK
-	ChipmunkDebugDrawPolygon(3, (cpVect[]){v0.ab, v1.ab, v2.ab}, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
-#endif
-	
-	struct MinkowskiPoint hull[3] = {v0, v1, v2};
-	return EPARecurse(context, 3, hull, 1);
-}
-
 //MARK: GJK Functions.
 
 static inline struct ClosestPoints
@@ -359,7 +348,8 @@ GJKRecurse(const struct SupportContext *context, struct MinkowskiPoint v0, struc
 				cpvcross(cpvsub(v0.ab, p.ab), cpvneg(p.ab)) >= 0.0f
 			){
 				// The triangle v0, v1, p contains the origin. Use EPA to find the MSA.
-				return EPA(context, v0, p, v1);
+				struct MinkowskiPoint hull[3] = {v0, p, v1};
+				return EPARecurse(context, 3, hull, 1);
 			} else {
 				// TODO: Can clean this up.
 				cpFloat d = ClosestDist(v0.ab, v1.ab);
