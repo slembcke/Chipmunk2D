@@ -254,45 +254,6 @@ ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1,
 
 //MARK: EPA Functions
 
-//struct EPANode {
-//	struct MinkowskiPoint v0, v1;
-//	struct EPANode *best, *left, *right, *parent;
-//	cpVect closest;
-//	cpFloat t, dist;
-//};
-//
-//static inline void
-//EPANodeInit(struct EPANode *node, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
-//{
-//	cpFloat t = ClosestT(v0.ab, v1.ab);
-//	cpVect closest = cpvlerp(v0.ab, v1.ab, t);
-//	
-//	node->v0 = v0;
-//	node->v1 = v1;
-//	node->best = node;
-//	node->closest = closest;
-//	node->t = t;
-//	node->dist = cpvlengthsq(closest);
-//}
-//
-//static inline void
-//EPANodeSplit(struct EPANode *parent, struct EPANode *left, struct EPANode *right)
-//{
-//	parent->left = left;
-//	parent->right = right;
-//	left->parent = right->parent = parent;
-//	
-//	for(struct EPANode *node = parent; node; node = node->parent){
-//		if(node->left->dist < node->right->dist){
-//			node->dist = node->left->dist;
-//			node->best = node->left->best;
-//		} else {
-//			node->dist = node->right->dist;
-//			node->best = node->right->best;
-//		}
-//	}
-//}
-
 static inline cpFloat
 ClosestDist(cpVect v0, cpVect v1)
 {
@@ -335,23 +296,20 @@ EPARecurse(const struct SupportContext context, int count, struct MinkowskiPoint
 		
 		for(int i=0; i<count; i++){
 			int j = (mini + 1 + i)%count;
-			cpVect delta = cpvsub(hull[j].ab, hull2[count2 - 1].ab);
+			cpVect pivot = hull2[count2 - 1].ab;
+			cpVect delta = cpvsub(hull[j].ab, pivot);
 			
-			if(cpvcross(cpvsub(hull2[0].ab, hull2[count2 - 1].ab), delta) < 0.0f){
-				break;
-			}
+			if(cpvcross(cpvsub(p.ab, pivot), delta) < 0.0f) break;
 			for(int k=0; k<count; k++){
-				if(cpvcross(cpvsub(hull[k].ab, hull2[count2 - 1].ab), delta) < 0.0f){
-					break;
-				}
+				if(cpvcross(cpvsub(hull[k].ab, pivot), delta) < 0.0f) break;
 			}
+			
 			hull2[count2] = hull[j];
 			count2++;
 		}
 		
 		return EPARecurse(context, count2, hull2, i + 1);
 	} else {
-//		ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(0, 1, 0, 0.5));
 		cpFloat t = ClosestT(v0.ab, v1.ab);
 		return ClosestPointsNew(v0, v1, t, cpvlerp(v0.ab, v1.ab, t));
 	}
@@ -363,11 +321,6 @@ EPA(const struct SupportContext context, const struct MinkowskiPoint v0, const s
 #if DRAW_EPA || DRAW_GJK
 	ChipmunkDebugDrawPolygon(3, (cpVect[]){v0.ab, v1.ab, v2.ab}, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
 #endif
-	
-//	cpFloat area = cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(v2.ab, v0.ab));
-//	if(area == 0.0){
-//		printf("bad\n");
-//	}
 	
 	struct MinkowskiPoint hull[3] = {v0, v1, v2};
 	return EPARecurse(context, 3, hull, 1);
