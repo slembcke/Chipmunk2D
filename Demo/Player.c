@@ -90,19 +90,20 @@ update(cpSpace *space)
 {
 	int jumpState = (ChipmunkDemoKeyboard.y > 0.0f);
 	
-	// If the jump key was just pressed this frame, jump!
-	if(jumpState && !lastJumpState && grounded){
-		cpFloat jump_v = cpfsqrt(2.0*JUMP_HEIGHT*GRAVITY);
-		playerBody->v = cpvadd(playerBody->v, cpv(0.0, jump_v));
-		
-		remainingBoost = JUMP_BOOST_HEIGHT/jump_v;
-	}
+//	// If the jump key was just pressed this frame, jump!
+//	if(jumpState && !lastJumpState && grounded){
+//		cpFloat jump_v = cpfsqrt(2.0*JUMP_HEIGHT*GRAVITY);
+//		playerBody->v = cpvadd(playerBody->v, cpv(0.0, jump_v));
+//		
+//		remainingBoost = JUMP_BOOST_HEIGHT/jump_v;
+//	}
 	
 	// Step the space
 	int steps = 3;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
-	for(int i=0; i<steps; i++){
+//	for(int i=0; i<steps; i++)
+	{
 		cpSpaceStep(space, dt);
 		
 		remainingBoost -= dt;
@@ -140,24 +141,26 @@ init(void)
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	// Set up the player
-	cpFloat radius = 25.0f;
-	body = cpSpaceAddBody(space, cpBodyNew(1.0f, INFINITY));
-	body->p = cpv(0, -200);
-	body->velocity_func = playerUpdateVelocity;
-	playerBody = body;
-
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpvzero, cpv(0, radius), radius));
-	shape->e = 0.0f; shape->u = 0.0f;
-	shape->collision_type = 1;
-	playerShape = shape;
+//	cpFloat radius = 25.0f;
+//	body = cpSpaceAddBody(space, cpBodyNew(1.0f, INFINITY));
+//	body->p = cpv(0, -200);
+//	body->velocity_func = playerUpdateVelocity;
+//	playerBody = body;
+//
+//	shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpvzero, cpv(0, radius), radius));
+//	shape->e = 0.0f; shape->u = 0.0f;
+//	shape->collision_type = 1;
+//	playerShape = shape;
 	
 	// Add some boxes to jump on
-	for(int i=0; i<6; i++){
-		for(int j=0; j<3; j++){
-			body = cpSpaceAddBody(space, cpBodyNew(4.0f, INFINITY));
-			body->p = cpv(100 + j*60, -200 + i*60);
+	cpFloat mass = 1.0;
+	cpFloat size = 30.0;
+	for(int i=0; i<600/size/1.1 - 1; i++){
+		for(int j=0; j<20; j++){
+			body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
+			body->p = cpv(-280 + i*size*1.1 + frand(), -200 + j*size*1.1 + frand());
 			
-			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 50, 50));
+			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
 			shape->e = 0.0f; shape->u = 0.7f;
 		}
 	}

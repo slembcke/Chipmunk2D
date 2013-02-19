@@ -31,6 +31,7 @@
 #define DRAW_EPA (0 || DRAW_ALL)
 #define DRAW_CLOSEST (0 || DRAW_ALL)
 #define DRAW_CLIP (0 || DRAW_ALL)
+#define ENABLE_CACHING 0
 
 #define PRINT_LOG 0
 #endif
@@ -252,44 +253,44 @@ ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1,
 
 //MARK: EPA Functions
 
-struct EPANode {
-	struct MinkowskiPoint v0, v1;
-	struct EPANode *best, *left, *right, *parent;
-	cpVect closest;
-	cpFloat t, dist;
-};
-
-static inline void
-EPANodeInit(struct EPANode *node, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
-{
-	cpFloat t = ClosestT(v0.ab, v1.ab);
-	cpVect closest = cpvlerp(v0.ab, v1.ab, t);
-	
-	node->v0 = v0;
-	node->v1 = v1;
-	node->best = node;
-	node->closest = closest;
-	node->t = t;
-	node->dist = cpvlengthsq(closest);
-}
-
-static inline void
-EPANodeSplit(struct EPANode *parent, struct EPANode *left, struct EPANode *right)
-{
-	parent->left = left;
-	parent->right = right;
-	left->parent = right->parent = parent;
-	
-	for(struct EPANode *node = parent; node; node = node->parent){
-		if(node->left->dist < node->right->dist){
-			node->dist = node->left->dist;
-			node->best = node->left->best;
-		} else {
-			node->dist = node->right->dist;
-			node->best = node->right->best;
-		}
-	}
-}
+//struct EPANode {
+//	struct MinkowskiPoint v0, v1;
+//	struct EPANode *best, *left, *right, *parent;
+//	cpVect closest;
+//	cpFloat t, dist;
+//};
+//
+//static inline void
+//EPANodeInit(struct EPANode *node, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
+//{
+//	cpFloat t = ClosestT(v0.ab, v1.ab);
+//	cpVect closest = cpvlerp(v0.ab, v1.ab, t);
+//	
+//	node->v0 = v0;
+//	node->v1 = v1;
+//	node->best = node;
+//	node->closest = closest;
+//	node->t = t;
+//	node->dist = cpvlengthsq(closest);
+//}
+//
+//static inline void
+//EPANodeSplit(struct EPANode *parent, struct EPANode *left, struct EPANode *right)
+//{
+//	parent->left = left;
+//	parent->right = right;
+//	left->parent = right->parent = parent;
+//	
+//	for(struct EPANode *node = parent; node; node = node->parent){
+//		if(node->left->dist < node->right->dist){
+//			node->dist = node->left->dist;
+//			node->best = node->left->best;
+//		} else {
+//			node->dist = node->right->dist;
+//			node->best = node->right->best;
+//		}
+//	}
+//}
 
 static inline cpFloat
 ClosestDist(cpVect v0, cpVect v1)
@@ -298,31 +299,60 @@ ClosestDist(cpVect v0, cpVect v1)
 }
 
 static struct ClosestPoints
-EPARecurse(const struct SupportContext context, struct EPANode *root, int i)
+EPARecurse(const struct SupportContext context, int count, struct MinkowskiPoint *hull, int i)
 {
-	struct EPANode *best = root->best;
-	struct MinkowskiPoint p = Support(context, best->closest);
+	int mini = 0;
+	cpFloat minDist = INFINITY;
 	
-	struct MinkowskiPoint v0 = best->v0;
-	struct MinkowskiPoint v1 = best->v1;
+	for(int j=0, i=count-1; j<count; i=j, j++){
+		cpFloat d = ClosestDist(hull[i].ab, hull[j].ab);
+		if(d < minDist){
+			minDist = d;
+			mini = i;
+		}
+	}
+	
+	struct MinkowskiPoint v0 = hull[mini];
+	struct MinkowskiPoint v1 = hull[(mini + 1)%count];
+	struct MinkowskiPoint p = Support(context, cpvperp(cpvsub(v1.ab, v0.ab)));
 	
 #if DRAW_EPA
-	ChipmunkDebugDrawPolygon(3, (cpVect[]){v0.ab, v1.ab, p.ab}, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
-	cpVect closest = best->closest;
-	ChipmunkDebugDrawPoints(3.0, 1, &closest, RGBAColor(1, 1, 0, 1));
-	ChipmunkDebugDrawSegment(closest, p.ab, RGBAColor(0, 0, 1, 1));
+	cpVect verts[count];
+	for(int i=0; i<count; i++) verts[i] = hull[i].ab;
+	
+	ChipmunkDebugDrawPolygon(count, verts, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
+	ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 0, 0, 1));
+	
+	ChipmunkDebugDrawPoints(5, 1, (cpVect[]){p.ab}, RGBAColor(1, 1, 1, 1));
 #endif
 	
 	cpFloat area = cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab));
 	if(area > 0.0f && i < 20){
-		struct EPANode left; EPANodeInit(&left, v0, p);
-		struct EPANode right; EPANodeInit(&right, p, v1);
-		EPANodeSplit(best, &left, &right);
+		int count2 = 1;
+		struct MinkowskiPoint *hull2 = alloca((count + 1)*sizeof(struct MinkowskiPoint));
+		hull2[0] = p;
 		
-		return EPARecurse(context, root, i + 1);
+		for(int i=0; i<count; i++){
+			int j = (mini + 1 + i)%count;
+			cpVect delta = cpvsub(hull[j].ab, hull2[count2 - 1].ab);
+			
+			if(cpvcross(cpvsub(hull2[0].ab, hull2[count2 - 1].ab), delta) < 0.0f){
+				break;
+			}
+			for(int k=0; k<count; k++){
+				if(cpvcross(cpvsub(hull[k].ab, hull2[count2 - 1].ab), delta) < 0.0f){
+					break;
+				}
+			}
+			hull2[count2] = hull[j];
+			count2++;
+		}
+		
+		return EPARecurse(context, count2, hull2, i + 1);
 	} else {
 //		ChipmunkDebugDrawSegment(cpBBCenter(context.shape1->bb), cpBBCenter(context.shape2->bb), RGBAColor(0, 1, 0, 0.5));
-		return ClosestPointsNew(v0, v1, best->t, best->closest);
+		cpFloat t = ClosestT(v0.ab, v1.ab);
+		return ClosestPointsNew(v0, v1, t, cpvlerp(v0.ab, v1.ab, t));
 	}
 }
 
@@ -338,19 +368,8 @@ EPA(const struct SupportContext context, const struct MinkowskiPoint v0, const s
 //		printf("bad\n");
 //	}
 	
-	struct EPANode n01, n12, n20;
-	EPANodeInit(&n01, v0, v1);
-	EPANodeInit(&n12, v1, v2);
-	EPANodeInit(&n20, v2, v0);
-	
-	struct EPANode inner, root;
-	bzero(&inner, sizeof(struct EPANode));
-	bzero(&root, sizeof(struct EPANode));
-	
-	EPANodeSplit(&inner, &n01, &n12);
-	EPANodeSplit(&root, &inner, &n20);
-	
-	return EPARecurse(context, &root, 1);
+	struct MinkowskiPoint hull[3] = {v0, v1, v2};
+	return EPARecurse(context, 3, hull, 1);
 }
 
 //MARK: GJK Functions.
@@ -472,7 +491,7 @@ GJK(const cpShape *shape1, const cpShape *shape2, SupportFunction support1, Supp
 	struct SupportContext context = {shape1, shape2, support1, support2};
 	
 	struct MinkowskiPoint v0, v1;
-	if(*id){
+	if(*id && ENABLE_CACHING){
 		v0 = MinkoskiPointNew(ShapePoint(shape1, (*id>>24)&0xFF), ShapePoint(shape2, (*id>>16)&0xFF));
 		v1 = MinkoskiPointNew(ShapePoint(shape1, (*id>> 8)&0xFF), ShapePoint(shape2, (*id    )&0xFF));
 	} else {
