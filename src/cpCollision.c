@@ -40,7 +40,7 @@
 #define MAX_GJK_ITERATIONS 100
 #define MAX_EPA_ITERATIONS MAX_GJK_ITERATIONS
 #define WARN_GJK_ITERATIONS 10
-#define WARN_EPA_ITERATIONS WARN_GJK_ITERATIONS
+#define WARN_EPA_ITERATIONS 15
 
 // Add contact points for circle to circle collisions.
 // Used by several collision tests.
@@ -314,10 +314,10 @@ EPARecurse(const struct SupportContext *context, int count, struct MinkowskiPoin
 			count2++;
 		}
 		
-		cpAssertWarn(i<WARN_EPA_ITERATIONS, "High EPA iterations: %d", i + 1);
 		return EPARecurse(context, count2, hull2, i + 1);
 	} else {
-//		printf("% 2d EPA\n", i + 1);
+		cpAssertWarn(i<WARN_EPA_ITERATIONS, "High EPA iterations: %d", i + 1);
+		
 		cpFloat t = ClosestT(v0.ab, v1.ab);
 		return ClosestPointsNew(v0, v1, t, cpvlerp(v0.ab, v1.ab, t));
 	}
