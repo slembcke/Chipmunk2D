@@ -31,10 +31,11 @@
 #define DRAW_EPA (0 || DRAW_ALL)
 #define DRAW_CLOSEST (0 || DRAW_ALL)
 #define DRAW_CLIP (0 || DRAW_ALL)
-#define ENABLE_CACHING 1
 
 #define PRINT_LOG 0
 #endif
+
+#define ENABLE_CACHING 1
 
 // Add contact points for circle to circle collisions.
 // Used by several collision tests.
