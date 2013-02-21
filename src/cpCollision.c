@@ -38,9 +38,9 @@
 #define ENABLE_CACHING 1
 
 #define MAX_GJK_ITERATIONS 100
-#define MAX_EPA_ITERATIONS MAX_GJK_ITERATIONS
-#define WARN_GJK_ITERATIONS 10
-#define WARN_EPA_ITERATIONS 15
+#define MAX_EPA_ITERATIONS 100
+#define WARN_GJK_ITERATIONS 20
+#define WARN_EPA_ITERATIONS 20
 
 // Add contact points for circle to circle collisions.
 // Used by several collision tests.
@@ -168,10 +168,10 @@ struct SupportContext {
 };
 
 static inline struct MinkowskiPoint
-Support(const struct SupportContext *context, const cpVect n)
+Support(const struct SupportContext *ctx, const cpVect n)
 {
-	struct SupportPoint a = cpSupportPoint(context->count1, context->verts1, cpvneg(n));
-	struct SupportPoint b = cpSupportPoint(context->count2, context->verts2, n);
+	struct SupportPoint a = cpSupportPoint(ctx->count1, ctx->verts1, cpvneg(n));
+	struct SupportPoint b = cpSupportPoint(ctx->count2, ctx->verts2, n);
 	return MinkoskiPointNew(a, b);
 }
 
@@ -236,8 +236,11 @@ struct ClosestPoints {
 };
 
 static inline struct ClosestPoints
-ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, cpFloat t, cpVect p)
+ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
 {
+	cpFloat t = ClosestT(v0.ab, v1.ab);
+	cpVect p = cpvlerp(v0.ab, v1.ab, t);
+	
 	cpVect pa = cpvlerp(v0.a, v1.a, t);
 	cpVect pb = cpvlerp(v0.b, v1.b, t);
 	cpCollisionID id = (v0.id & 0xFFFF)<<16 | (v1.id & 0xFFFF);
@@ -261,17 +264,18 @@ ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1,
 //MARK: EPA Functions
 
 static inline cpFloat
-ClosestDist(cpVect v0, cpVect v1)
+ClosestDist(const cpVect v0,const cpVect v1)
 {
 	return cpvlengthsq(cpvlerp(v0, v1, ClosestT(v0, v1)));
 }
 
 static struct ClosestPoints
-EPARecurse(const struct SupportContext *context, int count, struct MinkowskiPoint *hull, int i)
+EPARecurse(const struct SupportContext *ctx, const int count, const struct MinkowskiPoint *hull, const int i)
 {
 	int mini = 0;
 	cpFloat minDist = INFINITY;
 	
+	// TODO: precalculate this when building the hull and save a step.
 	for(int j=0, i=count-1; j<count; i=j, j++){
 		cpFloat d = ClosestDist(hull[i].ab, hull[j].ab);
 		if(d < minDist){
@@ -282,7 +286,9 @@ EPARecurse(const struct SupportContext *context, int count, struct MinkowskiPoin
 	
 	struct MinkowskiPoint v0 = hull[mini];
 	struct MinkowskiPoint v1 = hull[(mini + 1)%count];
-	struct MinkowskiPoint p = Support(context, cpvperp(cpvsub(v1.ab, v0.ab)));
+	cpAssertSoft(v0.id != v1.id, "Internal Error: EPA vertexes are the same");
+	
+	struct MinkowskiPoint p = Support(ctx, cpvperp(cpvsub(v1.ab, v0.ab)));
 	
 #if DRAW_EPA
 	cpVect verts[count];
@@ -301,41 +307,43 @@ EPARecurse(const struct SupportContext *context, int count, struct MinkowskiPoin
 		hull2[0] = p;
 		
 		for(int i=0; i<count; i++){
-			int j = (mini + 1 + i)%count;
-			cpVect pivot = hull2[count2 - 1].ab;
-			cpVect delta = cpvsub(hull[j].ab, pivot);
+			int index = (i + mini + 1)%count;
 			
-			if(cpvcross(cpvsub(p.ab, pivot), delta) < 0.0f) break;
-			for(int k=0; k<count; k++){
-				if(cpvcross(cpvsub(hull[k].ab, pivot), delta) < 0.0f) break;
+			cpVect h0 = hull2[count2 - 1].ab;
+			cpVect h1 = hull[index].ab;
+			cpVect h2 = (i + 1 == count ? p : hull[index + 1]).ab;
+			
+			if(cpvcross(cpvsub(h2, h0), cpvsub(h1, h0)) > 0.0f){
+				hull2[count2] = hull[index];
+				count2++;
 			}
-			
-			hull2[count2] = hull[j];
-			count2++;
 		}
 		
-		return EPARecurse(context, count2, hull2, i + 1);
+		return EPARecurse(ctx, count2, hull2, i + 1);
 	} else {
-		cpAssertWarn(i<WARN_EPA_ITERATIONS, "High EPA iterations: %d", i + 1);
-		
-		cpFloat t = ClosestT(v0.ab, v1.ab);
-		return ClosestPointsNew(v0, v1, t, cpvlerp(v0.ab, v1.ab, t));
+		cpAssertWarn(i<WARN_EPA_ITERATIONS, "High EPA iterations: %d", i);
+		return ClosestPointsNew(v0, v1);
 	}
 }
 
 //MARK: GJK Functions.
 
 static inline struct ClosestPoints
-GJKRecurse(const struct SupportContext *context, struct MinkowskiPoint v0, struct MinkowskiPoint v1, const int i)
+GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, const int i)
 {
+	if(i > MAX_GJK_ITERATIONS){
+		cpAssertWarn(i < WARN_GJK_ITERATIONS, "High GJK iterations: %d", i);
+		return ClosestPointsNew(v0, v1);
+	}
+	
 	cpVect delta = cpvsub(v1.ab, v0.ab);
 	if(cpvcross(delta, cpvneg(v0.ab)) < 0.0f){
 		// Origin is behind axis. Flip and try again.
-		return GJKRecurse(context, v1, v0, i);
+		return GJKRecurse(ctx, v1, v0, i + 1);
 	} else {
 		cpFloat t = ClosestT(v0.ab, v1.ab);
 		cpVect n = (0.0f < t && t < 1.0f ? cpvperp(delta) : cpvneg(cpvlerp(v0.ab, v1.ab, t)));
-		struct MinkowskiPoint p = Support(context, n);
+		struct MinkowskiPoint p = Support(ctx, n);
 		
 #if DRAW_GJK
 		ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 1, 1, 1));
@@ -349,27 +357,22 @@ GJKRecurse(const struct SupportContext *context, struct MinkowskiPoint v0, struc
 			cpvcross(cpvsub(v1.ab, p.ab), cpvneg(p.ab)) <= 0.0f &&
 			cpvcross(cpvsub(v0.ab, p.ab), cpvneg(p.ab)) >= 0.0f
 		){
-			cpAssertWarn(i < WARN_GJK_ITERATIONS, "High GJK->EPA iterations: %d", i + 1);
+			cpAssertWarn(i < WARN_GJK_ITERATIONS, "High GJK->EPA iterations: %d", i);
 			
-			// The triangle v0, v1, p contains the origin. Use EPA to find the MSA.
+			// The triangle v0, p, v1 contains the origin. Use EPA to find the MSA.
+			// TODO: allocate a NxM array here and do an in place convex hull reduction in EPARecurse
 			struct MinkowskiPoint hull[3] = {v0, p, v1};
-			return EPARecurse(context, 3, hull, 1);
+			return EPARecurse(ctx, 3, hull, 1);
 		} else {
-//			cpVect closest = cpvlerp(v0.ab, v1.ab, t);
-//			cpFloat d = cpvlengthsq(closest);
-//			cpFloat d0 = ClosestDist(v0.ab, p.ab);
-//			cpFloat d1 = ClosestDist(p.ab, v1.ab);
-			
 			cpVect pdelta = cpvsub(p.ab, v0.ab);
-			cpFloat area = cpvcross(delta, pdelta);
-			if(area <= 0.0f && i < MAX_EPA_ITERATIONS){
-				cpAssertWarn(i < WARN_GJK_ITERATIONS, "High GJK iterations: %d", i + 1);
-				return ClosestPointsNew(v0, v1, t, cpvlerp(v0.ab, v1.ab, t));
+			if(cpvcross(delta, pdelta) <= 0.0f){
+				cpAssertWarn(i < WARN_GJK_ITERATIONS, "High GJK iterations: %d", i);
+				return ClosestPointsNew(v0, v1);
 			} else {
 				if(cpvdot(cpvneg(v0.ab), delta) < cpvdot(pdelta, delta)){
-					return GJKRecurse(context, v0, p, i + 1);
+					return GJKRecurse(ctx, v0, p, i + 1);
 				} else {
-					return GJKRecurse(context, p, v1, i + 1);
+					return GJKRecurse(ctx, p, v1, i + 1);
 				}
 			}
 		}
@@ -377,27 +380,27 @@ GJKRecurse(const struct SupportContext *context, struct MinkowskiPoint v0, struc
 }
 
 static struct SupportPoint
-ShapePoint(const cpVect *verts, int i)
+ShapePoint(const int count, const cpVect *verts, int i)
 {
 	return SupportPointNew(verts[i], i);
 }
 
 static struct ClosestPoints
-GJK(struct SupportContext *context, cpCollisionID *id)
+GJK(const struct SupportContext *ctx, cpCollisionID *id)
 {
 #if DRAW_GJK || DRAW_EPA
 	// draw the minkowski difference origin
 	cpVect origin = cpvzero;
 	ChipmunkDebugDrawPoints(5.0, 1, &origin, RGBAColor(1,0,0,1));
 	
-	int mdiffCount = shape1Count*shape2Count;
+	int mdiffCount = ctx->count1*ctx->count2;
 	cpVect *mdiffVerts = alloca(mdiffCount*sizeof(cpVect));
 	
-	for(int i=0; i<shape1Count; i++){
-		for(int j=0; j<shape2Count; j++){
-			cpVect v1 = ShapePoint(verts1, i).p;
-			cpVect v2 = ShapePoint(verts2, j).p;
-			mdiffVerts[i*shape2Count + j] = cpvsub(v2, v1);
+	for(int i=0; i<ctx->count1; i++){
+		for(int j=0; j<ctx->count2; j++){
+			cpVect v1 = ShapePoint(ctx->count1, ctx->verts1, i).p;
+			cpVect v2 = ShapePoint(ctx->count2, ctx->verts2, j).p;
+			mdiffVerts[i*ctx->count2 + j] = cpvsub(v2, v1);
 		}
 	}
 	 
@@ -411,16 +414,16 @@ GJK(struct SupportContext *context, cpCollisionID *id)
 	struct MinkowskiPoint v0, v1;
 	if(*id && ENABLE_CACHING){
 		// TODO needs a bounds check in case the shape was mutated.
-		v0 = MinkoskiPointNew(ShapePoint(context->verts1, (*id>>24)&0xFF), ShapePoint(context->verts2, (*id>>16)&0xFF));
-		v1 = MinkoskiPointNew(ShapePoint(context->verts1, (*id>> 8)&0xFF), ShapePoint(context->verts2, (*id    )&0xFF));
+		v0 = MinkoskiPointNew(ShapePoint(ctx->count1, ctx->verts1, (*id>>24)&0xFF), ShapePoint(ctx->count2, ctx->verts2, (*id>>16)&0xFF));
+		v1 = MinkoskiPointNew(ShapePoint(ctx->count1, ctx->verts1, (*id>> 8)&0xFF), ShapePoint(ctx->count2, ctx->verts2, (*id    )&0xFF));
 	} else {
 		// TODO use bounding box centers as the starting axis
-		cpVect axis = cpvperp(cpvsub(cpBBCenter(context->shape1->bb), cpBBCenter(context->shape2->bb)));
-		v0 = Support(context, axis);
-		v1 = Support(context, cpvneg(axis));
+		cpVect axis = cpvperp(cpvsub(cpBBCenter(ctx->shape1->bb), cpBBCenter(ctx->shape2->bb)));
+		v0 = Support(ctx, axis);
+		v1 = Support(ctx, cpvneg(axis));
 	}
 	
-	struct ClosestPoints points = GJKRecurse(context, v0, v1, 1);
+	struct ClosestPoints points = GJKRecurse(ctx, v0, v1, 1);
 	*id = points.id;
 	return points;
 }
