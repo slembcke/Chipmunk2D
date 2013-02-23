@@ -106,7 +106,7 @@ init(void)
 			body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, width, height)));
 			cpBodySetPos(body, pos);
 			
-			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+			shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpv(0, (height - width)/2.0), cpv(0, (width - height)/2.0), width/2.0));
 			cpShapeSetFriction(shape, 0.8f);
 			
 			cpFloat breakingForce = 80000;

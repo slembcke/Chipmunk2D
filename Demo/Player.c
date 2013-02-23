@@ -146,7 +146,7 @@ init(void)
 	body->velocity_func = playerUpdateVelocity;
 	playerBody = body;
 
-	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpvzero, cpv(0, radius), radius));
 	shape->e = 0.0f; shape->u = 0.0f;
 	shape->collision_type = 1;
 	playerShape = shape;

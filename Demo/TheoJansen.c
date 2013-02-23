@@ -61,7 +61,9 @@ make_leg(cpSpace *space, cpFloat side, cpFloat offset, cpBody *chassis, cpBody *
 	cpBody *upper_leg = cpSpaceAddBody(space, cpBodyNew(leg_mass, cpMomentForSegment(leg_mass, a, b)));
 	cpBodySetPos(upper_leg, cpv(offset, 0.0f));
 	
-	cpSpaceAddShape(space, cpSegmentShapeNew(upper_leg, a, b, seg_radius));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(upper_leg, a, b, seg_radius));
+	cpShapeSetGroup(shape, 1);
+	
 	cpSpaceAddConstraint(space, cpPivotJointNew2(chassis, upper_leg, cpv(offset, 0.0f), cpvzero));
 	
 	// lower leg

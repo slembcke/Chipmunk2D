@@ -250,6 +250,9 @@ ChipmunkDemoPrintString(char *fmt, ...)
 static void
 display(void)
 {
+	if(paused && !step) return;
+	step = cpFalse;
+	
 	PrintStringBuffer[0] = 0;
 	PrintStringCursor = PrintStringBuffer;
 	
@@ -258,21 +261,18 @@ display(void)
 	glScalef(scale, scale, 1.0);
 	glTranslatef(translate_x, translate_y, 0.0);
 	
+//	demos[demoIndex].drawFunc(space);
+	
+	cpVect newPoint = cpvlerp(mouseBody->p, ChipmunkDemoMouse, 0.25f);
+	mouseBody->v = cpvmult(cpvsub(newPoint, mouseBody->p), 60.0f);
+	mouseBody->p = newPoint;
+	
+	demos[demoIndex].updateFunc(space);
 	demos[demoIndex].drawFunc(space);
 	
-	if(!paused || step){
-		cpVect newPoint = cpvlerp(mouseBody->p, ChipmunkDemoMouse, 0.25f);
-		mouseBody->v = cpvmult(cpvsub(newPoint, mouseBody->p), 60.0f);
-		mouseBody->p = newPoint;
-		
-		demos[demoIndex].updateFunc(space);
-		
-		ChipmunkDemoTicks++;
-		ChipmunkDemoTime = ChipmunkDemoTicks/60.0;
-		
-		step = cpFalse;
-	}
-  
+	ChipmunkDemoTicks++;
+	ChipmunkDemoTime = ChipmunkDemoTicks/60.0;
+	
 	if(drawBBs) cpSpaceEachShape(space, drawShapeBB, NULL);
 	
 	glMatrixMode(GL_MODELVIEW);
@@ -573,6 +573,10 @@ extern int bench_count;
 int
 main(int argc, const char **argv)
 {
+	// Segment/segment collisions need to be explicitly enabled currently.
+	// This will becoume enabled by default in future versions of Chipmunk.
+	cpEnableSegmentToSegmentCollisions();
+	
 	ChipmunkDemo demo_list[] = {
 		LogoSmash,
 		PyramidStack,

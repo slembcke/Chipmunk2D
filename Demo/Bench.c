@@ -1,4 +1,5 @@
 #include "chipmunk.h"
+#include "chipmunk_unsafe.h"
 #include "ChipmunkDemo.h"
 
 #if 1
@@ -20,6 +21,8 @@
 	#define BENCH_SPACE_FREE cpHastySpaceFree
 	#define BENCH_SPACE_STEP cpHastySpaceStep
 #endif
+
+const cpFloat bevel = 0.0;
 
 static cpVect simple_terrain_verts[] = {
 	{350.00, 425.07}, {336.00, 436.55}, {272.00, 435.39}, {258.00, 427.63}, {225.28, 420.00}, {202.82, 396.00},
@@ -60,7 +63,8 @@ static void add_box(cpSpace *space, int index, cpFloat size){
 	body->p = cpvmult(frand_unit_circle(), 180.0f);
 	
 	
-	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
+	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size - bevel*2, size - bevel*2));
+	cpPolyShapeSetRadius(shape, bevel);
 	shape->e = 0.0f; shape->u = 0.9f;
 }
 
@@ -68,7 +72,7 @@ static void add_hexagon(cpSpace *space, int index, cpFloat radius){
 	cpVect hexagon[6] = {};
 	for(int i=0; i<6; i++){
 		cpFloat angle = -M_PI*2.0f*i/6.0f;
-		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
+		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius - bevel);
 	}
 	
 	cpFloat mass = radius*radius;
@@ -76,6 +80,7 @@ static void add_hexagon(cpSpace *space, int index, cpFloat radius){
 	body->p = cpvmult(frand_unit_circle(), 180.0f);
 	
 	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpvzero));
+	cpPolyShapeSetRadius(shape, bevel);
 	shape->e = 0.0f; shape->u = 0.9f;
 }
 
@@ -257,7 +262,7 @@ static cpSpace *init_ComplexTerrainHexagons_1000(){
 	cpVect hexagon[6] = {};
 	for(int i=0; i<6; i++){
 		cpFloat angle = -M_PI*2.0f*i/6.0f;
-		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
+		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius - bevel);
 	}
 	
 	for(int i=0; i<1000; i++){
@@ -266,6 +271,7 @@ static cpSpace *init_ComplexTerrainHexagons_1000(){
 		body->p = cpvadd(cpvmult(frand_unit_circle(), 180.0f), cpv(0.0f, 300.0f));
 		
 		cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpvzero));
+		cpPolyShapeSetRadius(shape, bevel);
 		shape->e = 0.0f; shape->u = 0.0f;
 	}
 	
@@ -361,7 +367,7 @@ static cpSpace *init_BouncyTerrainHexagons_500(){
 	cpVect hexagon[6] = {};
 	for(int i=0; i<6; i++){
 		cpFloat angle = -M_PI*2.0f*i/6.0f;
-		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
+		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius - bevel);
 	}
 	
 	for(int i=0; i<500; i++){
@@ -371,6 +377,7 @@ static cpSpace *init_BouncyTerrainHexagons_500(){
 		body->v = cpvmult(frand_unit_circle(), 50.0f);
 		
 		cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpvzero));
+		cpPolyShapeSetRadius(shape, bevel);
 		shape->e = 1.0f;
 	}
 	

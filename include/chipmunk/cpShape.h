@@ -33,6 +33,9 @@ typedef struct cpNearestPointQueryInfo {
 	cpVect p;
 	/// The distance to the point. The distance is negative if the point is inside the shape.
 	cpFloat d;
+	/// The gradient of the signed distance function.
+	/// The same as info.p/info.d, but accurate even for very small values of info.d.
+	cpVect g;
 } cpNearestPointQueryInfo;
 
 /// Segment query info struct.
