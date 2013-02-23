@@ -286,7 +286,7 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 	
 	struct MinkowskiPoint v0 = hull[mini];
 	struct MinkowskiPoint v1 = hull[(mini + 1)%count];
-	cpAssertSoft(v0.id != v1.id, "Internal Error: EPA vertexes are the same");
+	cpAssertSoft(!cpveql(v0.ab, v1.ab), "Internal Error: EPA vertexes are the same (%d and %d)", mini, (mini + 1)%count);
 	
 	struct MinkowskiPoint p = Support(ctx, cpvperp(cpvsub(v1.ab, v0.ab)));
 	
@@ -300,19 +300,20 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 	ChipmunkDebugDrawPoints(5, 1, (cpVect[]){p.ab}, RGBAColor(1, 1, 1, 1));
 #endif
 	
-	cpFloat area = cpvcross(cpvsub(v1.ab, v0.ab), cpvsub(p.ab, v0.ab));
-	if(area > 0.0f && i < MAX_EPA_ITERATIONS){
+	cpFloat area2x = cpvcross(cpvsub(v1.ab, v0.ab), cpvadd(cpvsub(p.ab, v0.ab), cpvsub(p.ab, v1.ab)));
+	if(area2x > 0.0f && i < MAX_EPA_ITERATIONS){
 		int count2 = 1;
 		struct MinkowskiPoint *hull2 = alloca((count + 1)*sizeof(struct MinkowskiPoint));
 		hull2[0] = p;
 		
 		for(int i=0; i<count; i++){
-			int index = (i + mini + 1)%count;
+			int index = (mini + 1 + i)%count;
 			
 			cpVect h0 = hull2[count2 - 1].ab;
 			cpVect h1 = hull[index].ab;
-			cpVect h2 = (i + 1 == count ? p : hull[index + 1]).ab;
+			cpVect h2 = (i + 1 < count ? hull[(index + 1)%count] : p).ab;
 			
+			// TODO: Should this be changed to an area2x check?
 			if(cpvcross(cpvsub(h2, h0), cpvsub(h1, h0)) > 0.0f){
 				hull2[count2] = hull[index];
 				count2++;
@@ -326,6 +327,14 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 	}
 }
 
+static struct ClosestPoints
+EPA(const struct SupportContext *ctx, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, const struct MinkowskiPoint v2)
+{
+	// TODO: allocate a NxM array here and do an in place convex hull reduction in EPARecurse
+	struct MinkowskiPoint hull[3] = {v0, v1, v2};
+	return EPARecurse(ctx, 3, hull, 1);
+}
+
 //MARK: GJK Functions.
 
 static inline struct ClosestPoints
@@ -337,7 +346,7 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 	}
 	
 	cpVect delta = cpvsub(v1.ab, v0.ab);
-	if(cpvcross(delta, cpvneg(v0.ab)) < 0.0f){
+	if(cpvcross(delta, cpvadd(v0.ab, v1.ab)) > 0.0f){
 		// Origin is behind axis. Flip and try again.
 		return GJKRecurse(ctx, v1, v0, i + 1);
 	} else {
@@ -354,18 +363,15 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 #endif
 		
 		if(
-			cpvcross(cpvsub(v1.ab, p.ab), cpvneg(p.ab)) <= 0.0f &&
-			cpvcross(cpvsub(v0.ab, p.ab), cpvneg(p.ab)) >= 0.0f
+			cpvcross(cpvsub(v1.ab, p.ab), cpvadd(v1.ab, p.ab)) > 0.0f &&
+			cpvcross(cpvsub(v0.ab, p.ab), cpvadd(v0.ab, p.ab)) < 0.0f
 		){
 			cpAssertWarn(i < WARN_GJK_ITERATIONS, "High GJK->EPA iterations: %d", i);
-			
 			// The triangle v0, p, v1 contains the origin. Use EPA to find the MSA.
-			// TODO: allocate a NxM array here and do an in place convex hull reduction in EPARecurse
-			struct MinkowskiPoint hull[3] = {v0, p, v1};
-			return EPARecurse(ctx, 3, hull, 1);
+			return EPA(ctx, v0, p, v1);
 		} else {
 			cpVect pdelta = cpvsub(p.ab, v0.ab);
-			if(cpvcross(delta, pdelta) <= 0.0f){
+			if(cpvcross(delta, cpvadd(cpvsub(p.ab, v0.ab), cpvsub(p.ab, v1.ab))) <= 0.0f){
 				cpAssertWarn(i < WARN_GJK_ITERATIONS, "High GJK iterations: %d", i);
 				return ClosestPointsNew(v0, v1);
 			} else {
@@ -380,9 +386,10 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 }
 
 static struct SupportPoint
-ShapePoint(const int count, const cpVect *verts, int i)
+ShapePoint(const int count, const cpVect *verts, const int i)
 {
-	return SupportPointNew(verts[i], i);
+	int index = (i < count ? i : 0);
+	return SupportPointNew(verts[i], index);
 }
 
 static struct ClosestPoints
@@ -413,11 +420,9 @@ GJK(const struct SupportContext *ctx, cpCollisionID *id)
 	
 	struct MinkowskiPoint v0, v1;
 	if(*id && ENABLE_CACHING){
-		// TODO needs a bounds check in case the shape was mutated.
 		v0 = MinkoskiPointNew(ShapePoint(ctx->count1, ctx->verts1, (*id>>24)&0xFF), ShapePoint(ctx->count2, ctx->verts2, (*id>>16)&0xFF));
 		v1 = MinkoskiPointNew(ShapePoint(ctx->count1, ctx->verts1, (*id>> 8)&0xFF), ShapePoint(ctx->count2, ctx->verts2, (*id    )&0xFF));
 	} else {
-		// TODO use bounding box centers as the starting axis
 		cpVect axis = cpvperp(cpvsub(cpBBCenter(ctx->shape1->bb), cpBBCenter(ctx->shape2->bb)));
 		v0 = Support(ctx, axis);
 		v1 = Support(ctx, cpvneg(axis));

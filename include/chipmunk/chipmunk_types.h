@@ -35,7 +35,6 @@
 #if CP_USE_DOUBLES
 /// Chipmunk's floating point type.
 /// Can be reconfigured at compile time.
-#error need to use floats for testing
 	typedef double cpFloat;
 	#define cpfsqrt sqrt
 	#define cpfsin sin

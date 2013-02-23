@@ -22,7 +22,7 @@
 	#define BENCH_SPACE_STEP cpHastySpaceStep
 #endif
 
-const cpFloat bevel = 2.0;
+const cpFloat bevel = 0.0;
 
 static cpVect simple_terrain_verts[] = {
 	{350.00, 425.07}, {336.00, 436.55}, {272.00, 435.39}, {258.00, 427.63}, {225.28, 420.00}, {202.82, 396.00},
