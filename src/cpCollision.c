@@ -29,8 +29,8 @@
 #define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
-#define DRAW_CLOSEST (0 || DRAW_ALL)
-#define DRAW_CLIP (0 || DRAW_ALL)
+#define DRAW_CLOSEST (1 || DRAW_ALL)
+#define DRAW_CLIP (1 || DRAW_ALL)
 
 #define PRINT_LOG 0
 #endif
@@ -370,12 +370,12 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 			// The triangle v0, p, v1 contains the origin. Use EPA to find the MSA.
 			return EPA(ctx, v0, p, v1);
 		} else {
-			cpVect pdelta = cpvsub(p.ab, v0.ab);
-			if(cpvcross(delta, cpvadd(cpvsub(p.ab, v0.ab), cpvsub(p.ab, v1.ab))) <= 0.0f){
+			// The new point must be farther along the normal than the existing points.
+			if(cpvdot(p.ab, n) <= cpfmax(cpvdot(v0.ab, n), cpvdot(v1.ab, n))){
 				cpAssertWarn(i < WARN_GJK_ITERATIONS, "High GJK iterations: %d", i);
 				return ClosestPointsNew(v0, v1);
 			} else {
-				if(cpvdot(cpvneg(v0.ab), delta) < cpvdot(pdelta, delta)){
+				if(ClosestDist(v0.ab, p.ab) < ClosestDist(p.ab, v1.ab)){
 					return GJKRecurse(ctx, v0, p, i + 1);
 				} else {
 					return GJKRecurse(ctx, p, v1, i + 1);

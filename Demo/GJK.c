@@ -82,7 +82,7 @@ init(void)
 	
 	{
 		cpFloat size = 100.0;
-		const int NUM_VERTS = 3;
+		const int NUM_VERTS = 5;
 		
 		cpVect verts[NUM_VERTS];
 		for(int i=0; i<NUM_VERTS; i++){
@@ -95,22 +95,23 @@ init(void)
 		
 		shape1 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 		shape1->group = 1;
-	}{
-		cpFloat size = 100.0;
-		const int NUM_VERTS = 4;
-		
-		cpVect verts[NUM_VERTS];
-		for(int i=0; i<NUM_VERTS; i++){
-			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
-			verts[i] = cpv(size/2.0*cos(angle), size/2.0*sin(angle));
-		}
-		
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-		cpBodySetPos(body, cpv(100.0, -50.0f));
-		
-		shape2 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
-		shape2->group = 1;
 	}
+//	{
+//		cpFloat size = 100.0;
+//		const int NUM_VERTS = 4;
+//		
+//		cpVect verts[NUM_VERTS];
+//		for(int i=0; i<NUM_VERTS; i++){
+//			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
+//			verts[i] = cpv(size/2.0*cos(angle), size/2.0*sin(angle));
+//		}
+//		
+//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
+//		cpBodySetPos(body, cpv(100.0, -50.0f));
+//		
+//		shape2 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
+//		shape2->group = 1;
+//	}
 	
 //	{
 //		cpFloat size = 150.0;
@@ -123,19 +124,20 @@ init(void)
 //		
 //		shape1 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, radius));
 //		shape1->group = 1;
-//	}{
-//		cpFloat size = 150.0;
-//		cpFloat radius = 25.0;
-//		
-//		cpVect a = cpv( size/2.0, 0.0);
-//		cpVect b = cpv(-size/2.0, 0.0);
-//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
-//		cpBodySetPos(body, cpv(0, -25));
-//		
-//		shape2 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, radius));
-//		shape2->group = 1;
 //	}
-	
+	{
+		cpFloat size = 150.0;
+		cpFloat radius = 25.0;
+		
+		cpVect a = cpv( size/2.0, 0.0);
+		cpVect b = cpv(-size/2.0, 0.0);
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
+		cpBodySetPos(body, cpv(0, -25));
+		
+		shape2 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, radius));
+		shape2->group = 1;
+	}
+
 	return space;
 }
 

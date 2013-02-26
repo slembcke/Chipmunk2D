@@ -261,14 +261,14 @@ display(void)
 	glScalef(scale, scale, 1.0);
 	glTranslatef(translate_x, translate_y, 0.0);
 	
-//	demos[demoIndex].drawFunc(space);
+	demos[demoIndex].drawFunc(space);
 	
 	cpVect newPoint = cpvlerp(mouseBody->p, ChipmunkDemoMouse, 0.25f);
 	mouseBody->v = cpvmult(cpvsub(newPoint, mouseBody->p), 60.0f);
 	mouseBody->p = newPoint;
 	
 	demos[demoIndex].updateFunc(space);
-	demos[demoIndex].drawFunc(space);
+//	demos[demoIndex].drawFunc(space);
 	
 	ChipmunkDemoTicks++;
 	ChipmunkDemoTime = ChipmunkDemoTicks/60.0;
