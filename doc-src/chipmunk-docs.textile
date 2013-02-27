@@ -2,7 +2,7 @@
 
 <%= pop_open_div("Outline") %><%%= Node::Root.outline %></div></div>
 
-<%= h 1, "Chipmunk Physics 6.1.2", "Intro" %>
+<%= h 1, "Chipmunk Physics 6.1.3", "Intro" %>
 
 First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be blazingly fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games across just about every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
 

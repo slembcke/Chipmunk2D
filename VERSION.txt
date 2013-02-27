@@ -1,3 +1,10 @@
+CHANGES SINCE 6.1.2:
+* BUG: Fixed a couple of very specific but fatal bugs that occur when sleeping is enabled and filtering collisions.
+* BUG: Fixed an issue with cpvslerp() between very similar vectors.
+* BUG: Fixed an issue with grab friction in ChipmunkMultiGrab. (Pro only)
+* MISC: Implemented the cpConstraintGetImpulse() functionality for spring joints.
+* MISC: Added more functions to chipmunk_ffi.h
+
 CHANGES SINCE 6.1.1:
 * API: Added a cpArbiter.data pointer. Now you can tag collisions with custom persistent data.
 * API: Added segment to segment collisions (thanks to LegoCylon)

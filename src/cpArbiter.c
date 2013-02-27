@@ -48,7 +48,10 @@ unthreadHelper(cpArbiter *arb, cpBody *body)
 	
 	if(prev){
 		cpArbiterThreadForBody(prev, body)->next = next;
-	} else {
+	} else if(body->arbiterList == arb) {
+		// IFF prev is NULL and body->arbiterList == arb, is arb at the head of the list.
+		// This function may be called for an arbiter that was never in a list.
+		// In that case, we need to protect it from wiping out the body->arbiterList pointer.
 		body->arbiterList = next;
 	}
 	
@@ -221,7 +224,7 @@ void
 cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisionHandler *handler, cpShape *a, cpShape *b)
 {
 	// Arbiters without contact data may exist if a collision function rejected the collision.
-	if(arb->contacts){
+	if(arb->numContacts > 0){
 		// Iterate over the possible pairs to look for hash value matches.
 		for(int i=0; i<arb->numContacts; i++){
 			cpContact *old = &arb->contacts[i];

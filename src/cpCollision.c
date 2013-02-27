@@ -83,32 +83,6 @@ cpSupportPointIndex(const int count, const cpVect *verts, const cpVect n)
 	return index;
 }
 
-//static inline int
-//cpSupportPointIndex(const cpPolyShape *poly, const cpVect n)
-//{
-//	cpSplittingPlane *planes = poly->tPlanes;
-//	
-//	int min, max;
-//	if(cpvcross(planes[0].n, n) < 0.0){
-//		min = 0;
-//		max = poly->splitLeft;
-//	} else {
-//		min = poly->splitRight;
-//		max = poly->numVerts - 1;
-//	}
-//	
-//	while(min != max){
-//		int mid = (min + max + 1)/2;
-//		if(cpvcross(planes[mid].n, n) > 0.0){
-//			max = mid - 1;
-//		} else {
-//			min = mid;
-//		}
-//	}
-//	
-//	return min;
-//}
-
 struct SupportPoint {
 	cpVect p;
 	cpCollisionID id;
@@ -127,26 +101,6 @@ cpSupportPoint(const int count, const cpVect *verts, const cpVect n)
 	int i = cpSupportPointIndex(count, verts, n);
 	return SupportPointNew(verts[i], i);
 }
-
-//static struct SupportPoint
-//cpPolySupportPoint(const cpPolyShape *poly, const cpVect n)
-//{
-//	int i = cpSupportPointIndex(poly, n);
-//	return SupportPointNew(poly->tVerts[i], i);
-//}
-//
-//static struct SupportPoint
-//cpSegmentSupportPoint(const cpSegmentShape *seg, const cpVect n)
-//{
-//	cpVect a = seg->ta, b = seg->tb;
-//	if(cpvdot(a, n) > cpvdot(b, n)){
-//		return SupportPointNew(a, 0);
-//	} else {
-//		return SupportPointNew(b, 1);
-//	}
-//}
-
-typedef struct SupportPoint (*SupportFunction)(const cpShape *a, cpVect n);
 
 struct MinkowskiPoint {
 	cpVect a, b;
@@ -497,7 +451,6 @@ ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestP
 	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.a.p, inc.a.p}, RGBAColor(1, 1, 0, 1));
 	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.b.p, inc.b.p}, RGBAColor(0, 1, 1, 1));
 	
-//	ChipmunkDemoPrintString("cost_a: %5.2f, cost_b: %5.2f\n", cost_a, cost_b);
 	if(cost_a < cost_b){
 		ChipmunkDebugDrawSegment(closest_inca, inc.a.p, RGBAColor(1, 0, 1, 1));
 	} else {

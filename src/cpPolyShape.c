@@ -217,18 +217,9 @@ setUpVerts(cpPolyShape *poly, int numVerts, const cpVect *verts, cpVect offset)
 		poly->planes[i].d = cpvdot(n, a);
 	}
 	
+	// TODO: Why did I add this? It duplicates work from above.
 	for(int i=0; i<numVerts; i++){
 		poly->planes[i] = cpSplittingPlaneNew(poly->verts[(i - 1 + numVerts)%numVerts], poly->verts[i]);
-	}
-	
-	cpVect n0 = poly->planes[0].n;
-	for(int i=1; i<numVerts; i++){
-		cpFloat cross = cpvcross(n0, poly->planes[i].n);
-		if(cross >= 0.0f){
-			poly->splitLeft = i - 1;
-			poly->splitRight = i - (cross != 0.0f);
-			break;
-		}
 	}
 }
 
