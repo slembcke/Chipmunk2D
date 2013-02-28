@@ -29,8 +29,8 @@
 #define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
-#define DRAW_CLOSEST (1 || DRAW_ALL)
-#define DRAW_CLIP (1 || DRAW_ALL)
+#define DRAW_CLOSEST (0 || DRAW_ALL)
+#define DRAW_CLIP (0 || DRAW_ALL)
 
 #define PRINT_LOG 0
 #endif
