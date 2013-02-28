@@ -1309,6 +1309,9 @@ Point queries are useful for things like mouse picking and simple sensors. They 
 	cpVect p;
 	/// The distance to the point. The distance is negative if the point is inside the shape.
 	cpFloat d;
+	/// The gradient of the distance function.
+	/// The same as info.p/info.d, but accurate even for very small values of info.d.
+	cpVect g;
 } cpNearestPointQueryInfo;</code></pre>
 
 p(expl). Nearest point queries return the point on the surface of the shape as well as the distance from the query point to the surface point.

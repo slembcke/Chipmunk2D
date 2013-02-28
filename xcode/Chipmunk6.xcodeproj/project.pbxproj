@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 45;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -499,8 +499,11 @@
 /* Begin PBXProject section */
 		D3E5F0190AA32EAC004E361B /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+			};
 			buildConfigurationList = D3E5F01A0AA32EAC004E361B /* Build configuration list for PBXProject "Chipmunk6" */;
-			compatibilityVersion = "Xcode 3.1";
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -650,11 +653,12 @@
 		D34963BF0B56CACA00CAD239 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				INSTALL_PATH = /usr/local/lib;
 				OTHER_CFLAGS = (
+					"-DDEBUG",
 					"-DCHIPMUNK_FFI",
 					"-ffast-math",
 				);
@@ -674,8 +678,8 @@
 		D34963C00B56CACA00CAD239 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				INSTALL_PATH = /usr/local/lib;
 				OTHER_CFLAGS = (
 					"-DCHIPMUNK_FFI",
@@ -705,7 +709,7 @@
 				GCC_THUMB_SUPPORT = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
-				PREBINDING = NO;
+				OTHER_CFLAGS = "-ffast-math";
 				PRODUCT_NAME = "Chipmunk-iPhone";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -720,11 +724,9 @@
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_AUTO_VECTORIZATION = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
-				PREBINDING = NO;
 				PRODUCT_NAME = "Chipmunk-iPhone";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -735,13 +737,16 @@
 		D3E5F01B0AA32EAC004E361B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = ../include/chipmunk;
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
-				OTHER_CFLAGS = "-ffast-math";
+				OTHER_CFLAGS = (
+					"-DDEBUG",
+					"-ffast-math",
+				);
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-W",
@@ -755,7 +760,7 @@
 		D3E5F01C0AA32EAC004E361B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -778,9 +783,10 @@
 		D3E5F04E0AA32FDF004E361B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "main-Info.plist";
@@ -792,7 +798,6 @@
 					"-framework",
 					AppKit,
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = ChipmunkDemo;
 				SHARED_PRECOMPS_DIR = "";
 				WARNING_CFLAGS = "-Wall";
@@ -804,9 +809,10 @@
 		D3E5F04F0AA32FDF004E361B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_AUTO_VECTORIZATION = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "main-Info.plist";
@@ -822,7 +828,6 @@
 					"-framework",
 					AppKit,
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = ChipmunkDemo;
 				SHARED_PRECOMPS_DIR = "";
 				WARNING_CFLAGS = "-Wall";

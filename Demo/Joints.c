@@ -67,6 +67,7 @@ addBar(cpSpace *space, cpVect pos, cpVect boxOffset)
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 5.0f));
 	cpShapeSetElasticity(shape, 0.0f);
 	cpShapeSetFriction(shape, 0.7f);
+	cpShapeSetGroup(shape, 1);
 	
 	return body;
 }

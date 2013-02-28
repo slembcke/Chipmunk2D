@@ -35,6 +35,8 @@ typedef struct cpPolyShape {
 	int numVerts;
 	cpVect *verts, *tVerts;
 	cpSplittingPlane *planes, *tPlanes;
+	
+	cpFloat r;
 } cpPolyShape;
 
 /// Allocate a polygon shape.
@@ -60,8 +62,10 @@ cpShape* cpBoxShapeNew2(cpBody *body, cpBB box);
 cpBool cpPolyValidate(const cpVect *verts, const int numVerts);
 
 /// Get the number of verts in a polygon shape.
-int cpPolyShapeGetNumVerts(cpShape *shape);
+int cpPolyShapeGetNumVerts(const cpShape *shape);
 /// Get the @c ith vertex of a polygon shape.
-cpVect cpPolyShapeGetVert(cpShape *shape, int idx);
+cpVect cpPolyShapeGetVert(const cpShape *shape, int idx);
+/// Get the radius of a polygon shape.
+cpFloat cpPolyShapeGetRadius(const cpShape *shape);
 
 /// @}

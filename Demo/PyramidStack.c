@@ -21,6 +21,7 @@
  
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
+#include "chipmunk_unsafe.h"
 
 static void
 update(cpSpace *space)
