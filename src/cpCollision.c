@@ -37,8 +37,8 @@
 
 #define ENABLE_CACHING 1
 
-#define MAX_GJK_ITERATIONS 100
-#define MAX_EPA_ITERATIONS 100
+#define MAX_GJK_ITERATIONS 30
+#define MAX_EPA_ITERATIONS 30
 #define WARN_GJK_ITERATIONS 20
 #define WARN_EPA_ITERATIONS 20
 
@@ -179,7 +179,14 @@ static inline cpFloat
 ClosestT(const cpVect a, const cpVect b)
 {
 	cpVect delta = cpvsub(b, a);
-	return cpfclamp01(cpvdot(delta, cpvneg(a))/cpvlengthsq(delta));
+	return -cpfclamp(cpvdot(delta, cpvadd(a, b))/cpvlengthsq(delta), -1.0f, 1.0f);
+}
+
+static inline cpVect
+LerpT(const cpVect a, const cpVect b, const cpFloat t)
+{
+	cpFloat ht = 0.5f*t;
+	return cpvadd(cpvmult(a, 0.5f - ht), cpvmult(b, 0.5f + ht));
 }
 
 struct ClosestPoints {
@@ -193,10 +200,10 @@ static inline struct ClosestPoints
 ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
 {
 	cpFloat t = ClosestT(v0.ab, v1.ab);
-	cpVect p = cpvlerp(v0.ab, v1.ab, t);
+	cpVect p = LerpT(v0.ab, v1.ab, t);
 	
-	cpVect pa = cpvlerp(v0.a, v1.a, t);
-	cpVect pb = cpvlerp(v0.b, v1.b, t);
+	cpVect pa = LerpT(v0.a, v1.a, t);
+	cpVect pb = LerpT(v0.b, v1.b, t);
 	cpCollisionID id = (v0.id & 0xFFFF)<<16 | (v1.id & 0xFFFF);
 	
 	cpVect delta = cpvsub(v1.ab, v0.ab);
@@ -220,7 +227,7 @@ ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
 static inline cpFloat
 ClosestDist(const cpVect v0,const cpVect v1)
 {
-	return cpvlengthsq(cpvlerp(v0, v1, ClosestT(v0, v1)));
+	return cpvlengthsq(LerpT(v0, v1, ClosestT(v0, v1)));
 }
 
 static struct ClosestPoints
@@ -305,7 +312,7 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 		return GJKRecurse(ctx, v1, v0, i + 1);
 	} else {
 		cpFloat t = ClosestT(v0.ab, v1.ab);
-		cpVect n = (0.0f < t && t < 1.0f ? cpvperp(delta) : cpvneg(cpvlerp(v0.ab, v1.ab, t)));
+		cpVect n = (-1.0f < t && t < 1.0f ? cpvperp(delta) : cpvneg(LerpT(v0.ab, v1.ab, t)));
 		struct MinkowskiPoint p = Support(ctx, n);
 		
 #if DRAW_GJK
