@@ -16,7 +16,7 @@ IO.readlines("|gcc -DNDEBUG -E include/chipmunk/chipmunk.h").each do|line|
 		
 		inline = !!inline
 		
-#		p({:inline => inline, :return => ret, :name => name, :args => args})
-		puts "#{name} - #{inline ? "static inline " : ""}#{ret} #{name}(#{args})"
+		p({:inline => inline, :return => ret, :name => name, :args => args})
+#		puts "#{name} - #{inline ? "static inline " : ""}#{ret} #{name}(#{args})"
 	end
 end
