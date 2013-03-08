@@ -33,6 +33,7 @@ struct WorleyContex {
 	cpFloat cellSize;
 	int width, height;
 	cpBB bb;
+	cpVect focus;
 };
 
 static inline cpVect
@@ -149,7 +150,7 @@ ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int cell_i, int cell_j,
 }
 
 static void
-ShatterShape(cpSpace *space, cpShape *shape, cpFloat cellSize)
+ShatterShape(cpSpace *space, cpShape *shape, cpFloat cellSize, cpVect focus)
 {
 	cpSpaceRemoveShape(space, shape);
 	cpSpaceRemoveBody(space, shape->body);
@@ -158,7 +159,7 @@ ShatterShape(cpSpace *space, cpShape *shape, cpFloat cellSize)
 	int width = (bb.r - bb.l)/cellSize + 1;
 	int height = (bb.t - bb.b)/cellSize + 1;
 //	printf("Splitting as %dx%d\n", width, height);
-	struct WorleyContex context = {rand(), cellSize, width, height, bb};
+	struct WorleyContex context = {rand(), cellSize, width, height, bb, focus};
 	
 	for(int i=0; i<context.width; i++){
 		for(int j=0; j<context.height; j++){
@@ -187,9 +188,9 @@ update(cpSpace *space)
 		cpNearestPointQueryInfo info;
 		if(cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 0, GRABABLE_MASK_BIT, CP_NO_GROUP, &info)){
 			cpBB bb = cpShapeGetBB(info.shape);
-			cpFloat cell_size = cpfmax(bb.r - bb.l, bb.t - bb.b)/5.0f;
+			cpFloat cell_size = cpfmax(bb.r - bb.l, bb.t - bb.b)/10.0f;
 			if(cell_size > 5.0f){
-				ShatterShape(space, info.shape, cell_size);
+				ShatterShape(space, info.shape, cell_size, ChipmunkDemoMouse);
 			} else {
 				printf("Too small to splinter %f\n", cell_size);
 			}
