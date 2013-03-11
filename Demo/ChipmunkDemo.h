@@ -49,6 +49,7 @@ extern cpFloat ChipmunkDemoTime;
 extern cpVect ChipmunkDemoKeyboard;
 extern cpVect ChipmunkDemoMouse;
 extern cpBool ChipmunkDemoRightClick;
+extern cpBool ChipmunkDemoRightDown;
 
 extern char *ChipmunkDemoMessageString;
 void ChipmunkDemoPrintString(char *fmt, ...);

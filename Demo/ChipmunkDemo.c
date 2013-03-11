@@ -73,6 +73,7 @@ static cpBody *mouseBody = NULL;
 static cpConstraint *mouseJoint = NULL;
 cpVect ChipmunkDemoMouse;
 cpBool ChipmunkDemoRightClick = cpFalse;
+cpBool ChipmunkDemoRightDown = cpFalse;
 
 char *ChipmunkDemoMessageString = NULL;
 
@@ -271,6 +272,7 @@ display(void)
 		ChipmunkDemoTime = ChipmunkDemoTicks/60.0;
 		
 		step = cpFalse;
+		ChipmunkDemoRightDown = cpFalse;
 	}
   
 	if(drawBBs) cpSpaceEachShape(space, drawShapeBB, NULL);
@@ -404,7 +406,7 @@ click(int button, int state, int x, int y)
 			mouseJoint = NULL;
 		}
 	} else if(button == GLUT_RIGHT_BUTTON){
-		ChipmunkDemoRightClick = (state == GLUT_DOWN);
+		ChipmunkDemoRightDown = ChipmunkDemoRightClick = (state == GLUT_DOWN);
 	}
 }
 
@@ -566,6 +568,7 @@ extern ChipmunkDemo Slice;
 extern ChipmunkDemo Convex;
 extern ChipmunkDemo Unicycle;
 extern ChipmunkDemo Sticky;
+extern ChipmunkDemo Shatter;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -597,6 +600,7 @@ main(int argc, const char **argv)
 		Convex,
 		Unicycle,
 		Sticky,
+		Shatter,
 	};
 	
 	demos = demo_list;
