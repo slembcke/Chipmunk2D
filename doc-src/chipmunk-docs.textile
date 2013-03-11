@@ -1138,7 +1138,7 @@ A collision handler is a set of 4 function callbacks for the different collision
 * @begin()@: Two shapes just started touching for the first time this step. Return true from the callback to process the collision normally or false to cause Chipmunk to ignore the collision entirely. If you return false, the @preSolve()@ and @postSolve()@ callbacks will never be run, but you will still recieve a separate event when the shapes stop overlapping.
 * @preSolve()@: Two shapes are touching during this step. Return false from the callback to make Chipmunk ignore the collision this step or true to process it normally. Additionally, you may override collision values such as cpArbiter.e and cpArbiter.u to provide custom friction or elasticity values. See "cpArbiter":#cpArbiter for more info.
 * @postSolve()@: Two shapes are touching and their collision response has been processed. You can retrieve the collision force at this time if you want to use it to calculate sound volumes or damage amounts. See "cpArbiter":#cpArbiter for more info.
-* @separate()@: Two shapes have just stopped touching for the first time this step.
+* @separate()@: Two shapes have just stopped touching for the first time this step. To ensure that begin()/separate() are always called in balanced pairs, it will also be called when removing a shape while its in contact with something or when deallocating the space.
 
 Collision callbacks are closely associated with "cpArbiter":#cpArbiter structs. You should familiarize yourself with those as well.
 
