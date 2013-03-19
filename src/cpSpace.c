@@ -304,6 +304,7 @@ cpConstraint *
 cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
 	cpAssertHard(!constraint->space, "This shape is already added to a space and cannot be added to another.");
+	cpAssertHard(constraint->a && constraint->b, "Constraint is attached to a NULL body.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(constraint->a);
