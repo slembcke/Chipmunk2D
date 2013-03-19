@@ -1,8 +1,4 @@
 Priorities:
-	Document ChipmunkMultiGrab, update example code.
-	Add license to showcase code. (and example code)
-	Release new Showcase app with push mode.
-	Finish AG tilemap tutorial
 	Simple top down player controls.
 	* test tiny omega bug in cpvslerp().
 	User definable default winding.
@@ -15,17 +11,12 @@ Priorities:
 	Convert body between static/dynamic.
 	More UIKit examples? There are a surprising number of questions on this.
 	Reorganize Chimpnuk Pro directory structure. Too flat and confusing.
-	Finish the GJK branch.
-	Finish smooth line collisions
 	Improve the ACD splitting plane algorithm.
 	Fishing game
-	Crayon Ball tutorial
 	Redo Logosmash with more particles?! :D
 	Motorcycle in a spinning cage
 	Squid thingy like TomorrowPlusX. (Would be better with seg/seg collisions)
 
-	Redo AngryChipmunks as Cocos2D 2.x
-	Check that SpacePatrol and CloudBomber work when Cocos2D 2.1 is released.
 	Investigate getting better PhysicsEditor support.
 
 Unordered
@@ -48,4 +39,3 @@ Future things to think about:
 	Easy callback programable joint?
 	Top down racing game. (Need the callback constraint)
 	cpBodyActivateStatic() should also activate joints?
-	Figure out why poly contacts can sometimes be unstable when driven by a strong constraint
