@@ -9,7 +9,6 @@ Priorities:
 	Reorganize Chimpnuk Pro directory structure. Too flat and confusing.
 	Improve the ACD splitting plane algorithm.
 	Fishing game
-	Redo Logosmash with more particles?! :D
 	Motorcycle in a spinning cage
 	Squid thingy like TomorrowPlusX. (Would be better with seg/seg collisions)
 
