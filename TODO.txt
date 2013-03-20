@@ -2,14 +2,10 @@ Priorities:
 	Simple top down player controls.
 	* test tiny omega bug in cpvslerp().
 	User definable default winding.
-	Return 0/invalid normal when beginnig a raycast inside a shape.
 	User definable fast collision filtering.
 	Assertion (or warning?) for destroying a body with things still attached
-	Add assertions so that you can't construct (or maybe add?) a constraint with NULL bodies.
 	Bilinearly sampled image sampler function. (override the sample method to always take bilinear samples)
 	RGB Image Sampler class.
-	Convert body between static/dynamic.
-	More UIKit examples? There are a surprising number of questions on this.
 	Reorganize Chimpnuk Pro directory structure. Too flat and confusing.
 	Improve the ACD splitting plane algorithm.
 	Fishing game
