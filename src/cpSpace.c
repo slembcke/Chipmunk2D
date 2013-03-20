@@ -185,7 +185,7 @@ cpSpaceFree(cpSpace *space)
 
 #define cpAssertSpaceUnlocked(space) \
 	cpAssertHard(!space->locked, \
-		"This addition/removal cannot be done safely during a call to cpSpaceStep() or during a query. " \
+		"This operation cannot be done safely during a call to cpSpaceStep() or during a query. " \
 		"Put these calls into a post-step callback." \
 	);
 
@@ -304,6 +304,7 @@ cpConstraint *
 cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 {
 	cpAssertHard(!constraint->space, "This shape is already added to a space and cannot be added to another.");
+	cpAssertHard(constraint->a && constraint->b, "Constraint is attached to a NULL body.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(constraint->a);
@@ -433,6 +434,45 @@ cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)
 	return (constraint->space == space);
 }
 
+//MARK: Static/rogue body conversion.
+
+void
+cpSpaceConvertBodyToStatic(cpSpace *space, cpBody *body)
+{
+	cpAssertHard(!cpBodyIsStatic(body), "Body is already static.");
+	cpAssertHard(cpBodyIsRogue(body), "Remove the body from the space before calling this function.");
+	cpAssertSpaceUnlocked(space);
+	
+	cpBodySetMass(body, INFINITY);
+	cpBodySetMoment(body, INFINITY);
+	
+	cpBodySetVel(body, cpvzero);
+	cpBodySetAngVel(body, 0.0f);
+	
+	body->node.idleTime = INFINITY;
+	CP_BODY_FOREACH_SHAPE(body, shape){
+		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
+		cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
+	}
+}
+
+void
+cpSpaceConvertBodyToDynamic(cpSpace *space, cpBody *body, cpFloat m, cpFloat i)
+{
+	cpAssertHard(cpBodyIsStatic(body), "Body is already dynamic.");
+	cpAssertSpaceUnlocked(space);
+	
+	cpBodyActivateStatic(body, NULL);
+	
+	cpBodySetMass(body, m);
+	cpBodySetMoment(body, i);
+	
+	body->node.idleTime = 0.0f;
+	CP_BODY_FOREACH_SHAPE(body, shape){
+		cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
+		cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
+	}
+}
 
 //MARK: Iteration
 

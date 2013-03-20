@@ -148,7 +148,7 @@ static inline void cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape
 	}
 }
 /// A macro shortcut for defining and retrieving the shapes from an arbiter.
-#define CP_ARBITER_GET_SHAPES(arb, a, b) cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+#define CP_ARBITER_GET_SHAPES(__arb__, __a__, __b__) cpShape *__a__, *__b__; cpArbiterGetShapes(__arb__, &__a__, &__b__);
 
 /// Return the colliding bodies involved for this arbiter.
 /// The order of the cpSpace.collision_type the bodies are associated with values will match
@@ -160,7 +160,7 @@ static inline void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody *
 	(*b) = shape_b->body;
 }
 /// A macro shortcut for defining and retrieving the bodies from an arbiter.
-#define CP_ARBITER_GET_BODIES(arb, a, b) cpBody *a, *b; cpArbiterGetBodies(arb, &a, &b);
+#define CP_ARBITER_GET_BODIES(__arb__, __a__, __b__) cpBody *__a__, *__b__; cpArbiterGetBodies(__arb__, &__a__, &__b__);
 
 /// A struct that wraps up the important collision data for an arbiter.
 typedef struct cpContactPointSet {
