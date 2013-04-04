@@ -110,7 +110,7 @@ typedef struct cpSpace cpSpace;
 
 #include "cpSpace.h"
 
-// Chipmunk 6.1.3
+// Chipmunk 6.1.4
 #define CP_VERSION_MAJOR 6
 #define CP_VERSION_MINOR 1
 #define CP_VERSION_RELEASE 4
