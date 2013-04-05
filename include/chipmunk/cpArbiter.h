@@ -177,8 +177,13 @@ typedef struct cpContactPointSet {
 		cpFloat dist;
 	} points[CP_MAX_CONTACTS_PER_ARBITER];
 } cpContactPointSet;
+
 /// Return a contact set from an arbiter.
 cpContactPointSet cpArbiterGetContactPointSet(const cpArbiter *arb);
+
+/// Replace the contact point set for an arbiter.
+/// This can be a very powerful feature, but use it with caution!
+void cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set);
 
 /// Returns true if this is the first step a pair of objects started colliding.
 cpBool cpArbiterIsFirstContact(const cpArbiter *arb);

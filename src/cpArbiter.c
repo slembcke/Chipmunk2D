@@ -110,8 +110,7 @@ cpArbiterGetContactPointSet(const cpArbiter *arb)
 	cpContactPointSet set;
 	set.count = cpArbiterGetCount(arb);
 	
-	int i;
-	for(i=0; i<set.count; i++){
+	for(int i=0; i<set.count; i++){
 		set.points[i].point = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
 		set.points[i].normal = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(n);
 		set.points[i].dist = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
@@ -120,6 +119,18 @@ cpArbiterGetContactPointSet(const cpArbiter *arb)
 	return set;
 }
 
+void
+cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
+{
+	int count = set->count;
+	arb->numContacts = count;
+	
+	for(int i=0; i<count; i++){
+		arb->contacts[i].p = set->points[i].point;
+		arb->contacts[i].n = set->points[i].normal;
+		arb->contacts[i].dist = set->points[i].dist;
+	}
+}
 
 cpVect
 cpArbiterTotalImpulse(const cpArbiter *arb)
