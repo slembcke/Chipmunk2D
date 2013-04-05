@@ -117,7 +117,15 @@ CP_DefineArbiterStructSetter(type, member, name)
 
 CP_DefineArbiterStructProperty(cpFloat, e, Elasticity)
 CP_DefineArbiterStructProperty(cpFloat, u, Friction)
-CP_DefineArbiterStructProperty(cpVect, surface_vr, SurfaceVelocity)
+
+// Get the relative surface velocity of the two shapes in contact.
+cpVect cpArbiterGetSurfaceVelocity(cpArbiter *arb);
+
+// Override the relative surface velocity of the two shapes in contact.
+// By default this is calculated to be the difference of the two
+// surface velocities clamped to the tangent plane.
+void cpArbiterSetSurfaceVelocity(cpArbiter *arb, cpVect vr);
+
 CP_DefineArbiterStructProperty(cpDataPointer, data, UserData)
 
 /// Calculate the total impulse that was applied by this arbiter.
