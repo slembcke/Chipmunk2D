@@ -56,8 +56,6 @@ BallIterator(cpBody *body, cpArbiter *arb, int *count)
 	(*count)++;
 }
 
-#endif
-
 struct CrushingContext {
 	cpFloat magnitudeSum;
 	cpVect vectorSum;
@@ -70,6 +68,8 @@ EstimateCrushing(cpBody *body, cpArbiter *arb, struct CrushingContext *context)
 	context->magnitudeSum += cpvlength(j);
 	context->vectorSum = cpvadd(context->vectorSum, j);
 }
+
+#endif
 
 static void
 update(cpSpace *space)
@@ -124,12 +124,25 @@ update(cpSpace *space)
 	
 	ChipmunkDemoPrintString("The ball is touching %d shapes.\n", count);
 	
-	struct CrushingContext crush = {0.0f, cpvzero};
-	cpBodyEachArbiter(ballBody, (cpBodyArbiterIteratorFunc)EstimateCrushing, &crush);
+	#if USE_BLOCKS
+		__block cpFloat magnitudeSum = 0.0f;
+		__block cpVect vectorSum = cpvzero;
+		cpBodyEachArbiter_b(ballBody, ^(cpArbiter *arb){
+			cpVect j = cpArbiterTotalImpulseWithFriction(arb);
+			magnitudeSum += cpvlength(j);
+			vectorSum = cpvadd(vectorSum, j);
+		});
+		
+		cpFloat crushForce = (magnitudeSum - cpvlength(vectorSum))*dt;
+	#else
+		struct CrushingContext crush = {0.0f, cpvzero};
+		cpBodyEachArbiter(ballBody, (cpBodyArbiterIteratorFunc)EstimateCrushing, &crush);
+		
+		cpFloat crushForce = (crush.magnitudeSum - cpvlength(crush.vectorSum))*dt;
+	#endif
 	
-	cpFloat crushForce = (crush.magnitudeSum - cpvlength(crush.vectorSum))*dt;
-	cpFloat crushStrength = 10.0f;
-	if(crushForce > crushStrength){
+	
+	if(crushForce > 10.0f){
 		ChipmunkDemoPrintString("The ball is being crushed. (f: %.2f)", crushForce);
 	} else {
 		ChipmunkDemoPrintString("The ball is not being crushed. (f: %.2f)", crushForce);
