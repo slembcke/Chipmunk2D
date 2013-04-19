@@ -51,21 +51,25 @@ BallIterator(cpBody *body, cpArbiter *arb, int *count)
 	// body is the body we are iterating the arbiters for.
 	// CP_ARBITER_GET_*() in an arbiter iterator always returns the body/shape for the iterated body first.
 	CP_ARBITER_GET_SHAPES(arb, ball, other);
-	
-	// Grab the bounding box, expand it slightly (for visibility) and draw it.
-	cpBB bb = cpShapeGetBB(other);
-	bb.l -= 5.0;
-	bb.b -= 5.0;
-	bb.r += 5.0;
-	bb.t += 5.0;
-	
-	ChipmunkDebugDrawBB(bb, RGBAColor(1, 0, 0, 1));
+	ChipmunkDebugDrawBB(cpShapeGetBB(other), RGBAColor(1, 0, 0, 1));
 	
 	(*count)++;
 }
 
 #endif
 
+struct CrushingContext {
+	cpFloat magnitudeSum;
+	cpVect vectorSum;
+};
+
+static void
+EstimateCrushing(cpBody *body, cpArbiter *arb, struct CrushingContext *context)
+{
+	cpVect j = cpArbiterTotalImpulseWithFriction(arb);
+	context->magnitudeSum += cpvlength(j);
+	context->vectorSum = cpvadd(context->vectorSum, j);
+}
 
 static void
 update(cpSpace *space)
@@ -109,15 +113,7 @@ update(cpSpace *space)
 			// body is the body we are iterating the arbiters for.
 			// CP_ARBITER_GET_*() in an arbiter iterator always returns the body/shape for the iterated body first.
 			CP_ARBITER_GET_SHAPES(arb, ball, other);
-			
-			// Grab the bounding box, expand it slightly (for visibility) and draw it.
-			cpBB bb = cpShapeGetBB(other);
-			bb.l -= 5.0;
-			bb.b -= 5.0;
-			bb.r += 5.0;
-			bb.t += 5.0;
-			
-			ChipmunkDebugDrawBB(bb, RGBAColor(1, 0, 0, 1));
+			ChipmunkDebugDrawBB(cpShapeGetBB(other), RGBAColor(1, 0, 0, 1));
 			
 			count++;
 		});
@@ -127,6 +123,17 @@ update(cpSpace *space)
 	#endif
 	
 	ChipmunkDemoPrintString("The ball is touching %d shapes.\n", count);
+	
+	struct CrushingContext crush = {0.0f, cpvzero};
+	cpBodyEachArbiter(ballBody, (cpBodyArbiterIteratorFunc)EstimateCrushing, &crush);
+	
+	cpFloat crushForce = (crush.magnitudeSum - cpvlength(crush.vectorSum))*dt;
+	cpFloat crushStrength = 10.0f;
+	if(crushForce > crushStrength){
+		ChipmunkDemoPrintString("The ball is being crushed. (f: %.2f)", crushForce);
+	} else {
+		ChipmunkDemoPrintString("The ball is not being crushed. (f: %.2f)", crushForce);
+	}
 }
 
 #define WIDTH 4.0f
