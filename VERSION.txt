@@ -1,3 +1,6 @@
+CHANGES SINCE 6.1.3:
+* MISC: Fixed a build script issue that was preventing the documentation from being generated.
+
 CHANGES SINCE 6.1.2:
 * BUG: Fixed a couple of very specific but fatal bugs that occur when sleeping is enabled and filtering collisions.
 * BUG: Fixed an issue with cpvslerp() between very similar vectors.

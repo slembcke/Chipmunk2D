@@ -22,6 +22,9 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
+static cpFloat pentagon_mass = 0.0f;
+static cpFloat pentagon_moment = 0.0f;
+
 // Iterate over all of the bodies and reset the ones that have fallen offscreen.
 static void
 eachBody(cpBody *body, void *unused)
@@ -36,6 +39,20 @@ eachBody(cpBody *body, void *unused)
 static void
 update(cpSpace *space)
 {
+	if(ChipmunkDemoRightDown){
+		cpShape *nearest = cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 0.0, GRABABLE_MASK_BIT, CP_NO_GROUP, NULL);
+		if(nearest){
+			cpBody *body = cpShapeGetBody(nearest);
+			if(cpBodyIsStatic(body)){
+				cpSpaceConvertBodyToDynamic(space, body, 1.0f, cpMomentForBox(1.0f, 30.0f, 30.0f));
+				cpSpaceAddBody(space, body);
+			} else {
+				cpSpaceRemoveBody(space, body);
+				cpSpaceConvertBodyToStatic(space, body);
+			}
+		}
+	}
+	
 	int steps = 1;
 	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
 	
@@ -50,19 +67,14 @@ update(cpSpace *space)
 static cpSpace *
 init(void)
 {
+	ChipmunkDemoMessageString = "Right click to make pentagons static/dynamic.";
+	
 	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 5);
 	cpSpaceSetGravity(space, cpv(0, -100));
 		
 	cpBody *body, *staticBody = cpSpaceGetStaticBody(space);
 	cpShape *shape;
-	
-	// Create vertexes for a pentagon shape.
-	cpVect verts[NUM_VERTS];
-	for(int i=0; i<NUM_VERTS; i++){
-		cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
-		verts[i] = cpv(10*cos(angle), 10*sin(angle));
-	}
 	
 	// Vertexes for a triangle shape.
 	cpVect tris[] = {
@@ -83,9 +95,19 @@ init(void)
 		}
 	}
 	
+	// Create vertexes for a pentagon shape.
+	cpVect verts[NUM_VERTS];
+	for(int i=0; i<NUM_VERTS; i++){
+		cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
+		verts[i] = cpv(10*cos(angle), 10*sin(angle));
+	}
+	
+	pentagon_mass = 1.0;
+	pentagon_moment = cpMomentForPoly(1.0f, NUM_VERTS, verts, cpvzero);
+	
 	// Add lots of pentagons.
 	for(int i=0; i<300; i++){
-		body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForPoly(1.0f, NUM_VERTS, verts, cpvzero)));
+		body = cpSpaceAddBody(space, cpBodyNew(pentagon_mass, pentagon_moment));
 		cpFloat x = rand()/(cpFloat)RAND_MAX*640 - 320;
 		cpBodySetPos(body, cpv(x, 350));
 		

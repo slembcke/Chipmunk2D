@@ -22,6 +22,10 @@
 #ifndef CHIPMUNK_HEADER
 #define CHIPMUNK_HEADER
 
+#ifdef _MSC_VER
+    #define _USE_MATH_DEFINES
+#endif
+
 #include <stdlib.h>
 #include <math.h>
 
@@ -34,26 +38,26 @@ extern "C" {
 #endif
 
 #if CP_ALLOW_PRIVATE_ACCESS == 1
-	#define CP_PRIVATE(symbol) symbol
+	#define CP_PRIVATE(__symbol__) __symbol__
 #else
-	#define CP_PRIVATE(symbol) symbol##_private
+	#define CP_PRIVATE(__symbol__) __symbol__##_private
 #endif
 
 void cpMessage(const char *condition, const char *file, int line, int isError, int isHardError, const char *message, ...);
 #ifdef NDEBUG
-	#define	cpAssertWarn(condition, ...)
+	#define	cpAssertWarn(__condition__, ...)
 #else
-	#define cpAssertWarn(condition, ...) if(!(condition)) cpMessage(#condition, __FILE__, __LINE__, 0, 0, __VA_ARGS__)
+	#define cpAssertWarn(__condition__, ...) if(!(__condition__)) cpMessage(#__condition__, __FILE__, __LINE__, 0, 0, __VA_ARGS__)
 #endif
 
 #ifdef NDEBUG
-	#define	cpAssertSoft(condition, ...)
+	#define	cpAssertSoft(__condition__, ...)
 #else
-	#define cpAssertSoft(condition, ...) if(!(condition)) cpMessage(#condition, __FILE__, __LINE__, 1, 0, __VA_ARGS__)
+	#define cpAssertSoft(__condition__, ...) if(!(__condition__)) cpMessage(#__condition__, __FILE__, __LINE__, 1, 0, __VA_ARGS__)
 #endif
 
 // Hard assertions are important and cheap to execute. They are not disabled by compiling as debug.
-#define cpAssertHard(condition, ...) if(!(condition)) cpMessage(#condition, __FILE__, __LINE__, 1, 1, __VA_ARGS__)
+#define cpAssertHard(__condition__, ...) if(!(__condition__)) cpMessage(#__condition__, __FILE__, __LINE__, 1, 1, __VA_ARGS__)
 
 
 #include "chipmunk_types.h"
@@ -106,7 +110,7 @@ typedef struct cpSpace cpSpace;
 
 #include "cpSpace.h"
 
-// Chipmunk 6.1.3
+// Chipmunk 6.1.4
 #define CP_VERSION_MAJOR 6
 #define CP_VERSION_MINOR 2
 #define CP_VERSION_RELEASE 0
@@ -173,8 +177,7 @@ int cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat t
 cpVect *__verts_var__ = (cpVect *)alloca(__count__*sizeof(cpVect)); \
 int __count_var__ = cpConvexHull(__count__, __verts__, __verts_var__, NULL, 0.0); \
 
-#if defined(__has_extension)
-#if __has_extension(blocks)
+#if defined(__has_extension) && __has_extension(blocks)
 // Define alternate block based alternatives for a few of the callback heavy functions.
 // Collision handlers are post-step callbacks are not included to avoid memory management issues.
 // If you want to use blocks for those and are aware of how to correctly manage the memory, the implementation is trivial. 
@@ -199,7 +202,6 @@ void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, c
 typedef void (^cpSpaceShapeQueryBlock)(cpShape *shape, cpContactPointSet *points);
 cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block);
 
-#endif
 #endif
 
 

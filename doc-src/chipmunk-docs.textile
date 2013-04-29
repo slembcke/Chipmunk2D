@@ -2,7 +2,7 @@
 
 <%= pop_open_div("Outline") %><%%= Node::Root.outline %></div></div>
 
-<%= h 1, "Chipmunk Physics 6.1.3", "Intro" %>
+<%= h 1, "Chipmunk Physics 6.1.4", "Intro" %>
 
 First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be blazingly fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games across just about every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
 
@@ -11,7 +11,7 @@ First of all, I would like to give a Erin Catto a big thank you, as Chipmunk's i
 
 <%= h 2, "Why a C Library?", "WhyC" %>
 
-A lot of people ask me why I wrote Chipmunk in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, OOC, Lua, Io... the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I also wanted Chipmunk to be fast, portable, easy to optimize and easy to debug. Writing Chipmunk in C made it simpler to acheive all of those goals.
+A lot of people ask me why I wrote Chipmunk in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, ooc, Lua, Io... the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I also wanted Chipmunk to be fast, portable, easy to optimize and easy to debug. Writing Chipmunk in C made it simpler to achieve all of those goals.
 
 That said, I've never developed a whole game in C and I probably never will. There are much more interesting and fun languages than C with all sorts of nice features like garbage collection, closures and all sorts of unique object oriented runtimes. Check out the "Bindings and Ports":http://chipmunk-physics.net/bindingsAndPorts.php page to see if you can use Chipmunk from your language of choice. Because Chipmunk is written in a subset of C99 it compiles cleanly as C, C++, Objective-C and Objective-C++ code, making it easy to integrate into projects in those languages.
 
@@ -1138,7 +1138,7 @@ A collision handler is a set of 4 function callbacks for the different collision
 * @begin()@: Two shapes just started touching for the first time this step. Return true from the callback to process the collision normally or false to cause Chipmunk to ignore the collision entirely. If you return false, the @preSolve()@ and @postSolve()@ callbacks will never be run, but you will still recieve a separate event when the shapes stop overlapping.
 * @preSolve()@: Two shapes are touching during this step. Return false from the callback to make Chipmunk ignore the collision this step or true to process it normally. Additionally, you may override collision values such as cpArbiter.e and cpArbiter.u to provide custom friction or elasticity values. See "cpArbiter":#cpArbiter for more info.
 * @postSolve()@: Two shapes are touching and their collision response has been processed. You can retrieve the collision force at this time if you want to use it to calculate sound volumes or damage amounts. See "cpArbiter":#cpArbiter for more info.
-* @separate()@: Two shapes have just stopped touching for the first time this step.
+* @separate()@: Two shapes have just stopped touching for the first time this step. To ensure that begin()/separate() are always called in balanced pairs, it will also be called when removing a shape while its in contact with something or when deallocating the space.
 
 Collision callbacks are closely associated with "cpArbiter":#cpArbiter structs. You should familiarize yourself with those as well.
 
