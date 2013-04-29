@@ -278,7 +278,7 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 {
 	cpAssertHard(shape->space != space, "You have already added this shape to this space. You must not add it a second time.");
 	cpAssertHard(!shape->space, "You have already added this shape to another space. You cannot add it to a second.");
-	cpAssertHard(!cpBodyIsRogue(shape->body), "You are adding a static shape to a dynamic body. Did you mean to attach it to a static or rogue body? See the documentation for more information.");
+	cpAssertHard(cpBodyIsRogue(shape->body), "You are adding a static shape to a dynamic body. Did you mean to attach it to a static or rogue body? See the documentation for more information.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBody *body = shape->body;
