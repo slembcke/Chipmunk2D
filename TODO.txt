@@ -34,3 +34,10 @@ Future things to think about:
 	Easy callback programable joint?
 	Top down racing game. (Need the callback constraint)
 	cpBodyActivateStatic() should also activate joints?
+	Collision handler objects with additional callbacks.
+	Revisit rolling friction.
+	Calculate contact anchors to get rid of contact pos. (needed for speculative contacts anyway)
+	Revisit per contact surface velocity.
+	Mass property calculation changes.
+	Change apply force/impulse and point velocity functions.
+	
