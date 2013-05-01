@@ -568,6 +568,7 @@ extern ChipmunkDemo Convex;
 extern ChipmunkDemo Unicycle;
 extern ChipmunkDemo Sticky;
 extern ChipmunkDemo Shatter;
+extern ChipmunkDemo GJK;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -580,6 +581,7 @@ main(int argc, const char **argv)
 	cpEnableSegmentToSegmentCollisions();
 	
 	ChipmunkDemo demo_list[] = {
+		GJK,
 		LogoSmash,
 		PyramidStack,
 		Plink,

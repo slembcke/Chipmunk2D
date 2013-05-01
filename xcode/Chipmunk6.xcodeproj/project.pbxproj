@@ -109,6 +109,7 @@
 		D3E4A9CC0E99683200EE08BA /* cpGrooveJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */; };
 		D3E5F0550AA3303F004E361B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0530AA3303F004E361B /* GLUT.framework */; };
 		D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0540AA3303F004E361B /* OpenGL.framework */; };
+		D3EC86FC17318F550063C16D /* GJK.c in Sources */ = {isa = PBXBuildFile; fileRef = D3EC86FB17318F550063C16D /* GJK.c */; };
 		D3F2EE2F14F898E9005FD439 /* Unicycle.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F2EE2E14F898E9005FD439 /* Unicycle.c */; };
 		D3F52BD313C509DC00EB67D9 /* Chains.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F52BD213C509DC00EB67D9 /* Chains.c */; };
 		D3F6EEDF156D581300A158A8 /* Convex.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F6EEDE156D581300A158A8 /* Convex.c */; };
@@ -213,6 +214,7 @@
 		D3E5F2DA0AAA5622004E361B /* cpBB.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpBB.c; sourceTree = "<group>"; };
 		D3E5F2DD0AAA562B004E361B /* cpArray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpArray.c; sourceTree = "<group>"; };
 		D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpSpaceHash.c; sourceTree = "<group>"; };
+		D3EC86FB17318F550063C16D /* GJK.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GJK.c; path = ../../../Desktop/GJK.c; sourceTree = "<group>"; };
 		D3F2EE2E14F898E9005FD439 /* Unicycle.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Unicycle.c; sourceTree = "<group>"; };
 		D3F52BD213C509DC00EB67D9 /* Chains.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Chains.c; sourceTree = "<group>"; };
 		D3F6EEDE156D581300A158A8 /* Convex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Convex.c; sourceTree = "<group>"; };
@@ -314,6 +316,7 @@
 		D3CCDF5B0AE35DA00080442F /* Demo */ = {
 			isa = PBXGroup;
 			children = (
+				D3EC86FB17318F550063C16D /* GJK.c */,
 				D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */,
 				D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */,
 				D3FBA1B80E9B1F6300950BCC /* ChipmunkDebugDraw.h */,
@@ -640,6 +643,7 @@
 				D3F6EEDF156D581300A158A8 /* Convex.c in Sources */,
 				D3DFB55D1613765700162F19 /* Sticky.c in Sources */,
 				D38C029916840ED3009F612B /* Shatter.c in Sources */,
+				D3EC86FC17318F550063C16D /* GJK.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -428,25 +428,29 @@ void ChipmunkDebugDrawConstraints(cpSpace *space)
 
 void ChipmunkDebugDrawCollisionPoints(cpSpace *space)
 {
-//	cpArray *arbiters = space->arbiters;
-//	
-//	glColor3f(1.0f, 0.0f, 0.0f);
-//	glPointSize(4.0f*ChipmunkDebugDrawPointLineScale);
-//	
-//	glBegin(GL_LINES); {
-//		for(int i=0; i<arbiters->num; i++){
-//			cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
-//			
-//			for(int j=0; j<arb->numContacts; j++){
-//				cpVect p = arb->contacts[j].p;
-//				cpVect n = arb->contacts[j].n;
-//				cpFloat d = 2.0 - arb->contacts[j].dist/2.0;
-//				
-//				cpVect a = cpvadd(p, cpvmult(n,  d));
-//				cpVect b = cpvadd(p, cpvmult(n, -d));
-//				glVertex2f(a.x, a.y);
-//				glVertex2f(b.x, b.y);
-//			}
-//		}
-//	} glEnd();
+	cpArray *arbiters = space->arbiters;
+	
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glPointSize(4.0f*ChipmunkDebugDrawPointLineScale);
+	
+	glBegin(GL_LINES); {
+		for(int i=0; i<arbiters->num; i++){
+			cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
+			cpVect n = arb->n;
+			
+			cpBody *a = arb->body_a;
+			cpBody *b = arb->body_b;
+			
+			for(int j=0; j<arb->numContacts; j++){
+				cpVect r1 = cpvadd(a->p, arb->contacts[j].r1);
+				cpVect r2 = cpvadd(b->p, arb->contacts[j].r2);
+				
+				glVertex2f(r1.x, r1.y);
+				glVertex2f(r1.x + n.x, r1.y + n.y);
+				
+				glVertex2f(r2.x, r2.y);
+				glVertex2f(r2.x - n.x, r2.y - n.y);
+			}
+		}
+	} glEnd();
 }
