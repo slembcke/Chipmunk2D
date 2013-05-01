@@ -239,17 +239,22 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 	}
 	
 	// Narrow-phase collision detection.
-	cpContact *contacts = cpContactBufferGetArray(space);
-	int numContacts = cpCollideShapes(a, b, &id, contacts);
-	if(!numContacts) return id; // Shapes are not colliding.
-	cpSpacePushContacts(space, numContacts);
+	struct cpContactTemp contacts = {
+		a->body, b->body,
+		0, cpContactBufferGetArray(space),
+		cpvzero
+	};
+	
+	cpCollideShapes(a, b, &id, &contacts);
+	if(contacts.count == 0) return id; // Shapes are not colliding.
+	cpSpacePushContacts(space, contacts.count);
 	
 	// Get an arbiter from space->arbiterSet for the two shapes.
 	// This is where the persistant contact magic comes from.
 	cpShape *shape_pair[] = {a, b};
 	cpHashValue arbHashID = CP_HASH_PAIR((cpHashValue)a, (cpHashValue)b);
 	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->cachedArbiters, arbHashID, shape_pair, space, (cpHashSetTransFunc)cpSpaceArbiterSetTrans);
-	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b);
+	cpArbiterUpdate(arb, &contacts, handler, a, b);
 	
 	// Call the begin function first if it's the first step
 	if(arb->state == cpArbiterStateFirstColl && !handler->begin(arb, space, handler->data)){
@@ -266,7 +271,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 	){
 		cpArrayPush(space->arbiters, arb);
 	} else {
-		cpSpacePopContacts(space, numContacts);
+		cpSpacePopContacts(space, contacts.count);
 		
 		arb->contacts = NULL;
 		arb->numContacts = 0;

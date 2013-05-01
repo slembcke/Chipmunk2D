@@ -46,7 +46,7 @@
 // Used by several collision tests.
 // TODO should accept hash parameter
 static int
-circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpFloat r2, cpHashValue hash, cpContact *con)
+circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpFloat r2, cpHashValue hash, struct cpContactTemp *contacts)
 {
 	cpFloat mindist = r1 + r2;
 	cpVect delta = cpvsub(p2, p1);
@@ -55,7 +55,11 @@ circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpF
 	if(distsq < mindist*mindist){
 		cpFloat dist = cpfsqrt(distsq);
 		cpVect n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
-		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist, hash);
+//		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist, hash);
+		
+		// TODO calculate r1 and r2 independently
+		cpVect p = cpvlerp(p1, p2, r1/(r1 + r2));
+		cpContactTempPush(contacts, cpvsub(p, contacts->a->p), cpvsub(p, contacts->b->p), n, dist - mindist, hash);
 		
 		return 1;
 	} else {
@@ -397,17 +401,18 @@ GJK(const struct SupportContext *ctx, cpCollisionID *id)
 //MARK: Contact Clipping
 
 static inline void
-Contact1(cpFloat dist, cpVect a, cpVect b, cpFloat refr, cpFloat incr, cpVect n, cpHashValue hash, cpContact *arr)
+Contact1(cpFloat dist, cpVect a, cpVect b, cpFloat refr, cpFloat incr, cpVect n, cpHashValue hash, struct cpContactTemp *contacts)
 {
 	cpFloat rsum = refr + incr;
 	cpFloat alpha = (rsum > 0.0f ? refr/rsum : 0.5f);
 	cpVect point = cpvlerp(a, b, alpha);
 	
-	cpContactInit(arr, point, n, dist - rsum, hash);
+//	cpContactInit(arr, point, n, dist - rsum, hash);
+	cpContactTempPush(contacts, cpvsub(point, contacts->a->p), cpvsub(point, contacts->b->p), n, dist - rsum, hash);
 }
 
 static inline int
-Contact2(cpVect refp, cpVect inca, cpVect incb, cpFloat refr, cpFloat incr, cpVect refn, cpVect n, cpHashValue hash, cpContact *arr)
+Contact2(cpVect refp, cpVect inca, cpVect incb, cpFloat refr, cpFloat incr, cpVect refn, cpVect n, cpHashValue hash, struct cpContactTemp *contacts)
 {
 	cpFloat cian = cpvcross(inca, refn);
 	cpFloat cibn = cpvcross(incb, refn);
@@ -421,7 +426,9 @@ Contact2(cpVect refp, cpVect inca, cpVect incb, cpFloat refr, cpFloat incr, cpVe
 		cpFloat rsum = refr + incr;
 		cpFloat alpha = (rsum > 0.0f ? incr*(1.0f - (rsum + pd)/rsum) : -0.5f*pd);
 		
-		cpContactInit(arr, cpvadd(point, cpvmult(refn, alpha)), n, pd, hash);
+//		cpContactInit(arr, cpvadd(point, cpvmult(refn, alpha)), n, pd, hash);
+		cpVect p = cpvadd(point, cpvmult(refn, alpha));
+		cpContactTempPush(contacts, cpvsub(p, contacts->a->p), cpvsub(p, contacts->b->p), n, pd, hash);
 		return 1;
 	} else {
 		return 0;
@@ -429,7 +436,7 @@ Contact2(cpVect refp, cpVect inca, cpVect incb, cpFloat refr, cpFloat incr, cpVe
 }
 
 static inline int
-ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestPoints points, const cpFloat nflip, cpContact *arr)
+ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestPoints points, const cpFloat nflip, struct cpContactTemp *contacts)
 {
 	cpVect inc_offs = cpvmult(inc.n, inc.r);
 	cpVect ref_offs = cpvmult(ref.n, ref.r);
@@ -470,17 +477,17 @@ ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestP
 	
 	if(cost_a < cost_b){
 		cpVect refp = cpvadd(ref.a.p, ref_offs);
-		Contact1(points.d, closest_inca, inc.a.p, ref.r, inc.r, points.n, hash_iarb, arr);
-		return Contact2(refp, inca, incb, ref.r, inc.r, ref.n, points.n, hash_ibra, arr + 1) + 1;
+		Contact1(points.d, closest_inca, inc.a.p, ref.r, inc.r, points.n, hash_iarb, contacts);
+		return Contact2(refp, inca, incb, ref.r, inc.r, ref.n, points.n, hash_ibra, contacts) + 1;
 	} else {
 		cpVect refp = cpvadd(ref.b.p, ref_offs);
-		Contact1(points.d, closest_incb, inc.b.p, ref.r, inc.r, points.n, hash_ibra, arr);
-		return Contact2(refp, incb, inca, ref.r, inc.r, ref.n, points.n, hash_iarb, arr + 1) + 1;
+		Contact1(points.d, closest_incb, inc.b.p, ref.r, inc.r, points.n, hash_ibra, contacts);
+		return Contact2(refp, incb, inca, ref.r, inc.r, ref.n, points.n, hash_iarb, contacts) + 1;
 	}
 }
 
 static inline int
-ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPoints points, cpContact *arr)
+ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPoints points, struct cpContactTemp *contacts)
 {
 	cpFloat mindist = e1.r + e2.r;
 	if(points.d <= mindist){
@@ -493,9 +500,9 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 			// Pick the longest edge as the reference to break the tie.
 			(pick == 0.0f && (cpvdistsq(e1.a.p, e1.b.p) > cpvdistsq(e2.a.p, e2.b.p)))
 		){
-			return ClipContacts(e1, e2, points,  1.0f, arr);
+			return ClipContacts(e1, e2, points,  1.0f, contacts);
 		} else {
-			return ClipContacts(e2, e1, points, -1.0f, arr);
+			return ClipContacts(e2, e1, points, -1.0f, contacts);
 		}
 	} else {
 		return 0;
@@ -504,17 +511,17 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 
 //MARK: Collision Functions
 
-typedef int (*CollisionFunc)(const cpShape *a, const cpShape *b, cpCollisionID *id, cpContact *arr);
+typedef int (*CollisionFunc)(const cpShape *a, const cpShape *b, cpCollisionID *id, struct cpContactTemp *contacts);
 
 // Collide circle shapes.
 static int
-circle2circle(const cpCircleShape *c1, const cpCircleShape *c2, cpCollisionID *id, cpContact *arr)
+circle2circle(const cpCircleShape *c1, const cpCircleShape *c2, cpCollisionID *id, struct cpContactTemp *contacts)
 {
-	return circle2circleQuery(c1->tc, c2->tc, c1->r, c2->r, 0, arr);
+	return circle2circleQuery(c1->tc, c2->tc, c1->r, c2->r, 0, contacts);
 }
 
 static int
-circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentShape, cpCollisionID *id, cpContact *con)
+circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentShape, cpCollisionID *id, struct cpContactTemp *contacts)
 {
 	cpVect seg_a = segmentShape->ta;
 	cpVect seg_b = segmentShape->tb;
@@ -524,8 +531,8 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 	cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(center, seg_a))/cpvlengthsq(seg_delta));
 	cpVect closest = cpvadd(seg_a, cpvmult(seg_delta, closest_t));
 	
-	if(circle2circleQuery(center, closest, circleShape->r, segmentShape->r, 0, con)){
-		cpVect n = con[0].n;
+	if(circle2circleQuery(center, closest, circleShape->r, segmentShape->r, 0, contacts)){
+		cpVect n = contacts->n;
 		
 		// Reject endcap collisions if tangents are provided.
 		if(
@@ -540,7 +547,7 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 }
 
 static int
-segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollisionID *id, cpContact *arr)
+segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollisionID *id, struct cpContactTemp *contacts)
 {
 	struct SupportContext context = {(cpShape *)seg1, (cpShape *)seg2, 2, 2, &seg1->ta, &seg2->ta};
 	struct ClosestPoints points = GJK(&context, id);
@@ -567,14 +574,14 @@ segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollis
 			(!cpveql(points.b, seg2->tb) || cpvdot(n, cpvrotate(seg2->b_tangent, rot2)) >= 0.0)
 		)
 	){
-		return ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), points, arr);
+		return ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), points, contacts);
 	} else {
 		return 0;
 	}
 }
 
 static int
-poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionID *id, cpContact *arr)
+poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionID *id, struct cpContactTemp *contacts)
 {
 	struct SupportContext context = {(cpShape *)poly1, (cpShape *)poly2, poly1->numVerts, poly2->numVerts, poly1->tVerts, poly2->tVerts};
 	struct ClosestPoints points = GJK(&context, id);
@@ -590,14 +597,14 @@ poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionID *id,
 #endif
 	
 	if(points.d - poly1->r - poly2->r <= 0.0){
-		return ContactPoints(SupportEdgeForPoly(poly1, points.n), SupportEdgeForPoly(poly2, cpvneg(points.n)), points, arr);
+		return ContactPoints(SupportEdgeForPoly(poly1, points.n), SupportEdgeForPoly(poly2, cpvneg(points.n)), points, contacts);
 	} else {
 		return 0;
 	}
 }
 
 static int
-seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionID *id, cpContact *arr)
+seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionID *id, struct cpContactTemp *contacts)
 {
 	struct SupportContext context = {(cpShape *)seg, (cpShape *)poly, 2, poly->numVerts, &seg->ta, poly->tVerts};
 	struct ClosestPoints points = GJK(&context, id);
@@ -622,7 +629,7 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionID *id, 
 			(!cpveql(points.a, seg->tb) || cpvdot(n, cpvrotate(seg->b_tangent, rot)) <= 0.0)
 		)
 	){
-		return ContactPoints(SupportEdgeForSegment(seg, n), SupportEdgeForPoly(poly, cpvneg(n)), points, arr);
+		return ContactPoints(SupportEdgeForSegment(seg, n), SupportEdgeForPoly(poly, cpvneg(n)), points, contacts);
 	} else {
 		return 0;
 	}
@@ -632,7 +639,7 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionID *id, 
 // TODO: Comment me!
 // TODO respect poly radius
 static int
-circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionID *id, cpContact *con)
+circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionID *id, struct cpContactTemp *contacts)
 {
 	cpSplittingPlane *planes = poly->tPlanes;
 	
@@ -657,14 +664,15 @@ circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionID 
 	cpFloat dt = cpvcross(n, circle->tc);
 	
 	if(dt < dtb){
-		return circle2circleQuery(circle->tc, b, circle->r, poly->r, 0, con);
+		return circle2circleQuery(circle->tc, b, circle->r, poly->r, 0, contacts);
 	} else if(dt < dta) {
 		cpVect point = cpvsub(circle->tc, cpvmult(n, circle->r + min/2.0f));
-		cpContactInit(con, point, cpvneg(n), min, 0);
+//		cpContactInit(con, point, cpvneg(n), min, 0);
+		cpContactTempPush(contacts, cpvsub(point, contacts->a->p), cpvsub(point, contacts->b->p), cpvneg(n), min, 0);
 	
 		return 1;
 	} else {
-		return circle2circleQuery(circle->tc, a, circle->r, poly->r, 0, con);
+		return circle2circleQuery(circle->tc, a, circle->r, poly->r, 0, contacts);
 	}
 }
 
@@ -699,16 +707,14 @@ cpEnableSegmentToSegmentCollisions(void)
 	colfuncs = segmentCollisions;
 }
 
-int
-cpCollideShapes(const cpShape *a, const cpShape *b, cpCollisionID *id, cpContact *arr)
+void
+cpCollideShapes(const cpShape *a, const cpShape *b, cpCollisionID *id, struct cpContactTemp *contacts)
 {
 	// Their shape types must be in order.
 	cpAssertSoft(a->klass->type <= b->klass->type, "Internal Error: Collision shapes passed to cpCollideShapes() are not sorted.");
 	
 	CollisionFunc cfunc = colfuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
 	
-	int numContacts = (cfunc? cfunc(a, b, id, arr) : 0);
+	int numContacts = (cfunc? cfunc(a, b, id, contacts) : 0);
 	cpAssertSoft(numContacts <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error: Too many contact points returned.");
-	
-	return numContacts;
 }

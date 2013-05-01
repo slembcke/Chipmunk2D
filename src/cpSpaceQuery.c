@@ -270,40 +270,40 @@ struct ShapeQueryContext {
 static cpCollisionID
 ShapeQuery(cpShape *a, cpShape *b, cpCollisionID id, struct ShapeQueryContext *context)
 {
-	// Reject any of the simple cases
-	if(
-		(a->group && a->group == b->group) ||
-		!(a->layers & b->layers) ||
-		a == b
-	) return id;
-	
-	cpContact contacts[CP_MAX_CONTACTS_PER_ARBITER];
-	int numContacts = 0;
-	
-	// Shape 'a' should have the lower shape type. (required by cpCollideShapes() )
-	if(a->klass->type <= b->klass->type){
-		numContacts = cpCollideShapes(a, b, &id, contacts);
-	} else {
-		numContacts = cpCollideShapes(b, a, &id, contacts);
-		for(int i=0; i<numContacts; i++) contacts[i].n = cpvneg(contacts[i].n);
-	}
-	
-	if(numContacts){
-		context->anyCollision = !(a->sensor || b->sensor);
-		
-		if(context->func){
-			cpContactPointSet set;
-			set.count = numContacts;
-			
-			for(int i=0; i<set.count; i++){
-				set.points[i].point = contacts[i].p;
-				set.points[i].normal = contacts[i].n;
-				set.points[i].dist = contacts[i].dist;
-			}
-			
-			context->func(b, &set, context->data);
-		}
-	}
+//	// Reject any of the simple cases
+//	if(
+//		(a->group && a->group == b->group) ||
+//		!(a->layers & b->layers) ||
+//		a == b
+//	) return id;
+//	
+//	cpContact contacts[CP_MAX_CONTACTS_PER_ARBITER];
+//	int numContacts = 0;
+//	
+//	// Shape 'a' should have the lower shape type. (required by cpCollideShapes() )
+//	if(a->klass->type <= b->klass->type){
+//		numContacts = cpCollideShapes(a, b, &id, contacts);
+//	} else {
+//		numContacts = cpCollideShapes(b, a, &id, contacts);
+//		for(int i=0; i<numContacts; i++) contacts[i].n = cpvneg(contacts[i].n);
+//	}
+//	
+//	if(numContacts){
+//		context->anyCollision = !(a->sensor || b->sensor);
+//		
+//		if(context->func){
+//			cpContactPointSet set;
+//			set.count = numContacts;
+//			
+//			for(int i=0; i<set.count; i++){
+//				set.points[i].point = contacts[i].p;
+//				set.points[i].normal = contacts[i].n;
+//				set.points[i].dist = contacts[i].dist;
+//			}
+//			
+//			context->func(b, &set, context->data);
+//		}
+//	}
 	
 	return id;
 }

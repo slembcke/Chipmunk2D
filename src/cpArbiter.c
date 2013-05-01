@@ -22,11 +22,14 @@
 #include "chipmunk_private.h"
 #include "constraints/util.h"
 
-cpContact*
-cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash)
+void
+cpContactTempPush(struct cpContactTemp *contacts, cpVect r1, cpVect r2, cpVect n, cpFloat dist, cpHashValue hash)
 {
-	con->p = p;
-	con->n = n;
+	contacts->n = n;
+	
+	cpContact *con = &contacts->arr[contacts->count];
+	con->r1 = r1;
+	con->r2 = r2;
 	con->dist = dist;
 	
 	con->jnAcc = 0.0f;
@@ -34,8 +37,8 @@ cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash
 	con->jBias = 0.0f;
 	
 	con->hash = hash;
-		
-	return con;
+	
+	contacts->count++;
 }
 
 // TODO make this generic so I can reuse it for constraints also.
@@ -82,18 +85,20 @@ int cpArbiterGetCount(const cpArbiter *arb)
 cpVect
 cpArbiterGetNormal(const cpArbiter *arb, int i)
 {
-	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
-	
-	cpVect n = arb->contacts[i].n;
-	return arb->swappedColl ? cpvneg(n) : n;
+//	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
+//	
+//	cpVect n = arb->contacts[i].n;
+//	return arb->swappedColl ? cpvneg(n) : n;
+	return cpvzero;
 }
 
 cpVect
 cpArbiterGetPoint(const cpArbiter *arb, int i)
 {
-	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
-	
-	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
+//	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
+//	
+//	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
+	return cpvzero;
 }
 
 cpFloat
@@ -111,8 +116,8 @@ cpArbiterGetContactPointSet(const cpArbiter *arb)
 	set.count = cpArbiterGetCount(arb);
 	
 	for(int i=0; i<set.count; i++){
-		set.points[i].point = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
-		set.points[i].normal = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(n);
+//		set.points[i].point = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
+//		set.points[i].normal = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(n);
 		set.points[i].dist = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
 	}
 	
@@ -126,8 +131,8 @@ cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
 	arb->numContacts = count;
 	
 	for(int i=0; i<count; i++){
-		arb->contacts[i].p = set->points[i].point;
-		arb->contacts[i].n = set->points[i].normal;
+//		arb->contacts[i].p = set->points[i].point;
+//		arb->contacts[i].n = set->points[i].normal;
 		arb->contacts[i].dist = set->points[i].dist;
 	}
 }
@@ -135,29 +140,31 @@ cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
 cpVect
 cpArbiterTotalImpulse(const cpArbiter *arb)
 {
-	cpContact *contacts = arb->contacts;
-	cpVect sum = cpvzero;
-	
-	for(int i=0, count=cpArbiterGetCount(arb); i<count; i++){
-		cpContact *con = &contacts[i];
-		sum = cpvadd(sum, cpvmult(con->n, con->jnAcc));
-	}
-	
-	return (arb->swappedColl ? sum : cpvneg(sum));
+//	cpContact *contacts = arb->contacts;
+//	cpVect sum = cpvzero;
+//	
+//	for(int i=0, count=cpArbiterGetCount(arb); i<count; i++){
+//		cpContact *con = &contacts[i];
+//		sum = cpvadd(sum, cpvmult(con->n, con->jnAcc));
+//	}
+//	
+//	return (arb->swappedColl ? sum : cpvneg(sum));
+	return cpvzero;
 }
 
 cpVect
 cpArbiterTotalImpulseWithFriction(const cpArbiter *arb)
 {
-	cpContact *contacts = arb->contacts;
-	cpVect sum = cpvzero;
-	
-	for(int i=0, count=cpArbiterGetCount(arb); i<count; i++){
-		cpContact *con = &contacts[i];
-		sum = cpvadd(sum, cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc)));
-	}
-		
-	return (arb->swappedColl ? sum : cpvneg(sum));
+//	cpContact *contacts = arb->contacts;
+//	cpVect sum = cpvzero;
+//	
+//	for(int i=0, count=cpArbiterGetCount(arb); i<count; i++){
+//		cpContact *con = &contacts[i];
+//		sum = cpvadd(sum, cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc)));
+//	}
+//		
+//	return (arb->swappedColl ? sum : cpvneg(sum));
+	return cpvzero;
 }
 
 cpFloat
@@ -247,11 +254,11 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 }
 
 void
-cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisionHandler *handler, cpShape *a, cpShape *b)
+cpArbiterUpdate(cpArbiter *arb, struct cpContactTemp *contacts, cpCollisionHandler *handler, cpShape *a, cpShape *b)
 {
 	// Iterate over the possible pairs to look for hash value matches.
-	for(int i=0; i<numContacts; i++){
-		cpContact *con = &contacts[i];
+	for(int i=0; i<contacts->count; i++){
+		cpContact *con = &contacts->arr[i];
 		
 		for(int j=0; j<arb->numContacts; j++){
 			cpContact *old = &arb->contacts[j];
@@ -265,8 +272,9 @@ cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisio
 		}
 	}
 	
-	arb->contacts = contacts;
-	arb->numContacts = numContacts;
+	arb->contacts = contacts->arr;
+	arb->numContacts = contacts->count;
+	arb->n = contacts->n;
 	
 	arb->handler = handler;
 	arb->swappedColl = (a->collision_type != handler->a);
@@ -276,9 +284,8 @@ cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, cpCollisio
 	
 	// Currently all contacts will have the same normal.
 	// This may change in the future.
-	cpVect n = (numContacts ? contacts[0].n : cpvzero);
 	cpVect surface_vr = cpvsub(a->surface_v, b->surface_v);
-	arb->surface_vr = cpvsub(surface_vr, cpvmult(n, cpvdot(surface_vr, n)));
+	arb->surface_vr = cpvsub(surface_vr, cpvmult(contacts->n, cpvdot(surface_vr, contacts->n)));
 	
 	// For collisions between two similar primitive types, the order could have been swapped.
 	arb->a = a; arb->body_a = a->body;
@@ -293,24 +300,25 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat slop, cpFloat bias)
 {
 	cpBody *a = arb->body_a;
 	cpBody *b = arb->body_b;
+	cpVect n = arb->n;
 	
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];
 		
 		// Calculate the offsets.
-		con->r1 = cpvsub(con->p, a->p);
-		con->r2 = cpvsub(con->p, b->p);
+//		con->r1 = cpvsub(con->p, a->p);
+//		con->r2 = cpvsub(con->p, b->p);
 		
 		// Calculate the mass normal and mass tangent.
-		con->nMass = 1.0f/k_scalar(a, b, con->r1, con->r2, con->n);
-		con->tMass = 1.0f/k_scalar(a, b, con->r1, con->r2, cpvperp(con->n));
+		con->nMass = 1.0f/k_scalar(a, b, con->r1, con->r2, n);
+		con->tMass = 1.0f/k_scalar(a, b, con->r1, con->r2, cpvperp(n));
 				
 		// Calculate the target bias velocity.
 		con->bias = -bias*cpfmin(0.0f, con->dist + slop)/dt;
 		con->jBias = 0.0f;
 		
 		// Calculate the target bounce velocity.
-		con->bounce = normal_relative_velocity(a, b, con->r1, con->r2, con->n)*arb->e;
+		con->bounce = normal_relative_velocity(a, b, con->r1, con->r2, n)*arb->e;
 	}
 }
 
@@ -321,10 +329,11 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef)
 	
 	cpBody *a = arb->body_a;
 	cpBody *b = arb->body_b;
+	cpVect n = arb->n;
 	
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];
-		cpVect j = cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc));
+		cpVect j = cpvrotate(n, cpv(con->jnAcc, con->jtAcc));
 		apply_impulses(a, b, con->r1, con->r2, cpvmult(j, dt_coef));
 	}
 }
@@ -336,13 +345,13 @@ cpArbiterApplyImpulse(cpArbiter *arb)
 {
 	cpBody *a = arb->body_a;
 	cpBody *b = arb->body_b;
+	cpVect n = arb->n;
 	cpVect surface_vr = arb->surface_vr;
 	cpFloat friction = arb->u;
 
 	for(int i=0; i<arb->numContacts; i++){
 		cpContact *con = &arb->contacts[i];
 		cpFloat nMass = con->nMass;
-		cpVect n = con->n;
 		cpVect r1 = con->r1;
 		cpVect r2 = con->r2;
 		

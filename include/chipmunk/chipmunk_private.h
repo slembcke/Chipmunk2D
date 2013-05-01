@@ -122,7 +122,7 @@ cpShapeActive(cpShape *shape)
 	return shape->prev || (shape->body && shape->body->shapeList == shape);
 }
 
-int cpCollideShapes(const cpShape *a, const cpShape *b, cpCollisionID *id, cpContact *arr);
+void cpCollideShapes(const cpShape *a, const cpShape *b, cpCollisionID *id, struct cpContactTemp *contacts);
 
 // TODO doesn't really need to be inline, but need a better place to put this function
 static inline cpSplittingPlane
@@ -195,10 +195,9 @@ cpCollisionID cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpS
 //MARK: Arbiters
 
 struct cpContact {
-	cpVect p, n;
+	cpVect r1, r2;
 	cpFloat dist;
 	
-	cpVect r1, r2;
 	cpFloat nMass, tMass, bounce;
 
 	cpFloat jnAcc, jtAcc, jBias;
@@ -207,7 +206,7 @@ struct cpContact {
 	cpHashValue hash;
 };
 
-cpContact* cpContactInit(cpContact *con, cpVect p, cpVect n, cpFloat dist, cpHashValue hash);
+void cpContactTempPush(struct cpContactTemp *contacts, cpVect r1, cpVect r2, cpVect n, cpFloat dist, cpHashValue hash);
 cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
 
 static inline void
@@ -226,7 +225,7 @@ cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
 
 void cpArbiterUnthread(cpArbiter *arb);
 
-void cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, struct cpCollisionHandler *handler, cpShape *a, cpShape *b);
+void cpArbiterUpdate(cpArbiter *arb, struct cpContactTemp *contacts, cpCollisionHandler *handler, cpShape *a, cpShape *b);
 void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
 void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
 void cpArbiterApplyImpulse(cpArbiter *arb);
