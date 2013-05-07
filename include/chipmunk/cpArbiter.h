@@ -19,6 +19,9 @@
  * SOFTWARE.
  */
 
+#ifndef CHIPMUNK_ARBITER_HEADER
+#define CHIPMUNK_ARBITER_HEADER
+
 /// @defgroup cpArbiter cpArbiter
 /// The cpArbiter struct controls pairs of colliding shapes.
 /// They are also used in conjuction with collision handler callbacks
@@ -205,3 +208,6 @@ cpVect cpArbiterGetPoint(const cpArbiter *arb, int i);
 cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i);
 
 /// @}
+
+#endif //guard
+

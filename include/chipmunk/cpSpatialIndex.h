@@ -19,6 +19,9 @@
  * SOFTWARE.
  */
 
+#ifndef CHIPMUNK_SPATIALINDEX_HEADER
+#define CHIPMUNK_SPATIALINDEX_HEADER
+
 /**
 	@defgroup cpSpatialIndex cpSpatialIndex
 	
@@ -225,3 +228,6 @@ static inline void cpSpatialIndexReindexQuery(cpSpatialIndex *index, cpSpatialIn
 }
 
 ///@}
+
+#endif // guard
+
