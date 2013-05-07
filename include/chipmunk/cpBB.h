@@ -19,6 +19,9 @@
  * SOFTWARE.
  */
 
+#ifndef CHIPMUNK_BB_HEADER
+#define CHIPMUNK_BB_HEADER
+
 /// @defgroup cpBBB cpBB
 /// Chipmunk's axis-aligned 2D bounding box type along with a few handy routines.
 /// @{
@@ -134,3 +137,6 @@ cpBBClampVect(const cpBB bb, const cpVect v)
 cpVect cpBBWrapVect(const cpBB bb, const cpVect v); // wrap a vector to a bbox
 
 ///@}
+
+#endif // guard
+
