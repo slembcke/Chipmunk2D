@@ -19,6 +19,9 @@
  * SOFTWARE.
  */
 
+#ifndef CHIPMUNK_POLY_HEADER
+#define CHIPMUNK_POLY_HEADER
+
 /// @defgroup cpPolyShape cpPolyShape
 /// @{
 
@@ -65,3 +68,6 @@ int cpPolyShapeGetNumVerts(cpShape *shape);
 cpVect cpPolyShapeGetVert(cpShape *shape, int idx);
 
 /// @}
+
+#endif // guard
+

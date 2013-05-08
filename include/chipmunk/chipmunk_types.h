@@ -1,3 +1,6 @@
+#ifndef CHIPMUNK_TYPES_HEADER
+#define CHIPMUNK_TYPES_HEADER
+
 #include <stdint.h>
 
 #ifdef __APPLE__
@@ -213,3 +216,6 @@ typedef struct cpMat2x2 {
 	// Row major [[a, b][c d]]
 	cpFloat a, b, c, d;
 } cpMat2x2;
+
+#endif //guard
+

@@ -19,6 +19,9 @@
  * SOFTWARE.
  */
 
+#ifndef CHIPMUNK_VECT_HEADER
+#define CHIPMUNK_VECT_HEADER
+
 /// @defgroup cpVect cpVect
 /// Chipmunk's 2D vector type along with a handy 2D vector math lib.
 /// @{
@@ -210,3 +213,6 @@ cpMat2x2Transform(cpMat2x2 m, cpVect v)
 }
 
 ///@}
+
+#endif // guard
+
