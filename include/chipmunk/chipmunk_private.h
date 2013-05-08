@@ -19,6 +19,9 @@
  * SOFTWARE.
  */
 
+#ifndef CHIPMUNK_PRIVATE_HEADER
+#define CHIPMUNK_PRIVATE_HEADER
+
 #define CP_ALLOW_PRIVATE_ACCESS 1
 #include "chipmunk.h"
 
@@ -263,3 +266,6 @@ void cpArbiterUpdate(cpArbiter *arb, cpContact *contacts, int numContacts, struc
 void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
 void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
 void cpArbiterApplyImpulse(cpArbiter *arb);
+
+#endif // guard
+

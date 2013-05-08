@@ -19,6 +19,9 @@
  * SOFTWARE.
  */
 
+#ifndef CHIPMUNK_SPACE_HEADER
+#define CHIPMUNK_SPACE_HEADER
+
 /// @defgroup cpSpace cpSpace
 /// @{
 
@@ -283,3 +286,6 @@ void cpSpaceUseSpatialHash(cpSpace *space, cpFloat dim, int count);
 void cpSpaceStep(cpSpace *space, cpFloat dt);
 
 /// @}
+
+#endif // guard
+
