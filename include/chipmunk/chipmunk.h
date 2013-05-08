@@ -177,7 +177,8 @@ int cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat t
 cpVect *__verts_var__ = (cpVect *)alloca(__count__*sizeof(cpVect)); \
 int __count_var__ = cpConvexHull(__count__, __verts__, __verts_var__, NULL, 0.0); \
 
-#if defined(__has_extension) && __has_extension(blocks)
+#if defined(__has_extension)
+#if __has_extension(blocks)
 // Define alternate block based alternatives for a few of the callback heavy functions.
 // Collision handlers are post-step callbacks are not included to avoid memory management issues.
 // If you want to use blocks for those and are aware of how to correctly manage the memory, the implementation is trivial. 
@@ -202,6 +203,7 @@ void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, c
 typedef void (^cpSpaceShapeQueryBlock)(cpShape *shape, cpContactPointSet *points);
 cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block);
 
+#endif
 #endif
 
 
