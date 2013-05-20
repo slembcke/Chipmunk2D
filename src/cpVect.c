@@ -23,7 +23,7 @@
 
 #include "chipmunk_private.h"
 
-inline cpVect
+cpVect
 cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t)
 {
 	cpFloat dot = cpvdot(cpvnormalize(v1), cpvnormalize(v2));
