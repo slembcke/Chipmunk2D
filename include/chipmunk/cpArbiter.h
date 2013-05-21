@@ -71,6 +71,16 @@ struct cpArbiterThread {
 	struct cpArbiter *next, *prev;
 };
 
+typedef struct cpCollisionInfo {
+	cpShape *a, *b;
+	cpCollisionID id;
+	
+	cpVect n;
+	
+	int count;
+	struct cpContact *arr;
+} cpCollisionInfo;
+
 /// A colliding pair of shapes.
 struct cpArbiter {
 	/// Calculated value to use for the elasticity coefficient.
@@ -98,6 +108,7 @@ struct cpArbiter {
 	
 	CP_PRIVATE(int numContacts);
 	CP_PRIVATE(cpContact *contacts);
+	CP_PRIVATE(cpVect n);
 	
 	CP_PRIVATE(cpTimestamp stamp);
 	CP_PRIVATE(cpCollisionHandler *handler);

@@ -30,7 +30,7 @@
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
 #define DRAW_CLOSEST (0 || DRAW_ALL)
-#define DRAW_CLIP (0 || DRAW_ALL)
+#define DRAW_CLIP (1 || DRAW_ALL)
 
 #define PRINT_LOG 0
 #endif
@@ -45,8 +45,8 @@
 // Add contact points for circle to circle collisions.
 // Used by several collision tests.
 // TODO should accept hash parameter
-static int
-circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpFloat r2, cpHashValue hash, cpContact *con)
+static void
+circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpFloat r2, cpHashValue hash, cpCollisionInfo *info)
 {
 	cpFloat mindist = r1 + r2;
 	cpVect delta = cpvsub(p2, p1);
@@ -55,11 +55,11 @@ circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpF
 	if(distsq < mindist*mindist){
 		cpFloat dist = cpfsqrt(distsq);
 		cpVect n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
-		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist, hash);
+//		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist, hash);
 		
-		return 1;
-	} else {
-		return 0;
+		// TODO calculate r1 and r2 independently
+		cpVect p = cpvlerp(p1, p2, r1/(r1 + r2));
+		cpCollisionInfoPushContact(info, cpvsub(p, info->a->body->p), cpvsub(p, info->b->body->p), n, dist - mindist, hash);
 	}
 }
 
@@ -396,107 +396,159 @@ GJK(const struct SupportContext *ctx, cpCollisionID *id)
 
 //MARK: Contact Clipping
 
-static inline void
-Contact1(cpFloat dist, cpVect a, cpVect b, cpFloat refr, cpFloat incr, cpVect n, cpHashValue hash, cpContact *arr)
-{
-	cpFloat rsum = refr + incr;
-	cpFloat alpha = (rsum > 0.0f ? refr/rsum : 0.5f);
-	cpVect point = cpvlerp(a, b, alpha);
-	
-	cpContactInit(arr, point, n, dist - rsum, hash);
-}
+//static inline void
+//Contact1(cpFloat dist, cpVect a, cpVect b, cpFloat refr, cpFloat incr, cpVect n, cpHashValue hash, cpCollisionInfo *info)
+//{
+//	cpFloat rsum = refr + incr;
+//	cpFloat alpha = (rsum > 0.0f ? refr/rsum : 0.5f);
+//	cpVect point = cpvlerp(a, b, alpha);
+//	
+////	cpContactInit(arr, point, n, dist - rsum, hash);
+//	cpContactTempPush(contacts, cpvsub(point, contacts->a->p), cpvsub(point, contacts->b->p), n, dist - rsum, hash);
+//}
+//
+//static inline int
+//Contact2(cpVect refp, cpVect inca, cpVect incb, cpFloat refr, cpFloat incr, cpVect refn, cpVect n, cpHashValue hash, cpCollisionInfo *info)
+//{
+//	cpFloat cian = cpvcross(inca, refn);
+//	cpFloat cibn = cpvcross(incb, refn);
+//	cpFloat crpn = cpvcross(refp, refn);
+//	cpFloat t = 1.0f - cpfclamp01((cibn - crpn)/(cibn - cian));
+//	
+//	cpVect point = cpvlerp(inca, incb, t);
+//	cpFloat pd = cpvdot(cpvsub(point, refp), refn);
+//	
+//	if(t > 0.0f && pd <= 0.0f){
+//		cpFloat rsum = refr + incr;
+//		cpFloat alpha = (rsum > 0.0f ? incr*(1.0f - (rsum + pd)/rsum) : -0.5f*pd);
+//		
+////		cpContactInit(arr, cpvadd(point, cpvmult(refn, alpha)), n, pd, hash);
+//		cpVect p = cpvadd(point, cpvmult(refn, alpha));
+//		cpContactTempPush(contacts, cpvsub(p, contacts->a->p), cpvsub(p, contacts->b->p), n, pd, hash);
+//		return 1;
+//	} else {
+//		return 0;
+//	}
+//}
+//
+//static inline int
+//ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestPoints points, const cpFloat nflip, cpCollisionInfo *info)
+//{
+//	cpVect inc_offs = cpvmult(inc.n, inc.r);
+//	cpVect ref_offs = cpvmult(ref.n, ref.r);
+//	
+//	cpVect inca = cpvadd(inc.a.p, inc_offs);
+//	cpVect incb = cpvadd(inc.b.p, inc_offs);
+//	
+//	cpVect closest_inca = cpClosetPointOnSegment(inc.a.p, ref.a.p, ref.b.p);
+//	cpVect closest_incb = cpClosetPointOnSegment(inc.b.p, ref.a.p, ref.b.p);
+//	
+//	cpVect msa = cpvmult(points.n, nflip*points.d);
+//	cpFloat cost_a = cpvdistsq(cpvsub(inc.a.p, closest_inca), msa);
+//	cpFloat cost_b = cpvdistsq(cpvsub(inc.b.p, closest_incb), msa);
+//	
+//#if DRAW_CLIP
+//	ChipmunkDebugDrawSegment(ref.a.p, ref.b.p, RGBAColor(1, 0, 0, 1));
+//	ChipmunkDebugDrawSegment(inc.a.p, inc.b.p, RGBAColor(0, 1, 0, 1));
+//	ChipmunkDebugDrawSegment(inca, incb, RGBAColor(0, 1, 0, 1));
+//	
+//	cpVect cref = cpvlerp(ref.a.p, ref.b.p, 0.5);
+//	ChipmunkDebugDrawSegment(cref, cpvadd(cref, cpvmult(ref.n, 5.0)), RGBAColor(1, 0, 0, 1));
+//	
+//	cpVect cinc = cpvlerp(inc.a.p, inc.b.p, 0.5);
+//	ChipmunkDebugDrawSegment(cinc, cpvadd(cinc, cpvmult(inc.n, 5.0)), RGBAColor(1, 0, 0, 1));
+//	
+//	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.a.p, inc.a.p}, RGBAColor(1, 1, 0, 1));
+//	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.b.p, inc.b.p}, RGBAColor(0, 1, 1, 1));
+//	
+//	if(cost_a < cost_b){
+//		ChipmunkDebugDrawSegment(closest_inca, inc.a.p, RGBAColor(1, 0, 1, 1));
+//	} else {
+//		ChipmunkDebugDrawSegment(closest_incb, inc.b.p, RGBAColor(1, 0, 1, 1));
+//	}
+//#endif
+//	
+//	cpHashValue hash_iarb = CP_HASH_PAIR(inc.a.hash, ref.b.hash);
+//	cpHashValue hash_ibra = CP_HASH_PAIR(inc.b.hash, ref.a.hash);
+//	
+//	if(cost_a < cost_b){
+//		cpVect refp = cpvadd(ref.a.p, ref_offs);
+//		Contact1(points.d, closest_inca, inc.a.p, ref.r, inc.r, points.n, hash_iarb, contacts);
+//		return Contact2(refp, inca, incb, ref.r, inc.r, ref.n, points.n, hash_ibra, contacts) + 1;
+//	} else {
+//		cpVect refp = cpvadd(ref.b.p, ref_offs);
+//		Contact1(points.d, closest_incb, inc.b.p, ref.r, inc.r, points.n, hash_ibra, contacts);
+//		return Contact2(refp, incb, inca, ref.r, inc.r, ref.n, points.n, hash_iarb, contacts) + 1;
+//	}
+//}
+//
+//static inline int
+//ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPoints points, cpCollisionInfo *info)
+//{
+//	cpFloat mindist = e1.r + e2.r;
+//	if(points.d <= mindist){
+//		cpFloat pick = cpvdot(e1.n, points.n) + cpvdot(e2.n, points.n);
+//		
+//		if(
+//			(pick != 0.0f && pick > 0.0f) ||
+//			// If the edges are both perfectly aligned weird things happen.
+//			// This is *very* common at the start of a simulation.
+//			// Pick the longest edge as the reference to break the tie.
+//			(pick == 0.0f && (cpvdistsq(e1.a.p, e1.b.p) > cpvdistsq(e2.a.p, e2.b.p)))
+//		){
+//			return ClipContacts(e1, e2, points,  1.0f, contacts);
+//		} else {
+//			return ClipContacts(e2, e1, points, -1.0f, contacts);
+//		}
+//	} else {
+//		return 0;
+//	}
+//}
 
 static inline int
-Contact2(cpVect refp, cpVect inca, cpVect incb, cpFloat refr, cpFloat incr, cpVect refn, cpVect n, cpHashValue hash, cpContact *arr)
-{
-	cpFloat cian = cpvcross(inca, refn);
-	cpFloat cibn = cpvcross(incb, refn);
-	cpFloat crpn = cpvcross(refp, refn);
-	cpFloat t = 1.0f - cpfclamp01((cibn - crpn)/(cibn - cian));
-	
-	cpVect point = cpvlerp(inca, incb, t);
-	cpFloat pd = cpvdot(cpvsub(point, refp), refn);
-	
-	if(t > 0.0f && pd <= 0.0f){
-		cpFloat rsum = refr + incr;
-		cpFloat alpha = (rsum > 0.0f ? incr*(1.0f - (rsum + pd)/rsum) : -0.5f*pd);
-		
-		cpContactInit(arr, cpvadd(point, cpvmult(refn, alpha)), n, pd, hash);
-		return 1;
-	} else {
-		return 0;
-	}
-}
-
-static inline int
-ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestPoints points, const cpFloat nflip, cpContact *arr)
-{
-	cpVect inc_offs = cpvmult(inc.n, inc.r);
-	cpVect ref_offs = cpvmult(ref.n, ref.r);
-	
-	cpVect inca = cpvadd(inc.a.p, inc_offs);
-	cpVect incb = cpvadd(inc.b.p, inc_offs);
-	
-	cpVect closest_inca = cpClosetPointOnSegment(inc.a.p, ref.a.p, ref.b.p);
-	cpVect closest_incb = cpClosetPointOnSegment(inc.b.p, ref.a.p, ref.b.p);
-	
-	cpVect msa = cpvmult(points.n, nflip*points.d);
-	cpFloat cost_a = cpvdistsq(cpvsub(inc.a.p, closest_inca), msa);
-	cpFloat cost_b = cpvdistsq(cpvsub(inc.b.p, closest_incb), msa);
-	
-#if DRAW_CLIP
-	ChipmunkDebugDrawSegment(ref.a.p, ref.b.p, RGBAColor(1, 0, 0, 1));
-	ChipmunkDebugDrawSegment(inc.a.p, inc.b.p, RGBAColor(0, 1, 0, 1));
-	ChipmunkDebugDrawSegment(inca, incb, RGBAColor(0, 1, 0, 1));
-	
-	cpVect cref = cpvlerp(ref.a.p, ref.b.p, 0.5);
-	ChipmunkDebugDrawSegment(cref, cpvadd(cref, cpvmult(ref.n, 5.0)), RGBAColor(1, 0, 0, 1));
-	
-	cpVect cinc = cpvlerp(inc.a.p, inc.b.p, 0.5);
-	ChipmunkDebugDrawSegment(cinc, cpvadd(cinc, cpvmult(inc.n, 5.0)), RGBAColor(1, 0, 0, 1));
-	
-	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.a.p, inc.a.p}, RGBAColor(1, 1, 0, 1));
-	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.b.p, inc.b.p}, RGBAColor(0, 1, 1, 1));
-	
-	if(cost_a < cost_b){
-		ChipmunkDebugDrawSegment(closest_inca, inc.a.p, RGBAColor(1, 0, 1, 1));
-	} else {
-		ChipmunkDebugDrawSegment(closest_incb, inc.b.p, RGBAColor(1, 0, 1, 1));
-	}
-#endif
-	
-	cpHashValue hash_iarb = CP_HASH_PAIR(inc.a.hash, ref.b.hash);
-	cpHashValue hash_ibra = CP_HASH_PAIR(inc.b.hash, ref.a.hash);
-	
-	if(cost_a < cost_b){
-		cpVect refp = cpvadd(ref.a.p, ref_offs);
-		Contact1(points.d, closest_inca, inc.a.p, ref.r, inc.r, points.n, hash_iarb, arr);
-		return Contact2(refp, inca, incb, ref.r, inc.r, ref.n, points.n, hash_ibra, arr + 1) + 1;
-	} else {
-		cpVect refp = cpvadd(ref.b.p, ref_offs);
-		Contact1(points.d, closest_incb, inc.b.p, ref.r, inc.r, points.n, hash_ibra, arr);
-		return Contact2(refp, incb, inca, ref.r, inc.r, ref.n, points.n, hash_iarb, arr + 1) + 1;
-	}
-}
-
-static inline int
-ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPoints points, cpContact *arr)
+ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPoints points, cpCollisionInfo *info)
 {
 	cpFloat mindist = e1.r + e2.r;
 	if(points.d <= mindist){
-		cpFloat pick = cpvdot(e1.n, points.n) + cpvdot(e2.n, points.n);
+		cpVect n = (cpvdot(e1.n, points.n) + cpvdot(e2.n, points.n) > 0.0f ? e1.n : cpvneg(e2.n));
 		
-		if(
-			(pick != 0.0f && pick > 0.0f) ||
-			// If the edges are both perfectly aligned weird things happen.
-			// This is *very* common at the start of a simulation.
-			// Pick the longest edge as the reference to break the tie.
-			(pick == 0.0f && (cpvdistsq(e1.a.p, e1.b.p) > cpvdistsq(e2.a.p, e2.b.p)))
-		){
-			return ClipContacts(e1, e2, points,  1.0f, arr);
-		} else {
-			return ClipContacts(e2, e1, points, -1.0f, arr);
+//		ChipmunkDebugDrawSegment(e1.a.p, e1.b.p, RGBAColor(0, 1, 0, 1));
+//		ChipmunkDebugDrawSegment(e2.a.p, e2.b.p, RGBAColor(0, 1, 0, 1));
+		
+		// Distances along the axis parallel to n
+		cpFloat d_e1_a = cpvcross(e1.a.p, n);
+		cpFloat d_e1_b = cpvcross(e1.b.p, n);
+		cpFloat d_e2_a = cpvcross(e2.a.p, n);
+		cpFloat d_e2_b = cpvcross(e2.b.p, n);
+		
+		cpFloat e1_denom = 1.0f/(d_e1_b - d_e1_a);
+		cpFloat e2_denom = 1.0f/(d_e2_b - d_e2_a);
+		
+		cpHashValue hash_1a2b = CP_HASH_PAIR(e1.a.hash, e2.b.hash);
+		cpHashValue hash_1b2a = CP_HASH_PAIR(e1.b.hash, e2.a.hash);
+		
+		int count = 0;
+		{
+			cpVect r1 = cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_b - d_e1_a)*e1_denom));
+			cpVect r2 = cpvlerp(e2.a.p, e2.b.p, cpfclamp01((d_e1_a - d_e2_a)*e2_denom));
+			cpFloat dist = cpvdot(cpvsub(r2, r1), n);
+//			ChipmunkDemoPrintString("dist: %f\n", dist);
+			if(dist <= 0.0f){
+				cpCollisionInfoPushContact(info, cpvsub(r1, info->a->body->p), cpvsub(r2, info->b->body->p), n, dist, hash_1a2b);
+				count++;
+			}
+		}{
+			cpVect r1 = cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_a - d_e1_a)*e1_denom));
+			cpVect r2 = cpvlerp(e2.a.p, e2.b.p, cpfclamp01((d_e1_b - d_e2_a)*e2_denom));
+			cpFloat dist = cpvdot(cpvsub(r2, r1), n);
+//			ChipmunkDemoPrintString("dist: %f\n", dist);
+			if(dist <= 0.0f){
+				cpCollisionInfoPushContact(info, cpvsub(r1, info->a->body->p), cpvsub(r2, info->b->body->p), n, dist, hash_1b2a);
+				count++;
+			}
 		}
+		
+		return count;
 	} else {
 		return 0;
 	}
@@ -504,17 +556,17 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 
 //MARK: Collision Functions
 
-typedef int (*CollisionFunc)(const cpShape *a, const cpShape *b, cpCollisionID *id, cpContact *arr);
+typedef void (*CollisionFunc)(const cpShape *a, const cpShape *b, cpCollisionInfo *info);
 
 // Collide circle shapes.
-static int
-circle2circle(const cpCircleShape *c1, const cpCircleShape *c2, cpCollisionID *id, cpContact *arr)
+static void
+circle2circle(const cpCircleShape *c1, const cpCircleShape *c2, cpCollisionInfo *info)
 {
-	return circle2circleQuery(c1->tc, c2->tc, c1->r, c2->r, 0, arr);
+	circle2circleQuery(c1->tc, c2->tc, c1->r, c2->r, 0, info);
 }
 
-static int
-circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentShape, cpCollisionID *id, cpContact *con)
+static void
+circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentShape, cpCollisionInfo *info)
 {
 	cpVect seg_a = segmentShape->ta;
 	cpVect seg_b = segmentShape->tb;
@@ -524,26 +576,26 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 	cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(center, seg_a))/cpvlengthsq(seg_delta));
 	cpVect closest = cpvadd(seg_a, cpvmult(seg_delta, closest_t));
 	
-	if(circle2circleQuery(center, closest, circleShape->r, segmentShape->r, 0, con)){
-		cpVect n = con[0].n;
+	circle2circleQuery(center, closest, circleShape->r, segmentShape->r, 0, info);
+	if(info->count > 0){
+		cpVect n = info->n;
 		
 		// Reject endcap collisions if tangents are provided.
 		if(
 			(closest_t != 0.0f || cpvdot(n, cpvrotate(segmentShape->a_tangent, segmentShape->shape.body->rot)) >= 0.0) &&
 			(closest_t != 1.0f || cpvdot(n, cpvrotate(segmentShape->b_tangent, segmentShape->shape.body->rot)) >= 0.0)
 		){
-			return 1;
+		} else {
+			info->count = 0;
 		}
 	}
-	
-	return 0;
 }
 
-static int
-segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollisionID *id, cpContact *arr)
+static void
+segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollisionInfo *info)
 {
 	struct SupportContext context = {(cpShape *)seg1, (cpShape *)seg2, 2, 2, &seg1->ta, &seg2->ta};
-	struct ClosestPoints points = GJK(&context, id);
+	struct ClosestPoints points = GJK(&context, &info->id);
 	
 #if DRAW_CLOSEST
 #if PRINT_LOG
@@ -567,17 +619,15 @@ segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollis
 			(!cpveql(points.b, seg2->tb) || cpvdot(n, cpvrotate(seg2->b_tangent, rot2)) >= 0.0)
 		)
 	){
-		return ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), points, arr);
-	} else {
-		return 0;
+		ContactPoints(SupportEdgeForSegment(seg1, n), SupportEdgeForSegment(seg2, cpvneg(n)), points, info);
 	}
 }
 
-static int
-poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionID *id, cpContact *arr)
+static void
+poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionInfo *info)
 {
 	struct SupportContext context = {(cpShape *)poly1, (cpShape *)poly2, poly1->numVerts, poly2->numVerts, poly1->tVerts, poly2->tVerts};
-	struct ClosestPoints points = GJK(&context, id);
+	struct ClosestPoints points = GJK(&context, &info->id);
 	
 #if DRAW_CLOSEST
 #if PRINT_LOG
@@ -590,17 +640,15 @@ poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionID *id,
 #endif
 	
 	if(points.d - poly1->r - poly2->r <= 0.0){
-		return ContactPoints(SupportEdgeForPoly(poly1, points.n), SupportEdgeForPoly(poly2, cpvneg(points.n)), points, arr);
-	} else {
-		return 0;
+		ContactPoints(SupportEdgeForPoly(poly1, points.n), SupportEdgeForPoly(poly2, cpvneg(points.n)), points, info);
 	}
 }
 
-static int
-seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionID *id, cpContact *arr)
+static void
+seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionInfo *info)
 {
 	struct SupportContext context = {(cpShape *)seg, (cpShape *)poly, 2, poly->numVerts, &seg->ta, poly->tVerts};
-	struct ClosestPoints points = GJK(&context, id);
+	struct ClosestPoints points = GJK(&context, &info->id);
 	
 #if DRAW_CLOSEST
 #if PRINT_LOG
@@ -622,17 +670,15 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionID *id, 
 			(!cpveql(points.a, seg->tb) || cpvdot(n, cpvrotate(seg->b_tangent, rot)) <= 0.0)
 		)
 	){
-		return ContactPoints(SupportEdgeForSegment(seg, n), SupportEdgeForPoly(poly, cpvneg(n)), points, arr);
-	} else {
-		return 0;
+		ContactPoints(SupportEdgeForSegment(seg, n), SupportEdgeForPoly(poly, cpvneg(n)), points, info);
 	}
 }
 
 // This one is less gross, but still gross.
 // TODO: Comment me!
 // TODO respect poly radius
-static int
-circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionID *id, cpContact *con)
+static void
+circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionInfo *info)
 {
 	cpSplittingPlane *planes = poly->tPlanes;
 	
@@ -642,7 +688,7 @@ circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionID 
 	for(int i=0; i<poly->numVerts; i++){
 		cpFloat dist = cpSplittingPlaneCompare(planes[i], circle->tc) - circle->r;
 		if(dist > 0.0f){
-			return 0;
+			return;
 		} else if(dist > min) {
 			min = dist;
 			mini = i;
@@ -657,14 +703,13 @@ circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionID 
 	cpFloat dt = cpvcross(n, circle->tc);
 	
 	if(dt < dtb){
-		return circle2circleQuery(circle->tc, b, circle->r, poly->r, 0, con);
+		circle2circleQuery(circle->tc, b, circle->r, poly->r, 0, info);
 	} else if(dt < dta) {
 		cpVect point = cpvsub(circle->tc, cpvmult(n, circle->r + min/2.0f));
-		cpContactInit(con, point, cpvneg(n), min, 0);
-	
-		return 1;
+//		cpContactInit(con, point, cpvneg(n), min, 0);
+		cpCollisionInfoPushContact(info, cpvsub(point, info->a->body->p), cpvsub(point, info->b->body->p), cpvneg(n), min, 0);
 	} else {
-		return circle2circleQuery(circle->tc, a, circle->r, poly->r, 0, con);
+		circle2circleQuery(circle->tc, a, circle->r, poly->r, 0, info);
 	}
 }
 
@@ -699,16 +744,35 @@ cpEnableSegmentToSegmentCollisions(void)
 	colfuncs = segmentCollisions;
 }
 
-int
-cpCollideShapes(const cpShape *a, const cpShape *b, cpCollisionID *id, cpContact *arr)
+struct cpCollisionInfo
+cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpContact *contacts)
 {
+	cpCollisionInfo info = {a, b, id, cpvzero, 0, contacts};
+	
 	// Their shape types must be in order.
 	cpAssertSoft(a->klass->type <= b->klass->type, "Internal Error: Collision shapes passed to cpCollideShapes() are not sorted.");
 	
 	CollisionFunc cfunc = colfuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
 	
-	int numContacts = (cfunc? cfunc(a, b, id, arr) : 0);
-	cpAssertSoft(numContacts <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error: Too many contact points returned.");
+	if(cfunc) cfunc(a, b, &info);
+	cpAssertSoft(info.count <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error: Too many contact points returned.");
 	
-	return numContacts;
+//	{
+//		cpVect n = info.n;
+//		
+//		cpBody *a = info.a->body;
+//		cpBody *b = info.b->body;
+//		
+//		for(int i=0; i<info.count; i++){
+//			cpVect r1 = cpvadd(a->p, info.arr[i].r1);
+//			cpVect r2 = cpvadd(b->p, info.arr[i].r2);
+//			cpVect delta = cpvmult(n, cpfmax(5.0, -0.5*info.arr[i].dist));
+//			
+//			ChipmunkDebugDrawSegment(r1, cpvsub(r1, delta), RGBAColor(1, 0, 0, 1));
+//			ChipmunkDebugDrawSegment(r2, cpvadd(r2, delta), RGBAColor(0, 0, 1, 1));
+//		}
+//	}
+	
+	return info;
 }
+

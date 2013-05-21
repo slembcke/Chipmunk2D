@@ -47,7 +47,7 @@ draw(cpSpace *space)
 	ChipmunkDemoDefaultDrawImpl(space);
 	cpContact arr[CP_MAX_CONTACTS_PER_ARBITER];
 //	cpCollideShapes(shape1, shape2, (cpCollisionID[]){0}, arr);
-	cpCollideShapes(shape2, shape1, (cpCollisionID[]){0x00010101}, arr);
+	cpCollisionInfo info = cpCollideShapes(shape2, shape1, 0x00010101, arr);
 }
 
 static cpSpace *
