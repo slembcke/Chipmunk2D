@@ -396,124 +396,12 @@ GJK(const struct SupportContext *ctx, cpCollisionID *id)
 
 //MARK: Contact Clipping
 
-//static inline void
-//Contact1(cpFloat dist, cpVect a, cpVect b, cpFloat refr, cpFloat incr, cpVect n, cpHashValue hash, cpCollisionInfo *info)
-//{
-//	cpFloat rsum = refr + incr;
-//	cpFloat alpha = (rsum > 0.0f ? refr/rsum : 0.5f);
-//	cpVect point = cpvlerp(a, b, alpha);
-//	
-////	cpContactInit(arr, point, n, dist - rsum, hash);
-//	cpContactTempPush(contacts, cpvsub(point, contacts->a->p), cpvsub(point, contacts->b->p), n, dist - rsum, hash);
-//}
-//
-//static inline int
-//Contact2(cpVect refp, cpVect inca, cpVect incb, cpFloat refr, cpFloat incr, cpVect refn, cpVect n, cpHashValue hash, cpCollisionInfo *info)
-//{
-//	cpFloat cian = cpvcross(inca, refn);
-//	cpFloat cibn = cpvcross(incb, refn);
-//	cpFloat crpn = cpvcross(refp, refn);
-//	cpFloat t = 1.0f - cpfclamp01((cibn - crpn)/(cibn - cian));
-//	
-//	cpVect point = cpvlerp(inca, incb, t);
-//	cpFloat pd = cpvdot(cpvsub(point, refp), refn);
-//	
-//	if(t > 0.0f && pd <= 0.0f){
-//		cpFloat rsum = refr + incr;
-//		cpFloat alpha = (rsum > 0.0f ? incr*(1.0f - (rsum + pd)/rsum) : -0.5f*pd);
-//		
-////		cpContactInit(arr, cpvadd(point, cpvmult(refn, alpha)), n, pd, hash);
-//		cpVect p = cpvadd(point, cpvmult(refn, alpha));
-//		cpContactTempPush(contacts, cpvsub(p, contacts->a->p), cpvsub(p, contacts->b->p), n, pd, hash);
-//		return 1;
-//	} else {
-//		return 0;
-//	}
-//}
-//
-//static inline int
-//ClipContacts(const struct Edge ref, const struct Edge inc, const struct ClosestPoints points, const cpFloat nflip, cpCollisionInfo *info)
-//{
-//	cpVect inc_offs = cpvmult(inc.n, inc.r);
-//	cpVect ref_offs = cpvmult(ref.n, ref.r);
-//	
-//	cpVect inca = cpvadd(inc.a.p, inc_offs);
-//	cpVect incb = cpvadd(inc.b.p, inc_offs);
-//	
-//	cpVect closest_inca = cpClosetPointOnSegment(inc.a.p, ref.a.p, ref.b.p);
-//	cpVect closest_incb = cpClosetPointOnSegment(inc.b.p, ref.a.p, ref.b.p);
-//	
-//	cpVect msa = cpvmult(points.n, nflip*points.d);
-//	cpFloat cost_a = cpvdistsq(cpvsub(inc.a.p, closest_inca), msa);
-//	cpFloat cost_b = cpvdistsq(cpvsub(inc.b.p, closest_incb), msa);
-//	
-//#if DRAW_CLIP
-//	ChipmunkDebugDrawSegment(ref.a.p, ref.b.p, RGBAColor(1, 0, 0, 1));
-//	ChipmunkDebugDrawSegment(inc.a.p, inc.b.p, RGBAColor(0, 1, 0, 1));
-//	ChipmunkDebugDrawSegment(inca, incb, RGBAColor(0, 1, 0, 1));
-//	
-//	cpVect cref = cpvlerp(ref.a.p, ref.b.p, 0.5);
-//	ChipmunkDebugDrawSegment(cref, cpvadd(cref, cpvmult(ref.n, 5.0)), RGBAColor(1, 0, 0, 1));
-//	
-//	cpVect cinc = cpvlerp(inc.a.p, inc.b.p, 0.5);
-//	ChipmunkDebugDrawSegment(cinc, cpvadd(cinc, cpvmult(inc.n, 5.0)), RGBAColor(1, 0, 0, 1));
-//	
-//	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.a.p, inc.a.p}, RGBAColor(1, 1, 0, 1));
-//	ChipmunkDebugDrawPoints(5.0, 2, (cpVect[]){ref.b.p, inc.b.p}, RGBAColor(0, 1, 1, 1));
-//	
-//	if(cost_a < cost_b){
-//		ChipmunkDebugDrawSegment(closest_inca, inc.a.p, RGBAColor(1, 0, 1, 1));
-//	} else {
-//		ChipmunkDebugDrawSegment(closest_incb, inc.b.p, RGBAColor(1, 0, 1, 1));
-//	}
-//#endif
-//	
-//	cpHashValue hash_iarb = CP_HASH_PAIR(inc.a.hash, ref.b.hash);
-//	cpHashValue hash_ibra = CP_HASH_PAIR(inc.b.hash, ref.a.hash);
-//	
-//	if(cost_a < cost_b){
-//		cpVect refp = cpvadd(ref.a.p, ref_offs);
-//		Contact1(points.d, closest_inca, inc.a.p, ref.r, inc.r, points.n, hash_iarb, contacts);
-//		return Contact2(refp, inca, incb, ref.r, inc.r, ref.n, points.n, hash_ibra, contacts) + 1;
-//	} else {
-//		cpVect refp = cpvadd(ref.b.p, ref_offs);
-//		Contact1(points.d, closest_incb, inc.b.p, ref.r, inc.r, points.n, hash_ibra, contacts);
-//		return Contact2(refp, incb, inca, ref.r, inc.r, ref.n, points.n, hash_iarb, contacts) + 1;
-//	}
-//}
-//
-//static inline int
-//ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPoints points, cpCollisionInfo *info)
-//{
-//	cpFloat mindist = e1.r + e2.r;
-//	if(points.d <= mindist){
-//		cpFloat pick = cpvdot(e1.n, points.n) + cpvdot(e2.n, points.n);
-//		
-//		if(
-//			(pick != 0.0f && pick > 0.0f) ||
-//			// If the edges are both perfectly aligned weird things happen.
-//			// This is *very* common at the start of a simulation.
-//			// Pick the longest edge as the reference to break the tie.
-//			(pick == 0.0f && (cpvdistsq(e1.a.p, e1.b.p) > cpvdistsq(e2.a.p, e2.b.p)))
-//		){
-//			return ClipContacts(e1, e2, points,  1.0f, contacts);
-//		} else {
-//			return ClipContacts(e2, e1, points, -1.0f, contacts);
-//		}
-//	} else {
-//		return 0;
-//	}
-//}
-
 static inline void
 ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPoints points, cpCollisionInfo *info)
 {
 	cpFloat mindist = e1.r + e2.r;
 	if(points.d <= mindist){
-		cpVect n = points.n;//(cpvdot(e1.n, points.n) + cpvdot(e2.n, points.n) > 0.0f ? e1.n : cpvneg(e2.n));
-		
-//		ChipmunkDebugDrawSegment(e1.a.p, e1.b.p, RGBAColor(0, 1, 0, 1));
-//		ChipmunkDebugDrawSegment(e2.a.p, e2.b.p, RGBAColor(0, 1, 0, 1));
+		cpVect n = points.n;
 		
 		// Distances along the axis parallel to n
 		cpFloat d_e1_a = cpvcross(e1.a.p, n);
@@ -524,25 +412,22 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 		cpFloat e1_denom = 1.0f/(d_e1_b - d_e1_a);
 		cpFloat e2_denom = 1.0f/(d_e2_b - d_e2_a);
 		
-		cpHashValue hash_1a2b = CP_HASH_PAIR(e1.a.hash, e2.b.hash);
-		cpHashValue hash_1b2a = CP_HASH_PAIR(e1.b.hash, e2.a.hash);
-		
 		{
 			cpVect r1 = cpvadd(cpvmult(n,  e1.r), cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_b - d_e1_a)*e1_denom)));
 			cpVect r2 = cpvadd(cpvmult(n, -e2.r), cpvlerp(e2.a.p, e2.b.p, cpfclamp01((d_e1_a - d_e2_a)*e2_denom)));
 			cpFloat dist = cpvdot(cpvsub(r2, r1), n);
-//			ChipmunkDemoPrintString("dist: %f\n", dist);
 			if(dist <= 0.0f)
 			{
+				cpHashValue hash_1a2b = CP_HASH_PAIR(e1.a.hash, e2.b.hash);
 				cpCollisionInfoPushContact(info, cpvsub(r1, info->a->body->p), cpvsub(r2, info->b->body->p), n, dist, hash_1a2b);
 			}
 		}{
 			cpVect r1 = cpvadd(cpvmult(n,  e1.r), cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_a - d_e1_a)*e1_denom)));
 			cpVect r2 = cpvadd(cpvmult(n, -e2.r), cpvlerp(e2.a.p, e2.b.p, cpfclamp01((d_e1_b - d_e2_a)*e2_denom)));
 			cpFloat dist = cpvdot(cpvsub(r2, r1), n);
-//			ChipmunkDemoPrintString("dist: %f\n", dist);
 			if(dist <= 0.0f)
 			{
+				cpHashValue hash_1b2a = CP_HASH_PAIR(e1.b.hash, e2.a.hash);
 				cpCollisionInfoPushContact(info, cpvsub(r1, info->a->body->p), cpvsub(r2, info->b->body->p), n, dist, hash_1b2a);
 			}
 		}
