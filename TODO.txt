@@ -1,4 +1,5 @@
 Priorities:
+	Basics tutorial.
 	Simple top down player controls.
 	* test tiny omega bug in cpvslerp().
 	User definable default winding.
