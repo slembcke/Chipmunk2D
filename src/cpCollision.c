@@ -30,7 +30,7 @@
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
 #define DRAW_CLOSEST (0 || DRAW_ALL)
-#define DRAW_CLIP (1 || DRAW_ALL)
+#define DRAW_CLIP (0 || DRAW_ALL)
 
 #define PRINT_LOG 0
 #endif
@@ -505,7 +505,7 @@ GJK(const struct SupportContext *ctx, cpCollisionID *id)
 //	}
 //}
 
-static inline int
+static inline void
 ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPoints points, cpCollisionInfo *info)
 {
 	cpFloat mindist = e1.r + e2.r;
@@ -527,7 +527,6 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 		cpHashValue hash_1a2b = CP_HASH_PAIR(e1.a.hash, e2.b.hash);
 		cpHashValue hash_1b2a = CP_HASH_PAIR(e1.b.hash, e2.a.hash);
 		
-		int count = 0;
 		{
 			cpVect r1 = cpvadd(cpvmult(n,  e1.r), cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_b - d_e1_a)*e1_denom)));
 			cpVect r2 = cpvadd(cpvmult(n, -e2.r), cpvlerp(e2.a.p, e2.b.p, cpfclamp01((d_e1_a - d_e2_a)*e2_denom)));
@@ -536,7 +535,6 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 			if(dist <= 0.0f)
 			{
 				cpCollisionInfoPushContact(info, cpvsub(r1, info->a->body->p), cpvsub(r2, info->b->body->p), n, dist, hash_1a2b);
-				count++;
 			}
 		}{
 			cpVect r1 = cpvadd(cpvmult(n,  e1.r), cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_a - d_e1_a)*e1_denom)));
@@ -546,13 +544,8 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 			if(dist <= 0.0f)
 			{
 				cpCollisionInfoPushContact(info, cpvsub(r1, info->a->body->p), cpvsub(r2, info->b->body->p), n, dist, hash_1b2a);
-				count++;
 			}
 		}
-		
-		return count;
-	} else {
-		return 0;
 	}
 }
 
@@ -759,7 +752,7 @@ cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpContact *contacts)
 	if(cfunc) cfunc(a, b, &info);
 	cpAssertSoft(info.count <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error: Too many contact points returned.");
 	
-	{
+	if(0){
 		cpVect n = info.n;
 		
 		cpBody *a = info.a->body;
