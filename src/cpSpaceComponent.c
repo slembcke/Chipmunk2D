@@ -324,7 +324,7 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 		return;
 	}
 	
-	CP_BODY_FOREACH_SHAPE(body, shape) cpShapeUpdate(shape, body->p, body->rot);
+	CP_BODY_FOREACH_SHAPE(body, shape) cpShapeCacheBB(shape);
 	cpSpaceDeactivateBody(space, body);
 	
 	if(group){

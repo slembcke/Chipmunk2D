@@ -312,7 +312,7 @@ cpBool
 cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data)
 {
 	cpBody *body = shape->body;
-	cpBB bb = (body ? cpShapeUpdate(shape, body->p, body->rot) : shape->bb);
+	cpBB bb = (body ? cpShapeCacheBB(shape) : shape->bb);
 	struct ShapeQueryContext context = {func, data, cpFalse};
 	
 	cpSpaceLock(space); {

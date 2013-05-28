@@ -378,9 +378,11 @@ drawConstraint(cpConstraint *constraint, void *unused)
 	const cpConstraintClass *klass = constraint->klass;
 	if(klass == cpPinJointGetClass()){
 		cpPinJoint *joint = (cpPinJoint *)constraint;
-	
-		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
-		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
+		
+		cpVect a = cpBodyLocal2World(body_a, joint->anchr1);
+		cpVect b = cpBodyLocal2World(body_b, joint->anchr2);
+//		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
+//		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
 		
 		cpVect points[] = {a, b};
 		ChipmunkDebugDrawPoints(5, 2, points, CONSTRAINT_COLOR);
@@ -388,8 +390,8 @@ drawConstraint(cpConstraint *constraint, void *unused)
 	} else if(klass == cpSlideJointGetClass()){
 		cpSlideJoint *joint = (cpSlideJoint *)constraint;
 	
-		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
-		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
+		cpVect a = cpBodyLocal2World(body_a, joint->anchr1);
+		cpVect b = cpBodyLocal2World(body_b, joint->anchr2);
 		
 		cpVect points[] = {a, b};
 		ChipmunkDebugDrawPoints(5, 2, points, CONSTRAINT_COLOR);
@@ -397,17 +399,17 @@ drawConstraint(cpConstraint *constraint, void *unused)
 	} else if(klass == cpPivotJointGetClass()){
 		cpPivotJoint *joint = (cpPivotJoint *)constraint;
 	
-		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
-		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
+		cpVect a = cpBodyLocal2World(body_a, joint->anchr1);
+		cpVect b = cpBodyLocal2World(body_b, joint->anchr2);
 
 		cpVect points[] = {a, b};
 		ChipmunkDebugDrawPoints(10, 2, points, CONSTRAINT_COLOR);
 	} else if(klass == cpGrooveJointGetClass()){
 		cpGrooveJoint *joint = (cpGrooveJoint *)constraint;
 	
-		cpVect a = cpvadd(body_a->p, cpvrotate(joint->grv_a, body_a->rot));
-		cpVect b = cpvadd(body_a->p, cpvrotate(joint->grv_b, body_a->rot));
-		cpVect c = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
+		cpVect a = cpBodyLocal2World(body_a, joint->grv_a);
+		cpVect b = cpBodyLocal2World(body_a, joint->grv_b);
+		cpVect c = cpBodyLocal2World(body_b, joint->anchr2);
 		
 		ChipmunkDebugDrawPoints(5, 1, &c, CONSTRAINT_COLOR);
 		ChipmunkDebugDrawSegment(a, b, CONSTRAINT_COLOR);

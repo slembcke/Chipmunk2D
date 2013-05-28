@@ -92,7 +92,9 @@ cpBB
 cpShapeCacheBB(cpShape *shape)
 {
 	cpBody *body = shape->body;
-	return cpShapeUpdate(shape, body->p, body->rot);
+	cpVect rot = body->rot;
+	cpVect anchrPos = cpvsub(body->p, cpvrotate(body->cog, rot));
+	return cpShapeUpdate(shape, anchrPos, rot);
 }
 
 cpBB
@@ -159,6 +161,16 @@ cpCircleShapeCacheData(cpCircleShape *circle, cpVect p, cpVect rot)
 	return cpBBNewForCircle(c, circle->r);
 }
 
+static struct cpMassInfo
+cpCircleShapeMassInfo(cpCircleShape *circle, cpFloat density)
+{
+	cpFloat mass = density*cpAreaForCircle(0.0f, circle->r);
+	cpFloat moment = cpMomentForCircle(mass, 0.0f, circle->r, cpvzero);
+	
+	struct cpMassInfo info = {mass, moment, circle->c};
+	return info;
+}
+
 static void
 cpCicleShapeNearestPointQuery(cpCircleShape *circle, cpVect p, cpNearestPointQueryInfo *info)
 {
@@ -206,6 +218,7 @@ static const cpShapeClass cpCircleShapeClass = {
 	CP_CIRCLE_SHAPE,
 	(cpShapeCacheDataImpl)cpCircleShapeCacheData,
 	NULL,
+	(cpShapeMassInfoImpl)cpCircleShapeMassInfo,
 	(cpShapeNearestPointQueryImpl)cpCicleShapeNearestPointQuery,
 	(cpShapeSegmentQueryImpl)cpCircleShapeSegmentQuery,
 };
@@ -263,6 +276,17 @@ cpSegmentShapeCacheData(cpSegmentShape *seg, cpVect p, cpVect rot)
 	
 	cpFloat rad = seg->r;
 	return cpBBNew(l - rad, b - rad, r + rad, t + rad);
+}
+
+static struct cpMassInfo
+cpSegmentShapeMassInfo(cpSegmentShape *segment, cpFloat density)
+{
+	cpFloat mass = density*cpAreaForSegment(segment->a, segment->b, segment->r);
+	cpFloat w = 2.0f*segment->r;
+	cpFloat moment = cpMomentForBox(mass, cpvdist(segment->a, segment->b) + w, w); // TODO approximation
+	
+	struct cpMassInfo info = {mass, moment, cpvlerp(segment->a, segment->b, 0.5f)};
+	return info;
 }
 
 static void
@@ -326,6 +350,7 @@ static const cpShapeClass cpSegmentShapeClass = {
 	CP_SEGMENT_SHAPE,
 	(cpShapeCacheDataImpl)cpSegmentShapeCacheData,
 	NULL,
+	(cpShapeMassInfoImpl)cpSegmentShapeMassInfo,
 	(cpShapeNearestPointQueryImpl)cpSegmentShapeNearestPointQuery,
 	(cpShapeSegmentQueryImpl)cpSegmentShapeSegmentQuery,
 };

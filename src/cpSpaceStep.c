@@ -318,11 +318,10 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 
 //MARK: All Important cpSpaceStep() Function
 
-void
+ void
 cpShapeUpdateFunc(cpShape *shape, void *unused)
 {
-	cpBody *body = shape->body;
-	cpShapeUpdate(shape, body->p, body->rot);
+	cpShapeCacheBB(shape);
 }
 
 void

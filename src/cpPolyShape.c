@@ -80,6 +80,17 @@ cpPolyShapeDestroy(cpPolyShape *poly)
 	cpfree(poly->planes);
 }
 
+static struct cpMassInfo
+cpPolyShapeMassInfo(cpPolyShape *poly, cpFloat density)
+{
+		cpFloat mass = density*cpAreaForPoly(poly->numVerts, poly->verts);
+		cpVect centroid = cpCentroidForPoly(poly->numVerts, poly->verts);
+		cpFloat moment = cpMomentForPoly(mass, poly->numVerts, poly->verts, cpvneg(centroid));
+		
+		struct cpMassInfo info = {mass, moment, centroid};
+		return info;
+}
+
 static void
 cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInfo *info){
 	int count = poly->numVerts;
@@ -151,6 +162,7 @@ static const cpShapeClass polyClass = {
 	CP_POLY_SHAPE,
 	(cpShapeCacheDataImpl)cpPolyShapeCacheData,
 	(cpShapeDestroyImpl)cpPolyShapeDestroy,
+	(cpShapeMassInfoImpl)cpPolyShapeMassInfo,
 	(cpShapeNearestPointQueryImpl)cpPolyShapeNearestPointQuery,
 	(cpShapeSegmentQueryImpl)cpPolyShapeSegmentQuery,
 };
