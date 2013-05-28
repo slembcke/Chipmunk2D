@@ -679,7 +679,7 @@ static const CollisionFunc builtinCollisionFuncs[9] = {
 	(CollisionFunc)seg2poly,
 	(CollisionFunc)poly2poly,
 };
-static const CollisionFunc *colfuncs = builtinCollisionFuncs;
+static const CollisionFunc *colfuncs = segmentCollisions;
 
 static const CollisionFunc segmentCollisions[9] = {
 	(CollisionFunc)circle2circle,
