@@ -44,20 +44,20 @@ extern "C" {
 #endif
 
 void cpMessage(const char *condition, const char *file, int line, int isError, int isHardError, const char *message, ...);
-#ifdef NDEBUG
+//#ifdef NDEBUG
 	#define	cpAssertWarn(__condition__, ...)
-#else
-	#define cpAssertWarn(__condition__, ...) if(!(__condition__)) cpMessage(#__condition__, __FILE__, __LINE__, 0, 0, __VA_ARGS__)
-#endif
+//#else
+//	#define cpAssertWarn(__condition__, ...) if(!(__condition__)) cpMessage(#__condition__, __FILE__, __LINE__, 0, 0, __VA_ARGS__)
+//#endif
 
-#ifdef NDEBUG
+//#ifdef NDEBUG
 	#define	cpAssertSoft(__condition__, ...)
-#else
-	#define cpAssertSoft(__condition__, ...) if(!(__condition__)) cpMessage(#__condition__, __FILE__, __LINE__, 1, 0, __VA_ARGS__)
-#endif
+//#else
+//	#define cpAssertSoft(__condition__, ...) if(!(__condition__)) cpMessage(#__condition__, __FILE__, __LINE__, 1, 0, __VA_ARGS__)
+//#endif
 
 // Hard assertions are important and cheap to execute. They are not disabled by compiling as debug.
-#define cpAssertHard(__condition__, ...) if(!(__condition__)) cpMessage(#__condition__, __FILE__, __LINE__, 1, 1, __VA_ARGS__)
+#define cpAssertHard(__condition__, ...) if(!(__condition__)) //cpMessage(#__condition__, __FILE__, __LINE__, 1, 1, __VA_ARGS__)
 
 
 #include "chipmunk_types.h"
