@@ -1,4 +1,5 @@
 Priorities:
+	Basics tutorial.
 	Simple top down player controls.
 	* test tiny omega bug in cpvslerp().
 	User definable default winding.
@@ -40,10 +41,16 @@ Future things to think about:
 	Top down racing game. (Need the callback constraint)
 	cpBodyActivateStatic() should also activate joints?
 
-
 Chipmunk 7:
 	Speculative contacts
 	Unity bindings
 	user definable constraint
 	serialization
 	API changes, different body/shape instantiation.
+	Collision handler objects with additional callbacks.
+	Revisit rolling friction.
+	Calculate contact anchors to get rid of contact pos. (needed for speculative contacts anyway)
+	Revisit per contact surface velocity.
+	Mass property calculation changes.
+	Change apply force/impulse and point velocity functions.
+	Separate doxygen docs for Objective-C parts and C parts.
