@@ -54,3 +54,4 @@ Chipmunk 7:
 	Mass property calculation changes.
 	Change apply force/impulse and point velocity functions.
 	Separate doxygen docs for Objective-C parts and C parts.
+	Cocos2D xcode templates.
