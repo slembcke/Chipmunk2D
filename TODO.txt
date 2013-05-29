@@ -19,10 +19,15 @@ Unordered
 	Use a slop tolerance on joint boundaries.
 
 Website things
-	Google analytics
+	-Google analytics
+	Rename to Chipmunk2D
 	Make it so people can upgrade license versions
+	upgrade to new version
+	Coupon codes (unlimited use)
+	log purchase IP for fraud
 	Don't make any mistakes: http://www.gamasutra.com/view/feature/185773/the_top_10_mistakes_tool_.php
 	Several people want a Chipmunk Facebook page.
+	figure out and redo front page.	Chipmunk js examples.
 
 Future things to think about:
 	breakable object support functions?
@@ -34,3 +39,11 @@ Future things to think about:
 	Easy callback programable joint?
 	Top down racing game. (Need the callback constraint)
 	cpBodyActivateStatic() should also activate joints?
+
+
+Chipmunk 7:
+	Speculative contacts
+	Unity bindings
+	user definable constraint
+	serialization
+	API changes, different body/shape instantiation.
