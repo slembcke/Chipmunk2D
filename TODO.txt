@@ -40,4 +40,5 @@ Future things to think about:
 	Revisit per contact surface velocity.
 	Mass property calculation changes.
 	Change apply force/impulse and point velocity functions.
+	Custom contacts using arbiter data.
 	
