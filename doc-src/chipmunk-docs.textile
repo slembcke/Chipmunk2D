@@ -438,6 +438,9 @@ p(expl). This one is more interesting. Calls @func@ once for each collision pair
 
 *Note:* If your compiler supports blocks (such as Clang), there are an alternate set of functions you can call. @cpBodyEachShape_b()@, etc. See @chipmunk.h@ for more information.
 
+<%= pop_open_example "Crushing" %>
+
+
 <%= h 2, "Integration Callbacks:", "Integration Callbacks" %>
 
 This section is a stub. For now you can look at the Planet demo for an example of how to use integration callbacks to implement planetary gravity.
@@ -747,7 +750,7 @@ cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)</code
 p(expl). These functions add and remove shapes, bodies and constraints from @space@. The add/remove functions cannot be called from within a callback other than a @postStep()@ callback _(which is different than a postSolve() callback!)_. Attempting to add or remove objects from the space while @cpSpaceStep()@ is still executing will throw an assertion. See the "callbacks section":#Callbacks for more information. The add functions return the thing being added so that you can create and add something in one line. Be careful not to free bodies before removing shapes and constraints attached to them or you will cause crashes.. The contains functions allow you to check if an object has been added to the space or not.
 
 
-<%= h 2, "Static <-> Dynamic conversion Functions:", "Static <-> Dynamic Conversion" %>
+<%= h 2, "Static &harr; Dynamic conversion Functions:", "Static <-> Dynamic Conversion" %>
 
 <pre><code>void cpSpaceConvertBodyToStatic(cpSpace *space, cpBody *body)</code></pre>
 
@@ -756,6 +759,8 @@ p(expl). Convert a body to a static one. It's mass and moment will be set to inf
 <pre><code>void cpSpaceConvertBodyToDynamic(cpSpace *space, cpBody *body, cpFloat mass, cpFloat moment)</code></pre>
 
 p(expl). Convert a static to a dynamic one. This does not call @cpSpaceAddBody()@ to make the body active, so you will need to do that explicitly if you need it. Also, because it modifies collision detection data structures, you must use a post step callback if you want to use it from another callback or iterator.
+
+<%= pop_open_example "DynamicStatic" %>
 
 
 <%= h 3, "Deprecated:", "Deprecated" %>
