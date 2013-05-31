@@ -736,6 +736,17 @@ cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)</code
 p(expl). These functions add and remove shapes, bodies and constraints from @space@. The add/remove functions cannot be called from within a callback other than a @postStep()@ callback _(which is different than a postSolve() callback!)_. Attempting to add or remove objects from the space while @cpSpaceStep()@ is still executing will throw an assertion. See the "callbacks section":#Callbacks for more information. The add functions return the thing being added so that you can create and add something in one line. Be careful not to free bodies before removing shapes and constraints attached to them or you will cause crashes.. The contains functions allow you to check if an object has been added to the space or not.
 
 
+<%= h 2, "Static <-> Dynamic conversion Functions:", "Static <-> Dynamic Conversion" %>
+
+<pre><code>void cpSpaceConvertBodyToStatic(cpSpace *space, cpBody *body)</code></pre>
+
+p(expl). Convert a body to a static one. It's mass and moment will be set to infinity and it's velocity to 0. The old mass, moment and velocity are not saved. This will effectively freeze a body and it's shapes into place. This cannot be called on an active body, so you may need to call @cpSpaceRemoveBody()@ first. Also, because it modifies collision detection data structures, you must use a post step callback if you want to use it from another callback or iterator.
+
+<pre><code>void cpSpaceConvertBodyToDynamic(cpSpace *space, cpBody *body, cpFloat mass, cpFloat moment)</code></pre>
+
+p(expl). Convert a static to a dynamic one. This does not call @cpSpaceAddBody()@ to make the body active, so you will need to do that explicitly if you need it. Also, because it modifies collision detection data structures, you must use a post step callback if you want to use it from another callback or iterator.
+
+
 <%= h 3, "Deprecated:", "Deprecated" %>
 
 <pre><code>cpShape *cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
@@ -1136,8 +1147,8 @@ A physics library without any events or feedback would not be very useful for ga
 
 A collision handler is a set of 4 function callbacks for the different collision events that Chipmunk recognizes. The event types are:
 * @begin()@: Two shapes just started touching for the first time this step. Return true from the callback to process the collision normally or false to cause Chipmunk to ignore the collision entirely. If you return false, the @preSolve()@ and @postSolve()@ callbacks will never be run, but you will still recieve a separate event when the shapes stop overlapping.
-* @preSolve()@: Two shapes are touching during this step. Return false from the callback to make Chipmunk ignore the collision this step or true to process it normally. Additionally, you may override collision values such as cpArbiter.e and cpArbiter.u to provide custom friction or elasticity values. See "cpArbiter":#cpArbiter for more info.
-* @postSolve()@: Two shapes are touching and their collision response has been processed. You can retrieve the collision force at this time if you want to use it to calculate sound volumes or damage amounts. See "cpArbiter":#cpArbiter for more info.
+* @preSolve()@: Two shapes are touching during this step. Return false from the callback to make Chipmunk ignore the collision this step or true to process it normally. Additionally, you may override collision values using @cpArbiterSetFriction()@, @cpArbiterSetElasticity()@ or @cpArbiterSetSurfaceVelocity()@ to provide custom friction, elasticity, or surface velocity values. See "cpArbiter":#cpArbiter for more info.
+* @postSolve()@: Two shapes are touching and their collision response has been processed. You can retrieve the collision impulse or kinetic energy at this time if you want to use it to calculate sound volumes or damage amounts. See "cpArbiter":#cpArbiter for more info.
 * @separate()@: Two shapes have just stopped touching for the first time this step. To ensure that begin()/separate() are always called in balanced pairs, it will also be called when removing a shape while its in contact with something or when deallocating the space.
 
 Collision callbacks are closely associated with "cpArbiter":#cpArbiter structs. You should familiarize yourself with those as well.
@@ -1210,24 +1221,26 @@ Why are they called arbiters? The short answer is that I kept using the word "ar
 
 <%= h 2, "Memory Management:", "Memory" %>
 
-You will never need to create or free an arbiter. More importantly, because they are entirely managed by the space you should *never* store a reference to an arbiter as you don't know when they will be recycled. Use them within the callback where they are given to you and then forget about them or copy out the information you need.
+You will never need to create or free an arbiter. More importantly, because they are entirely managed by the space you should *never* store a reference to an arbiter as you don't know when they will be freed or reused. Use them within the callback where they are given to you and then forget about them or copy out the information you need.
 
 <%= h 2, "Properties:", "Properties" %>
 
 <pre><code>cpFloat cpArbiterGetElasticity(const cpArbiter *arb)
 void cpArbiterSetElasticity(cpArbiter *arb, cpFloat value)</code></pre>
 
-p(expl). The calculated elasticity for this collision pair. Setting the value in a @preSolve()@ callback will override the value calculated by the space.
+p(expl). The calculated elasticity for this collision pair. Setting the value in a @preSolve()@ callback will override the value calculated by the space. The default calculation multiplies the elasticity of the two shapes together.
 
 <pre><code>cpFloat cpArbiterGetFriction(const cpArbiter *arb)
 void cpArbiterSetFriction(cpArbiter *arb, cpFloat value)</code></pre>
 
-p(expl). The calculated friction for this collision pair. Setting the value in a @preSolve()@ callback will override the value calculated by the space.
+p(expl). The calculated friction for this collision pair. Setting the value in a @preSolve()@ callback will override the value calculated by the space. The default calculation multiplies the friction of the two shapes together.
 
 <pre><code>cpVect cpArbiterGetSurfaceVelocity(const cpArbiter *arb)
 void cpArbiterSetSurfaceVelocity(cpArbiter *arb, cpVect value)</code></pre>
 
-p(expl). The calculated surface velocity for this collision pair. Setting the value in a @preSolve()@ callback will override the value calculated by the space.
+p(expl). The calculated surface velocity for this collision pair. Setting the value in a @preSolve()@ callback will override the value calculated by the space. the default calculation subtracts the surface velocity of the second shape from the first and then projects that onto the tangent of the collision. This is so that only friction is affected by default calculation. Using a custom calculation, you can make something that responds like a pinball bumper, or where the surface velocity is dependent on the location of the contact point.
+
+*NOTE:* Unfortunately there is an old bug where the surface velocity is calculated backwards (negative). I didn't really notice this for a long time. It will be fixed in Chipmunk 7, but for now I've left it alone for backwards compatibility reasons.
 
 <pre><code>cpDataPointer cpArbiterGetUserData(const cpArbiter *arb)
 void cpArbiterSetUserData(cpArbiter *arb, cpDataPointer data)</code></pre>
@@ -1272,6 +1285,10 @@ for(int i=0; i<set.count; i++){
 	set.points[i].normal
 	set.points[i].dist
 }</code></pre>
+
+<pre><code>void cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)</code></pre>
+
+p(expl). Replace the contact point set of an Arbiter. You cannot change the number of contacts, but can change the location, normal or penetration distance. The "Sticky" demo uses this to allow objects to overlap an extra amount. You could also use it in a Pong style game to modify the normal of the collision based on the x-position of the collision even though the paddle is a flat shape.
 
 <%= h 2, "Helper Functions:", "HelperFunctions" %>
 
@@ -1344,7 +1361,7 @@ Segment queries are like ray casting, but because not all spatial indexes allow 
 	cpVect n;
 } cpSegmentQueryInfo;</code></pre>
 
-p(expl). Segment queries return more information than just a simple yes or no, they also return where a shape was hit and it's surface normal at the hit point. @t@ is the percentage between the query start and end points. If you need the hit point in world space or the absolute distance from start, see the segment query helper functions farther down.
+p(expl). Segment queries return more information than just a simple yes or no, they also return where a shape was hit and it's surface normal at the hit point. @t@ is the percentage between the query start and end points. If you need the hit point in world space or the absolute distance from start, see the segment query helper functions farther down. If a segment query starts within a shape it will have @t = 0@ and @n = cpvzero@.
 
 <pre><code>cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)</code></pre>
 
