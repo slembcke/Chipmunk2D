@@ -2,20 +2,18 @@
 
 <%= pop_open_div("Outline") %><%%= Node::Root.outline %></div></div>
 
-<%= h 1, "Chipmunk Physics 6.1.4", "Intro" %>
+<%= h 1, "Chipmunk2D 6.1.5", "Intro" %>
 
-First of all, Chipmunk is a 2D rigid body physics library distributed under the MIT license. It is intended to be blazingly fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games across just about every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk what it is today. If you find Chipmunk has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
+First of all, Chipmunk2D is a 2D rigid body physics library distributed under the MIT license. It is intended to be blazingly fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games across just about every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk2D what it is today. If you find Chipmunk2D has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
 
-First of all, I would like to give a Erin Catto a big thank you, as Chipmunk's impulse solver was directly inspired by his example code way back in 2006. (Now a full fledged physics engine all it's own: "Box2D.org":http://www.box2d.org/). His contact persistence idea allows for stable stacks of objects with very few iterations of the solver. My previous solver produced mushy piles of objects or required a large amount of CPU to operate stably.
+First of all, I would like to give a Erin Catto a big thank you, as Chipmunk2D's impulse solver was directly inspired by his example code way back in 2006. (Now a full fledged physics engine all it's own: "Box2D.org":http://www.box2d.org/). His contact persistence idea allows for stable stacks of objects with very few iterations of the solver. My previous solver produced mushy piles of objects or required a large amount of CPU to operate stably.
 
 
 <%= h 2, "Why a C Library?", "WhyC" %>
 
-A lot of people ask me why I wrote Chipmunk in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, ooc, Lua, Io... the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I also wanted Chipmunk to be fast, portable, easy to optimize and easy to debug. Writing Chipmunk in C made it simpler to achieve all of those goals.
+A lot of people ask me why I wrote Chipmunk2D in C instead of _pick your favorite language here_. I tend to get really excited about different programming languages. Depending on the month, take your pick of Scheme, OCaml, Ruby, Objective-C, ooc, Lua, Io... the list goes on. The one common factor between most any language is that they are usually dead simple to make bindings to C code. I also wanted Chipmunk2D to be fast, portable, easy to optimize and easy to debug. Writing Chipmunk2D in C made it simpler to achieve all of those goals.
 
-That said, I've never developed a whole game in C and I probably never will. There are much more interesting and fun languages than C with all sorts of nice features like garbage collection, closures and all sorts of unique object oriented runtimes. Check out the "Bindings and Ports":http://chipmunk-physics.net/bindingsAndPorts.php page to see if you can use Chipmunk from your language of choice. Because Chipmunk is written in a subset of C99 it compiles cleanly as C, C++, Objective-C and Objective-C++ code, making it easy to integrate into projects in those languages.
-
-If you are writing iPhone games using Chipmunk, you should check out the Objective-Chipmunk wrapper that we've developed for Chipmunk. It integrates with the Objective-C memory model and provides a number of high level APIs that make writing physics based games for the iPhone even easier. While we do charge for Objective-Chipmunk, it will almost certainly save you more time than the small cost to license it. As a bonus, you'll be helping to ensure that we can afford to continue to work on Chipmunk improvements.
+That said, I've never developed a whole game in C and I probably never will. There are much more interesting and fun languages than C with all sorts of nice features like garbage collection, closures and all sorts of unique object oriented runtimes. Check out the "Bindings and Ports":http://chipmunk2d.net/bindingsAndPorts.php page to see if you can use Chipmunk2D from your language of choice. Because Chipmunk2D is written in a subset of C99 it compiles cleanly as C, C++, Objective-C and Objective-C++ code, making it easy to integrate into projects in those languages.
 
 
 <%= h 2, "Limitations of a C API:", "Limitations" %>
@@ -25,21 +23,32 @@ Chipmunk does provide overloaded operators for @*@, @+@, and @-@ (unary and bina
 Another problem for a C API is access restriction. There are many structs, fields and functions in Chipmunk that are only meant to be used internally. To work around this, I have a separate header full of Chipmunk's private API, @chipmunk_private.h@. I also use a macro, @CP_PRIVATE()@ to mangle names in public structures. While you can feel free to include this header or use the macro in your own code to access the private API, be aware that the fields and functions may be renamed or disappear without warning and I have no plans to document or support usage of the private API.
 
 
+<%= h 2, "Chipmunk2D Pro", "ChipmunkPro" %>
+
+We also sell an extended version of Chipmunk2D called Chipmunk2D Pro. The main features of that are ARM NEON and multithreading optimizations, an Objective-C wrapper for iOS/Mac development and the Autogeometry tools. The solver optimizations are mostly focused on mobile performance, but the multithreading works anywhere you can use pthreads. The Objective-C wrapper allows you to integrate seamlessly into Objective-C frameworks such a Cocos2D or UIKit while taking advantage of native memory management (including ARC). It also has a number of very nice API enhancements. Autogeometry is a set of tools that allows you to generate and work with geometry extracted from image data or procedural functions.
+
+Additionally, selling Chipmunk2D Pro is how we make part of our living while being able to give Chipmunk2D away as open source software. Donations are nice, but this way you can get something out of it too.
+
+
 <%= h 2, "Get it, Compile it:", "Compiling" %>
 
-If you haven't downloaded it yet, you can always download the newest version of Chipmunk "here":http://files.slembcke.net/chipmunk/release/ChipmunkLatest.tgz. Inside you'll find a command line build script that works with "CMake":http://www.cmake.org/, a XCode project and project files for Visual Studio '09 and '10.
+If you haven't downloaded it yet, you can always download the newest version of Chipmunk2D "here":http://chipmunk-physics.net/release/ChipmunkLatest.tgz. Inside you'll find a command line build script that works with "CMake":http://www.cmake.org/, a XCode project and project files for Visual Studio '09 and '10.
+
 
 <%= h 3, "Debug or Release?", "DebugRelease" %>
 
 Debug mode might be slightly slower, but will include a lot of error checking assertions that can help you find bugs quicker such as removing objects twice or doing things that might cause unsolvable collisions. I highly recommend you use a debug build until you are ready to ship the game and only then switch to a release build.
 
+
 <%= h 3, "XCode (Mac/iPhone)", "XCode" %>
 
 The included XCode project has targets for building a static library for the Mac or iOS. Additionally, you might want to just run the @macosx/iphonestatic.command@ or @macosx/macstatic.command@ to build you a directory with the headers and debug/release static libraries that you can just drop right into your projects. Including Chipmunk in your project with all the correct compiler flags applied couldn't be simpler. The iPhone script generates a "fat" library that can be used with both the iOS simulator and devices. The device version is compiled as release, and the simulator version is compiled as debug.
 
+
 <%= h 3, "MSVC", "MSVC" %>
 
 I rarely use MSVC, but others have chipped in to help me maintain Visual Studio project files. The MSVC 10 project should work, as I usually remember to test that before making a stable release. The MSVC 9 project may not as I don't have access to that version. Let me know if there are any issues.
+
 
 <%= h 3, "Command Line", "CommandLine" %>
 
@@ -51,6 +60,8 @@ To compile a Chipmunk debug build on the command line, all you need to do is run
 make</code></pre>
 
 If the @-D CMAKE_BUILD_TYPE=Debug@ option is left out, it will make a release build instead.
+
+Why CMake? Somebody was kind enough to make the build scripts for me originally and it seems to handle a lot of the cross-platform issues nicely. I know some people really hate having to install some random non-make build system in order to compile things, but it has saved me a lot of time and effort.
 
 <%= h 2, "Hello Chipmunk (World)", "HelloChipmunk" %>
 
@@ -74,7 +85,7 @@ If you find any bugs in Chipmunk, errors or broken links in this document, or ha
 Chipmunk is licensed under the MIT license.
 
 <pre>
-Copyright (c) 2007-2011 Scott Lembcke
+Copyright (c) 2007-2013 Scott Lembcke and Howling Moon Software
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -100,13 +111,13 @@ This means that you do not have to buy a license or pay to use Chipmunk in comme
 
 <%= h 2, "Links:", "Links" %>
 
-* "Chipmunk Forums":http://chipmunk-physics.net/forum - The official forum Chipmunk Physics forum.
-* "Howling Moon Software":http://howlingmoonsoftware.com/ -  My software company.
-* "Chipmunk Pro":http://chipmunk-physics.net/chipmunkPro.php - An enhanced version of Chipmunk that we maintain with some specific optimizations for ARM or multi-core platforms, automatic geometry manipulation from images or procedural data, and API wrappers for Objective-C.
-* "Games":http://chipmunk-physics.net/games.php - A small list of games done with Chipmunk. At least a few of the ones we know of.
+* "Chipmunk Forums":http://chipmunk2d.net/forum - The official forum Chipmunk2D forum.
+* "Howling Moon Software":http://howlingmoonsoftware.com/ -  The software company I cofounded. (We are available for contract work!)
+* "Chipmunk2D Pro":http://chipmunk2d.net/chipmunkPro.php - An enhanced version of Chipmunk that we maintain with some specific optimizations for ARM or multi-core platforms, automatic geometry manipulation from images or procedural data, and API wrappers for Objective-C.
+* "Games":http://chipmunk2d.net/games.php - A small list of games done with Chipmunk. At least a few of the ones we know of.
 
 
-<%= h 1, "Chipmunk Basics:", "Basics" %>
+<%= h 1, "Chipmunk2D Basics:", "Basics" %>
 
 <%= h 2, "Overview:", "Overview" %>
 
