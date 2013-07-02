@@ -123,7 +123,7 @@ void
 cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
 {
 	int count = set->count;
-	arb->numContacts = count;
+	cpAssertHard(count == arb->numContacts, "The number of contact points cannot be changed.");
 	
 	for(int i=0; i<count; i++){
 		arb->contacts[i].p = set->points[i].point;
@@ -177,26 +177,6 @@ cpArbiterTotalKE(const cpArbiter *arb)
 	
 	return sum;
 }
-
-// TODO this really shouldn't be a library function probably.
-// Should either decide to put it in the API or throw it in a demo.
-//cpFloat
-//cpContactsEstimateCrushingImpulse(cpContact *contacts, int numContacts)
-//{
-//	cpFloat fsum = 0.0f;
-//	cpVect vsum = cpvzero;
-//	
-//	for(int i=0; i<numContacts; i++){
-//		cpContact *con = &contacts[i];
-//		cpVect j = cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc));
-//		
-//		fsum += cpvlength(j);
-//		vsum = cpvadd(vsum, j);
-//	}
-//	
-//	cpFloat vmag = cpvlength(vsum);
-//	return fsum - vmag;
-//}
 
 void
 cpArbiterIgnore(cpArbiter *arb)

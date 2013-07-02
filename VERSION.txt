@@ -1,3 +1,19 @@
+CHANGES SINCE 6.1.4
+* API: Added cpArbiter*SurfaceVelocity() to allow for custom surface velocity calculation.
+* API: Added cpArbiteSetContactPointSet() to allow changing the contact geometry on the fly.
+* API: Added cpSpaceConvertBodyToStatic() and cpSpaceConvertBodyToDynamic().
+* API: Added [ChipmunkBody velocityAt*Point:] methods to wrap their C equivalents. (Pro only)
+* API: Added overridable [ChipmunkBody updateVelocity:...] and [ChipmunkBody updatePosition:] methods. (Pro only)
+* API: Added .space properties to ChipmunkBody, ChipmunkShape and ChipmunkConstaint to wrap their C equivalents. (Pro only)
+* API: Added overridable [ChipmunkConstraint preSolve:] and [ChipmunkConstraint postSolve:] methods. (Pro only)
+* API: Added an ChipmunkMultiGrab.grabSort property that allows you to prioritize which shape is grabbed when there is overlap. (Pro only)
+* MISC: Segment queries started inside of a shape now return t=0 and n=cpvzero instead of being undefined.
+* MISC: Cleaned up a lot of common assertion messages to be more clear.
+* MISC: Added a new demo called Shatter.
+* MISC: Added a crushing force estimation example to the ContactGraph demo and a static/dynamic conversion example to Plink.
+* MISC: Modified the Sticky demo to use the new cpArbiteSetContactPointSet() to avoid the use of unnecessary sensor shapes.
+* MISC: [ChipmunkSpace addBounds:...] now returns a NSArray of the bounding segments. (Pro only)
+
 CHANGES SINCE 6.1.3:
 * MISC: Fixed a build script issue that was preventing the documentation from being generated.
 

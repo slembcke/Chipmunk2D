@@ -44,7 +44,7 @@ update(cpSpace *space)
 		if(nearest){
 			cpBody *body = cpShapeGetBody(nearest);
 			if(cpBodyIsStatic(body)){
-				cpSpaceConvertBodyToDynamic(space, body, 1.0f, cpMomentForBox(1.0f, 30.0f, 30.0f));
+				cpSpaceConvertBodyToDynamic(space, body, pentagon_mass, pentagon_moment);
 				cpSpaceAddBody(space, body);
 			} else {
 				cpSpaceRemoveBody(space, body);

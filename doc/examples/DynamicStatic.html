@@ -1,0 +1,18 @@
+<pre style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; "><span style="color:#236e25;"><em>// This example is pulled from the Plink demo.
+</em></span><strong><span style="color:#881350;">if</span></strong>(ChipmunkDemoRightDown){
+  <span style="color:#236e25;"><em>// Find the shape under the mouse.
+</em></span>  cpShape *nearest = <span style="color:#003369;">cpSpaceNearestPointQueryNearest</span>(space, ChipmunkDemoMouse, <span style="color:#0000ff;">0.0</span>, GRABABLE_MASK_BIT, CP_NO_GROUP, <strong><span style="color:#881350;">NULL</span></strong>);
+  <strong><span style="color:#881350;">if</span></strong>(nearest){
+    cpBody *body = <span style="color:#003369;">cpShapeGetBody</span>(nearest);
+    <strong><span style="color:#881350;">if</span></strong>(<span style="color:#003369;">cpBodyIsStatic</span>(body)){
+      <span style="color:#236e25;"><em>// If the body is static, convert it to dynamic and add it to the space.
+</em></span>      <span style="color:#003369;">cpSpaceConvertBodyToDynamic</span>(space, body, pentagon_mass, pentagon_moment);
+      <span style="color:#003369;">cpSpaceAddBody</span>(space, body);
+    } <strong><span style="color:#881350;">else</span></strong> {
+      <span style="color:#236e25;"><em>// If the body is dynamic, remove it from the space and convert it to static.
+</em></span>      <span style="color:#003369;">cpSpaceRemoveBody</span>(space, body);
+      <span style="color:#003369;">cpSpaceConvertBodyToStatic</span>(space, body);
+    }
+  }
+}
+</pre>
