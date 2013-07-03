@@ -29,7 +29,7 @@
 #define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
-#define DRAW_CLOSEST (0 || DRAW_ALL)
+#define DRAW_CLOSEST (1 || DRAW_ALL)
 #define DRAW_CLIP (0 || DRAW_ALL)
 
 #define PRINT_LOG 0
@@ -630,41 +630,22 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionID *id, 
 
 // This one is less gross, but still gross.
 // TODO: Comment me!
-// TODO respect poly radius
 static int
 circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionID *id, cpContact *con)
 {
-	cpSplittingPlane *planes = poly->tPlanes;
+	struct SupportContext context = {(cpShape *)circle, (cpShape *)poly, 1, poly->numVerts, &circle->tc, poly->tVerts};
+	struct ClosestPoints points = GJK(&context, id);
 	
-	int numVerts = poly->numVerts;
-	int mini = 0;
-	cpFloat min = cpSplittingPlaneCompare(planes[0], circle->tc) - circle->r;
-	for(int i=0; i<poly->numVerts; i++){
-		cpFloat dist = cpSplittingPlaneCompare(planes[i], circle->tc) - circle->r;
-		if(dist > 0.0f){
-			return 0;
-		} else if(dist > min) {
-			min = dist;
-			mini = i;
-		}
-	}
+#if DRAW_CLOSEST
+	ChipmunkDebugDrawPoints(3.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
+#endif
 	
-	cpVect n = planes[mini].n;
-	cpVect a = poly->tVerts[(mini - 1 + numVerts)%numVerts];
-	cpVect b = poly->tVerts[mini];
-	cpFloat dta = cpvcross(n, a);
-	cpFloat dtb = cpvcross(n, b);
-	cpFloat dt = cpvcross(n, circle->tc);
-	
-	if(dt < dtb){
-		return circle2circleQuery(circle->tc, b, circle->r, poly->r, 0, con);
-	} else if(dt < dta) {
-		cpVect point = cpvsub(circle->tc, cpvmult(n, circle->r + min/2.0f));
-		cpContactInit(con, point, cpvneg(n), min, 0);
-	
-		return 1;
+	if(points.d - circle->r - poly->r <= 0.0){
+		return circle2circleQuery(circle->tc, points.b, circle->r, poly->r, 0, con);
 	} else {
-		return circle2circleQuery(circle->tc, a, circle->r, poly->r, 0, con);
+		return 0;
 	}
 }
 
