@@ -351,7 +351,7 @@ remove_orphaned_handles(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr)
 
 //MARK: Query Functions
 
-static inline void
+static inline cpQueryResult
 query_helper(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpatialIndexQueryFunc func, void *data)
 {
 	restart:
@@ -362,7 +362,7 @@ query_helper(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpatialIn
 		if(hand->stamp == hash->stamp || obj == other){
 			continue;
 		} else if(other){
-			func(obj, other, data);
+			cpQueryCall(func(obj, other, data), return cpQueryAbort);
 			hand->stamp = hash->stamp;
 		} else {
 			// The object for this handle has been removed
@@ -371,9 +371,10 @@ query_helper(cpSpaceHash *hash, cpSpaceHashBin **bin_ptr, void *obj, cpSpatialIn
 			goto restart; // GCC not smart enough/able to tail call an inlined function.
 		}
 	}
+	return cpQueryContinue;
 }
 
-static void
+static cpQueryResult
 cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, void *data)
 {
 	// Get the dimensions in cell coordinates.
@@ -389,11 +390,12 @@ cpSpaceHashQuery(cpSpaceHash *hash, void *obj, cpBB bb, cpSpatialIndexQueryFunc 
 	// Iterate over the cells and query them.
 	for(int i=l; i<=r; i++){
 		for(int j=b; j<=t; j++){
-			query_helper(hash, &table[hash_func(i,j,n)], obj, func, data);
+			cpQueryCall(query_helper(hash, &table[hash_func(i,j,n)], obj, func, data), return cpQueryAbort);
 		}
 	}
 	
 	hash->stamp++;
+	return cpQueryContinue;
 }
 
 // Similar to struct eachPair above.
