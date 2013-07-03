@@ -566,7 +566,7 @@ p(expl). @Destroy@ and @Free@ functions are shared by all shape types. Allocatio
 
 * @cpBB cpShapeCacheBB(cpShape *shape)@ - Synchronizes @shape@ with the body its attached to.
 * @cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot)@ - Sets the position and rotation of the shape to 
-* @void cpResetShapeIdCounter(void)@ - Chipmunk keeps a counter so that every new shape is given a unique hash value to be used in the spatial hash. Because this affects the order in which the collisions are found and handled, you can reset the shape counter every time you populate a space with new shapes. If you don't, there might be (very) slight differences in the simulation.
+* @void cpResetShapeIdCounter(void)@ - Chipmunk keeps a counter so that every new shape is given a unique hash value to be used in the spatial index. Because this affects the order in which the collisions are found and handled, you can reset the shape counter every time you populate a space with new shapes. If you don't, there might be (very) slight differences in the simulation.
 
 <%= h 2, "Working With Circle Shapes:", "Circles" %>
 
