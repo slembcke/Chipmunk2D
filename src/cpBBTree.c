@@ -346,17 +346,18 @@ SubtreeInsert(Node *subtree, Node *leaf, cpBBTree *tree)
 	}
 }
 
-static void
+static cpQueryResult
 SubtreeQuery(Node *subtree, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, void *data)
 {
 	if(cpBBIntersects(subtree->bb, bb)){
 		if(NodeIsLeaf(subtree)){
-			func(obj, subtree->obj, data);
+			return func(obj, subtree->obj, data);
 		} else {
-			SubtreeQuery(subtree->A, obj, bb, func, data);
-			SubtreeQuery(subtree->B, obj, bb, func, data);
+			cpQueryCall(SubtreeQuery(subtree->A, obj, bb, func, data), return cpQueryAbort);
+			cpQueryCall(SubtreeQuery(subtree->B, obj, bb, func, data), return cpQueryAbort);
 		}
 	}
+	return cpQueryContinue;
 }
 
 
@@ -513,7 +514,7 @@ LeafUpdate(Node *leaf, cpBBTree *tree)
 	return cpFalse;
 }
 
-static void VoidQueryFunc(void *obj1, void *obj2, void *data){}
+static cpQueryResult VoidQueryFunc(void *obj1, void *obj2, void *data){ return cpQueryContinue; }
 
 static void
 LeafAddPairs(Node *leaf, cpBBTree *tree)
@@ -673,10 +674,11 @@ cpBBTreeSegmentQuery(cpBBTree *tree, void *obj, cpVect a, cpVect b, cpFloat t_ex
 	if(root) SubtreeSegmentQuery(root, obj, a, b, t_exit, func, data);
 }
 
-static void
+static cpQueryResult
 cpBBTreeQuery(cpBBTree *tree, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, void *data)
 {
-	if(tree->root) SubtreeQuery(tree->root, obj, bb, func, data);
+	if(tree->root) return SubtreeQuery(tree->root, obj, bb, func, data);
+	return cpQueryContinue;
 }
 
 //MARK: Misc

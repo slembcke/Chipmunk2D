@@ -213,3 +213,20 @@ typedef struct cpMat2x2 {
 	// Row major [[a, b][c d]]
 	cpFloat a, b, c, d;
 } cpMat2x2;
+
+#ifndef CP_ABORT_QUERIES
+	// Default to not support aborting a query for backwards compatibility.
+	#define CP_ABORT_QUERIES 0
+#endif
+
+#if CP_ABORT_QUERIES
+	typedef cpBool cpQueryResult;
+	#define cpQueryContinue cpTrue
+	#define cpQueryAbort cpFalse
+	#define cpQueryCall(x, r) { if ((x) == cpQueryAbort) { r; } }
+#else
+	typedef void cpQueryResult;
+	#define cpQueryContinue
+	#define cpQueryAbort
+	#define cpQueryCall(x, r) (x)
+#endif

@@ -172,7 +172,7 @@ cpSweep1DReindex(cpSweep1D *sweep)
 
 //MARK: Query Functions
 
-static void
+static cpQueryResult
 cpSweep1DQuery(cpSweep1D *sweep, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, void *data)
 {
 	// Implementing binary search here would allow you to find an upper limit
@@ -183,8 +183,10 @@ cpSweep1DQuery(cpSweep1D *sweep, void *obj, cpBB bb, cpSpatialIndexQueryFunc fun
 	TableCell *table = sweep->table;
 	for(int i=0, count=sweep->num; i<count; i++){
 		TableCell cell = table[i];
-		if(BoundsOverlap(bounds, cell.bounds) && obj != cell.obj) func(obj, cell.obj, data);
+		if(BoundsOverlap(bounds, cell.bounds) && obj != cell.obj)
+			cpQueryCall(func(obj, cell.obj, data), return cpQueryAbort);
 	}
+	return cpQueryContinue;
 }
 
 static void
