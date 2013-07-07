@@ -214,7 +214,7 @@ cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *ver
 }
 
 cpShape *
-cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset)
+cpPolyShapeNew(cpBody *body, int numVerts, const cpVect *verts, cpVect offset)
 {
 	return (cpShape *)cpPolyShapeInit(cpPolyShapeAlloc(), body, numVerts, verts, offset);
 }
