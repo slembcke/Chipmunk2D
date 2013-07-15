@@ -35,7 +35,7 @@
 #if CP_USE_DOUBLES
 /// Chipmunk's floating point type.
 /// Can be reconfigured at compile time.
-#error crap
+#error ChipmunkUnity needs to use 32 bit floats
 	typedef double cpFloat;
 	#define cpfsqrt sqrt
 	#define cpfsin sin
