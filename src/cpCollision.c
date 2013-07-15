@@ -23,13 +23,13 @@
 #include <string.h>
 
 #include "chipmunk_private.h"
-#include "ChipmunkDemo.h"
+//#include "ChipmunkDemo.h"
 
 #if DEBUG
 #define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
-#define DRAW_CLOSEST (1 || DRAW_ALL)
+#define DRAW_CLOSEST (0 || DRAW_ALL)
 #define DRAW_CLIP (0 || DRAW_ALL)
 
 #define PRINT_LOG 0
@@ -159,9 +159,11 @@ SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 	
 	cpVect *verts = poly->tVerts;
 	if(cpvdot(n, poly->tPlanes[i1].n) > cpvdot(n, poly->tPlanes[i2].n)){
-		return (struct Edge){{verts[i0], CP_HASH_PAIR(poly, i0)}, {verts[i1], CP_HASH_PAIR(poly, i1)}, poly->r, poly->tPlanes[i1].n};
+		struct Edge edge = {{verts[i0], CP_HASH_PAIR(poly, i0)}, {verts[i1], CP_HASH_PAIR(poly, i1)}, poly->r, poly->tPlanes[i1].n};
+		return edge;
 	} else {
-		return (struct Edge){{verts[i1], CP_HASH_PAIR(poly, i1)}, {verts[i2], CP_HASH_PAIR(poly, i2)}, poly->r, poly->tPlanes[i2].n};
+		struct Edge edge = {{verts[i1], CP_HASH_PAIR(poly, i1)}, {verts[i2], CP_HASH_PAIR(poly, i2)}, poly->r, poly->tPlanes[i2].n};
+		return edge;
 	}
 }
 
@@ -169,9 +171,11 @@ static struct Edge
 SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
 {
 	if(cpvdot(seg->tn, n) > 0.0){
-		return (struct Edge){{seg->ta, CP_HASH_PAIR(seg, 0)}, {seg->tb, CP_HASH_PAIR(seg, 1)}, seg->r, seg->tn};
+		struct Edge edge = {{seg->ta, CP_HASH_PAIR(seg, 0)}, {seg->tb, CP_HASH_PAIR(seg, 1)}, seg->r, seg->tn};
+		return edge;
 	} else {
-		return (struct Edge){{seg->tb, CP_HASH_PAIR(seg, 1)}, {seg->ta, CP_HASH_PAIR(seg, 0)}, seg->r, cpvneg(seg->tn)};
+		struct Edge edge = {{seg->tb, CP_HASH_PAIR(seg, 1)}, {seg->ta, CP_HASH_PAIR(seg, 0)}, seg->r, cpvneg(seg->tn)};
+		return edge;
 	}
 }
 
@@ -264,7 +268,7 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 	cpFloat area2x = cpvcross(cpvsub(v1.ab, v0.ab), cpvadd(cpvsub(p.ab, v0.ab), cpvsub(p.ab, v1.ab)));
 	if(area2x > 0.0f && i < MAX_EPA_ITERATIONS){
 		int count2 = 1;
-		struct MinkowskiPoint *hull2 = alloca((count + 1)*sizeof(struct MinkowskiPoint));
+		struct MinkowskiPoint *hull2 = (struct MinkowskiPoint *)alloca((count + 1)*sizeof(struct MinkowskiPoint));
 		hull2[0] = p;
 		
 		for(int i=0; i<count; i++){
