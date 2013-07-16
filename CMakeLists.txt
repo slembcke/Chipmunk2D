@@ -25,7 +25,7 @@ option(BUILD_STATIC "Build as static library" ON)
 option(INSTALL_STATIC "Install the static library" ON)
 
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
-  option(USE_CLANG_BLOCKS "Force enable Clang blocks in Chipmunk" YES)
+  option(FORCE_CLANG_BLOCKS "Force enable Clang blocks" YES)
 endif()
 
 # sanity checks...
@@ -40,7 +40,7 @@ endif()
 
 if(NOT MSVC)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99") # always use gnu99
-  if(USE_CLANG_BLOCKS)
+  if(FORCE_CLANG_BLOCKS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fblocks")
   endif()
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -ffast-math") # extend release-profile with fast-math
