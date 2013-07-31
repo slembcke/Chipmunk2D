@@ -14,7 +14,9 @@ if(BUILD_SHARED)
     set_target_properties(chipmunk PROPERTIES LINKER_LANGUAGE CXX)
   endif(MSVC)
   # set the lib's version number
-  set_target_properties(chipmunk PROPERTIES VERSION 6.1.5)
+  if(NOT ANDROID)
+	  set_target_properties(chipmunk PROPERTIES VERSION 6.1.5)
+  endif(NOT ANDROID)
   install(TARGETS chipmunk RUNTIME DESTINATION lib LIBRARY DESTINATION lib)
 endif(BUILD_SHARED)
 

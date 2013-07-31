@@ -18,11 +18,19 @@ endif()
 # other options for the build, you can i.e. activate the shared library by passing
 #   -D BUILD_SHARED=ON
 # to cmake. Other options analog
-option(BUILD_DEMOS "Build the demo applications" ON)
-option(INSTALL_DEMOS "Install the demo applications" OFF)
-option(BUILD_SHARED "Build and install the shared library" ON)
-option(BUILD_STATIC "Build as static library" ON)
-option(INSTALL_STATIC "Install the static library" ON)
+if(ANDROID)
+  option(BUILD_DEMOS "Build the demo applications" OFF)
+  option(INSTALL_DEMOS "Install the demo applications" OFF)
+  option(BUILD_SHARED "Build and install the shared library" ON)
+  option(BUILD_STATIC "Build as static library" OFF)
+  option(INSTALL_STATIC "Install the static library" OFF)
+else()
+  option(BUILD_DEMOS "Build the demo applications" ON)
+  option(INSTALL_DEMOS "Install the demo applications" OFF)
+  option(BUILD_SHARED "Build and install the shared library" ON)
+  option(BUILD_STATIC "Build as static library" ON)
+  option(INSTALL_STATIC "Install the static library" ON)
+endif()
 
 # sanity checks...
 if(INSTALL_DEMOS)
