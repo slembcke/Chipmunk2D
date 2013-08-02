@@ -44,18 +44,28 @@ cpPolyShape* cpPolyShapeAlloc(void);
 /// Initialize a polygon shape.
 /// A convex hull will be created from the vertexes.
 cpPolyShape* cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset);
+/// Initialize a polygon shape.
+/// A convex hull will be created from the vertexes.
+cpPolyShape* cpPolyShapeInit2(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset, cpFloat radius);
 /// Allocate and initialize a polygon shape.
 /// A convex hull will be created from the vertexes.
 cpShape* cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset);
+/// Allocate and initialize a polygon shape.
+/// A convex hull will be created from the vertexes.
+cpShape* cpPolyShapeNew2(cpBody *body, int numVerts, cpVect *verts, cpVect offset, cpFloat radius);
 
 /// Initialize a box shaped polygon shape.
 cpPolyShape* cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height);
 /// Initialize an offset box shaped polygon shape.
 cpPolyShape* cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box);
+/// Initialize an offset box shaped polygon shape.
+cpPolyShape* cpBoxShapeInit3(cpPolyShape *poly, cpBody *body, cpBB box, cpFloat radius);
 /// Allocate and initialize a box shaped polygon shape.
 cpShape* cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height);
 /// Allocate and initialize an offset box shaped polygon shape.
 cpShape* cpBoxShapeNew2(cpBody *body, cpBB box);
+/// Allocate and initialize an offset box shaped polygon shape.
+cpShape* cpBoxShapeNew3(cpBody *body, cpBB box, cpFloat radius);
 
 /// Check that a set of vertexes is convex and has a clockwise winding.
 /// NOTE: Due to floating point precision issues, hulls created with cpQuickHull() are not guaranteed to validate!

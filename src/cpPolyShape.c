@@ -226,15 +226,28 @@ setUpVerts(cpPolyShape *poly, int numVerts, const cpVect *verts, cpVect offset)
 cpPolyShape *
 cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset)
 {
+	return cpPolyShapeInit2(poly, body, numVerts, verts, offset, 0.0f);
+}
+
+cpPolyShape *
+cpPolyShapeInit2(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset, cpFloat radius)
+{
 	setUpVerts(poly, numVerts, verts, offset);
 	cpShapeInit((cpShape *)poly, &polyClass, body);
-	poly->r = 0.0f;
+	poly->r = radius;
 
 	return poly;
 }
 
+
 cpShape *
 cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset)
+{
+	return cpPolyShapeNew2(body, numVerts, verts, offset, 0.0f);
+}
+
+cpShape *
+cpPolyShapeNew2(cpBody *body, int numVerts, cpVect *verts, cpVect offset, cpFloat radius)
 {
 	return (cpShape *)cpPolyShapeInit(cpPolyShapeAlloc(), body, numVerts, verts, offset);
 }
@@ -251,6 +264,12 @@ cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height)
 cpPolyShape *
 cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box)
 {
+	return cpBoxShapeInit3(poly, body, box, 0.0f);
+}
+
+cpPolyShape *
+cpBoxShapeInit3(cpPolyShape *poly, cpBody *body, cpBB box, cpFloat radius)
+{
 	cpVect verts[] = {
 		cpv(box.l, box.b),
 		cpv(box.l, box.t),
@@ -258,7 +277,7 @@ cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box)
 		cpv(box.r, box.b),
 	};
 	
-	return cpPolyShapeInit(poly, body, 4, verts, cpvzero);
+	return cpPolyShapeInit2(poly, body, 4, verts, cpvzero, radius);
 }
 
 cpShape *
