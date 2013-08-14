@@ -86,7 +86,7 @@ playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 }
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
 	int jumpState = (ChipmunkDemoKeyboard.y > 0.0f);
 	
@@ -99,15 +99,10 @@ update(cpSpace *space)
 	}
 	
 	// Step the space
-	int steps = 3;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
+	cpSpaceStep(space, dt);
 	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-		
-		remainingBoost -= dt;
-		lastJumpState = jumpState;
-	}
+	remainingBoost -= dt;
+	lastJumpState = jumpState;
 }
 
 static cpSpace *
@@ -174,6 +169,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Player = {
 	"Platformer Player Controls",
+	1.0/180.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

@@ -33,14 +33,17 @@ static inline Color LAColor(float l, float a){
 	return color;
 }
 
-extern float ChipmunkDebugDrawPointLineScale;
+void ChipmunkDebugDrawInit(void);
 
-void ChipmunkDebugDrawCircle(cpVect center, cpFloat angle, cpFloat radius, Color lineColor, Color fillColor);
+extern float ChipmunkDebugDrawPointLineScale;
+extern float ChipmunkDebugDrawOutlineWidth;
+
+void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, Color outlineColor, Color fillColor);
 void ChipmunkDebugDrawSegment(cpVect a, cpVect b, Color color);
-void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, Color lineColor, Color fillColor);
-void ChipmunkDebugDrawPolygon(int count, cpVect *verts, Color lineColor, Color fillColor);
-void ChipmunkDebugDrawPoints(cpFloat size, int count, cpVect *verts, Color color);
-void ChipmunkDebugDrawBB(cpBB bb, Color color);
+void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, Color outlineColor, Color fillColor);
+void ChipmunkDebugDrawPolygon(int count, cpVect *verts, cpFloat radius, Color outlineColor, Color fillColor);
+void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, Color fillColor);
+void ChipmunkDebugDrawBB(cpBB bb, Color outlineColor);
 
 void ChipmunkDebugDrawConstraint(cpConstraint *constraint);
 void ChipmunkDebugDrawShape(cpShape *shape);
@@ -48,3 +51,8 @@ void ChipmunkDebugDrawShape(cpShape *shape);
 void ChipmunkDebugDrawShapes(cpSpace *space);
 void ChipmunkDebugDrawConstraints(cpSpace *space);
 void ChipmunkDebugDrawCollisionPoints(cpSpace *space);
+
+// Call this at the end of the frame to draw the ChipmunkDebugDraw*() commands to the screen.
+void ChipmunkDebugDrawFlushRenderer(void);
+// Call this at the beginning of the frame to clear out any ChipmunkDebugDraw*() commands.
+void ChipmunkDebugDrawClearRenderer(void);

@@ -25,18 +25,13 @@
 static cpVect QUERY_START = {0,0};
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
 	if(ChipmunkDemoRightClick){
 		QUERY_START = ChipmunkDemoMouse;
 	}
 	
-	int steps = 1;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-	}
+	cpSpaceStep(space, dt);
 }
 
 static void
@@ -61,7 +56,7 @@ draw(cpSpace *space)
 		ChipmunkDebugDrawSegment(point, cpvadd(point, cpvmult(segInfo.n, 16)), RGBAColor(0,0,1,1));
 		
 		// Draw a little red dot on the hit point.
-		ChipmunkDebugDrawPoints(3, 1, &point, RGBAColor(1,0,0,1));
+		ChipmunkDebugDrawDot(3, point, RGBAColor(1,0,0,1));
 
 		
 		ChipmunkDemoPrintString("Segment Query: Dist(%f) Normal%s", cpSegmentQueryHitDist(start, end, segInfo), cpvstr(segInfo.n));
@@ -73,7 +68,7 @@ draw(cpSpace *space)
 	cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 100.0, CP_ALL_LAYERS, CP_NO_GROUP, &nearestInfo);
 	if(nearestInfo.shape){
 		// Draw a grey line to the closest shape.
-		ChipmunkDebugDrawPoints(3, 1, &ChipmunkDemoMouse, RGBAColor(0.5, 0.5, 0.5, 1.0));
+		ChipmunkDebugDrawDot(3, ChipmunkDemoMouse, RGBAColor(0.5, 0.5, 0.5, 1.0));
 		ChipmunkDebugDrawSegment(ChipmunkDemoMouse, nearestInfo.p, 	RGBAColor(0.5, 0.5, 0.5, 1.0));
 		
 		// Draw a red bounding box around the shape under the mouse.
@@ -142,6 +137,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Query = {
 	"Segment Query",
+	1.0/60.0,
 	init,
 	update,
 	draw,

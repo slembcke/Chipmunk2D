@@ -31,19 +31,14 @@
 static cpConstraint *motor;
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
 	cpFloat coef = (2.0f + ChipmunkDemoKeyboard.y)/3.0f;
 	cpFloat rate = ChipmunkDemoKeyboard.x*10.0f*coef;
 	cpSimpleMotorSetRate(motor, rate);
 	cpConstraintSetMaxForce(motor, (rate) ? 100000.0f : 0.0f);
 	
-	int steps = 3;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-	}
+	cpSpaceStep(space, dt);
 }
 
 static cpFloat seg_radius = 3.0f;
@@ -164,6 +159,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo TheoJansen = {
 	"Theo Jansen Machine",
+	1.0/180.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

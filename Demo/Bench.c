@@ -443,8 +443,8 @@ static cpSpace *init_NoCollide(){
 
 
 // Build benchmark list
-static void update(cpSpace *space){
-	BENCH_SPACE_STEP(space, 1.0f/60.0f);
+static void update(cpSpace *space, double dt){
+	BENCH_SPACE_STEP(space, dt);
 }
 
 static void destroy(cpSpace *space){
@@ -455,13 +455,14 @@ static void destroy(cpSpace *space){
 // Make a second demo declaration for this demo to use in the regular demo set.
 ChipmunkDemo BouncyHexagons = {
 	"Bouncy Hexagons",
+	1.0/60.0,
 	init_BouncyTerrainHexagons_500,
 	update,
 	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };
 
-#define BENCH(n) {"benchmark - " #n, init_##n, update, 	ChipmunkDemoDefaultDrawImpl, destroy}
+#define BENCH(n) {"benchmark - " #n, 1.0/60.0, init_##n, update, 	ChipmunkDemoDefaultDrawImpl, destroy}
 ChipmunkDemo bench_list[] = {
 	BENCH(SimpleTerrainCircles_1000),
 	BENCH(SimpleTerrainCircles_500),

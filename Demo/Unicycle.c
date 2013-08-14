@@ -63,14 +63,9 @@ static void motor_preSolve(cpConstraint *motor, cpSpace *space)
 
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	int steps = 1;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-	}
+	cpSpaceStep(space, dt);
 }
 
 static cpSpace *
@@ -172,6 +167,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Unicycle = {
 	"Unicycle",
+	1.0/60.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

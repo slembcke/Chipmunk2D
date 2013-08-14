@@ -24,14 +24,9 @@
 #include "chipmunk_unsafe.h"
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	int steps = 3;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-	}
+	cpSpaceStep(space, dt);
 }
 
 static cpSpace *
@@ -95,6 +90,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo PyramidStack = {
 	"Pyramid Stack",
+	1.0/180.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

@@ -41,14 +41,9 @@ new_spring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLengt
 }
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	int steps = 1;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-	}
+	cpSpaceStep(space, dt);
 }
 
 static cpBody *
@@ -159,6 +154,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Springies = {
 	"Springies",
+	1.0/60.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

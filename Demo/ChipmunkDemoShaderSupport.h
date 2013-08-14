@@ -19,44 +19,9 @@
  * SOFTWARE.
  */
 
-#include "ChipmunkDebugDraw.h"
+void CheckGLErrors(void);
+#define CHECK_GL_ERRORS() CheckGLErrors()
 
-typedef struct ChipmunkDemo ChipmunkDemo;
-
-typedef cpSpace *(*ChipmunkDemoInitFunc)(void);
-typedef void (*ChipmunkDemoUpdateFunc)(cpSpace *space, double dt);
-typedef void (*ChipmunkDemoDrawFunc)(cpSpace *space);
-typedef void (*ChipmunkDemoDestroyFunc)(cpSpace *space);
-
-struct ChipmunkDemo {
-	const char *name;
-	double timestep;
- 
-	ChipmunkDemoInitFunc initFunc;
-	ChipmunkDemoUpdateFunc updateFunc;
-	ChipmunkDemoDrawFunc drawFunc;
-	
-	ChipmunkDemoDestroyFunc destroyFunc;
-};
-
-static inline cpFloat
-frand(void)
-{
-	return (cpFloat)rand()/(cpFloat)RAND_MAX;
-}
-
-extern int ChipmunkDemoTicks;
-extern double ChipmunkDemoTime;
-extern cpVect ChipmunkDemoKeyboard;
-extern cpVect ChipmunkDemoMouse;
-extern cpBool ChipmunkDemoRightClick;
-extern cpBool ChipmunkDemoRightDown;
-
-extern char *ChipmunkDemoMessageString;
-void ChipmunkDemoPrintString(char *fmt, ...);
-
-#define GRABABLE_MASK_BIT (1<<31)
-#define NOT_GRABABLE_MASK (~GRABABLE_MASK_BIT)
-
-void ChipmunkDemoDefaultDrawImpl(cpSpace *space);
-void ChipmunkDemoFreeSpaceChildren(cpSpace *space);
+GLint CompileShader(GLenum type, const char *source);
+GLint LinkProgram(GLint vshader, GLint fshader);
+cpBool ValidateProgram(GLint program);
