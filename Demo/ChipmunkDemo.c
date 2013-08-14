@@ -261,7 +261,13 @@ Display(void)
 	glScalef(scale, scale, 1.0f);
 	
 	demos[demo_index].drawFunc(space);
+	
+	// Highlight the shape under the mouse because it looks neat.
+	cpShape *nearest = cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 0.0f, CP_ALL_LAYERS, CP_NO_GROUP, NULL);
+	if(nearest) ChipmunkDebugDrawShape(nearest, RGBAColor(1.0f, 0.0f, 0.0f, 1.0f), LAColor(0.0f, 0.0f));
+	
 	Update();
+	
 	
 //	glMatrixMode(GL_MODELVIEW);
 //	glPushMatrix(); {

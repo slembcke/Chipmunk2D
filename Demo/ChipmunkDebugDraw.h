@@ -46,7 +46,7 @@ void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, Color fillColor);
 void ChipmunkDebugDrawBB(cpBB bb, Color outlineColor);
 
 void ChipmunkDebugDrawConstraint(cpConstraint *constraint);
-void ChipmunkDebugDrawShape(cpShape *shape);
+void ChipmunkDebugDrawShape(cpShape *shape, Color outlineColor, Color fillColor);
 
 void ChipmunkDebugDrawShapes(cpSpace *space);
 void ChipmunkDebugDrawConstraints(cpSpace *space);

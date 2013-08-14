@@ -126,7 +126,7 @@ cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *info
 
 cpBool
 cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info){
-	cpSegmentQueryInfo blank = {NULL, 0.0f, cpvzero};
+	cpSegmentQueryInfo blank = {NULL, 1.0f, cpvzero};
 	if(info){
 		(*info) = blank;
 	} else {
@@ -175,31 +175,9 @@ cpCicleShapeNearestPointQuery(cpCircleShape *circle, cpVect p, cpNearestPointQue
 }
 
 static void
-circleSegmentQuery(cpShape *shape, cpVect center, cpFloat r, cpVect a, cpVect b, cpSegmentQueryInfo *info)
-{
-	cpVect da = cpvsub(a, center);
-	cpVect db = cpvsub(b, center);
-	
-	cpFloat qa = cpvdot(da, da) - 2.0f*cpvdot(da, db) + cpvdot(db, db);
-	cpFloat qb = -2.0f*cpvdot(da, da) + 2.0f*cpvdot(da, db);
-	cpFloat qc = cpvdot(da, da) - r*r;
-	
-	cpFloat det = qb*qb - 4.0f*qa*qc;
-	
-	if(det >= 0.0f){
-		cpFloat t = (-qb - cpfsqrt(det))/(2.0f*qa);
-		if(0.0f<= t && t <= 1.0f){
-			info->shape = shape;
-			info->t = t;
-			info->n = cpvnormalize(cpvlerp(da, db, t));
-		}
-	}
-}
-
-static void
 cpCircleShapeSegmentQuery(cpCircleShape *circle, cpVect a, cpVect b, cpSegmentQueryInfo *info)
 {
-	circleSegmentQuery((cpShape *)circle, circle->tc, circle->r, a, b, info);
+	CircleSegmentQuery((cpShape *)circle, circle->tc, circle->r, a, b, info);
 }
 
 static const cpShapeClass cpCircleShapeClass = {
@@ -311,8 +289,8 @@ cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpSegmentQue
 	} else if(r != 0.0f){
 		cpSegmentQueryInfo info1 = {NULL, 1.0f, cpvzero};
 		cpSegmentQueryInfo info2 = {NULL, 1.0f, cpvzero};
-		circleSegmentQuery((cpShape *)seg, seg->ta, seg->r, a, b, &info1);
-		circleSegmentQuery((cpShape *)seg, seg->tb, seg->r, a, b, &info2);
+		CircleSegmentQuery((cpShape *)seg, seg->ta, seg->r, a, b, &info1);
+		CircleSegmentQuery((cpShape *)seg, seg->tb, seg->r, a, b, &info2);
 		
 		if(info1.t < info2.t){
 			(*info) = info1;

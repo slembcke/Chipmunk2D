@@ -382,40 +382,44 @@ void ChipmunkDebugDrawBB(cpBB bb, Color color)
 	ChipmunkDebugDrawPolygon(4, verts, 0.0f, color, LAColor(0, 0));
 }
 
+struct ShapeColors {Color outlineColor, fillColor;};
+
 static void
-drawShape(cpShape *shape, void *unused)
+DrawShape(cpShape *shape, struct ShapeColors *colors)
 {
 	cpBody *body = shape->body;
-	Color color = ColorForShape(shape);
+	Color fill_color = (colors ? colors->fillColor : ColorForShape(shape));
+	Color outline_color = (colors ? colors->outlineColor : LINE_COLOR);
 	
 	switch(shape->klass->type){
 		case CP_CIRCLE_SHAPE: {
 			cpCircleShape *circle = (cpCircleShape *)shape;
-			ChipmunkDebugDrawCircle(circle->tc, body->a, circle->r, LINE_COLOR, color);
+			ChipmunkDebugDrawCircle(circle->tc, body->a, circle->r, outline_color, fill_color);
 			break;
 		}
 		case CP_SEGMENT_SHAPE: {
 			cpSegmentShape *seg = (cpSegmentShape *)shape;
-			ChipmunkDebugDrawFatSegment(seg->ta, seg->tb, seg->r, LINE_COLOR, color);
+			ChipmunkDebugDrawFatSegment(seg->ta, seg->tb, seg->r, outline_color, fill_color);
 			break;
 		}
 		case CP_POLY_SHAPE: {
 			cpPolyShape *poly = (cpPolyShape *)shape;
-			ChipmunkDebugDrawPolygon(poly->numVerts, poly->tVerts, poly->r, LINE_COLOR, color);
+			ChipmunkDebugDrawPolygon(poly->numVerts, poly->tVerts, poly->r, outline_color, fill_color);
 			break;
 		}
 		default: break;
 	}
 }
 
-void ChipmunkDebugDrawShape(cpShape *shape)
+void ChipmunkDebugDrawShape(cpShape *shape, Color outlineColor, Color fillColor)
 {
-	drawShape(shape, NULL);
+	struct ShapeColors colors = {outlineColor, fillColor};
+	DrawShape(shape, (outlineColor.a == 0.0 && fillColor.a == 0.0 ? NULL : &colors));
 }
 
 void ChipmunkDebugDrawShapes(cpSpace *space)
 {
-	cpSpaceEachShape(space, drawShape, NULL);
+	cpSpaceEachShape(space, (cpSpaceShapeIteratorFunc)DrawShape, NULL);
 }
 
 static const cpVect spring_verts[] = {
