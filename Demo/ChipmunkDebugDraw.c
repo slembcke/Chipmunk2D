@@ -418,24 +418,24 @@ void ChipmunkDebugDrawShapes(cpSpace *space)
 	cpSpaceEachShape(space, drawShape, NULL);
 }
 
-static const GLfloat springVAR[] = {
-	0.00f, 0.0f,
-	0.20f, 0.0f,
-	0.25f, 3.0f,
-	0.30f,-6.0f,
-	0.35f, 6.0f,
-	0.40f,-6.0f,
-	0.45f, 6.0f,
-	0.50f,-6.0f,
-	0.55f, 6.0f,
-	0.60f,-6.0f,
-	0.65f, 6.0f,
-	0.70f,-3.0f,
-	0.75f, 6.0f,
-	0.80f, 0.0f,
-	1.00f, 0.0f,
+static const cpVect spring_verts[] = {
+	{0.00f, 0.0f},
+	{0.20f, 0.0f},
+	{0.25f, 3.0f},
+	{0.30f,-6.0f},
+	{0.35f, 6.0f},
+	{0.40f,-6.0f},
+	{0.45f, 6.0f},
+	{0.50f,-6.0f},
+	{0.55f, 6.0f},
+	{0.60f,-6.0f},
+	{0.65f, 6.0f},
+	{0.70f,-3.0f},
+	{0.75f, 6.0f},
+	{0.80f, 0.0f},
+	{1.00f, 0.0f},
 };
-static const int springVAR_count = sizeof(springVAR)/sizeof(GLfloat)/2;
+static const int spring_count = sizeof(spring_verts)/sizeof(cpVect);
 
 static void
 drawSpring(cpDampedSpring *spring, cpBody *body_a, cpBody *body_b)
@@ -447,25 +447,22 @@ drawSpring(cpDampedSpring *spring, cpBody *body_a, cpBody *body_b)
 	ChipmunkDebugDrawDot(5, b, CONSTRAINT_COLOR);
 
 	cpVect delta = cpvsub(b, a);
-
-	// TODO
-//	glPushMatrix(); {
-//		GLfloat x = a.x;
-//		GLfloat y = a.y;
-//		GLfloat cos = delta.x;
-//		GLfloat sin = delta.y;
-//		GLfloat s = 1.0f/cpvlength(delta);
-//
-//		const GLfloat matrix[] = {
-//				 cos,    sin, 0.0f, 0.0f,
-//			-sin*s,  cos*s, 0.0f, 0.0f,
-//				0.0f,   0.0f, 1.0f, 0.0f,
-//					 x,      y, 0.0f, 1.0f,
-//		};
-//		
-//		glMultMatrixf(matrix);
-//		glDrawArrays(GL_LINE_STRIP, 0, springVAR_count);
-//	} glPopMatrix();
+	GLfloat cos = delta.x;
+	GLfloat sin = delta.y;
+	GLfloat s = 1.0f/cpvlength(delta);
+	
+	cpVect r1 = cpv(cos, -sin*s);
+	cpVect r2 = cpv(sin,  cos*s);
+	
+	cpVect *verts = alloca(spring_count*sizeof(cpVect));
+	for(int i=0; i<spring_count; i++){
+		cpVect v = spring_verts[i];
+		verts[i] = cpv(cpvdot(v, r1) + a.x, cpvdot(v, r2) + a.y);
+	}
+	
+	for(int i=0; i<spring_count-1; i++){
+		ChipmunkDebugDrawSegment(verts[i], verts[i + 1], CONSTRAINT_COLOR);
+	}
 }
 
 static void
