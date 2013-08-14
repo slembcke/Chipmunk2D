@@ -135,13 +135,13 @@ init(void)
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	// Set up the player
-	cpFloat radius = 25.0f;
 	body = cpSpaceAddBody(space, cpBodyNew(1.0f, INFINITY));
 	body->p = cpv(0, -200);
 	body->velocity_func = playerUpdateVelocity;
 	playerBody = body;
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(playerBody, cpvzero, cpv(0, radius), radius));
+	shape = cpSpaceAddShape(space, cpBoxShapeNew3(body, cpBBNew(-15.0, -27.5, 15.0, 27.5), 10.0));
+//	shape = cpSpaceAddShape(space, cpSegmentShapeNew(playerBody, cpvzero, cpv(0, radius), radius));
 	shape->e = 0.0f; shape->u = 0.0f;
 	shape->collision_type = 1;
 	playerShape = shape;

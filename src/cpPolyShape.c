@@ -249,7 +249,7 @@ cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset)
 cpShape *
 cpPolyShapeNew2(cpBody *body, int numVerts, cpVect *verts, cpVect offset, cpFloat radius)
 {
-	return (cpShape *)cpPolyShapeInit(cpPolyShapeAlloc(), body, numVerts, verts, offset);
+	return (cpShape *)cpPolyShapeInit2(cpPolyShapeAlloc(), body, numVerts, verts, offset, radius);
 }
 
 cpPolyShape *
@@ -290,6 +290,12 @@ cpShape *
 cpBoxShapeNew2(cpBody *body, cpBB box)
 {
 	return (cpShape *)cpBoxShapeInit2(cpPolyShapeAlloc(), body, box);
+}
+
+cpShape *
+cpBoxShapeNew3(cpBody *body, cpBB box, cpFloat radius)
+{
+	return (cpShape *)cpBoxShapeInit3(cpPolyShapeAlloc(), body, box, radius);
 }
 
 // Unsafe API (chipmunk_unsafe.h)
