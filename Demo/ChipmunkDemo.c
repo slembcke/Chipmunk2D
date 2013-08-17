@@ -49,6 +49,7 @@
 
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
+#include "ChipmunkDemoTextSupport.h"
 
 static ChipmunkDemo *demos;
 static int demo_count = 0;
@@ -124,29 +125,10 @@ void ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 	ChipmunkDebugDrawCollisionPoints(space);
 }
 
-
-static void
-DrawString(int x, int y, const char *str)
-{
-//	glColor3f(1.0f, 1.0f, 1.0f);
-//	glRasterPos2i(x, y);
-//	
-//	for(int i=0, len=strlen(str); i<len; i++){
-//		if(str[i] == '\n'){
-//			y -= 16;
-//			glRasterPos2i(x, y);
-//		} else if(str[i] == '*'){ // print out the last demo key
-//			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, 'A' + demoCount - 1);
-//		} else {
-//			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, str[i]);
-//		}
-//	}
-}
-
 static void
 DrawInstructions()
 {
-	DrawString(-300, 220,
+	ChipmunkDemoTextDrawString(cpv(-300, 220),
 		"Controls:\n"
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
@@ -197,7 +179,7 @@ DrawInfo()
 		ChipmunkDemoTime, (ke < 1e-10f ? 0.0f : ke)
 	);
 	
-	DrawString(0, 220, buffer);
+	ChipmunkDemoTextDrawString(cpv(0, 220), buffer);
 }
 
 static char PrintStringBuffer[1024*8];
@@ -268,19 +250,22 @@ Display(void)
 	
 	Update();
 	
-	
-//	glMatrixMode(GL_MODELVIEW);
-//	glPushMatrix(); {
-//		// Draw the text at fixed positions,
-//		// but save the drawing matrix for the mouse picking
-//		glLoadIdentity();
-//		
-//		DrawInstructions();
-//		DrawInfo();
-//		DrawString(-300, -200, ChipmunkDemoMessageString);
-//	} glPopMatrix();
-	
 	ChipmunkDebugDrawFlushRenderer();
+	
+	// Now render all the UI text.
+	DrawInstructions();
+	DrawInfo();
+	ChipmunkDemoTextDrawString(cpv(-300, -200), ChipmunkDemoMessageString);
+	
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix(); {
+		// Draw the text at fixed positions,
+		// but save the drawing matrix for the mouse picking
+		glLoadIdentity();
+		
+		ChipmunkDemoTextFlushRenderer();
+	} glPopMatrix();
+	
 	glfwSwapBuffers();
 	glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -455,6 +440,7 @@ SetupGL(void)
 	cpAssertHard(GLEW_ARB_vertex_array_object, "Requires VAO support.");
 	
 	ChipmunkDebugDrawInit();
+	ChipmunkDemoTextInit();
 	
 	glClearColor(52.0/255.0, 62.0/255.0, 72.0/255.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);

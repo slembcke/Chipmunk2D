@@ -110,6 +110,7 @@
 		D3E4A9CA0E99683200EE08BA /* cpPivotJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA40E98260200A3D7FA /* cpPivotJoint.c */; };
 		D3E4A9CC0E99683200EE08BA /* cpGrooveJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */; };
 		D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0540AA3303F004E361B /* OpenGL.framework */; };
+		D3E76CFC17BFE2340068C3C3 /* ChipmunkDemoTextSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E76CFB17BFDD930068C3C3 /* ChipmunkDemoTextSupport.c */; };
 		D3EEF8A117BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = D3EEF8A017BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c */; };
 		D3EEF8A617BAC098006B62EB /* libGLEW.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D3EEF8A517BAC098006B62EB /* libGLEW.a */; };
 		D3F2EE2F14F898E9005FD439 /* Unicycle.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F2EE2E14F898E9005FD439 /* Unicycle.c */; };
@@ -219,6 +220,9 @@
 		D3E5F2DA0AAA5622004E361B /* cpBB.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpBB.c; sourceTree = "<group>"; };
 		D3E5F2DD0AAA562B004E361B /* cpArray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpArray.c; sourceTree = "<group>"; };
 		D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpSpaceHash.c; sourceTree = "<group>"; };
+		D3E76CF917BFDD220068C3C3 /* VeraMoBI.ttf_sdf.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VeraMoBI.ttf_sdf.h; sourceTree = "<group>"; };
+		D3E76CFA17BFDD820068C3C3 /* ChipmunkDemoTextSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemoTextSupport.h; sourceTree = "<group>"; };
+		D3E76CFB17BFDD930068C3C3 /* ChipmunkDemoTextSupport.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ChipmunkDemoTextSupport.c; sourceTree = "<group>"; };
 		D3EEF8A017BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ChipmunkDemoShaderSupport.c; sourceTree = "<group>"; };
 		D3EEF8A217BAB5C0006B62EB /* ChipmunkDemoShaderSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemoShaderSupport.h; sourceTree = "<group>"; };
 		D3EEF8A417BAC098006B62EB /* glew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glew.h; sourceTree = "<group>"; };
@@ -341,6 +345,9 @@
 				D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */,
 				D3EEF8A217BAB5C0006B62EB /* ChipmunkDemoShaderSupport.h */,
 				D3EEF8A017BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c */,
+				D3E76CF917BFDD220068C3C3 /* VeraMoBI.ttf_sdf.h */,
+				D3E76CFA17BFDD820068C3C3 /* ChipmunkDemoTextSupport.h */,
+				D3E76CFB17BFDD930068C3C3 /* ChipmunkDemoTextSupport.c */,
 				D3CCDF460AE35D920080442F /* LogoSmash.c */,
 				D3BAF9C40E9C4F250039DD5C /* PyramidStack.c */,
 				D3BAFA030E9C52810039DD5C /* Plink.c */,
@@ -649,6 +656,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D3E76CFC17BFE2340068C3C3 /* ChipmunkDemoTextSupport.c in Sources */,
 				D3BC99C10AB381EE0025A2C0 /* ChipmunkDemo.c in Sources */,
 				D37697200B50C53900BB33CC /* LogoSmash.c in Sources */,
 				D3FBA1A70E9B1E0400950BCC /* ChipmunkDebugDraw.c in Sources */,

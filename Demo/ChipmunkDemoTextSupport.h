@@ -19,16 +19,9 @@
  * SOFTWARE.
  */
 
-void CheckGLErrors(void);
-#define CHECK_GL_ERRORS() CheckGLErrors()
+#include "chipmunk.h"
 
-GLint CompileShader(GLenum type, const char *source);
-GLint LinkProgram(GLint vshader, GLint fshader);
-cpBool ValidateProgram(GLint program);
-
-#define GLSL(x) #x
-
-void SetAttribute(GLuint program, char *name, GLint size, GLenum gltype, GLsizei stride, GLvoid *offset);
-
-#define SET_ATTRIBUTE(program, type, name, gltype)\
-	SetAttribute(program, #name, sizeof(((type *)NULL)->name)/sizeof(GLfloat), gltype, sizeof(type), (GLvoid *)offsetof(type, name))
+void ChipmunkDemoTextInit(void);
+//#define ChipmunkDemoTextDrawString(...)
+void ChipmunkDemoTextDrawString(cpVect pos, char *str);
+void ChipmunkDemoTextFlushRenderer(void);

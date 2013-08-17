@@ -65,19 +65,6 @@ typedef struct Triangle {Vertex a, b, c;} Triangle;
 static GLuint vao = 0;
 static GLuint vbo = 0;
 
-#define GLSL(x) #x
-
-static void
-SetAttribute(GLuint program, char *name, GLint size, GLenum gltype, GLsizei stride, GLvoid *offset)
-{
-	GLint index = glGetAttribLocation(program, name);
-	glEnableVertexAttribArray(index);
-	glVertexAttribPointer(index, size, gltype, GL_FALSE, stride, offset);
-}
-
-#define SET_ATTRIBUTE(program, type, name, gltype)\
-	SetAttribute(program, #name, sizeof(((type *)NULL)->name)/sizeof(GLfloat), gltype, sizeof(type), (GLvoid *)offsetof(type, name))
-
 void
 ChipmunkDebugDrawInit(void)
 {
@@ -316,7 +303,7 @@ void ChipmunkDebugDrawPolygon(int count, cpVect *verts, cpFloat radius, Color ou
 	Triangle *triangles = PushTriangles(5*count - 2);
 	Triangle *cursor = triangles;
 	
-	cpFloat inset = cpfmax(0.0f, ChipmunkDebugDrawPointLineScale - radius);
+	cpFloat inset = cpfmax(0.0f, 1 - radius);
 	for(int i=0; i<count-2; i++){
 		cpVect v0 = cpvsub(verts[  0], cpvmult(extrude[  0].offset, inset));
 		cpVect v1 = cpvsub(verts[i+1], cpvmult(extrude[i+1].offset, inset));
@@ -325,7 +312,7 @@ void ChipmunkDebugDrawPolygon(int count, cpVect *verts, cpFloat radius, Color ou
 		*cursor++ = (Triangle){{v0, cpvzero, fillColor, fillColor}, {v1, cpvzero, fillColor, fillColor}, {v2, cpvzero, fillColor, fillColor}};
 	}
 	
-	cpFloat outset = inset + ChipmunkDebugDrawPointLineScale + radius;
+	cpFloat outset = inset + 1 + radius;
 	for(int i=0, j=count-1; i<count; j=i, i++){
 		cpVect v0 = verts[i];
 		cpVect v1 = verts[j];

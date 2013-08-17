@@ -107,3 +107,11 @@ ValidateProgram(GLint program)
 	// TODO
 	return cpTrue;
 }
+
+void
+SetAttribute(GLuint program, char *name, GLint size, GLenum gltype, GLsizei stride, GLvoid *offset)
+{
+	GLint index = glGetAttribLocation(program, name);
+	glEnableVertexAttribArray(index);
+	glVertexAttribPointer(index, size, gltype, GL_FALSE, stride, offset);
+}
