@@ -37,11 +37,11 @@
 #include "ChipmunkDemoShaderSupport.h"
 #include "ChipmunkDemoTextSupport.h"
 
-#include "VeraMoBI.ttf_sdf.h"
+#include "VeraMoBd.ttf_sdf.h"
 
 //#define Scale 3.0f
-#define Scale 0.25f
-#define LineHeight (36.0f*Scale)
+#define Scale 0.70f
+#define LineHeight (18.0f*Scale)
 
 static GLuint program;
 static GLuint texture;
@@ -91,8 +91,8 @@ ChipmunkDemoTextInit(void)
 		{
 			float sdf = texture2D(u_texture, v_tex_coord).a;
 			
-			float fw = fwidth(sdf)*0.5;
-			//float fw = length(vec2(dFdx(alpha), dFdy(alpha)));
+			//float fw = fwidth(sdf)*0.5;
+			float fw = length(vec2(dFdx(sdf), dFdy(sdf)))*0.5;
 			
 			float alpha = aa_step(0.5 - fw, 0.5 + fw, sdf);
 			gl_FragColor = v_color*(v_color.a*alpha);
