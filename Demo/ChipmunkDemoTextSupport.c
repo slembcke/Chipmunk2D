@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+#include <string.h>
+
 #ifdef __APPLE__
 	#include "OpenGL/gl.h"
 	#include "OpenGL/glu.h"
@@ -141,6 +143,8 @@ ChipmunkDemoTextInit(void)
 		glyph_indexes[char_index] = i;
 	}
 }
+
+#define MAX(__a__, __b__) (__a__ > __b__ ? __a__ : __b__)
 
 static size_t triangle_capacity = 0;
 static size_t triangle_count = 0;

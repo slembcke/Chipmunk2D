@@ -21,6 +21,7 @@
 
 #include <limits.h>
 #include <string.h>
+#include <stdio.h>
 
 #ifdef __APPLE__
 	#include "OpenGL/gl.h"
@@ -66,9 +67,9 @@ CheckError(GLint obj, GLenum status, GETIV getiv, GETINFOLOG getInfoLog)
 		getInfoLog(obj, length, NULL, log);
 		
 		fprintf(stderr, "Shader compile error for 0x%04X: %s\n", status, log);
-		return false;
+		return cpFalse;
 	} else {
-		return true;
+		return cpTrue;
 	}
 }
 

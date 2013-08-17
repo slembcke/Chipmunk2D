@@ -63,7 +63,7 @@ static cpSpace *space;
 static double Accumulator = 0.0;
 static double LastTime = 0.0;
 int ChipmunkDemoTicks = 0;
-cpFloat ChipmunkDemoTime;
+double ChipmunkDemoTime;
 
 cpVect ChipmunkDemoMouse;
 cpBool ChipmunkDemoRightClick = cpFalse;
@@ -429,7 +429,7 @@ WindowClose()
 	glfwTerminate();
 	exit(EXIT_SUCCESS);
 	
-	return TRUE;
+	return GL_TRUE;
 }
 
 static void
@@ -579,7 +579,7 @@ main(int argc, const char **argv)
 		RunDemo(demo_index);
 		SetupGLFW();
 		
-		while(TRUE){
+		while(1){
 			Display();
 		}
 	}

@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+#include <stddef.h>
+
 void CheckGLErrors(void);
 #define CHECK_GL_ERRORS() CheckGLErrors()
 

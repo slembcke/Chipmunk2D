@@ -18,7 +18,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
+
+#include <string.h>
+
 #include "chipmunk.h"
 #include "constraints/util.h"
 
@@ -187,7 +189,7 @@ update(cpSpace *space, double dt)
 			if(cell_size > 5.0f){
 				ShatterShape(space, info.shape, cell_size, ChipmunkDemoMouse);
 			} else {
-				printf("Too small to splinter %f\n", cell_size);
+//				printf("Too small to splinter %f\n", cell_size);
 			}
 		}
 	}
