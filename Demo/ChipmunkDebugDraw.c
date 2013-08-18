@@ -59,7 +59,17 @@ float ChipmunkDebugDrawOutlineWidth = 1.0;
 
 static GLuint program;
 
-typedef struct Vertex {cpVect vertex, aa_coord; Color fill_color, outline_color;} Vertex;
+struct v2f {GLfloat x, y;};
+static struct v2f v2f0 = {0.0f, 0.0f};
+
+static inline struct v2f
+v2f(cpVect v)
+{
+	struct v2f v2 = {v.x, v.y};
+	return v2;
+}
+
+typedef struct Vertex {struct v2f vertex, aa_coord; Color fill_color, outline_color;} Vertex;
 typedef struct Triangle {Vertex a, b, c;} Triangle;
 
 static GLuint vao = 0;
@@ -136,10 +146,8 @@ ChipmunkDebugDrawInit(void)
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	
-	GLenum cp_float_type = (CP_USE_DOUBLES ? GL_DOUBLE : GL_FLOAT);
-	
-	SET_ATTRIBUTE(program, struct Vertex, vertex, cp_float_type);
-	SET_ATTRIBUTE(program, struct Vertex, aa_coord, cp_float_type);
+	SET_ATTRIBUTE(program, struct Vertex, vertex, GL_FLOAT);
+	SET_ATTRIBUTE(program, struct Vertex, aa_coord, GL_FLOAT);
 	SET_ATTRIBUTE(program, struct Vertex, fill_color, GL_FLOAT);
 	SET_ATTRIBUTE(program, struct Vertex, outline_color, GL_FLOAT);
 	
@@ -208,7 +216,7 @@ ColorForShape(cpShape *shape)
 	}
 }
 
-
+#undef MAX // Defined on some systems
 #define MAX(__a__, __b__) (__a__ > __b__ ? __a__ : __b__)
 
 static size_t triangle_capacity = 0;
@@ -262,16 +270,16 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, Color outli
 		fillColor = outlineColor;
 	}
 	
-	cpVect nw = cpvmult(n, r);
-	cpVect tw = cpvmult(t, r);
-	cpVect v0 = cpvsub(b, cpvadd(nw, tw)); // { 1.0, -1.0}
-	cpVect v1 = cpvadd(b, cpvsub(nw, tw)); // { 1.0,  1.0}
-	cpVect v2 = cpvsub(b, nw); // { 0.0, -1.0}
-	cpVect v3 = cpvadd(b, nw); // { 0.0,  1.0}
-	cpVect v4 = cpvsub(a, nw); // { 0.0, -1.0}
-	cpVect v5 = cpvadd(a, nw); // { 0.0,  1.0}
-	cpVect v6 = cpvsub(a, cpvsub(nw, tw)); // {-1.0, -1.0}
-	cpVect v7 = cpvadd(a, cpvadd(nw, tw)); // {-1.0,  1.0}
+	cpVect nw = (cpvmult(n, r));
+	cpVect tw = (cpvmult(t, r));
+	struct v2f v0 = v2f(cpvsub(b, cpvadd(nw, tw))); // { 1.0, -1.0}
+	struct v2f v1 = v2f(cpvadd(b, cpvsub(nw, tw))); // { 1.0,  1.0}
+	struct v2f v2 = v2f(cpvsub(b, nw)); // { 0.0, -1.0}
+	struct v2f v3 = v2f(cpvadd(b, nw)); // { 0.0,  1.0}
+	struct v2f v4 = v2f(cpvsub(a, nw)); // { 0.0, -1.0}
+	struct v2f v5 = v2f(cpvadd(a, nw)); // { 0.0,  1.0}
+	struct v2f v6 = v2f(cpvsub(a, cpvsub(nw, tw))); // {-1.0, -1.0}
+	struct v2f v7 = v2f(cpvadd(a, cpvadd(nw, tw))); // {-1.0,  1.0}
 	
 	triangles[0] = (Triangle){{v0, { 1.0f, -1.0f}, fillColor, outlineColor}, {v1, { 1.0f,  1.0f}, fillColor, outlineColor}, {v2, { 0.0f, -1.0f}, fillColor, outlineColor}};
 	triangles[1] = (Triangle){{v3, { 0.0f,  1.0f}, fillColor, outlineColor}, {v1, { 1.0f,  1.0f}, fillColor, outlineColor}, {v2, { 0.0f, -1.0f}, fillColor, outlineColor}};
@@ -307,42 +315,43 @@ void ChipmunkDebugDrawPolygon(int count, cpVect *verts, cpFloat radius, Color ou
 	
 	cpFloat inset = cpfmax(0.0f, 1 - radius);
 	for(int i=0; i<count-2; i++){
-		cpVect v0 = cpvsub(verts[  0], cpvmult(extrude[  0].offset, inset));
-		cpVect v1 = cpvsub(verts[i+1], cpvmult(extrude[i+1].offset, inset));
-		cpVect v2 = cpvsub(verts[i+2], cpvmult(extrude[i+2].offset, inset));
+		struct v2f v0 = v2f(cpvsub(verts[  0], cpvmult(extrude[  0].offset, inset)));
+		struct v2f v1 = v2f(cpvsub(verts[i+1], cpvmult(extrude[i+1].offset, inset)));
+		struct v2f v2 = v2f(cpvsub(verts[i+2], cpvmult(extrude[i+2].offset, inset)));
 		
-		*cursor++ = (Triangle){{v0, cpvzero, fillColor, fillColor}, {v1, cpvzero, fillColor, fillColor}, {v2, cpvzero, fillColor, fillColor}};
+		*cursor++ = (Triangle){{v0, v2f0, fillColor, fillColor}, {v1, v2f0, fillColor, fillColor}, {v2, v2f0, fillColor, fillColor}};
 	}
 	
 	cpFloat outset = inset + 1 + radius;
 	for(int i=0, j=count-1; i<count; j=i, i++){
-		cpVect v0 = verts[i];
-		cpVect v1 = verts[j];
+		cpVect vA = verts[i];
+		cpVect vB = verts[j];
 		
-		cpVect n0 = extrude[i].n;
-		cpVect n1 = extrude[j].n;
+		cpVect nA = extrude[i].n;
+		cpVect nB = extrude[j].n;
 		
-		cpVect offset0 = extrude[i].offset;
-		cpVect offset1 = extrude[j].offset;
+		cpVect offsetA = extrude[i].offset;
+		cpVect offsetB = extrude[j].offset;
 		
-		cpVect inner0 = cpvsub(v0, cpvmult(offset0, inset));
-		cpVect inner1 = cpvsub(v1, cpvmult(offset1, inset));
-		cpVect outer0 = cpvadd(inner0, cpvmult(n1, outset));
-		cpVect outer1 = cpvadd(inner1, cpvmult(n1, outset));
-		cpVect outer2 = cpvadd(inner0, cpvmult(offset0, outset));
-		cpVect outer3 = cpvadd(inner0, cpvmult(n0, outset));
+		cpVect innerA = cpvsub(vA, cpvmult(offsetA, inset));
+		cpVect innerB = cpvsub(vB, cpvmult(offsetB, inset));
 		
-//		cpFloat fraction = inset/(inset + outset);
-//		cpVect aa1 = cpvmult(n1, fraction);
-//		cpVect aa2 = cpvmult(offset0, fraction);
-//		cpVect aa3 = cpvmult(n0, fraction);
+		// Admittedly my variable naming sucks here...
+		struct v2f inner0 = v2f(innerA);
+		struct v2f inner1 = v2f(innerB);
+		struct v2f outer0 = v2f(cpvadd(innerA, cpvmult(nB, outset)));
+		struct v2f outer1 = v2f(cpvadd(innerB, cpvmult(nB, outset)));
+		struct v2f outer2 = v2f(cpvadd(innerA, cpvmult(offsetA, outset)));
+		struct v2f outer3 = v2f(cpvadd(innerA, cpvmult(nA, outset)));
 		
-		*cursor++ = (Triangle){{inner0, cpvzero, fillColor, outlineColor}, {inner1, cpvzero, fillColor, outlineColor}, {outer1,      n1, fillColor, outlineColor}};
-		*cursor++ = (Triangle){{inner0, cpvzero, fillColor, outlineColor}, {outer0,      n1, fillColor, outlineColor}, {outer1,      n1, fillColor, outlineColor}};
-//		*cursor++ = (Triangle){{    v0,     aa1, fillColor, outlineColor}, {    v1,     aa1, fillColor, outlineColor}, {outer1,      n1, fillColor, outlineColor}};
-//		*cursor++ = (Triangle){{    v0,     aa1, fillColor, outlineColor}, {outer0,      n1, fillColor, outlineColor}, {outer1,      n1, fillColor, outlineColor}};
-		*cursor++ = (Triangle){{inner0, cpvzero, fillColor, outlineColor}, {outer0,      n1, fillColor, outlineColor}, {outer2, offset0, fillColor, outlineColor}};
-		*cursor++ = (Triangle){{inner0, cpvzero, fillColor, outlineColor}, {outer2, offset0, fillColor, outlineColor}, {outer3,      n0, fillColor, outlineColor}};
+		struct v2f n0 = v2f(nA);
+		struct v2f n1 = v2f(nB);
+		struct v2f offset0 = v2f(offsetA);
+		
+		*cursor++ = (Triangle){{inner0, v2f0, fillColor, outlineColor}, {inner1,    v2f0, fillColor, outlineColor}, {outer1,      n1, fillColor, outlineColor}};
+		*cursor++ = (Triangle){{inner0, v2f0, fillColor, outlineColor}, {outer0,      n1, fillColor, outlineColor}, {outer1,      n1, fillColor, outlineColor}};
+		*cursor++ = (Triangle){{inner0, v2f0, fillColor, outlineColor}, {outer0,      n1, fillColor, outlineColor}, {outer2, offset0, fillColor, outlineColor}};
+		*cursor++ = (Triangle){{inner0, v2f0, fillColor, outlineColor}, {outer2, offset0, fillColor, outlineColor}, {outer3,      n0, fillColor, outlineColor}};
 	}
 }
 

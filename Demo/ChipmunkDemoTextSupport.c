@@ -48,7 +48,8 @@
 static GLuint program;
 static GLuint texture;
 
-typedef struct Vertex {cpVect vertex, tex_coord; Color color;} Vertex;
+struct v2f {GLfloat x, y;};
+typedef struct Vertex {struct v2f vertex, tex_coord; Color color;} Vertex;
 typedef struct Triangle {Vertex a, b, c;} Triangle;
 
 static GLuint vao = 0;
@@ -116,10 +117,8 @@ ChipmunkDemoTextInit(void)
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	
-	GLenum cp_float_type = (CP_USE_DOUBLES ? GL_DOUBLE : GL_FLOAT);
-	
-	SET_ATTRIBUTE(program, struct Vertex, vertex, cp_float_type);
-	SET_ATTRIBUTE(program, struct Vertex, tex_coord, cp_float_type);
+	SET_ATTRIBUTE(program, struct Vertex, vertex, GL_FLOAT);
+	SET_ATTRIBUTE(program, struct Vertex, tex_coord, GL_FLOAT);
 	SET_ATTRIBUTE(program, struct Vertex, color, GL_FLOAT);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -144,6 +143,7 @@ ChipmunkDemoTextInit(void)
 	}
 }
 
+#undef MAX
 #define MAX(__a__, __b__) (__a__ > __b__ ? __a__ : __b__)
 
 static size_t triangle_capacity = 0;
