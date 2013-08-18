@@ -99,7 +99,7 @@ cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInf
 		cpVect v1 = verts[i];
 		cpVect closest = cpClosetPointOnSegment(p, v0, v1);
 		
-		cpFloat dist = cpvdist(p, closest) - r;
+		cpFloat dist = cpvdist(p, closest);
 		if(dist < minDist){
 			minDist = dist;
 			closestPoint = closest;
@@ -114,7 +114,7 @@ cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInf
 	
 	info->shape = (cpShape *)poly;
 	info->p = cpvadd(closestPoint, cpvmult(g, r));
-	info->d = dist;
+	info->d = dist - r;
 	
 	// Use the normal of the closest segment if the distance is small.
 	info->g = (minDist > MAGIC_EPSILON ? g : closestNormal);
