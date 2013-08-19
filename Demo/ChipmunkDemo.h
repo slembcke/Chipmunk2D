@@ -45,6 +45,12 @@ frand(void)
 	return (cpFloat)rand()/(cpFloat)RAND_MAX;
 }
 
+static inline cpVect
+frand_unit_circle(){
+	cpVect v = cpv(frand()*2.0f - 1.0f, frand()*2.0f - 1.0f);
+	return (cpvlengthsq(v) < 1.0f ? v : frand_unit_circle());
+}
+
 extern int ChipmunkDemoTicks;
 extern double ChipmunkDemoTime;
 extern cpVect ChipmunkDemoKeyboard;

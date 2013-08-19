@@ -36,11 +36,6 @@ static cpVect simple_terrain_verts[] = {
 };
 static int simple_terrain_count = sizeof(simple_terrain_verts)/sizeof(cpVect);
 
-static cpVect frand_unit_circle(){
-	cpVect v = cpv(frand()*2.0f - 1.0f, frand()*2.0f - 1.0f);
-	return (cpvlengthsq(v) < 1.0f ? v : frand_unit_circle());
-}
-
 //cpBody bodies[1000] = {};
 //cpCircleShape circles[1000] = {};
 
