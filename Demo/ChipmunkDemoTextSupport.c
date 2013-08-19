@@ -229,6 +229,26 @@ ChipmunkDemoTextFlushRenderer(void)
 	glBindVertexArrayAPPLE(vao);
 	glDrawArrays(GL_TRIANGLES, 0, triangle_count*3);
 		
-	triangle_count = 0;
 	CHECK_GL_ERRORS();
 }
+
+void
+ChipmunkDemoTextClearRenderer(void)
+{
+	triangle_count = 0;
+}
+
+static int pushed_triangle_count = 0;
+void
+ChipmunkDemoTextPushRenderer(void)
+{
+	pushed_triangle_count = triangle_count;
+}
+
+void
+ChipmunkDemoTextPopRenderer(void)
+{
+	triangle_count = pushed_triangle_count;
+}
+
+

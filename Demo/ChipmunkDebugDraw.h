@@ -56,3 +56,8 @@ void ChipmunkDebugDrawCollisionPoints(cpSpace *space);
 void ChipmunkDebugDrawFlushRenderer(void);
 // Call this at the beginning of the frame to clear out any ChipmunkDebugDraw*() commands.
 void ChipmunkDebugDrawClearRenderer(void);
+
+// Save the current contents of the renderer.
+void ChipmunkDebugDrawPushRenderer(void);
+// Reset the renderer back to it's last pushed state.
+void ChipmunkDebugDrawPopRenderer(void);

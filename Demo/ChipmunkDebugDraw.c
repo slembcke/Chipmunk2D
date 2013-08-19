@@ -514,17 +514,20 @@ drawConstraint(cpConstraint *constraint, void *unused)
 	}
 }
 
-void ChipmunkDebugDrawConstraint(cpConstraint *constraint)
+void
+ChipmunkDebugDrawConstraint(cpConstraint *constraint)
 {
 	drawConstraint(constraint, NULL);
 }
 
-void ChipmunkDebugDrawConstraints(cpSpace *space)
+void
+ChipmunkDebugDrawConstraints(cpSpace *space)
 {
 	cpSpaceEachConstraint(space, drawConstraint, NULL);
 }
 
-void ChipmunkDebugDrawCollisionPoints(cpSpace *space)
+void
+ChipmunkDebugDrawCollisionPoints(cpSpace *space)
 {
 	cpArray *arbiters = space->arbiters;
 	Color color = RGBAColor(1.0f, 0.0f, 0.0f, 1.0f);
@@ -544,7 +547,8 @@ void ChipmunkDebugDrawCollisionPoints(cpSpace *space)
 	}
 }
 
-void ChipmunkDebugDrawFlushRenderer(void)
+void
+ChipmunkDebugDrawFlushRenderer(void)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Triangle)*triangle_count, triangle_buffer, GL_STREAM_DRAW);
@@ -555,11 +559,24 @@ void ChipmunkDebugDrawFlushRenderer(void)
 	glBindVertexArrayAPPLE(vao);
 	glDrawArrays(GL_TRIANGLES, 0, triangle_count*3);
 		
-	ChipmunkDebugDrawClearRenderer();
 	CHECK_GL_ERRORS();
 }
 
-void ChipmunkDebugDrawClearRenderer(void)
+void
+ChipmunkDebugDrawClearRenderer(void)
 {
 	triangle_count = 0;
+}
+
+static int pushed_triangle_count = 0;
+void
+ChipmunkDebugDrawPushRenderer(void)
+{
+	pushed_triangle_count = triangle_count;
+}
+
+void
+ChipmunkDebugDrawPopRenderer(void)
+{
+	triangle_count = pushed_triangle_count;
 }

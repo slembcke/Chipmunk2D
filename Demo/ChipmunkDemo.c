@@ -201,6 +201,14 @@ static void
 Tick(double dt)
 {
 	if(!paused || step){
+		PrintStringBuffer[0] = 0;
+		PrintStringCursor = PrintStringBuffer;
+		
+		// Completely reset the renderer only at the beginning of a tick.
+		// That way it can always display at least the last ticks' debug drawing.
+		ChipmunkDebugDrawClearRenderer();
+		ChipmunkDemoTextClearRenderer();
+		
 		cpVect new_point = cpvlerp(mouse_body->p, ChipmunkDemoMouse, 0.25f);
 		mouse_body->v = cpvmult(cpvsub(new_point, mouse_body->p), 60.0f);
 		mouse_body->p = new_point;
@@ -212,6 +220,8 @@ Tick(double dt)
 		
 		step = cpFalse;
 		ChipmunkDemoRightDown = cpFalse;
+		
+		ChipmunkDemoTextDrawString(cpv(-300, -200), ChipmunkDemoMessageString);
 	}
 }
 
@@ -234,28 +244,28 @@ Update(void)
 static void
 Display(void)
 {
-	PrintStringBuffer[0] = 0;
-	PrintStringCursor = PrintStringBuffer;
-	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslatef(translate.x, translate.y, 0.0f);
 	glScalef(scale, scale, 1.0f);
 	
+	Update();
+	
+	ChipmunkDebugDrawPushRenderer();
 	demos[demo_index].drawFunc(space);
 	
 	// Highlight the shape under the mouse because it looks neat.
 	cpShape *nearest = cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 0.0f, CP_ALL_LAYERS, CP_NO_GROUP, NULL);
 	if(nearest) ChipmunkDebugDrawShape(nearest, RGBAColor(1.0f, 0.0f, 0.0f, 1.0f), LAColor(0.0f, 0.0f));
 	
-	Update();
-	
+	// Draw the renderer contents and reset it back to the last tick's state.
 	ChipmunkDebugDrawFlushRenderer();
+	ChipmunkDebugDrawPopRenderer();
 	
+	ChipmunkDemoTextPushRenderer();
 	// Now render all the UI text.
 	DrawInstructions();
 	DrawInfo();
-	ChipmunkDemoTextDrawString(cpv(-300, -200), ChipmunkDemoMessageString);
 	
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix(); {
@@ -264,6 +274,7 @@ Display(void)
 		glLoadIdentity();
 		
 		ChipmunkDemoTextFlushRenderer();
+		ChipmunkDemoTextPopRenderer();
 	} glPopMatrix();
 	
 	glfwSwapBuffers();

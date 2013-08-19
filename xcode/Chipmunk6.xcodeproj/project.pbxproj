@@ -339,15 +339,15 @@
 		D3CCDF5B0AE35DA00080442F /* Demo */ = {
 			isa = PBXGroup;
 			children = (
-				D3E76CFE17C007E70068C3C3 /* VeraMoBd.ttf_sdf.h */,
 				D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */,
 				D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */,
-				D3FBA1B80E9B1F6300950BCC /* ChipmunkDebugDraw.h */,
-				D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */,
 				D3EEF8A217BAB5C0006B62EB /* ChipmunkDemoShaderSupport.h */,
 				D3EEF8A017BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c */,
+				D3FBA1B80E9B1F6300950BCC /* ChipmunkDebugDraw.h */,
+				D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */,
 				D3E76CFA17BFDD820068C3C3 /* ChipmunkDemoTextSupport.h */,
 				D3E76CFB17BFDD930068C3C3 /* ChipmunkDemoTextSupport.c */,
+				D3E76CFE17C007E70068C3C3 /* VeraMoBd.ttf_sdf.h */,
 				D3CCDF460AE35D920080442F /* LogoSmash.c */,
 				D3BAF9C40E9C4F250039DD5C /* PyramidStack.c */,
 				D3BAFA030E9C52810039DD5C /* Plink.c */,

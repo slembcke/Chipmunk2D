@@ -25,3 +25,7 @@ void ChipmunkDemoTextInit(void);
 //#define ChipmunkDemoTextDrawString(...)
 void ChipmunkDemoTextDrawString(cpVect pos, char *str);
 void ChipmunkDemoTextFlushRenderer(void);
+void ChipmunkDemoTextClearRenderer(void);
+
+void ChipmunkDemoTextPushRenderer(void);
+void ChipmunkDemoTextPopRenderer(void);

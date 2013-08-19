@@ -27,17 +27,11 @@ static cpVect QUERY_START = {0,0};
 static void
 update(cpSpace *space, double dt)
 {
+	cpSpaceStep(space, dt);
+	
 	if(ChipmunkDemoRightClick){
 		QUERY_START = ChipmunkDemoMouse;
 	}
-	
-	cpSpaceStep(space, dt);
-}
-
-static void
-draw(cpSpace *space)
-{
-	ChipmunkDemoDefaultDrawImpl(space);
 	
 	cpVect start = QUERY_START;
 	cpVect end = ChipmunkDemoMouse;
@@ -49,11 +43,11 @@ draw(cpSpace *space)
 	if(cpSpaceSegmentQueryFirst(space, start, end, CP_ALL_LAYERS, CP_NO_GROUP, &segInfo)){
 		cpVect point = cpSegmentQueryHitPoint(start, end, segInfo);
 		
-		// Draw red over the occluded part of the query
-		ChipmunkDebugDrawSegment(point, end, RGBAColor(1,0,0,1));
+		// Draw blue over the occluded part of the query
+		ChipmunkDebugDrawSegment(point, end, RGBAColor(0,0,1,1));
 		
-		// Draw a little blue surface normal
-		ChipmunkDebugDrawSegment(point, cpvadd(point, cpvmult(segInfo.n, 16)), RGBAColor(0,0,1,1));
+		// Draw a little red surface normal
+		ChipmunkDebugDrawSegment(point, cpvadd(point, cpvmult(segInfo.n, 16)), RGBAColor(1,0,0,1));
 		
 		// Draw a little red dot on the hit point.
 		ChipmunkDebugDrawDot(3, point, RGBAColor(1,0,0,1));
@@ -110,7 +104,7 @@ init(void)
 		}
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-		cpBodySetPos(body, cpv(50.0f, 50.0f));
+		cpBodySetPos(body, cpv(50.0f, 30.0f));
 		
 		cpSpaceAddShape(space, cpPolyShapeNew2(body, NUM_VERTS, verts, cpvzero, 10.0f));
 	}
@@ -140,6 +134,6 @@ ChipmunkDemo Query = {
 	1.0/60.0,
 	init,
 	update,
-	draw,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };
