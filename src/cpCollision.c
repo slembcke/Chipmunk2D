@@ -646,8 +646,11 @@ circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionID 
 	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
 	
-	if(points.d - circle->r - poly->r <= 0.0){
-		return circle2circleQuery(circle->tc, points.b, circle->r, poly->r, 0, con);
+	cpFloat mindist = circle->r + poly->r;
+	if(points.d - mindist <= 0.0){
+		cpVect p = cpvlerp(points.a, points.b, circle->r/(mindist));
+		cpContactInit(con, p, points.n, points.d - mindist, 0);
+		return 1;
 	} else {
 		return 0;
 	}
