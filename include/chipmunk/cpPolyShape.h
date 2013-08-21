@@ -49,10 +49,10 @@ cpPolyShape* cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, cons
 cpPolyShape* cpPolyShapeInit2(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset, cpFloat radius);
 /// Allocate and initialize a polygon shape.
 /// A convex hull will be created from the vertexes.
-cpShape* cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset);
+cpShape* cpPolyShapeNew(cpBody *body, int numVerts, const cpVect *verts, cpVect offset);
 /// Allocate and initialize a polygon shape.
 /// A convex hull will be created from the vertexes.
-cpShape* cpPolyShapeNew2(cpBody *body, int numVerts, cpVect *verts, cpVect offset, cpFloat radius);
+cpShape* cpPolyShapeNew2(cpBody *body, int numVerts, const cpVect *verts, cpVect offset, cpFloat radius);
 
 /// Initialize a box shaped polygon shape.
 cpPolyShape* cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height);

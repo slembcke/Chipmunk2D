@@ -4,7 +4,6 @@ h2. ABOUT:
 
 Chipmunk2D is a simple, lightweight, fast and portable 2D rigid body physics library written in C. It's licensed under the unrestrictive, OSI approved MIT license. My aim is to give 2D developers access to the same quality of physics you find in newer 3D games. I hope you enjoy using Chipmunk2D, and please consider donating to help make it worth our time to continue to support Chipmunk2D with great new features.
 
-
 h2. FEATURES:
 
 * Designed specifically for 2D video games.
@@ -28,14 +27,14 @@ h2. FEATURES:
 * Unrestrictive MIT license
 
 
-h2. CONTRACTING:
-
-Howling Moon Software (my company) is available for contracting if you want to make the physics in your game really stand out. Given our unique experience with the library, we can help you use Chipmunk to it's fullest potential. Feel free to contact us through our webpage: http://howlingmoonsoftware.com/contracting.php
-
-
 h2. CHIPMUNK PRO:
 
 We also make a bunch of extra for Chipmunk called "Chipmunk Pro":http://chipmunk2d.net/chipmunkPro.php. Currently we have a nice Objective-C wrapper that should be of particular interest to Mac and iPhone developers. It also offers auto-geometry features and multithreading/SIMD optimizations as well. Check out the link above for more information!
+
+
+h2. CONTRACTING:
+
+Howling Moon Software (my company) is available for contracting if you want to make the physics in your game really stand out. Given our unique experience with the library, we can help you use Chipmunk to it's fullest potential. Feel free to contact us through our webpage: http://howlingmoonsoftware.com/contracting.php
 
 
 h2. BUILDING:
@@ -47,6 +46,13 @@ iPhone: If you want a native Objective-C API, check out Chipmunk Pro on the Chip
 UNIXes: A forum user was kind enough to make a set of CMake files for Chipmunk. This will require you to have CMake installed. To build run 'cmake .' then 'make'. This should build a dynamic library, a static library, and the demo application. A number of people have had build errors on Ubuntu due to not having GLUT or libxmu installed.
 
 Windows: Visual Studio projects are included in the msvc/ directory. While I try to make sure the MSVC 10 project is up to date, I don't have MSVC 9 to keep that project updated regularly. It may not work. I'd appreciate a hand fixing it if that's the case.
+
+
+h2. GET UP TO DATE:
+
+If you got the source from a point release download, you might want to consider getting the latest source from GitHub. Bugs are fixed and new features are added regularly. Big changes are done in branches and tested before merging them in it's rare for the point release downloads to be better or more bug free than the latest code.
+
+Head on over to "GitHub":https://github.com/slembcke/Chipmunk2D and experience the future TODAY! (Okay, so maybe it's not that exciting.)
 
 
 h2. GETTING STARTED:
