@@ -123,10 +123,10 @@ ChipmunkDebugDrawInit(void)
 			float fw = length(fwidth(v_aa_coord));
 			
 			// Outline width threshold.
-			float ow = 1.0 - fw*u_outline_coef;
+			float ow = 1.0 - fw;//*u_outline_coef;
 			
 			// Fill/outline color.
-			float fo_step = aa_step(ow - fw, ow, l);
+			float fo_step = aa_step(max(ow - fw, 0.0), ow, l);
 			vec4 fo_color = mix(v_fill_color, v_outline_color, fo_step);
 			
 			// Use pre-multiplied alpha.
@@ -240,7 +240,7 @@ void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, Color ou
 {
 	Triangle *triangles = PushTriangles(2);
 	
-	cpFloat r = radius + ChipmunkDebugDrawPointLineScale*0.5f;
+	cpFloat r = radius + 1.0f/ChipmunkDebugDrawPointLineScale;
 	Vertex a = {{pos.x - r, pos.y - r}, {-1.0, -1.0}, fillColor, outlineColor};
 	Vertex b = {{pos.x - r, pos.y + r}, {-1.0,  1.0}, fillColor, outlineColor};
 	Vertex c = {{pos.x + r, pos.y + r}, { 1.0,  1.0}, fillColor, outlineColor};
@@ -264,9 +264,10 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, Color outli
 	cpVect n = cpvnormalize(cpvperp(cpvsub(b, a)));
 	cpVect t = cpvperp(n);
 	
-	cpFloat r = radius + ChipmunkDebugDrawPointLineScale*0.5f;
-	if(r < ChipmunkDebugDrawPointLineScale){
-		r = ChipmunkDebugDrawPointLineScale;
+	cpFloat half = 1.0f/ChipmunkDebugDrawPointLineScale;
+	cpFloat r = radius + half;
+	if(r <= half){
+		r = half;
 		fillColor = outlineColor;
 	}
 	
@@ -313,7 +314,7 @@ void ChipmunkDebugDrawPolygon(int count, cpVect *verts, cpFloat radius, Color ou
 	Triangle *triangles = PushTriangles(5*count - 2);
 	Triangle *cursor = triangles;
 	
-	cpFloat inset = cpfmax(0.0f, 1 - radius);
+	cpFloat inset = cpfmax(0.0f, 1.0f/ChipmunkDebugDrawPointLineScale - radius);
 	for(int i=0; i<count-2; i++){
 		struct v2f v0 = v2f(cpvsub(verts[  0], cpvmult(extrude[  0].offset, inset)));
 		struct v2f v1 = v2f(cpvsub(verts[i+1], cpvmult(extrude[i+1].offset, inset)));
@@ -322,7 +323,7 @@ void ChipmunkDebugDrawPolygon(int count, cpVect *verts, cpFloat radius, Color ou
 		*cursor++ = (Triangle){{v0, v2f0, fillColor, fillColor}, {v1, v2f0, fillColor, fillColor}, {v2, v2f0, fillColor, fillColor}};
 	}
 	
-	cpFloat outset = inset + 1 + radius;
+	cpFloat outset = inset + 1.0f/ChipmunkDebugDrawPointLineScale + radius;
 	for(int i=0, j=count-1; i<count; j=i, i++){
 		cpVect vA = verts[i];
 		cpVect vB = verts[j];
@@ -359,7 +360,7 @@ void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, Color fillColor)
 {
 	Triangle *triangles = PushTriangles(2);
 	
-	float r = ChipmunkDebugDrawPointLineScale*size*0.5f;
+	float r = size*0.5f/ChipmunkDebugDrawPointLineScale;
 	Vertex a = {{pos.x - r, pos.y - r}, {-1.0f, -1.0f}, fillColor, fillColor};
 	Vertex b = {{pos.x - r, pos.y + r}, {-1.0f,  1.0f}, fillColor, fillColor};
 	Vertex c = {{pos.x + r, pos.y + r}, { 1.0f,  1.0f}, fillColor, fillColor};
