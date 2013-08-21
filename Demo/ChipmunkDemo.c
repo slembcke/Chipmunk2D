@@ -487,21 +487,45 @@ SetupGLFW()
 	glfwSetMouseButtonCallback(Click);
 }
 
+#ifdef WIN32
+
+static double GetMilliseconds(){
+	__int64 count, freq;
+	QueryPerformanceCounter((LARGE_INTEGER*)&count);
+	QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
+
+	return 1000.0*(double)count/(double)freq;
+}
+
+#else
+
+#include <sys/time.h>
+#include <unistd.h>
+
+static double GetMilliseconds(){
+	struct timeval time;
+	gettimeofday(&time, NULL);
+	
+	return (time.tv_sec*1000.0 + time.tv_usec/1000.0);
+}
+
+#endif
+
 void TimeTrial(int index, int count)
 {
 	space = demos[index].initFunc();
 	
-	double start_time = glfwGetTime();
+	double start_time = GetMilliseconds();
 	double dt = demos[index].timestep;
 	
 	for(int i=0; i<count; i++)
 		demos[index].updateFunc(space, dt);
 	
-	double end_time = glfwGetTime();
+	double end_time = GetMilliseconds();
 	
 	demos[index].destroyFunc(space);
 	
-	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', 1e3*(end_time - start_time), demos[index].name);
+	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, demos[index].name);
 }
 
 extern ChipmunkDemo LogoSmash;
