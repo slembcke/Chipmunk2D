@@ -47,12 +47,6 @@ cpMessage(const char *condition, const char *file, int line, cpBool isError, cpB
 
 const char *cpVersionString = XSTR(CP_VERSION_MAJOR)"."XSTR(CP_VERSION_MINOR)"."XSTR(CP_VERSION_RELEASE);
 
-void
-cpInitChipmunk(void)
-{
-	cpAssertWarn(cpFalse, "cpInitChipmunk is deprecated and no longer required. It will be removed in the future.");
-}
-
 //MARK: Misc Functions
 
 cpFloat
@@ -152,7 +146,7 @@ cpMomentForBox2(cpFloat m, cpBB box)
 	cpFloat height = box.t - box.b;
 	cpVect offset = cpvmult(cpv(box.l + box.r, box.b + box.t), 0.5f);
 	
-	// TODO NaN when offset is 0 and m is INFINITY
+	// TODO: NaN when offset is 0 and m is INFINITY
 	return cpMomentForBox(m, width, height) + m*cpvlengthsq(offset);
 }
 

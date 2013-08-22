@@ -34,10 +34,15 @@ typedef struct cpPolyShape {
 	
 	int numVerts;
 	cpVect *verts, *tVerts;
+	
+	// NUKE
 	cpSplittingPlane *planes, *tPlanes;
 	
 	cpFloat r;
 } cpPolyShape;
+
+// TODO: Clean up naming here.
+// Use transforms.
 
 /// Allocate a polygon shape.
 cpPolyShape* cpPolyShapeAlloc(void);

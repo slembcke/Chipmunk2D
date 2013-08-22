@@ -3,6 +3,9 @@
 // Create non static inlined copies of Chipmunk functions, useful for working with dynamic FFIs
 // This file should only be included in chipmunk.c
 
+// TODO: get rid of the reliance on static inlines.
+// They make a mess for FFIs.
+
 #ifdef _MSC_VER
  #if _MSC_VER >= 1600
   #define MAKE_REF(name) decltype(name) *_##name = name

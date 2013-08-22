@@ -192,7 +192,7 @@ ChipmunkDemoPrintString(char *fmt, ...)
 	
 	va_list args;
 	va_start(args, fmt);
-	// TODO should use vsnprintf herep
+	// TODO: should use vsnprintf herep
 	PrintStringCursor += vsprintf(PrintStringCursor, fmt, args);
 	va_end(args);
 }
@@ -560,10 +560,6 @@ extern int bench_count;
 int
 main(int argc, const char **argv)
 {
-	// Segment/segment collisions need to be explicitly enabled currently.
-	// This will becoume enabled by default in future versions of Chipmunk.
-	cpEnableSegmentToSegmentCollisions();
-	
 	ChipmunkDemo demo_list[] = {
 		LogoSmash,
 		PyramidStack,

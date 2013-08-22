@@ -105,6 +105,8 @@ struct cpSpace {
 	CP_PRIVATE(cpBody _staticBody);
 };
 
+// TODO: Make timestep a parameter?
+
 /// Allocate a cpSpace.
 cpSpace* cpSpaceAlloc(void);
 /// Initialize a cpSpace.
@@ -147,6 +149,9 @@ cpSpaceIsLocked(cpSpace *space)
 	return space->CP_PRIVATE(locked);
 }
 
+// TODO: Handlers should return a struct that can be filled in.
+// TODO: Implement wildcard handlers.
+
 /// Set a default collision handler for this space.
 /// The default collision handler is invoked for each colliding pair of shapes
 /// that isn't explicitly handled by a specific collision handler.
@@ -172,14 +177,9 @@ void cpSpaceAddCollisionHandler(
 	void *data
 );
 
-/// Unset a collision handler.
-void cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
-
 /// Add a collision shape to the simulation.
 /// If the shape is attached to a static body, it will be added as a static shape.
 cpShape* cpSpaceAddShape(cpSpace *space, cpShape *shape);
-/// Explicity add a shape as a static shape to the simulation.
-cpShape* cpSpaceAddStaticShape(cpSpace *space, cpShape *shape);
 /// Add a rigid body to the simulation.
 cpBody* cpSpaceAddBody(cpSpace *space, cpBody *body);
 /// Add a constraint to the simulation.
@@ -187,8 +187,6 @@ cpConstraint* cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint);
 
 /// Remove a collision shape from the simulation.
 void cpSpaceRemoveShape(cpSpace *space, cpShape *shape);
-/// Remove a collision shape added using cpSpaceAddStaticShape() from the simulation.
-void cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape);
 /// Remove a rigid body from the simulation.
 void cpSpaceRemoveBody(cpSpace *space, cpBody *body);
 /// Remove a constraint from the simulation.
@@ -215,6 +213,9 @@ typedef void (*cpPostStepFunc)(cpSpace *space, void *key, void *data);
 /// Returns true only if @c key has never been scheduled before.
 /// It's possible to pass @c NULL for @c func if you only want to mark @c key as being used.
 cpBool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data);
+
+// TODO: Queries and iterators should take a cpSpace parametery.
+// TODO: They should also be abortable.
 
 /// Point query callback function type.
 typedef void (*cpSpacePointQueryFunc)(cpShape *shape, void *data);

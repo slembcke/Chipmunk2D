@@ -136,7 +136,7 @@ cpBBClampVect(const cpBB bb, const cpVect v)
 	return cpv(cpfclamp(v.x, bb.l, bb.r), cpfclamp(v.y, bb.b, bb.t));
 }
 
-// TODO edge case issue
+// TODO: edge case issue
 /// Wrap a vector to a bounding box.
 cpVect cpBBWrapVect(const cpBB bb, const cpVect v); // wrap a vector to a bbox
 

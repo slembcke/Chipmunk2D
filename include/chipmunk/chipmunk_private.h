@@ -105,7 +105,7 @@ void cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint);
 
 //MARK: Shape/Collision Functions
 
-// TODO should move this to the cpVect API. It's pretty useful.
+// TODO: should move this to the cpVect API. It's pretty useful.
 static inline cpVect
 cpClosetPointOnSegment(const cpVect p, const cpVect a, const cpVect b)
 {
@@ -146,7 +146,7 @@ CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r, cpVect a, cpVect b,
 	}
 }
 
-// TODO doesn't really need to be inline, but need a better place to put this function
+// NUKE
 static inline cpSplittingPlane
 cpSplittingPlaneNew(cpVect a, cpVect b)
 {

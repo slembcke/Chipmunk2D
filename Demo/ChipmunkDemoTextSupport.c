@@ -70,7 +70,7 @@ ChipmunkDemoTextInit(void)
 		varying vec4 v_color;
 		
 		void main(void){
-			// TODO get rid of the GL 2.x matrix bit eventually?
+			// TODO: get rid of the GL 2.x matrix bit eventually?
 			gl_Position = gl_ModelViewProjectionMatrix*vec4(vertex, 0.0, 1.0);
 			
 			v_color = color;

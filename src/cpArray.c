@@ -70,15 +70,6 @@ cpArrayPop(cpArray *arr)
 	return value;
 }
 
-//static void
-//cpArrayDeleteIndex(cpArray *arr, int idx)
-//{
-//	arr->num--;
-//	
-//	arr->arr[idx] = arr->arr[arr->num];
-//	arr->arr[arr->num] = NULL;
-//}
-
 void
 cpArrayDeleteObj(cpArray *arr, void *obj)
 {
@@ -93,20 +84,6 @@ cpArrayDeleteObj(cpArray *arr, void *obj)
 		}
 	}
 }
-
-//void
-//cpArrayAppend(cpArray *arr, cpArray *other)
-//{
-//	void *tail = &arr->arr[arr->num];
-//	
-//	arr->num += other->num;
-//	if(arr->num >= arr->max){
-//		arr->max = arr->num;
-//		arr->arr = (void **)cprealloc(arr->arr, arr->max*sizeof(void**));
-//	}
-//	
-//	memcpy(tail, other->arr, other->num*sizeof(void**));
-//}
 
 void
 cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*))

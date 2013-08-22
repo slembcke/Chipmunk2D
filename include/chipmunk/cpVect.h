@@ -197,6 +197,7 @@ static inline cpBool cpvnear(const cpVect v1, const cpVect v2, const cpFloat dis
 /// 2x2 matrix type used for tensors and such.
 /// @{
 
+// NUKE
 static inline cpMat2x2
 cpMat2x2New(cpFloat a, cpFloat b, cpFloat c, cpFloat d)
 {

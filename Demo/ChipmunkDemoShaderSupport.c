@@ -81,7 +81,7 @@ CompileShader(GLenum type, const char *source)
 	glShaderSource(shader, 1, &source, NULL);
 	glCompileShader(shader);
 	
-	// TODO return placeholder shader instead?
+	// TODO: return placeholder shader instead?
 	cpAssertHard(CheckError(shader, GL_COMPILE_STATUS, glGetShaderiv, glGetShaderInfoLog), "Error compiling shader");
 	
 	return shader;
@@ -105,7 +105,7 @@ LinkProgram(GLint vshader, GLint fshader)
 cpBool
 ValidateProgram(GLint program)
 {
-	// TODO
+	// TODO: Implement?
 	return cpTrue;
 }
 

@@ -32,7 +32,7 @@ static cpBody *wheel_body;
 static cpConstraint *motor;
 
 /*
-	TODO
+	TODO:
 	- Clamp max angle dynamically based on output torque.
 */
 

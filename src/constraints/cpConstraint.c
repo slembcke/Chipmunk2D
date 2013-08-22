@@ -35,7 +35,8 @@ cpConstraintFree(cpConstraint *constraint)
 	}
 }
 
-// *** declared in util.h TODO move declaration to chipmunk_private.h
+// *** declared in util.h
+// TODO: move declaration to chipmunk_private.h
 
 void
 cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b)

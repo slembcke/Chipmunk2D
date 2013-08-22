@@ -90,7 +90,7 @@ cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
 				cpPostStepFunc func = callback->func;
 				
 				// Mark the func as NULL in case calling it calls cpSpaceRunPostStepCallbacks() again.
-				// TODO need more tests around this case I think.
+				// TODO: need more tests around this case I think.
 				callback->func = NULL;
 				if(func) func(space, callback->key, callback->data);
 				
@@ -231,8 +231,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 	if(sensor && handler == &cpDefaultCollisionHandler) return id;
 	
 	// Shape 'a' should have the lower shape type. (required by cpCollideShapes() )
-	// TODO remove me: a < b comparison is for debugging collisions
-	if(a->klass->type > b->klass->type || (a->klass->type == b->klass->type && a < b)){
+	if(a->klass->type > b->klass->type || (a->klass->type == b->klass->type)){
 		cpShape *temp = a;
 		a = b;
 		b = temp;
@@ -289,7 +288,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	
 	cpBody *a = arb->body_a, *b = arb->body_b;
 	
-	// TODO should make an arbiter state for this so it doesn't require filtering arbiters for dangling body pointers on body removal.
+	// TODO: should make an arbiter state for this so it doesn't require filtering arbiters for dangling body pointers on body removal.
 	// Preserve arbiters on sensors and rejected arbiters for sleeping objects.
 	// This prevents errant separate callbacks from happenening.
 	if(

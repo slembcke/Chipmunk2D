@@ -47,6 +47,7 @@ cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)
 	return cpvslerp(v1, v2, cpfmin(a, omega)/omega);
 }
 
+// NUKE
 char*
 cpvstr(const cpVect v)
 {

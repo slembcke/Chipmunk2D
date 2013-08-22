@@ -44,7 +44,6 @@
 
 // Add contact points for circle to circle collisions.
 // Used by several collision tests.
-// TODO should accept hash parameter
 static void
 CircleToCircleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpFloat r2, cpHashValue hash, cpCollisionInfo *info)
 {
@@ -57,7 +56,7 @@ CircleToCircleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cp
 		cpVect n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
 //		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist, hash);
 		
-		// TODO calculate r1 and r2 independently
+		// TODO: calculate r1 and r2 independently
 		cpVect p = cpvlerp(p1, p2, r1/(r1 + r2));
 		cpCollisionInfoPushContact(info, cpvsub(p, info->a->body->p), cpvsub(p, info->b->body->p), n, dist - mindist, hash);
 	}
@@ -171,7 +170,7 @@ SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 	int numVerts = poly->numVerts;
 	int i1 = PolySupportPointIndex(poly->numVerts, poly->tVerts, n);
 	
-	// TODO get rid of mod eventually, very expensive on ARM
+	// TODO: get rid of mod eventually, very expensive on ARM
 	int i0 = (i1 - 1 + numVerts)%numVerts;
 	int i2 = (i1 + 1)%numVerts;
 	
@@ -588,41 +587,6 @@ SegmentToPoly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionInf
 	}
 }
 
-//static void
-//circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionInfo *info)
-//{
-//	cpSplittingPlane *planes = poly->tPlanes;
-//	
-//	int numVerts = poly->numVerts;
-//	int mini = 0;
-//	cpFloat min = cpSplittingPlaneCompare(planes[0], circle->tc) - circle->r;
-//	for(int i=0; i<poly->numVerts; i++){
-//		cpFloat dist = cpSplittingPlaneCompare(planes[i], circle->tc) - circle->r;
-//		if(dist > 0.0f){
-//			return;
-//		} else if(dist > min) {
-//			min = dist;
-//			mini = i;
-//		}
-//	}
-//	
-//	cpVect n = planes[mini].n;
-//	cpVect a = poly->tVerts[(mini - 1 + numVerts)%numVerts];
-//	cpVect b = poly->tVerts[mini];
-//	cpFloat dta = cpvcross(n, a);
-//	cpFloat dtb = cpvcross(n, b);
-//	cpFloat dt = cpvcross(n, circle->tc);
-//	
-//	if(dt < dtb){
-//		circle2circleQuery(circle->tc, b, circle->r, poly->r, 0, info);
-//	} else if(dt < dta) {
-//		cpVect point = cpvsub(circle->tc, cpvmult(n, circle->r + min/2.0f));
-////		cpContactInit(con, point, cpvneg(n), min, 0);
-//		cpCollisionInfoPushContact(info, cpvsub(point, info->a->body->p), cpvsub(point, info->b->body->p), cpvneg(n), min, 0);
-//	} else {
-//		circle2circleQuery(circle->tc, a, circle->r, poly->r, 0, info);
-//	}
-//}
 static void
 CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionInfo *info)
 {
@@ -644,20 +608,7 @@ CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionIn
 	}
 }
 
-static const CollisionFunc builtinCollisionFuncs[9] = {
-	(CollisionFunc)CircleToCircle,
-	NULL,
-	NULL,
-	(CollisionFunc)CircleToSegment,
-	NULL,
-	NULL,
-	(CollisionFunc)CircleToPoly,
-	(CollisionFunc)SegmentToPoly,
-	(CollisionFunc)PolyToPoly,
-};
-static const CollisionFunc *colfuncs = builtinCollisionFuncs;
-
-static const CollisionFunc segmentCollisions[9] = {
+static const CollisionFunc BuiltinCollisionFuncs[9] = {
 	(CollisionFunc)CircleToCircle,
 	NULL,
 	NULL,
@@ -668,12 +619,7 @@ static const CollisionFunc segmentCollisions[9] = {
 	(CollisionFunc)SegmentToPoly,
 	(CollisionFunc)PolyToPoly,
 };
-
-void
-cpEnableSegmentToSegmentCollisions(void)
-{
-	colfuncs = segmentCollisions;
-}
+static const CollisionFunc *CollisionFuncs = BuiltinCollisionFuncs;
 
 struct cpCollisionInfo
 cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpContact *contacts)
@@ -683,7 +629,7 @@ cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpContact *contacts)
 	// Their shape types must be in order.
 	cpAssertSoft(a->klass->type <= b->klass->type, "Internal Error: Collision shapes passed to cpCollideShapes() are not sorted.");
 	
-	CollisionFunc cfunc = colfuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
+	CollisionFunc cfunc = CollisionFuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
 	
 	if(cfunc) cfunc(a, b, &info);
 	cpAssertSoft(info.count <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error: Too many contact points returned.");

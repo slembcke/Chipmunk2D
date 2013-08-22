@@ -33,6 +33,7 @@
 extern "C" {
 #endif
 
+// NUKE
 #ifndef CP_ALLOW_PRIVATE_ACCESS
 	#define CP_ALLOW_PRIVATE_ACCESS 0
 #endif
@@ -110,20 +111,13 @@ typedef struct cpSpace cpSpace;
 
 #include "cpSpace.h"
 
-// Chipmunk 6.1.5
-#define CP_VERSION_MAJOR 6
-#define CP_VERSION_MINOR 2
+// Chipmunk 7.0.0
+#define CP_VERSION_MAJOR 7
+#define CP_VERSION_MINOR 0
 #define CP_VERSION_RELEASE 0
 
 /// Version string.
 extern const char *cpVersionString;
-
-/// @deprecated
-void cpInitChipmunk(void);
-
-/// Enables segment to segment shape collisions.
-void cpEnableSegmentToSegmentCollisions(void);
-
 
 /// Calculate the moment of inertia for a circle.
 /// @c r1 and @c r2 are the inner and outer diameters. A solid circle has an inner diameter of 0.

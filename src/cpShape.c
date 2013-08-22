@@ -167,7 +167,7 @@ cpCicleShapeNearestPointQuery(cpCircleShape *circle, cpVect p, cpNearestPointQue
 	cpFloat r = circle->r;
 	
 	info->shape = (cpShape *)circle;
-	info->p = cpvadd(circle->tc, cpvmult(delta, r/d)); // TODO div/0
+	info->p = cpvadd(circle->tc, cpvmult(delta, r/d)); // TODO: div/0
 	info->d = d - r;
 	
 	// Use up for the gradient if the distance is very small.

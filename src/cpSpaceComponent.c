@@ -166,7 +166,7 @@ cpBodyActivateStatic(cpBody *body, cpShape *filter)
 		}
 	}
 	
-	// TODO should also activate joints?
+	// TODO: should also activate joints?
 }
 
 static inline void

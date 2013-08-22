@@ -138,7 +138,7 @@ init(void)
 	// Max speed of the dolly servo
 	cpConstraintSetMaxBias(winchServo, 60);
 	
-	// TODO cleanup
+	// TODO: cleanup
 	// Finally a box to play with
 	cpBody *boxBody = cpSpaceAddBody(space, cpBodyNew(30, cpMomentForBox(30, 50, 50)));
 	cpBodySetPos(boxBody, cpv(200, -200));
