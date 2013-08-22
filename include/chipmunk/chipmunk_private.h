@@ -76,6 +76,99 @@ void cpBodyRemoveShape(cpBody *body, cpShape *shape);
 void cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint);
 
 
+//MARK: Spatial Index Functions
+
+cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *klass, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
+
+
+//MARK: Arbiters
+
+enum cpArbiterState {
+	// Arbiter is active and its the first collision.
+	cpArbiterStateFirstColl,
+	// Arbiter is active and its not the first collision.
+	cpArbiterStateNormal,
+	// Collision has been explicitly ignored.
+	// Either by returning false from a begin collision handler or calling cpArbiterIgnore().
+	cpArbiterStateIgnore,
+	// Collison is no longer active. A space will cache an arbiter for up to cpSpace.collisionPersistence more steps.
+	cpArbiterStateCached,
+};
+
+struct cpArbiterThread {
+	struct cpArbiter *next, *prev;
+};
+
+struct cpContact {
+	cpVect r1, r2;
+	
+	cpFloat nMass, tMass;
+	cpFloat bounce; // TODO: look for an alternate bounce solution.
+
+	cpFloat jnAcc, jtAcc, jBias;
+	cpFloat bias;
+	
+	cpHashValue hash;
+};
+
+struct cpCollisionInfo {
+	cpShape *a, *b;
+	cpCollisionID id;
+	
+	cpVect n;
+	
+	int count;
+	// TODO Should this be a unique struct type?
+	struct cpContact *arr;
+};
+
+struct cpArbiter {
+	cpFloat e;
+	cpFloat u;
+	cpVect surface_vr;
+	
+	cpDataPointer data;
+	
+	cpShape *a, *b;
+	cpBody *body_a, *body_b;
+	struct cpArbiterThread thread_a, thread_b;
+	
+	int count;
+	struct cpContact *contacts;
+	cpVect n;
+	
+	cpTimestamp stamp;
+	cpCollisionHandler *handler;
+	cpBool swapped;
+	enum cpArbiterState state;
+};
+
+cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
+
+static inline cpCollisionHandler * cpSpaceLookupHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
+
+static inline void
+cpArbiterCallSeparate(cpArbiter *arb, cpSpace *space)
+{
+	// The handler needs to be looked up again as the handler cached on the arbiter may have been deleted since the last step.
+	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->a->collision_type, arb->b->collision_type);
+	handler->separate(arb, space, handler->data);
+}
+
+static inline struct cpArbiterThread *
+cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
+{
+	return (arb->body_a == body ? &arb->thread_a : &arb->thread_b);
+}
+
+void cpArbiterUnthread(cpArbiter *arb);
+
+void cpArbiterUpdate(cpArbiter *arb, cpCollisionInfo *info, cpCollisionHandler *handler);
+void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
+void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
+void cpArbiterApplyImpulse(cpArbiter *arb);
+
+
 //MARK: Shape/Collision Functions
 
 // TODO: should move this to the cpVect API. It's pretty useful.
@@ -136,87 +229,6 @@ cpSplittingPlaneCompare(cpSplittingPlane plane, cpVect v)
 
 void cpLoopIndexes(cpVect *verts, int count, int *start, int *end);
 
-
-//MARK: Spatial Index Functions
-
-cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *klass, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
-
-
-//MARK: Arbiters
-
-enum cpArbiterState {
-	// Arbiter is active and its the first collision.
-	cpArbiterStateFirstColl,
-	// Arbiter is active and its not the first collision.
-	cpArbiterStateNormal,
-	// Collision has been explicitly ignored.
-	// Either by returning false from a begin collision handler or calling cpArbiterIgnore().
-	cpArbiterStateIgnore,
-	// Collison is no longer active. A space will cache an arbiter for up to cpSpace.collisionPersistence more steps.
-	cpArbiterStateCached,
-};
-
-struct cpArbiterThread {
-	struct cpArbiter *next, *prev;
-};
-
-struct cpContact {
-	cpVect r1, r2;
-	
-	cpFloat nMass, tMass;
-	cpFloat bounce; // TODO: look for an alternate bounce solution.
-
-	cpFloat jnAcc, jtAcc, jBias;
-	cpFloat bias;
-	
-	cpHashValue hash;
-};
-
-struct cpArbiter {
-	cpFloat e;
-	cpFloat u;
-	cpVect surface_vr;
-	
-	cpDataPointer data;
-	
-	cpShape *a, *b;
-	cpBody *body_a, *body_b;
-	struct cpArbiterThread thread_a, thread_b;
-	
-	int count;
-	struct cpContact *contacts;
-	cpVect n;
-	
-	cpTimestamp stamp;
-	cpCollisionHandler *handler;
-	cpBool swapped;
-	enum cpArbiterState state;
-};
-
-cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
-
-static inline cpCollisionHandler * cpSpaceLookupHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
-
-static inline void
-cpArbiterCallSeparate(cpArbiter *arb, cpSpace *space)
-{
-	// The handler needs to be looked up again as the handler cached on the arbiter may have been deleted since the last step.
-	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->a->collision_type, arb->b->collision_type);
-	handler->separate(arb, space, handler->data);
-}
-
-static inline struct cpArbiterThread *
-cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
-{
-	return (arb->body_a == body ? &arb->thread_a : &arb->thread_b);
-}
-
-void cpArbiterUnthread(cpArbiter *arb);
-
-void cpArbiterUpdate(cpArbiter *arb, cpCollisionInfo *info, cpCollisionHandler *handler);
-void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
-void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
-void cpArbiterApplyImpulse(cpArbiter *arb);
 
 //MARK: Space Functions
 

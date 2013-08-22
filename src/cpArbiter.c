@@ -222,9 +222,21 @@ cpArbiterUpdate(cpArbiter *arb, cpCollisionInfo *info, cpCollisionHandler *handl
 {
 	cpShape *a = info->a, *b = info->b;
 	
+	// For collisions between two similar primitive types, the order could have been swapped.
+	arb->a = a; arb->body_a = a->body;
+	arb->b = b; arb->body_b = b->body;
+	
 	// Iterate over the possible pairs to look for hash value matches.
 	for(int i=0; i<info->count; i++){
 		struct cpContact *con = &info->arr[i];
+		
+		// r1 and r2 store absolute offsets at init time.
+		// Need to convert them to relative offsets.
+		con->r1 = cpvsub(con->r1, a->body->p);
+		con->r2 = cpvsub(con->r2, b->body->p);
+		
+		// Cached impulses are not zeroed at init time.
+		con->jnAcc = con->jtAcc = 0.0f;
 		
 		for(int j=0; j<arb->count; j++){
 			struct cpContact *old = &arb->contacts[j];
@@ -252,10 +264,6 @@ cpArbiterUpdate(cpArbiter *arb, cpCollisionInfo *info, cpCollisionHandler *handl
 	// This may change in the future.
 	cpVect surface_vr = cpvsub(a->surface_v, b->surface_v);
 	arb->surface_vr = cpvsub(surface_vr, cpvmult(info->n, cpvdot(surface_vr, info->n)));
-	
-	// For collisions between two similar primitive types, the order could have been swapped.
-	arb->a = a; arb->body_a = a->body;
-	arb->b = b; arb->body_b = b->body;
 	
 	// mark it as new if it's been cached
 	if(arb->state == cpArbiterStateCached) arb->state = cpArbiterStateFirstColl;

@@ -48,14 +48,8 @@ cpCollisionInfoPushContact(cpCollisionInfo *info, cpVect p1, cpVect p2, cpHashVa
 	cpAssertSoft(info->count <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error: Tried to push too many contacts.");
 	
 	struct cpContact *con = &info->arr[info->count];
-	con->r1 = cpvsub(p1, info->a->body->p);
-	con->r2 = cpvsub(p2, info->b->body->p);
-	
-	// TODO: Could eliminate this in cpArbiterUpdate()
-	con->jnAcc = 0.0f;
-	con->jtAcc = 0.0f;
-	con->jBias = 0.0f;
-	
+	con->r1 = p1;
+	con->r2 = p2;
 	con->hash = hash;
 	
 	info->count++;
@@ -458,22 +452,22 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 		cpFloat e2_denom = 1.0f/(d_e2_b - d_e2_a);
 		
 		{
-			cpVect r1 = cpvadd(cpvmult(n,  e1.r), cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_b - d_e1_a)*e1_denom)));
-			cpVect r2 = cpvadd(cpvmult(n, -e2.r), cpvlerp(e2.a.p, e2.b.p, cpfclamp01((d_e1_a - d_e2_a)*e2_denom)));
-			cpFloat dist = cpvdot(cpvsub(r2, r1), n);
+			cpVect p1 = cpvadd(cpvmult(n,  e1.r), cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_b - d_e1_a)*e1_denom)));
+			cpVect p2 = cpvadd(cpvmult(n, -e2.r), cpvlerp(e2.a.p, e2.b.p, cpfclamp01((d_e1_a - d_e2_a)*e2_denom)));
+			cpFloat dist = cpvdot(cpvsub(p2, p1), n);
 			if(dist <= 0.0f)
 			{
 				cpHashValue hash_1a2b = CP_HASH_PAIR(e1.a.hash, e2.b.hash);
-				cpCollisionInfoPushContact(info, r1, r2, hash_1a2b);
+				cpCollisionInfoPushContact(info, p1, p2, hash_1a2b);
 			}
 		}{
-			cpVect r1 = cpvadd(cpvmult(n,  e1.r), cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_a - d_e1_a)*e1_denom)));
-			cpVect r2 = cpvadd(cpvmult(n, -e2.r), cpvlerp(e2.a.p, e2.b.p, cpfclamp01((d_e1_b - d_e2_a)*e2_denom)));
-			cpFloat dist = cpvdot(cpvsub(r2, r1), n);
+			cpVect p1 = cpvadd(cpvmult(n,  e1.r), cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_a - d_e1_a)*e1_denom)));
+			cpVect p2 = cpvadd(cpvmult(n, -e2.r), cpvlerp(e2.a.p, e2.b.p, cpfclamp01((d_e1_b - d_e2_a)*e2_denom)));
+			cpFloat dist = cpvdot(cpvsub(p2, p1), n);
 			if(dist <= 0.0f)
 			{
 				cpHashValue hash_1b2a = CP_HASH_PAIR(e1.b.hash, e2.a.hash);
-				cpCollisionInfoPushContact(info, r1, r2, hash_1b2a);
+				cpCollisionInfoPushContact(info, p1, p2, hash_1b2a);
 			}
 		}
 	}

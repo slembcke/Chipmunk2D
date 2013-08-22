@@ -50,16 +50,7 @@ struct cpCollisionHandler {
 
 #define CP_MAX_CONTACTS_PER_ARBITER 2
 
-typedef struct cpCollisionInfo {
-	cpShape *a, *b;
-	cpCollisionID id;
-	
-	cpVect n;
-	
-	int count;
-	// TODO Should this be a unique struct type?
-	struct cpContact *arr;
-} cpCollisionInfo;
+typedef struct cpCollisionInfo cpCollisionInfo;
 
 //#define CP_DefineArbiterStructGetter(type, member, name) \
 //static inline type cpArbiterGet##name(const cpArbiter *arb){return arb->member;}
