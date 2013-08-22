@@ -489,7 +489,9 @@ SetupGLFW()
 
 #ifdef WIN32
 
-static double GetMilliseconds(){
+static double
+GetMilliseconds()
+{
 	__int64 count, freq;
 	QueryPerformanceCounter((LARGE_INTEGER*)&count);
 	QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
@@ -502,7 +504,9 @@ static double GetMilliseconds(){
 #include <sys/time.h>
 #include <unistd.h>
 
-static double GetMilliseconds(){
+static double
+GetMilliseconds()
+{
 	struct timeval time;
 	gettimeofday(&time, NULL);
 	
@@ -511,21 +515,32 @@ static double GetMilliseconds(){
 
 #endif
 
-void TimeTrial(int index, int count)
+static void
+TimeTrial(int index, int count, int attempts)
 {
-	space = demos[index].initFunc();
+	double best = INFINITY;
 	
-	double start_time = GetMilliseconds();
-	double dt = demos[index].timestep;
+	for(int attempt=0; attempt<attempts; attempt++){
+		space = demos[index].initFunc();
+		
+		double start_time = GetMilliseconds();
+		double dt = demos[index].timestep;
+		
+		for(int i=0; i<count; i++)
+			demos[index].updateFunc(space, dt);
+		
+		double end_time = GetMilliseconds();
+		
+		demos[index].destroyFunc(space);
+		
+		double duration = end_time - start_time;
+		//printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', duration, demos[index].name);
+		
+		best = cpfmin(best, duration);
+	}
 	
-	for(int i=0; i<count; i++)
-		demos[index].updateFunc(space, dt);
-	
-	double end_time = GetMilliseconds();
-	
-	demos[index].destroyFunc(space);
-	
-	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, demos[index].name);
+	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', best, demos[index].name);
+	fflush(stdout);
 }
 
 extern ChipmunkDemo LogoSmash;
@@ -602,7 +617,7 @@ main(int argc, const char **argv)
 	
 	if(trial){
 //		sleep(1);
-		for(int i=0; i<demo_count; i++) TimeTrial(i, 1000);
+		for(int i=0; i<demo_count; i++) TimeTrial(i, 1000, 5);
 //		time_trial('d' - 'a', 10000);
 		exit(0);
 	} else {
