@@ -84,7 +84,7 @@ update(cpSpace *space, double dt)
 	#if USE_BLOCKS
 		__block cpVect impulseSum = cpvzero;
 		cpBodyEachArbiter_b(scaleStaticBody, ^(cpArbiter *arb){
-			impulseSum = cpvadd(impulseSum, cpArbiterTotalImpulseWithFriction(arb));
+			impulseSum = cpvadd(impulseSum, cpArbiterTotalImpulse(arb));
 		});
 	#else
 		cpVect impulseSum = cpvzero;
@@ -123,7 +123,7 @@ update(cpSpace *space, double dt)
 		__block cpFloat magnitudeSum = 0.0f;
 		__block cpVect vectorSum = cpvzero;
 		cpBodyEachArbiter_b(ballBody, ^(cpArbiter *arb){
-			cpVect j = cpArbiterTotalImpulseWithFriction(arb);
+			cpVect j = cpArbiterTotalImpulse(arb);
 			magnitudeSum += cpvlength(j);
 			vectorSum = cpvadd(vectorSum, j);
 		});

@@ -260,16 +260,17 @@ cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceB
 
 //MARK: Shape Query Functions
 
-struct ShapeQueryContext {
-	cpSpaceShapeQueryFunc func;
-	void *data;
-	cpBool anyCollision;
-};
-
-// Callback from the spatial hash.
-static cpCollisionID
-ShapeQuery(cpShape *a, cpShape *b, cpCollisionID id, struct ShapeQueryContext *context)
-{
+// TODO: Reimplement
+//struct ShapeQueryContext {
+//	cpSpaceShapeQueryFunc func;
+//	void *data;
+//	cpBool anyCollision;
+//};
+//
+//// Callback from the spatial hash.
+//static cpCollisionID
+//ShapeQuery(cpShape *a, cpShape *b, cpCollisionID id, struct ShapeQueryContext *context)
+//{
 //	// Reject any of the simple cases
 //	if(
 //		(a->group && a->group == b->group) ||
@@ -304,21 +305,21 @@ ShapeQuery(cpShape *a, cpShape *b, cpCollisionID id, struct ShapeQueryContext *c
 //			context->func(b, &set, context->data);
 //		}
 //	}
-	
-	return id;
-}
-
-cpBool
-cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data)
-{
-	cpBody *body = shape->body;
-	cpBB bb = (body ? cpShapeUpdate(shape, body->p, body->rot) : shape->bb);
-	struct ShapeQueryContext context = {func, data, cpFalse};
-	
-	cpSpaceLock(space); {
-    cpSpatialIndexQuery(space->activeShapes, shape, bb, (cpSpatialIndexQueryFunc)ShapeQuery, &context);
-    cpSpatialIndexQuery(space->staticShapes, shape, bb, (cpSpatialIndexQueryFunc)ShapeQuery, &context);
-	} cpSpaceUnlock(space, cpTrue);
-	
-	return context.anyCollision;
-}
+//	
+//	return id;
+//}
+//
+//cpBool
+//cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data)
+//{
+//	cpBody *body = shape->body;
+//	cpBB bb = (body ? cpShapeUpdate(shape, body->p, body->rot) : shape->bb);
+//	struct ShapeQueryContext context = {func, data, cpFalse};
+//	
+//	cpSpaceLock(space); {
+//    cpSpatialIndexQuery(space->activeShapes, shape, bb, (cpSpatialIndexQueryFunc)ShapeQuery, &context);
+//    cpSpatialIndexQuery(space->staticShapes, shape, bb, (cpSpatialIndexQueryFunc)ShapeQuery, &context);
+//	} cpSpaceUnlock(space, cpTrue);
+//	
+//	return context.anyCollision;
+//}

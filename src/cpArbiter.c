@@ -30,7 +30,7 @@ cpCollisionInfoPushContact(cpCollisionInfo *info, cpVect r1, cpVect r2, cpVect n
 	struct cpContact *con = &info->arr[info->count];
 	con->r1 = r1;
 	con->r2 = r2;
-	con->dist = dist;
+//	con->dist = dist;
 	
 	con->jnAcc = 0.0f;
 	con->jtAcc = 0.0f;
@@ -83,87 +83,69 @@ int cpArbiterGetCount(const cpArbiter *arb)
 }
 
 cpVect
-cpArbiterGetNormal(const cpArbiter *arb, int i)
+cpArbiterGetNormal(const cpArbiter *arb)
 {
-//	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
-//	
-//	cpVect n = arb->contacts[i].n;
-//	return arb->swapped ? cpvneg(n) : n;
-	return cpvzero;
+	return cpvmult(arb->n, arb->swapped ? -1.0f : 1.0);
 }
 
-cpVect
-cpArbiterGetPoint(const cpArbiter *arb, int i)
-{
+//cpVect
+//cpArbiterGetPoint(const cpArbiter *arb, int i)
+//{
 //	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
 //	
-//	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
-	return cpvzero;
-}
+//	return arb->contacts[i].p;
+//}
 
 cpFloat
 cpArbiterGetDepth(const cpArbiter *arb, int i)
 {
 	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
 	
-	return arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
+	struct cpContact *con = &arb->contacts[i];
+	return cpvdot(cpvadd(cpvsub(con->r2, con->r1), cpvsub(arb->body_b->p, arb->body_a->p)), arb->n);
 }
 
-cpContactPointSet
-cpArbiterGetContactPointSet(const cpArbiter *arb)
-{
-	cpContactPointSet set;
-	set.count = cpArbiterGetCount(arb);
-	
-	for(int i=0; i<set.count; i++){
-//		set.points[i].point = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
-//		set.points[i].normal = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(n);
-		set.points[i].dist = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
-	}
-	
-	return set;
-}
-
-void
-cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
-{
-	int count = set->count;
-	cpAssertHard(count == arb->count, "The number of contact points cannot be changed.");
-	
-	for(int i=0; i<count; i++){
-//		arb->contacts[i].p = set->points[i].point;
-//		arb->contacts[i].n = set->points[i].normal;
-		arb->contacts[i].dist = set->points[i].dist;
-	}
-}
+//cpContactPointSet
+//cpArbiterGetContactPointSet(const cpArbiter *arb)
+//{
+//	cpContactPointSet set;
+//	set.count = cpArbiterGetCount(arb);
+//	
+//	for(int i=0; i<set.count; i++){
+////		set.points[i].point = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(p);
+////		set.points[i].normal = arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(n);
+//		set.points[i].dist = 0.0;//arb->CP_PRIVATE(contacts)[i].CP_PRIVATE(dist);
+//	}
+//	
+//	return set;
+//}
+//
+//void
+//cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
+//{
+//	int count = set->count;
+//	cpAssertHard(count == arb->count, "The number of contact points cannot be changed.");
+//	
+//	for(int i=0; i<count; i++){
+////		arb->contacts[i].p = set->points[i].point;
+////		arb->contacts[i].n = set->points[i].normal;
+////		arb->contacts[i].dist = set->points[i].dist;
+//	}
+//}
 
 cpVect
 cpArbiterTotalImpulse(const cpArbiter *arb)
 {
-//	cpContact *contacts = arb->contacts;
-//	cpVect sum = cpvzero;
-//	
-//	for(int i=0, count=cpArbiterGetCount(arb); i<count; i++){
-//		cpContact *con = &contacts[i];
-//		sum = cpvadd(sum, cpvmult(con->n, con->jnAcc));
-//	}
-//	
-//	return (arb->swapped ? sum : cpvneg(sum));
-	return cpvzero;
-}
-
-cpVect
-cpArbiterTotalImpulseWithFriction(const cpArbiter *arb)
-{
-//	cpContact *contacts = arb->contacts;
-//	cpVect sum = cpvzero;
-//	
-//	for(int i=0, count=cpArbiterGetCount(arb); i<count; i++){
-//		cpContact *con = &contacts[i];
-//		sum = cpvadd(sum, cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc)));
-//	}
-//		
-//	return (arb->swapped ? sum : cpvneg(sum));
+	struct cpContact *contacts = arb->contacts;
+	cpVect n = arb->n;
+	cpVect sum = cpvzero;
+	
+	for(int i=0, count=cpArbiterGetCount(arb); i<count; i++){
+		struct cpContact *con = &contacts[i];
+		sum = cpvadd(sum, cpvrotate(n, cpv(con->jnAcc, con->jtAcc)));
+	}
+		
+	return (arb->swapped ? sum : cpvneg(sum));
 	return cpvzero;
 }
 
@@ -304,20 +286,18 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat slop, cpFloat bias)
 	cpBody *a = arb->body_a;
 	cpBody *b = arb->body_b;
 	cpVect n = arb->n;
+	cpVect body_delta = cpvsub(b->p, a->p);
 	
 	for(int i=0; i<arb->count; i++){
 		struct cpContact *con = &arb->contacts[i];
-		
-		// Calculate the offsets.
-//		con->r1 = cpvsub(con->p, a->p);
-//		con->r2 = cpvsub(con->p, b->p);
 		
 		// Calculate the mass normal and mass tangent.
 		con->nMass = 1.0f/k_scalar(a, b, con->r1, con->r2, n);
 		con->tMass = 1.0f/k_scalar(a, b, con->r1, con->r2, cpvperp(n));
 				
 		// Calculate the target bias velocity.
-		con->bias = -bias*cpfmin(0.0f, con->dist + slop)/dt;
+		cpFloat dist = cpvdot(cpvadd(cpvsub(con->r2, con->r1), body_delta), n);
+		con->bias = -bias*cpfmin(0.0f, dist + slop)/dt;
 		con->jBias = 0.0f;
 		
 		// Calculate the target bounce velocity.

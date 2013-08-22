@@ -34,7 +34,7 @@ preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 	CP_ARBITER_GET_SHAPES(arb, a, b);
 	OneWayPlatform *platform = (OneWayPlatform *)cpShapeGetUserData(a);
 		
-	if(cpvdot(cpArbiterGetNormal(arb, 0), platform->n) < 0){
+	if(cpvdot(cpArbiterGetNormal(arb), platform->n) < 0){
 		cpArbiterIgnore(arb);
 		return cpFalse;
 	}

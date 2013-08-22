@@ -343,15 +343,3 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 	
 	cpArrayDeleteObj(space->bodies, body);
 }
-
-static void
-activateTouchingHelper(cpShape *shape, cpContactPointSet *points, cpShape *other){
-	cpBodyActivate(shape->body);
-}
-
-void
-cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape){
-	if(space->sleepTimeThreshold != INFINITY){
-		cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)activateTouchingHelper, shape);
-	}
-}

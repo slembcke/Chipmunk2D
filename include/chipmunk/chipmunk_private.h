@@ -162,9 +162,9 @@ struct cpArbiterThread {
 
 struct cpContact {
 	cpVect r1, r2;
-	cpFloat dist;
 	
-	cpFloat nMass, tMass, bounce;
+	cpFloat nMass, tMass;
+	cpFloat bounce; // TODO: look for an alternate bounce solution.
 
 	cpFloat jnAcc, jtAcc, jBias;
 	cpFloat bias;

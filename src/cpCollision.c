@@ -54,11 +54,8 @@ CircleToCircleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cp
 	if(distsq < mindist*mindist){
 		cpFloat dist = cpfsqrt(distsq);
 		cpVect n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
-//		cpContactInit(con, cpvlerp(p1, p2, r1/(r1 + r2)), n, dist - mindist, hash);
 		
-		// TODO: calculate r1 and r2 independently
-		cpVect p = cpvlerp(p1, p2, r1/(r1 + r2));
-		cpCollisionInfoPushContact(info, cpvsub(p, info->a->body->p), cpvsub(p, info->b->body->p), n, dist - mindist, hash);
+		cpCollisionInfoPushContact(info, cpvsub(cpvadd(p1, cpvmult(n, r1)), info->a->body->p), cpvsub(cpvadd(p2, cpvmult(n, -r2)), info->b->body->p), n, dist - mindist, hash);
 	}
 }
 
@@ -602,9 +599,8 @@ CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionIn
 	
 	cpFloat mindist = circle->r + poly->r;
 	if(points.d - mindist <= 0.0){
-		cpVect p = cpvlerp(points.a, points.b, circle->r/(mindist));
-//		cpContactInit(con, p, points.n, points.d - mindist, 0);
-		cpCollisionInfoPushContact(info, cpvsub(p, info->a->body->p), cpvsub(p, info->b->body->p), points.n, points.d - mindist, 0);
+		cpVect n = points.n;
+		cpCollisionInfoPushContact(info, cpvsub(cpvadd(points.a, cpvmult(n, circle->r)), info->a->body->p), cpvsub(cpvadd(points.b, cpvmult(n, poly->r)), info->b->body->p), n, points.d - mindist, 0);
 	}
 }
 
@@ -634,21 +630,19 @@ cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, struct cpContact *cont
 	if(cfunc) cfunc(a, b, &info);
 	cpAssertSoft(info.count <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error: Too many contact points returned.");
 	
-	if(0){
-		cpVect n = info.n;
-		
-		cpBody *a = info.a->body;
-		cpBody *b = info.b->body;
-		
-		for(int i=0; i<info.count; i++){
-			cpVect r1 = cpvadd(a->p, info.arr[i].r1);
-			cpVect r2 = cpvadd(b->p, info.arr[i].r2);
-			cpVect delta = cpvmult(n, cpfmax(5.0, -0.5*info.arr[i].dist));
-			
-			ChipmunkDebugDrawSegment(r1, cpvsub(r1, delta), RGBAColor(1, 0, 0, 1));
-			ChipmunkDebugDrawSegment(r2, cpvadd(r2, delta), RGBAColor(0, 0, 1, 1));
-		}
-	}
+//	if(0){
+//		cpBody *a = info.a->body;
+//		cpBody *b = info.b->body;
+//		
+//		for(int i=0; i<info.count; i++){
+//			cpVect r1 = cpvadd(a->p, info.arr[i].r1);
+//			cpVect r2 = cpvadd(b->p, info.arr[i].r2);
+//			cpVect mid = cpvlerp(r1, r2, 0.5f);
+//			
+//			ChipmunkDebugDrawSegment(r1, mid, RGBAColor(1, 0, 0, 1));
+//			ChipmunkDebugDrawSegment(r2, mid, RGBAColor(0, 0, 1, 1));
+//		}
+//	}
 	
 	return info;
 }

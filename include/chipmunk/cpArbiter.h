@@ -87,12 +87,9 @@ void cpArbiterSetSurfaceVelocity(cpArbiter *arb, cpVect vr);
 cpDataPointer cpArbiterGetUserData(const cpArbiter *arb);
 void cpArbiterSetUserData(cpArbiter *arb, cpDataPointer userData);
 
-/// Calculate the total impulse that was applied by this arbiter.
-/// This function should only be called from a post-solve, post-step or cpBodyEachArbiter callback.
-cpVect cpArbiterTotalImpulse(const cpArbiter *arb);
 /// Calculate the total impulse including the friction that was applied by this arbiter.
 /// This function should only be called from a post-solve, post-step or cpBodyEachArbiter callback.
-cpVect cpArbiterTotalImpulseWithFriction(const cpArbiter *arb);
+cpVect cpArbiterTotalImpulse(const cpArbiter *arb);
 /// Calculate the amount of energy lost in a collision including static, but not dynamic friction.
 /// This function should only be called from a post-solve, post-step or cpBodyEachArbiter callback.
 cpFloat cpArbiterTotalKE(const cpArbiter *arb);
@@ -123,37 +120,37 @@ static inline void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody *
 /// A macro shortcut for defining and retrieving the bodies from an arbiter.
 #define CP_ARBITER_GET_BODIES(__arb__, __a__, __b__) cpBody *__a__, *__b__; cpArbiterGetBodies(__arb__, &__a__, &__b__);
 
-/// A struct that wraps up the important collision data for an arbiter.
-typedef struct cpContactPointSet {
-	/// The number of contact points in the set.
-	int count;
-	
-	/// The array of contact points.
-	struct {
-		/// The position of the contact point.
-		cpVect point;
-		/// The normal of the contact point.
-		cpVect normal;
-		/// The depth of the contact point.
-		cpFloat dist;
-	} points[CP_MAX_CONTACTS_PER_ARBITER];
-} cpContactPointSet;
-
-/// Return a contact set from an arbiter.
-cpContactPointSet cpArbiterGetContactPointSet(const cpArbiter *arb);
-
-/// Replace the contact point set for an arbiter.
-/// This can be a very powerful feature, but use it with caution!
-void cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set);
+///// A struct that wraps up the important collision data for an arbiter.
+//typedef struct cpContactPointSet {
+//	/// The number of contact points in the set.
+//	int count;
+//	
+//	/// The array of contact points.
+//	struct {
+//		/// The position of the contact point.
+//		cpVect point;
+//		/// The normal of the contact point.
+//		cpVect normal;
+//		/// The depth of the contact point.
+//		cpFloat dist;
+//	} points[CP_MAX_CONTACTS_PER_ARBITER];
+//} cpContactPointSet;
+//
+///// Return a contact set from an arbiter.
+//cpContactPointSet cpArbiterGetContactPointSet(const cpArbiter *arb);
+//
+///// Replace the contact point set for an arbiter.
+///// This can be a very powerful feature, but use it with caution!
+//void cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set);
 
 /// Returns true if this is the first step a pair of objects started colliding.
 cpBool cpArbiterIsFirstContact(const cpArbiter *arb);
 /// Get the number of contact points for this arbiter.
 int cpArbiterGetCount(const cpArbiter *arb);
 /// Get the normal of the @c ith contact point.
-cpVect cpArbiterGetNormal(const cpArbiter *arb, int i);
+cpVect cpArbiterGetNormal(const cpArbiter *arb);
 /// Get the position of the @c ith contact point.
-cpVect cpArbiterGetPoint(const cpArbiter *arb, int i);
+//cpVect cpArbiterGetPoint(const cpArbiter *arb, int i);
 /// Get the depth of the @c ith contact point.
 cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i);
 

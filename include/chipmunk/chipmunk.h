@@ -194,8 +194,9 @@ void cpSpaceSegmentQuery_b(cpSpace *space, cpVect start, cpVect end, cpLayers la
 typedef void (^cpSpaceBBQueryBlock)(cpShape *shape);
 void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryBlock block);
 
-typedef void (^cpSpaceShapeQueryBlock)(cpShape *shape, cpContactPointSet *points);
-cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block);
+// TODO: Reimplement
+//typedef void (^cpSpaceShapeQueryBlock)(cpShape *shape, cpContactPointSet *points);
+//cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block);
 
 #endif
 #endif

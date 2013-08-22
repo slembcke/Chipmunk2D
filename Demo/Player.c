@@ -44,7 +44,7 @@ static cpBool lastJumpState = cpFalse;
 
 static void
 SelectPlayerGroundNormal(cpBody *body, cpArbiter *arb, cpVect *groundNormal){
-	cpVect n = cpvneg(cpArbiterGetNormal(arb, 0));
+	cpVect n = cpvneg(cpArbiterGetNormal(arb));
 	
 	if(n.y > groundNormal->y){
 		(*groundNormal) = n;

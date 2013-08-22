@@ -307,10 +307,11 @@ void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, c
 	cpSpaceBBQuery(space, bb, layers, group, (cpSpaceBBQueryFunc)IteratorFunc, block);
 }
 
-static void ShapeQueryIteratorFunc(cpShape *shape, cpContactPointSet *points, cpSpaceShapeQueryBlock block){block(shape, points);}
-cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block){
-	return cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)ShapeQueryIteratorFunc, block);
-}
+// TODO: Reimplement
+//static void ShapeQueryIteratorFunc(cpShape *shape, cpContactPointSet *points, cpSpaceShapeQueryBlock block){block(shape, points);}
+//cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block){
+//	return cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)ShapeQueryIteratorFunc, block);
+//}
 
 #endif
 #endif
