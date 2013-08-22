@@ -47,33 +47,6 @@ cpBool cpArrayContains(cpArray *arr, void *ptr);
 void cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*));
 
 
-//MARK: Foreach loops
-
-static inline cpConstraint *
-cpConstraintNext(cpConstraint *node, cpBody *body)
-{
-	return (node->a == body ? node->next_a : node->next_b);
-}
-
-#define CP_BODY_FOREACH_CONSTRAINT(bdy, var)\
-	for(cpConstraint *var = bdy->constraintList; var; var = cpConstraintNext(var, bdy))
-
-static inline cpArbiter *
-cpArbiterNext(cpArbiter *node, cpBody *body)
-{
-	return (node->body_a == body ? node->thread_a.next : node->thread_b.next);
-}
-
-#define CP_BODY_FOREACH_ARBITER(bdy, var)\
-	for(cpArbiter *var = bdy->arbiterList; var; var = cpArbiterNext(var, bdy))
-
-#define CP_BODY_FOREACH_SHAPE(body, var)\
-	for(cpShape *var = body->shapeList; var; var = var->next)
-
-#define CP_BODY_FOREACH_COMPONENT(root, var)\
-	for(cpBody *var = root; var; var = var->node.next)
-
-
 //MARK: cpHashSet
 
 typedef cpBool (*cpHashSetEqlFunc)(void *ptr, void *elt);
@@ -122,7 +95,7 @@ cpShapeActive(cpShape *shape)
 	return shape->prev || (shape->body && shape->body->shapeList == shape);
 }
 
-cpCollisionInfo cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpContact *contacts);
+cpCollisionInfo cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, struct cpContact *contacts);
 
 static inline void
 CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r, cpVect a, cpVect b, cpSegmentQueryInfo *info)
@@ -169,13 +142,90 @@ void cpLoopIndexes(cpVect *verts, int count, int *start, int *end);
 cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *klass, cpSpatialIndexBBFunc bbfunc, cpSpatialIndex *staticIndex);
 
 
+//MARK: Arbiters
+
+enum cpArbiterState {
+	// Arbiter is active and its the first collision.
+	cpArbiterStateFirstColl,
+	// Arbiter is active and its not the first collision.
+	cpArbiterStateNormal,
+	// Collision has been explicitly ignored.
+	// Either by returning false from a begin collision handler or calling cpArbiterIgnore().
+	cpArbiterStateIgnore,
+	// Collison is no longer active. A space will cache an arbiter for up to cpSpace.collisionPersistence more steps.
+	cpArbiterStateCached,
+};
+
+struct cpArbiterThread {
+	struct cpArbiter *next, *prev;
+};
+
+struct cpContact {
+	cpVect r1, r2;
+	cpFloat dist;
+	
+	cpFloat nMass, tMass, bounce;
+
+	cpFloat jnAcc, jtAcc, jBias;
+	cpFloat bias;
+	
+	cpHashValue hash;
+};
+
+struct cpArbiter {
+	cpFloat e;
+	cpFloat u;
+	cpVect surface_vr;
+	
+	cpDataPointer data;
+	
+	cpShape *a, *b;
+	cpBody *body_a, *body_b;
+	struct cpArbiterThread thread_a, thread_b;
+	
+	int count;
+	struct cpContact *contacts;
+	cpVect n;
+	
+	cpTimestamp stamp;
+	cpCollisionHandler *handler;
+	cpBool swapped;
+	enum cpArbiterState state;
+};
+
+void cpCollisionInfoPushContact(cpCollisionInfo *info, cpVect r1, cpVect r2, cpVect n, cpFloat dist, cpHashValue hash);
+cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
+
+static inline cpCollisionHandler * cpSpaceLookupHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
+
+static inline void
+cpArbiterCallSeparate(cpArbiter *arb, cpSpace *space)
+{
+	// The handler needs to be looked up again as the handler cached on the arbiter may have been deleted since the last step.
+	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->a->collision_type, arb->b->collision_type);
+	handler->separate(arb, space, handler->data);
+}
+
+static inline struct cpArbiterThread *
+cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
+{
+	return (arb->body_a == body ? &arb->thread_a : &arb->thread_b);
+}
+
+void cpArbiterUnthread(cpArbiter *arb);
+
+void cpArbiterUpdate(cpArbiter *arb, cpCollisionInfo *info, cpCollisionHandler *handler);
+void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
+void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
+void cpArbiterApplyImpulse(cpArbiter *arb);
+
 //MARK: Space Functions
 
 extern cpCollisionHandler cpDefaultCollisionHandler;
 void cpSpaceProcessComponents(cpSpace *space, cpFloat dt);
 
 void cpSpacePushFreshContactBuffer(cpSpace *space);
-cpContact *cpContactBufferGetArray(cpSpace *space);
+struct cpContact *cpContactBufferGetArray(cpSpace *space);
 void cpSpacePushContacts(cpSpace *space, int count);
 
 typedef struct cpPostStepCallback {
@@ -214,40 +264,28 @@ void cpShapeUpdateFunc(cpShape *shape, void *unused);
 cpCollisionID cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space);
 
 
-//MARK: Arbiters
+//MARK: Foreach loops
 
-struct cpContact {
-	cpVect r1, r2;
-	cpFloat dist;
-	
-	cpFloat nMass, tMass, bounce;
-
-	cpFloat jnAcc, jtAcc, jBias;
-	cpFloat bias;
-	
-	cpHashValue hash;
-};
-
-void cpCollisionInfoPushContact(cpCollisionInfo *info, cpVect r1, cpVect r2, cpVect n, cpFloat dist, cpHashValue hash);
-cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
-
-static inline void
-cpArbiterCallSeparate(cpArbiter *arb, cpSpace *space)
+static inline cpConstraint *
+cpConstraintNext(cpConstraint *node, cpBody *body)
 {
-	// The handler needs to be looked up again as the handler cached on the arbiter may have been deleted since the last step.
-	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->a->collision_type, arb->b->collision_type);
-	handler->separate(arb, space, handler->data);
+	return (node->a == body ? node->next_a : node->next_b);
 }
 
-static inline struct cpArbiterThread *
-cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
+#define CP_BODY_FOREACH_CONSTRAINT(bdy, var)\
+	for(cpConstraint *var = bdy->constraintList; var; var = cpConstraintNext(var, bdy))
+
+static inline cpArbiter *
+cpArbiterNext(cpArbiter *node, cpBody *body)
 {
-	return (arb->body_a == body ? &arb->thread_a : &arb->thread_b);
+	return (node->body_a == body ? node->thread_a.next : node->thread_b.next);
 }
 
-void cpArbiterUnthread(cpArbiter *arb);
+#define CP_BODY_FOREACH_ARBITER(bdy, var)\
+	for(cpArbiter *var = bdy->arbiterList; var; var = cpArbiterNext(var, bdy))
 
-void cpArbiterUpdate(cpArbiter *arb, cpCollisionInfo *info, cpCollisionHandler *handler);
-void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
-void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
-void cpArbiterApplyImpulse(cpArbiter *arb);
+#define CP_BODY_FOREACH_SHAPE(body, var)\
+	for(cpShape *var = body->shapeList; var; var = var->next)
+
+#define CP_BODY_FOREACH_COMPONENT(root, var)\
+	for(cpBody *var = root; var; var = var->node.next)

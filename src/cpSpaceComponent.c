@@ -50,12 +50,12 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 			// The edge case is when static bodies are involved as the static bodies never actually sleep.
 			// If the static body is bodyB then all is good. If the static body is bodyA, that can easily be checked.
 			if(body == bodyA || cpBodyIsStatic(bodyA)){
-				int numContacts = arb->numContacts;
-				cpContact *contacts = arb->contacts;
+				int numContacts = arb->count;
+				struct cpContact *contacts = arb->contacts;
 				
 				// Restore contact values back to the space's contact buffer memory
 				arb->contacts = cpContactBufferGetArray(space);
-				memcpy(arb->contacts, contacts, numContacts*sizeof(cpContact));
+				memcpy(arb->contacts, contacts, numContacts*sizeof(struct cpContact));
 				cpSpacePushContacts(space, numContacts);
 				
 				// Reinsert the arbiter into the arbiter cache
@@ -98,8 +98,8 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 			cpSpaceUncacheArbiter(space, arb);
 			
 			// Save contact values to a new block of memory so they won't time out
-			size_t bytes = arb->numContacts*sizeof(cpContact);
-			cpContact *contacts = (cpContact *)cpcalloc(1, bytes);
+			size_t bytes = arb->count*sizeof(struct cpContact);
+			struct cpContact *contacts = (struct cpContact *)cpcalloc(1, bytes);
 			memcpy(contacts, arb->contacts, bytes);
 			arb->contacts = contacts;
 		}

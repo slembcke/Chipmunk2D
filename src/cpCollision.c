@@ -622,7 +622,7 @@ static const CollisionFunc BuiltinCollisionFuncs[9] = {
 static const CollisionFunc *CollisionFuncs = BuiltinCollisionFuncs;
 
 struct cpCollisionInfo
-cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpContact *contacts)
+cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, struct cpContact *contacts)
 {
 	cpCollisionInfo info = {a, b, id, cpvzero, 0, contacts};
 	

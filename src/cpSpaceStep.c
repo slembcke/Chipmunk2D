@@ -112,10 +112,10 @@ struct cpContactBufferHeader {
 	unsigned int numContacts;
 };
 
-#define CP_CONTACTS_BUFFER_SIZE ((CP_BUFFER_BYTES - sizeof(cpContactBufferHeader))/sizeof(cpContact))
+#define CP_CONTACTS_BUFFER_SIZE ((CP_BUFFER_BYTES - sizeof(cpContactBufferHeader))/sizeof(struct cpContact))
 typedef struct cpContactBuffer {
 	cpContactBufferHeader header;
-	cpContact contacts[CP_CONTACTS_BUFFER_SIZE];
+	struct cpContact contacts[CP_CONTACTS_BUFFER_SIZE];
 } cpContactBuffer;
 
 static cpContactBufferHeader *
@@ -158,7 +158,7 @@ cpSpacePushFreshContactBuffer(cpSpace *space)
 }
 
 
-cpContact *
+struct cpContact *
 cpContactBufferGetArray(cpSpace *space)
 {
 	if(space->contactBuffersHead->numContacts + CP_MAX_CONTACTS_PER_ARBITER > CP_CONTACTS_BUFFER_SIZE){
@@ -268,7 +268,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 		cpSpacePopContacts(space, info.count);
 		
 		arb->contacts = NULL;
-		arb->numContacts = 0;
+		arb->count = 0;
 		
 		// Normally arbiters are set as used after calling the post-solve callback.
 		// However, post-solve callbacks are not called for sensors or arbiters rejected from pre-solve.
@@ -306,7 +306,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	
 	if(ticks >= space->collisionPersistence){
 		arb->contacts = NULL;
-		arb->numContacts = 0;
+		arb->count = 0;
 		
 		cpArrayPush(space->pooledArbiters, arb);
 		return cpFalse;

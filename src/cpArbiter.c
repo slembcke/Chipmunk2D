@@ -27,7 +27,7 @@ cpCollisionInfoPushContact(cpCollisionInfo *info, cpVect r1, cpVect r2, cpVect n
 {
 	info->n = n;
 	
-	cpContact *con = &info->arr[info->count];
+	struct cpContact *con = &info->arr[info->count];
 	con->r1 = r1;
 	con->r2 = r2;
 	con->dist = dist;
@@ -79,7 +79,7 @@ cpBool cpArbiterIsFirstContact(const cpArbiter *arb)
 int cpArbiterGetCount(const cpArbiter *arb)
 {
 	// Return 0 contacts if we are in a separate callback.
-	return (arb->CP_PRIVATE(state) != cpArbiterStateCached ? arb->CP_PRIVATE(numContacts) : 0);
+	return (arb->state != cpArbiterStateCached ? arb->count : 0);
 }
 
 cpVect
@@ -88,7 +88,7 @@ cpArbiterGetNormal(const cpArbiter *arb, int i)
 //	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
 //	
 //	cpVect n = arb->contacts[i].n;
-//	return arb->swappedColl ? cpvneg(n) : n;
+//	return arb->swapped ? cpvneg(n) : n;
 	return cpvzero;
 }
 
@@ -128,7 +128,7 @@ void
 cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
 {
 	int count = set->count;
-	cpAssertHard(count == arb->numContacts, "The number of contact points cannot be changed.");
+	cpAssertHard(count == arb->count, "The number of contact points cannot be changed.");
 	
 	for(int i=0; i<count; i++){
 //		arb->contacts[i].p = set->points[i].point;
@@ -148,7 +148,7 @@ cpArbiterTotalImpulse(const cpArbiter *arb)
 //		sum = cpvadd(sum, cpvmult(con->n, con->jnAcc));
 //	}
 //	
-//	return (arb->swappedColl ? sum : cpvneg(sum));
+//	return (arb->swapped ? sum : cpvneg(sum));
 	return cpvzero;
 }
 
@@ -163,7 +163,7 @@ cpArbiterTotalImpulseWithFriction(const cpArbiter *arb)
 //		sum = cpvadd(sum, cpvrotate(con->n, cpv(con->jnAcc, con->jtAcc)));
 //	}
 //		
-//	return (arb->swappedColl ? sum : cpvneg(sum));
+//	return (arb->swapped ? sum : cpvneg(sum));
 	return cpvzero;
 }
 
@@ -173,9 +173,9 @@ cpArbiterTotalKE(const cpArbiter *arb)
 	cpFloat eCoef = (1 - arb->e)/(1 + arb->e);
 	cpFloat sum = 0.0;
 	
-	cpContact *contacts = arb->contacts;
+	struct cpContact *contacts = arb->contacts;
 	for(int i=0, count=cpArbiterGetCount(arb); i<count; i++){
-		cpContact *con = &contacts[i];
+		struct cpContact *con = &contacts[i];
 		cpFloat jnAcc = con->jnAcc;
 		cpFloat jtAcc = con->jtAcc;
 		
@@ -194,13 +194,34 @@ cpArbiterIgnore(cpArbiter *arb)
 cpVect
 cpArbiterGetSurfaceVelocity(cpArbiter *arb)
 {
-	return cpvmult(arb->surface_vr, arb->swappedColl ? -1.0f : 1.0);
+	return cpvmult(arb->surface_vr, arb->swapped ? -1.0f : 1.0);
 }
 
 void
 cpArbiterSetSurfaceVelocity(cpArbiter *arb, cpVect vr)
 {
-	arb->surface_vr = cpvmult(vr, arb->swappedColl ? -1.0f : 1.0);
+	arb->surface_vr = cpvmult(vr, arb->swapped ? -1.0f : 1.0);
+}
+
+cpDataPointer
+cpArbiterGetUserData(const cpArbiter *arb)
+{
+	return arb->data;
+}
+
+void
+cpArbiterSetUserData(cpArbiter *arb, cpDataPointer userData)
+{
+	arb->data = userData;
+}
+
+void cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
+{
+	if(arb->swapped){
+		(*a) = arb->b, (*b) = arb->a;
+	} else {
+		(*a) = arb->a, (*b) = arb->b;
+	}
 }
 
 
@@ -208,13 +229,13 @@ cpArbiter*
 cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 {
 	arb->handler = NULL;
-	arb->swappedColl = cpFalse;
+	arb->swapped = cpFalse;
 	
 	arb->e = 0.0f;
 	arb->u = 0.0f;
 	arb->surface_vr = cpvzero;
 	
-	arb->numContacts = 0;
+	arb->count = 0;
 	arb->contacts = NULL;
 	
 	arb->a = a; arb->body_a = a->body;
@@ -240,10 +261,10 @@ cpArbiterUpdate(cpArbiter *arb, cpCollisionInfo *info, cpCollisionHandler *handl
 	
 	// Iterate over the possible pairs to look for hash value matches.
 	for(int i=0; i<info->count; i++){
-		cpContact *con = &info->arr[i];
+		struct cpContact *con = &info->arr[i];
 		
-		for(int j=0; j<arb->numContacts; j++){
-			cpContact *old = &arb->contacts[j];
+		for(int j=0; j<arb->count; j++){
+			struct cpContact *old = &arb->contacts[j];
 			
 			// This could trigger false positives, but is fairly unlikely nor serious if it does.
 			if(con->hash == old->hash){
@@ -255,11 +276,11 @@ cpArbiterUpdate(cpArbiter *arb, cpCollisionInfo *info, cpCollisionHandler *handl
 	}
 	
 	arb->contacts = info->arr;
-	arb->numContacts = info->count;
+	arb->count = info->count;
 	arb->n = info->n;
 	
 	arb->handler = handler;
-	arb->swappedColl = (a->collision_type != handler->a);
+	arb->swapped = (a->collision_type != handler->a);
 	
 	arb->e = a->e * b->e;
 	arb->u = a->u * b->u;
@@ -284,8 +305,8 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat slop, cpFloat bias)
 	cpBody *b = arb->body_b;
 	cpVect n = arb->n;
 	
-	for(int i=0; i<arb->numContacts; i++){
-		cpContact *con = &arb->contacts[i];
+	for(int i=0; i<arb->count; i++){
+		struct cpContact *con = &arb->contacts[i];
 		
 		// Calculate the offsets.
 //		con->r1 = cpvsub(con->p, a->p);
@@ -313,8 +334,8 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef)
 	cpBody *b = arb->body_b;
 	cpVect n = arb->n;
 	
-	for(int i=0; i<arb->numContacts; i++){
-		cpContact *con = &arb->contacts[i];
+	for(int i=0; i<arb->count; i++){
+		struct cpContact *con = &arb->contacts[i];
 		cpVect j = cpvrotate(n, cpv(con->jnAcc, con->jtAcc));
 		apply_impulses(a, b, con->r1, con->r2, cpvmult(j, dt_coef));
 	}
@@ -331,8 +352,8 @@ cpArbiterApplyImpulse(cpArbiter *arb)
 	cpVect surface_vr = arb->surface_vr;
 	cpFloat friction = arb->u;
 
-	for(int i=0; i<arb->numContacts; i++){
-		cpContact *con = &arb->contacts[i];
+	for(int i=0; i<arb->count; i++){
+		struct cpContact *con = &arb->contacts[i];
 		cpFloat nMass = con->nMass;
 		cpVect r1 = con->r1;
 		cpVect r2 = con->r2;

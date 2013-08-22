@@ -146,7 +146,7 @@ DrawInfo()
 	int points = 0;
 	
 	for(int i=0; i<arbiters; i++)
-		points += ((cpArbiter *)(space->arbiters->arr[i]))->numContacts;
+		points += ((cpArbiter *)(space->arbiters->arr[i]))->count;
 	
 	int constraints = (space->constraints->num + points)*space->iterations;
 	

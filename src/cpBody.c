@@ -322,7 +322,7 @@ cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 	while(arb){
 		cpArbiter *next = cpArbiterNext(arb, body);
 		
-		arb->swappedColl = (body == arb->body_b);
+		arb->swapped = (body == arb->body_b);
 		func(body, arb, data);
 		
 		arb = next;
