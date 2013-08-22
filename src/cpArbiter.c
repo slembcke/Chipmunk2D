@@ -22,25 +22,6 @@
 #include "chipmunk_private.h"
 #include "constraints/util.h"
 
-void
-cpCollisionInfoPushContact(cpCollisionInfo *info, cpVect r1, cpVect r2, cpVect n, cpFloat dist, cpHashValue hash)
-{
-	info->n = n;
-	
-	struct cpContact *con = &info->arr[info->count];
-	con->r1 = r1;
-	con->r2 = r2;
-//	con->dist = dist;
-	
-	con->jnAcc = 0.0f;
-	con->jtAcc = 0.0f;
-	con->jBias = 0.0f;
-	
-	con->hash = hash;
-	
-	info->count++;
-}
-
 // TODO: make this generic so I can reuse it for constraints also.
 static inline void
 unthreadHelper(cpArbiter *arb, cpBody *body)

@@ -57,6 +57,7 @@ typedef struct cpCollisionInfo {
 	cpVect n;
 	
 	int count;
+	// TODO Should this be a unique struct type?
 	struct cpContact *arr;
 } cpCollisionInfo;
 

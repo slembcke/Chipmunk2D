@@ -193,7 +193,6 @@ struct cpArbiter {
 	enum cpArbiterState state;
 };
 
-void cpCollisionInfoPushContact(cpCollisionInfo *info, cpVect r1, cpVect r2, cpVect n, cpFloat dist, cpHashValue hash);
 cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
 
 static inline cpCollisionHandler * cpSpaceLookupHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);

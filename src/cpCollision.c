@@ -42,6 +42,25 @@
 #define WARN_GJK_ITERATIONS 20
 #define WARN_EPA_ITERATIONS 20
 
+static inline void
+cpCollisionInfoPushContact(cpCollisionInfo *info, cpVect p1, cpVect p2, cpHashValue hash)
+{
+	cpAssertSoft(info->count <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error: Tried to push too many contacts.");
+	
+	struct cpContact *con = &info->arr[info->count];
+	con->r1 = cpvsub(p1, info->a->body->p);
+	con->r2 = cpvsub(p2, info->b->body->p);
+	
+	// TODO: Could eliminate this in cpArbiterUpdate()
+	con->jnAcc = 0.0f;
+	con->jtAcc = 0.0f;
+	con->jBias = 0.0f;
+	
+	con->hash = hash;
+	
+	info->count++;
+}
+
 // Add contact points for circle to circle collisions.
 // Used by several collision tests.
 static void
@@ -53,9 +72,8 @@ CircleToCircleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cp
 	
 	if(distsq < mindist*mindist){
 		cpFloat dist = cpfsqrt(distsq);
-		cpVect n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
-		
-		cpCollisionInfoPushContact(info, cpvsub(cpvadd(p1, cpvmult(n, r1)), info->a->body->p), cpvsub(cpvadd(p2, cpvmult(n, -r2)), info->b->body->p), n, dist - mindist, hash);
+		cpVect n = info->n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
+		cpCollisionInfoPushContact(info, cpvadd(p1, cpvmult(n, r1)), cpvadd(p2, cpvmult(n, -r2)), hash);
 	}
 }
 
@@ -428,7 +446,7 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 {
 	cpFloat mindist = e1.r + e2.r;
 	if(points.d <= mindist){
-		cpVect n = points.n;
+		cpVect n = info->n = points.n;
 		
 		// Distances along the axis parallel to n
 		cpFloat d_e1_a = cpvcross(e1.a.p, n);
@@ -446,7 +464,7 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 			if(dist <= 0.0f)
 			{
 				cpHashValue hash_1a2b = CP_HASH_PAIR(e1.a.hash, e2.b.hash);
-				cpCollisionInfoPushContact(info, cpvsub(r1, info->a->body->p), cpvsub(r2, info->b->body->p), n, dist, hash_1a2b);
+				cpCollisionInfoPushContact(info, r1, r2, hash_1a2b);
 			}
 		}{
 			cpVect r1 = cpvadd(cpvmult(n,  e1.r), cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_a - d_e1_a)*e1_denom)));
@@ -455,7 +473,7 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 			if(dist <= 0.0f)
 			{
 				cpHashValue hash_1b2a = CP_HASH_PAIR(e1.b.hash, e2.a.hash);
-				cpCollisionInfoPushContact(info, cpvsub(r1, info->a->body->p), cpvsub(r2, info->b->body->p), n, dist, hash_1b2a);
+				cpCollisionInfoPushContact(info, r1, r2, hash_1b2a);
 			}
 		}
 	}
@@ -483,6 +501,7 @@ CircleToSegment(const cpCircleShape *circleShape, const cpSegmentShape *segmentS
 	cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(center, seg_a))/cpvlengthsq(seg_delta));
 	cpVect closest = cpvadd(seg_a, cpvmult(seg_delta, closest_t));
 	
+	// TODO: don't need this anymore.
 	CircleToCircleQuery(center, closest, circleShape->r, segmentShape->r, 0, info);
 	if(info->count > 0){
 		cpVect n = info->n;
@@ -599,8 +618,8 @@ CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionIn
 	
 	cpFloat mindist = circle->r + poly->r;
 	if(points.d - mindist <= 0.0){
-		cpVect n = points.n;
-		cpCollisionInfoPushContact(info, cpvsub(cpvadd(points.a, cpvmult(n, circle->r)), info->a->body->p), cpvsub(cpvadd(points.b, cpvmult(n, poly->r)), info->b->body->p), n, points.d - mindist, 0);
+		cpVect n = info->n = points.n;
+		cpCollisionInfoPushContact(info, cpvadd(points.a, cpvmult(n, circle->r)), cpvadd(points.b, cpvmult(n, poly->r)), 0);
 	}
 }
 
@@ -628,7 +647,6 @@ cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, struct cpContact *cont
 	CollisionFunc cfunc = CollisionFuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
 	
 	if(cfunc) cfunc(a, b, &info);
-	cpAssertSoft(info.count <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error: Too many contact points returned.");
 	
 //	if(0){
 //		cpBody *a = info.a->body;
