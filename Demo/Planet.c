@@ -27,17 +27,12 @@ static cpBody *planetBody;
 static cpFloat gravityStrength = 5.0e6f;
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	int steps = 1;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
+	cpSpaceStep(space, dt);
 	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-		
-		// Update the static body spin so that it looks like it's rotating.
-		cpBodyUpdatePosition(planetBody, dt);
-	}
+	// Update the static body spin so that it looks like it's rotating.
+	cpBodyUpdatePosition(planetBody, dt);
 }
 
 static void
@@ -131,6 +126,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Planet = {
 	"Planet",
+	1.0/60.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

@@ -46,7 +46,7 @@
 // Used by several collision tests.
 // TODO should accept hash parameter
 static void
-circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpFloat r2, cpHashValue hash, cpCollisionInfo *info)
+CircleToCircleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpFloat r2, cpHashValue hash, cpCollisionInfo *info)
 {
 	cpFloat mindist = r1 + r2;
 	cpVect delta = cpvsub(p2, p1);
@@ -66,7 +66,7 @@ circle2circleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpF
 //MARK: Support Points and Edges:
 
 static inline int
-cpSupportPointIndex(const int count, const cpVect *verts, const cpVect n)
+PolySupportPointIndex(const int count, const cpVect *verts, const cpVect n)
 {
 	cpFloat max = -INFINITY;
 	int index = 0;
@@ -95,10 +95,29 @@ SupportPointNew(cpVect p, cpCollisionID id)
 	return point;
 }
 
+typedef struct SupportPoint (*SupportPointFunc)(const cpShape *shape, const cpVect n);
+
 static inline struct SupportPoint
-cpSupportPoint(const int count, const cpVect *verts, const cpVect n)
+CircleSupportPoint(const cpCircleShape *circle, const cpVect n)
 {
-	int i = cpSupportPointIndex(count, verts, n);
+	return SupportPointNew(circle->tc, 0);
+}
+
+static inline struct SupportPoint
+SegmentSupportPoint(const cpSegmentShape *seg, const cpVect n)
+{
+	if(cpvdot(seg->ta, n) > cpvdot(seg->tb, n)){
+		return SupportPointNew(seg->ta, 0);
+	} else {
+		return SupportPointNew(seg->tb, 1);
+	}
+}
+
+static inline struct SupportPoint
+PolySupportPoint(const cpPolyShape *poly, const cpVect n)
+{
+	const cpVect *verts = poly->tVerts;
+	int i = PolySupportPointIndex(poly->numVerts, verts, n);
 	return SupportPointNew(verts[i], i);
 }
 
@@ -117,15 +136,14 @@ MinkoskiPointNew(const struct SupportPoint a, const struct SupportPoint b)
 
 struct SupportContext {
 	const cpShape *shape1, *shape2;
-	const int count1, count2;
-	const cpVect *verts1, *verts2;
+	SupportPointFunc func1, func2;
 };
 
 static inline struct MinkowskiPoint
 Support(const struct SupportContext *ctx, const cpVect n)
 {
-	struct SupportPoint a = cpSupportPoint(ctx->count1, ctx->verts1, cpvneg(n));
-	struct SupportPoint b = cpSupportPoint(ctx->count2, ctx->verts2, n);
+	struct SupportPoint a = ctx->func1(ctx->shape1, cpvneg(n));
+	struct SupportPoint b = ctx->func2(ctx->shape2, n);
 	return MinkoskiPointNew(a, b);
 }
 
@@ -151,7 +169,7 @@ static struct Edge
 SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 {
 	int numVerts = poly->numVerts;
-	int i1 = cpSupportPointIndex(poly->numVerts, poly->tVerts, n);
+	int i1 = PolySupportPointIndex(poly->numVerts, poly->tVerts, n);
 	
 	// TODO get rid of mod eventually, very expensive on ARM
 	int i0 = (i1 - 1 + numVerts)%numVerts;
@@ -347,10 +365,23 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 }
 
 static struct SupportPoint
-ShapePoint(const int count, const cpVect *verts, const int i)
+ShapePoint(const cpShape *shape, const int i)
 {
-	int index = (i < count ? i : 0);
-	return SupportPointNew(verts[i], index);
+	switch(shape->klass->type){
+		case CP_CIRCLE_SHAPE: {
+			return SupportPointNew(((cpCircleShape *)shape)->tc, 0);
+		} case CP_SEGMENT_SHAPE: {
+			cpSegmentShape *seg = (cpSegmentShape *)shape;
+			return SupportPointNew(i == 0 ? seg->ta : seg->tb, i);
+		} case CP_POLY_SHAPE: {
+			cpPolyShape *poly = (cpPolyShape *)shape;
+			// Poly shapes may change vertex count.
+			int index = (i < poly->numVerts ? i : 0);
+			return SupportPointNew(poly->tVerts[index], index);
+		} default: {
+			return SupportPointNew(cpvzero, 0);
+		}
+	}
 }
 
 static struct ClosestPoints
@@ -381,8 +412,8 @@ GJK(const struct SupportContext *ctx, cpCollisionID *id)
 	
 	struct MinkowskiPoint v0, v1;
 	if(*id && ENABLE_CACHING){
-		v0 = MinkoskiPointNew(ShapePoint(ctx->count1, ctx->verts1, (*id>>24)&0xFF), ShapePoint(ctx->count2, ctx->verts2, (*id>>16)&0xFF));
-		v1 = MinkoskiPointNew(ShapePoint(ctx->count1, ctx->verts1, (*id>> 8)&0xFF), ShapePoint(ctx->count2, ctx->verts2, (*id    )&0xFF));
+		v0 = MinkoskiPointNew(ShapePoint(ctx->shape1, (*id>>24)&0xFF), ShapePoint(ctx->shape2, (*id>>16)&0xFF));
+		v1 = MinkoskiPointNew(ShapePoint(ctx->shape1, (*id>> 8)&0xFF), ShapePoint(ctx->shape2, (*id    )&0xFF));
 	} else {
 		cpVect axis = cpvperp(cpvsub(cpBBCenter(ctx->shape1->bb), cpBBCenter(ctx->shape2->bb)));
 		v0 = Support(ctx, axis);
@@ -440,13 +471,13 @@ typedef void (*CollisionFunc)(const cpShape *a, const cpShape *b, cpCollisionInf
 
 // Collide circle shapes.
 static void
-circle2circle(const cpCircleShape *c1, const cpCircleShape *c2, cpCollisionInfo *info)
+CircleToCircle(const cpCircleShape *c1, const cpCircleShape *c2, cpCollisionInfo *info)
 {
-	circle2circleQuery(c1->tc, c2->tc, c1->r, c2->r, 0, info);
+	CircleToCircleQuery(c1->tc, c2->tc, c1->r, c2->r, 0, info);
 }
 
 static void
-circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentShape, cpCollisionInfo *info)
+CircleToSegment(const cpCircleShape *circleShape, const cpSegmentShape *segmentShape, cpCollisionInfo *info)
 {
 	cpVect seg_a = segmentShape->ta;
 	cpVect seg_b = segmentShape->tb;
@@ -456,7 +487,7 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 	cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(center, seg_a))/cpvlengthsq(seg_delta));
 	cpVect closest = cpvadd(seg_a, cpvmult(seg_delta, closest_t));
 	
-	circle2circleQuery(center, closest, circleShape->r, segmentShape->r, 0, info);
+	CircleToCircleQuery(center, closest, circleShape->r, segmentShape->r, 0, info);
 	if(info->count > 0){
 		cpVect n = info->n;
 		
@@ -472,9 +503,9 @@ circle2segment(const cpCircleShape *circleShape, const cpSegmentShape *segmentSh
 }
 
 static void
-segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollisionInfo *info)
+SegmentToSegment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollisionInfo *info)
 {
-	struct SupportContext context = {(cpShape *)seg1, (cpShape *)seg2, 2, 2, &seg1->ta, &seg2->ta};
+	struct SupportContext context = {(cpShape *)seg1, (cpShape *)seg2, (SupportPointFunc)SegmentSupportPoint, (SupportPointFunc)SegmentSupportPoint};
 	struct ClosestPoints points = GJK(&context, &info->id);
 	
 #if DRAW_CLOSEST
@@ -482,7 +513,8 @@ segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollis
 //	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
 #endif
 	
-	ChipmunkDebugDrawPoints(6.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawDot(6.0, points.a, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawDot(6.0, points.b, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
@@ -504,9 +536,9 @@ segment2segment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollis
 }
 
 static void
-poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionInfo *info)
+PolyToPoly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionInfo *info)
 {
-	struct SupportContext context = {(cpShape *)poly1, (cpShape *)poly2, poly1->numVerts, poly2->numVerts, poly1->tVerts, poly2->tVerts};
+	struct SupportContext context = {(cpShape *)poly1, (cpShape *)poly2, (SupportPointFunc)PolySupportPoint, (SupportPointFunc)PolySupportPoint};
 	struct ClosestPoints points = GJK(&context, &info->id);
 	
 #if DRAW_CLOSEST
@@ -514,7 +546,8 @@ poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionInfo *i
 //	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
 #endif
 	
-	ChipmunkDebugDrawPoints(3.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawDot(3.0, points.a, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawDot(3.0, points.b, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
@@ -525,9 +558,9 @@ poly2poly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionInfo *i
 }
 
 static void
-seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionInfo *info)
+SegmentToPoly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionInfo *info)
 {
-	struct SupportContext context = {(cpShape *)seg, (cpShape *)poly, 2, poly->numVerts, &seg->ta, poly->tVerts};
+	struct SupportContext context = {(cpShape *)seg, (cpShape *)poly, (SupportPointFunc)SegmentSupportPoint, (SupportPointFunc)PolySupportPoint};
 	struct ClosestPoints points = GJK(&context, &info->id);
 	
 #if DRAW_CLOSEST
@@ -535,7 +568,8 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionInfo *in
 //	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
 #endif
 	
-	ChipmunkDebugDrawPoints(3.0, 2, (cpVect[]){points.a, points.b}, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawDot(3.0, points.a, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawDot(3.0, points.b, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
@@ -554,68 +588,85 @@ seg2poly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionInfo *in
 	}
 }
 
-// This one is less gross, but still gross.
-// TODO: Comment me!
-// TODO respect poly radius
+//static void
+//circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionInfo *info)
+//{
+//	cpSplittingPlane *planes = poly->tPlanes;
+//	
+//	int numVerts = poly->numVerts;
+//	int mini = 0;
+//	cpFloat min = cpSplittingPlaneCompare(planes[0], circle->tc) - circle->r;
+//	for(int i=0; i<poly->numVerts; i++){
+//		cpFloat dist = cpSplittingPlaneCompare(planes[i], circle->tc) - circle->r;
+//		if(dist > 0.0f){
+//			return;
+//		} else if(dist > min) {
+//			min = dist;
+//			mini = i;
+//		}
+//	}
+//	
+//	cpVect n = planes[mini].n;
+//	cpVect a = poly->tVerts[(mini - 1 + numVerts)%numVerts];
+//	cpVect b = poly->tVerts[mini];
+//	cpFloat dta = cpvcross(n, a);
+//	cpFloat dtb = cpvcross(n, b);
+//	cpFloat dt = cpvcross(n, circle->tc);
+//	
+//	if(dt < dtb){
+//		circle2circleQuery(circle->tc, b, circle->r, poly->r, 0, info);
+//	} else if(dt < dta) {
+//		cpVect point = cpvsub(circle->tc, cpvmult(n, circle->r + min/2.0f));
+////		cpContactInit(con, point, cpvneg(n), min, 0);
+//		cpCollisionInfoPushContact(info, cpvsub(point, info->a->body->p), cpvsub(point, info->b->body->p), cpvneg(n), min, 0);
+//	} else {
+//		circle2circleQuery(circle->tc, a, circle->r, poly->r, 0, info);
+//	}
+//}
 static void
-circle2poly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionInfo *info)
+CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionInfo *info)
 {
-	cpSplittingPlane *planes = poly->tPlanes;
+	struct SupportContext context = {(cpShape *)circle, (cpShape *)poly, (SupportPointFunc)CircleSupportPoint, (SupportPointFunc)PolySupportPoint};
+	struct ClosestPoints points = GJK(&context, &info->id);
 	
-	int numVerts = poly->numVerts;
-	int mini = 0;
-	cpFloat min = cpSplittingPlaneCompare(planes[0], circle->tc) - circle->r;
-	for(int i=0; i<poly->numVerts; i++){
-		cpFloat dist = cpSplittingPlaneCompare(planes[i], circle->tc) - circle->r;
-		if(dist > 0.0f){
-			return;
-		} else if(dist > min) {
-			min = dist;
-			mini = i;
-		}
-	}
+#if DRAW_CLOSEST
+	ChipmunkDebugDrawDot(3.0, points.a, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawDot(3.0, points.b, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
+#endif
 	
-	cpVect n = planes[mini].n;
-	cpVect a = poly->tVerts[(mini - 1 + numVerts)%numVerts];
-	cpVect b = poly->tVerts[mini];
-	cpFloat dta = cpvcross(n, a);
-	cpFloat dtb = cpvcross(n, b);
-	cpFloat dt = cpvcross(n, circle->tc);
-	
-	if(dt < dtb){
-		circle2circleQuery(circle->tc, b, circle->r, poly->r, 0, info);
-	} else if(dt < dta) {
-		cpVect point = cpvsub(circle->tc, cpvmult(n, circle->r + min/2.0f));
-//		cpContactInit(con, point, cpvneg(n), min, 0);
-		cpCollisionInfoPushContact(info, cpvsub(point, info->a->body->p), cpvsub(point, info->b->body->p), cpvneg(n), min, 0);
-	} else {
-		circle2circleQuery(circle->tc, a, circle->r, poly->r, 0, info);
+	cpFloat mindist = circle->r + poly->r;
+	if(points.d - mindist <= 0.0){
+		cpVect p = cpvlerp(points.a, points.b, circle->r/(mindist));
+//		cpContactInit(con, p, points.n, points.d - mindist, 0);
+		cpCollisionInfoPushContact(info, cpvsub(p, info->a->body->p), cpvsub(p, info->b->body->p), points.n, points.d - mindist, 0);
 	}
 }
 
 static const CollisionFunc builtinCollisionFuncs[9] = {
-	(CollisionFunc)circle2circle,
+	(CollisionFunc)CircleToCircle,
 	NULL,
 	NULL,
-	(CollisionFunc)circle2segment,
+	(CollisionFunc)CircleToSegment,
 	NULL,
 	NULL,
-	(CollisionFunc)circle2poly,
-	(CollisionFunc)seg2poly,
-	(CollisionFunc)poly2poly,
+	(CollisionFunc)CircleToPoly,
+	(CollisionFunc)SegmentToPoly,
+	(CollisionFunc)PolyToPoly,
 };
 static const CollisionFunc *colfuncs = builtinCollisionFuncs;
 
 static const CollisionFunc segmentCollisions[9] = {
-	(CollisionFunc)circle2circle,
+	(CollisionFunc)CircleToCircle,
 	NULL,
 	NULL,
-	(CollisionFunc)circle2segment,
-	(CollisionFunc)segment2segment,
+	(CollisionFunc)CircleToSegment,
+	(CollisionFunc)SegmentToSegment,
 	NULL,
-	(CollisionFunc)circle2poly,
-	(CollisionFunc)seg2poly,
-	(CollisionFunc)poly2poly,
+	(CollisionFunc)CircleToPoly,
+	(CollisionFunc)SegmentToPoly,
+	(CollisionFunc)PolyToPoly,
 };
 
 void

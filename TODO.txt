@@ -1,4 +1,5 @@
 Priorities:
+	Basics tutorial.
 	Simple top down player controls.
 	* test tiny omega bug in cpvslerp().
 	User definable default winding.
@@ -10,7 +11,7 @@ Priorities:
 	Improve the ACD splitting plane algorithm.
 	Fishing game
 	Motorcycle in a spinning cage
-	Squid thingy like TomorrowPlusX. (Would be better with seg/seg collisions)
+	Squid thingy like TomorrowPlusX.
 
 	Investigate getting better PhysicsEditor support.
 
@@ -19,10 +20,15 @@ Unordered
 	Use a slop tolerance on joint boundaries.
 
 Website things
-	Google analytics
+	-Google analytics
+	Rename to Chipmunk2D
 	Make it so people can upgrade license versions
+	upgrade to new version
+	Coupon codes (unlimited use)
+	log purchase IP for fraud
 	Don't make any mistakes: http://www.gamasutra.com/view/feature/185773/the_top_10_mistakes_tool_.php
 	Several people want a Chipmunk Facebook page.
+	figure out and redo front page.	Chipmunk js examples.
 
 Future things to think about:
 	breakable object support functions?
@@ -34,10 +40,19 @@ Future things to think about:
 	Easy callback programable joint?
 	Top down racing game. (Need the callback constraint)
 	cpBodyActivateStatic() should also activate joints?
+
+Chipmunk 7:
+	Speculative contacts
+	User definable constraint
+	Custom contact constraint with rolling friction and per contact surface v.
+	Serialization
+	API changes, different body/shape instantiation.
 	Collision handler objects with additional callbacks.
-	Revisit rolling friction.
 	Calculate contact anchors to get rid of contact pos. (needed for speculative contacts anyway)
-	Revisit per contact surface velocity.
 	Mass property calculation changes.
 	Change apply force/impulse and point velocity functions.
+	Separate doxygen docs for Objective-C parts and C parts.
+	Cocos2D xcode templates.
+	Custom contacts using cpArbiter user data.
+	Built in transform type.
 	

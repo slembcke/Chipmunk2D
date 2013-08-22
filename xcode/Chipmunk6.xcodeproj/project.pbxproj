@@ -14,7 +14,8 @@
 		D31847750FC458FD00E30B0D /* Query.c in Sources */ = {isa = PBXBuildFile; fileRef = D31847740FC458FD00E30B0D /* Query.c */; };
 		D3185D200EC5610A00E6BFCB /* TheoJansen.c in Sources */ = {isa = PBXBuildFile; fileRef = D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */; };
 		D3238F8210C1B5ED00C4BDC2 /* Joints.c in Sources */ = {isa = PBXBuildFile; fileRef = D3238F8110C1B5ED00C4BDC2 /* Joints.c */; };
-		D341247C174C1E1D00FFCF73 /* GJK.c in Sources */ = {isa = PBXBuildFile; fileRef = D341247B174C1E1D00FFCF73 /* GJK.c */; };
+		D339D6241673D943001A5890 /* libglfw.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D339D6221673D943001A5890 /* libglfw.a */; };
+		D339D6281673DD3C001A5890 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D339D6271673DD3C001A5890 /* IOKit.framework */; };
 		D34963C10B56CBA900CAD239 /* chipmunk.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0C40AA75CC3004E361B /* chipmunk.h */; };
 		D34963C20B56CBA900CAD239 /* cpVect.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0270AA32F16004E361B /* cpVect.h */; };
 		D34963C30B56CBA900CAD239 /* cpBB.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F2D90AAA5622004E361B /* cpBB.h */; };
@@ -108,8 +109,10 @@
 		D3E4A9C80E99683200EE08BA /* cpSlideJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA60E98260200A3D7FA /* cpSlideJoint.c */; };
 		D3E4A9CA0E99683200EE08BA /* cpPivotJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA40E98260200A3D7FA /* cpPivotJoint.c */; };
 		D3E4A9CC0E99683200EE08BA /* cpGrooveJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */; };
-		D3E5F0550AA3303F004E361B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0530AA3303F004E361B /* GLUT.framework */; };
 		D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0540AA3303F004E361B /* OpenGL.framework */; };
+		D3E76CFC17BFE2340068C3C3 /* ChipmunkDemoTextSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E76CFB17BFDD930068C3C3 /* ChipmunkDemoTextSupport.c */; };
+		D3EEF8A117BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = D3EEF8A017BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c */; };
+		D3EEF8A617BAC098006B62EB /* libGLEW.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D3EEF8A517BAC098006B62EB /* libGLEW.a */; };
 		D3F2EE2F14F898E9005FD439 /* Unicycle.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F2EE2E14F898E9005FD439 /* Unicycle.c */; };
 		D3F52BD313C509DC00EB67D9 /* Chains.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F52BD213C509DC00EB67D9 /* Chains.c */; };
 		D3F6EEDF156D581300A158A8 /* Convex.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F6EEDE156D581300A158A8 /* Convex.c */; };
@@ -134,7 +137,10 @@
 		D31847740FC458FD00E30B0D /* Query.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Query.c; sourceTree = "<group>"; };
 		D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = TheoJansen.c; sourceTree = "<group>"; };
 		D3238F8110C1B5ED00C4BDC2 /* Joints.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Joints.c; sourceTree = "<group>"; };
-		D341247B174C1E1D00FFCF73 /* GJK.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GJK.c; sourceTree = "<group>"; };
+		D339D6211673D943001A5890 /* glfw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glfw.h; sourceTree = "<group>"; };
+		D339D6221673D943001A5890 /* libglfw.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libglfw.a; sourceTree = "<group>"; };
+		D339D6251673DD29001A5890 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = ../../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = "<group>"; };
+		D339D6271673DD3C001A5890 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = ../../../../../System/Library/Frameworks/IOKit.framework; sourceTree = "<group>"; };
 		D34963BB0B56CAA300CAD239 /* libChipmunk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libChipmunk.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D34E9E6412558081002C0FE5 /* cpSpaceQuery.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpSpaceQuery.c; path = ../src/cpSpaceQuery.c; sourceTree = "<group>"; };
 		D34E9E96125581DD002C0FE5 /* cpSpaceComponent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpSpaceComponent.c; path = ../src/cpSpaceComponent.c; sourceTree = "<group>"; };
@@ -202,7 +208,6 @@
 		D3E5F0270AA32F16004E361B /* cpVect.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpVect.h; path = ../include/chipmunk/cpVect.h; sourceTree = "<group>"; };
 		D3E5F0490AA32FDE004E361B /* ChipmunkDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChipmunkDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3E5F04C0AA32FDE004E361B /* main-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "main-Info.plist"; sourceTree = "<group>"; };
-		D3E5F0530AA3303F004E361B /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
 		D3E5F0540AA3303F004E361B /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		D3E5F0C10AA75CA9004E361B /* cpArbiter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpArbiter.h; path = ../include/chipmunk/cpArbiter.h; sourceTree = "<group>"; };
 		D3E5F0C20AA75CA9004E361B /* cpArbiter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpArbiter.c; sourceTree = "<group>"; };
@@ -215,6 +220,13 @@
 		D3E5F2DA0AAA5622004E361B /* cpBB.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpBB.c; sourceTree = "<group>"; };
 		D3E5F2DD0AAA562B004E361B /* cpArray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpArray.c; sourceTree = "<group>"; };
 		D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpSpaceHash.c; sourceTree = "<group>"; };
+		D3E76CFA17BFDD820068C3C3 /* ChipmunkDemoTextSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemoTextSupport.h; sourceTree = "<group>"; };
+		D3E76CFB17BFDD930068C3C3 /* ChipmunkDemoTextSupport.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ChipmunkDemoTextSupport.c; sourceTree = "<group>"; };
+		D3E76CFE17C007E70068C3C3 /* VeraMoBd.ttf_sdf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VeraMoBd.ttf_sdf.h; sourceTree = "<group>"; };
+		D3EEF8A017BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ChipmunkDemoShaderSupport.c; sourceTree = "<group>"; };
+		D3EEF8A217BAB5C0006B62EB /* ChipmunkDemoShaderSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemoShaderSupport.h; sourceTree = "<group>"; };
+		D3EEF8A417BAC098006B62EB /* glew.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glew.h; sourceTree = "<group>"; };
+		D3EEF8A517BAC098006B62EB /* libGLEW.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libGLEW.a; sourceTree = "<group>"; };
 		D3F2EE2E14F898E9005FD439 /* Unicycle.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Unicycle.c; sourceTree = "<group>"; };
 		D3F52BD213C509DC00EB67D9 /* Chains.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Chains.c; sourceTree = "<group>"; };
 		D3F6EEDE156D581300A158A8 /* Convex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Convex.c; sourceTree = "<group>"; };
@@ -241,15 +253,26 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D3EEF8A617BAC098006B62EB /* libGLEW.a in Frameworks */,
+				D339D6281673DD3C001A5890 /* IOKit.framework in Frameworks */,
 				D38687D30BAFC695008B7008 /* libChipmunk.a in Frameworks */,
-				D3E5F0550AA3303F004E361B /* GLUT.framework in Frameworks */,
 				D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */,
+				D339D6241673D943001A5890 /* libglfw.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D339D61F1673D943001A5890 /* libglfw */ = {
+			isa = PBXGroup;
+			children = (
+				D339D6211673D943001A5890 /* glfw.h */,
+				D339D6221673D943001A5890 /* libglfw.a */,
+			);
+			path = libglfw;
+			sourceTree = "<group>";
+		};
 		D34E9E5A12557FBF002C0FE5 /* Space */ = {
 			isa = PBXGroup;
 			children = (
@@ -319,8 +342,13 @@
 				D341247B174C1E1D00FFCF73 /* GJK.c */,
 				D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */,
 				D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */,
+				D3EEF8A217BAB5C0006B62EB /* ChipmunkDemoShaderSupport.h */,
+				D3EEF8A017BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c */,
 				D3FBA1B80E9B1F6300950BCC /* ChipmunkDebugDraw.h */,
 				D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */,
+				D3E76CFA17BFDD820068C3C3 /* ChipmunkDemoTextSupport.h */,
+				D3E76CFB17BFDD930068C3C3 /* ChipmunkDemoTextSupport.c */,
+				D3E76CFE17C007E70068C3C3 /* VeraMoBd.ttf_sdf.h */,
 				D3CCDF460AE35D920080442F /* LogoSmash.c */,
 				D3BAF9C40E9C4F250039DD5C /* PyramidStack.c */,
 				D3BAFA030E9C52810039DD5C /* Plink.c */,
@@ -353,6 +381,8 @@
 		D3E5F0170AA32EAC004E361B = {
 			isa = PBXGroup;
 			children = (
+				D339D6271673DD3C001A5890 /* IOKit.framework */,
+				D339D6251673DD29001A5890 /* Cocoa.framework */,
 				D3C517841279B38300C2AFEB /* TODO.txt */,
 				D390FDAD146EF0F8005D1E06 /* VERSION.txt */,
 				D38BB1D1149933F20000EC41 /* chipmunk-docs.textile */,
@@ -369,6 +399,8 @@
 				D37E24570AAAA48800BB4C50 /* Collision */,
 				D3800E0E0E9815FC00A3D7FA /* constraints */,
 				D34E9E5A12557FBF002C0FE5 /* Space */,
+				D3EEF8A317BAC098006B62EB /* libGLEW */,
+				D339D61F1673D943001A5890 /* libglfw */,
 				D3E5F0520AA32FF5004E361B /* frameworks */,
 				D3E5F04A0AA32FDE004E361B /* Products */,
 				D3E5F04C0AA32FDE004E361B /* main-Info.plist */,
@@ -388,7 +420,6 @@
 		D3E5F0520AA32FF5004E361B /* frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D3E5F0530AA3303F004E361B /* GLUT.framework */,
 				D3E5F0540AA3303F004E361B /* OpenGL.framework */,
 			);
 			name = frameworks;
@@ -407,6 +438,15 @@
 			);
 			name = Basics;
 			path = ../src;
+			sourceTree = "<group>";
+		};
+		D3EEF8A317BAC098006B62EB /* libGLEW */ = {
+			isa = PBXGroup;
+			children = (
+				D3EEF8A417BAC098006B62EB /* glew.h */,
+				D3EEF8A517BAC098006B62EB /* libGLEW.a */,
+			);
+			path = libGLEW;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -617,6 +657,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D3E76CFC17BFE2340068C3C3 /* ChipmunkDemoTextSupport.c in Sources */,
 				D3BC99C10AB381EE0025A2C0 /* ChipmunkDemo.c in Sources */,
 				D37697200B50C53900BB33CC /* LogoSmash.c in Sources */,
 				D3FBA1A70E9B1E0400950BCC /* ChipmunkDebugDraw.c in Sources */,
@@ -635,6 +676,7 @@
 				D3102B171119FD3000E77771 /* Tank.c in Sources */,
 				D3E4867613175AE000A00840 /* Bench.c in Sources */,
 				D3F52BD313C509DC00EB67D9 /* Chains.c in Sources */,
+				D3EEF8A117BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c in Sources */,
 				D37282AD13C6432F00FFFA3F /* Crane.c in Sources */,
 				D37282D413C76C1B00FFFA3F /* Buoyancy.c in Sources */,
 				D373FF1013D0D66E000EDB87 /* ContactGraph.c in Sources */,
@@ -799,6 +841,11 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "main-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/libglfw",
+					"$(SRCROOT)/libGLEW",
+				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -825,6 +872,11 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "main-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/libglfw",
+					"$(SRCROOT)/libGLEW",
+				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
 				OTHER_CFLAGS = (
 					"-ffast-math",

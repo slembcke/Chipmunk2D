@@ -18,39 +18,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
-#include <stdio.h>
 
-#include "chipmunk_private.h"
+#include "chipmunk.h"
 
-cpVect
-cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t)
-{
-	cpFloat dot = cpvdot(cpvnormalize(v1), cpvnormalize(v2));
-	cpFloat omega = cpfacos(cpfclamp(dot, -1.0f, 1.0f));
-	
-	if(omega < 1e-3){
-		// If the angle between two vectors is very small, lerp instead to avoid precision issues.
-		return cpvlerp(v1, v2, t);
-	} else {
-		cpFloat denom = 1.0f/cpfsin(omega);
-		return cpvadd(cpvmult(v1, cpfsin((1.0f - t)*omega)*denom), cpvmult(v2, cpfsin(t*omega)*denom));
-	}
-}
+void ChipmunkDemoTextInit(void);
+//#define ChipmunkDemoTextDrawString(...)
+void ChipmunkDemoTextDrawString(cpVect pos, char *str);
+void ChipmunkDemoTextFlushRenderer(void);
+void ChipmunkDemoTextClearRenderer(void);
 
-cpVect
-cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)
-{
-	cpFloat dot = cpvdot(cpvnormalize(v1), cpvnormalize(v2));
-	cpFloat omega = cpfacos(cpfclamp(dot, -1.0f, 1.0f));
-	
-	return cpvslerp(v1, v2, cpfmin(a, omega)/omega);
-}
-
-char*
-cpvstr(const cpVect v)
-{
-	static char str[256];
-	sprintf(str, "(% .3f, % .3f)", v.x, v.y);
-	return str;
-}
+void ChipmunkDemoTextPushRenderer(void);
+void ChipmunkDemoTextPopRenderer(void);

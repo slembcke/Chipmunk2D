@@ -86,7 +86,7 @@ playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 }
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
 	int jumpState = (ChipmunkDemoKeyboard.y > 0.0f);
 	
@@ -99,15 +99,10 @@ update(cpSpace *space)
 	}
 	
 	// Step the space
-	int steps = 3;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
+	cpSpaceStep(space, dt);
 	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-		
-		remainingBoost -= dt;
-		lastJumpState = jumpState;
-	}
+	remainingBoost -= dt;
+	lastJumpState = jumpState;
 }
 
 static cpSpace *
@@ -140,13 +135,13 @@ init(void)
 	shape->layers = NOT_GRABABLE_MASK;
 	
 	// Set up the player
-	cpFloat radius = 25.0f;
 	body = cpSpaceAddBody(space, cpBodyNew(1.0f, INFINITY));
 	body->p = cpv(0, -200);
 	body->velocity_func = playerUpdateVelocity;
 	playerBody = body;
 
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(playerBody, cpvzero, cpv(0, radius), radius));
+	shape = cpSpaceAddShape(space, cpBoxShapeNew3(body, cpBBNew(-15.0, -27.5, 15.0, 27.5), 10.0));
+//	shape = cpSpaceAddShape(space, cpSegmentShapeNew(playerBody, cpvzero, cpv(0, radius), radius));
 	shape->e = 0.0f; shape->u = 0.0f;
 	shape->collision_type = 1;
 	playerShape = shape;
@@ -174,6 +169,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Player = {
 	"Platformer Player Controls",
+	1.0/180.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

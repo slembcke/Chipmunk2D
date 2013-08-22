@@ -25,14 +25,9 @@
 #include "ChipmunkDemo.h"
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	int steps = 3;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-	}
+	cpSpaceStep(space, dt);
 }
 
 #define FLUID_DENSITY 0.00014
@@ -85,8 +80,8 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpVect centroid = cpCentroidForPoly(clippedCount, clipped);
 	cpVect r = cpvsub(centroid, cpBodyGetPos(body));
 	
-	ChipmunkDebugDrawPolygon(clippedCount, clipped, RGBAColor(0, 0, 1, 1), RGBAColor(0, 0, 1, 0.1f));
-	ChipmunkDebugDrawPoints(5, 1, &centroid, RGBAColor(0, 0, 1, 1));
+	ChipmunkDebugDrawPolygon(clippedCount, clipped, 0.0f, RGBAColor(0, 0, 1, 1), RGBAColor(0, 0, 1, 0.1f));
+	ChipmunkDebugDrawDot(5, centroid, RGBAColor(0, 0, 1, 1));
 	
 	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
 	cpVect g = cpSpaceGetGravity(space);
@@ -216,6 +211,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Buoyancy = {
 	"Simple Sensor based fluids.",
+	1.0/180.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

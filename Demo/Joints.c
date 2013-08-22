@@ -276,9 +276,9 @@ init(void)
 }
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	cpSpaceStep(space, 1.0f/60.0f);
+	cpSpaceStep(space, dt);
 }
 
 static void
@@ -290,6 +290,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Joints = {
 	"Joints and Constraints",
+	1.0/60.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

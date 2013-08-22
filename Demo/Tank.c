@@ -25,27 +25,22 @@
 static cpBody *tankBody, *tankControlBody;
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	int steps = 1;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
+	// turn the control body based on the angle relative to the actual body
+	cpVect mouseDelta = cpvsub(ChipmunkDemoMouse, cpBodyGetPos(tankBody));
+	cpFloat turn = cpvtoangle(cpvunrotate(cpBodyGetRot(tankBody), mouseDelta));
+	cpBodySetAngle(tankControlBody, cpBodyGetAngle(tankBody) - turn);
 	
-	for(int i=0; i<steps; i++){
-		// turn the control body based on the angle relative to the actual body
-		cpVect mouseDelta = cpvsub(ChipmunkDemoMouse, cpBodyGetPos(tankBody));
-		cpFloat turn = cpvtoangle(cpvunrotate(cpBodyGetRot(tankBody), mouseDelta));
-		cpBodySetAngle(tankControlBody, cpBodyGetAngle(tankBody) - turn);
-		
-		// drive the tank towards the mouse
-		if(cpvnear(ChipmunkDemoMouse, cpBodyGetPos(tankBody), 30.0)){
-			cpBodySetVel(tankControlBody, cpvzero); // stop
-		} else {
-			cpFloat direction = (cpvdot(mouseDelta, cpBodyGetRot(tankBody)) > 0.0 ? 1.0 : -1.0);
-			cpBodySetVel(tankControlBody, cpvrotate(cpBodyGetRot(tankBody), cpv(30.0f*direction, 0.0f)));
-		}
-		
-		cpSpaceStep(space, dt);
+	// drive the tank towards the mouse
+	if(cpvnear(ChipmunkDemoMouse, cpBodyGetPos(tankBody), 30.0)){
+		cpBodySetVel(tankControlBody, cpvzero); // stop
+	} else {
+		cpFloat direction = (cpvdot(mouseDelta, cpBodyGetRot(tankBody)) > 0.0 ? 1.0 : -1.0);
+		cpBodySetVel(tankControlBody, cpvrotate(cpBodyGetRot(tankBody), cpv(30.0f*direction, 0.0f)));
 	}
+	
+	cpSpaceStep(space, dt);
 }
 
 static cpBody *
@@ -134,6 +129,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Tank = {
 	"Tank",
+	1.0/60.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

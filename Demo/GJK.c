@@ -47,7 +47,7 @@ draw(cpSpace *space)
 	ChipmunkDemoDefaultDrawImpl(space);
 	cpContact arr[CP_MAX_CONTACTS_PER_ARBITER];
 //	cpCollideShapes(shape1, shape2, (cpCollisionID[]){0}, arr);
-	cpCollisionInfo info = cpCollideShapes(shape2, shape1, 0x00010101, arr);
+	cpCollisionInfo info = cpCollideShapes(shape2, shape1, 0x00000000, arr);
 }
 
 static cpSpace *
@@ -126,16 +126,13 @@ init(void)
 		shape1->group = 1;
 	}
 	{
-		cpFloat size = 150.0;
-		cpFloat radius = 25.0;
+		cpFloat radius = 50.0;
 		
-		cpVect a = cpv( size/2.0, 0.0);
-		cpVect b = cpv(-size/2.0, 0.0);
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero)));
 		cpBodySetPos(body, cpv(0, -25));
 		
-		shape2 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, radius));
-		shape2->group = 1;
+		shape2 = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
+		shape2->group = 2;
 	}
 
 	return space;

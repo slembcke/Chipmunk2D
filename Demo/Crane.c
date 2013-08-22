@@ -34,26 +34,21 @@ static cpConstraint *hookJoint = NULL;
 
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	int steps = 1;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
+	// Set the first anchor point (the one attached to the static body) of the dolly servo to the mouse's x position.
+	cpPivotJointSetAnchr1(dollyServo, cpv(ChipmunkDemoMouse.x, 100));
 	
-	for(int i=0; i<steps; i++){
-		// Set the first anchor point (the one attached to the static body) of the dolly servo to the mouse's x position.
-		cpPivotJointSetAnchr1(dollyServo, cpv(ChipmunkDemoMouse.x, 100));
-		
-		// Set the max length of the winch servo to match the mouse's height.
-		cpSlideJointSetMax(winchServo, cpfmax(100 - ChipmunkDemoMouse.y, 50));
-		
-		if(hookJoint && ChipmunkDemoRightClick){
-			cpSpaceRemoveConstraint(space, hookJoint);
-			cpConstraintFree(hookJoint);
-			hookJoint = NULL;
-		}
-		
-		cpSpaceStep(space, dt);
+	// Set the max length of the winch servo to match the mouse's height.
+	cpSlideJointSetMax(winchServo, cpfmax(100 - ChipmunkDemoMouse.y, 50));
+	
+	if(hookJoint && ChipmunkDemoRightClick){
+		cpSpaceRemoveConstraint(space, hookJoint);
+		cpConstraintFree(hookJoint);
+		hookJoint = NULL;
 	}
+	
+	cpSpaceStep(space, dt);
 }
 
 enum COLLISION_TYPES {
@@ -167,6 +162,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Crane = {
 	"Crane",
+	1.0/60.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,
