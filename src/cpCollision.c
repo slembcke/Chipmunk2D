@@ -55,22 +55,6 @@ cpCollisionInfoPushContact(cpCollisionInfo *info, cpVect p1, cpVect p2, cpHashVa
 	info->count++;
 }
 
-// Add contact points for circle to circle collisions.
-// Used by several collision tests.
-static void
-CircleToCircleQuery(const cpVect p1, const cpVect p2, const cpFloat r1, const cpFloat r2, cpHashValue hash, cpCollisionInfo *info)
-{
-	cpFloat mindist = r1 + r2;
-	cpVect delta = cpvsub(p2, p1);
-	cpFloat distsq = cpvlengthsq(delta);
-	
-	if(distsq < mindist*mindist){
-		cpFloat dist = cpfsqrt(distsq);
-		cpVect n = info->n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
-		cpCollisionInfoPushContact(info, cpvadd(p1, cpvmult(n, r1)), cpvadd(p2, cpvmult(n, -r2)), hash);
-	}
-}
-
 //MARK: Support Points and Edges:
 
 static inline int
@@ -481,32 +465,41 @@ typedef void (*CollisionFunc)(const cpShape *a, const cpShape *b, cpCollisionInf
 static void
 CircleToCircle(const cpCircleShape *c1, const cpCircleShape *c2, cpCollisionInfo *info)
 {
-	CircleToCircleQuery(c1->tc, c2->tc, c1->r, c2->r, 0, info);
+	cpFloat mindist = c1->r + c2->r;
+	cpVect delta = cpvsub(c2->tc, c1->tc);
+	cpFloat distsq = cpvlengthsq(delta);
+	
+	if(distsq < mindist*mindist){
+		cpFloat dist = cpfsqrt(distsq);
+		cpVect n = info->n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
+		cpCollisionInfoPushContact(info, cpvadd(c1->tc, cpvmult(n, c1->r)), cpvadd(c2->tc, cpvmult(n, -c2->r)), 0);
+	}
 }
 
 static void
-CircleToSegment(const cpCircleShape *circleShape, const cpSegmentShape *segmentShape, cpCollisionInfo *info)
+CircleToSegment(const cpCircleShape *circle, const cpSegmentShape *segment, cpCollisionInfo *info)
 {
-	cpVect seg_a = segmentShape->ta;
-	cpVect seg_b = segmentShape->tb;
-	cpVect center = circleShape->tc;
+	cpVect seg_a = segment->ta;
+	cpVect seg_b = segment->tb;
+	cpVect center = circle->tc;
 	
 	cpVect seg_delta = cpvsub(seg_b, seg_a);
 	cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(center, seg_a))/cpvlengthsq(seg_delta));
 	cpVect closest = cpvadd(seg_a, cpvmult(seg_delta, closest_t));
 	
-	// TODO: don't need this anymore.
-	CircleToCircleQuery(center, closest, circleShape->r, segmentShape->r, 0, info);
-	if(info->count > 0){
-		cpVect n = info->n;
+	cpFloat mindist = circle->r + segment->r;
+	cpVect delta = cpvsub(closest, center);
+	cpFloat distsq = cpvlengthsq(delta);
+	if(distsq < mindist*mindist){
+		cpFloat dist = cpfsqrt(distsq);
+		cpVect n = info->n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
 		
 		// Reject endcap collisions if tangents are provided.
 		if(
-			(closest_t != 0.0f || cpvdot(n, cpvrotate(segmentShape->a_tangent, segmentShape->shape.body->rot)) >= 0.0) &&
-			(closest_t != 1.0f || cpvdot(n, cpvrotate(segmentShape->b_tangent, segmentShape->shape.body->rot)) >= 0.0)
+			(closest_t != 0.0f || cpvdot(n, cpvrotate(segment->a_tangent, segment->shape.body->rot)) >= 0.0) &&
+			(closest_t != 1.0f || cpvdot(n, cpvrotate(segment->b_tangent, segment->shape.body->rot)) >= 0.0)
 		){
-		} else {
-			info->count = 0;
+			cpCollisionInfoPushContact(info, cpvadd(center, cpvmult(n, circle->r)), cpvadd(closest, cpvmult(n, -segment->r)), 0);
 		}
 	}
 }
