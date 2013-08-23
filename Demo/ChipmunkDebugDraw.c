@@ -530,23 +530,23 @@ ChipmunkDebugDrawConstraints(cpSpace *space)
 void
 ChipmunkDebugDrawCollisionPoints(cpSpace *space)
 {
-//	cpArray *arbiters = space->arbiters;
-//	Color color = RGBAColor(1.0f, 0.0f, 0.0f, 1.0f);
-//	
-//	for(int i=0; i<arbiters->num; i++){
-//		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
-//		cpVect n = arb->n;
-//		
-//		for(int j=0; j<arb->numContacts; j++){
-//			cpVect r1 = arb->contacts[j].r1;
-//			cpVect r2 = arb->contacts[j].r1;
-//			cpFloat d = 2.0 - arb->contacts[j].dist/2.0;
-//			
-//			cpVect a = cpvadd(p, cpvmult(n,  d));
-//			cpVect b = cpvadd(p, cpvmult(n, -d));
-//			ChipmunkDebugDrawSegment(a, b, color);
-//		}
-//	}
+	cpArray *arbiters = space->arbiters;
+	Color color = RGBAColor(1.0f, 0.0f, 0.0f, 1.0f);
+	
+	for(int i=0; i<arbiters->num; i++){
+		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
+		cpVect n = arb->n;
+		
+		for(int j=0; j<arb->count; j++){
+			cpVect p1 = cpvadd(arb->body_a->p, arb->contacts[j].r1);
+			cpVect p2 = cpvadd(arb->body_b->p, arb->contacts[j].r2);
+			
+			cpFloat d = 2.0f;
+			cpVect a = cpvadd(p1, cpvmult(n, -d));
+			cpVect b = cpvadd(p2, cpvmult(n,  d));
+			ChipmunkDebugDrawSegment(a, b, color);
+		}
+	}
 }
 
 void
