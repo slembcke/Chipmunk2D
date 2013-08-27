@@ -124,6 +124,28 @@ cpShapeActive(cpShape *shape)
 
 int cpCollideShapes(const cpShape *a, const cpShape *b, cpCollisionID *id, cpContact *arr);
 
+static inline void
+CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+{
+	cpVect da = cpvsub(a, center);
+	cpVect db = cpvsub(b, center);
+	
+	cpFloat qa = cpvdot(da, da) - 2.0f*cpvdot(da, db) + cpvdot(db, db);
+	cpFloat qb = -2.0f*cpvdot(da, da) + 2.0f*cpvdot(da, db);
+	cpFloat qc = cpvdot(da, da) - r*r;
+	
+	cpFloat det = qb*qb - 4.0f*qa*qc;
+	
+	if(det >= 0.0f){
+		cpFloat t = (-qb - cpfsqrt(det))/(2.0f*qa);
+		if(0.0f<= t && t <= 1.0f){
+			info->shape = shape;
+			info->t = t;
+			info->n = cpvnormalize(cpvlerp(da, db, t));
+		}
+	}
+}
+
 // TODO doesn't really need to be inline, but need a better place to put this function
 static inline cpSplittingPlane
 cpSplittingPlaneNew(cpVect a, cpVect b)

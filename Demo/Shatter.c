@@ -18,7 +18,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
+
+#include <string.h>
+
 #include "chipmunk.h"
 #include "constraints/util.h"
 
@@ -175,14 +177,9 @@ ShatterShape(cpSpace *space, cpShape *shape, cpFloat cellSize, cpVect focus)
 }
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	int steps = 1;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-	}
+	cpSpaceStep(space, dt);
 	
 	if(ChipmunkDemoRightDown){
 		cpNearestPointQueryInfo info;
@@ -192,7 +189,7 @@ update(cpSpace *space)
 			if(cell_size > 5.0f){
 				ShatterShape(space, info.shape, cell_size, ChipmunkDemoMouse);
 			} else {
-				printf("Too small to splinter %f\n", cell_size);
+//				printf("Too small to splinter %f\n", cell_size);
 			}
 		}
 	}
@@ -240,6 +237,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Shatter = {
 	"Shatter.",
+	1.0f/60.0f,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

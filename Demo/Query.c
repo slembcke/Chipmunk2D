@@ -25,24 +25,13 @@
 static cpVect QUERY_START = {0,0};
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
+	cpSpaceStep(space, dt);
+	
 	if(ChipmunkDemoRightClick){
 		QUERY_START = ChipmunkDemoMouse;
 	}
-	
-	int steps = 1;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-	}
-}
-
-static void
-draw(cpSpace *space)
-{
-	ChipmunkDemoDefaultDrawImpl(space);
 	
 	cpVect start = QUERY_START;
 	cpVect end = ChipmunkDemoMouse;
@@ -54,14 +43,14 @@ draw(cpSpace *space)
 	if(cpSpaceSegmentQueryFirst(space, start, end, CP_ALL_LAYERS, CP_NO_GROUP, &segInfo)){
 		cpVect point = cpSegmentQueryHitPoint(start, end, segInfo);
 		
-		// Draw red over the occluded part of the query
-		ChipmunkDebugDrawSegment(point, end, RGBAColor(1,0,0,1));
+		// Draw blue over the occluded part of the query
+		ChipmunkDebugDrawSegment(point, end, RGBAColor(0,0,1,1));
 		
-		// Draw a little blue surface normal
-		ChipmunkDebugDrawSegment(point, cpvadd(point, cpvmult(segInfo.n, 16)), RGBAColor(0,0,1,1));
+		// Draw a little red surface normal
+		ChipmunkDebugDrawSegment(point, cpvadd(point, cpvmult(segInfo.n, 16)), RGBAColor(1,0,0,1));
 		
 		// Draw a little red dot on the hit point.
-		ChipmunkDebugDrawPoints(3, 1, &point, RGBAColor(1,0,0,1));
+		ChipmunkDebugDrawDot(3, point, RGBAColor(1,0,0,1));
 
 		
 		ChipmunkDemoPrintString("Segment Query: Dist(%f) Normal%s", cpSegmentQueryHitDist(start, end, segInfo), cpvstr(segInfo.n));
@@ -73,7 +62,7 @@ draw(cpSpace *space)
 	cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 100.0, CP_ALL_LAYERS, CP_NO_GROUP, &nearestInfo);
 	if(nearestInfo.shape){
 		// Draw a grey line to the closest shape.
-		ChipmunkDebugDrawPoints(3, 1, &ChipmunkDemoMouse, RGBAColor(0.5, 0.5, 0.5, 1.0));
+		ChipmunkDebugDrawDot(3, ChipmunkDemoMouse, RGBAColor(0.5, 0.5, 0.5, 1.0));
 		ChipmunkDebugDrawSegment(ChipmunkDemoMouse, nearestInfo.p, 	RGBAColor(0.5, 0.5, 0.5, 1.0));
 		
 		// Draw a red bounding box around the shape under the mouse.
@@ -115,9 +104,9 @@ init(void)
 		}
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-		cpBodySetPos(body, cpv(50.0f, 50.0f));
+		cpBodySetPos(body, cpv(50.0f, 30.0f));
 		
-		cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
+		cpSpaceAddShape(space, cpPolyShapeNew2(body, NUM_VERTS, verts, cpvzero, 10.0f));
 	}
 	
 	{ // add a circle
@@ -142,8 +131,9 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Query = {
 	"Segment Query",
+	1.0/60.0,
 	init,
 	update,
-	draw,
+	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };

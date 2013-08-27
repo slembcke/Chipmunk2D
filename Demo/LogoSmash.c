@@ -71,34 +71,21 @@ get_pixel(int x, int y)
 static int bodyCount = 0;
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	int steps = 1;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-	}
+	cpSpaceStep(space, dt);
 }
 
 static void
-PushBodyPos(cpBody *body, cpVect **cursor)
+DrawDot(cpBody *body, void *unused)
 {
-	(**cursor) = cpBodyGetPos(body);
-	(*cursor)++;
+	ChipmunkDebugDrawDot(3.0, cpBodyGetPos(body), RGBAColor(200.0f/255.0f, 210.0f/255.0f, 230.0f/255.0f, 1.0f));
 }
 
 static void
 draw(cpSpace *space)
 {
-	// Make an array with all the body positions to draw dots
-	cpVect *verts = (cpVect *)cpcalloc(bodyCount, sizeof(cpVect));
-	
-	cpVect *cursor = verts;
-	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)PushBodyPos, &cursor);
-	
-	ChipmunkDebugDrawPoints(3, bodyCount, verts, RGBAColor(200.0f/255.0f, 210.0f/255.0f, 230.0f/255.0f, 1.0f));
-	cpfree(verts);
+	cpSpaceEachBody(space, DrawDot, NULL);
 	
 	ChipmunkDebugDrawCollisionPoints(space);
 }
@@ -170,6 +157,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo LogoSmash = {
 	"Logo Smash",
+	1.0/60.0,
 	init,
 	update,
 	draw,

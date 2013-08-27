@@ -25,19 +25,14 @@
 static cpBody *rogueBoxBody;
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	int steps = 3;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
+	// Manually update the position of the box body so that the box rotates.
+	// Normally Chipmunk calls this and cpBodyUpdateVelocity() for you,
+	// but we wanted to control the angular velocity explicitly.
+	cpBodyUpdatePosition(rogueBoxBody, dt);
 	
-	for(int i=0; i<steps; i++){
-		// Manually update the position of the box body so that the box rotates.
-		// Normally Chipmunk calls this and cpBodyUpdateVelocity() for you,
-		// but we wanted to control the angular velocity explicitly.
-		cpBodyUpdatePosition(rogueBoxBody, dt);
-		
-		cpSpaceStep(space, dt);
-	}
+	cpSpaceStep(space, dt);
 }
 
 static void
@@ -146,6 +141,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Tumble = {
 	"Tumble",
+	1.0/180.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

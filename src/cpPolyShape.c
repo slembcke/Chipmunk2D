@@ -96,6 +96,7 @@ cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInf
 	int count = poly->numVerts;
 	cpSplittingPlane *planes = poly->tPlanes;
 	cpVect *verts = poly->tVerts;
+	cpFloat r = poly->r;
 	
 	cpVect v0 = verts[count - 1];
 	cpFloat minDist = INFINITY;
@@ -120,13 +121,14 @@ cpPolyShapeNearestPointQuery(cpPolyShape *poly, cpVect p, cpNearestPointQueryInf
 	}
 	
 	cpFloat dist = (outside ? minDist : -minDist);
+	cpVect g = cpvmult(cpvsub(p, closestPoint), 1.0f/dist);
 	
 	info->shape = (cpShape *)poly;
-	info->p = closestPoint;
-	info->d = dist;
+	info->p = cpvadd(closestPoint, cpvmult(g, r));
+	info->d = dist - r;
 	
 	// Use the normal of the closest segment if the distance is small.
-	info->g = (minDist > MAGIC_EPSILON ? cpvmult(cpvsub(p, closestPoint), 1.0f/dist) : closestNormal);
+	info->g = (minDist > MAGIC_EPSILON ? g : closestNormal);
 }
 
 static void
@@ -135,14 +137,16 @@ cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpSegmentQueryInf
 	cpSplittingPlane *axes = poly->tPlanes;
 	cpVect *verts = poly->tVerts;
 	int numVerts = poly->numVerts;
+	cpFloat r = poly->r;
 	
 	for(int i=0; i<numVerts; i++){
 		cpVect n = axes[i].n;
 		cpFloat an = cpvdot(a, n);
-		if(axes[i].d > an) continue;
+		cpFloat d = axes[i].d + r - an;
+		if(d > 0.0f) continue;
 		
 		cpFloat bn = cpvdot(b, n);
-		cpFloat t = (axes[i].d - an)/(bn - an);
+		cpFloat t = d/(bn - an);
 		if(t < 0.0f || 1.0f < t) continue;
 		
 		cpVect point = cpvlerp(a, b, t);
@@ -154,6 +158,15 @@ cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpSegmentQueryInf
 			info->shape = (cpShape *)poly;
 			info->t = t;
 			info->n = n;
+		}
+	}
+	
+	// Also check against the beveled vertexes.
+	if(r > 0.0f){
+		for(int i=0; i<numVerts; i++){
+			cpSegmentQueryInfo circle_info = {NULL, 1.0f, cpvzero};
+			CircleSegmentQuery(&poly->shape, verts[i], r, a, b, &circle_info);
+			if(circle_info.t < info->t) (*info) = circle_info;
 		}
 	}
 }
@@ -238,17 +251,30 @@ setUpVerts(cpPolyShape *poly, int numVerts, const cpVect *verts, cpVect offset)
 cpPolyShape *
 cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset)
 {
+	return cpPolyShapeInit2(poly, body, numVerts, verts, offset, 0.0f);
+}
+
+cpPolyShape *
+cpPolyShapeInit2(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset, cpFloat radius)
+{
 	setUpVerts(poly, numVerts, verts, offset);
 	cpShapeInit((cpShape *)poly, &polyClass, body);
-	poly->r = 0.0f;
+	poly->r = radius;
 
 	return poly;
 }
 
+
 cpShape *
-cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset)
+cpPolyShapeNew(cpBody *body, int numVerts, const cpVect *verts, cpVect offset)
 {
-	return (cpShape *)cpPolyShapeInit(cpPolyShapeAlloc(), body, numVerts, verts, offset);
+	return cpPolyShapeNew2(body, numVerts, verts, offset, 0.0f);
+}
+
+cpShape *
+cpPolyShapeNew2(cpBody *body, int numVerts, const cpVect *verts, cpVect offset, cpFloat radius)
+{
+	return (cpShape *)cpPolyShapeInit2(cpPolyShapeAlloc(), body, numVerts, verts, offset, radius);
 }
 
 cpPolyShape *
@@ -263,6 +289,12 @@ cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height)
 cpPolyShape *
 cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box)
 {
+	return cpBoxShapeInit3(poly, body, box, 0.0f);
+}
+
+cpPolyShape *
+cpBoxShapeInit3(cpPolyShape *poly, cpBody *body, cpBB box, cpFloat radius)
+{
 	cpVect verts[] = {
 		cpv(box.l, box.b),
 		cpv(box.l, box.t),
@@ -270,7 +302,7 @@ cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box)
 		cpv(box.r, box.b),
 	};
 	
-	return cpPolyShapeInit(poly, body, 4, verts, cpvzero);
+	return cpPolyShapeInit2(poly, body, 4, verts, cpvzero, radius);
 }
 
 cpShape *
@@ -283,6 +315,12 @@ cpShape *
 cpBoxShapeNew2(cpBody *body, cpBB box)
 {
 	return (cpShape *)cpBoxShapeInit2(cpPolyShapeAlloc(), body, box);
+}
+
+cpShape *
+cpBoxShapeNew3(cpBody *body, cpBB box, cpFloat radius)
+{
+	return (cpShape *)cpBoxShapeInit3(cpPolyShapeAlloc(), body, box, radius);
 }
 
 // Unsafe API (chipmunk_unsafe.h)

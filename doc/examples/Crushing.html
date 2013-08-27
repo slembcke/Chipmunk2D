@@ -1,0 +1,23 @@
+<pre style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; "><strong><span style="color:#881350;">struct</span></strong> CrushingContext {
+  cpFloat magnitudeSum;
+  cpVect vectorSum;
+};
+
+<strong><span style="color:#881350;">static</span></strong> <strong><span style="color:#881350;">void</span></strong>
+<span style="color:#003369;">EstimateCrushingHelper</span>(cpBody *body, cpArbiter *arb, <strong><span style="color:#881350;">struct</span></strong> CrushingContext *context)
+{
+  cpVect j = <span style="color:#003369;">cpArbiterTotalImpulseWithFriction</span>(arb);
+  context-&gt;magnitudeSum += <span style="color:#003369;">cpvlength</span>(j);
+  context-&gt;vectorSum = <span style="color:#003369;">cpvadd</span>(context-&gt;vectorSum, j);
+}
+
+cpFloat
+<span style="color:#003369;">EstimateCrushForce</span>(cpBody *body, cpFloat dt)
+{
+  <strong><span style="color:#881350;">struct</span></strong> CrushingContext crush = {<span style="color:#0000ff;">0.0f</span>, cpvzero};
+  <span style="color:#003369;">cpBodyEachArbiter</span>(body, (cpBodyArbiterIteratorFunc)EstimateCrushingHelper, &amp;crush);
+  
+  <span style="color:#236e25;"><em>// Compare the vector sum magnitude and magnitude sum to see if
+</em></span>  <span style="color:#236e25;"><em>// how much the collision forces oppose one another.
+</em></span>  cpFloat crushForce = (crush.magnitudeSum - <span style="color:#003369;">cpvlength</span>(crush.vectorSum))*dt;
+}</pre>
