@@ -187,13 +187,13 @@ cpArbiterIgnore(cpArbiter *arb)
 cpVect
 cpArbiterGetSurfaceVelocity(cpArbiter *arb)
 {
-	return cpvmult(arb->surface_vr, arb->swappedColl ? -1.0f : 1.0);
+	return cpvmult(arb->surface_vr, arb->swappedColl ? -1.0f : 1.0f);
 }
 
 void
 cpArbiterSetSurfaceVelocity(cpArbiter *arb, cpVect vr)
 {
-	arb->surface_vr = cpvmult(vr, arb->swappedColl ? -1.0f : 1.0);
+	arb->surface_vr = cpvmult(vr, arb->swappedColl ? -1.0f : 1.0f);
 }
 
 
