@@ -144,7 +144,7 @@ static Triangle *PushTriangles(size_t count)
 {
 	if(triangle_count + count > triangle_capacity){
 		triangle_capacity += MAX(triangle_capacity, count);
-		triangle_buffer = realloc(triangle_buffer, triangle_capacity*sizeof(Triangle));
+		triangle_buffer = (Triangle *)realloc(triangle_buffer, triangle_capacity*sizeof(Triangle));
 	}
 	
 	Triangle *buffer = triangle_buffer + triangle_count;
@@ -152,15 +152,15 @@ static Triangle *PushTriangles(size_t count)
 	return buffer;
 }
 
-static cpFloat
+static GLfloat
 PushChar(int character, GLfloat x, GLfloat y, Color color)
 {
 	int i = glyph_indexes[character];
 	GLfloat w = (GLfloat)sdf_tex_width;
 	GLfloat h = (GLfloat)sdf_tex_height;
 	
-	GLfloat gw = sdf_spacing[i*8 + 3];
-	GLfloat gh = sdf_spacing[i*8 + 4];
+	GLfloat gw = (GLfloat)sdf_spacing[i*8 + 3];
+	GLfloat gh = (GLfloat)sdf_spacing[i*8 + 4];
 	
 	GLfloat txmin = sdf_spacing[i*8 + 1]/w;
 	GLfloat tymin = sdf_spacing[i*8 + 2]/h;
@@ -179,8 +179,8 @@ PushChar(int character, GLfloat x, GLfloat y, Color color)
 	Vertex d = {{xmax, ymin}, {txmax, tymax}, color};
 	
 	Triangle *triangles = PushTriangles(2);
-	triangles[0] = (Triangle){a, b, c};
-	triangles[1] = (Triangle){a, c, d};
+	Triangle t0 = {a, b, c}; triangles[0] = t0;
+	Triangle t1 = {a, c, d}; triangles[1] = t1;
 	
 	return sdf_spacing[i*8 + 7]*s;
 }
@@ -191,16 +191,16 @@ void
 ChipmunkDemoTextDrawString(cpVect pos, char *str)
 {
 	Color c = LAColor(1.0f, 1.0f);
-	GLfloat x = pos.x, y = pos.y;
+	GLfloat x = (GLfloat)pos.x, y = (GLfloat)pos.y;
 	
 	for(int i=0, len=strlen(str); i<len; i++){
 		if(str[i] == '\n'){
 			y -= LineHeight;
-			x = pos.x;
+			x = (GLfloat)pos.x;
 //		} else if(str[i] == '*'){ // print out the last demo key
 //			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, 'A' + demoCount - 1);
 		} else {
-			x += PushChar(str[i], x, y, c);
+			x += (GLfloat)PushChar(str[i], x, y, c);
 		}
 	}
 }

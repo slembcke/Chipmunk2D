@@ -177,9 +177,11 @@ SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 	
 	cpVect *verts = poly->tVerts;
 	if(cpvdot(n, poly->tPlanes[i1].n) > cpvdot(n, poly->tPlanes[i2].n)){
-		return (struct Edge){{verts[i0], CP_HASH_PAIR(poly, i0)}, {verts[i1], CP_HASH_PAIR(poly, i1)}, poly->r, poly->tPlanes[i1].n};
+		struct Edge edge = {{verts[i0], CP_HASH_PAIR(poly, i0)}, {verts[i1], CP_HASH_PAIR(poly, i1)}, poly->r, poly->tPlanes[i1].n};
+		return edge;
 	} else {
-		return (struct Edge){{verts[i1], CP_HASH_PAIR(poly, i1)}, {verts[i2], CP_HASH_PAIR(poly, i2)}, poly->r, poly->tPlanes[i2].n};
+		struct Edge edge = {{verts[i1], CP_HASH_PAIR(poly, i1)}, {verts[i2], CP_HASH_PAIR(poly, i2)}, poly->r, poly->tPlanes[i2].n};
+		return edge;
 	}
 }
 
@@ -187,9 +189,11 @@ static struct Edge
 SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
 {
 	if(cpvdot(seg->tn, n) > 0.0){
-		return (struct Edge){{seg->ta, CP_HASH_PAIR(seg, 0)}, {seg->tb, CP_HASH_PAIR(seg, 1)}, seg->r, seg->tn};
+		struct Edge edge = {{seg->ta, CP_HASH_PAIR(seg, 0)}, {seg->tb, CP_HASH_PAIR(seg, 1)}, seg->r, seg->tn};
+		return edge;
 	} else {
-		return (struct Edge){{seg->tb, CP_HASH_PAIR(seg, 1)}, {seg->ta, CP_HASH_PAIR(seg, 0)}, seg->r, cpvneg(seg->tn)};
+		struct Edge edge = {{seg->tb, CP_HASH_PAIR(seg, 1)}, {seg->ta, CP_HASH_PAIR(seg, 0)}, seg->r, cpvneg(seg->tn)};
+		return edge;
 	}
 }
 
@@ -249,7 +253,7 @@ ClosestDist(const cpVect v0,const cpVect v1)
 }
 
 static struct ClosestPoints
-EPARecurse(const struct SupportContext *ctx, const int count, const struct MinkowskiPoint *hull, const int i)
+EPARecurse(const struct SupportContext *ctx, const int count, const struct MinkowskiPoint *hull, const int iteration)
 {
 	int mini = 0;
 	cpFloat minDist = INFINITY;
@@ -280,9 +284,9 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 #endif
 	
 	cpFloat area2x = cpvcross(cpvsub(v1.ab, v0.ab), cpvadd(cpvsub(p.ab, v0.ab), cpvsub(p.ab, v1.ab)));
-	if(area2x > 0.0f && i < MAX_EPA_ITERATIONS){
+	if(area2x > 0.0f && iteration < MAX_EPA_ITERATIONS){
 		int count2 = 1;
-		struct MinkowskiPoint *hull2 = alloca((count + 1)*sizeof(struct MinkowskiPoint));
+		struct MinkowskiPoint *hull2 = (struct MinkowskiPoint *)alloca((count + 1)*sizeof(struct MinkowskiPoint));
 		hull2[0] = p;
 		
 		for(int i=0; i<count; i++){
@@ -299,9 +303,9 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 			}
 		}
 		
-		return EPARecurse(ctx, count2, hull2, i + 1);
+		return EPARecurse(ctx, count2, hull2, iteration + 1);
 	} else {
-		cpAssertWarn(i<WARN_EPA_ITERATIONS, "High EPA iterations: %d", i);
+		cpAssertWarn(iteration < WARN_EPA_ITERATIONS, "High EPA iterations: %d", iteration);
 		return ClosestPointsNew(v0, v1);
 	}
 }
@@ -317,17 +321,17 @@ EPA(const struct SupportContext *ctx, const struct MinkowskiPoint v0, const stru
 //MARK: GJK Functions.
 
 static inline struct ClosestPoints
-GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, const int i)
+GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, const int iteration)
 {
-	if(i > MAX_GJK_ITERATIONS){
-		cpAssertWarn(i < WARN_GJK_ITERATIONS, "High GJK iterations: %d", i);
+	if(iteration > MAX_GJK_ITERATIONS){
+		cpAssertWarn(iteration < WARN_GJK_ITERATIONS, "High GJK iterations: %d", iteration);
 		return ClosestPointsNew(v0, v1);
 	}
 	
 	cpVect delta = cpvsub(v1.ab, v0.ab);
 	if(cpvcross(delta, cpvadd(v0.ab, v1.ab)) > 0.0f){
 		// Origin is behind axis. Flip and try again.
-		return GJKRecurse(ctx, v1, v0, i + 1);
+		return GJKRecurse(ctx, v1, v0, iteration + 1);
 	} else {
 		cpFloat t = ClosestT(v0.ab, v1.ab);
 		cpVect n = (-1.0f < t && t < 1.0f ? cpvperp(delta) : cpvneg(LerpT(v0.ab, v1.ab, t)));
@@ -345,19 +349,19 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 			cpvcross(cpvsub(v1.ab, p.ab), cpvadd(v1.ab, p.ab)) > 0.0f &&
 			cpvcross(cpvsub(v0.ab, p.ab), cpvadd(v0.ab, p.ab)) < 0.0f
 		){
-			cpAssertWarn(i < WARN_GJK_ITERATIONS, "High GJK->EPA iterations: %d", i);
+			cpAssertWarn(iteration < WARN_GJK_ITERATIONS, "High GJK->EPA iterations: %d", iteration);
 			// The triangle v0, p, v1 contains the origin. Use EPA to find the MSA.
 			return EPA(ctx, v0, p, v1);
 		} else {
 			// The new point must be farther along the normal than the existing points.
 			if(cpvdot(p.ab, n) <= cpfmax(cpvdot(v0.ab, n), cpvdot(v1.ab, n))){
-				cpAssertWarn(i < WARN_GJK_ITERATIONS, "High GJK iterations: %d", i);
+				cpAssertWarn(iteration < WARN_GJK_ITERATIONS, "High GJK iterations: %d", iteration);
 				return ClosestPointsNew(v0, v1);
 			} else {
 				if(ClosestDist(v0.ab, p.ab) < ClosestDist(p.ab, v1.ab)){
-					return GJKRecurse(ctx, v0, p, i + 1);
+					return GJKRecurse(ctx, v0, p, iteration + 1);
 				} else {
-					return GJKRecurse(ctx, p, v1, i + 1);
+					return GJKRecurse(ctx, p, v1, iteration + 1);
 				}
 			}
 		}

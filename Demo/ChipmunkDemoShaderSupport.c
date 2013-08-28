@@ -40,11 +40,11 @@ CheckGLErrors(void)
 	}
 }
 
-typedef void (*GETIV)(GLuint shader, GLenum pname, GLint *params);
-typedef void (*GETINFOLOG)(GLuint shader, GLsizei maxLength, GLsizei *length, GLchar *infoLog);
+//typedef GLAPIENTRY void (*GETIV)(GLuint shader, GLenum pname, GLint *params);
+//typedef GLAPIENTRY void (*GETINFOLOG)(GLuint shader, GLsizei maxLength, GLsizei *length, GLchar *infoLog);
 
 static cpBool
-CheckError(GLint obj, GLenum status, GETIV getiv, GETINFOLOG getInfoLog)
+CheckError(GLint obj, GLenum status, PFNGLGETSHADERIVPROC getiv, PFNGLGETSHADERINFOLOGPROC getInfoLog)
 {
 	GLint success;
 	getiv(obj, status, &success);
@@ -53,7 +53,7 @@ CheckError(GLint obj, GLenum status, GETIV getiv, GETINFOLOG getInfoLog)
 		GLint length;
 		getiv(obj, GL_INFO_LOG_LENGTH, &length);
 		
-		char *log = alloca(length);
+		char *log = (char *)alloca(length);
 		getInfoLog(obj, length, NULL, log);
 		
 		fprintf(stderr, "Shader compile error for 0x%04X: %s\n", status, log);
