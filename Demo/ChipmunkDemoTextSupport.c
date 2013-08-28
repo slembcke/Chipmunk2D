@@ -21,18 +21,8 @@
 
 #include <string.h>
 
-#ifdef __APPLE__
-	#include "OpenGL/gl.h"
-	#include "OpenGL/glu.h"
-	#include "glfw.h"
-#else
-	#ifdef WIN32
-		#include <windows.h>
-	#endif
-	
-	#include <GL/gl.h>
-	#include <GL/glu.h>
-#endif
+#include "GL/glew.h"
+#include "GL/glfw.h"
 
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"

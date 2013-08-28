@@ -36,16 +36,8 @@
 #include <limits.h>
 #include <stdarg.h>
 
-#ifdef __APPLE__
-	#include "glew.h"
-	#include "glfw.h"
-#else
-#ifdef WIN32
-	#include <windows.h>
-#endif
-	#include <GL/gl.h>
-	#include <GL/glu.h>
-#endif
+#include "GL/glew.h"
+#include "GL/glfw.h"
 
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
