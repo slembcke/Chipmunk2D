@@ -4,6 +4,8 @@ What's new in 6.2.0:
 * All shape types can now be given a rounding radius.
 * Collisions are now guaranteed to have a maximum of 2 collision points.
 * Poly to poly collision performance is slightly better when they have a radius. Slightly worse with none.
+* Implemented smoothed segment collisions to prevent colliding with the "cracks" between segment shapes.
+* API: (Officially) added cpSegmentShapeSetNeighbors() used to enable smoothed line collisions.
 * API: Added cpBBCenter() to get the center of a bounding box.
 * API: Added cpPolyShapeInit2() and cpPolyShapeNew2() to create poly shapes with a radius. (Horrible names yes, but it will go away in Chipmunk 7)
 * API: Added cpBoxShapeInit3() and cpBoxShapeNew3() to create boxes with a radius.
@@ -12,6 +14,7 @@ What's new in 6.2.0:
 * BUG: cpMomentForPoly() will now return a correct value for degenerate 2 vertex polygons.
 * BUG: Fixed an issue where certain segment query calls would return a t value of 0 instead of 1 for a missed query.
 * MISC: Passing cpvzero to cpvnormalize() will now return cpvzero. No need to worry about NaNs or cpvnormalize_safe().
+* MISC: Demo app now uses GLFW instead of GLUT, and has improved drawing and text rendering routines.
 
 What's new in 6.1.5:
 * API: Added cpArbiter*SurfaceVelocity() to allow for custom surface velocity calculation.
