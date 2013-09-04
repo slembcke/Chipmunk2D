@@ -67,6 +67,7 @@ addBar(cpSpace *space, cpVect pos, cpVect boxOffset)
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 5.0f));
 	cpShapeSetElasticity(shape, 0.0f);
 	cpShapeSetFriction(shape, 0.7f);
+	cpShapeSetGroup(shape, 1);
 	
 	return body;
 }
@@ -275,9 +276,9 @@ init(void)
 }
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	cpSpaceStep(space, 1.0f/60.0f);
+	cpSpaceStep(space, dt);
 }
 
 static void
@@ -289,6 +290,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Joints = {
 	"Joints and Constraints",
+	1.0/60.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

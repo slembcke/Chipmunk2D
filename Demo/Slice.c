@@ -111,14 +111,9 @@ SliceQuery(cpShape *shape, cpFloat t, cpVect n, struct SliceContext *context)
 }
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	int steps = 1;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-	}
+	cpSpaceStep(space, dt);
 	
 	static cpBool lastClickState = cpFalse;
 	static cpVect sliceStart = {0.0, 0.0};
@@ -158,7 +153,7 @@ init(void)
 	cpShape *shape;
 	
 	// Create segments around the edge of the screen.
-	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-1000,-240), cpv(1000,-240), 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
@@ -185,6 +180,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Slice = {
 	"Slice.",
+	1.0/60.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

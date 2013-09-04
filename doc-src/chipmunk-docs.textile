@@ -2,7 +2,7 @@
 
 <%= pop_open_div("Outline") %><%%= Node::Root.outline %></div></div>
 
-<%= h 1, "Chipmunk2D 6.1.5", "Intro" %>
+<%= h 1, "Chipmunk2D 6.2.0", "Intro" %>
 
 First of all, Chipmunk2D is a 2D rigid body physics library distributed under the MIT license. It is intended to be blazingly fast, portable, numerically stable, and easy to use. For this reason it's been used in hundreds of games across just about every system you can name. This includes top quality titles such as Night Sky for the Wii and many #1 sellers on the iPhone App Store! I've put thousands of hours of work over many years to make Chipmunk2D what it is today. If you find Chipmunk2D has saved you a lot of time, please consider "donating":https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552. You'll make an indie game developer very happy!
 
@@ -217,8 +217,7 @@ p(expl). Convenience constructor for creating new @cpVect@ structs.
 * @cpVect cpvlerpconst(cpVect v1, cpVect v2, cpFloat d)@ - Linearly interpolate between @v1@ towards @v2@ by distance @d@.
 * @cpVect cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t)@ - Spherical linearly interpolate between @v1@ and @v2@.
 * @cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)@ - Spherical linearly interpolate between @v1@ towards @v2@ by no more than angle @a@ in radians.
-* @cpVect cpvnormalize(const cpVect v)@ - Returns a normalized copy of @v@.
-* @cpVect cpvnormalize_safe(const cpVect v)@ - Returns a normalized copy of @v@ or @cpvzero@ if @v@ was already @cpvzero@. Protects against divide by zero errors.
+* @cpVect cpvnormalize(const cpVect v)@ - Returns a normalized copy of @v@. As a special case, it returns @cpvzero@ when called on @cpvzero@.
 * @cpVect cpvclamp(const cpVect v, const cpFloat len)@ - Clamp @v@ to length @len@.
 * @cpFloat cpvdist(const cpVect v1, const cpVect v2)@ - Returns the distance between @v1@ and @v2@.
 * @cpFloat cpvdistsq(const cpVect v1, const cpVect v2)@ - Returns the squared distance between @v1@ and @v2@. Faster than @cpvdist()@ when you only need to compare distances.
@@ -253,6 +252,7 @@ p(expl). Convenience constructor for making a @cpBB@ fitting a circle at positio
 * @cpBool cpBBContainsVect(const cpBB bb, const cpVect v)@ - Returns true if @bb@ contains @v@.
 * @cpBB cpBBMerge(const cpBB a, const cpBB b)@ - Return the minimal bounding box that contains both @a@ and @b@.
 * @cpBB cpBBExpand(const cpBB bb, const cpVect v)@ - Return the minimal bounding box that contains both @bb@ and @v@.
+* @cpVect cpBBCenter(const cpBB bb)@ - Return the center of @bb@.
 * @cpFloat cpBBArea(cpBB bb)@ - Return the area of @bb@.
 * @cpFloat cpBBMergedArea(cpBB a, cpBB b)@ - Merges @a@ and @b@ then returns the area of the merged bounding box.
 * @cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)@ - Returns the fraction along the segment query the cpBB is hit. Returns INFINITY if it doesn't hit.
@@ -596,16 +596,26 @@ cpFloat cpSegmentShapeGetRadius(cpShape *shape)</code></pre>
 
 p(expl). Getters for segment shape properties. Passing a non-segment shape will throw an assertion.
 
+<pre><code>void cpSegmentShapeSetNeighbors(cpShape *shape, cpVect prev, cpVect next)</code></pre>
+
+p(expl). When you have a number of segment shapes that are all joined together, things can still collide with the "cracks" between the segments. By setting the neighbor segment endpoints you can tell Chipmunk to avoid colliding with the inner parts of the crack.
+
 <%= h 2, "Working With Polygon Shapes:", "Polys" %>
 
 <pre><code>cpPolyShape *cpPolyShapeAlloc(void)
-cpPolyShape *cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, cpVect *verts, cpVect offset)
-cpShape *cpPolyShapeNew(cpBody *body, int numVerts, cpVect *verts, cpVect offset)</code></pre>
+cpPolyShape *cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset)
+cpShape *cpPolyShapeNew(cpBody *body, int numVerts, const cpVect *verts, cpVect offset)</code></pre>
 
 p(expl). @body@ is the body to attach the poly to, @verts@ is an array of @cpVect@ structs defining a convex hull with a clockwise winding, @offset@ is the offset from the body's center of gravity in body local coordinates. An assertion will be thrown the vertexes are not convex or do not have a clockwise winding.
 
+<pre><code>cpPolyShape *cpPolyShapeInit2(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset, cpFloat radius)
+cpShape *cpPolyShapeNew2(cpBody *body, int numVerts, cpVect *verts, cpVect offset, cpFloat radius)</code></pre>
+
+p(expl). Same as above, but allows you to create a polygon shape with a radius. _(I know the naming is sort of dumb. It will be cleaned up in Chipmunk 7)_
+
 <pre><code>int cpPolyShapeGetNumVerts(cpShape *shape)
-cpVect cpPolyShapeGetVert(cpShape *shape, int index)</code></pre>
+cpVect cpPolyShapeGetVert(cpShape *shape, int index)
+cpFloat cpPolyShapeGetRadius()</code></pre>
 
 p(expl). Getters for poly shape properties. Passing a non-poly shape or an index that does not exist will throw an assertion.
 
@@ -614,7 +624,12 @@ p(expl). Getters for poly shape properties. Passing a non-poly shape or an index
 Because boxes are so common in physics games, Chipmunk provides shortcuts to create box shaped polygons. The boxes will always be centered at the center of gravity of the body you are attaching them to. If you want to create an off-center box, you will need to use @cpPolyShapeNew()@ or @cpPolyShapeInit()@.
 
 <pre><code>cpPolyShape *cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height)
-cpShape *cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height)</code></pre>
+cpPolyShape *cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box)
+cpPolyShape *cpBoxShapeInit3(cpPolyShape *poly, cpBody *body, cpBB box, cpFloat radius)
+
+cpShape *cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height)
+cpShape *cpBoxShapeNew2(cpBody *body, cpBB box)
+cpShape *cpBoxShapeNew3(cpBody *body, cpBB box, cpFloat radius)</code></pre>
 
 <%= h 3, "Poly Shape Helper Functions:", "PolyHelpers" %>
 
@@ -1342,6 +1357,9 @@ Point queries are useful for things like mouse picking and simple sensors. They 
 	cpVect p;
 	/// The distance to the point. The distance is negative if the point is inside the shape.
 	cpFloat d;
+	/// The gradient of the distance function.
+	/// The same as info.p/info.d, but accurate even for very small values of info.d.
+	cpVect g;
 } cpNearestPointQueryInfo;</code></pre>
 
 p(expl). Nearest point queries return the point on the surface of the shape as well as the distance from the query point to the surface point.

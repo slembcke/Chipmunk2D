@@ -37,7 +37,7 @@ eachBody(cpBody *body, void *unused)
 }
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
 	if(ChipmunkDemoRightDown){
 		cpShape *nearest = cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 0.0, GRABABLE_MASK_BIT, CP_NO_GROUP, NULL);
@@ -53,13 +53,8 @@ update(cpSpace *space)
 		}
 	}
 	
-	int steps = 1;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-		cpSpaceEachBody(space, &eachBody, NULL);
-	}
+	cpSpaceStep(space, dt);
+	cpSpaceEachBody(space, &eachBody, NULL);
 }
 
 #define NUM_VERTS 5
@@ -128,6 +123,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Plink = {
 	"Plink",
+	1.0/60.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

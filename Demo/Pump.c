@@ -28,7 +28,7 @@ static cpConstraint *motor;
 static cpBody *balls[numBalls];
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
 	cpFloat coef = (2.0f + ChipmunkDemoKeyboard.y)/3.0f;
 	cpFloat rate = ChipmunkDemoKeyboard.x*30.0f*coef;
@@ -36,20 +36,15 @@ update(cpSpace *space)
 	cpSimpleMotorSetRate(motor, rate);
 	cpConstraintSetMaxForce(motor, rate ? 1000000.0f : 0.0f);
 
-	int steps = 2;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
+	cpSpaceStep(space, dt);
 	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
+	for(int i=0; i<numBalls; i++){
+		cpBody *ball = balls[i];
+		cpVect pos = cpBodyGetPos(ball);
 		
-		for(int i=0; i<numBalls; i++){
-			cpBody *ball = balls[i];
-			cpVect pos = cpBodyGetPos(ball);
-			
-			if(pos.x > 320.0f){
-				cpBodySetVel(ball, cpvzero);
-				cpBodySetPos(ball, cpv(-224.0f, 200.0f));
-			}
+		if(pos.x > 320.0f){
+			cpBodySetVel(ball, cpvzero);
+			cpBodySetPos(ball, cpv(-224.0f, 200.0f));
 		}
 	}
 }
@@ -166,7 +161,8 @@ init(void)
 	cpBodySetPos(feeder, cpv(-224, (bottom + top)/2.0f));
 	
 	cpFloat len = top - bottom;
-	cpSpaceAddShape(space, cpSegmentShapeNew(feeder, cpv(0.0f, len/2.0f), cpv(0.0f, -len/2.0f), 20.0f));
+	shape = cpSpaceAddShape(space, cpSegmentShapeNew(feeder, cpv(0.0f, len/2.0f), cpv(0.0f, -len/2.0f), 20.0f));
+	cpShapeSetLayers(shape, GRABABLE_MASK_BIT);
 	
 	cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, feeder, cpv(-224.0f, bottom), cpv(0.0f, -len/2.0f)));
 	cpVect anchr = cpBodyWorld2Local(feeder, cpv(-224.0f, -160.0f));
@@ -187,6 +183,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Pump = {
 	"Pump",
+	1.0/120.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

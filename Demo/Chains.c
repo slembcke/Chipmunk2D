@@ -48,14 +48,9 @@ BreakableJointPostSolve(cpConstraint *joint, cpSpace *space)
 }
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, double dt)
 {
-	int steps = 3;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-	}
+	cpSpaceStep(space, dt);
 }
 
 static cpSpace *
@@ -106,7 +101,7 @@ init(void)
 			body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, width, height)));
 			cpBodySetPos(body, pos);
 			
-			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+			shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpv(0, (height - width)/2.0), cpv(0, (width - height)/2.0), width/2.0));
 			cpShapeSetFriction(shape, 0.8f);
 			
 			cpFloat breakingForce = 80000;
@@ -146,6 +141,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Chains = {
 	"Breakable Chains",
+	1.0/180.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

@@ -11,7 +11,7 @@ Priorities:
 	Improve the ACD splitting plane algorithm.
 	Fishing game
 	Motorcycle in a spinning cage
-	Squid thingy like TomorrowPlusX. (Would be better with seg/seg collisions)
+	Squid thingy like TomorrowPlusX.
 
 	Investigate getting better PhysicsEditor support.
 
@@ -43,17 +43,16 @@ Future things to think about:
 
 Chipmunk 7:
 	Speculative contacts
-	Unity bindings
-	user definable constraint
-	serialization
+	User definable constraint
+	Custom contact constraint with rolling friction and per contact surface v.
+	Serialization
 	API changes, different body/shape instantiation.
 	Collision handler objects with additional callbacks.
-	Revisit rolling friction.
 	Calculate contact anchors to get rid of contact pos. (needed for speculative contacts anyway)
-	Revisit per contact surface velocity.
 	Mass property calculation changes.
 	Change apply force/impulse and point velocity functions.
 	Separate doxygen docs for Objective-C parts and C parts.
 	Cocos2D xcode templates.
 	Custom contacts using cpArbiter user data.
+	Built in transform type.
 	

@@ -1,4 +1,22 @@
-CHANGES SINCE 6.1.4
+What's new in 6.2.0:
+* Collision detection now primarily uses the GJK and EPA algorithms instead of SAT. Internally this was a rather huge change. o_O
+* Improved collision point quality and better collision point identification.
+* All shape types can now be given a rounding radius.
+* Collisions are now guaranteed to have a maximum of 2 collision points.
+* Poly to poly collision performance is slightly better when they have a radius. Slightly worse with none.
+* Implemented smoothed segment collisions to prevent colliding with the "cracks" between segment shapes.
+* API: (Officially) added cpSegmentShapeSetNeighbors() used to enable smoothed line collisions.
+* API: Added cpBBCenter() to get the center of a bounding box.
+* API: Added cpPolyShapeInit2() and cpPolyShapeNew2() to create poly shapes with a radius. (Horrible names yes, but it will go away in Chipmunk 7)
+* API: Added cpBoxShapeInit3() and cpBoxShapeNew3() to create boxes with a radius.
+* API: Added cpPolyShapeGetRadius() and cpPolyShapeSetRadius() (the latter only in chipmunk_unsafe.h).
+* API: Added cpNearestPointQueryInfo.g which returns the gradient of the signed distance field for the shape.
+* BUG: cpMomentForPoly() will now return a correct value for degenerate 2 vertex polygons.
+* BUG: Fixed an issue where certain segment query calls would return a t value of 0 instead of 1 for a missed query.
+* MISC: Passing cpvzero to cpvnormalize() will now return cpvzero. No need to worry about NaNs or cpvnormalize_safe().
+* MISC: Demo app now uses GLFW instead of GLUT, and has improved drawing and text rendering routines.
+
+What's new in 6.1.5:
 * API: Added cpArbiter*SurfaceVelocity() to allow for custom surface velocity calculation.
 * API: Added cpArbiteSetContactPointSet() to allow changing the contact geometry on the fly.
 * API: Added cpSpaceConvertBodyToStatic() and cpSpaceConvertBodyToDynamic().
@@ -14,17 +32,17 @@ CHANGES SINCE 6.1.4
 * MISC: Modified the Sticky demo to use the new cpArbiteSetContactPointSet() to avoid the use of unnecessary sensor shapes.
 * MISC: [ChipmunkSpace addBounds:...] now returns a NSArray of the bounding segments. (Pro only)
 
-CHANGES SINCE 6.1.3:
+What's new in 6.1.4:
 * MISC: Fixed a build script issue that was preventing the documentation from being generated.
 
-CHANGES SINCE 6.1.2:
+What's new in 6.1.3:
 * BUG: Fixed a couple of very specific but fatal bugs that occur when sleeping is enabled and filtering collisions.
 * BUG: Fixed an issue with cpvslerp() between very similar vectors.
 * BUG: Fixed an issue with grab friction in ChipmunkMultiGrab. (Pro only)
 * MISC: Implemented the cpConstraintGetImpulse() functionality for spring joints.
 * MISC: Added more functions to chipmunk_ffi.h
 
-CHANGES SINCE 6.1.1:
+What's new in 6.1.2:
 * API: Added a cpArbiter.data pointer. Now you can tag collisions with custom persistent data.
 * API: Added segment to segment collisions (thanks to LegoCylon)
 * API: cpSpaceAddPostStepCallback() now returns false if the callback was a duplicate.
@@ -41,10 +59,10 @@ CHANGES SINCE 6.1.1:
 * MISC: Added the "Sticky Surfaces" demo as a cpArbiter.data example.
 * MISC: Updated Objective-Chipmunk build scripts to always use the latest iOS SDK.
 
-CHANGES SINCE 6.1.0:
+What's new in 6.1.1:
 * API: Renamed the new block based iterators as soon as possible to match the Apple convention ("_b" suffix).
 
-CHANGES SINCE 6.0.3:
+What's new in 6.1.0:
 * API: Added a pthread based, multi-threaded solver to accelerate the game on multi-core systems. (Pro only)
 * API: Added cpConvexHull() and CP_CONVEX_HULL() for generating convex hulls.
 * API: Added cpPolylineConvexDecomposition_BETA() to generate an approximate concave decomposition of a polyline. (Pro only)
@@ -66,7 +84,7 @@ CHANGES SINCE 6.0.3:
 * MISC: The enableContactGraph property of cpSpace is deprecated and always be true.
 * MISC: Added a new demos of the convex hull functions and a self balancing Unicycle.
 
-CHANGES SINCE 6.0.2:
+What's new in 6.0.3:
 * API: Added a cpBBForCircle() convenience function.
 * API: Added cpBBSegmentQuery() to check where a segment hits a cpBB.
 * API: Added cpBodyGetVelAtWorldPoint() and cpBodyGetVelAtLocalPoint() to get point velocities on a body.
@@ -86,7 +104,7 @@ CHANGES SINCE 6.0.2:
 * MISC: Added NEON optimizations for Chipmunk Pro. Expect running on most ARM platforms to be 25-35% faster for contact heavy simulations.
 * MISC: All ChipmunkObject instances added to a space are now retained, even composite ones.
 
-CHANGES SINCE 6.0.1:
+What's new in 6.0.2:
 * API: Added cpSpaceIsLocked() to check if you are in a callback or not.
 * API: Removed the long deprecated [ChipmunkSpace addShapeAHandler:] and [ChipmunkSpace addShapeBHandler:] methods.
 * API: The ChipmunkObject protocol now can return any id<NSFastEnumeration> object instead of just an NSSet.
@@ -107,7 +125,7 @@ CHANGES SINCE 6.0.1:
 * MISC: Updated the MSVC10 project file.
 * MISC: Updated the FFI defs.
 
-CHANGES SINCE 6.0.0:
+What's new in 6.0.1:
 * BUG: Calling cpBodySetPos() on a sleeping body was delaying the Separate() handler callback if one existed.
 * BUG: Fixed a bug where Separate() handler callbacks were not occuring when removing shapes.
 * BUG: Calling cpBodyApplyForce() or cpBodyResetForces() was not activating sleeping bodies.
@@ -115,7 +133,7 @@ CHANGES SINCE 6.0.0:
 * API: Added a "CurrentTimeStep" property to cpSpace to retrieve the current (or most recent) timestep.
 * MISC: Got rid of anonymous unions so that it is C99 clean again.
 
-CHANGES SINCE 5.x:
+What's new in 6.0.0:
 Chipmunk 6.x's API is not quite 100% compatible with 5.x. Make sure you read the list of changes carefully.
 Keep in mind that this is a x.0.0 release and that it's likely there are still some bugs I don't know about yet. I've spent a lot of effort rewritting the collision detection, sleeping, and contact graph algorithms that have required large changes and cleanup to the 5.x codebase. I've ironed out all the bugs that I know of, and the beta test went well. So it's finally time for 6!
 
@@ -137,7 +155,7 @@ Keep in mind that this is a x.0.0 release and that it's likely there are still s
 * MISC: Chipmunk supports multiple spatial indexes and uses a bounding box tree similar to the one found in the Bullet physics library by default. This should provide much better performance for scenes with objects of differening size and works without any tuning for any scale.
 
 
-CHANGES SINCE 5.3.4
+What's new in 5.3.5
 * FIX: Fixed spelling of cpArbiterGetDepth(). Was cpArbiteGetDepth() before. Apparently nobody ever used this function.
 * FIX: Added defines for M_PI and M_E. Apparently these values were never part of the C standard math library. Who knew!?
 * FIX: Added a guard to cpBodyActivate() so that it's a noop for rouge bodies.
@@ -149,14 +167,14 @@ CHANGES SINCE 5.3.4
 * MISC: Removed cpmalloc from the API and replaced all occurences with cpcalloc
 * MISC: Added a benchmarking mode to the demo app. -trial runs it in time trial mode and -bench makes it run some benchmarking demos.
 
-CHANGES SINCE 5.3.3:
+What's new in 5.3.4:
 * FIX: cpBodyActivate() can now be called from collision and query callbacks. This way you can use the setter functions to change properties without indirectly calling cpBodyActivate() and causing an assertion.
 * FIX: cpArbiterGetContactPointSet() was returning the collision points for the normals.
 * FIX: cpSpaceEachBody() now includes sleeping bodies.
 * FIX: Shapes attached to static rogue bodies created with cpBodyNewStatic() are added as static shapes.
 * MISC: Applied a user patch to update the MSVC project and add a .def file.
 
-CHANGES SINCE 5.3.2:
+What's new in 5.3.3:
 * API: Added cpArbiteGetCount() to return the number of contact points.
 * API: Added helper functions for calculating areas of Chipmunk shapes as well as calculating polygon centroids and centering polygons on their centroid.
 * API: Shape queries. Query a shape to test for collisions if it were to be inserted into a space.
@@ -170,7 +188,7 @@ CHANGES SINCE 5.3.2:
 * MISC: Allow CGPoints to be used as cpVect on Mac OS X as well as iOS.
 
 
-CHANGES SINCE 5.3.1:
+What's new in 5.3.2:
 * FIX: Collision begin callbacks were being called continuously for sensors or collisions rejected from the pre-solve callback.
 * FIX: Plugged a nasty memory leak when adding post-step callbacks.
 * FIX: Shapes were being added to the spatial hash using an uninitialized bounding box in some cases.
@@ -184,14 +202,14 @@ CHANGES SINCE 5.3.1:
 * NEW: Added setter functions for the groove joint endpoints.
 * MISC: A number of other minor optimizations and fixes.
 
-CHANGES SINCE 5.3.0:
+What's new in 5.3.1:
  * NEW: Added a brand new tutorial for Objective-Chipmunk: SimpleObjectiveChipmunk that can be found in the Objective-Chipmunk folder.
  * NEW: Proper API docs for Objective-Chipmunk.
  * NEW: Updated the included Objective-Chipmunk library.
  * FIX: Fixed a rare memory crash in the sensor demo.
  * FIX: Fixed some warnings that users submitted.
 
-CHANGES SINCE 5.2.0:
+What's new in 5.3.0:
  * FIX: Fixed the source so it can compile as C, C++, Objective-C, and Objective-C++.
  * FIX: Fixed cp_contact_persistence. It was broken so that it would forget collision solutions after 1 frame instead of respecting the value set.
  * OPTIMIZATION: Several minor optimizations have been added. Though performance should only differ by a few percent.
@@ -203,7 +221,7 @@ CHANGES SINCE 5.2.0:
  * NEW: New MSVC projects.
  * NEW: Added boolean and time stamp types for clarity.
 
-CHANGES SINCE 5.1.0:
+What's new in 5.2.0:
  * OPTIMIZATION: Chipmunk structs used within the solver are now allocated linearly in large blocks. This is much more CPU cache friendly. Programs have seen up to 50% performance improvements though 15-20% should be expected.
  * API: Shape references in cpArbiter structs changed to private_a and private_b to discourage accessing the fields directly and getting them out of order. You should be using cpArbiterGetShapes() or CP_ARBITER_GET_SHAPES() to access the shapes in the correct order.
  * API: Added assertion error messages as well as warnings and covered many new assertion cases.
@@ -211,7 +229,7 @@ CHANGES SINCE 5.1.0:
  * NEW: Added convenience functions for creating box shapes and calculating moments.
  
 
-CHANGES SINCE 5.0.0:
+What's new in 5.1.0:
  * FIX: fixed a NaN issue that was causing raycasts for horizontal or vertical lines to end up in an infinite loop
  * FIX: fixed a number of memory leaks
  * FIX: fixed warnings for various compiler/OS combinations
@@ -224,7 +242,7 @@ CHANGES SINCE 5.0.0:
  * NEW: Added an AABB query to complement point and segment queries
  * NEW: CP_NO_GROUP and CP_ALL_LAYERS constants
 
-CHANGES SINCE 4.x:
+What's new in 5.0.0:
  * Brand new Joint/Constraint API: New constraints can be added easily and are much more flexible than the old joint system
  * Efficient Segment Queries - Like raycasting, but with line segments.
  * Brand new collision callback API: Collision begin/separate events, API for removal of objects within callbacks, more programable control over collision handling.

@@ -1,15 +1,25 @@
 find_package(OpenGL REQUIRED)
-find_package(GLUT REQUIRED)
+
+# Quick and dirty package searching.
+# Will probably only work on Unixes.
+# TODO need to fix this up eventually.
+FIND_LIBRARY(GLFW_LIBRARIES glfw /usr/lib)
+FIND_LIBRARY(GLEW_LIBRARIES GLEW /usr/lib)
+FIND_PATH(GLFW_INCLUDE_DIR GL/glfw.h /usr/include/GL)
+FIND_PATH(GLEW_INCLUDE_DIR GL/glew.h /usr/include/GL)
+
 
 set(chipmunk_demos_include_dirs
   ${chipmunk_SOURCE_DIR}/include/chipmunk
-  ${GLUT_INCLUDE_DIR}
+  ${GLFW_INCLUDE_DIR}
+  ${GLEW_INCLUDE_DIR}
   ${OPENGL_INCLUDE_DIR}
 )
 
 set(chipmunk_demos_libraries
   chipmunk_static
-  ${GLUT_LIBRARIES}
+  ${GLFW_LIBRARIES}
+  ${GLEW_LIBRARIES}
   ${OPENGL_LIBRARIES}
 )
 

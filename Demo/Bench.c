@@ -1,4 +1,5 @@
 #include "chipmunk.h"
+#include "chipmunk_unsafe.h"
 #include "ChipmunkDemo.h"
 
 #if 1
@@ -21,6 +22,8 @@
 	#define BENCH_SPACE_STEP cpHastySpaceStep
 #endif
 
+const cpFloat bevel = 0.0;
+
 static cpVect simple_terrain_verts[] = {
 	{350.00, 425.07}, {336.00, 436.55}, {272.00, 435.39}, {258.00, 427.63}, {225.28, 420.00}, {202.82, 396.00},
 	{191.81, 388.00}, {189.00, 381.89}, {173.00, 380.39}, {162.59, 368.00}, {150.47, 319.00}, {128.00, 311.55},
@@ -32,11 +35,6 @@ static cpVect simple_terrain_verts[] = {
 	{456.76, 382.00}, {432.95, 389.00}, {417.00, 411.32}, {373.00, 433.19}, {361.00, 430.02}, {350.00, 425.07},
 };
 static int simple_terrain_count = sizeof(simple_terrain_verts)/sizeof(cpVect);
-
-static cpVect frand_unit_circle(){
-	cpVect v = cpv(frand()*2.0f - 1.0f, frand()*2.0f - 1.0f);
-	return (cpvlengthsq(v) < 1.0f ? v : frand_unit_circle());
-}
 
 //cpBody bodies[1000] = {};
 //cpCircleShape circles[1000] = {};
@@ -60,7 +58,8 @@ static void add_box(cpSpace *space, int index, cpFloat size){
 	body->p = cpvmult(frand_unit_circle(), 180.0f);
 	
 	
-	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
+	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size - bevel*2, size - bevel*2));
+	cpPolyShapeSetRadius(shape, bevel);
 	shape->e = 0.0f; shape->u = 0.9f;
 }
 
@@ -68,14 +67,14 @@ static void add_hexagon(cpSpace *space, int index, cpFloat radius){
 	cpVect hexagon[6] = {};
 	for(int i=0; i<6; i++){
 		cpFloat angle = -M_PI*2.0f*i/6.0f;
-		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
+		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius - bevel);
 	}
 	
 	cpFloat mass = radius*radius;
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 6, hexagon, cpvzero)));
 	body->p = cpvmult(frand_unit_circle(), 180.0f);
 	
-	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpvzero));
+	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew2(body, 6, hexagon, cpvzero, bevel));
 	shape->e = 0.0f; shape->u = 0.9f;
 }
 
@@ -257,7 +256,7 @@ static cpSpace *init_ComplexTerrainHexagons_1000(){
 	cpVect hexagon[6] = {};
 	for(int i=0; i<6; i++){
 		cpFloat angle = -M_PI*2.0f*i/6.0f;
-		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
+		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius - bevel);
 	}
 	
 	for(int i=0; i<1000; i++){
@@ -265,7 +264,7 @@ static cpSpace *init_ComplexTerrainHexagons_1000(){
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 6, hexagon, cpvzero)));
 		body->p = cpvadd(cpvmult(frand_unit_circle(), 180.0f), cpv(0.0f, 300.0f));
 		
-		cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpvzero));
+		cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew2(body, 6, hexagon, cpvzero, bevel));
 		shape->e = 0.0f; shape->u = 0.0f;
 	}
 	
@@ -361,7 +360,7 @@ static cpSpace *init_BouncyTerrainHexagons_500(){
 	cpVect hexagon[6] = {};
 	for(int i=0; i<6; i++){
 		cpFloat angle = -M_PI*2.0f*i/6.0f;
-		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius);
+		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius - bevel);
 	}
 	
 	for(int i=0; i<500; i++){
@@ -370,7 +369,7 @@ static cpSpace *init_BouncyTerrainHexagons_500(){
 		body->p = cpvadd(cpvmult(frand_unit_circle(), 130.0f), cpvzero);
 		body->v = cpvmult(frand_unit_circle(), 50.0f);
 		
-		cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpvzero));
+		cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew2(body, 6, hexagon, cpvzero, bevel));
 		shape->e = 1.0f;
 	}
 	
@@ -439,8 +438,8 @@ static cpSpace *init_NoCollide(){
 
 
 // Build benchmark list
-static void update(cpSpace *space){
-	BENCH_SPACE_STEP(space, 1.0f/60.0f);
+static void update(cpSpace *space, double dt){
+	BENCH_SPACE_STEP(space, dt);
 }
 
 static void destroy(cpSpace *space){
@@ -451,13 +450,14 @@ static void destroy(cpSpace *space){
 // Make a second demo declaration for this demo to use in the regular demo set.
 ChipmunkDemo BouncyHexagons = {
 	"Bouncy Hexagons",
+	1.0/60.0,
 	init_BouncyTerrainHexagons_500,
 	update,
 	ChipmunkDemoDefaultDrawImpl,
 	destroy,
 };
 
-#define BENCH(n) {"benchmark - " #n, init_##n, update, 	ChipmunkDemoDefaultDrawImpl, destroy}
+#define BENCH(n) {"benchmark - " #n, 1.0/60.0, init_##n, update, 	ChipmunkDemoDefaultDrawImpl, destroy}
 ChipmunkDemo bench_list[] = {
 	BENCH(SimpleTerrainCircles_1000),
 	BENCH(SimpleTerrainCircles_500),
