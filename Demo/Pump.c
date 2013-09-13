@@ -119,7 +119,7 @@ init(void)
 	cpBody *plunger = cpSpaceAddBody(space, cpBodyNew(1.0f, INFINITY));
 	cpBodySetPosition(plunger, cpv(-160,-80));
 	
-	shape = cpSpaceAddShape(space, cpPolyShapeNew(plunger, 4, verts, cpvzero));
+	shape = cpSpaceAddShape(space, cpPolyShapeNew(plunger, 4, verts, cpvzero, 0.0));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 0.5f);
 	cpShapeSetLayers(shape, 1);

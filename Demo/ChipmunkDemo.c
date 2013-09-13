@@ -255,7 +255,7 @@ Display(void)
 	demos[demo_index].drawFunc(space);
 	
 	// Highlight the shape under the mouse because it looks neat.
-	cpShape *nearest = cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 0.0f, CP_ALL_LAYERS, CP_NO_GROUP, NULL);
+	cpShape *nearest = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0f, CP_ALL_LAYERS, CP_NO_GROUP, NULL);
 	if(nearest) ChipmunkDebugDrawShape(nearest, RGBAColor(1.0f, 0.0f, 0.0f, 1.0f), LAColor(0.0f, 0.0f));
 	
 	// Draw the renderer contents and reset it back to the last tick's state.
@@ -404,7 +404,7 @@ Click(int button, int state)
 {
 	if(button == GLFW_MOUSE_BUTTON_1){
 		if(state == GLFW_PRESS){
-			cpShape *shape = cpSpacePointQueryFirst(space, ChipmunkDemoMouse, GRABABLE_MASK_BIT, CP_NO_GROUP);
+			cpShape *shape = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0f, GRABABLE_MASK_BIT, CP_NO_GROUP, NULL);
 			if(shape){
 				cpBody *body = shape->body;
 				mouse_joint = cpPivotJointNew2(mouse_body, body, cpvzero, cpBodyWorldToLocal(body, ChipmunkDemoMouse));

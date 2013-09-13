@@ -63,7 +63,7 @@ init(void)
 			body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForBox(1.0f, 30.0f, 30.0f)));
 			cpBodySetPosition(body, cpv(j*32 - i*16, 300 - i*32));
 			
-			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 30.0f, 30.0f));
+			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 30.0f, 30.0f, 0.5f));
 			cpShapeSetElasticity(shape, 0.0f);
 			cpShapeSetFriction(shape, 0.8f);
 		}

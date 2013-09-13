@@ -403,7 +403,7 @@ DrawShape(cpShape *shape, struct ShapeColors *colors)
 		}
 		case CP_POLY_SHAPE: {
 			cpPolyShape *poly = (cpPolyShape *)shape;
-			ChipmunkDebugDrawPolygon(poly->numVerts, poly->tVerts, poly->r, outline_color, fill_color);
+			ChipmunkDebugDrawPolygon(poly->count, poly->tVerts, poly->r, outline_color, fill_color);
 			break;
 		}
 		default: break;

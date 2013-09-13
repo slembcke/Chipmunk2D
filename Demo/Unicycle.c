@@ -107,8 +107,8 @@ init(void)
 		cpBodySetPosition(wheel_body, cpv(0.0, -160.0 + radius));
 		
 		cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(wheel_body, radius, cpvzero));
-		shape->u = 0.7;
-		shape->group = 1;
+		cpShapeSetFriction(shape, 0.7);
+		cpShapeSetGroup(shape, 1);
 	}
 	
 	{
@@ -125,13 +125,13 @@ init(void)
 		
 		cpShape *shape = NULL;
 		
-		shape = cpSpaceAddShape(space, cpBoxShapeNew2(balance_body, bb1));
-		shape->u = 1.0;
-		shape->group = 1;
+		shape = cpSpaceAddShape(space, cpBoxShapeNew2(balance_body, bb1, 0.0));
+		cpShapeSetFriction(shape, 1.0);
+		cpShapeSetGroup(shape, 1);
 		
-		shape = cpSpaceAddShape(space, cpBoxShapeNew2(balance_body, bb2));
-		shape->u = 1.0;
-		shape->group = 1;
+		shape = cpSpaceAddShape(space, cpBoxShapeNew2(balance_body, bb2, 0.0));
+		cpShapeSetFriction(shape, 1.0);
+		cpShapeSetGroup(shape, 1);
 	}
 	
 	cpVect anchr1 = cpBodyWorldToLocal(balance_body, cpBodyGetPosition(wheel_body));
@@ -151,7 +151,7 @@ init(void)
 		cpBody *boxBody = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, width, height)));
 		cpBodySetPosition(boxBody, cpv(200, -100));
 		
-		cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, width, height));
+		cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, width, height, 0.0));
 		cpShapeSetFriction(shape, 0.7);
 	}
 	

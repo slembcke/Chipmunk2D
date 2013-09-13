@@ -217,19 +217,12 @@ cpBool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key
 // TODO: Queries and iterators should take a cpSpace parametery.
 // TODO: They should also be abortable.
 
-/// Point query callback function type.
-typedef void (*cpSpacePointQueryFunc)(cpShape *shape, void *data);
-/// Query the space at a point and call @c func for each shape found.
-void cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data);
-/// Query the space at a point and return the first shape found. Returns NULL if no shapes were found.
-cpShape *cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpGroup group);
-
 /// Nearest point query callback function type.
-typedef void (*cpSpaceNearestPointQueryFunc)(cpShape *shape, cpFloat distance, cpVect point, void *data);
+typedef void (*cpSpacePointQueryFunc)(cpShape *shape, cpFloat distance, cpVect point, void *data);
 /// Query the space at a point and call @c func for each shape found.
-void cpSpaceNearestPointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpaceNearestPointQueryFunc func, void *data);
+void cpSpacePointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data);
 /// Query the space at a point and return the nearest shape found. Returns NULL if no shapes were found.
-cpShape *cpSpaceNearestPointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpNearestPointQueryInfo *out);
+cpShape *cpSpacePointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpPointQueryInfo *out);
 
 /// Segment query callback function type.
 typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, void *data);

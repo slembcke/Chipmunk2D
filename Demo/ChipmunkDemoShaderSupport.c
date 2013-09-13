@@ -38,6 +38,7 @@
 
 #include "chipmunk.h"
 
+#include "ChipmunkDemoShaderSupport.h"
 
 void
 CheckGLErrors(void)

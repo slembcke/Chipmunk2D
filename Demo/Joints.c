@@ -98,7 +98,7 @@ addChassis(cpSpace *space, cpVect pos, cpVect boxOffset)
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, width, height)));
 	cpBodySetPosition(body, cpvadd(pos, boxOffset));
 	
-	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height, 0.0));
 	cpShapeSetElasticity(shape, 0.0f);
 	cpShapeSetFriction(shape, 0.7f);
 	cpShapeSetGroup(shape, 1); // use a group to keep the car parts from colliding

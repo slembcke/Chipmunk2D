@@ -139,14 +139,14 @@ cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat r);
 
 // TODO radius
 /// Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
-cpFloat cpMomentForPoly(cpFloat m, int numVerts, const cpVect *verts, cpVect offset);
+cpFloat cpMomentForPoly(cpFloat m, int count, const cpVect *verts, cpVect offset);
 
 /// Calculate the signed area of a polygon. A Clockwise winding gives positive area.
 /// This is probably backwards from what you expect, but matches Chipmunk's the winding for poly shapes.
-cpFloat cpAreaForPoly(const int numVerts, const cpVect *verts);
+cpFloat cpAreaForPoly(const int count, const cpVect *verts);
 
 /// Calculate the natural centroid of a polygon.
-cpVect cpCentroidForPoly(const int numVerts, const cpVect *verts);
+cpVect cpCentroidForPoly(const int count, const cpVect *verts);
 
 /// Calculate the moment of inertia for a solid box.
 cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height);
@@ -155,10 +155,10 @@ cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height);
 cpFloat cpMomentForBox2(cpFloat m, cpBB box);
 
 /// Calculate the convex hull of a given set of points. Returns the count of points in the hull.
-/// @c result must be a pointer to a @c cpVect array with at least @c count elements. If @c result is @c NULL, then @c verts will be reduced instead.
+/// @c result must be a pointer to a @c cpVect array with at least @c count elements. If @c verts == @c result, then @c verts will be reduced inplace.
 /// @c first is an optional pointer to an integer to store where the first vertex in the hull came from (i.e. verts[first] == result[0])
 /// @c tol is the allowed amount to shrink the hull when simplifying it. A tolerance of 0.0 creates an exact hull.
-int cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol);
+int cpConvexHull(int count, const cpVect *verts, cpVect *result, int *first, cpFloat tol);
 
 #ifdef _MSC_VER
 #include "malloc.h"
@@ -186,8 +186,8 @@ void cpBodyEachShape_b(cpBody *body, void (^block)(cpShape *shape));
 void cpBodyEachConstraint_b(cpBody *body, void (^block)(cpConstraint *constraint));
 void cpBodyEachArbiter_b(cpBody *body, void (^block)(cpArbiter *arbiter));
 
-typedef void (^cpSpaceNearestPointQueryBlock)(cpShape *shape, cpFloat distance, cpVect point);
-void cpSpaceNearestPointQuery_b(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpaceNearestPointQueryBlock block);
+typedef void (^cpSpacePointQueryBlock)(cpShape *shape, cpFloat distance, cpVect point);
+void cpSpacePointQuery_b(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpacePointQueryBlock block);
 
 typedef void (^cpSpaceSegmentQueryBlock)(cpShape *shape, cpFloat t, cpVect n);
 void cpSpaceSegmentQuery_b(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryBlock block);

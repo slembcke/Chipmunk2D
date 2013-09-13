@@ -234,7 +234,7 @@ cpSplittingPlaneCompare(cpSplittingPlane plane, cpVect v)
 	return cpvdot(plane.n, v) - plane.d;
 }
 
-void cpLoopIndexes(cpVect *verts, int count, int *start, int *end);
+//void cpLoopIndexes(const cpVect *verts, int count, int *start, int *end);
 
 
 //MARK: Space Functions

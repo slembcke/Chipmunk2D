@@ -51,7 +51,7 @@ add_box(cpSpace *space, cpFloat size, cpFloat mass)
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
 	cpBodySetPosition(body, cpv(frand()*(640 - 2*radius) - (320 - radius), frand()*(480 - 2*radius) - (240 - radius)));
 	
-	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
+	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size, 0.0));
 	cpShapeSetElasticity(shape, 0.0f);
 	cpShapeSetFriction(shape, 0.7f);
 	

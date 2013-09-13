@@ -75,15 +75,15 @@ cpAreaForSegment(cpVect a, cpVect b, cpFloat r)
 }
 
 cpFloat
-cpMomentForPoly(cpFloat m, const int numVerts, const cpVect *verts, cpVect offset)
+cpMomentForPoly(cpFloat m, const int count, const cpVect *verts, cpVect offset)
 {
-	if(numVerts == 2) return cpMomentForSegment(m, verts[0], verts[1]);
+	if(count == 2) return cpMomentForSegment(m, verts[0], verts[1]);
 	
 	cpFloat sum1 = 0.0f;
 	cpFloat sum2 = 0.0f;
-	for(int i=0; i<numVerts; i++){
+	for(int i=0; i<count; i++){
 		cpVect v1 = cpvadd(verts[i], offset);
-		cpVect v2 = cpvadd(verts[(i+1)%numVerts], offset);
+		cpVect v2 = cpvadd(verts[(i+1)%count], offset);
 		
 		cpFloat a = cpvcross(v2, v1);
 		cpFloat b = cpvdot(v1, v1) + cpvdot(v1, v2) + cpvdot(v2, v2);
@@ -96,25 +96,25 @@ cpMomentForPoly(cpFloat m, const int numVerts, const cpVect *verts, cpVect offse
 }
 
 cpFloat
-cpAreaForPoly(const int numVerts, const cpVect *verts)
+cpAreaForPoly(const int count, const cpVect *verts)
 {
 	cpFloat area = 0.0f;
-	for(int i=0; i<numVerts; i++){
-		area += cpvcross(verts[i], verts[(i+1)%numVerts]);
+	for(int i=0; i<count; i++){
+		area += cpvcross(verts[i], verts[(i+1)%count]);
 	}
 	
 	return -area/2.0f;
 }
 
 cpVect
-cpCentroidForPoly(const int numVerts, const cpVect *verts)
+cpCentroidForPoly(const int count, const cpVect *verts)
 {
 	cpFloat sum = 0.0f;
 	cpVect vsum = cpvzero;
 	
-	for(int i=0; i<numVerts; i++){
+	for(int i=0; i<count; i++){
 		cpVect v1 = verts[i];
-		cpVect v2 = verts[(i+1)%numVerts];
+		cpVect v2 = verts[(i+1)%count];
 		cpFloat cross = cpvcross(v1, v2);
 		
 		sum += cross;
@@ -125,10 +125,10 @@ cpCentroidForPoly(const int numVerts, const cpVect *verts)
 }
 
 void
-cpRecenterPoly(const int numVerts, cpVect *verts){
-	cpVect centroid = cpCentroidForPoly(numVerts, verts);
+cpRecenterPoly(const int count, cpVect *verts){
+	cpVect centroid = cpCentroidForPoly(count, verts);
 	
-	for(int i=0; i<numVerts; i++){
+	for(int i=0; i<count; i++){
 		verts[i] = cpvsub(verts[i], centroid);
 	}
 }
@@ -153,7 +153,7 @@ cpMomentForBox2(cpFloat m, cpBB box)
 //MARK: Quick Hull
 
 void
-cpLoopIndexes(cpVect *verts, int count, int *start, int *end)
+cpLoopIndexes(const cpVect *verts, int count, int *start, int *end)
 {
 	(*start) = (*end) = 0;
 	cpVect min = verts[0];
@@ -228,17 +228,14 @@ QHullReduce(cpFloat tol, cpVect *verts, int count, cpVect a, cpVect pivot, cpVec
 // QuickHull seemed like a neat algorithm, and efficient-ish for large input sets.
 // My implementation performs an in place reduction using the result array as scratch space.
 int
-cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)
+cpConvexHull(int count, const cpVect *verts, cpVect *result, int *first, cpFloat tol)
 {
-	if(result){
+	if(verts != result){
 		// Copy the line vertexes into the empty part of the result polyline to use as a scratch buffer.
 		memcpy(result, verts, count*sizeof(cpVect));
-	} else {
-		// If a result array was not specified, reduce the input instead.
-		result = verts;
 	}
 	
-	// Degenerate case, all poins are the same.
+	// Degenerate case, all points are the same.
 	int start, end;
 	cpLoopIndexes(verts, count, &start, &end);
 	if(start == end){
@@ -253,11 +250,7 @@ cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)
 	cpVect b = result[1];
 	
 	if(first) (*first) = start;
-	int resultCount = QHullReduce(tol, result + 2, count - 2, a, b, a, result + 1) + 1;
-	cpAssertSoft(cpPolyValidate(result, resultCount),
-		"Internal error: cpConvexHull() and cpPolyValidate() did not agree."
-		"Please report this error with as much info as you can.");
-	return resultCount;
+	return QHullReduce(tol, result + 2, count - 2, a, b, a, result + 1) + 1;
 }
 
 //MARK: Alternate Block Iterators
@@ -293,9 +286,9 @@ void cpBodyEachArbiter_b(cpBody *body, void (^block)(cpArbiter *arbiter)){
 	cpBodyEachArbiter(body, (cpBodyArbiterIteratorFunc)BodyIteratorFunc, block);
 }
 
-static void NearestPointQueryIteratorFunc(cpShape *shape, cpFloat distance, cpVect point, cpSpaceNearestPointQueryBlock block){block(shape, distance, point);}
-void cpSpaceNearestPointQuery_b(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpaceNearestPointQueryBlock block){
-	cpSpaceNearestPointQuery(space, point, maxDistance, layers, group, (cpSpaceNearestPointQueryFunc)NearestPointQueryIteratorFunc, block);
+static void PointQueryIteratorFunc(cpShape *shape, cpFloat distance, cpVect point, cpSpacePointQueryBlock block){block(shape, distance, point);}
+void cpSpacePointQuery_b(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpacePointQueryBlock block){
+	cpSpacePointQuery(space, point, maxDistance, layers, group, (cpSpacePointQueryFunc)PointQueryIteratorFunc, block);
 }
 
 static void SegmentQueryIteratorFunc(cpShape *shape, cpFloat t, cpVect n, cpSpaceSegmentQueryBlock block){block(shape, t, n);}

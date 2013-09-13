@@ -54,7 +54,7 @@ void cpSegmentShapeSetEndpoints(cpShape *shape, cpVect a, cpVect b);
 void cpSegmentShapeSetRadius(cpShape *shape, cpFloat radius);
 
 /// Set the vertexes of a poly shape.
-void cpPolyShapeSetVerts(cpShape *shape, int numVerts, cpVect *verts, cpVect offset);
+void cpPolyShapeSetVerts(cpShape *shape, int count, cpVect *verts, cpVect offset);
 /// Set the radius of a poly shape.
 void cpPolyShapeSetRadius(cpShape *shape, cpFloat radius);
 

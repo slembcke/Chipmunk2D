@@ -101,25 +101,17 @@ cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot)
 	return (shape->bb = shape->klass->cacheData(shape, pos, rot));
 }
 
-cpBool
-cpShapePointQuery(cpShape *shape, cpVect p){
-	cpNearestPointQueryInfo info = {NULL, cpvzero, INFINITY, cpvzero};
-	cpShapeNearestPointQuery(shape, p, &info);
-	
-	return (info.d < 0.0f);
-}
-
 cpFloat
-cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *info)
+cpShapePointQuery(cpShape *shape, cpVect p, cpPointQueryInfo *info)
 {
-	cpNearestPointQueryInfo blank = {NULL, cpvzero, INFINITY, cpvzero};
+	cpPointQueryInfo blank = {NULL, cpvzero, INFINITY, cpvzero};
 	if(info){
 		(*info) = blank;
 	} else {
 		info = &blank;
 	}
 	
-	shape->klass->nearestPointQuery(shape, p, info);
+	shape->klass->pointQuery(shape, p, info);
 	return info->d;
 }
 
@@ -133,8 +125,8 @@ cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info
 		info = &blank;
 	}
 	
-	cpNearestPointQueryInfo nearest;
-	shape->klass->nearestPointQuery(shape, a, &nearest);
+	cpPointQueryInfo nearest;
+	shape->klass->pointQuery(shape, a, &nearest);
 	if(nearest.d <= 0.0){
 		info->shape = shape;
 		info->t = 0.0;
@@ -160,7 +152,7 @@ cpCircleShapeCacheData(cpCircleShape *circle, cpVect p, cpVect rot)
 }
 
 static void
-cpCicleShapeNearestPointQuery(cpCircleShape *circle, cpVect p, cpNearestPointQueryInfo *info)
+cpCicleShapePointQuery(cpCircleShape *circle, cpVect p, cpPointQueryInfo *info)
 {
 	cpVect delta = cpvsub(p, circle->tc);
 	cpFloat d = cpvlength(delta);
@@ -184,7 +176,7 @@ static const cpShapeClass cpCircleShapeClass = {
 	CP_CIRCLE_SHAPE,
 	(cpShapeCacheDataImpl)cpCircleShapeCacheData,
 	NULL,
-	(cpShapeNearestPointQueryImpl)cpCicleShapeNearestPointQuery,
+	(cpShapePointQueryImpl)cpCicleShapePointQuery,
 	(cpShapeSegmentQueryImpl)cpCircleShapeSegmentQuery,
 };
 
@@ -244,7 +236,7 @@ cpSegmentShapeCacheData(cpSegmentShape *seg, cpVect p, cpVect rot)
 }
 
 static void
-cpSegmentShapeNearestPointQuery(cpSegmentShape *seg, cpVect p, cpNearestPointQueryInfo *info)
+cpSegmentShapePointQuery(cpSegmentShape *seg, cpVect p, cpPointQueryInfo *info)
 {
 	cpVect closest = cpClosetPointOnSegment(p, seg->ta, seg->tb);
 	
@@ -304,7 +296,7 @@ static const cpShapeClass cpSegmentShapeClass = {
 	CP_SEGMENT_SHAPE,
 	(cpShapeCacheDataImpl)cpSegmentShapeCacheData,
 	NULL,
-	(cpShapeNearestPointQueryImpl)cpSegmentShapeNearestPointQuery,
+	(cpShapePointQueryImpl)cpSegmentShapePointQuery,
 	(cpShapeSegmentQueryImpl)cpSegmentShapeSegmentQuery,
 };
 

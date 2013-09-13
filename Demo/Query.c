@@ -58,8 +58,8 @@ update(cpSpace *space, double dt)
 		ChipmunkDemoPrintString("Segment Query (None)");
 	}
 	
-	cpNearestPointQueryInfo nearestInfo = {};
-	cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 100.0, CP_ALL_LAYERS, CP_NO_GROUP, &nearestInfo);
+	cpPointQueryInfo nearestInfo = {};
+	cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 100.0, CP_ALL_LAYERS, CP_NO_GROUP, &nearestInfo);
 	if(nearestInfo.shape){
 		// Draw a grey line to the closest shape.
 		ChipmunkDebugDrawDot(3, ChipmunkDemoMouse, RGBAColor(0.5, 0.5, 0.5, 1.0));
@@ -106,7 +106,7 @@ init(void)
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
 		cpBodySetPosition(body, cpv(50.0f, 30.0f));
 		
-		cpSpaceAddShape(space, cpPolyShapeNew2(body, NUM_VERTS, verts, cpvzero, 10.0f));
+		cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero, 10.0f));
 	}
 	
 	{ // add a circle

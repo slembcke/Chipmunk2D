@@ -40,7 +40,7 @@ static void
 update(cpSpace *space, double dt)
 {
 	if(ChipmunkDemoRightDown){
-		cpShape *nearest = cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 0.0, GRABABLE_MASK_BIT, CP_NO_GROUP, NULL);
+		cpShape *nearest = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0, GRABABLE_MASK_BIT, CP_NO_GROUP, NULL);
 		if(nearest){
 			cpBody *body = cpShapeGetBody(nearest);
 			if(cpBodyIsStatic(body)){
@@ -83,7 +83,7 @@ init(void)
 		for(int j=0; j<6; j++){
 			cpFloat stagger = (j%2)*40;
 			cpVect offset = cpv(i*80 - 320 + stagger, j*70 - 240);
-			shape = cpSpaceAddShape(space, cpPolyShapeNew(staticBody, 3, tris, offset));
+			shape = cpSpaceAddShape(space, cpPolyShapeNew(staticBody, 3, tris, offset, 0.0));
 			cpShapeSetElasticity(shape, 1.0f);
 			cpShapeSetFriction(shape, 1.0f);
 			cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
@@ -106,7 +106,7 @@ init(void)
 		cpFloat x = rand()/(cpFloat)RAND_MAX*640 - 320;
 		cpBodySetPosition(body, cpv(x, 350));
 		
-		shape = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
+		shape = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero, 0.0));
 		cpShapeSetElasticity(shape, 0.0f);
 		cpShapeSetFriction(shape, 0.4f);
 	}

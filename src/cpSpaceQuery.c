@@ -21,74 +21,24 @@
  
 #include "chipmunk_private.h"
 
-//MARK: Point Query Functions
-
-struct PointQueryContext {
-	cpVect point;
-	cpLayers layers;
-	cpGroup group;
-	cpSpacePointQueryFunc func;
-	void *data;
-};
-
-static cpCollisionID 
-PointQuery(struct PointQueryContext *context, cpShape *shape, cpCollisionID id, void *data)
-{
-	if(
-		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
-		cpShapePointQuery(shape, context->point)
-	){
-		context->func(shape, context->data);
-	}
-	
-	return id;
-}
-
-void
-cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data)
-{
-	struct PointQueryContext context = {point, layers, group, func, data};
-	cpBB bb = cpBBNewForCircle(point, 0.0f);
-	
-	cpSpaceLock(space); {
-    cpSpatialIndexQuery(space->activeShapes, &context, bb, (cpSpatialIndexQueryFunc)PointQuery, data);
-    cpSpatialIndexQuery(space->staticShapes, &context, bb, (cpSpatialIndexQueryFunc)PointQuery, data);
-	} cpSpaceUnlock(space, cpTrue);
-}
-
-static void
-PointQueryFirst(cpShape *shape, cpShape **outShape)
-{
-	if(!shape->sensor) *outShape = shape;
-}
-
-cpShape *
-cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpGroup group)
-{
-	cpShape *shape = NULL;
-	cpSpacePointQuery(space, point, layers, group, (cpSpacePointQueryFunc)PointQueryFirst, &shape);
-	
-	return shape;
-}
-
 //MARK: Nearest Point Query Functions
 
-struct NearestPointQueryContext {
+struct PointQueryContext {
 	cpVect point;
 	cpFloat maxDistance;
 	cpLayers layers;
 	cpGroup group;
-	cpSpaceNearestPointQueryFunc func;
+	cpSpacePointQueryFunc func;
 };
 
 static cpCollisionID
-NearestPointQuery(struct NearestPointQueryContext *context, cpShape *shape, cpCollisionID id, void *data)
+NearestPointQuery(struct PointQueryContext *context, cpShape *shape, cpCollisionID id, void *data)
 {
 	if(
 		!(shape->group && context->group == shape->group) && (context->layers&shape->layers)
 	){
-		cpNearestPointQueryInfo info;
-		cpShapeNearestPointQuery(shape, context->point, &info);
+		cpPointQueryInfo info;
+		cpShapePointQuery(shape, context->point, &info);
 		
 		if(info.shape && info.d < context->maxDistance) context->func(shape, info.d, info.p, data);
 	}
@@ -97,9 +47,9 @@ NearestPointQuery(struct NearestPointQueryContext *context, cpShape *shape, cpCo
 }
 
 void
-cpSpaceNearestPointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpaceNearestPointQueryFunc func, void *data)
+cpSpacePointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data)
 {
-	struct NearestPointQueryContext context = {point, maxDistance, layers, group, func};
+	struct PointQueryContext context = {point, maxDistance, layers, group, func};
 	cpBB bb = cpBBNewForCircle(point, cpfmax(maxDistance, 0.0f));
 	
 	cpSpaceLock(space); {
@@ -109,13 +59,13 @@ cpSpaceNearestPointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpLa
 }
 
 static cpCollisionID
-NearestPointQueryNearest(struct NearestPointQueryContext *context, cpShape *shape, cpCollisionID id, cpNearestPointQueryInfo *out)
+NearestPointQueryNearest(struct PointQueryContext *context, cpShape *shape, cpCollisionID id, cpPointQueryInfo *out)
 {
 	if(
 		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) && !shape->sensor
 	){
-		cpNearestPointQueryInfo info;
-		cpShapeNearestPointQuery(shape, context->point, &info);
+		cpPointQueryInfo info;
+		cpShapePointQuery(shape, context->point, &info);
 		
 		if(info.d < out->d) (*out) = info;
 	}
@@ -124,16 +74,16 @@ NearestPointQueryNearest(struct NearestPointQueryContext *context, cpShape *shap
 }
 
 cpShape *
-cpSpaceNearestPointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpNearestPointQueryInfo *out)
+cpSpacePointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpPointQueryInfo *out)
 {
-	cpNearestPointQueryInfo info = {NULL, cpvzero, maxDistance, cpvzero};
+	cpPointQueryInfo info = {NULL, cpvzero, maxDistance, cpvzero};
 	if(out){
 		(*out) = info;
   } else {
 		out = &info;
 	}
 	
-	struct NearestPointQueryContext context = {
+	struct PointQueryContext context = {
 		point, maxDistance,
 		layers, group,
 		NULL

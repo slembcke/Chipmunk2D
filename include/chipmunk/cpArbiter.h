@@ -106,8 +106,8 @@ void cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b);
 static inline void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)
 {
 	CP_ARBITER_GET_SHAPES(arb, shape_a, shape_b);
-	(*a) = shape_a->body;
-	(*b) = shape_b->body;
+	(*a) = shape_a->CP_PRIVATE(body);
+	(*b) = shape_b->CP_PRIVATE(body);
 }
 /// A macro shortcut for defining and retrieving the bodies from an arbiter.
 #define CP_ARBITER_GET_BODIES(__arb__, __a__, __b__) cpBody *__a__, *__b__; cpArbiterGetBodies(__arb__, &__a__, &__b__);

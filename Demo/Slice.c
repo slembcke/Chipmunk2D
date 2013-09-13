@@ -65,7 +65,7 @@ ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 	cpBodySetVelocity(new_body, cpBodyGetVelocityAtWorldPoint(body, centroid));
 	cpBodySetAngularVelocity(new_body, cpBodyGetAngularVelocity(body));
 	
-	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, clippedCount, clipped, cpvneg(centroid)));
+	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, clippedCount, clipped, cpvneg(centroid), 0.0));
 	// Copy whatever properties you have set on the original shape that are important
 	cpShapeSetFriction(new_shape, cpShapeGetFriction(shape));
 }
@@ -103,7 +103,7 @@ SliceQuery(cpShape *shape, cpFloat t, cpVect n, struct SliceContext *context)
 	cpVect b = context->b;
 	
 	// Check that the slice was complete by checking that the endpoints aren't in the sliced shape.
-	if(!cpShapePointQuery(shape, a) && !cpShapePointQuery(shape, b)){
+	if(cpShapePointQuery(shape, a, NULL) > 0.0f && cpShapePointQuery(shape, b, NULL) > 0.0f){
 		// Can't modify the space during a query.
 		// Must make a post-step callback to do the actual slicing.
 		cpSpaceAddPostStepCallback(context->space, (cpPostStepFunc)SliceShapePostStep, shape, context);
@@ -165,7 +165,7 @@ init(void)
 	
 	body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 	
-	shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+	shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height, 0.0));
 	cpShapeSetFriction(shape, 0.6f);
 		
 	return space;

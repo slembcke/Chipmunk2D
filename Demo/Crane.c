@@ -105,7 +105,7 @@ init(void)
 	cpBodySetPosition(dollyBody, cpv(0, 100));
 	
 	// Add a block so you can see it.
-	cpSpaceAddShape(space, cpBoxShapeNew(dollyBody, 30, 30));
+	cpSpaceAddShape(space, cpBoxShapeNew(dollyBody, 30, 30, 0.0));
 	
 	// Add a groove joint for it to move back and forth on.
 	cpSpaceAddConstraint(space, cpGrooveJointNew(staticBody, dollyBody, cpv(-250, 100), cpv(250, 100), cpvzero));
@@ -144,7 +144,7 @@ init(void)
 	cpBodySetPosition(boxBody, cpv(200, -200));
 	
 	// Add a block so you can see it.
-	shape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, 50, 50));
+	shape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, 50, 50, 0.0));
 	cpShapeSetFriction(shape, 0.7);
 	cpShapeSetCollisionType(shape, CRATE);
 	

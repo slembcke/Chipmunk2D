@@ -161,7 +161,7 @@ init(void)
 		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 		
 		// Add the sensor for the water.
-		shape = cpSpaceAddShape(space, cpBoxShapeNew2(staticBody, bb));
+		shape = cpSpaceAddShape(space, cpBoxShapeNew2(staticBody, bb, 0.0));
 		cpShapeSetSensor(shape, cpTrue);
 		cpShapeSetCollisionType(shape, 1);
 	}
@@ -178,7 +178,7 @@ init(void)
 		cpBodySetVelocity(body, cpv(0, -100));
 		cpBodySetAngularVelocity(body, 1);
 		
-		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height, 0.0));
 		cpShapeSetFriction(shape, 0.8f);
 	}
 	
@@ -193,7 +193,7 @@ init(void)
 		cpBodySetVelocity(body, cpv(0, -100));
 		cpBodySetAngularVelocity(body, 1);
 		
-		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height, 0.0));
 		cpShapeSetFriction(shape, 0.8f);
 	}
 	

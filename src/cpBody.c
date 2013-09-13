@@ -76,6 +76,7 @@ cpBodyNew(cpFloat m, cpFloat i)
 	return cpBodyInit(cpBodyAlloc(), m, i);
 }
 
+// TODO static bodies should be addable
 cpBody *
 cpBodyInitStatic(cpBody *body)
 {
@@ -110,6 +111,7 @@ static void cpv_assert_sane(cpVect v, char *message){cpv_assert_nan(v, message);
 extern "C" {
 #endif
 
+// TODO this could be cleaned up.
 void
 cpBodySanityCheck(cpBody *body)
 {

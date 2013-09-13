@@ -339,7 +339,6 @@
 		D3CCDF5B0AE35DA00080442F /* Demo */ = {
 			isa = PBXGroup;
 			children = (
-				D341247B174C1E1D00FFCF73 /* GJK.c */,
 				D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */,
 				D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */,
 				D3EEF8A217BAB5C0006B62EB /* ChipmunkDemoShaderSupport.h */,
@@ -685,7 +684,6 @@
 				D3F6EEDF156D581300A158A8 /* Convex.c in Sources */,
 				D3DFB55D1613765700162F19 /* Sticky.c in Sources */,
 				D38C029916840ED3009F612B /* Shatter.c in Sources */,
-				D341247C174C1E1D00FFCF73 /* GJK.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -839,6 +837,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				INFOPLIST_FILE = "main-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -870,6 +869,7 @@
 				GCC_AUTO_VECTORIZATION = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				INFOPLIST_FILE = "main-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (

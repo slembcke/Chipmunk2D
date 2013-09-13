@@ -73,7 +73,7 @@ ClipCell(cpShape *shape, cpVect center, int i, int j, struct WorleyContex *conte
 {
 	cpVect other = WorleyPoint(i, j, context);
 //	printf("  other %dx%d: (% 5.2f, % 5.2f) ", i, j, other.x, other.y);
-	if(cpShapeNearestPointQuery(shape, other, NULL) > 0.0f){
+	if(cpShapePointQuery(shape, other, NULL) > 0.0f){
 //		printf("excluded\n");
 		memcpy(clipped, verts, count*sizeof(cpVect));
 		return count;
@@ -129,7 +129,7 @@ ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int cell_i, int cell_j,
 		for(int j=0; j<context->height; j++){
 			if(
 				!(i == cell_i && j == cell_j) &&
-				cpShapeNearestPointQuery(shape, cell, NULL) < 0.0f
+				cpShapePointQuery(shape, cell, NULL) < 0.0f
 			){
 				count = ClipCell(shape, cell, i, j, context, ping, pong, count);
 				memcpy(ping, pong, count*sizeof(cpVect));
@@ -146,7 +146,7 @@ ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int cell_i, int cell_j,
 	cpBodySetVelocity(new_body, cpBodyGetVelocityAtWorldPoint(body, centroid));
 	cpBodySetAngularVelocity(new_body, cpBodyGetAngularVelocity(body));
 	
-	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, count, ping, cpvneg(centroid)));
+	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, count, ping, cpvneg(centroid), 0.0));
 	// Copy whatever properties you have set on the original shape that are important
 	cpShapeSetFriction(new_shape, cpShapeGetFriction(shape));
 }
@@ -155,7 +155,7 @@ static void
 ShatterShape(cpSpace *space, cpShape *shape, cpFloat cellSize, cpVect focus)
 {
 	cpSpaceRemoveShape(space, shape);
-	cpSpaceRemoveBody(space, shape->body);
+	cpSpaceRemoveBody(space, cpShapeGetBody(shape));
 	
 	cpBB bb = cpShapeGetBB(shape);
 	int width = (bb.r - bb.l)/cellSize + 1;
@@ -166,13 +166,13 @@ ShatterShape(cpSpace *space, cpShape *shape, cpFloat cellSize, cpVect focus)
 	for(int i=0; i<context.width; i++){
 		for(int j=0; j<context.height; j++){
 			cpVect cell = WorleyPoint(i, j, &context);
-			if(cpShapeNearestPointQuery(shape, cell, NULL) < 0.0f){
+			if(cpShapePointQuery(shape, cell, NULL) < 0.0f){
 				ShatterCell(space, shape, cell, i, j, &context);
 			}
 		}
 	}
 	
-	cpBodyFree(shape->body);
+	cpBodyFree(cpShapeGetBody(shape));
 	cpShapeFree(shape);
 }
 
@@ -182,8 +182,8 @@ update(cpSpace *space, double dt)
 	cpSpaceStep(space, dt);
 	
 	if(ChipmunkDemoRightDown){
-		cpNearestPointQueryInfo info;
-		if(cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 0, GRABABLE_MASK_BIT, CP_NO_GROUP, &info)){
+		cpPointQueryInfo info;
+		if(cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0, GRABABLE_MASK_BIT, CP_NO_GROUP, &info)){
 			cpBB bb = cpShapeGetBB(info.shape);
 			cpFloat cell_size = cpfmax(bb.r - bb.l, bb.t - bb.b)/5.0f;
 			if(cell_size > 5.0f){
@@ -222,7 +222,7 @@ init(void)
 	
 	body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 	
-	shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+	shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height, 0.0));
 	cpShapeSetFriction(shape, 0.6f);
 		
 	return space;

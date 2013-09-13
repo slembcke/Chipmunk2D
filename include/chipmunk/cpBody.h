@@ -111,6 +111,8 @@ cpBody* cpBodyInitStatic(cpBody *body);
 /// Allocate and initialize a static cpBody.
 cpBody* cpBodyNewStatic(void);
 
+// TODO kinematic bodies.
+
 /// Destroy a cpBody.
 void cpBodyDestroy(cpBody *body);
 /// Destroy and free a cpBody.

@@ -142,7 +142,7 @@ ComponentActivate(cpBody *root)
 void
 cpBodyActivate(cpBody *body)
 {
-	if(!cpBodyIsRogue(body)){
+	if(body != NULL && !cpBodyIsRogue(body)){
 		body->node.idleTime = 0.0f;
 		ComponentActivate(ComponentRoot(body));
 	}
