@@ -118,7 +118,7 @@ cpShapePointQuery(cpShape *shape, cpVect p, cpPointQueryInfo *info)
 
 cpBool
 cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info){
-	cpSegmentQueryInfo blank = {NULL, 1.0f, cpvzero};
+	cpSegmentQueryInfo blank = {NULL, b, cpvzero, 1.0f};
 	if(info){
 		(*info) = blank;
 	} else {
@@ -129,9 +129,8 @@ cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmen
 	shape->klass->pointQuery(shape, a, &nearest);
 	if(nearest.d <= radius){
 		info->shape = shape;
-		info->t = 0.0;
-		// TODO is this correct?
-		info->n = cpvnormalize(cpvsub(a, nearest.p));
+		info->alpha = 0.0;
+		info->normal = cpvnormalize(cpvsub(a, nearest.p));
 	} else {
 		shape->klass->segmentQuery(shape, a, b, radius, info);
 	}
@@ -255,11 +254,11 @@ cpSegmentShapePointQuery(cpSegmentShape *seg, cpVect p, cpPointQueryInfo *info)
 }
 
 static void
-cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info)
+cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpFloat r2, cpSegmentQueryInfo *info)
 {
 	cpVect n = seg->tn;
 	cpFloat d = cpvdot(cpvsub(seg->ta, a), n);
-	cpFloat r = seg->r;
+	cpFloat r = seg->r + r2;
 	
 	cpVect flipped_n = (d > 0.0f ? cpvneg(n) : n);
 	cpVect seg_offset = cpvsub(cpvmult(flipped_n, r), a);
@@ -275,17 +274,20 @@ cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpFloat radi
 		cpFloat bd = cpvdot(delta, n) - d_offset;
 		
 		if(ad*bd < 0.0f){
+			cpFloat t = ad/(ad - bd);
+			
 			info->shape = (cpShape *)seg;
-			info->t = ad/(ad - bd);
-			info->n = flipped_n;
+			info->point = cpvsub(cpvlerp(a, b, t), cpvmult(flipped_n, r2));
+			info->normal = flipped_n;
+			info->alpha = t;
 		}
 	} else if(r != 0.0f){
-		cpSegmentQueryInfo info1 = {NULL, 1.0f, cpvzero};
-		cpSegmentQueryInfo info2 = {NULL, 1.0f, cpvzero};
-		CircleSegmentQuery((cpShape *)seg, seg->ta, seg->r, a, b, radius, &info1);
-		CircleSegmentQuery((cpShape *)seg, seg->tb, seg->r, a, b, radius, &info2);
+		cpSegmentQueryInfo info1 = {NULL, b, cpvzero, 1.0f};
+		cpSegmentQueryInfo info2 = {NULL, b, cpvzero, 1.0f};
+		CircleSegmentQuery((cpShape *)seg, seg->ta, seg->r, a, b, r2, &info1);
+		CircleSegmentQuery((cpShape *)seg, seg->tb, seg->r, a, b, r2, &info2);
 		
-		if(info1.t < info2.t){
+		if(info1.alpha < info2.alpha){
 			(*info) = info1;
 		} else {
 			(*info) = info2;

@@ -116,7 +116,7 @@ SegmentQuery(struct SegmentQueryContext *context, cpShape *shape, void *data)
 		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
 		cpShapeSegmentQuery(shape, context->start, context->end, context->radius, &info)
 	){
-		context->func(shape, info.t, info.n, data);
+		context->func(shape, info.point, info.normal, info.alpha, data);
 	}
 	
 	return 1.0f;
@@ -147,18 +147,18 @@ SegmentQueryFirst(struct SegmentQueryContext *context, cpShape *shape, cpSegment
 		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
 		!shape->sensor &&
 		cpShapeSegmentQuery(shape, context->start, context->end, context->radius, &info) &&
-		info.t < out->t
+		info.alpha < out->alpha
 	){
 		(*out) = info;
 	}
 	
-	return out->t;
+	return out->alpha;
 }
 
 cpShape *
 cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out)
 {
-	cpSegmentQueryInfo info = {NULL, 1.0f, cpvzero};
+	cpSegmentQueryInfo info = {NULL, end, cpvzero, 1.0f};
 	if(out){
 		(*out) = info;
   } else {
@@ -173,7 +173,7 @@ cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpFloat radiu
 	};
 	
 	cpSpatialIndexSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryFunc)SegmentQueryFirst, out);
-	cpSpatialIndexSegmentQuery(space->activeShapes, &context, start, end, out->t, (cpSpatialIndexSegmentQueryFunc)SegmentQueryFirst, out);
+	cpSpatialIndexSegmentQuery(space->activeShapes, &context, start, end, out->alpha, (cpSpatialIndexSegmentQueryFunc)SegmentQueryFirst, out);
 	
 	return out->shape;
 }

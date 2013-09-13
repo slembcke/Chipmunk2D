@@ -25,6 +25,8 @@
 
 typedef struct cpShapeClass cpShapeClass;
 
+// TODO Rename SLVNs
+
 /// Nearest point query info struct.
 typedef struct cpPointQueryInfo {
 	/// The nearest shape, NULL if no shape was within range.
@@ -42,10 +44,12 @@ typedef struct cpPointQueryInfo {
 typedef struct cpSegmentQueryInfo {
 	/// The shape that was hit, NULL if no collision occured.
 	cpShape *shape;
-	/// The normalized distance along the query segment in the range [0, 1].
-	cpFloat t;
+	/// The point of impact.
+	cpVect point;
 	/// The normal of the surface hit.
-	cpVect n;
+	cpVect normal;
+	/// The normalized distance along the query segment in the range [0, 1].
+	cpFloat alpha;
 } cpSegmentQueryInfo;
 
 /// @private
@@ -132,16 +136,16 @@ cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpFloat radius, c
 // TODO NUKE
 
 /// Get the hit point for a segment query.
-static inline cpVect cpSegmentQueryHitPoint(const cpVect start, const cpVect end, const cpSegmentQueryInfo info)
-{
-	return cpvlerp(start, end, info.t);
-}
-
-/// Get the hit distance for a segment query.
-static inline cpFloat cpSegmentQueryHitDist(const cpVect start, const cpVect end, const cpSegmentQueryInfo info)
-{
-	return cpvdist(start, end)*info.t;
-}
+//static inline cpVect cpSegmentQueryHitPoint(const cpVect start, const cpVect end, const cpFloat radius, const cpSegmentQueryInfo info)
+//{
+//	return cpvsub(cpvlerp(start, end, info.t), cpvmult(info.n, radius));
+//}
+//
+///// Get the hit distance for a segment query.
+//static inline cpFloat cpSegmentQueryHitDist(const cpVect start, const cpVect end, const cpSegmentQueryInfo info)
+//{
+//	return cpvdist(start, end)*info.t;
+//}
 
 #define CP_DefineShapeStructGetter(type, member, name) \
 static inline type cpShapeGet##name(const cpShape *shape){return shape->CP_PRIVATE(member);}

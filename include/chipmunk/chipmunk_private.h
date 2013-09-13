@@ -213,10 +213,12 @@ CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r1, cpVect a, cpVect b
 	if(det >= 0.0f){
 		cpFloat t = (-qb - cpfsqrt(det))/(qa);
 		if(0.0f<= t && t <= 1.0f){
+			cpVect n = cpvnormalize(cpvlerp(da, db, t));
+			
 			info->shape = shape;
-			info->t = t;
-			// TODO this is wrong now.
-			info->n = cpvnormalize(cpvlerp(da, db, t));
+			info->point = cpvsub(cpvlerp(a, b, t), cpvmult(n, r2));
+			info->normal = n;
+			info->alpha = t;
 		}
 	}
 }

@@ -23,6 +23,8 @@
 
 #include "chipmunk_private.h"
 
+// TODO move to header and nuke the file
+
 cpVect
 cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t)
 {
@@ -45,13 +47,4 @@ cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)
 	cpFloat omega = cpfacos(cpfclamp(dot, -1.0f, 1.0f));
 	
 	return cpvslerp(v1, v2, cpfmin(a, omega)/omega);
-}
-
-// NUKE
-char*
-cpvstr(const cpVect v)
-{
-	static char str[256];
-	sprintf(str, "(% .3f, % .3f)", v.x, v.y);
-	return str;
 }

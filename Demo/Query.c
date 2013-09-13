@@ -38,29 +38,30 @@ update(cpSpace *space, double dt)
 	cpFloat radius = 10.0;
 	ChipmunkDebugDrawSegment(start, end, RGBAColor(0,1,0,1));
 	
-	ChipmunkDemoPrintString("Query: Dist(%f) Point%s, ", cpvdist(start, end), cpvstr(end));
+	ChipmunkDemoPrintString("Query: Dist(%f) Point(%5.2f, %5.2f), ", cpvdist(start, end), end.x, end.y);
 	
 	cpSegmentQueryInfo segInfo = {};
 	if(cpSpaceSegmentQueryFirst(space, start, end, radius, CP_ALL_LAYERS, CP_NO_GROUP, &segInfo)){
-		cpVect point = cpSegmentQueryHitPoint(start, end, segInfo);
+		cpVect point = segInfo.point;
+		cpVect n = segInfo.normal;
 		
 		// Draw blue over the occluded part of the query
 		ChipmunkDebugDrawSegment(point, end, RGBAColor(0,0,1,1));
 		
 		// Draw a little red surface normal
-		ChipmunkDebugDrawSegment(point, cpvadd(point, cpvmult(segInfo.n, 16)), RGBAColor(1,0,0,1));
+		ChipmunkDebugDrawSegment(point, cpvadd(point, cpvmult(n, 16)), RGBAColor(1,0,0,1));
 		
 		// Draw a little red dot on the hit point.
 		ChipmunkDebugDrawDot(3, point, RGBAColor(1,0,0,1));
 
 		
-		ChipmunkDemoPrintString("Segment Query: Dist(%f) Normal%s", cpSegmentQueryHitDist(start, end, segInfo), cpvstr(segInfo.n));
+		ChipmunkDemoPrintString("Segment Query: Dist(%f) Normal(%5.2f, %5.2f)", segInfo.alpha*cpvdist(start, end), n.x, n.y);
 	} else {
 		ChipmunkDemoPrintString("Segment Query (None)");
 	}
 	
 	// Draw a fat green line over the unoccluded part of the query
-	ChipmunkDebugDrawFatSegment(start, cpvlerp(start, end, segInfo.t), radius, RGBAColor(0,1,0,1), LAColor(0,0));
+	ChipmunkDebugDrawFatSegment(start, cpvlerp(start, end, segInfo.alpha), radius, RGBAColor(0,1,0,1), LAColor(0,0));
 	
 	cpPointQueryInfo nearestInfo = {};
 	cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 100.0, CP_ALL_LAYERS, CP_NO_GROUP, &nearestInfo);

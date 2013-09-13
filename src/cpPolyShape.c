@@ -121,17 +121,18 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 }
 
 static void
-cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info)
+cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpFloat r2, cpSegmentQueryInfo *info)
 {
 	cpSplittingPlane *axes = poly->tPlanes;
 	cpVect *verts = poly->tVerts;
 	int count = poly->count;
 	cpFloat r = poly->r;
+	cpFloat rsum = r + r2;
 	
 	for(int i=0; i<count; i++){
 		cpVect n = axes[i].n;
 		cpFloat an = cpvdot(a, n);
-		cpFloat d = axes[i].d + r - an;
+		cpFloat d = axes[i].d + rsum - an;
 		if(d > 0.0f) continue;
 		
 		cpFloat bn = cpvdot(b, n);
@@ -145,17 +146,18 @@ cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpFloat radius, c
 		
 		if(dtMin <= dt && dt <= dtMax){
 			info->shape = (cpShape *)poly;
-			info->t = t;
-			info->n = n;
+			info->point = cpvsub(cpvlerp(a, b, t), cpvmult(n, r2));
+			info->normal = n;
+			info->alpha = t;
 		}
 	}
 	
 	// Also check against the beveled vertexes.
-	if(r > 0.0f){
+	if(rsum > 0.0f){
 		for(int i=0; i<count; i++){
-			cpSegmentQueryInfo circle_info = {NULL, 1.0f, cpvzero};
-			CircleSegmentQuery(&poly->shape, verts[i], r, a, b, radius, &circle_info);
-			if(circle_info.t < info->t) (*info) = circle_info;
+			cpSegmentQueryInfo circle_info = {NULL, b, cpvzero, 1.0f};
+			CircleSegmentQuery(&poly->shape, verts[i], r, a, b, r2, &circle_info);
+			if(circle_info.alpha < info->alpha) (*info) = circle_info;
 		}
 	}
 }

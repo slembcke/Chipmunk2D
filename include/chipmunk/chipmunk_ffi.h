@@ -148,9 +148,6 @@ MAKE_PROPERTIES_REF(cpSlideJoint, Anchr2);
 MAKE_PROPERTIES_REF(cpSlideJoint, Min);
 MAKE_PROPERTIES_REF(cpSlideJoint, Max);
 
-MAKE_REF(cpSegmentQueryHitPoint);
-MAKE_REF(cpSegmentQueryHitDist);
-
 MAKE_REF(cpSpatialIndexDestroy);
 MAKE_REF(cpSpatialIndexCount);
 MAKE_REF(cpSpatialIndexEach);
