@@ -37,7 +37,7 @@ ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 	cpVect *clipped = (cpVect *)alloca((count + 1)*sizeof(cpVect));
 	
 	for(int i=0, j=count-1; i<count; j=i, i++){
-		cpVect a = cpBodyLocal2World(body, cpPolyShapeGetVert(shape, j));
+		cpVect a = cpBodyLocalToWorld(body, cpPolyShapeGetVert(shape, j));
 		cpFloat a_dist = cpvdot(a, n) - dist;
 		
 		if(a_dist < 0.0){
@@ -45,7 +45,7 @@ ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 			clippedCount++;
 		}
 		
-		cpVect b = cpBodyLocal2World(body, cpPolyShapeGetVert(shape, i));
+		cpVect b = cpBodyLocalToWorld(body, cpPolyShapeGetVert(shape, i));
 		cpFloat b_dist = cpvdot(b, n) - dist;
 		
 		if(a_dist*b_dist < 0.0f){
@@ -61,9 +61,9 @@ ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 	cpFloat moment = cpMomentForPoly(mass, clippedCount, clipped, cpvneg(centroid));
 	
 	cpBody *new_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-	cpBodySetPos(new_body, centroid);
-	cpBodySetVel(new_body, cpBodyGetVelAtWorldPoint(body, centroid));
-	cpBodySetAngVel(new_body, cpBodyGetAngVel(body));
+	cpBodySetPosition(new_body, centroid);
+	cpBodySetVelocity(new_body, cpBodyGetVelocityAtWorldPoint(body, centroid));
+	cpBodySetAngularVelocity(new_body, cpBodyGetAngularVelocity(body));
 	
 	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, clippedCount, clipped, cpvneg(centroid)));
 	// Copy whatever properties you have set on the original shape that are important

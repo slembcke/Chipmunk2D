@@ -29,10 +29,10 @@ static cpFloat pentagon_moment = 0.0f;
 static void
 eachBody(cpBody *body, void *unused)
 {
-	cpVect pos = cpBodyGetPos(body);
+	cpVect pos = cpBodyGetPosition(body);
 	if(pos.y < -260 || cpfabs(pos.x) > 340){
 		cpFloat x = rand()/(cpFloat)RAND_MAX*640 - 320;
-		cpBodySetPos(body, cpv(x, 260));
+		cpBodySetPosition(body, cpv(x, 260));
 	}
 }
 
@@ -104,7 +104,7 @@ init(void)
 	for(int i=0; i<300; i++){
 		body = cpSpaceAddBody(space, cpBodyNew(pentagon_mass, pentagon_moment));
 		cpFloat x = rand()/(cpFloat)RAND_MAX*640 - 320;
-		cpBodySetPos(body, cpv(x, 350));
+		cpBodySetPosition(body, cpv(x, 350));
 		
 		shape = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 		cpShapeSetElasticity(shape, 0.0f);

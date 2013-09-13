@@ -438,8 +438,8 @@ cpSpaceConvertBodyToStatic(cpSpace *space, cpBody *body)
 	cpBodySetMass(body, INFINITY);
 	cpBodySetMoment(body, INFINITY);
 	
-	cpBodySetVel(body, cpvzero);
-	cpBodySetAngVel(body, 0.0f);
+	cpBodySetVelocity(body, cpvzero);
+	cpBodySetAngularVelocity(body, 0.0f);
 	
 	body->node.idleTime = INFINITY;
 	CP_BODY_FOREACH_SHAPE(body, shape){

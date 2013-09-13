@@ -48,44 +48,44 @@ struct cpBody {
 	
 	/// Mass of the body.
 	/// Must agree with cpBody.m_inv! Use cpBodySetMass() when changing the mass for this reason.
-	cpFloat m;
+	CP_PRIVATE(cpFloat m);
 	/// Mass inverse.
-	cpFloat m_inv;
+	CP_PRIVATE(cpFloat m_inv);
 	
 	/// Moment of inertia of the body.
 	/// Must agree with cpBody.i_inv! Use cpBodySetMoment() when changing the moment for this reason.
-	cpFloat i;
+	CP_PRIVATE(cpFloat i);
 	/// Moment of inertia inverse.
-	cpFloat i_inv;
+	CP_PRIVATE(cpFloat i_inv);
 	
 	/// Position of the rigid body's center of gravity.
-	cpVect p;
+	CP_PRIVATE(cpVect p);
 	/// Velocity of the rigid body's center of gravity.
-	cpVect v;
+	CP_PRIVATE(cpVect v);
 	/// Force acting on the rigid body's center of gravity.
-	cpVect f;
+	CP_PRIVATE(cpVect f);
 	
 	/// Rotation of the body around it's center of gravity in radians.
 	/// Must agree with cpBody.rot! Use cpBodySetAngle() when changing the angle for this reason.
-	cpFloat a;
+	CP_PRIVATE(cpFloat a);
 	/// Angular velocity of the body around it's center of gravity in radians/second.
-	cpFloat w;
+	CP_PRIVATE(cpFloat w);
 	/// Torque applied to the body around it's center of gravity.
-	cpFloat t;
+	CP_PRIVATE(cpFloat t);
 	
 	/// Cached unit length vector representing the angle of the body.
 	/// Used for fast rotations using cpvrotate().
-	cpVect rot;
+	CP_PRIVATE(cpVect rot);
 	
 	/// User definable data pointer.
 	/// Generally this points to your the game object class so you can access it
 	/// when given a cpBody reference in a callback.
-	cpDataPointer data;
+	CP_PRIVATE(cpDataPointer userData);
 	
 	/// Maximum velocity allowed when updating the velocity.
-	cpFloat v_limit;
+	CP_PRIVATE(cpFloat v_limit);
 	/// Maximum rotational rate (in radians/second) allowed when updating the angular velocity.
-	cpFloat w_limit;
+	CP_PRIVATE(cpFloat w_limit);
 	
 	CP_PRIVATE(cpVect v_bias);
 	CP_PRIVATE(cpFloat w_bias);
@@ -156,12 +156,12 @@ static inline cpBool cpBodyIsRogue(const cpBody *body)
 
 
 #define CP_DefineBodyStructGetter(type, member, name) \
-static inline type cpBodyGet##name(const cpBody *body){return body->member;}
+static inline type cpBodyGet##name(const cpBody *body){return body->CP_PRIVATE(member);}
 
 #define CP_DefineBodyStructSetter(type, member, name) \
 static inline void cpBodySet##name(cpBody *body, const type value){ \
 	cpBodyActivate(body); \
-	body->member = value; \
+	body->CP_PRIVATE(member) = value; \
 	cpBodyAssertSane(body); \
 }
 
@@ -170,7 +170,7 @@ CP_DefineBodyStructGetter(type, member, name) \
 CP_DefineBodyStructSetter(type, member, name)
 
 // TODO: add to docs
-CP_DefineBodyStructGetter(cpSpace*, CP_PRIVATE(space), Space)
+CP_DefineBodyStructGetter(cpSpace*, space, Space)
 
 CP_DefineBodyStructGetter(cpFloat, m, Mass)
 /// Set the mass of a body.
@@ -180,35 +180,35 @@ CP_DefineBodyStructGetter(cpFloat, i, Moment)
 /// Set the moment of a body.
 void cpBodySetMoment(cpBody *body, cpFloat i);
 
-CP_DefineBodyStructGetter(cpVect, p, Pos)
+CP_DefineBodyStructGetter(cpVect, p, Position)
 /// Set the position of a body.
-void cpBodySetPos(cpBody *body, cpVect pos);
-CP_DefineBodyStructProperty(cpVect, v, Vel)
+void cpBodySetPosition(cpBody *body, cpVect pos);
+CP_DefineBodyStructProperty(cpVect, v, Velocity)
 CP_DefineBodyStructProperty(cpVect, f, Force)
 CP_DefineBodyStructGetter(cpFloat, a, Angle)
 /// Set the angle of a body.
 void cpBodySetAngle(cpBody *body, cpFloat a);
-CP_DefineBodyStructProperty(cpFloat, w, AngVel)
+CP_DefineBodyStructProperty(cpFloat, w, AngularVelocity)
 CP_DefineBodyStructProperty(cpFloat, t, Torque)
-CP_DefineBodyStructGetter(cpVect, rot, Rot)
-CP_DefineBodyStructProperty(cpFloat, v_limit, VelLimit)
-CP_DefineBodyStructProperty(cpFloat, w_limit, AngVelLimit)
-CP_DefineBodyStructProperty(cpDataPointer, data, UserData)
+CP_DefineBodyStructGetter(cpVect, rot, Rotation)
+CP_DefineBodyStructProperty(cpFloat, v_limit, VelocityLimit)
+CP_DefineBodyStructProperty(cpFloat, w_limit, AngularVelocityLimit)
+CP_DefineBodyStructProperty(cpDataPointer, userData, UserData)
 
 /// Default Integration functions.
 void cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);
 void cpBodyUpdatePosition(cpBody *body, cpFloat dt);
 
 /// Convert body relative/local coordinates to absolute/world coordinates.
-static inline cpVect cpBodyLocal2World(const cpBody *body, const cpVect v)
+static inline cpVect cpBodyLocalToWorld(const cpBody *body, const cpVect v)
 {
-	return cpvadd(body->p, cpvrotate(v, body->rot));
+	return cpvadd(body->CP_PRIVATE(p), cpvrotate(v, body->CP_PRIVATE(rot)));
 }
 
 /// Convert body absolute/world coordinates to  relative/local coordinates.
-static inline cpVect cpBodyWorld2Local(const cpBody *body, const cpVect v)
+static inline cpVect cpBodyWorldToLocal(const cpBody *body, const cpVect v)
 {
-	return cpvunrotate(cpvsub(v, body->p), body->rot);
+	return cpvunrotate(cpvsub(v, body->CP_PRIVATE(p)), body->CP_PRIVATE(rot));
 }
 
 /// Set the forces and torque or a body to zero.
@@ -219,18 +219,18 @@ void cpBodyApplyForce(cpBody *body, const cpVect f, const cpVect r);
 void cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r);
 
 /// Get the velocity on a body (in world units) at a point on the body in world coordinates.
-cpVect cpBodyGetVelAtWorldPoint(cpBody *body, cpVect point);
+cpVect cpBodyGetVelocityAtWorldPoint(cpBody *body, cpVect point);
 /// Get the velocity on a body (in world units) at a point on the body in local coordinates.
-cpVect cpBodyGetVelAtLocalPoint(cpBody *body, cpVect point);
+cpVect cpBodyGetVelocityAtLocalPoint(cpBody *body, cpVect point);
 
 
 /// Get the kinetic energy of a body.
 static inline cpFloat cpBodyKineticEnergy(const cpBody *body)
 {
 	// Need to do some fudging to avoid NaNs
-	cpFloat vsq = cpvdot(body->v, body->v);
-	cpFloat wsq = body->w*body->w;
-	return (vsq ? vsq*body->m : 0.0f) + (wsq ? wsq*body->i : 0.0f);
+	cpFloat vsq = cpvdot(body->CP_PRIVATE(v), body->CP_PRIVATE(v));
+	cpFloat wsq = body->CP_PRIVATE(w)*body->CP_PRIVATE(w);
+	return (vsq ? vsq*body->CP_PRIVATE(m) : 0.0f) + (wsq ? wsq*body->CP_PRIVATE(i) : 0.0f);
 }
 
 /// Body/shape iterator callback function type. 

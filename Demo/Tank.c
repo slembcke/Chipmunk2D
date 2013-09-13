@@ -28,16 +28,16 @@ static void
 update(cpSpace *space, double dt)
 {
 	// turn the control body based on the angle relative to the actual body
-	cpVect mouseDelta = cpvsub(ChipmunkDemoMouse, cpBodyGetPos(tankBody));
-	cpFloat turn = cpvtoangle(cpvunrotate(cpBodyGetRot(tankBody), mouseDelta));
+	cpVect mouseDelta = cpvsub(ChipmunkDemoMouse, cpBodyGetPosition(tankBody));
+	cpFloat turn = cpvtoangle(cpvunrotate(cpBodyGetRotation(tankBody), mouseDelta));
 	cpBodySetAngle(tankControlBody, cpBodyGetAngle(tankBody) - turn);
 	
 	// drive the tank towards the mouse
-	if(cpvnear(ChipmunkDemoMouse, cpBodyGetPos(tankBody), 30.0)){
-		cpBodySetVel(tankControlBody, cpvzero); // stop
+	if(cpvnear(ChipmunkDemoMouse, cpBodyGetPosition(tankBody), 30.0)){
+		cpBodySetVelocity(tankControlBody, cpvzero); // stop
 	} else {
-		cpFloat direction = (cpvdot(mouseDelta, cpBodyGetRot(tankBody)) > 0.0 ? 1.0 : -1.0);
-		cpBodySetVel(tankControlBody, cpvrotate(cpBodyGetRot(tankBody), cpv(30.0f*direction, 0.0f)));
+		cpFloat direction = (cpvdot(mouseDelta, cpBodyGetRotation(tankBody)) > 0.0 ? 1.0 : -1.0);
+		cpBodySetVelocity(tankControlBody, cpvrotate(cpBodyGetRotation(tankBody), cpv(30.0f*direction, 0.0f)));
 	}
 	
 	cpSpaceStep(space, dt);
@@ -49,7 +49,7 @@ add_box(cpSpace *space, cpFloat size, cpFloat mass)
 	cpFloat radius = cpvlength(cpv(size, size));
 
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
-	cpBodySetPos(body, cpv(frand()*(640 - 2*radius) - (320 - radius), frand()*(480 - 2*radius) - (240 - radius)));
+	cpBodySetPosition(body, cpv(frand()*(640 - 2*radius) - (320 - radius), frand()*(480 - 2*radius) - (240 - radius)));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
 	cpShapeSetElasticity(shape, 0.0f);

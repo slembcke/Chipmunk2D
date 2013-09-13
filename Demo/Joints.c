@@ -28,7 +28,7 @@ addBall(cpSpace *space, cpVect pos, cpVect boxOffset)
 	cpFloat radius = 15.0f;
 	cpFloat mass = 1.0f;
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero)));
-	cpBodySetPos(body, cpvadd(pos, boxOffset));
+	cpBodySetPosition(body, cpvadd(pos, boxOffset));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
 	cpShapeSetElasticity(shape, 0.0f);
@@ -45,7 +45,7 @@ addLever(cpSpace *space, cpVect pos, cpVect boxOffset)
 	cpVect b = cpv(0, -15);
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
-	cpBodySetPos(body, cpvadd(pos, cpvadd(boxOffset, cpv(0, -15))));
+	cpBodySetPosition(body, cpvadd(pos, cpvadd(boxOffset, cpv(0, -15))));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 5.0f));
 	cpShapeSetElasticity(shape, 0.0f);
@@ -62,7 +62,7 @@ addBar(cpSpace *space, cpVect pos, cpVect boxOffset)
 	cpVect b = cpv(0, -30);
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
-	cpBodySetPos(body, cpvadd(pos, boxOffset));
+	cpBodySetPosition(body, cpvadd(pos, boxOffset));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 5.0f));
 	cpShapeSetElasticity(shape, 0.0f);
@@ -78,7 +78,7 @@ addWheel(cpSpace *space, cpVect pos, cpVect boxOffset)
 	cpFloat radius = 15.0f;
 	cpFloat mass = 1.0f;
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero)));
-	cpBodySetPos(body, cpvadd(pos, boxOffset));
+	cpBodySetPosition(body, cpvadd(pos, boxOffset));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
 	cpShapeSetElasticity(shape, 0.0f);
@@ -96,7 +96,7 @@ addChassis(cpSpace *space, cpVect pos, cpVect boxOffset)
 	cpFloat height = 30;
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, width, height)));
-	cpBodySetPos(body, cpvadd(pos, boxOffset));
+	cpBodySetPosition(body, cpvadd(pos, boxOffset));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
 	cpShapeSetElasticity(shape, 0.0f);

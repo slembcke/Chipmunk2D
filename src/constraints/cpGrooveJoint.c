@@ -29,8 +29,8 @@ preStep(cpGrooveJoint *joint, cpFloat dt)
 	cpBody *b = joint->constraint.b;
 	
 	// calculate endpoints in worldspace
-	cpVect ta = cpBodyLocal2World(a, joint->grv_a);
-	cpVect tb = cpBodyLocal2World(a, joint->grv_b);
+	cpVect ta = cpBodyLocalToWorld(a, joint->grv_a);
+	cpVect tb = cpBodyLocalToWorld(a, joint->grv_b);
 
 	// calculate axis
 	cpVect n = cpvrotate(joint->grv_n, a->rot);

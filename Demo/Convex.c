@@ -44,7 +44,7 @@ update(cpSpace *space, double dt)
 			verts[i] = cpPolyShapeGetVert(shape, i);
 		}
 		
-		verts[count] = cpBodyWorld2Local(body, ChipmunkDemoMouse);
+		verts[count] = cpBodyWorldToLocal(body, ChipmunkDemoMouse);
 		
 		// This function builds a convex hull for the vertexes.
 		// Because the result array is NULL, it will reduce the input array instead.
@@ -57,7 +57,7 @@ update(cpSpace *space, double dt)
 		cpFloat mass = cpAreaForPoly(hullCount, verts)*DENSITY;
 		cpBodySetMass(body, mass);
 		cpBodySetMoment(body, cpMomentForPoly(mass, hullCount, verts, cpvneg(centroid)));
-		cpBodySetPos(body, cpBodyLocal2World(body, centroid));
+		cpBodySetPosition(body, cpBodyLocalToWorld(body, centroid));
 		
 		// Use the setter function from chipmunk_unsafe.h.
 		// You could also remove and recreate the shape if you wanted.

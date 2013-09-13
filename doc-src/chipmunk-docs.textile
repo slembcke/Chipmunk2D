@@ -311,13 +311,13 @@ void cpBodySetMoment(cpBody *body, cpFloat i)</code></pre>
 
 p(expl). Moment of inertia (MoI or sometimes just moment) of the body. The moment is like the rotational mass of a body. See below for function to help calculate the moment.
 
-<pre><code>cpVect cpBodyGetPos(const cpBody *body)
-void cpBodySetPos(cpBody *body, cpVect pos)</code></pre>
+<pre><code>cpVect cpBodyGetPosition(const cpBody *body)
+void cpBodySetPosition(cpBody *body, cpVect pos)</code></pre>
 
 p(expl). Position of the center of gravity of the body. When changing the position you may also want to call @cpSpaceReindexShapesForBody()@ to update the collision detection information for the attached shapes if plan to make any queries against the space.
 
 <pre><code>cpVect cpBodyGetVel(const cpBody *body)
-void cpBodySetVel(cpBody *body, const cpVect value)</code></pre>
+void cpBodySetVelocity(cpBody *body, const cpVect value)</code></pre>
 
 p(expl). Linear velocity of the center of gravity of the body.
 
@@ -331,8 +331,8 @@ void cpBodySetAngle(cpBody *body, cpFloat a)</code></pre>
 
 p(expl). Rotation of the body in radians. When changing the rotation you may also want to call @cpSpaceReindexShapesForBody()@ to update the collision detection information for the attached shapes if plan to make any queries against the space.
 
-<pre><code>cpFloat cpBodyGetAngVel(const cpBody *body)
-void cpBodySetAngVel(cpBody *body, const cpFloat value)</code></pre>
+<pre><code>cpFloat cpBodyGetAngularVelocity(const cpBody *body)
+void cpBodySetAngularVelocity(cpBody *body, const cpFloat value)</code></pre>
 
 p(expl). The angular velocity of the body in radians per second.
 
@@ -341,17 +341,17 @@ void cpBodySetTorque(cpBody *body, const cpFloat value)</code></pre>
 
 p(expl). The torque applied to the body.
 
-<pre><code>cpVect cpBodyGetRot(const cpBody *body)</code></pre>
+<pre><code>cpVect cpBodyGetRotation(const cpBody *body)</code></pre>
 
 p(expl). The rotation vector for the body. Can be used with @cpvrotate()@ or @cpvunrotate()@ to perform fast rotations.
 
 <pre><code>cpFloat cpBodyGetVelLimit(const cpBody *body)
-void cpBodySetVelLimit(cpBody *body, const cpFloat value)</code></pre>
+void cpBodySetVelocityLimit(cpBody *body, const cpFloat value)</code></pre>
 
 p(expl). Velocity limit of the body. Defaults to @INFINITY@ unless you set it specifically. Can be used to limit falling speeds, etc.
 
-<pre><code>cpFloat cpBodyGetAngVelLimit(const cpBody *body)
-void cpBodySetAngVelLimit(cpBody *body, const cpFloat value)</code></pre>
+<pre><code>cpFloat cpBodyGetAngularVelocityLimit(const cpBody *body)
+void cpBodySetAngularVelocityLimit(cpBody *body, const cpFloat value)</code></pre>
 
 p(expl). Angular velocity limit of the body in radians per second. Defaults to @INFINITY@ unless you set it specifically.
 
@@ -389,8 +389,8 @@ Use the following functions to get the area for common Chipmunk shapes if you wa
 
 Many things are defined in coordinates local to a body meaning that the (0,0) is at the center of gravity of the body and the axis rotate along with the body.
 
-* @cpVect cpBodyLocal2World(const cpBody *body, const cpVect v)@ - Convert from body local coordinates to world space coordinates.
-* @cpVect cpBodyWorld2Local(const cpBody *body, const cpVect v)@ - Convert from world space coordinates to body local coordinates.
+* @cpVect cpBodyLocalToWorld(const cpBody *body, const cpVect v)@ - Convert from body local coordinates to world space coordinates.
+* @cpVect cpBodyWorldToLocal(const cpBody *body, const cpVect v)@ - Convert from world space coordinates to body local coordinates.
 
 
 <%= h 2, "Applying Forces and Torques:", "Forces" %>

@@ -40,11 +40,11 @@ update(cpSpace *space, double dt)
 	
 	for(int i=0; i<numBalls; i++){
 		cpBody *ball = balls[i];
-		cpVect pos = cpBodyGetPos(ball);
+		cpVect pos = cpBodyGetPosition(ball);
 		
 		if(pos.x > 320.0f){
-			cpBodySetVel(ball, cpvzero);
-			cpBodySetPos(ball, cpv(-224.0f, 200.0f));
+			cpBodySetVelocity(ball, cpvzero);
+			cpBodySetPosition(ball, cpv(-224.0f, 200.0f));
 		}
 	}
 }
@@ -53,7 +53,7 @@ static cpBody *
 add_ball(cpSpace *space, cpVect pos)
 {
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForCircle(1.0f, 30, 0, cpvzero)));
-	cpBodySetPos(body, pos);
+	cpBodySetPosition(body, pos);
 	
 	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, 30, cpvzero));
 	cpShapeSetElasticity(shape, 0.0f);
@@ -117,7 +117,7 @@ init(void)
 	};
 
 	cpBody *plunger = cpSpaceAddBody(space, cpBodyNew(1.0f, INFINITY));
-	cpBodySetPos(plunger, cpv(-160,-80));
+	cpBodySetPosition(plunger, cpv(-160,-80));
 	
 	shape = cpSpaceAddShape(space, cpPolyShapeNew(plunger, 4, verts, cpvzero));
 	cpShapeSetElasticity(shape, 1.0f);
@@ -130,7 +130,7 @@ init(void)
 	
 	// add small gear
 	cpBody *smallGear = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 80, 0, cpvzero)));
-	cpBodySetPos(smallGear, cpv(-160,-160));
+	cpBodySetPosition(smallGear, cpv(-160,-160));
 	cpBodySetAngle(smallGear, -M_PI_2);
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(smallGear, 80.0f, cpvzero));
@@ -140,7 +140,7 @@ init(void)
 
 	// add big gear
 	cpBody *bigGear = cpSpaceAddBody(space, cpBodyNew(40.0f, cpMomentForCircle(40.0f, 160, 0, cpvzero)));
-	cpBodySetPos(bigGear, cpv(80,-160));
+	cpBodySetPosition(bigGear, cpv(80,-160));
 	cpBodySetAngle(bigGear, M_PI_2);
 	
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(bigGear, 160.0f, cpvzero));
@@ -158,14 +158,14 @@ init(void)
 	cpFloat bottom = -300.0f;
 	cpFloat top = 32.0f;
 	cpBody *feeder = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForSegment(1.0f, cpv(-224.0f, bottom), cpv(-224.0f, top))));
-	cpBodySetPos(feeder, cpv(-224, (bottom + top)/2.0f));
+	cpBodySetPosition(feeder, cpv(-224, (bottom + top)/2.0f));
 	
 	cpFloat len = top - bottom;
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(feeder, cpv(0.0f, len/2.0f), cpv(0.0f, -len/2.0f), 20.0f));
 	cpShapeSetLayers(shape, GRABABLE_MASK_BIT);
 	
 	cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, feeder, cpv(-224.0f, bottom), cpv(0.0f, -len/2.0f)));
-	cpVect anchr = cpBodyWorld2Local(feeder, cpv(-224.0f, -160.0f));
+	cpVect anchr = cpBodyWorldToLocal(feeder, cpv(-224.0f, -160.0f));
 	cpSpaceAddConstraint(space, cpPinJointNew(feeder, smallGear, anchr, cpv(0.0f, 80.0f)));
 
 	// motorize the second gear

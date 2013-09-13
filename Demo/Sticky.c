@@ -171,7 +171,7 @@ init(void)
 		cpFloat radius = 10.0f;
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero)));
-		cpBodySetPos(body, cpv(cpflerp(-150.0f, 150.0f, frand()), cpflerp(-150.0f, 150.0f, frand())));
+		cpBodySetPosition(body, cpv(cpflerp(-150.0f, 150.0f, frand()), cpflerp(-150.0f, 150.0f, frand())));
 
 		cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius + STICK_SENSOR_THICKNESS, cpvzero));
 		cpShapeSetFriction(shape, 0.9f);

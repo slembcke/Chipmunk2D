@@ -38,7 +38,7 @@ add_domino(cpSpace *space, cpVect pos, cpBool flipped)
 	cpFloat moment = cpMomentForBox(mass, WIDTH, HEIGHT);
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-	cpBodySetPos(body, pos);
+	cpBodySetPosition(body, pos);
 
 	cpShape *shape = (flipped ? cpBoxShapeNew(body, HEIGHT, WIDTH) : cpBoxShapeNew(body, WIDTH, HEIGHT));
 	cpSpaceAddShape(space, shape);

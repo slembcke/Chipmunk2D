@@ -39,7 +39,7 @@ static void
 AddBox(cpSpace *space, cpVect pos, cpFloat mass, cpFloat width, cpFloat height)
 {
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, width, height)));
-	cpBodySetPos(body, pos);
+	cpBodySetPosition(body, pos);
 	
 	cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
 	cpShapeSetElasticity(shape, 0.0f);
@@ -50,7 +50,7 @@ static void
 AddSegment(cpSpace *space, cpVect pos, cpFloat mass, cpFloat width, cpFloat height)
 {
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, width, height)));
-	cpBodySetPos(body, pos);
+	cpBodySetPosition(body, pos);
 	
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpv(0.0, (height - width)/2.0), cpv(0.0, (width - height)/2.0), width/2.0));
 	cpShapeSetElasticity(shape, 0.0f);
@@ -61,7 +61,7 @@ static void
 AddCircle(cpSpace *space, cpVect pos, cpFloat mass, cpFloat radius)
 {
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0, radius, cpvzero)));
-	cpBodySetPos(body, pos);
+	cpBodySetPosition(body, pos);
 	
 	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
 	cpShapeSetElasticity(shape, 0.0f);
@@ -79,7 +79,7 @@ init(void)
 	// We create an infinite mass rogue body to attach the line segments too
 	// This way we can control the rotation however we want.
 	rogueBoxBody = cpBodyNew(INFINITY, INFINITY);
-	cpBodySetAngVel(rogueBoxBody, 0.4f);
+	cpBodySetAngularVelocity(rogueBoxBody, 0.4f);
 	
 	// Set up the static box.
 	cpVect a = cpv(-200, -200);

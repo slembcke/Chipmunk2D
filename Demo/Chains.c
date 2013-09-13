@@ -99,7 +99,7 @@ init(void)
 			cpVect pos = cpv(40*(i - (CHAIN_COUNT - 1)/2.0), 240 - (j + 0.5)*height - (j + 1)*spacing);
 			
 			body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, width, height)));
-			cpBodySetPos(body, pos);
+			cpBodySetPosition(body, pos);
 			
 			shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpv(0, (height - width)/2.0), cpv(0, (width - height)/2.0), width/2.0));
 			cpShapeSetFriction(shape, 0.8f);
@@ -122,8 +122,8 @@ init(void)
 	
 	cpFloat radius = 15.0f;
 	body = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 0.0f, radius, cpvzero)));
-	cpBodySetPos(body, cpv(0, -240 + radius+5));
-	cpBodySetVel(body, cpv(0, 300));
+	cpBodySetPosition(body, cpv(0, -240 + radius+5));
+	cpBodySetVelocity(body, cpv(0, 300));
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
 	cpShapeSetElasticity(shape, 0.0f);

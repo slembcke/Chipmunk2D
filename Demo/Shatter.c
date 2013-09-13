@@ -122,7 +122,7 @@ ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int cell_i, int cell_j,
 	count = (count > MAX_VERTEXES_PER_VORONOI ? MAX_VERTEXES_PER_VORONOI : count);
 	
 	for(int i=0; i<count; i++){
-		ping[i] = cpBodyLocal2World(body, cpPolyShapeGetVert(shape, i));
+		ping[i] = cpBodyLocalToWorld(body, cpPolyShapeGetVert(shape, i));
 	}
 	
 	for(int i=0; i<context->width; i++){
@@ -142,9 +142,9 @@ ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int cell_i, int cell_j,
 	cpFloat moment = cpMomentForPoly(mass, count, ping, cpvneg(centroid));
 	
 	cpBody *new_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-	cpBodySetPos(new_body, centroid);
-	cpBodySetVel(new_body, cpBodyGetVelAtWorldPoint(body, centroid));
-	cpBodySetAngVel(new_body, cpBodyGetAngVel(body));
+	cpBodySetPosition(new_body, centroid);
+	cpBodySetVelocity(new_body, cpBodyGetVelocityAtWorldPoint(body, centroid));
+	cpBodySetAngularVelocity(new_body, cpBodyGetAngularVelocity(body));
 	
 	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, count, ping, cpvneg(centroid)));
 	// Copy whatever properties you have set on the original shape that are important

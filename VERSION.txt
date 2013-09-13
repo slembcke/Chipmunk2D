@@ -108,7 +108,7 @@ CHANGES SINCE 6.0.1:
 * MISC: Updated the FFI defs.
 
 CHANGES SINCE 6.0.0:
-* BUG: Calling cpBodySetPos() on a sleeping body was delaying the Separate() handler callback if one existed.
+* BUG: Calling cpBodySetPosition() on a sleeping body was delaying the Separate() handler callback if one existed.
 * BUG: Fixed a bug where Separate() handler callbacks were not occuring when removing shapes.
 * BUG: Calling cpBodyApplyForce() or cpBodyResetForces() was not activating sleeping bodies.
 * API: Added cpSpaceEachConstraint().

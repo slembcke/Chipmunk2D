@@ -19,8 +19,8 @@
  * SOFTWARE.
  */
 
-#ifndef CHIPMUNK_HEADER
-#define CHIPMUNK_HEADER
+#ifndef CHIPMUNK_H
+#define CHIPMUNK_H
 
 #ifdef _MSC_VER
     #define _USE_MATH_DEFINES
@@ -119,6 +119,8 @@ typedef struct cpSpace cpSpace;
 /// Version string.
 extern const char *cpVersionString;
 
+// TODO return a mass data struct?
+
 /// Calculate the moment of inertia for a circle.
 /// @c r1 and @c r2 are the inner and outer diameters. A solid circle has an inner diameter of 0.
 cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset);
@@ -127,6 +129,7 @@ cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset);
 /// @c r1 and @c r2 are the inner and outer diameters. A solid circle has an inner diameter of 0.
 cpFloat cpAreaForCircle(cpFloat r1, cpFloat r2);
 
+// TODO radius
 /// Calculate the moment of inertia for a line segment.
 /// Beveling radius is not supported.
 cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b);
@@ -134,6 +137,7 @@ cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b);
 /// Calculate the area of a fattened (capsule shaped) line segment.
 cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat r);
 
+// TODO radius
 /// Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
 cpFloat cpMomentForPoly(cpFloat m, int numVerts, const cpVect *verts, cpVect offset);
 
@@ -143,9 +147,6 @@ cpFloat cpAreaForPoly(const int numVerts, const cpVect *verts);
 
 /// Calculate the natural centroid of a polygon.
 cpVect cpCentroidForPoly(const int numVerts, const cpVect *verts);
-
-/// Center the polygon on the origin. (Subtracts the centroid of the polygon from each vertex)
-void cpRecenterPoly(const int numVerts, cpVect *verts);
 
 /// Calculate the moment of inertia for a solid box.
 cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height);

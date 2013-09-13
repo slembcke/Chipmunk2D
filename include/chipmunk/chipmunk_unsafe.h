@@ -36,8 +36,8 @@
 /// so the results will be unrealistic. You must explicity include the chipmunk_unsafe.h header to use them.
 /// @{
 
-#ifndef CHIPMUNK_UNSAFE_HEADER
-#define CHIPMUNK_UNSAFE_HEADER
+#ifndef CHIPMUNK_UNSAFE_H
+#define CHIPMUNK_UNSAFE_H
 
 #ifdef __cplusplus
 extern "C" {

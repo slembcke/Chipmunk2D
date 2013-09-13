@@ -60,7 +60,7 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->v_limit = (cpFloat)INFINITY;
 	body->w_limit = (cpFloat)INFINITY;
 	
-	body->data = NULL;
+	body->userData = NULL;
 	
 	// Setters must be called after full initialization so the sanity checks don't assert on garbage data.
 	cpBodySetMass(body, m);
@@ -207,7 +207,7 @@ cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint)
 }
 
 void
-cpBodySetPos(cpBody *body, cpVect pos)
+cpBodySetPosition(cpBody *body, cpVect pos)
 {
 	cpBodyActivate(body);
 	body->p = pos;
@@ -282,13 +282,13 @@ cpBodyGetVelAtPoint(cpBody *body, cpVect r)
 }
 
 cpVect
-cpBodyGetVelAtWorldPoint(cpBody *body, cpVect point)
+cpBodyGetVelocityAtWorldPoint(cpBody *body, cpVect point)
 {
 	return cpBodyGetVelAtPoint(body, cpvsub(point, body->p));
 }
 
 cpVect
-cpBodyGetVelAtLocalPoint(cpBody *body, cpVect point)
+cpBodyGetVelocityAtLocalPoint(cpBody *body, cpVect point)
 {
 	return cpBodyGetVelAtPoint(body, cpvrotate(point, body->rot));
 }

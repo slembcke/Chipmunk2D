@@ -19,6 +19,13 @@
  * SOFTWARE.
  */
 
+#ifdef CHIPMUNK_H
+#error Cannot include chipmunk_private.h after chipmunk.h.
+#endif
+
+#ifndef CHIPMUNK_PRIVATE_H
+#define CHIPMUNK_PRIVATE_H
+
 #define CP_ALLOW_PRIVATE_ACCESS 1
 #include "chipmunk.h"
 
@@ -300,3 +307,5 @@ cpArbiterNext(cpArbiter *node, cpBody *body)
 
 #define CP_BODY_FOREACH_COMPONENT(root, var)\
 	for(cpBody *var = root; var; var = var->node.next)
+
+#endif

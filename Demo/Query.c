@@ -84,7 +84,7 @@ init(void)
 		cpVect a = cpv(-length/2.0f, 0.0f), b = cpv(length/2.0f, 0.0f);
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
-		cpBodySetPos(body, cpv(0.0f, 100.0f));
+		cpBodySetPosition(body, cpv(0.0f, 100.0f));
 		
 		cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 20.0f));
 	}
@@ -104,7 +104,7 @@ init(void)
 		}
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-		cpBodySetPos(body, cpv(50.0f, 30.0f));
+		cpBodySetPosition(body, cpv(50.0f, 30.0f));
 		
 		cpSpaceAddShape(space, cpPolyShapeNew2(body, NUM_VERTS, verts, cpvzero, 10.0f));
 	}
@@ -114,7 +114,7 @@ init(void)
 		cpFloat r = 20.0f;
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, r, cpvzero)));
-		cpBodySetPos(body, cpv(100.0f, 100.0f));
+		cpBodySetPosition(body, cpv(100.0f, 100.0f));
 		
 		cpSpaceAddShape(space, cpCircleShapeNew(body, r, cpvzero));
 	}

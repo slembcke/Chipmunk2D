@@ -407,7 +407,7 @@ Click(int button, int state)
 			cpShape *shape = cpSpacePointQueryFirst(space, ChipmunkDemoMouse, GRABABLE_MASK_BIT, CP_NO_GROUP);
 			if(shape){
 				cpBody *body = shape->body;
-				mouse_joint = cpPivotJointNew2(mouse_body, body, cpvzero, cpBodyWorld2Local(body, ChipmunkDemoMouse));
+				mouse_joint = cpPivotJointNew2(mouse_body, body, cpvzero, cpBodyWorldToLocal(body, ChipmunkDemoMouse));
 				mouse_joint->maxForce = 50000.0f;
 				mouse_joint->errorBias = cpfpow(1.0f - 0.15f, 60.0f);
 				cpSpaceAddConstraint(space, mouse_joint);

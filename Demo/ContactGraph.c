@@ -188,7 +188,7 @@ init(void)
 	// add some boxes to stack on the scale
 	for(int i=0; i<5; i++){
 		body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForBox(1.0f, 30.0f, 30.0f)));
-		cpBodySetPos(body, cpv(0, i*32 - 220));
+		cpBodySetPosition(body, cpv(0, i*32 - 220));
 		
 		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 30.0f, 30.0f));
 		cpShapeSetElasticity(shape, 0.0f);
@@ -198,7 +198,7 @@ init(void)
 	// Add a ball that we'll track which objects are beneath it.
 	cpFloat radius = 15.0f;
 	ballBody = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 0.0f, radius, cpvzero)));
-	cpBodySetPos(ballBody, cpv(120, -240 + radius+5));
+	cpBodySetPosition(ballBody, cpv(120, -240 + radius+5));
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero));
 	cpShapeSetElasticity(shape, 0.0f);

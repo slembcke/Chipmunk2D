@@ -91,8 +91,8 @@ init(void)
 	// Add a ball to make things more interesting
 	cpFloat radius = 15.0f;
 	body = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 0.0f, radius, cpvzero)));
-	cpBodySetPos(body, cpv(0, -200));
-	cpBodySetVel(body, cpv(0, 170));
+	cpBodySetPosition(body, cpv(0, -200));
+	cpBodySetVelocity(body, cpv(0, 170));
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
 	cpShapeSetElasticity(shape, 0.0f);
