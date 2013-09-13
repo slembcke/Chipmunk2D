@@ -35,12 +35,13 @@ update(cpSpace *space, double dt)
 	
 	cpVect start = QUERY_START;
 	cpVect end = ChipmunkDemoMouse;
+	cpFloat radius = 10.0;
 	ChipmunkDebugDrawSegment(start, end, RGBAColor(0,1,0,1));
 	
 	ChipmunkDemoPrintString("Query: Dist(%f) Point%s, ", cpvdist(start, end), cpvstr(end));
 	
 	cpSegmentQueryInfo segInfo = {};
-	if(cpSpaceSegmentQueryFirst(space, start, end, CP_ALL_LAYERS, CP_NO_GROUP, &segInfo)){
+	if(cpSpaceSegmentQueryFirst(space, start, end, radius, CP_ALL_LAYERS, CP_NO_GROUP, &segInfo)){
 		cpVect point = cpSegmentQueryHitPoint(start, end, segInfo);
 		
 		// Draw blue over the occluded part of the query
@@ -57,6 +58,9 @@ update(cpSpace *space, double dt)
 	} else {
 		ChipmunkDemoPrintString("Segment Query (None)");
 	}
+	
+	// Draw a fat green line over the unoccluded part of the query
+	ChipmunkDebugDrawFatSegment(start, cpvlerp(start, end, segInfo.t), radius, RGBAColor(0,1,0,1), LAColor(0,0));
 	
 	cpPointQueryInfo nearestInfo = {};
 	cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 100.0, CP_ALL_LAYERS, CP_NO_GROUP, &nearestInfo);

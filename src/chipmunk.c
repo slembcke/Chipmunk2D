@@ -292,8 +292,8 @@ void cpSpacePointQuery_b(cpSpace *space, cpVect point, cpFloat maxDistance, cpLa
 }
 
 static void SegmentQueryIteratorFunc(cpShape *shape, cpFloat t, cpVect n, cpSpaceSegmentQueryBlock block){block(shape, t, n);}
-void cpSpaceSegmentQuery_b(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryBlock block){
-	cpSpaceSegmentQuery(space, start, end, layers, group, (cpSpaceSegmentQueryFunc)SegmentQueryIteratorFunc, block);
+void cpSpaceSegmentQuery_b(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpLayers layers, cpGroup group, cpSpaceSegmentQueryBlock block){
+	cpSpaceSegmentQuery(space, start, end, radius, layers, group, (cpSpaceSegmentQueryFunc)SegmentQueryIteratorFunc, block);
 }
 
 void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryBlock block){

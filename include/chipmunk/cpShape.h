@@ -59,7 +59,7 @@ typedef enum cpShapeType{
 typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpVect p, cpVect rot);
 typedef void (*cpShapeDestroyImpl)(cpShape *shape);
 typedef void (*cpShapePointQueryImpl)(cpShape *shape, cpVect p, cpPointQueryInfo *info);
-typedef void (*cpShapeSegmentQueryImpl)(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+typedef void (*cpShapeSegmentQueryImpl)(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
 
 /// @private
 struct cpShapeClass {
@@ -127,7 +127,9 @@ cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot);
 cpFloat cpShapePointQuery(cpShape *shape, cpVect p, cpPointQueryInfo *out);
 
 /// Perform a segment query against a shape. @c info must be a pointer to a valid cpSegmentQueryInfo structure.
-cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
+
+// TODO NUKE
 
 /// Get the hit point for a segment query.
 static inline cpVect cpSegmentQueryHitPoint(const cpVect start, const cpVect end, const cpSegmentQueryInfo info)

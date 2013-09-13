@@ -101,6 +101,7 @@ cpSpacePointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLa
 
 struct SegmentQueryContext {
 	cpVect start, end;
+	cpFloat radius;
 	cpLayers layers;
 	cpGroup group;
 	cpSpaceSegmentQueryFunc func;
@@ -113,7 +114,7 @@ SegmentQuery(struct SegmentQueryContext *context, cpShape *shape, void *data)
 	
 	if(
 		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
-		cpShapeSegmentQuery(shape, context->start, context->end, &info)
+		cpShapeSegmentQuery(shape, context->start, context->end, context->radius, &info)
 	){
 		context->func(shape, info.t, info.n, data);
 	}
@@ -122,10 +123,11 @@ SegmentQuery(struct SegmentQueryContext *context, cpShape *shape, void *data)
 }
 
 void
-cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data)
+cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data)
 {
 	struct SegmentQueryContext context = {
 		start, end,
+		radius,
 		layers, group,
 		func,
 	};
@@ -144,7 +146,7 @@ SegmentQueryFirst(struct SegmentQueryContext *context, cpShape *shape, cpSegment
 	if(
 		!(shape->group && context->group == shape->group) && (context->layers&shape->layers) &&
 		!shape->sensor &&
-		cpShapeSegmentQuery(shape, context->start, context->end, &info) &&
+		cpShapeSegmentQuery(shape, context->start, context->end, context->radius, &info) &&
 		info.t < out->t
 	){
 		(*out) = info;
@@ -154,7 +156,7 @@ SegmentQueryFirst(struct SegmentQueryContext *context, cpShape *shape, cpSegment
 }
 
 cpShape *
-cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out)
+cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out)
 {
 	cpSegmentQueryInfo info = {NULL, 1.0f, cpvzero};
 	if(out){
@@ -165,6 +167,7 @@ cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers laye
 	
 	struct SegmentQueryContext context = {
 		start, end,
+		radius,
 		layers, group,
 		NULL
 	};

@@ -121,7 +121,7 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 }
 
 static void
-cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info)
 {
 	cpSplittingPlane *axes = poly->tPlanes;
 	cpVect *verts = poly->tVerts;
@@ -154,7 +154,7 @@ cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpSegmentQueryInf
 	if(r > 0.0f){
 		for(int i=0; i<count; i++){
 			cpSegmentQueryInfo circle_info = {NULL, 1.0f, cpvzero};
-			CircleSegmentQuery(&poly->shape, verts[i], r, a, b, &circle_info);
+			CircleSegmentQuery(&poly->shape, verts[i], r, a, b, radius, &circle_info);
 			if(circle_info.t < info->t) (*info) = circle_info;
 		}
 	}

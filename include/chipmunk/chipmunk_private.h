@@ -198,22 +198,24 @@ cpShapeActive(cpShape *shape)
 cpCollisionInfo cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, struct cpContact *contacts);
 
 static inline void
-CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r1, cpVect a, cpVect b, cpFloat r2, cpSegmentQueryInfo *info)
 {
 	cpVect da = cpvsub(a, center);
 	cpVect db = cpvsub(b, center);
+	cpFloat rsum = r1 + r2;
 	
 	cpFloat qa = cpvdot(da, da) - 2.0f*cpvdot(da, db) + cpvdot(db, db);
-	cpFloat qb = -2.0f*cpvdot(da, da) + 2.0f*cpvdot(da, db);
-	cpFloat qc = cpvdot(da, da) - r*r;
+	cpFloat qb = cpvdot(da, db) - cpvdot(da, da);
+	cpFloat qc = cpvdot(da, da) - rsum*rsum;
 	
-	cpFloat det = qb*qb - 4.0f*qa*qc;
+	cpFloat det = qb*qb - qa*qc;
 	
 	if(det >= 0.0f){
-		cpFloat t = (-qb - cpfsqrt(det))/(2.0f*qa);
+		cpFloat t = (-qb - cpfsqrt(det))/(qa);
 		if(0.0f<= t && t <= 1.0f){
 			info->shape = shape;
 			info->t = t;
+			// TODO this is wrong now.
 			info->n = cpvnormalize(cpvlerp(da, db, t));
 		}
 	}

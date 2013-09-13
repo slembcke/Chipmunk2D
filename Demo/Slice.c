@@ -127,7 +127,7 @@ update(cpSpace *space, double dt)
 		} else {
 			// MouseUp
 			struct SliceContext context = {sliceStart, ChipmunkDemoMouse, space};
-			cpSpaceSegmentQuery(space, sliceStart, ChipmunkDemoMouse, GRABABLE_MASK_BIT, CP_NO_GROUP, (cpSpaceSegmentQueryFunc)SliceQuery, &context);
+			cpSpaceSegmentQuery(space, sliceStart, ChipmunkDemoMouse, 0.0, GRABABLE_MASK_BIT, CP_NO_GROUP, (cpSpaceSegmentQueryFunc)SliceQuery, &context);
 		}
 		
 		lastClickState = ChipmunkDemoRightClick;

@@ -117,7 +117,7 @@ cpShapePointQuery(cpShape *shape, cpVect p, cpPointQueryInfo *info)
 
 
 cpBool
-cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info){
+cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info){
 	cpSegmentQueryInfo blank = {NULL, 1.0f, cpvzero};
 	if(info){
 		(*info) = blank;
@@ -127,12 +127,13 @@ cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info
 	
 	cpPointQueryInfo nearest;
 	shape->klass->pointQuery(shape, a, &nearest);
-	if(nearest.d <= 0.0){
+	if(nearest.d <= radius){
 		info->shape = shape;
 		info->t = 0.0;
+		// TODO is this correct?
 		info->n = cpvnormalize(cpvsub(a, nearest.p));
 	} else {
-		shape->klass->segmentQuery(shape, a, b, info);
+		shape->klass->segmentQuery(shape, a, b, radius, info);
 	}
 	
 	return (info->shape != NULL);
@@ -167,9 +168,9 @@ cpCicleShapePointQuery(cpCircleShape *circle, cpVect p, cpPointQueryInfo *info)
 }
 
 static void
-cpCircleShapeSegmentQuery(cpCircleShape *circle, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+cpCircleShapeSegmentQuery(cpCircleShape *circle, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info)
 {
-	CircleSegmentQuery((cpShape *)circle, circle->tc, circle->r, a, b, info);
+	CircleSegmentQuery((cpShape *)circle, circle->tc, circle->r, a, b, radius, info);
 }
 
 static const cpShapeClass cpCircleShapeClass = {
@@ -254,7 +255,7 @@ cpSegmentShapePointQuery(cpSegmentShape *seg, cpVect p, cpPointQueryInfo *info)
 }
 
 static void
-cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info)
 {
 	cpVect n = seg->tn;
 	cpFloat d = cpvdot(cpvsub(seg->ta, a), n);
@@ -281,8 +282,8 @@ cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpSegmentQue
 	} else if(r != 0.0f){
 		cpSegmentQueryInfo info1 = {NULL, 1.0f, cpvzero};
 		cpSegmentQueryInfo info2 = {NULL, 1.0f, cpvzero};
-		CircleSegmentQuery((cpShape *)seg, seg->ta, seg->r, a, b, &info1);
-		CircleSegmentQuery((cpShape *)seg, seg->tb, seg->r, a, b, &info2);
+		CircleSegmentQuery((cpShape *)seg, seg->ta, seg->r, a, b, radius, &info1);
+		CircleSegmentQuery((cpShape *)seg, seg->tb, seg->r, a, b, radius, &info2);
 		
 		if(info1.t < info2.t){
 			(*info) = info1;
