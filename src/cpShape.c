@@ -112,7 +112,7 @@ cpShapePointQuery(cpShape *shape, cpVect p, cpPointQueryInfo *info)
 	}
 	
 	shape->klass->pointQuery(shape, p, info);
-	return info->d;
+	return info->distance;
 }
 
 
@@ -127,10 +127,10 @@ cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmen
 	
 	cpPointQueryInfo nearest;
 	shape->klass->pointQuery(shape, a, &nearest);
-	if(nearest.d <= radius){
+	if(nearest.distance <= radius){
 		info->shape = shape;
 		info->alpha = 0.0;
-		info->normal = cpvnormalize(cpvsub(a, nearest.p));
+		info->normal = cpvnormalize(cpvsub(a, nearest.point));
 	} else {
 		shape->klass->segmentQuery(shape, a, b, radius, info);
 	}
@@ -159,11 +159,11 @@ cpCicleShapePointQuery(cpCircleShape *circle, cpVect p, cpPointQueryInfo *info)
 	cpFloat r = circle->r;
 	
 	info->shape = (cpShape *)circle;
-	info->p = cpvadd(circle->tc, cpvmult(delta, r/d)); // TODO: div/0
-	info->d = d - r;
+	info->point = cpvadd(circle->tc, cpvmult(delta, r/d)); // TODO: div/0
+	info->distance = d - r;
 	
 	// Use up for the gradient if the distance is very small.
-	info->g = (d > MAGIC_EPSILON ? cpvmult(delta, 1.0f/d) : cpv(0.0f, 1.0f));
+	info->gradient = (d > MAGIC_EPSILON ? cpvmult(delta, 1.0f/d) : cpv(0.0f, 1.0f));
 }
 
 static void
@@ -246,11 +246,11 @@ cpSegmentShapePointQuery(cpSegmentShape *seg, cpVect p, cpPointQueryInfo *info)
 	cpVect g = cpvmult(delta, 1.0f/d);
 	
 	info->shape = (cpShape *)seg;
-	info->p = (d ? cpvadd(closest, cpvmult(g, r)) : closest);
-	info->d = d - r;
+	info->point = (d ? cpvadd(closest, cpvmult(g, r)) : closest);
+	info->distance = d - r;
 	
 	// Use the segment's normal if the distance is very small.
-	info->g = (d > MAGIC_EPSILON ? g : seg->n);
+	info->gradient = (d > MAGIC_EPSILON ? g : seg->n);
 }
 
 static void

@@ -32,12 +32,12 @@ typedef struct cpPointQueryInfo {
 	/// The nearest shape, NULL if no shape was within range.
 	cpShape *shape;
 	/// The closest point on the shape's surface. (in world space coordinates)
-	cpVect p;
+	cpVect point;
 	/// The distance to the point. The distance is negative if the point is inside the shape.
-	cpFloat d;
+	cpFloat distance;
 	/// The gradient of the signed distance function.
 	/// The same as info.p/info.d, but accurate even for very small values of info.d.
-	cpVect g;
+	cpVect gradient;
 } cpPointQueryInfo;
 
 /// Segment query info struct.

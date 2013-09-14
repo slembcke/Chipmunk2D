@@ -113,11 +113,11 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	cpVect g = cpvmult(cpvsub(p, closestPoint), 1.0f/dist);
 	
 	info->shape = (cpShape *)poly;
-	info->p = cpvadd(closestPoint, cpvmult(g, r));
-	info->d = dist - r;
+	info->point = cpvadd(closestPoint, cpvmult(g, r));
+	info->distance = dist - r;
 	
 	// Use the normal of the closest segment if the distance is small.
-	info->g = (minDist > MAGIC_EPSILON ? g : closestNormal);
+	info->gradient = (minDist > MAGIC_EPSILON ? g : closestNormal);
 }
 
 static void

@@ -53,8 +53,8 @@ update(cpSpace *space, double dt)
 		}
 	}
 	
-	cpSpaceStep(space, dt);
 	cpSpaceEachBody(space, &eachBody, NULL);
+	cpSpaceStep(space, dt);
 }
 
 #define NUM_VERTS 5
