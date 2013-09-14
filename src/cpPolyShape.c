@@ -80,6 +80,17 @@ cpPolyShapeDestroy(cpPolyShape *poly)
 	cpfree(poly->planes);
 }
 
+static struct cpMassInfo
+cpPolyShapeMassInfo(cpPolyShape *poly, cpFloat density)
+{
+		cpFloat mass = density*cpAreaForPoly(poly->count, poly->verts);
+		cpVect centroid = cpCentroidForPoly(poly->count, poly->verts);
+		cpFloat moment = cpMomentForPoly(mass, poly->count, poly->verts, cpvneg(centroid));
+		
+		struct cpMassInfo info = {mass, moment, centroid};
+		return info;
+}
+
 static void
 cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	int count = poly->count;
@@ -166,6 +177,7 @@ static const cpShapeClass polyClass = {
 	CP_POLY_SHAPE,
 	(cpShapeCacheDataImpl)cpPolyShapeCacheData,
 	(cpShapeDestroyImpl)cpPolyShapeDestroy,
+	(cpShapeMassInfoImpl)cpPolyShapeMassInfo,
 	(cpShapePointQueryImpl)cpPolyShapePointQuery,
 	(cpShapeSegmentQueryImpl)cpPolyShapeSegmentQuery,
 };

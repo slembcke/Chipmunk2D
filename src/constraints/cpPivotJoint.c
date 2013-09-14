@@ -28,8 +28,8 @@ preStep(cpPivotJoint *joint, cpFloat dt)
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
-	joint->r1 = cpvrotate(joint->anchr1, a->rot);
-	joint->r2 = cpvrotate(joint->anchr2, b->rot);
+	joint->r1 = cpvrotate(cpvsub(joint->anchr1, a->cog), a->rot);
+	joint->r2 = cpvrotate(cpvsub(joint->anchr2, b->cog), b->rot);
 	
 	// Calculate mass tensor
 	joint-> k = k_tensor(a, b, joint->r1, joint->r2);

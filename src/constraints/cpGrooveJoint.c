@@ -37,7 +37,7 @@ preStep(cpGrooveJoint *joint, cpFloat dt)
 	cpFloat d = cpvdot(ta, n);
 	
 	joint->grv_tn = n;
-	joint->r2 = cpvrotate(joint->anchr2, b->rot);
+	joint->r2 = cpvrotate(cpvsub(joint->anchr2, b->cog), b->rot);
 	
 	// calculate tangential distance along the axis of r2
 	cpFloat td = cpvcross(cpvadd(b->p, joint->r2), n);

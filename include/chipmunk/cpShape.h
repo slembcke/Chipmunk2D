@@ -60,8 +60,14 @@ typedef enum cpShapeType{
 	CP_NUM_SHAPES
 } cpShapeType;
 
+struct cpMassInfo {
+	cpFloat m, i;
+	cpVect cog;
+};
+
 typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpVect p, cpVect rot);
 typedef void (*cpShapeDestroyImpl)(cpShape *shape);
+typedef struct cpMassInfo (*cpShapeMassInfoImpl)(cpShape *shape, cpFloat density);
 typedef void (*cpShapePointQueryImpl)(cpShape *shape, cpVect p, cpPointQueryInfo *info);
 typedef void (*cpShapeSegmentQueryImpl)(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
 
@@ -71,6 +77,7 @@ struct cpShapeClass {
 	
 	cpShapeCacheDataImpl cacheData;
 	cpShapeDestroyImpl destroy;
+	cpShapeMassInfoImpl massInfo;
 	cpShapePointQueryImpl pointQuery;
 	cpShapeSegmentQueryImpl segmentQuery;
 };
