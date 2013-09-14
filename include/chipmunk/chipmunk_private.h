@@ -80,6 +80,8 @@ void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);
 
 void cpBodyAddShape(cpBody *body, cpShape *shape);
 void cpBodyRemoveShape(cpBody *body, cpShape *shape);
+void cpBodyAddMassInfoForShape(cpBody *body, cpShape *shape);
+void cpBodyRemoveMassInfoForShape(cpBody *body, cpShape *shape);
 void cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint);
 
 

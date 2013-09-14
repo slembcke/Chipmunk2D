@@ -46,6 +46,7 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 	cpShapeIDCounter++;
 	
 	shape->body = body;
+	shape->m = 0.0f;
 	shape->sensor = 0;
 	
 	shape->e = 0.0f;
@@ -87,6 +88,17 @@ cpShapeSetBody(cpShape *shape, cpBody *body)
 	cpAssertHard(!cpShapeActive(shape), "You cannot change the body on an active shape. You must remove the shape from the space before changing the body.");
 	shape->body = body;
 }
+
+void
+cpShapeSetMass(cpShape *shape, cpFloat mass){
+	cpBody *body = shape->body;
+	cpBodyActivate(body);
+	
+	cpBodyRemoveMassInfoForShape(body, shape);
+	shape->m = mass;
+	cpBodyAddMassInfoForShape(body, shape);
+}
+
 
 cpBB
 cpShapeCacheBB(cpShape *shape)
@@ -156,10 +168,12 @@ cpCircleShapeCacheData(cpCircleShape *circle, cpVect p, cpVect rot)
 static struct cpMassInfo
 cpCircleShapeMassInfo(cpCircleShape *circle, cpFloat density)
 {
-	cpFloat mass = density*cpAreaForCircle(0.0f, circle->r);
-	cpFloat moment = cpMomentForCircle(mass, 0.0f, circle->r, cpvzero);
+	struct cpMassInfo info = {
+		cpAreaForCircle(0.0f, circle->r),
+		cpMomentForCircle(1.0f, 0.0f, circle->r, cpvzero),
+		circle->c
+	};
 	
-	struct cpMassInfo info = {mass, moment, circle->c};
 	return info;
 }
 
@@ -251,11 +265,13 @@ cpSegmentShapeCacheData(cpSegmentShape *seg, cpVect p, cpVect rot)
 static struct cpMassInfo
 cpSegmentShapeMassInfo(cpSegmentShape *segment, cpFloat density)
 {
-	cpFloat mass = density*cpAreaForSegment(segment->a, segment->b, segment->r);
 	cpFloat w = 2.0f*segment->r;
-	cpFloat moment = cpMomentForBox(mass, cpvdist(segment->a, segment->b) + w, w); // TODO approximation
+	struct cpMassInfo info = {
+		cpAreaForSegment(segment->a, segment->b, segment->r),
+		cpMomentForBox(1.0f, cpvdist(segment->a, segment->b) + w, w), // TODO is an approximation.
+		cpvlerp(segment->a, segment->b, 0.5f)
+	};
 	
-	struct cpMassInfo info = {mass, moment, cpvlerp(segment->a, segment->b, 0.5f)};
 	return info;
 }
 

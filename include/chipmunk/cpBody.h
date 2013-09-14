@@ -130,8 +130,6 @@ void cpBodyFree(cpBody *body);
 	#define	cpBodyAssertSane(body) cpBodySanityCheck(body)
 #endif
 
-void cpBodyAddMassForShape(cpBody *body, cpShape *shape, cpFloat density);
-
 // Defined in cpSpace.c
 /// Wake up a sleeping or idle body.
 void cpBodyActivate(cpBody *body);

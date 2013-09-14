@@ -57,26 +57,24 @@ init(void)
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
-	// Add lots of boxes.
-	for(int i=0; i<14; i++){
-		for(int j=0; j<=i; j++){
-			body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForBox(1.0f, 30.0f, 30.0f)));
-			cpBodySetPosition(body, cpv(j*32 - i*16, 300 - i*32));
-			
-			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 30.0f, 30.0f, 0.5f));
-			cpShapeSetElasticity(shape, 0.0f);
-			cpShapeSetFriction(shape, 0.8f);
-		}
-	}
+	body = cpSpaceAddBody(space, cpBodyNew(0.0f, 0.0f));
+	cpBodySetPosition(body, cpv(0.0, 0.0));
 	
-	// Add a ball to make things more interesting
-	cpFloat radius = 15.0f;
-	body = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 0.0f, radius, cpvzero)));
-	cpBodySetPosition(body, cpv(0, -240 + radius+5));
-
-	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
+	cpFloat s = 150.0;
+	shape = cpSpaceAddShape(space, cpBoxShapeNew2(body, cpBBNew(0, 0, s, s), 0.0));
+//	cpShapeSetMass(shape, 1.0);
 	cpShapeSetElasticity(shape, 0.0f);
-	cpShapeSetFriction(shape, 0.9f);
+	cpShapeSetFriction(shape, 0.8f);
+	
+	cpSpaceRemoveShape(space, shape);
+	
+	body = cpSpaceAddBody(space, cpBodyNew(0.0f, 0.0f));
+	cpBodySetPosition(body, cpv(0.0, 0.0));
+	
+	shape = cpSpaceAddShape(space, cpBoxShapeNew2(body, cpBBNew(-s, 0, 0, s), 0.0));
+//	cpShapeSetMass(shape, 1.0);
+	cpShapeSetElasticity(shape, 0.0f);
+	cpShapeSetFriction(shape, 0.8f);
 	
 	return space;
 }

@@ -83,11 +83,13 @@ cpPolyShapeDestroy(cpPolyShape *poly)
 static struct cpMassInfo
 cpPolyShapeMassInfo(cpPolyShape *poly, cpFloat density)
 {
-		cpFloat mass = density*cpAreaForPoly(poly->count, poly->verts);
 		cpVect centroid = cpCentroidForPoly(poly->count, poly->verts);
-		cpFloat moment = cpMomentForPoly(mass, poly->count, poly->verts, cpvneg(centroid));
+		struct cpMassInfo info = {
+			cpAreaForPoly(poly->count, poly->verts),
+			cpMomentForPoly(1.0f, poly->count, poly->verts, cpvneg(centroid)),
+			centroid
+		};
 		
-		struct cpMassInfo info = {mass, moment, centroid};
 		return info;
 }
 

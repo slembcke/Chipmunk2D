@@ -257,6 +257,7 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		cpBody *a = arb->body_a, *b = arb->body_b;
 		
 		if(sleep){
+			// TODO checking cpBodyIsSleepin() redundant?
 			if((cpBodyIsRogue(b) && !cpBodyIsStatic(b)) || cpBodyIsSleeping(a)) cpBodyActivate(a);
 			if((cpBodyIsRogue(a) && !cpBodyIsStatic(a)) || cpBodyIsSleeping(b)) cpBodyActivate(b);
 		}

@@ -52,6 +52,11 @@ typedef struct cpSegmentQueryInfo {
 	cpFloat alpha;
 } cpSegmentQueryInfo;
 
+struct cpMassInfo {
+	cpFloat area, i;
+	cpVect cog;
+};
+
 /// @private
 typedef enum cpShapeType{
 	CP_CIRCLE_SHAPE,
@@ -60,14 +65,9 @@ typedef enum cpShapeType{
 	CP_NUM_SHAPES
 } cpShapeType;
 
-struct cpMassInfo {
-	cpFloat m, i;
-	cpVect cog;
-};
-
 typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpVect p, cpVect rot);
 typedef void (*cpShapeDestroyImpl)(cpShape *shape);
-typedef struct cpMassInfo (*cpShapeMassInfoImpl)(cpShape *shape, cpFloat density);
+typedef struct cpMassInfo (*cpShapeMassInfoImpl)(cpShape *shape);
 typedef void (*cpShapePointQueryImpl)(cpShape *shape, cpVect p, cpPointQueryInfo *info);
 typedef void (*cpShapeSegmentQueryImpl)(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
 
@@ -88,6 +88,9 @@ struct cpShape {
 	
 	/// The rigid body this collision shape is attached to.
 	CP_PRIVATE(cpBody *body);
+	
+	// Optional mass of the shape.
+	CP_PRIVATE(cpFloat m);
 
 	/// The current bounding box of the shape.
 	CP_PRIVATE(cpBB bb);
@@ -159,7 +162,7 @@ static inline type cpShapeGet##name(const cpShape *shape){return shape->CP_PRIVA
 
 #define CP_DefineShapeStructSetter(type, member, name, activates) \
 static inline void cpShapeSet##name(cpShape *shape, type value){ \
-	if(activates && shape->CP_PRIVATE(body)) cpBodyActivate(shape->CP_PRIVATE(body)); \
+	if(activates) cpBodyActivate(shape->CP_PRIVATE(body)); \
 	shape->CP_PRIVATE(member) = value; \
 }
 
@@ -171,6 +174,8 @@ CP_DefineShapeStructGetter(cpSpace*, space, Space)
 
 CP_DefineShapeStructGetter(cpBody*, body, Body)
 void cpShapeSetBody(cpShape *shape, cpBody *body);
+CP_DefineShapeStructGetter(cpFloat, m, Mass)
+void cpShapeSetMass(cpShape *shape, cpFloat mass);
 
 CP_DefineShapeStructGetter(cpBB, bb, BB)
 CP_DefineShapeStructProperty(cpBool, sensor, Sensor, cpTrue)

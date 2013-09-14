@@ -138,39 +138,55 @@ cpBodySanityCheck(cpBody *body)
 #endif
 
 void
-cpBodyAddMassForShape(cpBody *body, cpShape *shape, cpFloat density)
+cpBodyAddMassInfoForShape(cpBody *body, cpShape *shape)
 {
-	// Cache the position to realign it at the end.
-	cpVect pos = cpBodyGetPosition(body);
+	cpFloat m = shape->m;
 	
-	cpAssertHard(density > 0.0f, "Density must be positive. (density: %f)", density);
-	struct cpMassInfo info = shape->klass->massInfo(shape, density);
-	cpFloat msum = body->m + info.m;
+	if(m > 0.0f){
+		// Cache the position to realign it at the end.
+		cpVect pos = cpBodyGetPosition(body);
+		
+		struct cpMassInfo info = shape->klass->massInfo(shape);
+		cpFloat msum = body->m + m;
+		
+		body->i += m*info.i + cpvdistsq(body->cog, info.cog)*(m*body->m)/msum;
+		body->cog = cpvlerp(body->cog, info.cog, m/msum);
+		body->m = msum;
+		
+		body->m_inv = 1.0f/body->m;
+		body->i_inv = 1.0f/body->i;
+		
+		cpBodySetPosition(body, pos);
+	}
+}
+
+void
+cpBodyRemoveMassInfoForShape(cpBody *body, cpShape *shape)
+{
+	cpFloat m = shape->m;
 	
-	body->i += info.i + cpvdistsq(body->cog, info.cog)*(info.m*body->m)/msum;
-	body->cog = cpvlerp(body->cog, info.cog, info.m/msum);
-	body->m = msum;
-	
-	body->m_inv = 1.0f/body->m;
-	body->i_inv = 1.0f/body->i;
-	
-	// Realign the position
-	cpBodySetPosition(body, pos);
-	
-//	cpVect p = cpBodyGetPos(body);
-//	printf("p: (%5.2f, %5.2f)\n", p.x, p.y);
-	
-	// If the body is already added to a space then reindex it's
-	// shapes since we just shifted all of them.
-	// TODO would like to avoid this in Chipmunk 7
-	cpSpace *space = cpBodyGetSpace(body);
-	if(space) cpSpaceReindexShapesForBody(space, body);
+	if(m > 0.0f){
+		// Cache the position to realign it at the end.
+		cpVect pos = cpBodyGetPosition(body);
+		
+		struct cpMassInfo info = shape->klass->massInfo(shape);
+		cpFloat msum = body->m;
+		
+		body->m = msum - m;
+		body->cog = cpvadd(body->cog, cpvmult(cpvsub(body->cog, info.cog), m/body->m));
+		body->i -= m*info.i - cpvdistsq(body->cog, info.cog)*body->m*m/(msum);
+		
+		body->m_inv = 1.0f/body->m;
+		body->i_inv = 1.0f/body->i;
+		
+		cpBodySetPosition(body, pos);
+	}
 }
 
 void
 cpBodySetMass(cpBody *body, cpFloat mass)
 {
-	cpAssertHard(mass > 0.0f, "Mass must be positive and non-zero.");
+	cpAssertHard(mass >= 0.0f, "Mass must be positive.");
 	
 	cpBodyActivate(body);
 	body->m = mass;
@@ -181,7 +197,7 @@ cpBodySetMass(cpBody *body, cpFloat mass)
 void
 cpBodySetMoment(cpBody *body, cpFloat moment)
 {
-	cpAssertHard(moment > 0.0f, "Moment of Inertia must be positive and non-zero.");
+	cpAssertHard(moment >= 0.0f, "Moment of Inertia must be positive.");
 	
 	cpBodyActivate(body);
 	body->i = moment;
@@ -197,6 +213,8 @@ cpBodyAddShape(cpBody *body, cpShape *shape)
 	
 	shape->next = next;
 	body->shapeList = shape;
+	
+	cpBodyAddMassInfoForShape(body, shape);
 }
 
 void
@@ -217,6 +235,8 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
   
   shape->prev = NULL;
   shape->next = NULL;
+	
+	cpBodyRemoveMassInfoForShape(body, shape);
 }
 
 static cpConstraint *
