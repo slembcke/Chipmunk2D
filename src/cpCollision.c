@@ -23,10 +23,10 @@
 #include <string.h>
 
 #include "chipmunk_private.h"
-#include "ChipmunkDemo.h"
 
-#if DEBUG
-#define DRAW_ALL 0
+#if DEBUG && 1
+#include "ChipmunkDemo.h"
+#define DRAW_ALL 1
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
 #define DRAW_CLOSEST (0 || DRAW_ALL)
@@ -265,10 +265,10 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 	cpVect verts[count];
 	for(int i=0; i<count; i++) verts[i] = hull[i].ab;
 	
-	ChipmunkDebugDrawPolygon(count, verts, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
+	ChipmunkDebugDrawPolygon(count, verts, 0.0, RGBAColor(1, 1, 0, 1), RGBAColor(1, 1, 0, 0.25));
 	ChipmunkDebugDrawSegment(v0.ab, v1.ab, RGBAColor(1, 0, 0, 1));
 	
-	ChipmunkDebugDrawPoints(5, 1, (cpVect[]){p.ab}, RGBAColor(1, 1, 1, 1));
+	ChipmunkDebugDrawDot(5, p.ab, LAColor(1, 1));
 #endif
 	
 	cpFloat area2x = cpvcross(cpvsub(v1.ab, v0.ab), cpvadd(cpvsub(p.ab, v0.ab), cpvsub(p.ab, v1.ab)));
@@ -330,7 +330,7 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 		cpVect c = cpvlerp(v0.ab, v1.ab, 0.5);
 		ChipmunkDebugDrawSegment(c, cpvadd(c, cpvmult(cpvnormalize(n), 5.0)), RGBAColor(1, 0, 0, 1));
 		
-		ChipmunkDebugDrawPoints(5.0, 1, &p.ab, RGBAColor(1, 1, 1, 1));
+		ChipmunkDebugDrawDot(5.0, p.ab, LAColor(1, 1));
 #endif
 		
 		if(
@@ -380,26 +380,41 @@ static struct ClosestPoints
 GJK(const struct SupportContext *ctx, cpCollisionID *id)
 {
 #if DRAW_GJK || DRAW_EPA
+	int count1 = 1;
+	int count2 = 1;
+	
+	switch(ctx->shape1->klass->type){
+		case CP_SEGMENT_SHAPE: count1 = 2; break;
+		case CP_POLY_SHAPE: count1 = ((cpPolyShape *)ctx->shape1)->count; break;
+		default: break;
+	}
+	
+	switch(ctx->shape2->klass->type){
+		case CP_SEGMENT_SHAPE: count1 = 2; break;
+		case CP_POLY_SHAPE: count2 = ((cpPolyShape *)ctx->shape2)->count; break;
+		default: break;
+	}
+	
+	
 	// draw the minkowski difference origin
 	cpVect origin = cpvzero;
-	ChipmunkDebugDrawPoints(5.0, 1, &origin, RGBAColor(1,0,0,1));
+	ChipmunkDebugDrawDot(5.0, origin, RGBAColor(1,0,0,1));
 	
-	int mdiffCount = ctx->count1*ctx->count2;
+	int mdiffCount = count1*count2;
 	cpVect *mdiffVerts = alloca(mdiffCount*sizeof(cpVect));
 	
-	for(int i=0; i<ctx->count1; i++){
-		for(int j=0; j<ctx->count2; j++){
-			cpVect v1 = ShapePoint(ctx->count1, ctx->verts1, i).p;
-			cpVect v2 = ShapePoint(ctx->count2, ctx->verts2, j).p;
-			mdiffVerts[i*ctx->count2 + j] = cpvsub(v2, v1);
+	for(int i=0; i<count1; i++){
+		for(int j=0; j<count2; j++){
+			cpVect v = cpvsub(ShapePoint(ctx->shape2, j).p, ShapePoint(ctx->shape1, i).p);
+			mdiffVerts[i*count2 + j] = v;
+			ChipmunkDebugDrawDot(2.0, v, RGBAColor(1, 0, 0, 1));
 		}
 	}
 	 
 	cpVect *hullVerts = alloca(mdiffCount*sizeof(cpVect));
 	int hullCount = cpConvexHull(mdiffCount, mdiffVerts, hullVerts, NULL, 0.0);
 	
-	ChipmunkDebugDrawPolygon(hullCount, hullVerts, RGBAColor(1, 0, 0, 1), RGBAColor(1, 0, 0, 0.25));
-	ChipmunkDebugDrawPoints(2.0, mdiffCount, mdiffVerts, RGBAColor(1, 0, 0, 1));
+	ChipmunkDebugDrawPolygon(hullCount, hullVerts, 0.0, RGBAColor(1, 0, 0, 1), RGBAColor(1, 0, 0, 0.25));
 #endif
 	
 	struct MinkowskiPoint v0, v1;

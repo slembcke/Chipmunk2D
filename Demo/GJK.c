@@ -31,21 +31,16 @@
 static cpShape *shape1, *shape2;
 
 static void
-update(cpSpace *space)
+update(cpSpace *space, cpFloat dt)
 {
-	int steps = 1;
-	cpFloat dt = 1.0f/60.0f/(cpFloat)steps;
-	
-	for(int i=0; i<steps; i++){
-		cpSpaceStep(space, dt);
-	}
+	cpSpaceStep(space, dt);
 }
 
 static void
 draw(cpSpace *space)
 {
 	ChipmunkDemoDefaultDrawImpl(space);
-	cpContact arr[CP_MAX_CONTACTS_PER_ARBITER];
+	struct cpContact arr[CP_MAX_CONTACTS_PER_ARBITER];
 //	cpCollideShapes(shape1, shape2, (cpCollisionID[]){0}, arr);
 	cpCollisionInfo info = cpCollideShapes(shape2, shape1, 0x00000000, arr);
 }
@@ -59,26 +54,24 @@ init(void)
 	
 	cpFloat mass = 1.0f;
 	
-//	{
-//		cpFloat size = 100.0;
-//		
-//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
-//		cpBodySetPos(body, cpv(100.0, 50.0f));
-//		
-//		shape1 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
-//		cpPolyShapeSetRadius(shape1, 10.0);
-//		shape1->group = 1;
-//	}{
-//		cpFloat size = 100.0;
-//		
-//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
-//		cpBodySetPos(body, cpv(120.0, -40.0f));
-//		cpBodySetAngle(body, 1e-2);
-//		
-//		shape2 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
-//		cpPolyShapeSetRadius(shape2, 20.0);
-//		shape2->group = 1;
-//	}
+	{
+		cpFloat size = 100.0;
+		
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
+		cpBodySetPosition(body, cpv(100.0, 50.0f));
+		
+		shape1 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size, 0.0));
+		shape1->group = 1;
+	}{
+		cpFloat size = 100.0;
+		
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForBox(mass, size, size)));
+		cpBodySetPosition(body, cpv(120.0, -40.0f));
+		cpBodySetAngle(body, 1e-2);
+		
+		shape2 = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size, 0.0));
+		shape2->group = 1;
+	}
 	
 //	{
 //		cpFloat size = 100.0;
@@ -91,7 +84,7 @@ init(void)
 //		}
 //		
 //		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-//		cpBodySetPos(body, cpv(100.0, 50.0f));
+//		cpBodySetPosition(body, cpv(100.0, 50.0f));
 //		
 //		shape1 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 //		shape1->group = 1;
@@ -107,33 +100,33 @@ init(void)
 //		}
 //		
 //		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero)));
-//		cpBodySetPos(body, cpv(100.0, -50.0f));
+//		cpBodySetPosition(body, cpv(100.0, -50.0f));
 //		
 //		shape2 = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero));
 //		shape2->group = 1;
 //	}
-	
-	{
-		cpFloat size = 150.0;
-		cpFloat radius = 25.0;
-		
-		cpVect a = cpv( size/2.0, 0.0);
-		cpVect b = cpv(-size/2.0, 0.0);
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
-		cpBodySetPos(body, cpv(0, 25));
-		
-		shape1 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, radius));
-		shape1->group = 1;
-	}
-	{
-		cpFloat radius = 50.0;
-		
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero)));
-		cpBodySetPos(body, cpv(0, -25));
-		
-		shape2 = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
-		shape2->group = 2;
-	}
+//	
+//	{
+//		cpFloat size = 150.0;
+//		cpFloat radius = 25.0;
+//		
+//		cpVect a = cpv( size/2.0, 0.0);
+//		cpVect b = cpv(-size/2.0, 0.0);
+//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
+//		cpBodySetPosition(body, cpv(0, 25));
+//		
+//		shape1 = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, radius));
+//		shape1->group = 1;
+//	}
+//	{
+//		cpFloat radius = 50.0;
+//		
+//		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero)));
+//		cpBodySetPosition(body, cpv(0, -25));
+//		
+//		shape2 = cpSpaceAddShape(space, cpCircleShapeNew(body, radius, cpvzero));
+//		shape2->group = 1;
+//	}
 
 	return space;
 }
@@ -147,6 +140,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo GJK = {
 	"GJK",
+	1.0/60.0,
 	init,
 	update,
 	draw,
