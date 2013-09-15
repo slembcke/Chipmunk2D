@@ -52,11 +52,6 @@ typedef struct cpSegmentQueryInfo {
 	cpFloat alpha;
 } cpSegmentQueryInfo;
 
-struct cpMassInfo {
-	cpFloat area, i;
-	cpVect cog;
-};
-
 /// @private
 typedef enum cpShapeType{
 	CP_CIRCLE_SHAPE,
@@ -67,7 +62,6 @@ typedef enum cpShapeType{
 
 typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpVect p, cpVect rot);
 typedef void (*cpShapeDestroyImpl)(cpShape *shape);
-typedef struct cpMassInfo (*cpShapeMassInfoImpl)(cpShape *shape);
 typedef void (*cpShapePointQueryImpl)(cpShape *shape, cpVect p, cpPointQueryInfo *info);
 typedef void (*cpShapeSegmentQueryImpl)(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
 
@@ -77,7 +71,6 @@ struct cpShapeClass {
 	
 	cpShapeCacheDataImpl cacheData;
 	cpShapeDestroyImpl destroy;
-	cpShapeMassInfoImpl massInfo;
 	cpShapePointQueryImpl pointQuery;
 	cpShapeSegmentQueryImpl segmentQuery;
 };
@@ -91,6 +84,8 @@ struct cpShape {
 	
 	// Optional mass of the shape.
 	CP_PRIVATE(cpFloat m);
+	CP_PRIVATE(cpFloat i);
+	CP_PRIVATE(cpVect cog);
 
 	/// The current bounding box of the shape.
 	CP_PRIVATE(cpBB bb);

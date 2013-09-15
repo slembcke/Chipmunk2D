@@ -145,13 +145,13 @@ cpBodyActivate(cpBody *body)
 	if(body != NULL && !cpBodyIsRogue(body)){
 		body->node.idleTime = 0.0f;
 		ComponentActivate(ComponentRoot(body));
-	}
-	
-	CP_BODY_FOREACH_ARBITER(body, arb){
-		// Reset the idle timer of things the body is touching as well.
-		// That way things don't get left hanging in the air.
-		cpBody *other = (arb->body_a == body ? arb->body_b : arb->body_a);
-		if(!cpBodyIsStatic(other)) other->node.idleTime = 0.0f;
+		
+		CP_BODY_FOREACH_ARBITER(body, arb){
+			// Reset the idle timer of things the body is touching as well.
+			// That way things don't get left hanging in the air.
+			cpBody *other = (arb->body_a == body ? arb->body_b : arb->body_a);
+			if(!cpBodyIsStatic(other)) other->node.idleTime = 0.0f;
+		}
 	}
 }
 

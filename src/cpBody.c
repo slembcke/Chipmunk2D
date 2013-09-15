@@ -137,50 +137,37 @@ cpBodySanityCheck(cpBody *body)
 }
 #endif
 
+// Should only be called for a shape with mass info set.
 void
-cpBodyAddMassInfoForShape(cpBody *body, cpShape *shape)
+cpBodyAccumulateMassForShape(cpBody *body, cpShape *shape)
 {
-	cpFloat m = shape->m;
+	// Cache the position to realign it at the end.
+	cpVect pos = cpBodyGetPosition(body);
 	
-	if(m > 0.0f){
-		// Cache the position to realign it at the end.
-		cpVect pos = cpBodyGetPosition(body);
-		
-		struct cpMassInfo info = shape->klass->massInfo(shape);
-		cpFloat msum = body->m + m;
-		
-		body->i += m*info.i + cpvdistsq(body->cog, info.cog)*(m*body->m)/msum;
-		body->cog = cpvlerp(body->cog, info.cog, m/msum);
-		body->m = msum;
-		
-		body->m_inv = 1.0f/body->m;
-		body->i_inv = 1.0f/body->i;
-		
-		cpBodySetPosition(body, pos);
-	}
+	cpFloat msum = body->m + shape->m;
+	
+	body->i += shape->m*shape->i + cpvdistsq(body->cog, shape->cog)*(shape->m*body->m)/msum;
+	body->cog = cpvlerp(body->cog, shape->cog, shape->m/msum);
+	body->m = msum;
+	
+	body->m_inv = 1.0f/body->m;
+	body->i_inv = 1.0f/body->i;
+	
+	cpBodySetPosition(body, pos);
 }
 
+// Should only be called when shapes with mass info are modified.
 void
-cpBodyRemoveMassInfoForShape(cpBody *body, cpShape *shape)
+cpBodyAccumulateMass(cpBody *body)
 {
-	cpFloat m = shape->m;
+	body->m = body->i = 0.0f;
+	body->m_inv = body->i_inv = INFINITY;
 	
-	if(m > 0.0f){
-		// Cache the position to realign it at the end.
-		cpVect pos = cpBodyGetPosition(body);
-		
-		struct cpMassInfo info = shape->klass->massInfo(shape);
-		cpFloat msum = body->m;
-		
-		body->m = msum - m;
-		body->cog = cpvadd(body->cog, cpvmult(cpvsub(body->cog, info.cog), m/body->m));
-		body->i -= m*info.i - cpvdistsq(body->cog, info.cog)*body->m*m/(msum);
-		
-		body->m_inv = 1.0f/body->m;
-		body->i_inv = 1.0f/body->i;
-		
-		cpBodySetPosition(body, pos);
+	CP_BODY_FOREACH_SHAPE(body, shape){
+		cpBodyAccumulateMassForShape(body, shape);
 	}
+	
+	// TODO Can possibly create massless bodies here with no shapes.
 }
 
 void
@@ -214,7 +201,9 @@ cpBodyAddShape(cpBody *body, cpShape *shape)
 	shape->next = next;
 	body->shapeList = shape;
 	
-	cpBodyAddMassInfoForShape(body, shape);
+	if(shape->m > 0.0f){
+		cpBodyAccumulateMassForShape(body, shape);
+	}
 }
 
 void
@@ -236,7 +225,9 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
   shape->prev = NULL;
   shape->next = NULL;
 	
-	cpBodyRemoveMassInfoForShape(body, shape);
+	if(shape->m > 0.0f){
+		cpBodyAccumulateMass(body);
+	}
 }
 
 static cpConstraint *

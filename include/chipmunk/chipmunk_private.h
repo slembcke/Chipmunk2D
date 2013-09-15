@@ -80,8 +80,10 @@ void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);
 
 void cpBodyAddShape(cpBody *body, cpShape *shape);
 void cpBodyRemoveShape(cpBody *body, cpShape *shape);
-void cpBodyAddMassInfoForShape(cpBody *body, cpShape *shape);
-void cpBodyRemoveMassInfoForShape(cpBody *body, cpShape *shape);
+
+void cpBodyAccumulateMassForShape(cpBody *body, cpShape *shape);
+void cpBodyAccumulateMass(cpBody *body);
+
 void cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint);
 
 
@@ -189,7 +191,7 @@ cpClosetPointOnSegment(const cpVect p, const cpVect a, const cpVect b)
 	return cpvadd(b, cpvmult(delta, t));
 }
 
-cpShape* cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body);
+cpShape *cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body, cpVect cog, cpFloat moment);
 
 static inline cpBool
 cpShapeActive(cpShape *shape)

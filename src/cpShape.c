@@ -37,8 +37,8 @@ cpResetShapeIdCounter(void)
 }
 
 
-cpShape*
-cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
+cpShape *
+cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body, cpVect cog, cpFloat moment)
 {
 	shape->klass = klass;
 	
@@ -47,6 +47,9 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 	
 	shape->body = body;
 	shape->m = 0.0f;
+	shape->i = moment;
+	shape->cog = cog;
+	
 	shape->sensor = 0;
 	
 	shape->e = 0.0f;
@@ -94,9 +97,8 @@ cpShapeSetMass(cpShape *shape, cpFloat mass){
 	cpBody *body = shape->body;
 	cpBodyActivate(body);
 	
-	cpBodyRemoveMassInfoForShape(body, shape);
 	shape->m = mass;
-	cpBodyAddMassInfoForShape(body, shape);
+	cpBodyAccumulateMass(body);
 }
 
 
@@ -165,18 +167,6 @@ cpCircleShapeCacheData(cpCircleShape *circle, cpVect p, cpVect rot)
 	return cpBBNewForCircle(c, circle->r);
 }
 
-static struct cpMassInfo
-cpCircleShapeMassInfo(cpCircleShape *circle, cpFloat density)
-{
-	struct cpMassInfo info = {
-		cpAreaForCircle(0.0f, circle->r),
-		cpMomentForCircle(1.0f, 0.0f, circle->r, cpvzero),
-		circle->c
-	};
-	
-	return info;
-}
-
 static void
 cpCicleShapePointQuery(cpCircleShape *circle, cpVect p, cpPointQueryInfo *info)
 {
@@ -202,7 +192,6 @@ static const cpShapeClass cpCircleShapeClass = {
 	CP_CIRCLE_SHAPE,
 	(cpShapeCacheDataImpl)cpCircleShapeCacheData,
 	NULL,
-	(cpShapeMassInfoImpl)cpCircleShapeMassInfo,
 	(cpShapePointQueryImpl)cpCicleShapePointQuery,
 	(cpShapeSegmentQueryImpl)cpCircleShapeSegmentQuery,
 };
@@ -213,7 +202,8 @@ cpCircleShapeInit(cpCircleShape *circle, cpBody *body, cpFloat radius, cpVect of
 	circle->c = offset;
 	circle->r = radius;
 	
-	cpShapeInit((cpShape *)circle, &cpCircleShapeClass, body);
+	cpFloat moment = cpMomentForCircle(1.0f, 0.0f, radius, cpvzero);
+	cpShapeInit((cpShape *)circle, &cpCircleShapeClass, body, circle->c, moment);
 	
 	return circle;
 }
@@ -260,19 +250,6 @@ cpSegmentShapeCacheData(cpSegmentShape *seg, cpVect p, cpVect rot)
 	
 	cpFloat rad = seg->r;
 	return cpBBNew(l - rad, b - rad, r + rad, t + rad);
-}
-
-static struct cpMassInfo
-cpSegmentShapeMassInfo(cpSegmentShape *segment, cpFloat density)
-{
-	cpFloat w = 2.0f*segment->r;
-	struct cpMassInfo info = {
-		cpAreaForSegment(segment->a, segment->b, segment->r),
-		cpMomentForBox(1.0f, cpvdist(segment->a, segment->b) + w, w), // TODO is an approximation.
-		cpvlerp(segment->a, segment->b, 0.5f)
-	};
-	
-	return info;
 }
 
 static void
@@ -339,7 +316,6 @@ static const cpShapeClass cpSegmentShapeClass = {
 	CP_SEGMENT_SHAPE,
 	(cpShapeCacheDataImpl)cpSegmentShapeCacheData,
 	NULL,
-	(cpShapeMassInfoImpl)cpSegmentShapeMassInfo,
 	(cpShapePointQueryImpl)cpSegmentShapePointQuery,
 	(cpShapeSegmentQueryImpl)cpSegmentShapeSegmentQuery,
 };
@@ -356,7 +332,11 @@ cpSegmentShapeInit(cpSegmentShape *seg, cpBody *body, cpVect a, cpVect b, cpFloa
 	seg->a_tangent = cpvzero;
 	seg->b_tangent = cpvzero;
 	
-	cpShapeInit((cpShape *)seg, &cpSegmentShapeClass, body);
+	cpFloat w = 2.0f*seg->r;
+//		cpAreaForSegment(seg->a, seg->b, seg->r),
+	cpVect cog = cpvlerp(seg->a, seg->b, 0.5f);
+	cpFloat moment = cpMomentForBox(1.0f, cpvdist(seg->a, seg->b) + w, w); // TODO is an approximation.
+	cpShapeInit((cpShape *)seg, &cpSegmentShapeClass, body, cog, moment);
 	
 	return seg;
 }

@@ -80,19 +80,6 @@ cpPolyShapeDestroy(cpPolyShape *poly)
 	cpfree(poly->planes);
 }
 
-static struct cpMassInfo
-cpPolyShapeMassInfo(cpPolyShape *poly, cpFloat density)
-{
-		cpVect centroid = cpCentroidForPoly(poly->count, poly->verts);
-		struct cpMassInfo info = {
-			cpAreaForPoly(poly->count, poly->verts),
-			cpMomentForPoly(1.0f, poly->count, poly->verts, cpvneg(centroid)),
-			centroid
-		};
-		
-		return info;
-}
-
 static void
 cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	int count = poly->count;
@@ -179,7 +166,6 @@ static const cpShapeClass polyClass = {
 	CP_POLY_SHAPE,
 	(cpShapeCacheDataImpl)cpPolyShapeCacheData,
 	(cpShapeDestroyImpl)cpPolyShapeDestroy,
-	(cpShapeMassInfoImpl)cpPolyShapeMassInfo,
 	(cpShapePointQueryImpl)cpPolyShapePointQuery,
 	(cpShapeSegmentQueryImpl)cpPolyShapeSegmentQuery,
 };
@@ -254,9 +240,12 @@ setUpVerts(cpPolyShape *poly, int count, const cpVect *verts, cpVect offset)
 cpPolyShape *
 cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int count, const cpVect *verts, cpVect offset, cpFloat radius)
 {
-	setUpVerts(poly, count, verts, offset);
-	cpShapeInit((cpShape *)poly, &polyClass, body);
 	poly->r = radius;
+	setUpVerts(poly, count, verts, offset);
+	
+	cpVect centroid = cpCentroidForPoly(poly->count, poly->verts);
+	cpFloat moment = cpMomentForPoly(1.0f, poly->count, poly->verts, cpvneg(centroid));
+	cpShapeInit((cpShape *)poly, &polyClass, body, centroid, moment);
 
 	return poly;
 }

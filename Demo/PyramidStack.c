@@ -62,17 +62,15 @@ init(void)
 	
 	cpFloat s = 150.0;
 	shape = cpSpaceAddShape(space, cpBoxShapeNew2(body, cpBBNew(0, 0, s, s), 0.0));
-//	cpShapeSetMass(shape, 1.0);
+	cpShapeSetMass(shape, 1.0);
 	cpShapeSetElasticity(shape, 0.0f);
 	cpShapeSetFriction(shape, 0.8f);
-	
-	cpSpaceRemoveShape(space, shape);
 	
 	body = cpSpaceAddBody(space, cpBodyNew(0.0f, 0.0f));
 	cpBodySetPosition(body, cpv(0.0, 0.0));
 	
 	shape = cpSpaceAddShape(space, cpBoxShapeNew2(body, cpBBNew(-s, 0, 0, s), 0.0));
-//	cpShapeSetMass(shape, 1.0);
+	cpShapeSetMass(shape, 1.0);
 	cpShapeSetElasticity(shape, 0.0f);
 	cpShapeSetFriction(shape, 0.8f);
 	
