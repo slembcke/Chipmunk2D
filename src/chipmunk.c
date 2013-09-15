@@ -100,7 +100,7 @@ cpAreaForPoly(const int count, const cpVect *verts)
 {
 	cpFloat area = 0.0f;
 	for(int i=0; i<count; i++){
-		area += cpvcross(verts[i], verts[(i+1)%count]);
+		area += cpvcross(verts[(i+1)%count], verts[i]);
 	}
 	
 	return -area/2.0f;
@@ -187,7 +187,7 @@ QHullPartition(cpVect *verts, int count, cpVect a, cpVect b, cpFloat tol)
 	
 	int head = 0;
 	for(int tail = count-1; head <= tail;){
-		cpFloat value = cpvcross(delta, cpvsub(verts[head], a));
+		cpFloat value = cpvcross(cpvsub(verts[head], a), delta);
 		if(value > valueTol){
 			if(value > max){
 				max = value;

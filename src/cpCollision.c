@@ -26,7 +26,7 @@
 
 #if DEBUG && 1
 #include "ChipmunkDemo.h"
-#define DRAW_ALL 1
+#define DRAW_ALL 0
 #define DRAW_GJK (0 || DRAW_ALL)
 #define DRAW_EPA (0 || DRAW_ALL)
 #define DRAW_CLOSEST (0 || DRAW_ALL)
@@ -168,7 +168,7 @@ SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 	int i2 = (i1 + 1)%count;
 	
 	cpVect *verts = poly->tVerts;
-	if(cpvdot(n, poly->tPlanes[i1].n) > cpvdot(n, poly->tPlanes[i2].n)){
+	if(cpvdot(n, poly->tPlanes[i1].n) < cpvdot(n, poly->tPlanes[i2].n)){
 		return (struct Edge){{verts[i0], CP_HASH_PAIR(poly, i0)}, {verts[i1], CP_HASH_PAIR(poly, i1)}, poly->r, poly->tPlanes[i1].n};
 	} else {
 		return (struct Edge){{verts[i1], CP_HASH_PAIR(poly, i1)}, {verts[i2], CP_HASH_PAIR(poly, i2)}, poly->r, poly->tPlanes[i2].n};
@@ -439,6 +439,10 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 {
 	cpFloat mindist = e1.r + e2.r;
 	if(points.d <= mindist){
+#ifdef DRAW_CLIP
+	ChipmunkDebugDrawFatSegment(e1.a.p, e1.b.p, e1.r, RGBAColor(0, 1, 0, 1), LAColor(0, 0));
+	ChipmunkDebugDrawFatSegment(e2.a.p, e2.b.p, e2.r, RGBAColor(1, 0, 0, 1), LAColor(0, 0));
+#endif
 		cpVect n = info->n = points.n;
 		
 		// Distances along the axis parallel to n
@@ -454,8 +458,7 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 			cpVect p1 = cpvadd(cpvmult(n,  e1.r), cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_b - d_e1_a)*e1_denom)));
 			cpVect p2 = cpvadd(cpvmult(n, -e2.r), cpvlerp(e2.a.p, e2.b.p, cpfclamp01((d_e1_a - d_e2_a)*e2_denom)));
 			cpFloat dist = cpvdot(cpvsub(p2, p1), n);
-			if(dist <= 0.0f)
-			{
+			if(dist <= 0.0f){
 				cpHashValue hash_1a2b = CP_HASH_PAIR(e1.a.hash, e2.b.hash);
 				cpCollisionInfoPushContact(info, p1, p2, hash_1a2b);
 			}
@@ -463,8 +466,7 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 			cpVect p1 = cpvadd(cpvmult(n,  e1.r), cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_a - d_e1_a)*e1_denom)));
 			cpVect p2 = cpvadd(cpvmult(n, -e2.r), cpvlerp(e2.a.p, e2.b.p, cpfclamp01((d_e1_b - d_e2_a)*e2_denom)));
 			cpFloat dist = cpvdot(cpvsub(p2, p1), n);
-			if(dist <= 0.0f)
-			{
+			if(dist <= 0.0f){
 				cpHashValue hash_1b2a = CP_HASH_PAIR(e1.b.hash, e2.a.hash);
 				cpCollisionInfoPushContact(info, p1, p2, hash_1b2a);
 			}
@@ -651,12 +653,9 @@ cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, struct cpContact *cont
 	if(cfunc) cfunc(a, b, &info);
 	
 //	if(0){
-//		cpBody *a = info.a->body;
-//		cpBody *b = info.b->body;
-//		
 //		for(int i=0; i<info.count; i++){
-//			cpVect r1 = cpvadd(a->p, info.arr[i].r1);
-//			cpVect r2 = cpvadd(b->p, info.arr[i].r2);
+//			cpVect r1 = info.arr[i].r1;
+//			cpVect r2 = info.arr[i].r2;
 //			cpVect mid = cpvlerp(r1, r2, 0.5f);
 //			
 //			ChipmunkDebugDrawSegment(r1, mid, RGBAColor(1, 0, 0, 1));

@@ -94,7 +94,7 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	cpBool outside = cpFalse;
 	
 	for(int i=0; i<count; i++){
-		if(cpSplittingPlaneCompare(planes[i], p) > 0.0f) outside = cpTrue;
+		if(cpSplittingPlaneCompare(planes[i], p) < 0.0f) outside = cpTrue;
 		
 		cpVect v1 = verts[i];
 		cpVect closest = cpClosetPointOnSegment(p, v0, v1);
