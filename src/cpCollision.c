@@ -168,7 +168,7 @@ SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 	int i2 = (i1 + 1)%count;
 	
 	cpVect *verts = poly->tVerts;
-	if(cpvdot(n, poly->tPlanes[i1].n) < cpvdot(n, poly->tPlanes[i2].n)){
+	if(cpvdot(n, poly->tPlanes[i1].n) > cpvdot(n, poly->tPlanes[i2].n)){
 		return (struct Edge){{verts[i0], CP_HASH_PAIR(poly, i0)}, {verts[i1], CP_HASH_PAIR(poly, i1)}, poly->r, poly->tPlanes[i1].n};
 	} else {
 		return (struct Edge){{verts[i1], CP_HASH_PAIR(poly, i1)}, {verts[i2], CP_HASH_PAIR(poly, i2)}, poly->r, poly->tPlanes[i2].n};
