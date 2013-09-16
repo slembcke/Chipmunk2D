@@ -118,7 +118,6 @@
 		D3F2EE2F14F898E9005FD439 /* Unicycle.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F2EE2E14F898E9005FD439 /* Unicycle.c */; };
 		D3F52BD313C509DC00EB67D9 /* Chains.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F52BD213C509DC00EB67D9 /* Chains.c */; };
 		D3F6EEDF156D581300A158A8 /* Convex.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F6EEDE156D581300A158A8 /* Convex.c */; };
-		D3F7695017E6190E00D03DD9 /* GJK.c in Sources */ = {isa = PBXBuildFile; fileRef = D3F7694F17E618D900D03DD9 /* GJK.c */; };
 		D3FBA1A70E9B1E0400950BCC /* ChipmunkDebugDraw.c in Sources */ = {isa = PBXBuildFile; fileRef = D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */; };
 /* End PBXBuildFile section */
 
@@ -234,7 +233,6 @@
 		D3F2EE2E14F898E9005FD439 /* Unicycle.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Unicycle.c; sourceTree = "<group>"; };
 		D3F52BD213C509DC00EB67D9 /* Chains.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Chains.c; sourceTree = "<group>"; };
 		D3F6EEDE156D581300A158A8 /* Convex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Convex.c; sourceTree = "<group>"; };
-		D3F7694F17E618D900D03DD9 /* GJK.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = GJK.c; sourceTree = "<group>"; };
 		D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ChipmunkDebugDraw.c; sourceTree = "<group>"; };
 		D3FBA1B80E9B1F6300950BCC /* ChipmunkDebugDraw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChipmunkDebugDraw.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -405,7 +403,6 @@
 		D3CCDF5B0AE35DA00080442F /* Demo */ = {
 			isa = PBXGroup;
 			children = (
-				D3F7694F17E618D900D03DD9 /* GJK.c */,
 				D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */,
 				D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */,
 				D3EEF8A217BAB5C0006B62EB /* ChipmunkDemoShaderSupport.h */,
@@ -730,7 +727,6 @@
 				D31847750FC458FD00E30B0D /* Query.c in Sources */,
 				D3BACF8310B5DF8900376394 /* OneWay.c in Sources */,
 				D3BAD65810B8B52900376394 /* Player.c in Sources */,
-				D3F7695017E6190E00D03DD9 /* GJK.c in Sources */,
 				D3238F8210C1B5ED00C4BDC2 /* Joints.c in Sources */,
 				D3102B171119FD3000E77771 /* Tank.c in Sources */,
 				D3E4867613175AE000A00840 /* Bench.c in Sources */,
@@ -897,12 +893,12 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				HEADER_SEARCH_PATHS = (
 					../include/chipmunk,
 					"\"$(SRCROOT)/libglfw/include\"",
 					"\"$(SRCROOT)/libGLEW/include\"",
 				);
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				INFOPLIST_FILE = "main-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -934,12 +930,12 @@
 				GCC_AUTO_VECTORIZATION = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				HEADER_SEARCH_PATHS = (
 					../include/chipmunk,
 					"\"$(SRCROOT)/libglfw/include\"",
 					"\"$(SRCROOT)/libGLEW/include\"",
 				);
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				INFOPLIST_FILE = "main-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (

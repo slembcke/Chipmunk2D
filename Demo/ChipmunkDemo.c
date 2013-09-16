@@ -479,7 +479,8 @@ SetupGLFW()
 	glfwSetMouseButtonCallback(Click);
 }
 
-void TimeTrial(int index, int count)
+static void
+TimeTrial(int index, int count)
 {
 	space = demos[index].initFunc();
 	
@@ -529,7 +530,6 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
-		GJK,
 		LogoSmash,
 		PyramidStack,
 		Plink,
@@ -572,7 +572,7 @@ main(int argc, const char **argv)
 	if(trial){
 		cpAssertHard(glfwInit(), "Error initializing GLFW.");
 //		sleep(1);
-		for(int i=0; i<demo_count; i++) TimeTrial(i, 1000, 5);
+		for(int i=0; i<demo_count; i++) TimeTrial(i, 1000);
 //		time_trial('d' - 'a', 10000);
 		exit(0);
 	} else {
