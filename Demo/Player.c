@@ -44,7 +44,7 @@ static cpBool lastJumpState = cpFalse;
 
 static void
 SelectPlayerGroundNormal(cpBody *body, cpArbiter *arb, cpVect *groundNormal){
-	cpVect n = cpvneg(cpArbiterGetNormal(arb, 0));
+	cpVect n = cpvneg(cpArbiterGetNormal(arb));
 	
 	if(n.y > groundNormal->y){
 		(*groundNormal) = n;
@@ -140,7 +140,7 @@ init(void)
 	body->velocity_func = playerUpdateVelocity;
 	playerBody = body;
 
-	shape = cpSpaceAddShape(space, cpBoxShapeNew3(body, cpBBNew(-15.0, -27.5, 15.0, 27.5), 10.0));
+	shape = cpSpaceAddShape(space, cpBoxShapeNew2(body, cpBBNew(-15.0, -27.5, 15.0, 27.5), 10.0));
 //	shape = cpSpaceAddShape(space, cpSegmentShapeNew(playerBody, cpvzero, cpv(0, radius), radius));
 	shape->e = 0.0f; shape->u = 0.0f;
 	shape->collision_type = 1;
@@ -152,7 +152,7 @@ init(void)
 			body = cpSpaceAddBody(space, cpBodyNew(4.0f, INFINITY));
 			body->p = cpv(100 + j*60, -200 + i*60);
 			
-			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 50, 50));
+			shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 50, 50, 0.0));
 			shape->e = 0.0f; shape->u = 0.7f;
 		}
 	}

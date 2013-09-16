@@ -203,9 +203,6 @@ cpSpaceAddCollisionHandler(
 ){
 	cpAssertSpaceUnlocked(space);
 	
-	// Remove any old function so the new one will get added.
-	cpSpaceRemoveCollisionHandler(space, a, b);
-	
 	cpCollisionHandler handler = {
 		a, b,
 		begin ? begin : alwaysCollide,
@@ -216,16 +213,6 @@ cpSpaceAddCollisionHandler(
 	};
 	
 	cpHashSetInsert(space->collisionHandlers, CP_HASH_PAIR(a, b), &handler, NULL, (cpHashSetTransFunc)handlerSetTrans);
-}
-
-void
-cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
-{
-	cpAssertSpaceUnlocked(space);
-	
-	struct { cpCollisionType a, b; } ids = {a, b};
-	cpCollisionHandler *old_handler = (cpCollisionHandler *) cpHashSetRemove(space->collisionHandlers, CP_HASH_PAIR(a, b), &ids);
-	cpfree(old_handler);
 }
 
 void
@@ -253,6 +240,23 @@ cpSpaceSetDefaultCollisionHandler(
 }
 
 //MARK: Body, Shape, and Joint Management
+static cpShape *
+cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
+{
+	cpAssertHard(shape->space != space, "You have already added this shape to this space. You must not add it a second time.");
+	cpAssertHard(!shape->space, "You have already added this shape to another space. You cannot add it to a second.");
+	cpAssertHard(cpBodyIsRogue(shape->body), "You are adding a static shape to a dynamic body. Did you mean to attach it to a static or rogue body? See the documentation for more information.");
+	cpAssertSpaceUnlocked(space);
+	
+	cpBody *body = shape->body;
+	cpBodyAddShape(body, shape);
+	cpShapeUpdate(shape, body->p, body->rot);
+	cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
+	shape->space = space;
+	
+	return shape;
+}
+
 cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
@@ -270,23 +274,6 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
 	shape->space = space;
 		
-	return shape;
-}
-
-cpShape *
-cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
-{
-	cpAssertHard(shape->space != space, "You have already added this shape to this space. You must not add it a second time.");
-	cpAssertHard(!shape->space, "You have already added this shape to another space. You cannot add it to a second.");
-	cpAssertHard(cpBodyIsRogue(shape->body), "You are adding a static shape to a dynamic body. Did you mean to attach it to a static or rogue body? See the documentation for more information.");
-	cpAssertSpaceUnlocked(space);
-	
-	cpBody *body = shape->body;
-	cpBodyAddShape(body, shape);
-	cpShapeUpdate(shape, body->p, body->rot);
-	cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
-	shape->space = space;
-	
 	return shape;
 }
 
@@ -365,6 +352,20 @@ cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter)
 	} cpSpaceUnlock(space, cpTrue);
 }
 
+static void
+cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
+{
+	cpAssertHard(cpSpaceContainsShape(space, shape), "Cannot remove a static or sleeping shape that was not added to the space. (Removed twice maybe?)");
+	cpAssertSpaceUnlocked(space);
+	
+	cpBody *body = shape->body;
+	if(cpBodyIsStatic(body)) cpBodyActivateStatic(body, shape);
+	cpBodyRemoveShape(body, shape);
+	cpSpaceFilterArbiters(space, body, shape);
+	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
+	shape->space = NULL;
+}
+
 void
 cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
@@ -381,20 +382,6 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
 		shape->space = NULL;
 	}
-}
-
-void
-cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
-{
-	cpAssertHard(cpSpaceContainsShape(space, shape), "Cannot remove a static or sleeping shape that was not added to the space. (Removed twice maybe?)");
-	cpAssertSpaceUnlocked(space);
-	
-	cpBody *body = shape->body;
-	if(cpBodyIsStatic(body)) cpBodyActivateStatic(body, shape);
-	cpBodyRemoveShape(body, shape);
-	cpSpaceFilterArbiters(space, body, shape);
-	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
-	shape->space = NULL;
 }
 
 void
@@ -451,8 +438,8 @@ cpSpaceConvertBodyToStatic(cpSpace *space, cpBody *body)
 	cpBodySetMass(body, INFINITY);
 	cpBodySetMoment(body, INFINITY);
 	
-	cpBodySetVel(body, cpvzero);
-	cpBodySetAngVel(body, 0.0f);
+	cpBodySetVelocity(body, cpvzero);
+	cpBodySetAngularVelocity(body, 0.0f);
 	
 	body->node.idleTime = INFINITY;
 	CP_BODY_FOREACH_SHAPE(body, shape){

@@ -33,7 +33,7 @@ update(cpSpace *space, double dt)
 {
 	cpFloat tolerance = 2.0;
 	
-	if(ChipmunkDemoRightClick && cpShapeNearestPointQuery(shape, ChipmunkDemoMouse, NULL) > tolerance){
+	if(ChipmunkDemoRightClick && cpShapePointQuery(shape, ChipmunkDemoMouse, NULL) > tolerance){
 		cpBody *body = cpShapeGetBody(shape);
 		int count = cpPolyShapeGetNumVerts(shape);
 		
@@ -44,11 +44,11 @@ update(cpSpace *space, double dt)
 			verts[i] = cpPolyShapeGetVert(shape, i);
 		}
 		
-		verts[count] = cpBodyWorld2Local(body, ChipmunkDemoMouse);
+		verts[count] = cpBodyWorldToLocal(body, ChipmunkDemoMouse);
 		
 		// This function builds a convex hull for the vertexes.
-		// Because the result array is NULL, it will reduce the input array instead.
-		int hullCount = cpConvexHull(count + 1, verts, NULL, NULL, tolerance);
+		// Because the result array is the same as verts, it will reduce it in place.
+		int hullCount = cpConvexHull(count + 1, verts, verts, NULL, tolerance);
 		
 		// Figure out how much to shift the body by.
 		cpVect centroid = cpCentroidForPoly(hullCount, verts);
@@ -57,7 +57,7 @@ update(cpSpace *space, double dt)
 		cpFloat mass = cpAreaForPoly(hullCount, verts)*DENSITY;
 		cpBodySetMass(body, mass);
 		cpBodySetMoment(body, cpMomentForPoly(mass, hullCount, verts, cpvneg(centroid)));
-		cpBodySetPos(body, cpBodyLocal2World(body, centroid));
+		cpBodySetPosition(body, cpBodyLocalToWorld(body, centroid));
 		
 		// Use the setter function from chipmunk_unsafe.h.
 		// You could also remove and recreate the shape if you wanted.
@@ -93,7 +93,7 @@ init(void)
 	
 	body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 	
-	shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+	shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height, 0.0));
 	cpShapeSetFriction(shape, 0.6f);
 		
 	return space;

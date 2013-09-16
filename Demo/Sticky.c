@@ -28,98 +28,99 @@ enum {
 
 #define STICK_SENSOR_THICKNESS 2.5f
 
-static void
-PostStepAddJoint(cpSpace *space, void *key, void *data)
-{
-//	printf("Adding joint for %p\n", data);
-	
-	cpConstraint *joint = (cpConstraint *)key;
-	cpSpaceAddConstraint(space, joint);
-}
-
-static cpBool
-StickyPreSolve(cpArbiter *arb, cpSpace *space, void *data)
-{
-	// We want to fudge the collisions a bit to allow shapes to overlap more.
-	// This simulates their squishy sticky surface, and more importantly
-	// keeps them from separating and destroying the joint.
-	
-	// Track the deepest collision point and use that to determine if a rigid collision should occur.
-	cpFloat deepest = INFINITY;
-	
-	// Grab the contact set and iterate over them.
-	cpContactPointSet contacts = cpArbiterGetContactPointSet(arb);
-	for(int i=0; i<contacts.count; i++){
-		// Increase the distance (negative means overlaping) of the
-		// collision to allow them to overlap more.
-		// This value is used only for fixing the positions of overlapping shapes.
-		cpFloat dist = contacts.points[i].dist + 2.0f*STICK_SENSOR_THICKNESS;
-		contacts.points[i].dist = cpfmin(0.0f, dist);
-		deepest = cpfmin(deepest, dist);
-	}
-	
-	// Set the new contact point data.
-	cpArbiterSetContactPointSet(arb, &contacts);
-	
-	// If the shapes are overlapping enough, then create a
-	// joint that sticks them together at the first contact point.
-	if(!cpArbiterGetUserData(arb) && deepest <= 0.0f){
-		CP_ARBITER_GET_BODIES(arb, bodyA, bodyB);
-		
-		// Create a joint at the contact point to hold the body in place.
-		cpConstraint *joint = cpPivotJointNew(bodyA, bodyB, contacts.points[0].point);
-		
-		// Give it a finite force for the stickyness.
-		cpConstraintSetMaxForce(joint, 3e3);
-		
-		// Schedule a post-step() callback to add the joint.
-		cpSpaceAddPostStepCallback(space, PostStepAddJoint, joint, NULL);
-		
-		// Store the joint on the arbiter so we can remove it later.
-		cpArbiterSetUserData(arb, joint);
-	}
-	
-	// Position correction and velocity are handled separately so changing
-	// the overlap distance alone won't prevent the collision from occuring.
-	// Explicitly the collision for this frame if the shapes don't overlap using the new distance.
-	return (deepest <= 0.0f);
-	
-	// Lots more that you could improve upon here as well:
-	// * Modify the joint over time to make it plastic.
-	// * Modify the joint in the post-step to make it conditionally plastic (like clay).
-	// * Track a joint for the deepest contact point instead of the first.
-	// * Track a joint for each contact point. (more complicated since you only get one data pointer).
-}
-
-static void
-PostStepRemoveJoint(cpSpace *space, void *key, void *data)
-{
-//	printf("Removing joint for %p\n", data);
-	
-	cpConstraint *joint = (cpConstraint *)key;
-	cpSpaceRemoveConstraint(space, joint);
-	cpConstraintFree(joint);
-}
-
-static void
-StickySeparate(cpArbiter *arb, cpSpace *space, void *data)
-{
-	cpConstraint *joint = (cpConstraint *)cpArbiterGetUserData(arb);
-	
-	if(joint){
-		// The joint won't be removed until the step is done.
-		// Need to disable it so that it won't apply itself.
-		// Setting the force to 0 will do just that
-		cpConstraintSetMaxForce(joint, 0.0f);
-		
-		// Perform the removal in a post-step() callback.
-		cpSpaceAddPostStepCallback(space, PostStepRemoveJoint, joint, NULL);
-		
-		// NULL out the reference to the joint.
-		// Not required, but it's a good practice.
-		cpArbiterSetUserData(arb, NULL);
-	}
-}
+// TODO: Reimplement
+//static void
+//PostStepAddJoint(cpSpace *space, void *key, void *data)
+//{
+////	printf("Adding joint for %p\n", data);
+//	
+//	cpConstraint *joint = (cpConstraint *)key;
+//	cpSpaceAddConstraint(space, joint);
+//}
+//
+//static cpBool
+//StickyPreSolve(cpArbiter *arb, cpSpace *space, void *data)
+//{
+//	// We want to fudge the collisions a bit to allow shapes to overlap more.
+//	// This simulates their squishy sticky surface, and more importantly
+//	// keeps them from separating and destroying the joint.
+//	
+//	// Track the deepest collision point and use that to determine if a rigid collision should occur.
+//	cpFloat deepest = INFINITY;
+//	
+//	// Grab the contact set and iterate over them.
+//	cpContactPointSet contacts = cpArbiterGetContactPointSet(arb);
+//	for(int i=0; i<contacts.count; i++){
+//		// Increase the distance (negative means overlaping) of the
+//		// collision to allow them to overlap more.
+//		// This value is used only for fixing the positions of overlapping shapes.
+//		cpFloat dist = contacts.points[i].dist + 2.0f*STICK_SENSOR_THICKNESS;
+//		contacts.points[i].dist = cpfmin(0.0f, dist);
+//		deepest = cpfmin(deepest, dist);
+//	}
+//	
+//	// Set the new contact point data.
+//	cpArbiterSetContactPointSet(arb, &contacts);
+//	
+//	// If the shapes are overlapping enough, then create a
+//	// joint that sticks them together at the first contact point.
+//	if(!cpArbiterGetUserData(arb) && deepest <= 0.0f){
+//		CP_ARBITER_GET_BODIES(arb, bodyA, bodyB);
+//		
+//		// Create a joint at the contact point to hold the body in place.
+//		cpConstraint *joint = cpPivotJointNew(bodyA, bodyB, contacts.points[0].point);
+//		
+//		// Give it a finite force for the stickyness.
+//		cpConstraintSetMaxForce(joint, 3e3);
+//		
+//		// Schedule a post-step() callback to add the joint.
+//		cpSpaceAddPostStepCallback(space, PostStepAddJoint, joint, NULL);
+//		
+//		// Store the joint on the arbiter so we can remove it later.
+//		cpArbiterSetUserData(arb, joint);
+//	}
+//	
+//	// Position correction and velocity are handled separately so changing
+//	// the overlap distance alone won't prevent the collision from occuring.
+//	// Explicitly the collision for this frame if the shapes don't overlap using the new distance.
+//	return (deepest <= 0.0f);
+//	
+//	// Lots more that you could improve upon here as well:
+//	// * Modify the joint over time to make it plastic.
+//	// * Modify the joint in the post-step to make it conditionally plastic (like clay).
+//	// * Track a joint for the deepest contact point instead of the first.
+//	// * Track a joint for each contact point. (more complicated since you only get one data pointer).
+//}
+//
+//static void
+//PostStepRemoveJoint(cpSpace *space, void *key, void *data)
+//{
+////	printf("Removing joint for %p\n", data);
+//	
+//	cpConstraint *joint = (cpConstraint *)key;
+//	cpSpaceRemoveConstraint(space, joint);
+//	cpConstraintFree(joint);
+//}
+//
+//static void
+//StickySeparate(cpArbiter *arb, cpSpace *space, void *data)
+//{
+//	cpConstraint *joint = (cpConstraint *)cpArbiterGetUserData(arb);
+//	
+//	if(joint){
+//		// The joint won't be removed until the step is done.
+//		// Need to disable it so that it won't apply itself.
+//		// Setting the force to 0 will do just that
+//		cpConstraintSetMaxForce(joint, 0.0f);
+//		
+//		// Perform the removal in a post-step() callback.
+//		cpSpaceAddPostStepCallback(space, PostStepRemoveJoint, joint, NULL);
+//		
+//		// NULL out the reference to the joint.
+//		// Not required, but it's a good practice.
+//		cpArbiterSetUserData(arb, NULL);
+//	}
+//}
 
 static void
 update(cpSpace *space, double dt)
@@ -170,14 +171,14 @@ init(void)
 		cpFloat radius = 10.0f;
 		
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForCircle(mass, 0.0f, radius, cpvzero)));
-		cpBodySetPos(body, cpv(cpflerp(-150.0f, 150.0f, frand()), cpflerp(-150.0f, 150.0f, frand())));
+		cpBodySetPosition(body, cpv(cpflerp(-150.0f, 150.0f, frand()), cpflerp(-150.0f, 150.0f, frand())));
 
 		cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(body, radius + STICK_SENSOR_THICKNESS, cpvzero));
 		cpShapeSetFriction(shape, 0.9f);
 		cpShapeSetCollisionType(shape, COLLIDE_STICK_SENSOR);
 	}
 	
-	cpSpaceAddCollisionHandler(space, COLLIDE_STICK_SENSOR, COLLIDE_STICK_SENSOR, NULL, StickyPreSolve, NULL, StickySeparate, NULL);
+//	cpSpaceAddCollisionHandler(space, COLLIDE_STICK_SENSOR, COLLIDE_STICK_SENSOR, NULL, StickyPreSolve, NULL, StickySeparate, NULL);
 	
 	return space;
 }

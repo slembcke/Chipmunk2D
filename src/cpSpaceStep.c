@@ -90,7 +90,7 @@ cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
 				cpPostStepFunc func = callback->func;
 				
 				// Mark the func as NULL in case calling it calls cpSpaceRunPostStepCallbacks() again.
-				// TODO need more tests around this case I think.
+				// TODO: need more tests around this case I think.
 				callback->func = NULL;
 				if(func) func(space, callback->key, callback->data);
 				
@@ -112,10 +112,10 @@ struct cpContactBufferHeader {
 	unsigned int numContacts;
 };
 
-#define CP_CONTACTS_BUFFER_SIZE ((CP_BUFFER_BYTES - sizeof(cpContactBufferHeader))/sizeof(cpContact))
+#define CP_CONTACTS_BUFFER_SIZE ((CP_BUFFER_BYTES - sizeof(cpContactBufferHeader))/sizeof(struct cpContact))
 typedef struct cpContactBuffer {
 	cpContactBufferHeader header;
-	cpContact contacts[CP_CONTACTS_BUFFER_SIZE];
+	struct cpContact contacts[CP_CONTACTS_BUFFER_SIZE];
 } cpContactBuffer;
 
 static cpContactBufferHeader *
@@ -158,7 +158,7 @@ cpSpacePushFreshContactBuffer(cpSpace *space)
 }
 
 
-cpContact *
+struct cpContact *
 cpContactBufferGetArray(cpSpace *space)
 {
 	if(space->contactBuffersHead->numContacts + CP_MAX_CONTACTS_PER_ARBITER > CP_CONTACTS_BUFFER_SIZE){
@@ -231,25 +231,24 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 	if(sensor && handler == &cpDefaultCollisionHandler) return id;
 	
 	// Shape 'a' should have the lower shape type. (required by cpCollideShapes() )
-	// TODO remove me: a < b comparison is for debugging collisions
-	if(a->klass->type > b->klass->type || (a->klass->type == b->klass->type && a < b)){
+	if(a->klass->type > b->klass->type || (a->klass->type == b->klass->type)){
 		cpShape *temp = a;
 		a = b;
 		b = temp;
 	}
 	
 	// Narrow-phase collision detection.
-	cpContact *contacts = cpContactBufferGetArray(space);
-	int numContacts = cpCollideShapes(a, b, &id, contacts);
-	if(!numContacts) return id; // Shapes are not colliding.
-	cpSpacePushContacts(space, numContacts);
+	cpCollisionInfo info = cpCollideShapes(a, b, id, cpContactBufferGetArray(space));
+	
+	if(info.count == 0) return info.id; // Shapes are not colliding.
+	cpSpacePushContacts(space, info.count);
 	
 	// Get an arbiter from space->arbiterSet for the two shapes.
 	// This is where the persistant contact magic comes from.
 	cpShape *shape_pair[] = {a, b};
 	cpHashValue arbHashID = CP_HASH_PAIR((cpHashValue)a, (cpHashValue)b);
 	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->cachedArbiters, arbHashID, shape_pair, space, (cpHashSetTransFunc)cpSpaceArbiterSetTrans);
-	cpArbiterUpdate(arb, contacts, numContacts, handler, a, b);
+	cpArbiterUpdate(arb, &info, handler);
 	
 	// Call the begin function first if it's the first step
 	if(arb->state == cpArbiterStateFirstColl && !handler->begin(arb, space, handler->data)){
@@ -266,10 +265,10 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 	){
 		cpArrayPush(space->arbiters, arb);
 	} else {
-		cpSpacePopContacts(space, numContacts);
+		cpSpacePopContacts(space, info.count);
 		
 		arb->contacts = NULL;
-		arb->numContacts = 0;
+		arb->count = 0;
 		
 		// Normally arbiters are set as used after calling the post-solve callback.
 		// However, post-solve callbacks are not called for sensors or arbiters rejected from pre-solve.
@@ -278,7 +277,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 	
 	// Time stamp the arbiter so we know it was used recently.
 	arb->stamp = space->stamp;
-	return id;
+	return info.id;
 }
 
 // Hashset filter func to throw away old arbiters.
@@ -289,7 +288,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	
 	cpBody *a = arb->body_a, *b = arb->body_b;
 	
-	// TODO should make an arbiter state for this so it doesn't require filtering arbiters for dangling body pointers on body removal.
+	// TODO: should make an arbiter state for this so it doesn't require filtering arbiters for dangling body pointers on body removal.
 	// Preserve arbiters on sensors and rejected arbiters for sleeping objects.
 	// This prevents errant separate callbacks from happenening.
 	if(
@@ -307,7 +306,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	
 	if(ticks >= space->collisionPersistence){
 		arb->contacts = NULL;
-		arb->numContacts = 0;
+		arb->count = 0;
 		
 		cpArrayPush(space->pooledArbiters, arb);
 		return cpFalse;

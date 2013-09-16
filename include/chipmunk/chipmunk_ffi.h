@@ -3,6 +3,9 @@
 // Create non static inlined copies of Chipmunk functions, useful for working with dynamic FFIs
 // This file should only be included in chipmunk.c
 
+// TODO: get rid of the reliance on static inlines.
+// They make a mess for FFIs.
+
 #ifdef _MSC_VER
  #if _MSC_VER >= 1600
   #define MAKE_REF(name) decltype(name) *_##name = name
@@ -64,21 +67,21 @@ MAKE_REF(cpBBClampVect);
 
 MAKE_REF(cpBodyGetMass);
 MAKE_REF(cpBodyGetMoment);
-MAKE_REF(cpBodyGetPos);
+MAKE_REF(cpBodyGetPosition);
 MAKE_REF(cpBodyGetAngle);
-MAKE_REF(cpBodyGetRot);
-MAKE_PROPERTIES_REF(cpBody, Vel);
+MAKE_REF(cpBodyGetRotation);
+MAKE_PROPERTIES_REF(cpBody, Velocity);
 MAKE_PROPERTIES_REF(cpBody, Force);
-MAKE_PROPERTIES_REF(cpBody, AngVel);
+MAKE_PROPERTIES_REF(cpBody, AngularVelocity);
 MAKE_PROPERTIES_REF(cpBody, Torque);
-MAKE_PROPERTIES_REF(cpBody, VelLimit);
-MAKE_PROPERTIES_REF(cpBody, AngVelLimit);
+MAKE_PROPERTIES_REF(cpBody, VelocityLimit);
+MAKE_PROPERTIES_REF(cpBody, AngularVelocityLimit);
 MAKE_PROPERTIES_REF(cpBody, UserData);
 MAKE_REF(cpBodyIsSleeping);
 MAKE_REF(cpBodyIsStatic);
 MAKE_REF(cpBodyIsRogue);
-MAKE_REF(cpBodyLocal2World);
-MAKE_REF(cpBodyWorld2Local);
+MAKE_REF(cpBodyLocalToWorld);
+MAKE_REF(cpBodyWorldToLocal);
 MAKE_REF(cpBodyKineticEnergy);
 
 MAKE_REF(cpShapeGetBB);
@@ -144,9 +147,6 @@ MAKE_PROPERTIES_REF(cpSlideJoint, Anchr1);
 MAKE_PROPERTIES_REF(cpSlideJoint, Anchr2);
 MAKE_PROPERTIES_REF(cpSlideJoint, Min);
 MAKE_PROPERTIES_REF(cpSlideJoint, Max);
-
-MAKE_REF(cpSegmentQueryHitPoint);
-MAKE_REF(cpSegmentQueryHitDist);
 
 MAKE_REF(cpSpatialIndexDestroy);
 MAKE_REF(cpSpatialIndexCount);

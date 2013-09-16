@@ -54,7 +54,7 @@ add_bar(cpSpace *space, cpVect a, cpVect b, int group)
 	cpFloat mass = length/160.0f;
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, mass*length*length/12.0f));
-	cpBodySetPos(body, center);
+	cpBodySetPosition(body, center);
 	
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpvsub(a, center), cpvsub(b, center), 10.0f));
 	cpShapeSetGroup(shape, group);

@@ -105,6 +105,8 @@ struct cpSpace {
 	CP_PRIVATE(cpBody _staticBody);
 };
 
+// TODO: Make timestep a parameter?
+
 /// Allocate a cpSpace.
 cpSpace* cpSpaceAlloc(void);
 /// Initialize a cpSpace.
@@ -147,6 +149,9 @@ cpSpaceIsLocked(cpSpace *space)
 	return space->CP_PRIVATE(locked);
 }
 
+// TODO: Handlers should return a struct that can be filled in.
+// TODO: Implement wildcard handlers.
+
 /// Set a default collision handler for this space.
 /// The default collision handler is invoked for each colliding pair of shapes
 /// that isn't explicitly handled by a specific collision handler.
@@ -172,14 +177,9 @@ void cpSpaceAddCollisionHandler(
 	void *data
 );
 
-/// Unset a collision handler.
-void cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
-
 /// Add a collision shape to the simulation.
 /// If the shape is attached to a static body, it will be added as a static shape.
 cpShape* cpSpaceAddShape(cpSpace *space, cpShape *shape);
-/// Explicity add a shape as a static shape to the simulation.
-cpShape* cpSpaceAddStaticShape(cpSpace *space, cpShape *shape);
 /// Add a rigid body to the simulation.
 cpBody* cpSpaceAddBody(cpSpace *space, cpBody *body);
 /// Add a constraint to the simulation.
@@ -187,8 +187,6 @@ cpConstraint* cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint);
 
 /// Remove a collision shape from the simulation.
 void cpSpaceRemoveShape(cpSpace *space, cpShape *shape);
-/// Remove a collision shape added using cpSpaceAddStaticShape() from the simulation.
-void cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape);
 /// Remove a rigid body from the simulation.
 void cpSpaceRemoveBody(cpSpace *space, cpBody *body);
 /// Remove a constraint from the simulation.
@@ -216,26 +214,22 @@ typedef void (*cpPostStepFunc)(cpSpace *space, void *key, void *data);
 /// It's possible to pass @c NULL for @c func if you only want to mark @c key as being used.
 cpBool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data);
 
-/// Point query callback function type.
-typedef void (*cpSpacePointQueryFunc)(cpShape *shape, void *data);
-/// Query the space at a point and call @c func for each shape found.
-void cpSpacePointQuery(cpSpace *space, cpVect point, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data);
-/// Query the space at a point and return the first shape found. Returns NULL if no shapes were found.
-cpShape *cpSpacePointQueryFirst(cpSpace *space, cpVect point, cpLayers layers, cpGroup group);
+// TODO: Queries and iterators should take a cpSpace parametery.
+// TODO: They should also be abortable.
 
 /// Nearest point query callback function type.
-typedef void (*cpSpaceNearestPointQueryFunc)(cpShape *shape, cpFloat distance, cpVect point, void *data);
+typedef void (*cpSpacePointQueryFunc)(cpShape *shape, cpFloat distance, cpVect point, void *data);
 /// Query the space at a point and call @c func for each shape found.
-void cpSpaceNearestPointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpaceNearestPointQueryFunc func, void *data);
+void cpSpacePointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data);
 /// Query the space at a point and return the nearest shape found. Returns NULL if no shapes were found.
-cpShape *cpSpaceNearestPointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpNearestPointQueryInfo *out);
+cpShape *cpSpacePointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpPointQueryInfo *out);
 
 /// Segment query callback function type.
-typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, void *data);
+typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpVect point, cpVect normal, cpFloat alpha, void *data);
 /// Perform a directed line segment query (like a raycast) against the space calling @c func for each shape intersected.
-void cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
+void cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
 /// Perform a directed line segment query (like a raycast) against the space and return the first shape hit. Returns NULL if no shapes were hit.
-cpShape *cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out);
+cpShape *cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out);
 
 /// Rectangle Query callback function type.
 typedef void (*cpSpaceBBQueryFunc)(cpShape *shape, void *data);
@@ -243,13 +237,11 @@ typedef void (*cpSpaceBBQueryFunc)(cpShape *shape, void *data);
 /// Only the shape's bounding boxes are checked for overlap, not their full shape.
 void cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryFunc func, void *data);
 
-/// Shape query callback function type.
-typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points, void *data);
-/// Query a space for any shapes overlapping the given shape and call @c func for each shape found.
-cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
-
-/// Call cpBodyActivate() for any shape that is overlaps the given shape.
-void cpSpaceActivateShapesTouchingShape(cpSpace *space, cpShape *shape);
+// TODO: Reimplement
+///// Shape query callback function type.
+//typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points, void *data);
+///// Query a space for any shapes overlapping the given shape and call @c func for each shape found.
+//cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
 
 
 /// Space/body iterator callback function type.

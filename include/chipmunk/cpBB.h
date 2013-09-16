@@ -19,6 +19,12 @@
  * SOFTWARE.
  */
 
+#ifndef CHIPMUNK_BB_H
+#define CHIPMUNK_BB_H
+
+#include "chipmunk_types.h"
+#include "cpVect.h"
+
 /// @defgroup cpBBB cpBB
 /// Chipmunk's axis-aligned 2D bounding box type along with a few handy routines.
 /// @{
@@ -136,8 +142,10 @@ cpBBClampVect(const cpBB bb, const cpVect v)
 	return cpv(cpfclamp(v.x, bb.l, bb.r), cpfclamp(v.y, bb.b, bb.t));
 }
 
-// TODO edge case issue
+// TODO: edge case issue
 /// Wrap a vector to a bounding box.
 cpVect cpBBWrapVect(const cpBB bb, const cpVect v); // wrap a vector to a bbox
 
 ///@}
+
+#endif

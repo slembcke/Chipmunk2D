@@ -54,7 +54,7 @@ make_leg(cpSpace *space, cpFloat side, cpFloat offset, cpBody *chassis, cpBody *
 	// make leg
 	a = cpvzero, b = cpv(0.0f, side);
 	cpBody *upper_leg = cpSpaceAddBody(space, cpBodyNew(leg_mass, cpMomentForSegment(leg_mass, a, b)));
-	cpBodySetPos(upper_leg, cpv(offset, 0.0f));
+	cpBodySetPosition(upper_leg, cpv(offset, 0.0f));
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(upper_leg, a, b, seg_radius));
 	cpShapeSetGroup(shape, 1);
@@ -64,7 +64,7 @@ make_leg(cpSpace *space, cpFloat side, cpFloat offset, cpBody *chassis, cpBody *
 	// lower leg
 	a = cpvzero, b = cpv(0.0f, -1.0f*side);
 	cpBody *lower_leg = cpSpaceAddBody(space, cpBodyNew(leg_mass, cpMomentForSegment(leg_mass, a, b)));
-	cpBodySetPos(lower_leg, cpv(offset, -side));
+	cpBodySetPosition(lower_leg, cpv(offset, -side));
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(lower_leg, a, b, seg_radius));
 	cpShapeSetGroup(shape, 1);

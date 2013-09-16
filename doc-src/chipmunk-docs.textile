@@ -311,13 +311,13 @@ void cpBodySetMoment(cpBody *body, cpFloat i)</code></pre>
 
 p(expl). Moment of inertia (MoI or sometimes just moment) of the body. The moment is like the rotational mass of a body. See below for function to help calculate the moment.
 
-<pre><code>cpVect cpBodyGetPos(const cpBody *body)
-void cpBodySetPos(cpBody *body, cpVect pos)</code></pre>
+<pre><code>cpVect cpBodyGetPosition(const cpBody *body)
+void cpBodySetPosition(cpBody *body, cpVect pos)</code></pre>
 
 p(expl). Position of the center of gravity of the body. When changing the position you may also want to call @cpSpaceReindexShapesForBody()@ to update the collision detection information for the attached shapes if plan to make any queries against the space.
 
 <pre><code>cpVect cpBodyGetVel(const cpBody *body)
-void cpBodySetVel(cpBody *body, const cpVect value)</code></pre>
+void cpBodySetVelocity(cpBody *body, const cpVect value)</code></pre>
 
 p(expl). Linear velocity of the center of gravity of the body.
 
@@ -331,8 +331,8 @@ void cpBodySetAngle(cpBody *body, cpFloat a)</code></pre>
 
 p(expl). Rotation of the body in radians. When changing the rotation you may also want to call @cpSpaceReindexShapesForBody()@ to update the collision detection information for the attached shapes if plan to make any queries against the space.
 
-<pre><code>cpFloat cpBodyGetAngVel(const cpBody *body)
-void cpBodySetAngVel(cpBody *body, const cpFloat value)</code></pre>
+<pre><code>cpFloat cpBodyGetAngularVelocity(const cpBody *body)
+void cpBodySetAngularVelocity(cpBody *body, const cpFloat value)</code></pre>
 
 p(expl). The angular velocity of the body in radians per second.
 
@@ -341,17 +341,17 @@ void cpBodySetTorque(cpBody *body, const cpFloat value)</code></pre>
 
 p(expl). The torque applied to the body.
 
-<pre><code>cpVect cpBodyGetRot(const cpBody *body)</code></pre>
+<pre><code>cpVect cpBodyGetRotation(const cpBody *body)</code></pre>
 
 p(expl). The rotation vector for the body. Can be used with @cpvrotate()@ or @cpvunrotate()@ to perform fast rotations.
 
 <pre><code>cpFloat cpBodyGetVelLimit(const cpBody *body)
-void cpBodySetVelLimit(cpBody *body, const cpFloat value)</code></pre>
+void cpBodySetVelocityLimit(cpBody *body, const cpFloat value)</code></pre>
 
 p(expl). Velocity limit of the body. Defaults to @INFINITY@ unless you set it specifically. Can be used to limit falling speeds, etc.
 
-<pre><code>cpFloat cpBodyGetAngVelLimit(const cpBody *body)
-void cpBodySetAngVelLimit(cpBody *body, const cpFloat value)</code></pre>
+<pre><code>cpFloat cpBodyGetAngularVelocityLimit(const cpBody *body)
+void cpBodySetAngularVelocityLimit(cpBody *body, const cpFloat value)</code></pre>
 
 p(expl). Angular velocity limit of the body in radians per second. Defaults to @INFINITY@ unless you set it specifically.
 
@@ -371,7 +371,7 @@ Use the following functions to approximate the moment of inertia for your body, 
 
 * @cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset)@ - Calculate the moment of inertia for a hollow circle, @r1@ and @r2@ are the inner and outer diameters in no particular order. _(A solid circle has an inner diameter of 0)_
 * @cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b)@ - Calculate the moment of inertia for a line segment. The endpoints @a@ and @b@ are relative to the body.
-* @cpFloat cpMomentForPoly(cpFloat m, int numVerts, const cpVect *verts, cpVect offset)@ - Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
+* @cpFloat cpMomentForPoly(cpFloat m, int count, const cpVect *verts, cpVect offset)@ - Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
 * @cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height)@ - Calculate the moment of inertia for a solid box centered on the body.
 
 <!-- TODO poly examples -->
@@ -382,15 +382,15 @@ Use the following functions to get the area for common Chipmunk shapes if you wa
 
 * @cpFloat cpAreaForCircle(cpFloat r1, cpFloat r2)@ - Area of a hollow circle.
 * @cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat r)@ - Area of a beveled segment. _(Will always be zero if radius is zero)_
-* @cpFloat cpAreaForPoly(const int numVerts, const cpVect *verts)@ - Signed area of a polygon shape. Returns a negative number for polygons with a backwards winding.
+* @cpFloat cpAreaForPoly(const int count, const cpVect *verts)@ - Signed area of a polygon shape. Returns a negative number for polygons with a backwards winding.
 
 
 <%= h 2, "Coordinate Conversion Functions:", "CoordinateConversion" %>
 
 Many things are defined in coordinates local to a body meaning that the (0,0) is at the center of gravity of the body and the axis rotate along with the body.
 
-* @cpVect cpBodyLocal2World(const cpBody *body, const cpVect v)@ - Convert from body local coordinates to world space coordinates.
-* @cpVect cpBodyWorld2Local(const cpBody *body, const cpVect v)@ - Convert from world space coordinates to body local coordinates.
+* @cpVect cpBodyLocalToWorld(const cpBody *body, const cpVect v)@ - Convert from body local coordinates to world space coordinates.
+* @cpVect cpBodyWorldToLocal(const cpBody *body, const cpVect v)@ - Convert from world space coordinates to body local coordinates.
 
 
 <%= h 2, "Applying Forces and Torques:", "Forces" %>
@@ -603,8 +603,8 @@ p(expl). When you have a number of segment shapes that are all joined together, 
 <%= h 2, "Working With Polygon Shapes:", "Polys" %>
 
 <pre><code>cpPolyShape *cpPolyShapeAlloc(void)
-cpPolyShape *cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset)
-cpShape *cpPolyShapeNew(cpBody *body, int numVerts, const cpVect *verts, cpVect offset)</code></pre>
+cpPolyShape *cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int count, cpVect *verts, cpVect offset)
+cpShape *cpPolyShapeNew(cpBody *body, int count, cpVect *verts, cpVect offset)</code></pre>
 
 p(expl). @body@ is the body to attach the poly to, @verts@ is an array of @cpVect@ structs defining a convex hull with a clockwise winding, @offset@ is the offset from the body's center of gravity in body local coordinates. An assertion will be thrown the vertexes are not convex or do not have a clockwise winding.
 
@@ -633,9 +633,9 @@ cpShape *cpBoxShapeNew3(cpBody *body, cpBB box, cpFloat radius)</code></pre>
 
 <%= h 3, "Poly Shape Helper Functions:", "PolyHelpers" %>
 
-* @cpBool cpPolyValidate(const cpVect *verts, const int numVerts)@ - Check if a vertex array is convex and with the correct winding.
-* @cpVect cpCentroidForPoly(const int numVerts, const cpVect *verts)@ - Calculate the centroid for a polygon.
-* @void cpRecenterPoly(const int numVerts, cpVect *verts)@ - Center a polygon to (0,0). Subtracts the centroid from each vertex.
+* @cpBool cpPolyValidate(const cpVect *verts, const int count)@ - Check if a vertex array is convex and with the correct winding.
+* @cpVect cpCentroidForPoly(const int count, const cpVect *verts)@ - Calculate the centroid for a polygon.
+* @void cpRecenterPoly(const int count, cpVect *verts)@ - Center a polygon to (0,0). Subtracts the centroid from each vertex.
 
 <%= h 3, "Convex Hull Helper Functions:", "ConvexHelpers" %>
 
@@ -1350,7 +1350,7 @@ Chipmunk spaces support four kinds of spatial queries, nearest point, segment, s
 
 Point queries are useful for things like mouse picking and simple sensors. They allow you to check if there are shapes within a certain distance of a point, find the closest point on a shape to a given point or find the closest shape to a point.
 
-<pre><code>typedef struct cpNearestPointQueryInfo {
+<pre><code>typedef struct cpPointQueryInfo {
 	/// The nearest shape, NULL if no shape was within range.
 	cpShape *shape;
 	/// The closest point on the shape's surface. (in world space coordinates)
@@ -1360,11 +1360,11 @@ Point queries are useful for things like mouse picking and simple sensors. They 
 	/// The gradient of the distance function.
 	/// The same as info.p/info.d, but accurate even for very small values of info.d.
 	cpVect g;
-} cpNearestPointQueryInfo;</code></pre>
+} cpPointQueryInfo;</code></pre>
 
 p(expl). Nearest point queries return the point on the surface of the shape as well as the distance from the query point to the surface point.
 
-<pre><code>cpFloat cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *out)</code></pre>
+<pre><code>cpFloat cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpPointQueryInfo *out)</code></pre>
 
 p(expl). Find the distance from @point@ to @shape@. If the point is inside of the shape, the distance will be negative and equal to the depth of the point. 
 
@@ -1378,9 +1378,9 @@ void cpSpaceNearestPointQuery(
 
 p(expl). Query @space@ at @point@ for shapes within the given distance range filtering out matches with the given @layers@ and @group@. @func@ is called for each shape found along with the distance to the closest point on the shape's surface, the distance to that point and the @data@ argument passed to @cpSpaceNearestPointQuery()@. Sensor shapes are included. If a @maxDistance@ of @0.0@ is used, the point must lie inside a shape. Negative @maxDistance@ is also allowed meaning that the point must be a under a certain depth within a shape to be considered a match.
 
-<pre><code>cpShape *cpSpaceNearestPointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpNearestPointQueryInfo *out)</code></pre>
+<pre><code>cpShape *cpSpaceNearestPointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpPointQueryInfo *out)</code></pre>
 
-p(expl). Query @space@ at @point@ and return the closest shape within @maxDistance@ units of distance. @out@ is an optional pointer to a @cpNearestPointQueryInfo@ if you want additional information about the match.
+p(expl). Query @space@ at @point@ and return the closest shape within @maxDistance@ units of distance. @out@ is an optional pointer to a @cpPointQueryInfo@ if you want additional information about the match.
 
 <%= h 2, "Segment Queries:", "SegmentQueries" %>
 

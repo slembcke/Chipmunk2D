@@ -41,7 +41,7 @@ planetGravityVelocityFunc(cpBody *body, cpVect gravity, cpFloat damping, cpFloat
 	// Gravitational acceleration is proportional to the inverse square of
 	// distance, and directed toward the origin. The central planet is assumed
 	// to be massive enough that it affects the satellites but not vice versa.
-	cpVect p = cpBodyGetPos(body);
+	cpVect p = cpBodyGetPosition(body);
 	cpFloat sqdist = cpvlengthsq(p);
 	cpVect g = cpvmult(p, -gravityStrength / (sqdist * cpfsqrt(sqdist)));
 	
@@ -77,20 +77,20 @@ add_box(cpSpace *space)
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 4, verts, cpvzero)));
 	body->velocity_func = planetGravityVelocityFunc;
-	cpBodySetPos(body, pos);
+	cpBodySetPosition(body, pos);
 
 	// Set the box's velocity to put it into a circular orbit from its
 	// starting position.
 	cpFloat r = cpvlength(pos);
 	cpFloat v = cpfsqrt(gravityStrength / r) / r;
-	cpBodySetVel(body, cpvmult(cpvperp(pos), v));
+	cpBodySetVelocity(body, cpvmult(cpvperp(pos), v));
 
 	// Set the box's angular velocity to match its orbital period and
 	// align its initial angle with its position.
-	cpBodySetAngVel(body, v);
+	cpBodySetAngularVelocity(body, v);
 	cpBodySetAngle(body, cpfatan2(pos.y, pos.x));
 
-	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 4, verts, cpvzero));
+	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 4, verts, cpvzero, 0.0));
 	cpShapeSetElasticity(shape, 0.0f);
 	cpShapeSetFriction(shape, 0.7f);
 }
@@ -100,7 +100,7 @@ init(void)
 {
 	// Create a rouge body to control the planet manually.
 	planetBody = cpBodyNew(INFINITY, INFINITY);
-	cpBodySetAngVel(planetBody, 0.2f);
+	cpBodySetAngularVelocity(planetBody, 0.2f);
 	
 	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 20);

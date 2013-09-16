@@ -25,8 +25,10 @@
 
 typedef struct cpShapeClass cpShapeClass;
 
+// TODO Rename SLVNs
+
 /// Nearest point query info struct.
-typedef struct cpNearestPointQueryInfo {
+typedef struct cpPointQueryInfo {
 	/// The nearest shape, NULL if no shape was within range.
 	cpShape *shape;
 	/// The closest point on the shape's surface. (in world space coordinates)
@@ -36,16 +38,18 @@ typedef struct cpNearestPointQueryInfo {
 	/// The gradient of the signed distance function.
 	/// The same as info.p/info.d, but accurate even for very small values of info.d.
 	cpVect g;
-} cpNearestPointQueryInfo;
+} cpPointQueryInfo;
 
 /// Segment query info struct.
 typedef struct cpSegmentQueryInfo {
 	/// The shape that was hit, NULL if no collision occured.
 	cpShape *shape;
-	/// The normalized distance along the query segment in the range [0, 1].
-	cpFloat t;
+	/// The point of impact.
+	cpVect point;
 	/// The normal of the surface hit.
-	cpVect n;
+	cpVect normal;
+	/// The normalized distance along the query segment in the range [0, 1].
+	cpFloat alpha;
 } cpSegmentQueryInfo;
 
 /// @private
@@ -58,8 +62,8 @@ typedef enum cpShapeType{
 
 typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpVect p, cpVect rot);
 typedef void (*cpShapeDestroyImpl)(cpShape *shape);
-typedef void (*cpShapeNearestPointQueryImpl)(cpShape *shape, cpVect p, cpNearestPointQueryInfo *info);
-typedef void (*cpShapeSegmentQueryImpl)(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+typedef void (*cpShapePointQueryImpl)(cpShape *shape, cpVect p, cpPointQueryInfo *info);
+typedef void (*cpShapeSegmentQueryImpl)(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
 
 /// @private
 struct cpShapeClass {
@@ -67,7 +71,7 @@ struct cpShapeClass {
 	
 	cpShapeCacheDataImpl cacheData;
 	cpShapeDestroyImpl destroy;
-	cpShapeNearestPointQueryImpl nearestPointQuery;
+	cpShapePointQueryImpl pointQuery;
 	cpShapeSegmentQueryImpl segmentQuery;
 };
 
@@ -76,33 +80,33 @@ struct cpShape {
 	CP_PRIVATE(const cpShapeClass *klass);
 	
 	/// The rigid body this collision shape is attached to.
-	cpBody *body;
+	CP_PRIVATE(cpBody *body);
 
 	/// The current bounding box of the shape.
-	cpBB bb;
+	CP_PRIVATE(cpBB bb);
 	
 	/// Sensor flag.
 	/// Sensor shapes call collision callbacks but don't produce collisions.
-	cpBool sensor;
+	CP_PRIVATE(cpBool sensor);
 	
 	/// Coefficient of restitution. (elasticity)
-	cpFloat e;
+	CP_PRIVATE(cpFloat e);
 	/// Coefficient of friction.
-	cpFloat u;
+	CP_PRIVATE(cpFloat u);
 	/// Surface velocity used when solving for friction.
-	cpVect surface_v;
+	CP_PRIVATE(cpVect surface_v);
 
 	/// User definable data pointer.
 	/// Generally this points to your the game object class so you can access it
 	/// when given a cpShape reference in a callback.
-	cpDataPointer data;
+	CP_PRIVATE(cpDataPointer data);
 	
 	/// Collision type of this shape used when picking collision handlers.
-	cpCollisionType collision_type;
+	CP_PRIVATE(cpCollisionType collision_type);
 	/// Group of this shape. Shapes in the same group don't collide.
-	cpGroup group;
+	CP_PRIVATE(cpGroup group);
 	// Layer bitmask for this shape. Shapes only collide if the bitwise and of their layers is non-zero.
-	cpLayers layers;
+	CP_PRIVATE(cpLayers layers);
 	
 	CP_PRIVATE(cpSpace *space);
 	
@@ -122,42 +126,41 @@ cpBB cpShapeCacheBB(cpShape *shape);
 /// Update, cache and return the bounding box of a shape with an explicit transformation.
 cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot);
 
-/// Test if a point lies within a shape.
-cpBool cpShapePointQuery(cpShape *shape, cpVect p);
-
 /// Perform a nearest point query. It finds the closest point on the surface of shape to a specific point.
 /// The value returned is the distance between the points. A negative distance means the point is inside the shape.
-cpFloat cpShapeNearestPointQuery(cpShape *shape, cpVect p, cpNearestPointQueryInfo *out);
+cpFloat cpShapePointQuery(cpShape *shape, cpVect p, cpPointQueryInfo *out);
 
 /// Perform a segment query against a shape. @c info must be a pointer to a valid cpSegmentQueryInfo structure.
-cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info);
+cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
+
+// TODO NUKE
 
 /// Get the hit point for a segment query.
-static inline cpVect cpSegmentQueryHitPoint(const cpVect start, const cpVect end, const cpSegmentQueryInfo info)
-{
-	return cpvlerp(start, end, info.t);
-}
-
-/// Get the hit distance for a segment query.
-static inline cpFloat cpSegmentQueryHitDist(const cpVect start, const cpVect end, const cpSegmentQueryInfo info)
-{
-	return cpvdist(start, end)*info.t;
-}
+//static inline cpVect cpSegmentQueryHitPoint(const cpVect start, const cpVect end, const cpFloat radius, const cpSegmentQueryInfo info)
+//{
+//	return cpvsub(cpvlerp(start, end, info.t), cpvmult(info.n, radius));
+//}
+//
+///// Get the hit distance for a segment query.
+//static inline cpFloat cpSegmentQueryHitDist(const cpVect start, const cpVect end, const cpSegmentQueryInfo info)
+//{
+//	return cpvdist(start, end)*info.t;
+//}
 
 #define CP_DefineShapeStructGetter(type, member, name) \
-static inline type cpShapeGet##name(const cpShape *shape){return shape->member;}
+static inline type cpShapeGet##name(const cpShape *shape){return shape->CP_PRIVATE(member);}
 
 #define CP_DefineShapeStructSetter(type, member, name, activates) \
 static inline void cpShapeSet##name(cpShape *shape, type value){ \
-	if(activates && shape->body) cpBodyActivate(shape->body); \
-	shape->member = value; \
+	if(activates && shape->CP_PRIVATE(body)) cpBodyActivate(shape->CP_PRIVATE(body)); \
+	shape->CP_PRIVATE(member) = value; \
 }
 
 #define CP_DefineShapeStructProperty(type, member, name, activates) \
 CP_DefineShapeStructGetter(type, member, name) \
 CP_DefineShapeStructSetter(type, member, name, activates)
 
-CP_DefineShapeStructGetter(cpSpace*, CP_PRIVATE(space), Space)
+CP_DefineShapeStructGetter(cpSpace*, space, Space)
 
 CP_DefineShapeStructGetter(cpBody*, body, Body)
 void cpShapeSetBody(cpShape *shape, cpBody *body);

@@ -59,7 +59,7 @@ enum COLLISION_TYPES {
 static void
 AttachHook(cpSpace *space, cpBody *hook, cpBody *crate)
 {
-	hookJoint = cpSpaceAddConstraint(space, cpPivotJointNew(hook, crate, cpBodyGetPos(hook)));
+	hookJoint = cpSpaceAddConstraint(space, cpPivotJointNew(hook, crate, cpBodyGetPosition(hook)));
 }
 
 
@@ -102,17 +102,17 @@ init(void)
 	
 	// Add a body for the dolly.
 	dollyBody = cpSpaceAddBody(space, cpBodyNew(10, INFINITY));
-	cpBodySetPos(dollyBody, cpv(0, 100));
+	cpBodySetPosition(dollyBody, cpv(0, 100));
 	
 	// Add a block so you can see it.
-	cpSpaceAddShape(space, cpBoxShapeNew(dollyBody, 30, 30));
+	cpSpaceAddShape(space, cpBoxShapeNew(dollyBody, 30, 30, 0.0));
 	
 	// Add a groove joint for it to move back and forth on.
 	cpSpaceAddConstraint(space, cpGrooveJointNew(staticBody, dollyBody, cpv(-250, 100), cpv(250, 100), cpvzero));
 	
 	// Add a pivot joint to act as a servo motor controlling it's position
 	// By updating the anchor points of the pivot joint, you can move the dolly.
-	dollyServo = cpSpaceAddConstraint(space, cpPivotJointNew(staticBody, dollyBody, cpBodyGetPos(dollyBody)));
+	dollyServo = cpSpaceAddConstraint(space, cpPivotJointNew(staticBody, dollyBody, cpBodyGetPosition(dollyBody)));
 	// Max force the dolly servo can generate.
 	cpConstraintSetMaxForce(dollyServo, 10000);
 	// Max speed of the dolly servo
@@ -123,7 +123,7 @@ init(void)
 	
 	// Add the crane hook.
 	cpBody *hookBody = cpSpaceAddBody(space, cpBodyNew(1, INFINITY));
-	cpBodySetPos(hookBody, cpv(0, 50));
+	cpBodySetPosition(hookBody, cpv(0, 50));
 	
 	// Add a sensor shape for it. This will be used to figure out when the hook touches a box.
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(hookBody, 10, cpvzero));
@@ -138,13 +138,13 @@ init(void)
 	// Max speed of the dolly servo
 	cpConstraintSetMaxBias(winchServo, 60);
 	
-	// TODO cleanup
+	// TODO: cleanup
 	// Finally a box to play with
 	cpBody *boxBody = cpSpaceAddBody(space, cpBodyNew(30, cpMomentForBox(30, 50, 50)));
-	cpBodySetPos(boxBody, cpv(200, -200));
+	cpBodySetPosition(boxBody, cpv(200, -200));
 	
 	// Add a block so you can see it.
-	shape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, 50, 50));
+	shape = cpSpaceAddShape(space, cpBoxShapeNew(boxBody, 50, 50, 0.0));
 	cpShapeSetFriction(shape, 0.7);
 	cpShapeSetCollisionType(shape, CRATE);
 	

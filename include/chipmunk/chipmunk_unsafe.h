@@ -36,8 +36,8 @@
 /// so the results will be unrealistic. You must explicity include the chipmunk_unsafe.h header to use them.
 /// @{
 
-#ifndef CHIPMUNK_UNSAFE_HEADER
-#define CHIPMUNK_UNSAFE_HEADER
+#ifndef CHIPMUNK_UNSAFE_H
+#define CHIPMUNK_UNSAFE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,7 +54,7 @@ void cpSegmentShapeSetEndpoints(cpShape *shape, cpVect a, cpVect b);
 void cpSegmentShapeSetRadius(cpShape *shape, cpFloat radius);
 
 /// Set the vertexes of a poly shape.
-void cpPolyShapeSetVerts(cpShape *shape, int numVerts, cpVect *verts, cpVect offset);
+void cpPolyShapeSetVerts(cpShape *shape, int count, cpVect *verts, cpVect offset);
 /// Set the radius of a poly shape.
 void cpPolyShapeSetRadius(cpShape *shape, cpFloat radius);
 

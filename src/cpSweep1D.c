@@ -216,7 +216,7 @@ cpSweep1DReindexQuery(cpSweep1D *sweep, cpSpatialIndexQueryFunc func, void *data
 	
 	// Update bounds and sort
 	for(int i=0; i<count; i++) table[i] = MakeTableCell(sweep, table[i].obj);
-	qsort(table, count, sizeof(TableCell), (int (*)(const void *, const void *))TableSort); // TODO use insertion sort instead
+	qsort(table, count, sizeof(TableCell), (int (*)(const void *, const void *))TableSort); // TODO: use insertion sort instead
 	
 	for(int i=0; i<count; i++){
 		TableCell cell = table[i];

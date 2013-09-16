@@ -55,8 +55,8 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 #endif
 
 	for(int i=0, j=count-1; i<count; j=i, i++){
-		cpVect a = cpBodyLocal2World(body, cpPolyShapeGetVert(poly, j));
-		cpVect b = cpBodyLocal2World(body, cpPolyShapeGetVert(poly, i));
+		cpVect a = cpBodyLocalToWorld(body, cpPolyShapeGetVert(poly, j));
+		cpVect b = cpBodyLocalToWorld(body, cpPolyShapeGetVert(poly, i));
 		
 		if(a.y < level){
 			clipped[clippedCount] = a;
@@ -78,7 +78,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpFloat clippedArea = cpAreaForPoly(clippedCount, clipped);
 	cpFloat displacedMass = clippedArea*FLUID_DENSITY;
 	cpVect centroid = cpCentroidForPoly(clippedCount, clipped);
-	cpVect r = cpvsub(centroid, cpBodyGetPos(body));
+	cpVect r = cpvsub(centroid, cpBodyGetPosition(body));
 	
 	ChipmunkDebugDrawPolygon(clippedCount, clipped, 0.0f, RGBAColor(0, 0, 1, 1), RGBAColor(0, 0, 1, 0.1f));
 	ChipmunkDebugDrawDot(5, centroid, RGBAColor(0, 0, 1, 1));
@@ -90,7 +90,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	apply_impulse(body, cpvmult(g, -displacedMass*dt), r);
 	
 	// Apply linear damping for the fluid drag.
-	cpVect v_centroid = cpvadd(body->v, cpvmult(cpvperp(r), body->w));
+	cpVect v_centroid = cpvadd(body->CP_PRIVATE(v), cpvmult(cpvperp(r), body->CP_PRIVATE(w)));
 	cpFloat k = k_scalar_body(body, r, cpvnormalize_safe(v_centroid));
 	cpFloat damping = clippedArea*FLUID_DRAG*FLUID_DENSITY;
 	cpFloat v_coef = cpfexp(-damping*dt*k); // linear drag
@@ -98,8 +98,8 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	apply_impulse(body, cpvmult(cpvsub(cpvmult(v_centroid, v_coef), v_centroid), 1.0/k), r);
 	
 	// Apply angular damping for the fluid drag.
-	cpFloat w_damping = cpMomentForPoly(FLUID_DRAG*FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(body->p));
-	body->w *= cpfexp(-w_damping*dt*body->i_inv);
+	cpFloat w_damping = cpMomentForPoly(FLUID_DRAG*FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(body->CP_PRIVATE(p)));
+	body->CP_PRIVATE(w) *= cpfexp(-w_damping*dt*body->CP_PRIVATE(i_inv));
 	
 	return cpTrue;
 }
@@ -161,7 +161,7 @@ init(void)
 		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 		
 		// Add the sensor for the water.
-		shape = cpSpaceAddShape(space, cpBoxShapeNew2(staticBody, bb));
+		shape = cpSpaceAddShape(space, cpBoxShapeNew2(staticBody, bb, 0.0));
 		cpShapeSetSensor(shape, cpTrue);
 		cpShapeSetCollisionType(shape, 1);
 	}
@@ -174,11 +174,11 @@ init(void)
 		cpFloat moment = cpMomentForBox(mass, width, height);
 		
 		body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-		cpBodySetPos(body, cpv(-50, -100));
-		cpBodySetVel(body, cpv(0, -100));
-		cpBodySetAngVel(body, 1);
+		cpBodySetPosition(body, cpv(-50, -100));
+		cpBodySetVelocity(body, cpv(0, -100));
+		cpBodySetAngularVelocity(body, 1);
 		
-		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height, 0.0));
 		cpShapeSetFriction(shape, 0.8f);
 	}
 	
@@ -189,11 +189,11 @@ init(void)
 		cpFloat moment = cpMomentForBox(mass, width, height);
 		
 		body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
-		cpBodySetPos(body, cpv(-200, -50));
-		cpBodySetVel(body, cpv(0, -100));
-		cpBodySetAngVel(body, 1);
+		cpBodySetPosition(body, cpv(-200, -50));
+		cpBodySetVelocity(body, cpv(0, -100));
+		cpBodySetAngularVelocity(body, 1);
 		
-		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height));
+		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height, 0.0));
 		cpShapeSetFriction(shape, 0.8f);
 	}
 	

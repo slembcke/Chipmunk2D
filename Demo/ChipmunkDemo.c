@@ -138,7 +138,7 @@ DrawInfo()
 	int points = 0;
 	
 	for(int i=0; i<arbiters; i++)
-		points += ((cpArbiter *)(space->arbiters->arr[i]))->numContacts;
+		points += ((cpArbiter *)(space->arbiters->arr[i]))->count;
 	
 	int constraints = (space->constraints->num + points)*space->iterations;
 	
@@ -184,7 +184,7 @@ ChipmunkDemoPrintString(char *fmt, ...)
 	
 	va_list args;
 	va_start(args, fmt);
-	// TODO should use vsnprintf herep
+	// TODO: should use vsnprintf herep
 	PrintStringCursor += vsprintf(PrintStringCursor, fmt, args);
 	va_end(args);
 }
@@ -247,7 +247,7 @@ Display(void)
 	demos[demo_index].drawFunc(space);
 	
 	// Highlight the shape under the mouse because it looks neat.
-	cpShape *nearest = cpSpaceNearestPointQueryNearest(space, ChipmunkDemoMouse, 0.0f, CP_ALL_LAYERS, CP_NO_GROUP, NULL);
+	cpShape *nearest = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0f, CP_ALL_LAYERS, CP_NO_GROUP, NULL);
 	if(nearest) ChipmunkDebugDrawShape(nearest, RGBAColor(1.0f, 0.0f, 0.0f, 1.0f), LAColor(0.0f, 0.0f));
 	
 	// Draw the renderer contents and reset it back to the last tick's state.
@@ -396,10 +396,10 @@ Click(int button, int state)
 {
 	if(button == GLFW_MOUSE_BUTTON_1){
 		if(state == GLFW_PRESS){
-			cpShape *shape = cpSpacePointQueryFirst(space, ChipmunkDemoMouse, GRABABLE_MASK_BIT, CP_NO_GROUP);
+			cpShape *shape = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0f, GRABABLE_MASK_BIT, CP_NO_GROUP, NULL);
 			if(shape){
 				cpBody *body = shape->body;
-				mouse_joint = cpPivotJointNew2(mouse_body, body, cpvzero, cpBodyWorld2Local(body, ChipmunkDemoMouse));
+				mouse_joint = cpPivotJointNew2(mouse_body, body, cpvzero, cpBodyWorldToLocal(body, ChipmunkDemoMouse));
 				mouse_joint->maxForce = 50000.0f;
 				mouse_joint->errorBias = cpfpow(1.0f - 0.15f, 60.0f);
 				cpSpaceAddConstraint(space, mouse_joint);
@@ -520,6 +520,7 @@ extern ChipmunkDemo Convex;
 extern ChipmunkDemo Unicycle;
 extern ChipmunkDemo Sticky;
 extern ChipmunkDemo Shatter;
+extern ChipmunkDemo GJK;
 
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
@@ -527,11 +528,8 @@ extern int bench_count;
 int
 main(int argc, const char **argv)
 {
-	// Segment/segment collisions need to be explicitly enabled currently.
-	// This will becoume enabled by default in future versions of Chipmunk.
-	cpEnableSegmentToSegmentCollisions();
-	
 	ChipmunkDemo demo_list[] = {
+		GJK,
 		LogoSmash,
 		PyramidStack,
 		Plink,
@@ -574,7 +572,7 @@ main(int argc, const char **argv)
 	if(trial){
 		cpAssertHard(glfwInit(), "Error initializing GLFW.");
 //		sleep(1);
-		for(int i=0; i<demo_count; i++) TimeTrial(i, 1000);
+		for(int i=0; i<demo_count; i++) TimeTrial(i, 1000, 5);
 //		time_trial('d' - 'a', 10000);
 		exit(0);
 	} else {

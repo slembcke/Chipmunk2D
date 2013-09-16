@@ -60,7 +60,7 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->v_limit = (cpFloat)INFINITY;
 	body->w_limit = (cpFloat)INFINITY;
 	
-	body->data = NULL;
+	body->userData = NULL;
 	
 	// Setters must be called after full initialization so the sanity checks don't assert on garbage data.
 	cpBodySetMass(body, m);
@@ -76,6 +76,7 @@ cpBodyNew(cpFloat m, cpFloat i)
 	return cpBodyInit(cpBodyAlloc(), m, i);
 }
 
+// TODO static bodies should be addable
 cpBody *
 cpBodyInitStatic(cpBody *body)
 {
@@ -110,6 +111,7 @@ static void cpv_assert_sane(cpVect v, char *message){cpv_assert_nan(v, message);
 extern "C" {
 #endif
 
+// TODO this could be cleaned up.
 void
 cpBodySanityCheck(cpBody *body)
 {
@@ -207,7 +209,7 @@ cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint)
 }
 
 void
-cpBodySetPos(cpBody *body, cpVect pos)
+cpBodySetPosition(cpBody *body, cpVect pos)
 {
 	cpBodyActivate(body);
 	body->p = pos;
@@ -282,13 +284,13 @@ cpBodyGetVelAtPoint(cpBody *body, cpVect r)
 }
 
 cpVect
-cpBodyGetVelAtWorldPoint(cpBody *body, cpVect point)
+cpBodyGetVelocityAtWorldPoint(cpBody *body, cpVect point)
 {
 	return cpBodyGetVelAtPoint(body, cpvsub(point, body->p));
 }
 
 cpVect
-cpBodyGetVelAtLocalPoint(cpBody *body, cpVect point)
+cpBodyGetVelocityAtLocalPoint(cpBody *body, cpVect point)
 {
 	return cpBodyGetVelAtPoint(body, cpvrotate(point, body->rot));
 }
@@ -322,7 +324,7 @@ cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 	while(arb){
 		cpArbiter *next = cpArbiterNext(arb, body);
 		
-		arb->swappedColl = (body == arb->body_b);
+		arb->swapped = (body == arb->body_b);
 		func(body, arb, data);
 		
 		arb = next;

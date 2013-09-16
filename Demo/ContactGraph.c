@@ -84,7 +84,7 @@ update(cpSpace *space, double dt)
 	#if USE_BLOCKS
 		__block cpVect impulseSum = cpvzero;
 		cpBodyEachArbiter_b(scaleStaticBody, ^(cpArbiter *arb){
-			impulseSum = cpvadd(impulseSum, cpArbiterTotalImpulseWithFriction(arb));
+			impulseSum = cpvadd(impulseSum, cpArbiterTotalImpulse(arb));
 		});
 	#else
 		cpVect impulseSum = cpvzero;
@@ -123,7 +123,7 @@ update(cpSpace *space, double dt)
 		__block cpFloat magnitudeSum = 0.0f;
 		__block cpVect vectorSum = cpvzero;
 		cpBodyEachArbiter_b(ballBody, ^(cpArbiter *arb){
-			cpVect j = cpArbiterTotalImpulseWithFriction(arb);
+			cpVect j = cpArbiterTotalImpulse(arb);
 			magnitudeSum += cpvlength(j);
 			vectorSum = cpvadd(vectorSum, j);
 		});
@@ -188,9 +188,9 @@ init(void)
 	// add some boxes to stack on the scale
 	for(int i=0; i<5; i++){
 		body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForBox(1.0f, 30.0f, 30.0f)));
-		cpBodySetPos(body, cpv(0, i*32 - 220));
+		cpBodySetPosition(body, cpv(0, i*32 - 220));
 		
-		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 30.0f, 30.0f));
+		shape = cpSpaceAddShape(space, cpBoxShapeNew(body, 30.0f, 30.0f, 0.0));
 		cpShapeSetElasticity(shape, 0.0f);
 		cpShapeSetFriction(shape, 0.8f);
 	}
@@ -198,7 +198,7 @@ init(void)
 	// Add a ball that we'll track which objects are beneath it.
 	cpFloat radius = 15.0f;
 	ballBody = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 0.0f, radius, cpvzero)));
-	cpBodySetPos(ballBody, cpv(120, -240 + radius+5));
+	cpBodySetPosition(ballBody, cpv(120, -240 + radius+5));
 
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero));
 	cpShapeSetElasticity(shape, 0.0f);

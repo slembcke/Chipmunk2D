@@ -19,6 +19,11 @@
  * SOFTWARE.
  */
 
+#ifndef CHIPMUNK_VECT_H
+#define CHIPMUNK_VECT_H
+
+#include "chipmunk_types.h"
+
 /// @defgroup cpVect cpVect
 /// Chipmunk's 2D vector type along with a handy 2D vector math lib.
 /// @{
@@ -38,11 +43,6 @@ cpVect cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t);
 
 /// Spherical linearly interpolate between v1 towards v2 by no more than angle a radians
 cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a);
-
-///	Returns a string representation of v. Intended mostly for debugging purposes and not production use.
-///	@attention The string points to a static local and is reset every time the function is called.
-///	If you want to print more than one vector you will have to split up your printing onto separate lines.
-char* cpvstr(const cpVect v);
 
 /// Check if two vectors are equal. (Be careful when comparing floating point numbers!)
 static inline cpBool cpveql(const cpVect v1, const cpVect v2)
@@ -197,6 +197,7 @@ static inline cpBool cpvnear(const cpVect v1, const cpVect v2, const cpFloat dis
 /// 2x2 matrix type used for tensors and such.
 /// @{
 
+// NUKE
 static inline cpMat2x2
 cpMat2x2New(cpFloat a, cpFloat b, cpFloat c, cpFloat d)
 {
@@ -211,3 +212,5 @@ cpMat2x2Transform(cpMat2x2 m, cpVect v)
 }
 
 ///@}
+
+#endif
