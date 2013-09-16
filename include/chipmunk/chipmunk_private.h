@@ -223,23 +223,6 @@ CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r1, cpVect a, cpVect b
 	}
 }
 
-// NUKE
-static inline cpSplittingPlane
-cpSplittingPlaneNew(cpVect a, cpVect b)
-{
-	cpVect n = cpvnormalize(cpvperp(cpvsub(b, a)));
-	cpSplittingPlane plane = {n, cpvdot(n, a)};
-	return plane;
-}
-
-static inline cpFloat
-cpSplittingPlaneCompare(cpSplittingPlane plane, cpVect v)
-{
-	return cpvdot(plane.n, v) - plane.d;
-}
-
-//void cpLoopIndexes(const cpVect *verts, int count, int *start, int *end);
-
 
 //MARK: Space Functions
 

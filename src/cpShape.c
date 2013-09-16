@@ -308,7 +308,7 @@ cpSegmentShapeInit(cpSegmentShape *seg, cpBody *body, cpVect a, cpVect b, cpFloa
 {
 	seg->a = a;
 	seg->b = b;
-	seg->n = cpvperp(cpvnormalize(cpvsub(b, a)));
+	seg->n = cpvrperp(cpvnormalize(cpvsub(b, a)));
 	
 	seg->r = r;
 	

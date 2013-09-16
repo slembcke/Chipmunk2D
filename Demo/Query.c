@@ -46,7 +46,7 @@ update(cpSpace *space, double dt)
 		cpVect n = segInfo.normal;
 		
 		// Draw blue over the occluded part of the query
-		ChipmunkDebugDrawSegment(point, end, RGBAColor(0,0,1,1));
+		ChipmunkDebugDrawSegment(cpvlerp(start, end, segInfo.alpha), end, RGBAColor(0,0,1,1));
 		
 		// Draw a little red surface normal
 		ChipmunkDebugDrawSegment(point, cpvadd(point, cpvmult(n, 16)), RGBAColor(1,0,0,1));

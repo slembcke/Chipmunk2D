@@ -94,7 +94,7 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	cpBool outside = cpFalse;
 	
 	for(int i=0; i<count; i++){
-		if(cpSplittingPlaneCompare(planes[i], p) < 0.0f) outside = cpTrue;
+		if(cpvdot(planes[i].n, p) - planes[i].d > 0.0f) outside = cpTrue;
 		
 		cpVect v1 = verts[i];
 		cpVect closest = cpClosetPointOnSegment(p, v0, v1);
@@ -132,17 +132,17 @@ cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpFloat r2, cpSeg
 	for(int i=0; i<count; i++){
 		cpVect n = axes[i].n;
 		cpFloat an = cpvdot(a, n);
-		cpFloat d = axes[i].d + rsum - an;
-		if(d > 0.0f) continue;
+		cpFloat d =  an - axes[i].d - rsum;
+		if(d < 0.0f) continue;
 		
 		cpFloat bn = cpvdot(b, n);
-		cpFloat t = d/(bn - an);
+		cpFloat t = d/(an - bn);
 		if(t < 0.0f || 1.0f < t) continue;
 		
 		cpVect point = cpvlerp(a, b, t);
-		cpFloat dt = -cpvcross(n, point);
-		cpFloat dtMin = -cpvcross(n, verts[(i - 1 + count)%count]);
-		cpFloat dtMax = -cpvcross(n, verts[i]);
+		cpFloat dt = cpvcross(n, point);
+		cpFloat dtMin = cpvcross(n, verts[(i - 1 + count)%count]);
+		cpFloat dtMax = cpvcross(n, verts[i]);
 		
 		if(dtMin <= dt && dt <= dtMax){
 			info->shape = (cpShape *)poly;
@@ -170,22 +170,6 @@ static const cpShapeClass polyClass = {
 	(cpShapeSegmentQueryImpl)cpPolyShapeSegmentQuery,
 };
 
-cpBool
-cpPolyValidate(const cpVect *verts, const int count)
-{
-	for(int i=0; i<count; i++){
-		cpVect a = verts[i];
-		cpVect b = verts[(i+1)%count];
-		cpVect c = verts[(i+2)%count];
-		
-		if(cpvcross(cpvsub(b, a), cpvsub(c, a)) > 0.0f){
-			return cpFalse;
-		}
-	}
-	
-	return cpTrue;
-}
-
 int
 cpPolyShapeGetNumVerts(const cpShape *shape)
 {
@@ -209,6 +193,13 @@ cpPolyShapeGetRadius(const cpShape *shape)
 	return ((cpPolyShape *)shape)->r;
 }
 
+static inline cpSplittingPlane
+cpSplittingPlaneNew(cpVect a, cpVect b)
+{
+	cpVect n = cpvnormalize(cpvrperp(cpvsub(b, a)));
+	cpSplittingPlane plane = {n, cpvdot(n, a)};
+	return plane;
+}
 
 static void
 setUpVerts(cpPolyShape *poly, int count, const cpVect *verts, cpVect offset)
@@ -222,18 +213,14 @@ setUpVerts(cpPolyShape *poly, int count, const cpVect *verts, cpVect offset)
 	poly->tPlanes = poly->planes + hullCount;
 	
 	for(int i=0; i<hullCount; i++){
-		cpVect a = cpvadd(offset, hullVerts[i]);
-		cpVect b = cpvadd(offset, hullVerts[(i+1)%hullCount]);
-		cpVect n = cpvnormalize(cpvperp(cpvsub(b, a)));
-
-		poly->verts[i] = a;
+		cpVect a = hullVerts[(i - 1 + hullCount)%hullCount];
+		cpVect b = hullVerts[i];
+		cpVect n = cpvnormalize(cpvrperp(cpvsub(b, a)));
+		cpVect v = cpvadd(offset, b);
+		
+		poly->verts[i] = v;
 		poly->planes[i].n = n;
-		poly->planes[i].d = cpvdot(n, a);
-	}
-	
-	// TODO: Why did I add this? It duplicates work from above.
-	for(int i=0; i<count; i++){
-		poly->planes[i] = cpSplittingPlaneNew(poly->verts[(i - 1 + count)%count], poly->verts[i]);
+		poly->planes[i].d = cpvdot(n, v);
 	}
 }
 

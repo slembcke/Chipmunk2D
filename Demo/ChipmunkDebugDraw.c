@@ -261,8 +261,8 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, Color outli
 {
 	Triangle *triangles = PushTriangles(6);
 	
-	cpVect n = cpvnormalize(cpvperp(cpvsub(b, a)));
-	cpVect t = cpvperp(n);
+	cpVect n = cpvnormalize(cpvrperp(cpvsub(b, a)));
+	cpVect t = cpvrperp(n);
 	
 	cpFloat half = 1.0f/ChipmunkDebugDrawPointLineScale;
 	cpFloat r = radius + half;
@@ -303,8 +303,8 @@ void ChipmunkDebugDrawPolygon(int count, cpVect *verts, cpFloat radius, Color ou
 		cpVect v1 = verts[i];
 		cpVect v2 = verts[(i+1)%count];
 		
-		cpVect n1 = cpvnormalize(cpvperp(cpvsub(v1, v0)));
-		cpVect n2 = cpvnormalize(cpvperp(cpvsub(v2, v1)));
+		cpVect n1 = cpvnormalize(cpvrperp(cpvsub(v1, v0)));
+		cpVect n2 = cpvnormalize(cpvrperp(cpvsub(v2, v1)));
 		
 		cpVect offset = cpvmult(cpvadd(n1, n2), 1.0/(cpvdot(n1, n2) + 1.0f));
 		extrude[i] = (struct ExtrudeVerts){offset, n2};
@@ -314,16 +314,16 @@ void ChipmunkDebugDrawPolygon(int count, cpVect *verts, cpFloat radius, Color ou
 	Triangle *triangles = PushTriangles(5*count - 2);
 	Triangle *cursor = triangles;
 	
-	cpFloat inset = cpfmax(0.0f, 1.0f/ChipmunkDebugDrawPointLineScale - radius);
+	cpFloat inset = -cpfmax(0.0f, 1.0f/ChipmunkDebugDrawPointLineScale - radius);
 	for(int i=0; i<count-2; i++){
-		struct v2f v0 = v2f(cpvsub(verts[  0], cpvmult(extrude[  0].offset, inset)));
-		struct v2f v1 = v2f(cpvsub(verts[i+1], cpvmult(extrude[i+1].offset, inset)));
-		struct v2f v2 = v2f(cpvsub(verts[i+2], cpvmult(extrude[i+2].offset, inset)));
+		struct v2f v0 = v2f(cpvadd(verts[  0], cpvmult(extrude[  0].offset, inset)));
+		struct v2f v1 = v2f(cpvadd(verts[i+1], cpvmult(extrude[i+1].offset, inset)));
+		struct v2f v2 = v2f(cpvadd(verts[i+2], cpvmult(extrude[i+2].offset, inset)));
 		
 		*cursor++ = (Triangle){{v0, v2f0, fillColor, fillColor}, {v1, v2f0, fillColor, fillColor}, {v2, v2f0, fillColor, fillColor}};
 	}
 	
-	cpFloat outset = inset + 1.0f/ChipmunkDebugDrawPointLineScale + radius;
+	cpFloat outset = 1.0f/ChipmunkDebugDrawPointLineScale + radius - inset;
 	for(int i=0, j=count-1; i<count; j=i, i++){
 		cpVect vA = verts[i];
 		cpVect vB = verts[j];
@@ -334,8 +334,8 @@ void ChipmunkDebugDrawPolygon(int count, cpVect *verts, cpFloat radius, Color ou
 		cpVect offsetA = extrude[i].offset;
 		cpVect offsetB = extrude[j].offset;
 		
-		cpVect innerA = cpvsub(vA, cpvmult(offsetA, inset));
-		cpVect innerB = cpvsub(vB, cpvmult(offsetB, inset));
+		cpVect innerA = cpvadd(vA, cpvmult(offsetA, inset));
+		cpVect innerB = cpvadd(vB, cpvmult(offsetB, inset));
 		
 		// Admittedly my variable naming sucks here...
 		struct v2f inner0 = v2f(innerA);
@@ -373,10 +373,10 @@ void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, Color fillColor)
 void ChipmunkDebugDrawBB(cpBB bb, Color color)
 {
 	cpVect verts[] = {
-		cpv(bb.l, bb.b),
-		cpv(bb.l, bb.t),
-		cpv(bb.r, bb.t),
 		cpv(bb.r, bb.b),
+		cpv(bb.r, bb.t),
+		cpv(bb.l, bb.t),
+		cpv(bb.l, bb.b),
 	};
 	ChipmunkDebugDrawPolygon(4, verts, 0.0f, color, LAColor(0, 0));
 }
