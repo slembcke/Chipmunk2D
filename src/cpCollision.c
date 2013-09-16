@@ -150,13 +150,6 @@ struct Edge {
 	cpVect n;
 };
 
-static inline struct Edge
-EdgeNew(cpVect va, cpVect vb, cpHashValue ha, cpHashValue hb, cpFloat r)
-{
-	struct Edge edge = {{va, ha}, {vb, hb}, r, cpvnormalize(cpvperp(cpvsub(vb, va)))};
-	return edge;
-}
-
 static struct Edge
 SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 {
@@ -168,11 +161,12 @@ SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 	int i2 = (i1 + 1)%count;
 	
 	cpVect *verts = poly->tVerts;
+	cpHashValue hashid = poly->shape.hashid;
 	if(cpvdot(n, poly->tPlanes[i1].n) > cpvdot(n, poly->tPlanes[i2].n)){
-		struct Edge edge = {{verts[i0], CP_HASH_PAIR(poly, i0)}, {verts[i1], CP_HASH_PAIR(poly, i1)}, poly->r, poly->tPlanes[i1].n};
+		struct Edge edge = {{verts[i0], CP_HASH_PAIR(hashid, i0)}, {verts[i1], CP_HASH_PAIR(hashid, i1)}, poly->r, poly->tPlanes[i1].n};
 		return edge;
 	} else {
-		struct Edge edge = {{verts[i1], CP_HASH_PAIR(poly, i1)}, {verts[i2], CP_HASH_PAIR(poly, i2)}, poly->r, poly->tPlanes[i2].n};
+		struct Edge edge = {{verts[i1], CP_HASH_PAIR(hashid, i1)}, {verts[i2], CP_HASH_PAIR(hashid, i2)}, poly->r, poly->tPlanes[i2].n};
 		return edge;
 	}
 }
@@ -180,11 +174,12 @@ SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 static struct Edge
 SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
 {
+	cpHashValue hashid = seg->shape.hashid;
 	if(cpvdot(seg->tn, n) > 0.0){
-		struct Edge edge = {{seg->ta, CP_HASH_PAIR(seg, 0)}, {seg->tb, CP_HASH_PAIR(seg, 1)}, seg->r, seg->tn};
+		struct Edge edge = {{seg->ta, CP_HASH_PAIR(hashid, 0)}, {seg->tb, CP_HASH_PAIR(hashid, 1)}, seg->r, seg->tn};
 		return edge;
 	} else {
-		struct Edge edge = {{seg->tb, CP_HASH_PAIR(seg, 1)}, {seg->ta, CP_HASH_PAIR(seg, 0)}, seg->r, cpvneg(seg->tn)};
+		struct Edge edge = {{seg->tb, CP_HASH_PAIR(hashid, 1)}, {seg->ta, CP_HASH_PAIR(hashid, 0)}, seg->r, cpvneg(seg->tn)};
 		return edge;
 	}
 }

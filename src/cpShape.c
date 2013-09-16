@@ -28,6 +28,7 @@ CP_DeclareShapeGetter(struct, type, name){ \
 	return ((struct *)shape)->member; \
 }
 
+ // TODO NUKE
 static cpHashValue cpShapeIDCounter = 0;
 
 void
