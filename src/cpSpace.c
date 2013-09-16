@@ -99,7 +99,8 @@ cpSpaceInit(cpSpace *space)
 	
 	space->locked = 0;
 	space->stamp = 0;
-
+	
+	space->shapeIDCounter = 0;
 	space->staticShapes = cpBBTreeNew((cpSpatialIndexBBFunc)cpShapeGetBB, NULL);
 	space->activeShapes = cpBBTreeNew((cpSpatialIndexBBFunc)cpShapeGetBB, space->staticShapes);
 	cpBBTreeSetVelocityFunc(space->activeShapes, (cpBBTreeVelocityFunc)shapeVelocityFunc);
@@ -250,6 +251,8 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	
 	cpBody *body = shape->body;
 	cpBodyAddShape(body, shape);
+	
+	shape->hashid = space->shapeIDCounter++;
 	cpShapeUpdate(shape, body->p, body->rot);
 	cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
 	shape->space = space;
@@ -270,6 +273,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	cpBodyActivate(body);
 	cpBodyAddShape(body, shape);
 	
+	shape->hashid = space->shapeIDCounter++;
 	cpShapeUpdate(shape, body->p, body->rot);
 	cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
 	shape->space = space;
@@ -364,6 +368,7 @@ cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
 	cpSpaceFilterArbiters(space, body, shape);
 	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
 	shape->space = NULL;
+	shape->hashid = 0;
 }
 
 void
@@ -381,6 +386,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 		cpSpaceFilterArbiters(space, body, shape);
 		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
 		shape->space = NULL;
+		shape->hashid = 0;
 	}
 }
 

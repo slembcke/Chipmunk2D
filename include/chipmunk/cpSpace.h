@@ -84,6 +84,7 @@ struct cpSpace {
 	CP_PRIVATE(cpArray *rousedBodies);
 	CP_PRIVATE(cpArray *sleepingComponents);
 	
+	CP_PRIVATE(cpHashValue shapeIDCounter);
 	CP_PRIVATE(cpSpatialIndex *staticShapes);
 	CP_PRIVATE(cpSpatialIndex *activeShapes);
 	

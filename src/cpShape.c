@@ -28,23 +28,10 @@ CP_DeclareShapeGetter(struct, type, name){ \
 	return ((struct *)shape)->member; \
 }
 
- // TODO NUKE
-static cpHashValue cpShapeIDCounter = 0;
-
-void
-cpResetShapeIdCounter(void)
-{
-	cpShapeIDCounter = 0;
-}
-
-
 cpShape*
 cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body)
 {
 	shape->klass = klass;
-	
-	shape->hashid = cpShapeIDCounter;
-	cpShapeIDCounter++;
 	
 	shape->body = body;
 	shape->sensor = 0;
