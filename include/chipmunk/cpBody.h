@@ -124,10 +124,10 @@ void cpBodyFree(cpBody *body);
 
 /// Check that the properties of a body is sane. (Only in debug mode)
 #ifdef NDEBUG
-	#define	cpBodyAssertSane(body)
+	#define	cpAssertSaneBody(body)
 #else
 	void cpBodySanityCheck(cpBody *body);
-	#define	cpBodyAssertSane(body) cpBodySanityCheck(body)
+	#define	cpAssertSaneBody(body) cpBodySanityCheck(body)
 #endif
 
 // Defined in cpSpace.c
@@ -179,7 +179,7 @@ static inline type cpBodyGet##name(const cpBody *body){return body->CP_PRIVATE(m
 static inline void cpBodySet##name(cpBody *body, const type value){ \
 	cpBodyActivate(body); \
 	body->CP_PRIVATE(member) = value; \
-	cpBodyAssertSane(body); \
+	cpAssertSaneBody(body); \
 }
 
 #define CP_DefineBodyStructProperty(type, member, name) \

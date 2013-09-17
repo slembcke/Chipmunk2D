@@ -57,7 +57,7 @@ init(void)
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
 	
-	body = cpSpaceAddBody(space, cpBodyNew(0.0f, 0.0f));
+	body = cpSpaceAddBody(space, cpBodyNew(1.0f, 0.0f));
 	cpBodySetPosition(body, cpv(0.0, 0.0));
 	
 	cpFloat s = 150.0;
