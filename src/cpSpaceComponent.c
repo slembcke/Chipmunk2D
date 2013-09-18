@@ -145,13 +145,13 @@ cpBodyActivate(cpBody *body)
 	if(body != NULL && !cpBodyIsRogue(body)){
 		body->node.idleTime = 0.0f;
 		ComponentActivate(ComponentRoot(body));
-	}
-	
-	CP_BODY_FOREACH_ARBITER(body, arb){
-		// Reset the idle timer of things the body is touching as well.
-		// That way things don't get left hanging in the air.
-		cpBody *other = (arb->body_a == body ? arb->body_b : arb->body_a);
-		if(!cpBodyIsStatic(other)) other->node.idleTime = 0.0f;
+		
+		CP_BODY_FOREACH_ARBITER(body, arb){
+			// Reset the idle timer of things the body is touching as well.
+			// That way things don't get left hanging in the air.
+			cpBody *other = (arb->body_a == body ? arb->body_b : arb->body_a);
+			if(!cpBodyIsStatic(other)) other->node.idleTime = 0.0f;
+		}
 	}
 }
 
@@ -257,6 +257,7 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		cpBody *a = arb->body_a, *b = arb->body_b;
 		
 		if(sleep){
+			// TODO checking cpBodyIsSleepin() redundant?
 			if((cpBodyIsRogue(b) && !cpBodyIsStatic(b)) || cpBodyIsSleeping(a)) cpBodyActivate(a);
 			if((cpBodyIsRogue(a) && !cpBodyIsStatic(a)) || cpBodyIsSleeping(b)) cpBodyActivate(b);
 		}
@@ -324,7 +325,7 @@ cpBodySleepWithGroup(cpBody *body, cpBody *group){
 		return;
 	}
 	
-	CP_BODY_FOREACH_SHAPE(body, shape) cpShapeUpdate(shape, body->p, body->rot);
+	CP_BODY_FOREACH_SHAPE(body, shape) cpShapeCacheBB(shape);
 	cpSpaceDeactivateBody(space, body);
 	
 	if(group){

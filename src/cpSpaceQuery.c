@@ -40,7 +40,7 @@ NearestPointQuery(struct PointQueryContext *context, cpShape *shape, cpCollision
 		cpPointQueryInfo info;
 		cpShapePointQuery(shape, context->point, &info);
 		
-		if(info.shape && info.d < context->maxDistance) context->func(shape, info.d, info.p, data);
+		if(info.shape && info.distance < context->maxDistance) context->func(shape, info.distance, info.point, data);
 	}
 	
 	return id;
@@ -67,7 +67,7 @@ NearestPointQueryNearest(struct PointQueryContext *context, cpShape *shape, cpCo
 		cpPointQueryInfo info;
 		cpShapePointQuery(shape, context->point, &info);
 		
-		if(info.d < out->d) (*out) = info;
+		if(info.distance < out->distance) (*out) = info;
 	}
 	
 	return id;

@@ -533,19 +533,12 @@ cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, void *
 
 //MARK: Spatial Index Management
 
-static void
-updateBBCache(cpShape *shape, void *unused)
-{
-	cpBody *body = shape->body;
-	cpShapeUpdate(shape, body->p, body->rot);
-}
-
 void 
 cpSpaceReindexStatic(cpSpace *space)
 {
 	cpAssertHard(!space->locked, "You cannot manually reindex objects while the space is locked. Wait until the current query or step is complete.");
 	
-	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)&updateBBCache, NULL);
+	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)&cpShapeUpdateFunc, NULL);
 	cpSpatialIndexReindex(space->staticShapes);
 }
 
@@ -554,8 +547,7 @@ cpSpaceReindexShape(cpSpace *space, cpShape *shape)
 {
 	cpAssertHard(!space->locked, "You cannot manually reindex objects while the space is locked. Wait until the current query or step is complete.");
 	
-	cpBody *body = shape->body;
-	cpShapeUpdate(shape, body->p, body->rot);
+	cpShapeCacheBB(shape);
 	
 	// attempt to rehash the shape in both hashes
 	cpSpatialIndexReindexObject(space->activeShapes, shape, shape->hashid);

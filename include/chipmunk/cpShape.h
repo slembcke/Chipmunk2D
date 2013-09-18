@@ -32,12 +32,12 @@ typedef struct cpPointQueryInfo {
 	/// The nearest shape, NULL if no shape was within range.
 	cpShape *shape;
 	/// The closest point on the shape's surface. (in world space coordinates)
-	cpVect p;
+	cpVect point;
 	/// The distance to the point. The distance is negative if the point is inside the shape.
-	cpFloat d;
+	cpFloat distance;
 	/// The gradient of the signed distance function.
 	/// The same as info.p/info.d, but accurate even for very small values of info.d.
-	cpVect g;
+	cpVect gradient;
 } cpPointQueryInfo;
 
 /// Segment query info struct.
@@ -51,6 +51,14 @@ typedef struct cpSegmentQueryInfo {
 	/// The normalized distance along the query segment in the range [0, 1].
 	cpFloat alpha;
 } cpSegmentQueryInfo;
+
+/// @private
+struct cpShapeMassInfo {
+	cpFloat m;
+	cpFloat i;
+	cpVect cog;
+	cpFloat area;
+};
 
 /// @private
 typedef enum cpShapeType{
@@ -81,6 +89,9 @@ struct cpShape {
 	
 	/// The rigid body this collision shape is attached to.
 	CP_PRIVATE(cpBody *body);
+	
+	// Optional mass of the shape.
+	CP_PRIVATE(struct cpShapeMassInfo massInfo);
 
 	/// The current bounding box of the shape.
 	CP_PRIVATE(cpBB bb);
@@ -152,7 +163,7 @@ static inline type cpShapeGet##name(const cpShape *shape){return shape->CP_PRIVA
 
 #define CP_DefineShapeStructSetter(type, member, name, activates) \
 static inline void cpShapeSet##name(cpShape *shape, type value){ \
-	if(activates && shape->CP_PRIVATE(body)) cpBodyActivate(shape->CP_PRIVATE(body)); \
+	if(activates) cpBodyActivate(shape->CP_PRIVATE(body)); \
 	shape->CP_PRIVATE(member) = value; \
 }
 
@@ -164,6 +175,12 @@ CP_DefineShapeStructGetter(cpSpace*, space, Space)
 
 CP_DefineShapeStructGetter(cpBody*, body, Body)
 void cpShapeSetBody(cpShape *shape, cpBody *body);
+
+cpFloat cpShapeGetMass(cpShape *shape);
+void cpShapeSetMass(cpShape *shape, cpFloat mass);
+
+cpFloat cpShapeGetDensity(cpShape *shape);
+void cpShapeSetDensity(cpShape *shape, cpFloat density);
 
 CP_DefineShapeStructGetter(cpBB, bb, BB)
 CP_DefineShapeStructProperty(cpBool, sensor, Sensor, cpTrue)

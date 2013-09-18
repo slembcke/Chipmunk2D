@@ -68,10 +68,10 @@ update(cpSpace *space, double dt)
 	if(nearestInfo.shape){
 		// Draw a grey line to the closest shape.
 		ChipmunkDebugDrawDot(3, ChipmunkDemoMouse, RGBAColor(0.5, 0.5, 0.5, 1.0));
-		ChipmunkDebugDrawSegment(ChipmunkDemoMouse, nearestInfo.p, 	RGBAColor(0.5, 0.5, 0.5, 1.0));
+		ChipmunkDebugDrawSegment(ChipmunkDemoMouse, nearestInfo.point, 	RGBAColor(0.5, 0.5, 0.5, 1.0));
 		
 		// Draw a red bounding box around the shape under the mouse.
-		if(nearestInfo.d < 0) ChipmunkDebugDrawBB(cpShapeGetBB(nearestInfo.shape), RGBAColor(1,0,0,1));
+		if(nearestInfo.distance < 0) ChipmunkDebugDrawBB(cpShapeGetBB(nearestInfo.shape), RGBAColor(1,0,0,1));
 	}
 }
 

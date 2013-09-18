@@ -20,6 +20,7 @@
  */
  
 #include <float.h>
+#include <stdarg.h>
 
 #include "chipmunk_private.h"
 #include "constraints/util.h"
@@ -103,59 +104,95 @@ cpBodyFree(cpBody *body)
 	}
 }
 
-static void cpv_assert_nan(cpVect v, char *message){cpAssertSoft(v.x == v.x && v.y == v.y, message);}
-static void cpv_assert_infinite(cpVect v, char *message){cpAssertSoft(cpfabs(v.x) != INFINITY && cpfabs(v.y) != INFINITY, message);}
+static void cpv_assert_nan(cpVect v, char *message){cpAssertHard(v.x == v.x && v.y == v.y, message);}
+static void cpv_assert_infinite(cpVect v, char *message){cpAssertHard(cpfabs(v.x) != INFINITY && cpfabs(v.y) != INFINITY, message);}
 static void cpv_assert_sane(cpVect v, char *message){cpv_assert_nan(v, message); cpv_assert_infinite(v, message);}
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// TODO this could be cleaned up.
 void
 cpBodySanityCheck(cpBody *body)
 {
-	cpAssertSoft(body->m == body->m && body->m_inv == body->m_inv, "Body's mass is invalid.");
-	cpAssertSoft(body->i == body->i && body->i_inv == body->i_inv, "Body's moment is invalid.");
+	cpAssertHard(body->m == body->m && body->m_inv == body->m_inv, "Body's mass is NaN.");
+	cpAssertHard(body->i == body->i && body->i_inv == body->i_inv, "Body's moment is NaN.");
+	cpAssertHard(body->m >= 0.0f, "Body's mass is negative.");
+	cpAssertHard(body->i >= 0.0f, "Body's moment is negative.");
 	
 	cpv_assert_sane(body->p, "Body's position is invalid.");
 	cpv_assert_sane(body->v, "Body's velocity is invalid.");
 	cpv_assert_sane(body->f, "Body's force is invalid.");
 
-	cpAssertSoft(body->a == body->a && cpfabs(body->a) != INFINITY, "Body's angle is invalid.");
-	cpAssertSoft(body->w == body->w && cpfabs(body->w) != INFINITY, "Body's angular velocity is invalid.");
-	cpAssertSoft(body->t == body->t && cpfabs(body->t) != INFINITY, "Body's torque is invalid.");
+	cpAssertHard(body->a == body->a && cpfabs(body->a) != INFINITY, "Body's angle is invalid.");
+	cpAssertHard(body->w == body->w && cpfabs(body->w) != INFINITY, "Body's angular velocity is invalid.");
+	cpAssertHard(body->t == body->t && cpfabs(body->t) != INFINITY, "Body's torque is invalid.");
 	
 	cpv_assert_sane(body->rot, "Body's rotation vector is invalid.");
 	
-	cpAssertSoft(body->v_limit == body->v_limit, "Body's velocity limit is invalid.");
-	cpAssertSoft(body->w_limit == body->w_limit, "Body's angular velocity limit is invalid.");
+	cpAssertHard(body->v_limit == body->v_limit, "Body's velocity limit is invalid.");
+	cpAssertHard(body->w_limit == body->w_limit, "Body's angular velocity limit is invalid.");
 }
 
 #ifdef __cplusplus
 }
 #endif
 
+// Should only be called for a shape with mass info set.
+void
+cpBodyAccumulateMassForShape(cpBody *body, cpShape *shape)
+{
+	// Cache the position to realign it at the end.
+	cpVect pos = cpBodyGetPosition(body);
+	
+	struct cpShapeMassInfo *info = &shape->massInfo;
+	cpFloat msum = body->m + info->m;
+	
+	body->i += info->m*info->i + cpvdistsq(body->cog, info->cog)*(info->m*body->m)/msum;
+	body->cog = cpvlerp(body->cog, info->cog, info->m/msum);
+	body->m = msum;
+	
+	body->m_inv = 1.0f/body->m;
+	body->i_inv = 1.0f/body->i;
+	
+	cpBodySetPosition(body, pos);
+	cpAssertSaneBody(body);
+}
+
+// Should only be called when shapes with mass info are modified.
+void
+cpBodyAccumulateMass(cpBody *body)
+{
+	if(body == NULL) return;
+	
+	body->m = body->i = 0.0f;
+	body->m_inv = body->i_inv = INFINITY;
+	
+	CP_BODY_FOREACH_SHAPE(body, shape){
+		if(shape->massInfo.m > 0.0f) cpBodyAccumulateMassForShape(body, shape);
+	}
+}
+
 void
 cpBodySetMass(cpBody *body, cpFloat mass)
 {
-	cpAssertHard(mass > 0.0f, "Mass must be positive and non-zero.");
+	cpAssertHard(mass >= 0.0f, "Mass must be positive.");
 	
 	cpBodyActivate(body);
 	body->m = mass;
 	body->m_inv = 1.0f/mass;
-	cpBodyAssertSane(body);
+	cpAssertSaneBody(body);
 }
 
 void
 cpBodySetMoment(cpBody *body, cpFloat moment)
 {
-	cpAssertHard(moment > 0.0f, "Moment of Inertia must be positive and non-zero.");
+	cpAssertHard(moment >= 0.0f, "Moment of Inertia must be positive.");
 	
 	cpBodyActivate(body);
 	body->i = moment;
 	body->i_inv = 1.0f/moment;
-	cpBodyAssertSane(body);
+	cpAssertSaneBody(body);
 }
 
 void
@@ -166,6 +203,10 @@ cpBodyAddShape(cpBody *body, cpShape *shape)
 	
 	shape->next = next;
 	body->shapeList = shape;
+	
+	if(shape->massInfo.m > 0.0f){
+		cpBodyAccumulateMassForShape(body, shape);
+	}
 }
 
 void
@@ -186,6 +227,10 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
   
   shape->prev = NULL;
   shape->next = NULL;
+	
+	if(!cpBodyIsStatic(body) && shape->massInfo.m > 0.0f){
+		cpBodyAccumulateMass(body);
+	}
 }
 
 static cpConstraint *
@@ -212,8 +257,8 @@ void
 cpBodySetPosition(cpBody *body, cpVect pos)
 {
 	cpBodyActivate(body);
-	body->p = pos;
-	cpBodyAssertSane(body);
+	body->p = cpvadd(cpvrotate(body->cog, body->rot), pos);
+	cpAssertSaneBody(body);
 }
 
 static inline void
@@ -221,7 +266,7 @@ setAngle(cpBody *body, cpFloat angle)
 {
 	body->a = angle;//fmod(a, (cpFloat)M_PI*2.0f);
 	body->rot = cpvforangle(angle);
-	cpBodyAssertSane(body);
+	cpAssertSaneBody(body);
 }
 
 void
@@ -234,12 +279,14 @@ cpBodySetAngle(cpBody *body, cpFloat angle)
 void
 cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
+	cpAssertSoft(body->m > 0.0f && body->i > 0.0f, "Body's mass and moment must be positive to simulate. (Mass: %f Moment: %f)", body->m, body->i);
+	
 	body->v = cpvclamp(cpvadd(cpvmult(body->v, damping), cpvmult(cpvadd(gravity, cpvmult(body->f, body->m_inv)), dt)), body->v_limit);
 	
 	cpFloat w_limit = body->w_limit;
 	body->w = cpfclamp(body->w*damping + body->t*body->i_inv*dt, -w_limit, w_limit);
 	
-	cpBodySanityCheck(body);
+	cpAssertSaneBody(body);
 }
 
 void
@@ -251,7 +298,7 @@ cpBodyUpdatePosition(cpBody *body, cpFloat dt)
 	body->v_bias = cpvzero;
 	body->w_bias = 0.0f;
 	
-	cpBodySanityCheck(body);
+	cpAssertSaneBody(body);
 }
 
 void
@@ -267,26 +314,31 @@ cpBodyApplyForce(cpBody *body, cpVect force, cpVect r)
 {
 	cpBodyActivate(body);
 	body->f = cpvadd(body->f, force);
-	body->t += cpvcross(r, force);
+	
+	cpVect r_cog = cpvsub(cpvrotate(body->cog, body->rot), r);
+	body->t += cpvcross(r_cog, force);
 }
 
 void
 cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)
 {
 	cpBodyActivate(body);
-	apply_impulse(body, j, r);
+	
+	cpVect r_cog = cpvsub(cpvrotate(body->cog, body->rot), r);
+	apply_impulse(body, j, r_cog);
 }
 
 static inline cpVect
 cpBodyGetVelAtPoint(cpBody *body, cpVect r)
 {
-	return cpvadd(body->v, cpvmult(cpvperp(r), body->w));
+	cpVect r_cog = cpvsub(cpvrotate(body->cog, body->rot), r);
+	return cpvadd(body->v, cpvmult(cpvperp(r_cog), body->w));
 }
 
 cpVect
 cpBodyGetVelocityAtWorldPoint(cpBody *body, cpVect point)
 {
-	return cpBodyGetVelAtPoint(body, cpvsub(point, body->p));
+	return cpBodyGetVelAtPoint(body, cpvsub(cpBodyGetPosition(body), point));
 }
 
 cpVect

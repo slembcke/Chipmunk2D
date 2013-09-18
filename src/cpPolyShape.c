@@ -113,11 +113,11 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	cpVect g = cpvmult(cpvsub(p, closestPoint), 1.0f/dist);
 	
 	info->shape = (cpShape *)poly;
-	info->p = cpvadd(closestPoint, cpvmult(g, r));
-	info->d = dist - r;
+	info->point = cpvadd(closestPoint, cpvmult(g, r));
+	info->distance = dist - r;
 	
 	// Use the normal of the closest segment if the distance is small.
-	info->g = (minDist > MAGIC_EPSILON ? g : closestNormal);
+	info->gradient = (minDist > MAGIC_EPSILON ? g : closestNormal);
 }
 
 static void
@@ -162,14 +162,6 @@ cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpFloat r2, cpSeg
 	}
 }
 
-static const cpShapeClass polyClass = {
-	CP_POLY_SHAPE,
-	(cpShapeCacheDataImpl)cpPolyShapeCacheData,
-	(cpShapeDestroyImpl)cpPolyShapeDestroy,
-	(cpShapePointQueryImpl)cpPolyShapePointQuery,
-	(cpShapeSegmentQueryImpl)cpPolyShapeSegmentQuery,
-};
-
 cpBool
 cpPolyValidate(const cpVect *verts, const int count)
 {
@@ -185,30 +177,6 @@ cpPolyValidate(const cpVect *verts, const int count)
 	
 	return cpTrue;
 }
-
-int
-cpPolyShapeGetNumVerts(const cpShape *shape)
-{
-	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
-	return ((cpPolyShape *)shape)->count;
-}
-
-cpVect
-cpPolyShapeGetVert(const cpShape *shape, int idx)
-{
-	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
-	cpAssertHard(0 <= idx && idx < cpPolyShapeGetNumVerts(shape), "Index out of range.");
-	
-	return ((cpPolyShape *)shape)->verts[idx];
-}
-
-cpFloat
-cpPolyShapeGetRadius(const cpShape *shape)
-{
-	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
-	return ((cpPolyShape *)shape)->r;
-}
-
 
 static void
 setUpVerts(cpPolyShape *poly, int count, const cpVect *verts, cpVect offset)
@@ -233,12 +201,36 @@ setUpVerts(cpPolyShape *poly, int count, const cpVect *verts, cpVect offset)
 	}
 }
 
+static struct cpShapeMassInfo
+cpPolyShapeMassInfo(cpFloat mass, int count, const cpVect *verts)
+{
+	// TODO moment is approximate due to radius.
+	
+	cpVect centroid = cpCentroidForPoly(count, verts);
+	struct cpShapeMassInfo info = {
+		mass, cpMomentForPoly(1.0f, count, verts, cpvneg(centroid)),
+		centroid,
+		cpAreaForPoly(count, verts),
+	};
+	
+	return info;
+}
+
+static const cpShapeClass polyClass = {
+	CP_POLY_SHAPE,
+	(cpShapeCacheDataImpl)cpPolyShapeCacheData,
+	(cpShapeDestroyImpl)cpPolyShapeDestroy,
+	(cpShapePointQueryImpl)cpPolyShapePointQuery,
+	(cpShapeSegmentQueryImpl)cpPolyShapeSegmentQuery,
+};
+
 cpPolyShape *
 cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int count, const cpVect *verts, cpVect offset, cpFloat radius)
 {
-	setUpVerts(poly, count, verts, offset);
-	cpShapeInit((cpShape *)poly, &polyClass, body);
 	poly->r = radius;
+	setUpVerts(poly, count, verts, offset);
+	
+	cpShapeInit((cpShape *)poly, &polyClass, body, cpPolyShapeMassInfo(0.0f, poly->count, poly->verts));
 
 	return poly;
 }
@@ -284,19 +276,55 @@ cpBoxShapeNew2(cpBody *body, cpBB box, cpFloat radius)
 	return (cpShape *)cpBoxShapeInit2(cpPolyShapeAlloc(), body, box, radius);
 }
 
+int
+cpPolyShapeGetNumVerts(const cpShape *shape)
+{
+	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
+	return ((cpPolyShape *)shape)->count;
+}
+
+cpVect
+cpPolyShapeGetVert(const cpShape *shape, int idx)
+{
+	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
+	cpAssertHard(0 <= idx && idx < cpPolyShapeGetNumVerts(shape), "Index out of range.");
+	
+	return ((cpPolyShape *)shape)->verts[idx];
+}
+
+cpFloat
+cpPolyShapeGetRadius(const cpShape *shape)
+{
+	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
+	return ((cpPolyShape *)shape)->r;
+}
+
 // Unsafe API (chipmunk_unsafe.h)
 
 void
 cpPolyShapeSetVerts(cpShape *shape, int count, cpVect *verts, cpVect offset)
 {
 	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
-	cpPolyShapeDestroy((cpPolyShape *)shape);
-	setUpVerts((cpPolyShape *)shape, count, verts, offset);
+	cpPolyShape *poly = (cpPolyShape *)shape;
+	cpPolyShapeDestroy(poly);
+	
+	setUpVerts(poly, count, verts, offset);
+	
+	cpFloat mass = shape->massInfo.m;
+	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, poly->count, poly->verts);
+	if(mass > 0.0f) cpBodyAccumulateMass(shape->body);
 }
 
 void
 cpPolyShapeSetRadius(cpShape *shape, cpFloat radius)
 {
 	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
-	((cpPolyShape *)shape)->r = radius;
+	cpPolyShape *poly = (cpPolyShape *)shape;
+	cpPolyShapeDestroy(poly);
+	
+	poly->r = radius;
+
+	cpFloat mass = shape->massInfo.m;
+	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, poly->count, poly->verts);
+	if(mass > 0.0f) cpBodyAccumulateMass(shape->body);
 }
