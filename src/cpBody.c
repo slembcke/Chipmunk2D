@@ -145,28 +145,31 @@ cpBodyAccumulateMassForShape(cpBody *body, cpShape *shape)
 	// Cache the position to realign it at the end.
 	cpVect pos = cpBodyGetPosition(body);
 	
-	cpFloat msum = body->m + shape->m;
+	struct cpShapeMassInfo *info = &shape->massInfo;
+	cpFloat msum = body->m + info->m;
 	
-	body->i += shape->m*shape->i + cpvdistsq(body->cog, shape->cog)*(shape->m*body->m)/msum;
-	body->cog = cpvlerp(body->cog, shape->cog, shape->m/msum);
+	body->i += info->m*info->i + cpvdistsq(body->cog, info->cog)*(info->m*body->m)/msum;
+	body->cog = cpvlerp(body->cog, info->cog, info->m/msum);
 	body->m = msum;
 	
 	body->m_inv = 1.0f/body->m;
 	body->i_inv = 1.0f/body->i;
 	
 	cpBodySetPosition(body, pos);
-	cpAssertSaneBody();
+	cpAssertSaneBody(body);
 }
 
 // Should only be called when shapes with mass info are modified.
 void
 cpBodyAccumulateMass(cpBody *body)
 {
+	if(body == NULL) return;
+	
 	body->m = body->i = 0.0f;
 	body->m_inv = body->i_inv = INFINITY;
 	
 	CP_BODY_FOREACH_SHAPE(body, shape){
-		if(shape->m > 0.0f) cpBodyAccumulateMassForShape(body, shape);
+		if(shape->massInfo.m > 0.0f) cpBodyAccumulateMassForShape(body, shape);
 	}
 }
 
@@ -201,7 +204,7 @@ cpBodyAddShape(cpBody *body, cpShape *shape)
 	shape->next = next;
 	body->shapeList = shape;
 	
-	if(shape->m > 0.0f){
+	if(shape->massInfo.m > 0.0f){
 		cpBodyAccumulateMassForShape(body, shape);
 	}
 }
@@ -225,7 +228,7 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
   shape->prev = NULL;
   shape->next = NULL;
 	
-	if(shape->m > 0.0f){
+	if(!cpBodyIsStatic(body) && shape->massInfo.m > 0.0f){
 		cpBodyAccumulateMass(body);
 	}
 }

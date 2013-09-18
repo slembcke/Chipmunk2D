@@ -53,6 +53,14 @@ typedef struct cpSegmentQueryInfo {
 } cpSegmentQueryInfo;
 
 /// @private
+struct cpShapeMassInfo {
+	cpFloat m;
+	cpFloat i;
+	cpVect cog;
+	cpFloat area;
+};
+
+/// @private
 typedef enum cpShapeType{
 	CP_CIRCLE_SHAPE,
 	CP_SEGMENT_SHAPE,
@@ -83,9 +91,7 @@ struct cpShape {
 	CP_PRIVATE(cpBody *body);
 	
 	// Optional mass of the shape.
-	CP_PRIVATE(cpFloat m);
-	CP_PRIVATE(cpFloat i);
-	CP_PRIVATE(cpVect cog);
+	CP_PRIVATE(struct cpShapeMassInfo massInfo);
 
 	/// The current bounding box of the shape.
 	CP_PRIVATE(cpBB bb);
@@ -169,7 +175,8 @@ CP_DefineShapeStructGetter(cpSpace*, space, Space)
 
 CP_DefineShapeStructGetter(cpBody*, body, Body)
 void cpShapeSetBody(cpShape *shape, cpBody *body);
-CP_DefineShapeStructGetter(cpFloat, m, Mass)
+
+cpFloat cpShapeGetMass(cpShape *shape);
 void cpShapeSetMass(cpShape *shape, cpFloat mass);
 
 CP_DefineShapeStructGetter(cpBB, bb, BB)

@@ -191,7 +191,7 @@ cpClosetPointOnSegment(const cpVect p, const cpVect a, const cpVect b)
 	return cpvadd(b, cpvmult(delta, t));
 }
 
-cpShape *cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body, cpVect cog, cpFloat moment);
+cpShape *cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body, struct cpShapeMassInfo massInfo);
 
 static inline cpBool
 cpShapeActive(cpShape *shape)
