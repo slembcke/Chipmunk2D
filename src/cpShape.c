@@ -101,6 +101,9 @@ cpShapeSetMass(cpShape *shape, cpFloat mass){
 	cpBodyAccumulateMass(body);
 }
 
+cpFloat cpShapeGetDensity(cpShape *shape){ return shape->massInfo.m/shape->massInfo.area; }
+void cpShapeSetDensity(cpShape *shape, cpFloat density){ cpShapeSetMass(shape, density*shape->massInfo.area); }
+
 
 cpBB
 cpShapeCacheBB(cpShape *shape)

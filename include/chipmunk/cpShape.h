@@ -179,6 +179,9 @@ void cpShapeSetBody(cpShape *shape, cpBody *body);
 cpFloat cpShapeGetMass(cpShape *shape);
 void cpShapeSetMass(cpShape *shape, cpFloat mass);
 
+cpFloat cpShapeGetDensity(cpShape *shape);
+void cpShapeSetDensity(cpShape *shape, cpFloat density);
+
 CP_DefineShapeStructGetter(cpBB, bb, BB)
 CP_DefineShapeStructProperty(cpBool, sensor, Sensor, cpTrue)
 CP_DefineShapeStructProperty(cpFloat, e, Elasticity, cpFalse)
