@@ -66,6 +66,8 @@
 		D38996A6148B1E72006CFE0B /* Slice.c in Sources */ = {isa = PBXBuildFile; fileRef = D38996A5148B1E72006CFE0B /* Slice.c */; };
 		D38C029916840ED3009F612B /* Shatter.c in Sources */ = {isa = PBXBuildFile; fileRef = D38C029816840ED2009F612B /* Shatter.c */; };
 		D393275C0EA02C710026F6A2 /* Pump.c in Sources */ = {isa = PBXBuildFile; fileRef = D393275B0EA02C710026F6A2 /* Pump.c */; };
+		D3A96F7B17E9F86900658436 /* cpSpaceDebug.c in Sources */ = {isa = PBXBuildFile; fileRef = D3A96F7A17E9F86900658436 /* cpSpaceDebug.c */; };
+		D3A96F7C17E9F86900658436 /* cpSpaceDebug.c in Sources */ = {isa = PBXBuildFile; fileRef = D3A96F7A17E9F86900658436 /* cpSpaceDebug.c */; };
 		D3AA477512AF0F8900E27AAB /* cpBBTree.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AA477312AF0F8900E27AAB /* cpBBTree.c */; };
 		D3AA477612AF0F8900E27AAB /* cpSpatialIndex.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AA477412AF0F8900E27AAB /* cpSpatialIndex.c */; };
 		D3AA477712AF0F8900E27AAB /* cpBBTree.c in Sources */ = {isa = PBXBuildFile; fileRef = D3AA477312AF0F8900E27AAB /* cpBBTree.c */; };
@@ -182,6 +184,7 @@
 		D390FDAD146EF0F8005D1E06 /* VERSION.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = VERSION.txt; path = ../VERSION.txt; sourceTree = "<group>"; };
 		D393275B0EA02C710026F6A2 /* Pump.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Pump.c; sourceTree = "<group>"; };
 		D39F478A0FD4AB4E00B244CA /* chipmunk_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_types.h; path = ../include/chipmunk/chipmunk_types.h; sourceTree = SOURCE_ROOT; };
+		D3A96F7A17E9F86900658436 /* cpSpaceDebug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpSpaceDebug.c; path = ../src/cpSpaceDebug.c; sourceTree = "<group>"; };
 		D3AA477312AF0F8900E27AAB /* cpBBTree.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpBBTree.c; sourceTree = "<group>"; };
 		D3AA477412AF0F8900E27AAB /* cpSpatialIndex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpSpatialIndex.c; sourceTree = "<group>"; };
 		D3AA477A12AF0F9B00E27AAB /* cpSpatialIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpSpatialIndex.h; path = ../include/chipmunk/cpSpatialIndex.h; sourceTree = SOURCE_ROOT; };
@@ -275,6 +278,7 @@
 				D34E9E6412558081002C0FE5 /* cpSpaceQuery.c */,
 				D34E9E96125581DD002C0FE5 /* cpSpaceComponent.c */,
 				D34E9EA212558A7C002C0FE5 /* cpSpaceStep.c */,
+				D3A96F7A17E9F86900658436 /* cpSpaceDebug.c */,
 			);
 			name = Space;
 			sourceTree = "<group>";
@@ -661,6 +665,7 @@
 				D34963D90B56CBBF00CAD239 /* cpSpace.c in Sources */,
 				D36B19510EA13B6D0028A362 /* cpDampedRotarySpring.c in Sources */,
 				D37BB76E0EAADA6300C70958 /* cpRotaryLimitJoint.c in Sources */,
+				D3A96F7B17E9F86900658436 /* cpSpaceDebug.c in Sources */,
 				D37BB8B30EAB01E400C70958 /* cpGearJoint.c in Sources */,
 				D37BB8F20EAB06B600C70958 /* cpSimpleMotor.c in Sources */,
 				D36D87831012D63600DB5078 /* cpRatchetJoint.c in Sources */,
@@ -697,6 +702,7 @@
 				D3C3790611063C57003EF1D9 /* cpSpace.c in Sources */,
 				D3C3790711063C57003EF1D9 /* cpDampedRotarySpring.c in Sources */,
 				D3C3790811063C57003EF1D9 /* cpRotaryLimitJoint.c in Sources */,
+				D3A96F7C17E9F86900658436 /* cpSpaceDebug.c in Sources */,
 				D3C3790911063C57003EF1D9 /* cpGearJoint.c in Sources */,
 				D3C3790A11063C57003EF1D9 /* cpSimpleMotor.c in Sources */,
 				D3C3790B11063C57003EF1D9 /* cpRatchetJoint.c in Sources */,

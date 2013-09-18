@@ -273,4 +273,44 @@ void cpSpaceUseSpatialHash(cpSpace *space, cpFloat dim, int count);
 /// Step the space forward in time by @c dt.
 void cpSpaceStep(cpSpace *space, cpFloat dt);
 
+
+#ifndef CP_SPACE_DISABLE_DEBUG_API
+
+typedef struct cpSpaceDebugColor {
+	float r, g, b, a;
+} cpSpaceDebugColor;
+
+typedef void (*cpSpaceDebugDrawCircleImpl)(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor, cpDataPointer *data);
+typedef void (*cpSpaceDebugDrawSegmentImpl)(cpVect a, cpVect b, cpSpaceDebugColor color, cpDataPointer *data);
+typedef void (*cpSpaceDebugDrawFatSegmentImpl)(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor, cpDataPointer *data);
+typedef void (*cpSpaceDebugDrawPolygonImpl)(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor, cpDataPointer *data);
+typedef void (*cpSpaceDebugDrawDotImpl)(cpFloat size, cpVect pos, cpSpaceDebugColor color, cpDataPointer *data);
+typedef cpSpaceDebugColor (*cpSpaceDebugDrawColorForShapeImpl)(cpShape *shape, cpDataPointer *data);
+
+typedef enum cpSpaceDebugDrawFlags {
+	CP_SPACE_DEBUG_DRAW_SHAPES = 1<<0,
+	CP_SPACE_DEBUG_DRAW_CONSTRAINTS = 1<<1,
+	CP_SPACE_DEBUG_DRAW_COLLISION_POINTS = 1<<2,
+} cpSpaceDebugDrawFlags;
+
+typedef struct cpSpaceDebugDrawOptions {
+	cpSpaceDebugDrawCircleImpl drawCircle;
+	cpSpaceDebugDrawSegmentImpl drawSegment;
+	cpSpaceDebugDrawFatSegmentImpl drawFatSegment;
+	cpSpaceDebugDrawPolygonImpl drawPolygon;
+	cpSpaceDebugDrawDotImpl drawDot;
+	
+	cpSpaceDebugDrawFlags flags;
+	cpSpaceDebugColor shapeOutlineColor;
+	cpSpaceDebugDrawColorForShapeImpl colorForShape;
+	cpSpaceDebugColor constraintColor;
+	cpSpaceDebugColor collisionPointColor;
+	
+	cpDataPointer *data;
+} cpSpaceDebugDrawOptions;
+
+void cpSpaceDebugDraw(cpSpace *space, cpSpaceDebugDrawOptions *options);
+
+#endif
+
 /// @}

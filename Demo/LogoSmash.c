@@ -87,7 +87,7 @@ draw(cpSpace *space)
 {
 	cpSpaceEachBody(space, DrawDot, NULL);
 	
-	ChipmunkDebugDrawCollisionPoints(space);
+//	ChipmunkDebugDrawCollisionPoints(space);
 }
 
 static cpShape *

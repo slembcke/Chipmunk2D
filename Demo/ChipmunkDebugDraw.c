@@ -29,22 +29,6 @@
 #include "ChipmunkDebugDraw.h"
 #include "ChipmunkDemoShaderSupport.h"
 
-/*
-	IMPORTANT - READ ME!
-	
-	This file sets up a simple interface that the individual demos can use to get
-	a Chipmunk space running and draw what's in it. In order to keep the Chipmunk
-	examples clean and simple, they contain no graphics code. All drawing is done
-	by accessing the Chipmunk structures at a very low level. It is NOT
-	recommended to write a game or application this way as it does not scale
-	beyond simple shape drawing and is very dependent on implementation details
-	about Chipmunk which may change with little to no warning.
-*/
-
-const Color LINE_COLOR = {200.0f/255.0f, 210.0f/255.0f, 230.0f/255.0f, 1.0f};
-const Color CONSTRAINT_COLOR = {0.0f, 0.75f, 0.0f, 1.0f};
-const float SHAPE_ALPHA = 1.0f;
-
 float ChipmunkDebugDrawPointLineScale = 1.0f;
 float ChipmunkDebugDrawOutlineWidth = 1.0f;
 
@@ -60,7 +44,7 @@ v2f(cpVect v)
 	return v2;
 }
 
-typedef struct Vertex {struct v2f vertex, aa_coord; Color fill_color, outline_color;} Vertex;
+typedef struct Vertex {struct v2f vertex, aa_coord; cpSpaceDebugColor fill_color, outline_color;} Vertex;
 typedef struct Triangle {Vertex a, b, c;} Triangle;
 
 static GLuint vao = 0;
@@ -148,65 +132,6 @@ ChipmunkDebugDrawInit(void)
 	CHECK_GL_ERRORS();
 }
 
-
-static Color
-ColorFromHash(cpHashValue hash, float alpha)
-{
-	unsigned long val = (unsigned long)hash;
-	
-	// scramble the bits up using Robert Jenkins' 32 bit integer hash function
-	val = (val+0x7ed55d16) + (val<<12);
-	val = (val^0xc761c23c) ^ (val>>19);
-	val = (val+0x165667b1) + (val<<5);
-	val = (val+0xd3a2646c) ^ (val<<9);
-	val = (val+0xfd7046c5) + (val<<3);
-	val = (val^0xb55a4f09) ^ (val>>16);
-	
-	GLfloat r = (GLfloat)((val>>0) & 0xFF);
-	GLfloat g = (GLfloat)((val>>8) & 0xFF);
-	GLfloat b = (GLfloat)((val>>16) & 0xFF);
-	
-	GLfloat max = (GLfloat)cpfmax(cpfmax(r, g), b);
-	GLfloat min = (GLfloat)cpfmin(cpfmin(r, g), b);
-	GLfloat intensity = 0.75f;
-	
-	// Saturate and scale the color
-	if(min == max){
-		return RGBAColor(intensity, 0.0f, 0.0f, alpha);
-	} else {
-		GLfloat coef = (GLfloat)intensity/(max - min);
-		return RGBAColor(
-			(r - min)*coef,
-			(g - min)*coef,
-			(b - min)*coef,
-			alpha
-		);
-	}
-}
-
-static inline void
-glColor_from_color(Color color){
-	glColor4fv((GLfloat *)&color);
-}
-
-static Color
-ColorForShape(cpShape *shape)
-{
-	if(cpShapeGetSensor(shape)){
-		return LAColor(1.0f, 0.1f);
-	} else {
-		cpBody *body = shape->body;
-		
-		if(cpBodyIsSleeping(body)){
-			return LAColor(0.2f, 1.0f);
-		} else if(body->node.idleTime > shape->space->sleepTimeThreshold) {
-			return LAColor(0.66f, 1.0f);
-		} else {
-			return ColorFromHash(shape->hashid, SHAPE_ALPHA);
-		}
-	}
-}
-
 #undef MAX // Defined on some systems
 #define MAX(__a__, __b__) (__a__ > __b__ ? __a__ : __b__)
 
@@ -227,7 +152,7 @@ static Triangle *PushTriangles(size_t count)
 }
 
 
-void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, Color outlineColor, Color fillColor)
+void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
 	Triangle *triangles = PushTriangles(2);
 	
@@ -243,12 +168,12 @@ void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, Color ou
 	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawPointLineScale*0.5f)), outlineColor);
 }
 
-void ChipmunkDebugDrawSegment(cpVect a, cpVect b, Color color)
+void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color)
 {
 	ChipmunkDebugDrawFatSegment(a, b, 0.0f, color, color);
 }
 
-void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, Color outlineColor, Color fillColor)
+void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
 	Triangle *triangles = PushTriangles(6);
 	
@@ -283,7 +208,7 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, Color outli
 
 extern cpVect ChipmunkDemoMouse;
 
-void ChipmunkDebugDrawPolygon(int count, cpVect *verts, cpFloat radius, Color outlineColor, Color fillColor)
+void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
 	struct ExtrudeVerts {cpVect offset, n;};
 	size_t bytes = sizeof(struct ExtrudeVerts)*count;
@@ -348,7 +273,7 @@ void ChipmunkDebugDrawPolygon(int count, cpVect *verts, cpFloat radius, Color ou
 	}
 }
 
-void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, Color fillColor)
+void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 {
 	Triangle *triangles = PushTriangles(2);
 	
@@ -362,7 +287,7 @@ void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, Color fillColor)
 	Triangle t1 = {a, c, d}; triangles[1] = t1;
 }
 
-void ChipmunkDebugDrawBB(cpBB bb, Color color)
+void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color)
 {
 	cpVect verts[] = {
 		cpv(bb.r, bb.b),
@@ -371,176 +296,6 @@ void ChipmunkDebugDrawBB(cpBB bb, Color color)
 		cpv(bb.l, bb.b),
 	};
 	ChipmunkDebugDrawPolygon(4, verts, 0.0f, color, LAColor(0, 0));
-}
-
-struct ShapeColors {Color outlineColor, fillColor;};
-
-static void
-DrawShape(cpShape *shape, struct ShapeColors *colors)
-{
-	cpBody *body = shape->body;
-	Color fill_color = (colors ? colors->fillColor : ColorForShape(shape));
-	Color outline_color = (colors ? colors->outlineColor : LINE_COLOR);
-	
-	switch(shape->klass->type){
-		case CP_CIRCLE_SHAPE: {
-			cpCircleShape *circle = (cpCircleShape *)shape;
-			ChipmunkDebugDrawCircle(circle->tc, body->a, circle->r, outline_color, fill_color);
-			break;
-		}
-		case CP_SEGMENT_SHAPE: {
-			cpSegmentShape *seg = (cpSegmentShape *)shape;
-			ChipmunkDebugDrawFatSegment(seg->ta, seg->tb, seg->r, outline_color, fill_color);
-			break;
-		}
-		case CP_POLY_SHAPE: {
-			cpPolyShape *poly = (cpPolyShape *)shape;
-			ChipmunkDebugDrawPolygon(poly->count, poly->tVerts, poly->r, outline_color, fill_color);
-			break;
-		}
-		default: break;
-	}
-}
-
-void ChipmunkDebugDrawShape(cpShape *shape, Color outlineColor, Color fillColor)
-{
-	struct ShapeColors colors = {outlineColor, fillColor};
-	DrawShape(shape, (outlineColor.a == 0.0 && fillColor.a == 0.0 ? NULL : &colors));
-}
-
-void ChipmunkDebugDrawShapes(cpSpace *space)
-{
-	cpSpaceEachShape(space, (cpSpaceShapeIteratorFunc)DrawShape, NULL);
-}
-
-static const cpVect spring_verts[] = {
-	{0.00f, 0.0f},
-	{0.20f, 0.0f},
-	{0.25f, 3.0f},
-	{0.30f,-6.0f},
-	{0.35f, 6.0f},
-	{0.40f,-6.0f},
-	{0.45f, 6.0f},
-	{0.50f,-6.0f},
-	{0.55f, 6.0f},
-	{0.60f,-6.0f},
-	{0.65f, 6.0f},
-	{0.70f,-3.0f},
-	{0.75f, 6.0f},
-	{0.80f, 0.0f},
-	{1.00f, 0.0f},
-};
-static const int spring_count = sizeof(spring_verts)/sizeof(cpVect);
-
-static void
-drawSpring(cpDampedSpring *spring, cpBody *body_a, cpBody *body_b)
-{
-	cpVect a = cpvadd(body_a->p, cpvrotate(spring->anchr1, body_a->rot));
-	cpVect b = cpvadd(body_b->p, cpvrotate(spring->anchr2, body_b->rot));
-	
-	ChipmunkDebugDrawDot(5, a, CONSTRAINT_COLOR);
-	ChipmunkDebugDrawDot(5, b, CONSTRAINT_COLOR);
-
-	cpVect delta = cpvsub(b, a);
-	GLfloat cos = delta.x;
-	GLfloat sin = delta.y;
-	GLfloat s = 1.0f/cpvlength(delta);
-	
-	cpVect r1 = cpv(cos, -sin*s);
-	cpVect r2 = cpv(sin,  cos*s);
-	
-	cpVect *verts = (cpVect *)alloca(spring_count*sizeof(cpVect));
-	for(int i=0; i<spring_count; i++){
-		cpVect v = spring_verts[i];
-		verts[i] = cpv(cpvdot(v, r1) + a.x, cpvdot(v, r2) + a.y);
-	}
-	
-	for(int i=0; i<spring_count-1; i++){
-		ChipmunkDebugDrawSegment(verts[i], verts[i + 1], CONSTRAINT_COLOR);
-	}
-}
-
-static void
-drawConstraint(cpConstraint *constraint, void *unused)
-{
-	cpBody *body_a = constraint->a;
-	cpBody *body_b = constraint->b;
-
-	const cpConstraintClass *klass = constraint->klass;
-	if(klass == cpPinJointGetClass()){
-		cpPinJoint *joint = (cpPinJoint *)constraint;
-		
-		cpVect a = cpBodyLocalToWorld(body_a, joint->anchr1);
-		cpVect b = cpBodyLocalToWorld(body_b, joint->anchr2);
-//		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
-//		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
-		
-		ChipmunkDebugDrawDot(5, a, CONSTRAINT_COLOR);
-		ChipmunkDebugDrawDot(5, b, CONSTRAINT_COLOR);
-		ChipmunkDebugDrawSegment(a, b, CONSTRAINT_COLOR);
-	} else if(klass == cpSlideJointGetClass()){
-		cpSlideJoint *joint = (cpSlideJoint *)constraint;
-	
-		cpVect a = cpBodyLocalToWorld(body_a, joint->anchr1);
-		cpVect b = cpBodyLocalToWorld(body_b, joint->anchr2);
-		
-		ChipmunkDebugDrawDot(5, a, CONSTRAINT_COLOR);
-		ChipmunkDebugDrawDot(5, b, CONSTRAINT_COLOR);
-		ChipmunkDebugDrawSegment(a, b, CONSTRAINT_COLOR);
-	} else if(klass == cpPivotJointGetClass()){
-		cpPivotJoint *joint = (cpPivotJoint *)constraint;
-	
-		cpVect a = cpBodyLocalToWorld(body_a, joint->anchr1);
-		cpVect b = cpBodyLocalToWorld(body_b, joint->anchr2);
-
-		ChipmunkDebugDrawDot(5, a, CONSTRAINT_COLOR);
-		ChipmunkDebugDrawDot(5, b, CONSTRAINT_COLOR);
-	} else if(klass == cpGrooveJointGetClass()){
-		cpGrooveJoint *joint = (cpGrooveJoint *)constraint;
-	
-		cpVect a = cpBodyLocalToWorld(body_a, joint->grv_a);
-		cpVect b = cpBodyLocalToWorld(body_a, joint->grv_b);
-		cpVect c = cpBodyLocalToWorld(body_b, joint->anchr2);
-		
-		ChipmunkDebugDrawDot(5, c, CONSTRAINT_COLOR);
-		ChipmunkDebugDrawSegment(a, b, CONSTRAINT_COLOR);
-	} else if(klass == cpDampedSpringGetClass()){
-		drawSpring((cpDampedSpring *)constraint, body_a, body_b);
-	}
-}
-
-void
-ChipmunkDebugDrawConstraint(cpConstraint *constraint)
-{
-	drawConstraint(constraint, NULL);
-}
-
-void
-ChipmunkDebugDrawConstraints(cpSpace *space)
-{
-	cpSpaceEachConstraint(space, drawConstraint, NULL);
-}
-
-void
-ChipmunkDebugDrawCollisionPoints(cpSpace *space)
-{
-	cpArray *arbiters = space->arbiters;
-	Color color = RGBAColor(1.0f, 0.0f, 0.0f, 1.0f);
-	
-	for(int i=0; i<arbiters->num; i++){
-		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
-		cpVect n = arb->n;
-		
-		for(int j=0; j<arb->count; j++){
-			cpVect p1 = cpvadd(arb->body_a->p, arb->contacts[j].r1);
-			cpVect p2 = cpvadd(arb->body_b->p, arb->contacts[j].r2);
-			
-			cpFloat d = 2.0f;
-			cpVect a = cpvadd(p1, cpvmult(n, -d));
-			cpVect b = cpvadd(p2, cpvmult(n,  d));
-			ChipmunkDebugDrawSegment(a, b, color);
-		}
-	}
 }
 
 void

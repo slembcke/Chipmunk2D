@@ -39,7 +39,7 @@ static GLuint program;
 static GLuint texture;
 
 struct v2f {GLfloat x, y;};
-typedef struct Vertex {struct v2f vertex, tex_coord; Color color;} Vertex;
+typedef struct Vertex {struct v2f vertex, tex_coord; cpSpaceDebugColor color;} Vertex;
 typedef struct Triangle {Vertex a, b, c;} Triangle;
 
 static GLuint vao = 0;
@@ -153,7 +153,7 @@ static Triangle *PushTriangles(size_t count)
 }
 
 static GLfloat
-PushChar(int character, GLfloat x, GLfloat y, Color color)
+PushChar(int character, GLfloat x, GLfloat y, cpSpaceDebugColor color)
 {
 	int i = glyph_indexes[character];
 	GLfloat w = (GLfloat)sdf_tex_width;
@@ -190,7 +190,7 @@ PushChar(int character, GLfloat x, GLfloat y, Color color)
 void
 ChipmunkDemoTextDrawString(cpVect pos, char *str)
 {
-	Color c = LAColor(1.0f, 1.0f);
+	cpSpaceDebugColor c = LAColor(1.0f, 1.0f);
 	GLfloat x = (GLfloat)pos.x, y = (GLfloat)pos.y;
 	
 	for(int i=0, len=strlen(str); i<len; i++){

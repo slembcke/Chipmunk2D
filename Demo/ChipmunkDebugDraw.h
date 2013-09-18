@@ -19,17 +19,13 @@
  * SOFTWARE.
  */
 
-typedef struct Color {
-	float r, g, b, a;
-} Color;
-
-static inline Color RGBAColor(float r, float g, float b, float a){
-	Color color = {r, g, b, a};
+static inline cpSpaceDebugColor RGBAColor(float r, float g, float b, float a){
+	cpSpaceDebugColor color = {r, g, b, a};
 	return color;
 }
 
-static inline Color LAColor(float l, float a){
-	Color color = {l, l, l, a};
+static inline cpSpaceDebugColor LAColor(float l, float a){
+	cpSpaceDebugColor color = {l, l, l, a};
 	return color;
 }
 
@@ -38,19 +34,12 @@ void ChipmunkDebugDrawInit(void);
 extern float ChipmunkDebugDrawPointLineScale;
 extern float ChipmunkDebugDrawOutlineWidth;
 
-void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, Color outlineColor, Color fillColor);
-void ChipmunkDebugDrawSegment(cpVect a, cpVect b, Color color);
-void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, Color outlineColor, Color fillColor);
-void ChipmunkDebugDrawPolygon(int count, cpVect *verts, cpFloat radius, Color outlineColor, Color fillColor);
-void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, Color fillColor);
-void ChipmunkDebugDrawBB(cpBB bb, Color outlineColor);
-
-void ChipmunkDebugDrawConstraint(cpConstraint *constraint);
-void ChipmunkDebugDrawShape(cpShape *shape, Color outlineColor, Color fillColor);
-
-void ChipmunkDebugDrawShapes(cpSpace *space);
-void ChipmunkDebugDrawConstraints(cpSpace *space);
-void ChipmunkDebugDrawCollisionPoints(cpSpace *space);
+void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor);
+void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color);
+void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor);
+void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor);
+void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor);
+void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor outlineColor);
 
 // Call this at the end of the frame to draw the ChipmunkDebugDraw*() commands to the screen.
 void ChipmunkDebugDrawFlushRenderer(void);
