@@ -19,8 +19,7 @@
  * SOFTWARE.
  */
 
-// TODO fix
-#include "chipmunk_private.h"
+#include "chipmunk.h"
 
 #include "ChipmunkDemo.h"
 
@@ -34,6 +33,14 @@ update(cpSpace *space, double dt)
 #define FLUID_DRAG 2.0
 
 char messageBuffer[1024] = {};
+
+// Modified from chipmunk_private.h
+static inline cpFloat
+k_scalar_body(cpBody *body, cpVect r, cpVect n)
+{
+	cpFloat rcn = cpvcross(r, n);
+	return 1.0f/cpBodyGetMass(body) + rcn*rcn/cpBodyGetMoment(body);
+}
 
 static cpBool
 waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
@@ -87,7 +94,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpVect g = cpSpaceGetGravity(space);
 	
 	// Apply the buoyancy force as an impulse.
-	apply_impulse(body, cpvmult(g, -displacedMass*dt), r);
+	cpBodyApplyImpulse(body, cpvmult(g, -displacedMass*dt), r);
 	
 	// Apply linear damping for the fluid drag.
 	cpVect v_centroid = cpvadd(body->CP_PRIVATE(v), cpvmult(cpvperp(r), body->CP_PRIVATE(w)));
@@ -95,7 +102,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpFloat damping = clippedArea*FLUID_DRAG*FLUID_DENSITY;
 	cpFloat v_coef = cpfexp(-damping*dt*k); // linear drag
 //	cpFloat v_coef = 1.0/(1.0 + damping*dt*cpvlength(v_centroid)*k); // quadratic drag
-	apply_impulse(body, cpvmult(cpvsub(cpvmult(v_centroid, v_coef), v_centroid), 1.0/k), r);
+	cpBodyApplyImpulse(body, cpvmult(cpvsub(cpvmult(v_centroid, v_coef), v_centroid), 1.0/k), r);
 	
 	// Apply angular damping for the fluid drag.
 	cpFloat w_damping = cpMomentForPoly(FLUID_DRAG*FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(body->CP_PRIVATE(p)), 0.0f);

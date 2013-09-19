@@ -314,7 +314,7 @@ cpBodyApplyForce(cpBody *body, cpVect force, cpVect r)
 	cpBodyActivate(body);
 	body->f = cpvadd(body->f, force);
 	
-	cpVect r_cog = cpvsub(cpvrotate(body->cog, body->rot), r);
+	cpVect r_cog = cpvsub(r, cpvrotate(body->cog, body->rot));
 	body->t += cpvcross(r_cog, force);
 }
 
@@ -323,7 +323,7 @@ cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)
 {
 	cpBodyActivate(body);
 	
-	cpVect r_cog = cpvsub(cpvrotate(body->cog, body->rot), r);
+	cpVect r_cog = cpvsub(r, cpvrotate(body->cog, body->rot));
 	apply_impulse(body, j, r_cog);
 }
 
