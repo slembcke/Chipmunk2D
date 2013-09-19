@@ -177,7 +177,8 @@ ColorForShape(cpShape *shape, cpDataPointer *data)
 }
 
 
-void ChipmunkDemoDefaultDrawImpl(cpSpace *space)
+void
+ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 {
 	cpSpaceDebugDrawOptions drawOptions = {
 		DrawCircle,

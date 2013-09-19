@@ -511,9 +511,10 @@ CircleToSegment(const cpCircleShape *circle, const cpSegmentShape *segment, stru
 		cpVect n = info->n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
 		
 		// Reject endcap collisions if tangents are provided.
+		cpVect rot = cpBodyGetRotation(segment->shape.body);
 		if(
-			(closest_t != 0.0f || cpvdot(n, cpvrotate(segment->a_tangent, segment->shape.body->rot)) >= 0.0) &&
-			(closest_t != 1.0f || cpvdot(n, cpvrotate(segment->b_tangent, segment->shape.body->rot)) >= 0.0)
+			(closest_t != 0.0f || cpvdot(n, cpvrotate(segment->a_tangent, rot)) >= 0.0) &&
+			(closest_t != 1.0f || cpvdot(n, cpvrotate(segment->b_tangent, rot)) >= 0.0)
 		){
 			cpCollisionInfoPushContact(info, cpvadd(center, cpvmult(n, circle->r)), cpvadd(closest, cpvmult(n, -segment->r)), 0);
 		}
@@ -538,8 +539,8 @@ SegmentToSegment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, struct 
 #endif
 	
 	cpVect n = points.n;
-	cpVect rot1 = seg1->shape.body->rot;
-	cpVect rot2 = seg2->shape.body->rot;
+	cpVect rot1 = cpBodyGetRotation(seg1->shape.body);
+	cpVect rot2 = cpBodyGetRotation(seg2->shape.body);
 	if(
 		points.d <= (seg1->r + seg2->r) &&
 		(
@@ -594,7 +595,7 @@ SegmentToPoly(const cpSegmentShape *seg, const cpPolyShape *poly, struct cpColli
 	
 	// Reject endcap collisions if tangents are provided.
 	cpVect n = points.n;
-	cpVect rot = seg->shape.body->rot;
+	cpVect rot = cpBodyGetRotation(seg->shape.body);
 	if(
 		points.d - seg->r - poly->r <= 0.0 &&
 		(

@@ -253,7 +253,7 @@ cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
 	cpBodyAddShape(body, shape);
 	
 	shape->hashid = space->shapeIDCounter++;
-	cpShapeUpdate(shape, body->p, body->rot);
+	cpShapeUpdate(shape, body->transform);
 	cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
 	shape->space = space;
 	
@@ -274,7 +274,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	cpBodyAddShape(body, shape);
 	
 	shape->hashid = space->shapeIDCounter++;
-	cpShapeUpdate(shape, body->p, body->rot);
+	cpShapeUpdate(shape, body->transform);
 	cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
 	shape->space = space;
 		

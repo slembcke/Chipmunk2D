@@ -29,7 +29,7 @@ cpPolyShapeAlloc(void)
 }
 
 static cpBB
-cpPolyShapeTransformVerts(cpPolyShape *poly, cpVect p, cpVect rot)
+cpPolyShapeTransformVerts(cpPolyShape *poly, cpTransform transform)
 {
 	cpVect *src = poly->verts;
 	cpVect *dst = poly->tVerts;
@@ -38,7 +38,7 @@ cpPolyShapeTransformVerts(cpPolyShape *poly, cpVect p, cpVect rot)
 	cpFloat b = (cpFloat)INFINITY, t = -(cpFloat)INFINITY;
 	
 	for(int i=0; i<poly->count; i++){
-		cpVect v = cpvadd(p, cpvrotate(src[i], rot));
+		cpVect v = cpTransformPoint(transform, src[i]);
 		
 		dst[i] = v;
 		l = cpfmin(l, v.x);
@@ -52,23 +52,23 @@ cpPolyShapeTransformVerts(cpPolyShape *poly, cpVect p, cpVect rot)
 }
 
 static void
-cpPolyShapeTransformAxes(cpPolyShape *poly, cpVect p, cpVect rot)
+cpPolyShapeTransformAxes(cpPolyShape *poly, cpTransform transform)
 {
 	cpSplittingPlane *src = poly->planes;
 	cpSplittingPlane *dst = poly->tPlanes;
 	
 	for(int i=0; i<poly->count; i++){
-		cpVect n = cpvrotate(src[i].n, rot);
+		cpVect n = cpTransformVect(transform, src[i].n);
 		dst[i].n = n;
-		dst[i].d = cpvdot(p, n) + src[i].d;
+		dst[i].d = transform.tx*n.x + transform.ty*n.y + src[i].d;
 	}
 }
 
 static cpBB
-cpPolyShapeCacheData(cpPolyShape *poly, cpVect p, cpVect rot)
+cpPolyShapeCacheData(cpPolyShape *poly, cpTransform transform)
 {
-	cpPolyShapeTransformAxes(poly, p, rot);
-	cpBB bb = poly->shape.bb = cpPolyShapeTransformVerts(poly, p, rot);
+	cpPolyShapeTransformAxes(poly, transform);
+	cpBB bb = poly->shape.bb = cpPolyShapeTransformVerts(poly, transform);
 	
 	return bb;
 }

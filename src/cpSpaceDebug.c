@@ -123,8 +123,8 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 		cpDataPointer *data = options->data;
 		cpSpaceDebugColor color = options->constraintColor;
 		
-		cpVect a = cpvadd(body_a->p, cpvrotate(spring->anchr1, body_a->rot));
-		cpVect b = cpvadd(body_b->p, cpvrotate(spring->anchr2, body_b->rot));
+		cpVect a = cpBodyLocalToWorld(body_a, spring->anchr1);
+		cpVect b = cpBodyLocalToWorld(body_b, spring->anchr2);
 		
 		options->drawDot(5, a, color, data);
 		options->drawDot(5, b, color, data);

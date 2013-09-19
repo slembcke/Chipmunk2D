@@ -68,7 +68,7 @@ typedef enum cpShapeType{
 	CP_NUM_SHAPES
 } cpShapeType;
 
-typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpVect p, cpVect rot);
+typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpTransform transform);
 typedef void (*cpShapeDestroyImpl)(cpShape *shape);
 typedef void (*cpShapePointQueryImpl)(const cpShape *shape, cpVect p, cpPointQueryInfo *info);
 typedef void (*cpShapeSegmentQueryImpl)(const cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
@@ -135,7 +135,7 @@ void cpShapeFree(cpShape *shape);
 /// Update, cache and return the bounding box of a shape based on the body it's attached to.
 cpBB cpShapeCacheBB(cpShape *shape);
 /// Update, cache and return the bounding box of a shape with an explicit transformation.
-cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot);
+cpBB cpShapeUpdate(cpShape *shape, cpTransform transform);
 
 /// Perform a nearest point query. It finds the closest point on the surface of shape to a specific point.
 /// The value returned is the distance between the points. A negative distance means the point is inside the shape.

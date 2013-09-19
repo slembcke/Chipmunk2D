@@ -36,9 +36,9 @@ char messageBuffer[1024] = {};
 
 // Modified from chipmunk_private.h
 static inline cpFloat
-k_scalar_body(cpBody *body, cpVect r, cpVect n)
+k_scalar_body(cpBody *body, cpVect point, cpVect n)
 {
-	cpFloat rcn = cpvcross(r, n);
+	cpFloat rcn = cpvcross(cpvsub(point, cpBodyGetPosition(body)), n);
 	return 1.0f/cpBodyGetMass(body) + rcn*rcn/cpBodyGetMoment(body);
 }
 
@@ -85,7 +85,6 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpFloat clippedArea = cpAreaForPoly(clippedCount, clipped, 0.0f);
 	cpFloat displacedMass = clippedArea*FLUID_DENSITY;
 	cpVect centroid = cpCentroidForPoly(clippedCount, clipped);
-	cpVect r = cpvsub(centroid, cpBodyGetPosition(body));
 	
 	ChipmunkDebugDrawPolygon(clippedCount, clipped, 0.0f, RGBAColor(0, 0, 1, 1), RGBAColor(0, 0, 1, 0.1f));
 	ChipmunkDebugDrawDot(5, centroid, RGBAColor(0, 0, 1, 1));
@@ -94,15 +93,15 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpVect g = cpSpaceGetGravity(space);
 	
 	// Apply the buoyancy force as an impulse.
-	cpBodyApplyImpulse(body, cpvmult(g, -displacedMass*dt), r);
+	cpBodyApplyImpulseAtWorldPoint(body, cpvmult(g, -displacedMass*dt), centroid);
 	
 	// Apply linear damping for the fluid drag.
-	cpVect v_centroid = cpvadd(body->CP_PRIVATE(v), cpvmult(cpvperp(r), body->CP_PRIVATE(w)));
-	cpFloat k = k_scalar_body(body, r, cpvnormalize_safe(v_centroid));
+	cpVect v_centroid = cpBodyGetVelocityAtWorldPoint(body, centroid);
+	cpFloat k = k_scalar_body(body, centroid, cpvnormalize_safe(v_centroid));
 	cpFloat damping = clippedArea*FLUID_DRAG*FLUID_DENSITY;
 	cpFloat v_coef = cpfexp(-damping*dt*k); // linear drag
 //	cpFloat v_coef = 1.0/(1.0 + damping*dt*cpvlength(v_centroid)*k); // quadratic drag
-	cpBodyApplyImpulse(body, cpvmult(cpvsub(cpvmult(v_centroid, v_coef), v_centroid), 1.0/k), r);
+	cpBodyApplyImpulseAtWorldPoint(body, cpvmult(cpvsub(cpvmult(v_centroid, v_coef), v_centroid), 1.0/k), centroid);
 	
 	// Apply angular damping for the fluid drag.
 	cpFloat w_damping = cpMomentForPoly(FLUID_DRAG*FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(body->CP_PRIVATE(p)), 0.0f);

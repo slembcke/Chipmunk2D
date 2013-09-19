@@ -32,8 +32,8 @@ preStep(cpDampedSpring *spring, cpFloat dt)
 	cpBody *a = spring->constraint.a;
 	cpBody *b = spring->constraint.b;
 	
-	spring->r1 = cpvrotate(spring->anchr1, a->rot);
-	spring->r2 = cpvrotate(spring->anchr2, b->rot);
+	spring->r1 = cpTransformVect(a->transform, cpvsub(spring->anchr1, a->cog));
+	spring->r2 = cpTransformVect(b->transform, cpvsub(spring->anchr2, b->cog));
 	
 	cpVect delta = cpvsub(cpvadd(b->p, spring->r2), cpvadd(a->p, spring->r1));
 	cpFloat dist = cpvlength(delta);

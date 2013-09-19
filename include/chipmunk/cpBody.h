@@ -58,6 +58,10 @@ struct cpBody {
 	/// Moment of inertia inverse.
 	CP_PRIVATE(cpFloat i_inv);
 	
+	/// Offset of the center of gravity from the body's anchor.
+	/// Defaults to cpvzero.
+	CP_PRIVATE(cpVect cog);
+	
 	/// Position of the rigid body's center of gravity.
 	CP_PRIVATE(cpVect p);
 	/// Velocity of the rigid body's center of gravity.
@@ -73,13 +77,7 @@ struct cpBody {
 	/// Torque applied to the body around it's center of gravity.
 	CP_PRIVATE(cpFloat t);
 	
-	/// Cached unit length vector representing the angle of the body.
-	/// Used for fast rotations using cpvrotate().
-	CP_PRIVATE(cpVect rot);
-	
-	/// Offset of the center of gravity from the body's anchor.
-	/// Defaults to cpvzero.
-	CP_PRIVATE(cpVect cog);
+	CP_PRIVATE(cpTransform transform);
 	
 	/// User definable data pointer.
 	/// Generally this points to your the game object class so you can access it
@@ -126,7 +124,7 @@ void cpBodyFree(cpBody *body);
 #ifdef NDEBUG
 	#define	cpAssertSaneBody(body)
 #else
-	void cpBodySanityCheck(cpBody *body);
+	void cpBodySanityCheck(const cpBody *body);
 	#define	cpAssertSaneBody(body) cpBodySanityCheck(body)
 #endif
 
@@ -161,15 +159,15 @@ static inline cpBool cpBodyIsRogue(const cpBody *body)
 }
 
 /// Convert body relative/local coordinates to absolute/world coordinates.
-static inline cpVect cpBodyLocalToWorld(const cpBody *body, const cpVect v)
+static inline cpVect cpBodyLocalToWorld(const cpBody *body, const cpVect point)
 {
-	return cpvadd(body->CP_PRIVATE(p), cpvrotate(cpvsub(v, body->CP_PRIVATE(cog)), body->CP_PRIVATE(rot)));
+	return cpTransformPoint(body->CP_PRIVATE(transform), point);
 }
 
 /// Convert body absolute/world coordinates to  relative/local coordinates.
-static inline cpVect cpBodyWorldToLocal(const cpBody *body, const cpVect v)
+static inline cpVect cpBodyWorldToLocal(const cpBody *body, const cpVect point)
 {
-	return cpvadd(cpvunrotate(cpvsub(v, body->CP_PRIVATE(p)), body->CP_PRIVATE(rot)), body->CP_PRIVATE(cog));
+	return cpTransformPoint(cpTransformRigidInverse(body->CP_PRIVATE(transform)), point);
 }
 
 #define CP_DefineBodyStructGetter(type, member, name) \
@@ -198,13 +196,14 @@ CP_DefineBodyStructGetter(cpFloat, i, Moment)
 void cpBodySetMoment(cpBody *body, cpFloat i);
 
 /// Get the position of a body.
-static inline cpVect cpBodyGetPosition(cpBody *body)
+static inline cpVect cpBodyGetPosition(const cpBody *body)
 {
 	return cpBodyLocalToWorld(body, cpvzero);
 }
 
 /// Set the position of a body.
 void cpBodySetPosition(cpBody *body, cpVect pos);
+CP_DefineBodyStructProperty(cpVect, cog, CenterOfGravity)
 CP_DefineBodyStructProperty(cpVect, v, Velocity)
 CP_DefineBodyStructProperty(cpVect, f, Force)
 CP_DefineBodyStructGetter(cpFloat, a, Angle)
@@ -212,7 +211,7 @@ CP_DefineBodyStructGetter(cpFloat, a, Angle)
 void cpBodySetAngle(cpBody *body, cpFloat a);
 CP_DefineBodyStructProperty(cpFloat, w, AngularVelocity)
 CP_DefineBodyStructProperty(cpFloat, t, Torque)
-CP_DefineBodyStructGetter(cpVect, rot, Rotation)
+cpVect cpBodyGetRotation(const cpBody *body); // TODO remove?
 CP_DefineBodyStructProperty(cpFloat, v_limit, VelocityLimit)
 CP_DefineBodyStructProperty(cpFloat, w_limit, AngularVelocityLimit)
 CP_DefineBodyStructProperty(cpDataPointer, userData, UserData)
@@ -221,17 +220,16 @@ CP_DefineBodyStructProperty(cpDataPointer, userData, UserData)
 void cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);
 void cpBodyUpdatePosition(cpBody *body, cpFloat dt);
 
-/// Set the forces and torque of a body to zero.
-void cpBodyResetForces(cpBody *body);
-/// Apply a force (in world coordinates) to the body at a point relative to the anchor (so an offset in world coordinates).
-void cpBodyApplyForce(cpBody *body, const cpVect f, const cpVect r);
-/// Apply an impulse (in world coordinates) to the body at a point relative to the anchor (so an offset in world coordinates).
-void cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r);
+void cpBodyApplyForceAtWorldPoint(cpBody *body, cpVect force, cpVect point);
+void cpBodyApplyForceAtLocalPoint(cpBody *body, cpVect force, cpVect point);
+
+void cpBodyApplyImpulseAtWorldPoint(cpBody *body, cpVect impulse, cpVect point);
+void cpBodyApplyImpulseAtLocalPoint(cpBody *body, cpVect impulse, cpVect point);
 
 /// Get the velocity on a body (in world units) at a point on the body in world coordinates.
-cpVect cpBodyGetVelocityAtWorldPoint(cpBody *body, cpVect point);
+cpVect cpBodyGetVelocityAtWorldPoint(const cpBody *body, cpVect point);
 /// Get the velocity on a body (in world units) at a point on the body in local coordinates.
-cpVect cpBodyGetVelocityAtLocalPoint(cpBody *body, cpVect point);
+cpVect cpBodyGetVelocityAtLocalPoint(const cpBody *body, cpVect point);
 
 
 /// Get the kinetic energy of a body.

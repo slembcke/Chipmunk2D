@@ -63,6 +63,8 @@
 		D38011620E984FA400A3D7FA /* cpDampedSpring.c in Sources */ = {isa = PBXBuildFile; fileRef = D380115F0E984FA400A3D7FA /* cpDampedSpring.c */; };
 		D38011630E984FA400A3D7FA /* cpDampedSpring.h in Headers */ = {isa = PBXBuildFile; fileRef = D38011600E984FA400A3D7FA /* cpDampedSpring.h */; };
 		D38687D30BAFC695008B7008 /* libChipmunk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D34963BB0B56CAA300CAD239 /* libChipmunk.a */; };
+		D38825E617EB945E00663730 /* cpTransform.h in Headers */ = {isa = PBXBuildFile; fileRef = D38825E517EB945E00663730 /* cpTransform.h */; };
+		D38825E717EB945E00663730 /* cpTransform.h in Headers */ = {isa = PBXBuildFile; fileRef = D38825E517EB945E00663730 /* cpTransform.h */; };
 		D38996A6148B1E72006CFE0B /* Slice.c in Sources */ = {isa = PBXBuildFile; fileRef = D38996A5148B1E72006CFE0B /* Slice.c */; };
 		D38C029916840ED3009F612B /* Shatter.c in Sources */ = {isa = PBXBuildFile; fileRef = D38C029816840ED2009F612B /* Shatter.c */; };
 		D393275C0EA02C710026F6A2 /* Pump.c in Sources */ = {isa = PBXBuildFile; fileRef = D393275B0EA02C710026F6A2 /* Pump.c */; };
@@ -177,6 +179,7 @@
 		D3800EA70E98260200A3D7FA /* cpSlideJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpSlideJoint.h; path = ../../include/chipmunk/constraints/cpSlideJoint.h; sourceTree = "<group>"; };
 		D380115F0E984FA400A3D7FA /* cpDampedSpring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpDampedSpring.c; sourceTree = "<group>"; };
 		D38011600E984FA400A3D7FA /* cpDampedSpring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpDampedSpring.h; path = ../../include/chipmunk/constraints/cpDampedSpring.h; sourceTree = "<group>"; };
+		D38825E517EB945E00663730 /* cpTransform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpTransform.h; path = ../include/chipmunk/cpTransform.h; sourceTree = "<group>"; };
 		D38996A5148B1E72006CFE0B /* Slice.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Slice.c; sourceTree = "<group>"; };
 		D38BB1D1149933F20000EC41 /* chipmunk-docs.textile */ = {isa = PBXFileReference; lastKnownFileType = text; name = "chipmunk-docs.textile"; path = "../doc-src/chipmunk-docs.textile"; sourceTree = "<group>"; };
 		D38C029816840ED2009F612B /* Shatter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Shatter.c; sourceTree = "<group>"; };
@@ -495,6 +498,7 @@
 				D353B6480B059C5F0038D274 /* prime.h */,
 				D3E5F0270AA32F16004E361B /* cpVect.h */,
 				D3E5F0260AA32F15004E361B /* cpVect.c */,
+				D38825E517EB945E00663730 /* cpTransform.h */,
 				D3E5F2D90AAA5622004E361B /* cpBB.h */,
 				D3E5F2DA0AAA5622004E361B /* cpBB.c */,
 				D3E5F2DD0AAA562B004E361B /* cpArray.c */,
@@ -513,6 +517,7 @@
 			files = (
 				D34963C10B56CBA900CAD239 /* chipmunk.h in Headers */,
 				D34963C20B56CBA900CAD239 /* cpVect.h in Headers */,
+				D38825E617EB945E00663730 /* cpTransform.h in Headers */,
 				D34963C30B56CBA900CAD239 /* cpBB.h in Headers */,
 				D34963C50B56CBA900CAD239 /* prime.h in Headers */,
 				D34963C70B56CBA900CAD239 /* cpBody.h in Headers */,
@@ -537,6 +542,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D3AA477E12AF0F9B00E27AAB /* cpSpatialIndex.h in Headers */,
+				D38825E717EB945E00663730 /* cpTransform.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -96,16 +96,13 @@ void cpShapeSetDensity(cpShape *shape, cpFloat density){ cpShapeSetMass(shape, d
 cpBB
 cpShapeCacheBB(cpShape *shape)
 {
-	cpBody *body = shape->body;
-	cpVect rot = body->rot;
-	cpVect anchrPos = cpvsub(body->p, cpvrotate(body->cog, rot));
-	return cpShapeUpdate(shape, anchrPos, rot);
+	return cpShapeUpdate(shape, shape->body->transform);
 }
 
 cpBB
-cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot)
+cpShapeUpdate(cpShape *shape, cpTransform transform)
 {
-	return (shape->bb = shape->klass->cacheData(shape, pos, rot));
+	return (shape->bb = shape->klass->cacheData(shape, transform));
 }
 
 cpFloat
@@ -176,9 +173,9 @@ cpCircleShapeAlloc(void)
 }
 
 static cpBB
-cpCircleShapeCacheData(cpCircleShape *circle, cpVect p, cpVect rot)
+cpCircleShapeCacheData(cpCircleShape *circle, cpTransform transform)
 {
-	cpVect c = circle->tc = cpvadd(p, cpvrotate(circle->c, rot));
+	cpVect c = circle->tc = cpTransformPoint(transform, circle->c);
 	return cpBBNewForCircle(c, circle->r);
 }
 
@@ -250,11 +247,11 @@ cpSegmentShapeAlloc(void)
 }
 
 static cpBB
-cpSegmentShapeCacheData(cpSegmentShape *seg, cpVect p, cpVect rot)
+cpSegmentShapeCacheData(cpSegmentShape *seg, cpTransform transform)
 {
-	seg->ta = cpvadd(p, cpvrotate(seg->a, rot));
-	seg->tb = cpvadd(p, cpvrotate(seg->b, rot));
-	seg->tn = cpvrotate(seg->n, rot);
+	seg->ta = cpTransformPoint(transform, seg->a);
+	seg->tb = cpTransformPoint(transform, seg->b);
+	seg->tn = cpTransformVect(transform, seg->n);
 	
 	cpFloat l,r,b,t;
 	

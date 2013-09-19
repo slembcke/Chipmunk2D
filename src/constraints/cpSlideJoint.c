@@ -27,8 +27,8 @@ preStep(cpSlideJoint *joint, cpFloat dt)
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
-	joint->r1 = cpvrotate(cpvsub(joint->anchr1, a->cog), a->rot);
-	joint->r2 = cpvrotate(cpvsub(joint->anchr2, b->cog), b->rot);
+	joint->r1 = cpTransformVect(a->transform, cpvsub(joint->anchr1, a->cog));
+	joint->r2 = cpTransformVect(b->transform, cpvsub(joint->anchr2, b->cog));
 	
 	cpVect delta = cpvsub(cpvadd(b->p, joint->r2), cpvadd(a->p, joint->r1));
 	cpFloat dist = cpvlength(delta);

@@ -27,8 +27,8 @@ preStep(cpPinJoint *joint, cpFloat dt)
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
-	joint->r1 = cpvrotate(cpvsub(joint->anchr1, a->cog), a->rot);
-	joint->r2 = cpvrotate(cpvsub(joint->anchr2, b->cog), b->rot);
+	joint->r1 = cpTransformVect(a->transform, cpvsub(joint->anchr1, a->cog));
+	joint->r2 = cpTransformVect(b->transform, cpvsub(joint->anchr2, b->cog));
 	
 	cpVect delta = cpvsub(cpvadd(b->p, joint->r2), cpvadd(a->p, joint->r1));
 	cpFloat dist = cpvlength(delta);
@@ -104,8 +104,8 @@ cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect an
 	joint->anchr2 = anchr2;
 	
 	// STATIC_BODY_CHECK
-	cpVect p1 = (a ? cpvadd(a->p, cpvrotate(anchr1, a->rot)) : anchr1);
-	cpVect p2 = (b ? cpvadd(b->p, cpvrotate(anchr2, b->rot)) : anchr2);
+	cpVect p1 = (a ? cpBodyLocalToWorld(a, anchr1) : anchr1);
+	cpVect p2 = (b ? cpBodyLocalToWorld(b, anchr2) : anchr2);
 	joint->dist = cpvlength(cpvsub(p2, p1));
 	
 	cpAssertWarn(joint->dist > 0.0, "You created a 0 length pin joint. A pivot joint will be much more stable.");

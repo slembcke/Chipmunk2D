@@ -112,7 +112,7 @@ extern "C" {
 #endif
 
 void
-cpBodySanityCheck(cpBody *body)
+cpBodySanityCheck(const cpBody *body)
 {
 	cpAssertHard(body->m == body->m && body->m_inv == body->m_inv, "Body's mass is NaN.");
 	cpAssertHard(body->i == body->i && body->i_inv == body->i_inv, "Body's moment is NaN.");
@@ -126,8 +126,6 @@ cpBodySanityCheck(cpBody *body)
 	cpAssertHard(body->a == body->a && cpfabs(body->a) != INFINITY, "Body's angle is invalid.");
 	cpAssertHard(body->w == body->w && cpfabs(body->w) != INFINITY, "Body's angular velocity is invalid.");
 	cpAssertHard(body->t == body->t && cpfabs(body->t) != INFINITY, "Body's torque is invalid.");
-	
-	cpv_assert_sane(body->rot, "Body's rotation vector is invalid.");
 	
 	cpAssertHard(body->v_limit == body->v_limit, "Body's velocity limit is invalid.");
 	cpAssertHard(body->w_limit == body->w_limit, "Body's angular velocity limit is invalid.");
@@ -194,6 +192,12 @@ cpBodySetMoment(cpBody *body, cpFloat moment)
 	cpAssertSaneBody(body);
 }
 
+cpVect
+cpBodyGetRotation(const cpBody *body)
+{
+	return cpv(body->transform.a, body->transform.b);
+}
+
 void
 cpBodyAddShape(cpBody *body, cpShape *shape)
 {
@@ -252,27 +256,38 @@ cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint)
 	body->constraintList = filterConstraints(body->constraintList, body, constraint);
 }
 
-void
-cpBodySetPosition(cpBody *body, cpVect pos)
+static inline void
+SetTransform(cpBody *body, cpVect p, cpFloat a)
 {
-	cpBodyActivate(body);
-	body->p = cpvadd(cpvrotate(body->cog, body->rot), pos);
-	cpAssertSaneBody(body);
+	body->transform = cpTransformMult(cpTransformRigid(p, a), cpTransformTranslate(cpvneg(body->cog)));
 }
 
-static inline void
-setAngle(cpBody *body, cpFloat angle)
+void
+cpBodySetPosition(cpBody *body, cpVect position)
 {
-	body->a = angle;//fmod(a, (cpFloat)M_PI*2.0f);
-	body->rot = cpvforangle(angle);
+	cpBodyActivate(body);
+	cpVect p = body->p = cpvadd(cpTransformVect(body->transform, body->cog), position);
 	cpAssertSaneBody(body);
+	
+	SetTransform(body, p, body->a);
+}
+
+static inline cpFloat
+SetAngle(cpBody *body, cpFloat a)
+{
+	body->a = a;
+	cpAssertSaneBody(body);
+	
+	return a;
 }
 
 void
 cpBodySetAngle(cpBody *body, cpFloat angle)
 {
 	cpBodyActivate(body);
-	setAngle(body, angle);
+	SetAngle(body, angle);
+	
+	SetTransform(body, body->p, angle);
 }
 
 void
@@ -285,14 +300,19 @@ cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 	cpFloat w_limit = body->w_limit;
 	body->w = cpfclamp(body->w*damping + body->t*body->i_inv*dt, -w_limit, w_limit);
 	
+	// Reset forces.
+	body->f = cpvzero;
+	body->t = 0.0f;
+	
 	cpAssertSaneBody(body);
 }
 
 void
 cpBodyUpdatePosition(cpBody *body, cpFloat dt)
 {
-	body->p = cpvadd(body->p, cpvmult(cpvadd(body->v, body->v_bias), dt));
-	setAngle(body, body->a + (body->w + body->w_bias)*dt);
+	cpVect p = body->p = cpvadd(body->p, cpvmult(cpvadd(body->v, body->v_bias), dt));
+	cpFloat a = SetAngle(body, body->a + (body->w + body->w_bias)*dt);
+	SetTransform(body, p, a);
 	
 	body->v_bias = cpvzero;
 	body->w_bias = 0.0f;
@@ -301,49 +321,48 @@ cpBodyUpdatePosition(cpBody *body, cpFloat dt)
 }
 
 void
-cpBodyResetForces(cpBody *body)
-{
-	cpBodyActivate(body);
-	body->f = cpvzero;
-	body->t = 0.0f;
-}
-
-void
-cpBodyApplyForce(cpBody *body, cpVect force, cpVect r)
+cpBodyApplyForceAtWorldPoint(cpBody *body, cpVect force, cpVect point)
 {
 	cpBodyActivate(body);
 	body->f = cpvadd(body->f, force);
 	
-	cpVect r_cog = cpvsub(r, cpvrotate(body->cog, body->rot));
-	body->t += cpvcross(r_cog, force);
+	cpVect r = cpvsub(point, cpBodyLocalToWorld(body, body->cog));
+	body->t += cpvcross(r, force);
 }
 
 void
-cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r)
+cpBodyApplyForceAtLocalPoint(cpBody *body, cpVect force, cpVect point)
+{
+	cpBodyApplyForceAtWorldPoint(body, cpTransformVect(body->transform, force), cpBodyLocalToWorld(body, point));
+}
+
+void
+cpBodyApplyImpulseAtWorldPoint(cpBody *body, cpVect impulse, cpVect point)
 {
 	cpBodyActivate(body);
 	
-	cpVect r_cog = cpvsub(r, cpvrotate(body->cog, body->rot));
-	apply_impulse(body, j, r_cog);
+	cpVect r = cpvsub(point, cpBodyLocalToWorld(body, body->cog));
+	apply_impulse(body, impulse, r);
 }
 
-static inline cpVect
-cpBodyGetVelAtPoint(cpBody *body, cpVect r)
+void
+cpBodyApplyImpulseAtLocalPoint(cpBody *body, cpVect impulse, cpVect point)
 {
-	cpVect r_cog = cpvsub(cpvrotate(body->cog, body->rot), r);
-	return cpvadd(body->v, cpvmult(cpvperp(r_cog), body->w));
-}
-
-cpVect
-cpBodyGetVelocityAtWorldPoint(cpBody *body, cpVect point)
-{
-	return cpBodyGetVelAtPoint(body, cpvsub(cpBodyGetPosition(body), point));
+	cpBodyApplyImpulseAtWorldPoint(body, cpTransformVect(body->transform, impulse), cpBodyLocalToWorld(body, point));
 }
 
 cpVect
-cpBodyGetVelocityAtLocalPoint(cpBody *body, cpVect point)
+cpBodyGetVelocityAtLocalPoint(const cpBody *body, cpVect point)
 {
-	return cpBodyGetVelAtPoint(body, cpvrotate(point, body->rot));
+	cpVect r = cpTransformVect(body->transform, cpvsub(point, body->cog));
+	return cpvadd(body->v, cpvmult(cpvperp(r), body->w));
+}
+
+cpVect
+cpBodyGetVelocityAtWorldPoint(const cpBody *body, cpVect point)
+{
+	cpVect r = cpvsub(point, cpBodyLocalToWorld(body, body->cog));
+	return cpvadd(body->v, cpvmult(cpvperp(r), body->w));
 }
 
 void

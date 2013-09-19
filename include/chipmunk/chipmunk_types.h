@@ -220,6 +220,11 @@ typedef uint32_t cpCollisionID;
 	typedef struct cpVect{cpFloat x,y;} cpVect;
 #endif
 
+/// Column major affine transform.
+typedef struct cpTransform {
+  cpFloat a, b, c, d, tx, ty;
+} cpTransform;
+
 // NUKE
 typedef struct cpMat2x2 {
 	// Row major [[a, b][c d]]

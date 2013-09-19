@@ -41,10 +41,17 @@ static inline cpBB cpBBNew(const cpFloat l, const cpFloat b, const cpFloat r, co
 	return bb;
 }
 
+/// Constructs a cpBB centered on a point with the given extents (half sizes).
+static inline cpBB
+cpBBNewForExtents(const cpVect c, const cpFloat hw, const cpFloat hh)
+{
+	return cpBBNew(c.x - hw, c.y - hh, c.x + hw, c.y + hh);
+}
+
 /// Constructs a cpBB for a circle with the given position and radius.
 static inline cpBB cpBBNewForCircle(const cpVect p, const cpFloat r)
 {
-	return cpBBNew(p.x - r, p.y - r, p.x + r, p.y + r);
+	return cpBBNewForExtents(p, r, r);
 }
 
 /// Returns true if @c a and @c b intersect.

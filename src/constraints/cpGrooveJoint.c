@@ -32,11 +32,11 @@ preStep(cpGrooveJoint *joint, cpFloat dt)
 	cpVect tb = cpBodyLocalToWorld(a, joint->grv_b);
 
 	// calculate axis
-	cpVect n = cpvrotate(joint->grv_n, a->rot);
+	cpVect n = cpTransformVect(a->transform, joint->grv_n);
 	cpFloat d = cpvdot(ta, n);
 	
 	joint->grv_tn = n;
-	joint->r2 = cpvrotate(cpvsub(joint->anchr2, b->cog), b->rot);
+	joint->r2 = cpTransformVect(b->transform, cpvsub(joint->anchr2, b->cog));
 	
 	// calculate tangential distance along the axis of r2
 	cpFloat td = cpvcross(cpvadd(b->p, joint->r2), n);

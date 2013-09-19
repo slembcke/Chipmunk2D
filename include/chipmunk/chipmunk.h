@@ -101,6 +101,7 @@ typedef struct cpSpace cpSpace;
 
 #include "cpVect.h"
 #include "cpBB.h"
+#include "cpTransform.h"
 #include "cpSpatialIndex.h"
 
 #include "cpBody.h"
