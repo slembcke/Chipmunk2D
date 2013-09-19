@@ -256,10 +256,25 @@ cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint)
 	body->constraintList = filterConstraints(body->constraintList, body, constraint);
 }
 
-static inline void
+void
 SetTransform(cpBody *body, cpVect p, cpFloat a)
 {
-	body->transform = cpTransformMult(cpTransformRigid(p, a), cpTransformTranslate(cpvneg(body->cog)));
+	cpVect rot = cpvforangle(a);
+	cpVect c = body->cog;
+	
+	body->transform = cpTransformNewTranspose(
+		rot.x, -rot.y, p.x - c.x*(rot.x + rot.y),
+		rot.y,  rot.x, p.y - c.y*(rot.x - rot.y)
+	);
+}
+
+static inline cpFloat
+SetAngle(cpBody *body, cpFloat a)
+{
+	body->a = a;
+	cpAssertSaneBody(body);
+	
+	return a;
 }
 
 void
@@ -270,15 +285,6 @@ cpBodySetPosition(cpBody *body, cpVect position)
 	cpAssertSaneBody(body);
 	
 	SetTransform(body, p, body->a);
-}
-
-static inline cpFloat
-SetAngle(cpBody *body, cpFloat a)
-{
-	body->a = a;
-	cpAssertSaneBody(body);
-	
-	return a;
 }
 
 void
