@@ -30,7 +30,7 @@ typedef struct cpShapeClass cpShapeClass;
 /// Nearest point query info struct.
 typedef struct cpPointQueryInfo {
 	/// The nearest shape, NULL if no shape was within range.
-	cpShape *shape;
+	const cpShape *shape;
 	/// The closest point on the shape's surface. (in world space coordinates)
 	cpVect point;
 	/// The distance to the point. The distance is negative if the point is inside the shape.
@@ -43,7 +43,7 @@ typedef struct cpPointQueryInfo {
 /// Segment query info struct.
 typedef struct cpSegmentQueryInfo {
 	/// The shape that was hit, NULL if no collision occured.
-	cpShape *shape;
+	const cpShape *shape;
 	/// The point of impact.
 	cpVect point;
 	/// The normal of the surface hit.
@@ -70,8 +70,8 @@ typedef enum cpShapeType{
 
 typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpVect p, cpVect rot);
 typedef void (*cpShapeDestroyImpl)(cpShape *shape);
-typedef void (*cpShapePointQueryImpl)(cpShape *shape, cpVect p, cpPointQueryInfo *info);
-typedef void (*cpShapeSegmentQueryImpl)(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
+typedef void (*cpShapePointQueryImpl)(const cpShape *shape, cpVect p, cpPointQueryInfo *info);
+typedef void (*cpShapeSegmentQueryImpl)(const cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
 
 /// @private
 struct cpShapeClass {
@@ -139,24 +139,14 @@ cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot);
 
 /// Perform a nearest point query. It finds the closest point on the surface of shape to a specific point.
 /// The value returned is the distance between the points. A negative distance means the point is inside the shape.
-cpFloat cpShapePointQuery(cpShape *shape, cpVect p, cpPointQueryInfo *out);
+cpFloat cpShapePointQuery(const cpShape *shape, cpVect p, cpPointQueryInfo *out);
 
 /// Perform a segment query against a shape. @c info must be a pointer to a valid cpSegmentQueryInfo structure.
-cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
+cpBool cpShapeSegmentQuery(const cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
 
-// TODO NUKE
+/// Return contact information about two shapes.
+cpContactPointSet cpShapesCollide(const cpShape *a, const cpShape *b);
 
-/// Get the hit point for a segment query.
-//static inline cpVect cpSegmentQueryHitPoint(const cpVect start, const cpVect end, const cpFloat radius, const cpSegmentQueryInfo info)
-//{
-//	return cpvsub(cpvlerp(start, end, info.t), cpvmult(info.n, radius));
-//}
-//
-///// Get the hit distance for a segment query.
-//static inline cpFloat cpSegmentQueryHitDist(const cpVect start, const cpVect end, const cpSegmentQueryInfo info)
-//{
-//	return cpvdist(start, end)*info.t;
-//}
 
 #define CP_DefineShapeStructGetter(type, member, name) \
 static inline type cpShapeGet##name(const cpShape *shape){return shape->CP_PRIVATE(member);}

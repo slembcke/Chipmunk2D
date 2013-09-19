@@ -75,7 +75,7 @@ add_box(cpSpace *space)
 	cpFloat radius = cpvlength(cpv(size, size));
 	cpVect pos = rand_pos(radius);
 	
-	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 4, verts, cpvzero)));
+	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 4, verts, cpvzero, 0.0f)));
 	body->velocity_func = planetGravityVelocityFunc;
 	cpBodySetPosition(body, pos);
 

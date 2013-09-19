@@ -94,6 +94,7 @@ typedef struct cpShape cpShape;
 typedef struct cpConstraint cpConstraint;
 
 typedef struct cpCollisionHandler cpCollisionHandler;
+typedef struct cpContactPointSet cpContactPointSet;
 typedef struct cpArbiter cpArbiter;
 
 typedef struct cpSpace cpSpace;
@@ -119,8 +120,6 @@ typedef struct cpSpace cpSpace;
 /// Version string.
 extern const char *cpVersionString;
 
-// TODO return a mass data struct?
-
 /// Calculate the moment of inertia for a circle.
 /// @c r1 and @c r2 are the inner and outer diameters. A solid circle has an inner diameter of 0.
 cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset);
@@ -129,21 +128,19 @@ cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset);
 /// @c r1 and @c r2 are the inner and outer diameters. A solid circle has an inner diameter of 0.
 cpFloat cpAreaForCircle(cpFloat r1, cpFloat r2);
 
-// TODO radius
 /// Calculate the moment of inertia for a line segment.
 /// Beveling radius is not supported.
-cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b);
+cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b, cpFloat radius);
 
 /// Calculate the area of a fattened (capsule shaped) line segment.
-cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat r);
+cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat radius);
 
-// TODO radius
 /// Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
-cpFloat cpMomentForPoly(cpFloat m, int count, const cpVect *verts, cpVect offset);
+cpFloat cpMomentForPoly(cpFloat m, int count, const cpVect *verts, cpVect offset, cpFloat radius);
 
 /// Calculate the signed area of a polygon. A Clockwise winding gives positive area.
 /// This is probably backwards from what you expect, but matches Chipmunk's the winding for poly shapes.
-cpFloat cpAreaForPoly(const int count, const cpVect *verts);
+cpFloat cpAreaForPoly(const int count, const cpVect *verts, cpFloat radius);
 
 /// Calculate the natural centroid of a polygon.
 cpVect cpCentroidForPoly(const int count, const cpVect *verts);
@@ -172,6 +169,15 @@ int cpConvexHull(int count, const cpVect *verts, cpVect *result, int *first, cpF
 cpVect *__verts_var__ = (cpVect *)alloca(__count__*sizeof(cpVect)); \
 int __count_var__ = cpConvexHull(__count__, __verts__, __verts_var__, NULL, 0.0); \
 
+/// Returns the closest point on the line segment ab, to the point p.
+static inline cpVect
+cpClosetPointOnSegment(const cpVect p, const cpVect a, const cpVect b)
+{
+	cpVect delta = cpvsub(a, b);
+	cpFloat t = cpfclamp01(cpvdot(delta, cpvsub(p, b))/cpvlengthsq(delta));
+	return cpvadd(b, cpvmult(delta, t));
+}
+
 #if defined(__has_extension)
 #if __has_extension(blocks)
 // Define alternate block based alternatives for a few of the callback heavy functions.
@@ -195,9 +201,8 @@ void cpSpaceSegmentQuery_b(cpSpace *space, cpVect start, cpVect end, cpFloat rad
 typedef void (^cpSpaceBBQueryBlock)(cpShape *shape);
 void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryBlock block);
 
-// TODO: Reimplement
-//typedef void (^cpSpaceShapeQueryBlock)(cpShape *shape, cpContactPointSet *points);
-//cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block);
+typedef void (^cpSpaceShapeQueryBlock)(cpShape *shape, cpContactPointSet *points);
+cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block);
 
 #endif
 #endif

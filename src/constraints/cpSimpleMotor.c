@@ -20,7 +20,6 @@
  */
 
 #include "chipmunk_private.h"
-#include "constraints/util.h"
 
 static void
 preStep(cpSimpleMotor *joint, cpFloat dt)

@@ -20,7 +20,6 @@
  */
  
 #include "chipmunk.h"
-#include "constraints/util.h"
 
 #include "ChipmunkDemo.h"
 
@@ -57,8 +56,8 @@ ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 	}
 	
 	cpVect centroid = cpCentroidForPoly(clippedCount, clipped);
-	cpFloat mass = cpAreaForPoly(clippedCount, clipped)*DENSITY;
-	cpFloat moment = cpMomentForPoly(mass, clippedCount, clipped, cpvneg(centroid));
+	cpFloat mass = cpAreaForPoly(clippedCount, clipped, 0.0f)*DENSITY;
+	cpFloat moment = cpMomentForPoly(mass, clippedCount, clipped, cpvneg(centroid), 0.0f);
 	
 	cpBody *new_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 	cpBodySetPosition(new_body, centroid);

@@ -20,7 +20,6 @@
  */
 
 #include "chipmunk_private.h"
-#include "constraints/util.h"
 
 // TODO: make this generic so I can reuse it for constraints also.
 static inline void
@@ -178,12 +177,13 @@ cpArbiterSetUserData(cpArbiter *arb, cpDataPointer userData)
 	arb->data = userData;
 }
 
-void cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
+void
+cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
 {
 	if(arb->swapped){
-		(*a) = arb->b, (*b) = arb->a;
+		(*a) = (cpShape *)arb->b, (*b) = (cpShape *)arb->a;
 	} else {
-		(*a) = arb->a, (*b) = arb->b;
+		(*a) = (cpShape *)arb->a, (*b) = (cpShape *)arb->b;
 	}
 }
 
@@ -218,9 +218,9 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 }
 
 void
-cpArbiterUpdate(cpArbiter *arb, cpCollisionInfo *info, cpCollisionHandler *handler)
+cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpCollisionHandler *handler)
 {
-	cpShape *a = info->a, *b = info->b;
+	const cpShape *a = info->a, *b = info->b;
 	
 	// For collisions between two similar primitive types, the order could have been swapped.
 	arb->a = a; arb->body_a = a->body;

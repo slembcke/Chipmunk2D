@@ -136,8 +136,8 @@ ChipmunkDemoTextInit(void)
 #undef MAX
 #define MAX(__a__, __b__) (__a__ > __b__ ? __a__ : __b__)
 
-static size_t triangle_capacity = 0;
-static size_t triangle_count = 0;
+static GLsizei triangle_capacity = 0;
+static GLsizei triangle_count = 0;
 static Triangle *triangle_buffer = NULL;
 
 static Triangle *PushTriangles(size_t count)
@@ -193,7 +193,7 @@ ChipmunkDemoTextDrawString(cpVect pos, char *str)
 	cpSpaceDebugColor c = LAColor(1.0f, 1.0f);
 	GLfloat x = (GLfloat)pos.x, y = (GLfloat)pos.y;
 	
-	for(int i=0, len=strlen(str); i<len; i++){
+	for(unsigned long i=0, len=strlen(str); i<len; i++){
 		if(str[i] == '\n'){
 			y -= LineHeight;
 			x = (GLfloat)pos.x;

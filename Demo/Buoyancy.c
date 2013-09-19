@@ -18,9 +18,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
-#include "chipmunk.h"
-#include "constraints/util.h"
+
+// TODO fix
+#include "chipmunk_private.h"
 
 #include "ChipmunkDemo.h"
 
@@ -75,7 +75,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	}
 	
 	// Calculate buoyancy from the clipped polygon area
-	cpFloat clippedArea = cpAreaForPoly(clippedCount, clipped);
+	cpFloat clippedArea = cpAreaForPoly(clippedCount, clipped, 0.0f);
 	cpFloat displacedMass = clippedArea*FLUID_DENSITY;
 	cpVect centroid = cpCentroidForPoly(clippedCount, clipped);
 	cpVect r = cpvsub(centroid, cpBodyGetPosition(body));
@@ -98,7 +98,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	apply_impulse(body, cpvmult(cpvsub(cpvmult(v_centroid, v_coef), v_centroid), 1.0/k), r);
 	
 	// Apply angular damping for the fluid drag.
-	cpFloat w_damping = cpMomentForPoly(FLUID_DRAG*FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(body->CP_PRIVATE(p)));
+	cpFloat w_damping = cpMomentForPoly(FLUID_DRAG*FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(body->CP_PRIVATE(p)), 0.0f);
 	body->CP_PRIVATE(w) *= cpfexp(-w_damping*dt*body->CP_PRIVATE(i_inv));
 	
 	return cpTrue;

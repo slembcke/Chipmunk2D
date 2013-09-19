@@ -43,7 +43,7 @@
 #define WARN_EPA_ITERATIONS 20
 
 static inline void
-cpCollisionInfoPushContact(cpCollisionInfo *info, cpVect p1, cpVect p2, cpHashValue hash)
+cpCollisionInfoPushContact(struct cpCollisionInfo *info, cpVect p1, cpVect p2, cpHashValue hash)
 {
 	cpAssertSoft(info->count <= CP_MAX_CONTACTS_PER_ARBITER, "Internal error: Tried to push too many contacts.");
 	
@@ -434,7 +434,7 @@ GJK(const struct SupportContext *ctx, cpCollisionID *id)
 //MARK: Contact Clipping
 
 static inline void
-ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPoints points, cpCollisionInfo *info)
+ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPoints points, struct cpCollisionInfo *info)
 {
 	cpFloat mindist = e1.r + e2.r;
 	if(points.d <= mindist){
@@ -475,11 +475,11 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 
 //MARK: Collision Functions
 
-typedef void (*CollisionFunc)(const cpShape *a, const cpShape *b, cpCollisionInfo *info);
+typedef void (*CollisionFunc)(const cpShape *a, const cpShape *b, struct cpCollisionInfo *info);
 
 // Collide circle shapes.
 static void
-CircleToCircle(const cpCircleShape *c1, const cpCircleShape *c2, cpCollisionInfo *info)
+CircleToCircle(const cpCircleShape *c1, const cpCircleShape *c2, struct cpCollisionInfo *info)
 {
 	cpFloat mindist = c1->r + c2->r;
 	cpVect delta = cpvsub(c2->tc, c1->tc);
@@ -493,7 +493,7 @@ CircleToCircle(const cpCircleShape *c1, const cpCircleShape *c2, cpCollisionInfo
 }
 
 static void
-CircleToSegment(const cpCircleShape *circle, const cpSegmentShape *segment, cpCollisionInfo *info)
+CircleToSegment(const cpCircleShape *circle, const cpSegmentShape *segment, struct cpCollisionInfo *info)
 {
 	cpVect seg_a = segment->ta;
 	cpVect seg_b = segment->tb;
@@ -521,7 +521,7 @@ CircleToSegment(const cpCircleShape *circle, const cpSegmentShape *segment, cpCo
 }
 
 static void
-SegmentToSegment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpCollisionInfo *info)
+SegmentToSegment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, struct cpCollisionInfo *info)
 {
 	struct SupportContext context = {(cpShape *)seg1, (cpShape *)seg2, (SupportPointFunc)SegmentSupportPoint, (SupportPointFunc)SegmentSupportPoint};
 	struct ClosestPoints points = GJK(&context, &info->id);
@@ -554,7 +554,7 @@ SegmentToSegment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, cpColli
 }
 
 static void
-PolyToPoly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionInfo *info)
+PolyToPoly(const cpPolyShape *poly1, const cpPolyShape *poly2, struct cpCollisionInfo *info)
 {
 	struct SupportContext context = {(cpShape *)poly1, (cpShape *)poly2, (SupportPointFunc)PolySupportPoint, (SupportPointFunc)PolySupportPoint};
 	struct ClosestPoints points = GJK(&context, &info->id);
@@ -576,7 +576,7 @@ PolyToPoly(const cpPolyShape *poly1, const cpPolyShape *poly2, cpCollisionInfo *
 }
 
 static void
-SegmentToPoly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionInfo *info)
+SegmentToPoly(const cpSegmentShape *seg, const cpPolyShape *poly, struct cpCollisionInfo *info)
 {
 	struct SupportContext context = {(cpShape *)seg, (cpShape *)poly, (SupportPointFunc)SegmentSupportPoint, (SupportPointFunc)PolySupportPoint};
 	struct ClosestPoints points = GJK(&context, &info->id);
@@ -607,7 +607,7 @@ SegmentToPoly(const cpSegmentShape *seg, const cpPolyShape *poly, cpCollisionInf
 }
 
 static void
-CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionInfo *info)
+CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, struct cpCollisionInfo *info)
 {
 	struct SupportContext context = {(cpShape *)circle, (cpShape *)poly, (SupportPointFunc)CircleSupportPoint, (SupportPointFunc)PolySupportPoint};
 	struct ClosestPoints points = GJK(&context, &info->id);
@@ -626,13 +626,20 @@ CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, cpCollisionIn
 	}
 }
 
+static void
+CollisionError(const cpShape *circle, const cpShape *poly, struct cpCollisionInfo *info)
+{
+	cpAssertHard(cpFalse, "Internal Error: Shape types are not sorted.");
+}
+
+
 static const CollisionFunc BuiltinCollisionFuncs[9] = {
 	(CollisionFunc)CircleToCircle,
-	NULL,
-	NULL,
+	CollisionError,
+	CollisionError,
 	(CollisionFunc)CircleToSegment,
 	(CollisionFunc)SegmentToSegment,
-	NULL,
+	CollisionError,
 	(CollisionFunc)CircleToPoly,
 	(CollisionFunc)SegmentToPoly,
 	(CollisionFunc)PolyToPoly,
@@ -640,16 +647,17 @@ static const CollisionFunc BuiltinCollisionFuncs[9] = {
 static const CollisionFunc *CollisionFuncs = BuiltinCollisionFuncs;
 
 struct cpCollisionInfo
-cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, struct cpContact *contacts)
+cpCollide(const cpShape *a, const cpShape *b, cpCollisionID id, struct cpContact *contacts)
 {
-	cpCollisionInfo info = {a, b, id, cpvzero, 0, contacts};
+	struct cpCollisionInfo info = {a, b, id, cpvzero, 0, contacts};
 	
-	// Their shape types must be in order.
-	cpAssertSoft(a->klass->type <= b->klass->type, "Internal Error: Collision shapes passed to cpCollideShapes() are not sorted.");
+	// Make sure the shape types are in order.
+	if(a->klass->type > b->klass->type){
+		info.a = b;
+		info.b = a;
+	}
 	
-	CollisionFunc cfunc = CollisionFuncs[a->klass->type + b->klass->type*CP_NUM_SHAPES];
-	
-	if(cfunc) cfunc(a, b, &info);
+	CollisionFuncs[info.a->klass->type + info.b->klass->type*CP_NUM_SHAPES](info.a, info.b, &info);
 	
 //	if(0){
 //		for(int i=0; i<info.count; i++){
@@ -664,4 +672,3 @@ cpCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, struct cpContact *cont
 	
 	return info;
 }
-

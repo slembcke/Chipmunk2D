@@ -202,15 +202,15 @@ setUpVerts(cpPolyShape *poly, int count, const cpVect *verts, cpVect offset)
 }
 
 static struct cpShapeMassInfo
-cpPolyShapeMassInfo(cpFloat mass, int count, const cpVect *verts)
+cpPolyShapeMassInfo(cpFloat mass, int count, const cpVect *verts, cpFloat radius)
 {
 	// TODO moment is approximate due to radius.
 	
 	cpVect centroid = cpCentroidForPoly(count, verts);
 	struct cpShapeMassInfo info = {
-		mass, cpMomentForPoly(1.0f, count, verts, cpvneg(centroid)),
+		mass, cpMomentForPoly(1.0f, count, verts, cpvneg(centroid), radius),
 		centroid,
-		cpAreaForPoly(count, verts),
+		cpAreaForPoly(count, verts, radius),
 	};
 	
 	return info;
@@ -230,7 +230,7 @@ cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int count, const cpVect *verts,
 	poly->r = radius;
 	setUpVerts(poly, count, verts, offset);
 	
-	cpShapeInit((cpShape *)poly, &polyClass, body, cpPolyShapeMassInfo(0.0f, poly->count, poly->verts));
+	cpShapeInit((cpShape *)poly, &polyClass, body, cpPolyShapeMassInfo(0.0f, poly->count, poly->verts, poly->r));
 
 	return poly;
 }
@@ -311,7 +311,7 @@ cpPolyShapeSetVerts(cpShape *shape, int count, cpVect *verts, cpVect offset)
 	setUpVerts(poly, count, verts, offset);
 	
 	cpFloat mass = shape->massInfo.m;
-	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, poly->count, poly->verts);
+	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, poly->count, poly->verts, poly->r);
 	if(mass > 0.0f) cpBodyAccumulateMass(shape->body);
 }
 
@@ -325,6 +325,6 @@ cpPolyShapeSetRadius(cpShape *shape, cpFloat radius)
 	poly->r = radius;
 
 	cpFloat mass = shape->massInfo.m;
-	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, poly->count, poly->verts);
+	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, poly->count, poly->verts, poly->r);
 	if(mass > 0.0f) cpBodyAccumulateMass(shape->body);
 }

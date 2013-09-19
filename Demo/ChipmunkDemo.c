@@ -264,7 +264,7 @@ ChipmunkDemoPrintString(char *fmt, ...)
 	
 	va_list args;
 	va_start(args, fmt);
-	// TODO: should use vsnprintf herep
+	// TODO: should use vsnprintf here
 	PrintStringCursor += vsprintf(PrintStringCursor, fmt, args);
 	va_end(args);
 }

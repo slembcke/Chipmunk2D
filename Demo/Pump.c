@@ -157,7 +157,7 @@ init(void)
 	// feeder mechanism
 	cpFloat bottom = -300.0f;
 	cpFloat top = 32.0f;
-	cpBody *feeder = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForSegment(1.0f, cpv(-224.0f, bottom), cpv(-224.0f, top))));
+	cpBody *feeder = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForSegment(1.0f, cpv(-224.0f, bottom), cpv(-224.0f, top), 0.0f)));
 	cpBodySetPosition(feeder, cpv(-224, (bottom + top)/2.0f));
 	
 	cpFloat len = top - bottom;

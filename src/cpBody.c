@@ -23,7 +23,6 @@
 #include <stdarg.h>
 
 #include "chipmunk_private.h"
-#include "constraints/util.h"
 
 // initialized in cpInitChipmunk()
 cpBody cpStaticBodySingleton;

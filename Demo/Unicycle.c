@@ -22,8 +22,6 @@
 #include "chipmunk.h"
 #include "ChipmunkDemo.h"
 
-#include "constraints/util.h"
-
 static cpBody *balance_body;
 static cpFloat balance_sin = 0.0;
 //static cpFloat last_v = 0.0;
@@ -36,6 +34,12 @@ static cpConstraint *motor;
 	- Clamp max angle dynamically based on output torque.
 */
 
+
+static inline cpFloat
+bias_coef(cpFloat errorBias, cpFloat dt)
+{
+	return 1.0f - cpfpow(errorBias, dt);
+}
 
 static void motor_preSolve(cpConstraint *motor, cpSpace *space)
 {

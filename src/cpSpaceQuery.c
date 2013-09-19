@@ -93,7 +93,7 @@ cpSpacePointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLa
 	cpSpatialIndexQuery(space->activeShapes, &context, bb, (cpSpatialIndexQueryFunc)NearestPointQueryNearest, out);
 	cpSpatialIndexQuery(space->staticShapes, &context, bb, (cpSpatialIndexQueryFunc)NearestPointQueryNearest, out);
 	
-	return out->shape;
+	return (cpShape *)out->shape;
 }
 
 
@@ -175,7 +175,7 @@ cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpFloat radiu
 	cpSpatialIndexSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryFunc)SegmentQueryFirst, out);
 	cpSpatialIndexSegmentQuery(space->activeShapes, &context, start, end, out->alpha, (cpSpatialIndexSegmentQueryFunc)SegmentQueryFirst, out);
 	
-	return out->shape;
+	return (cpShape *)out->shape;
 }
 
 //MARK: BB Query Functions
@@ -213,66 +213,43 @@ cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceB
 
 //MARK: Shape Query Functions
 
-// TODO: Reimplement
-//struct ShapeQueryContext {
-//	cpSpaceShapeQueryFunc func;
-//	void *data;
-//	cpBool anyCollision;
-//};
-//
-//// Callback from the spatial hash.
-//static cpCollisionID
-//ShapeQuery(cpShape *a, cpShape *b, cpCollisionID id, struct ShapeQueryContext *context)
-//{
-//	// Reject any of the simple cases
-//	if(
-//		(a->group && a->group == b->group) ||
-//		!(a->layers & b->layers) ||
-//		a == b
-//	) return id;
-//	
-//	cpContact contacts[CP_MAX_CONTACTS_PER_ARBITER];
-//	int numContacts = 0;
-//	
-//	// Shape 'a' should have the lower shape type. (required by cpCollideShapes() )
-//	if(a->klass->type <= b->klass->type){
-//		numContacts = cpCollideShapes(a, b, &id, contacts);
-//	} else {
-//		numContacts = cpCollideShapes(b, a, &id, contacts);
-//		for(int i=0; i<numContacts; i++) contacts[i].n = cpvneg(contacts[i].n);
-//	}
-//	
-//	if(numContacts){
-//		context->anyCollision = !(a->sensor || b->sensor);
-//		
-//		if(context->func){
-//			cpContactPointSet set;
-//			set.count = numContacts;
-//			
-//			for(int i=0; i<set.count; i++){
-//				set.points[i].point = contacts[i].p;
-//				set.points[i].normal = contacts[i].n;
-//				set.points[i].dist = contacts[i].dist;
-//			}
-//			
-//			context->func(b, &set, context->data);
-//		}
-//	}
-//	
-//	return id;
-//}
-//
-//cpBool
-//cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data)
-//{
-//	cpBody *body = shape->body;
-//	cpBB bb = (body ? cpShapeUpdate(shape, body->p, body->rot) : shape->bb);
-//	struct ShapeQueryContext context = {func, data, cpFalse};
-//	
-//	cpSpaceLock(space); {
-//    cpSpatialIndexQuery(space->activeShapes, shape, bb, (cpSpatialIndexQueryFunc)ShapeQuery, &context);
-//    cpSpatialIndexQuery(space->staticShapes, shape, bb, (cpSpatialIndexQueryFunc)ShapeQuery, &context);
-//	} cpSpaceUnlock(space, cpTrue);
-//	
-//	return context.anyCollision;
-//}
+struct ShapeQueryContext {
+	cpSpaceShapeQueryFunc func;
+	void *data;
+	cpBool anyCollision;
+};
+
+// Callback from the spatial hash.
+static cpCollisionID
+ShapeQuery(cpShape *a, cpShape *b, cpCollisionID id, struct ShapeQueryContext *context)
+{
+	// Reject any of the simple cases
+	if(
+		(a->group && a->group == b->group) ||
+		!(a->layers & b->layers) ||
+		a == b
+	) return id;
+	
+	cpContactPointSet set = cpShapesCollide(a, b);
+	if(set.count){
+		if(context->func) context->func(b, &set, context->data);
+		context->anyCollision = !(a->sensor || b->sensor);
+	}
+	
+	return id;
+}
+
+cpBool
+cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data)
+{
+	cpBody *body = shape->body;
+	cpBB bb = (body ? cpShapeUpdate(shape, body->p, body->rot) : shape->bb);
+	struct ShapeQueryContext context = {func, data, cpFalse};
+	
+	cpSpaceLock(space); {
+    cpSpatialIndexQuery(space->activeShapes, shape, bb, (cpSpatialIndexQueryFunc)ShapeQuery, &context);
+    cpSpatialIndexQuery(space->staticShapes, shape, bb, (cpSpatialIndexQueryFunc)ShapeQuery, &context);
+	} cpSpaceUnlock(space, cpTrue);
+	
+	return context.anyCollision;
+}

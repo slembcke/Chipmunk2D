@@ -169,7 +169,6 @@
 		D3800E100E9815FC00A3D7FA /* cpConstraint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpConstraint.c; sourceTree = "<group>"; };
 		D3800E1B0E98176F00A3D7FA /* cpPinJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpPinJoint.c; sourceTree = "<group>"; };
 		D3800E1C0E98176F00A3D7FA /* cpPinJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpPinJoint.h; path = ../../include/chipmunk/constraints/cpPinJoint.h; sourceTree = "<group>"; };
-		D3800E3A0E9820B900A3D7FA /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util.h; path = ../../include/chipmunk/constraints/util.h; sourceTree = "<group>"; };
 		D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpGrooveJoint.c; sourceTree = "<group>"; };
 		D3800EA10E98260200A3D7FA /* cpGrooveJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpGrooveJoint.h; path = ../../include/chipmunk/constraints/cpGrooveJoint.h; sourceTree = "<group>"; };
 		D3800EA40E98260200A3D7FA /* cpPivotJoint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpPivotJoint.c; sourceTree = "<group>"; };
@@ -306,7 +305,6 @@
 		D3800E0E0E9815FC00A3D7FA /* constraints */ = {
 			isa = PBXGroup;
 			children = (
-				D3800E3A0E9820B900A3D7FA /* util.h */,
 				D3800E0F0E9815FC00A3D7FA /* cpConstraint.h */,
 				D3800E100E9815FC00A3D7FA /* cpConstraint.c */,
 				D3800E1C0E98176F00A3D7FA /* cpPinJoint.h */,
@@ -854,6 +852,7 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
@@ -888,6 +887,7 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;

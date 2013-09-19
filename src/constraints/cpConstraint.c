@@ -20,7 +20,6 @@
  */
 
 #include "chipmunk_private.h"
-#include "constraints/util.h"
 
 // TODO: Comment me!
 
@@ -34,9 +33,6 @@ cpConstraintFree(cpConstraint *constraint)
 		cpfree(constraint);
 	}
 }
-
-// *** declared in util.h
-// TODO: move declaration to chipmunk_private.h
 
 void
 cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b)

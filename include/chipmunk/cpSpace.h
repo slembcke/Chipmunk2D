@@ -238,11 +238,10 @@ typedef void (*cpSpaceBBQueryFunc)(cpShape *shape, void *data);
 /// Only the shape's bounding boxes are checked for overlap, not their full shape.
 void cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryFunc func, void *data);
 
-// TODO: Reimplement
-///// Shape query callback function type.
-//typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points, void *data);
-///// Query a space for any shapes overlapping the given shape and call @c func for each shape found.
-//cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
+/// Shape query callback function type.
+typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points, void *data);
+/// Query a space for any shapes overlapping the given shape and call @c func for each shape found.
+cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
 
 
 /// Space/body iterator callback function type.

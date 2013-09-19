@@ -62,8 +62,9 @@ cpAreaForCircle(cpFloat r1, cpFloat r2)
 }
 
 cpFloat
-cpMomentForSegment(cpFloat m, cpVect a, cpVect b)
+cpMomentForSegment(cpFloat m, cpVect a, cpVect b, cpFloat radius)
 {
+	// TODO account for radius
 	cpVect offset = cpvmult(cpvadd(a, b), 0.5f);
 	return m*(cpvdistsq(b, a)/12.0f + cpvlengthsq(offset));
 }
@@ -75,9 +76,9 @@ cpAreaForSegment(cpVect a, cpVect b, cpFloat r)
 }
 
 cpFloat
-cpMomentForPoly(cpFloat m, const int count, const cpVect *verts, cpVect offset)
+cpMomentForPoly(cpFloat m, const int count, const cpVect *verts, cpVect offset, cpFloat radius)
 {
-	if(count == 2) return cpMomentForSegment(m, verts[0], verts[1]);
+	if(count == 2) return cpMomentForSegment(m, verts[0], verts[1], radius);
 	
 	cpFloat sum1 = 0.0f;
 	cpFloat sum2 = 0.0f;
@@ -92,17 +93,19 @@ cpMomentForPoly(cpFloat m, const int count, const cpVect *verts, cpVect offset)
 		sum2 += a;
 	}
 	
+	// TODO account for radius.
 	return (m*sum1)/(6.0f*sum2);
 }
 
 cpFloat
-cpAreaForPoly(const int count, const cpVect *verts)
+cpAreaForPoly(const int count, const cpVect *verts, cpFloat radius)
 {
 	cpFloat area = 0.0f;
 	for(int i=0; i<count; i++){
 		area += cpvcross(verts[(i+1)%count], verts[i]);
 	}
 	
+	// TODO add circle area + perimeter*radius
 	return -area/2.0f;
 }
 
@@ -300,11 +303,10 @@ void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, c
 	cpSpaceBBQuery(space, bb, layers, group, (cpSpaceBBQueryFunc)IteratorFunc, block);
 }
 
-// TODO: Reimplement
-//static void ShapeQueryIteratorFunc(cpShape *shape, cpContactPointSet *points, cpSpaceShapeQueryBlock block){block(shape, points);}
-//cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block){
-//	return cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)ShapeQueryIteratorFunc, block);
-//}
+static void ShapeQueryIteratorFunc(cpShape *shape, cpContactPointSet *points, cpSpaceShapeQueryBlock block){block(shape, points);}
+cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block){
+	return cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)ShapeQueryIteratorFunc, block);
+}
 
 #endif
 #endif

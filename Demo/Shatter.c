@@ -22,7 +22,6 @@
 #include <string.h>
 
 #include "chipmunk.h"
-#include "constraints/util.h"
 
 #include "ChipmunkDemo.h"
 
@@ -138,8 +137,8 @@ ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int cell_i, int cell_j,
 	}
                                                                                                                                                                                                                                                                                  	
 	cpVect centroid = cpCentroidForPoly(count, ping);
-	cpFloat mass = cpAreaForPoly(count, ping)*DENSITY;
-	cpFloat moment = cpMomentForPoly(mass, count, ping, cpvneg(centroid));
+	cpFloat mass = cpAreaForPoly(count, ping, 0.0f)*DENSITY;
+	cpFloat moment = cpMomentForPoly(mass, count, ping, cpvneg(centroid), 0.0f);
 	
 	cpBody *new_body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 	cpBodySetPosition(new_body, centroid);
@@ -187,7 +186,7 @@ update(cpSpace *space, double dt)
 			cpBB bb = cpShapeGetBB(info.shape);
 			cpFloat cell_size = cpfmax(bb.r - bb.l, bb.t - bb.b)/5.0f;
 			if(cell_size > 5.0f){
-				ShatterShape(space, info.shape, cell_size, ChipmunkDemoMouse);
+				ShatterShape(space, (cpShape *)info.shape, cell_size, ChipmunkDemoMouse);
 			} else {
 //				printf("Too small to splinter %f\n", cell_size);
 			}

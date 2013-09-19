@@ -98,7 +98,7 @@ init(void)
 	}
 	
 	pentagon_mass = 1.0;
-	pentagon_moment = cpMomentForPoly(1.0f, NUM_VERTS, verts, cpvzero);
+	pentagon_moment = cpMomentForPoly(1.0f, NUM_VERTS, verts, cpvzero, 0.0f);
 	
 	// Add lots of pentagons.
 	for(int i=0; i<300; i++){

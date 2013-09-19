@@ -71,7 +71,7 @@ static void add_hexagon(cpSpace *space, int index, cpFloat radius){
 	}
 	
 	cpFloat mass = radius*radius;
-	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 6, hexagon, cpvzero)));
+	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 6, hexagon, cpvzero, 0.0f)));
 	cpBodySetPosition(body, cpvmult(frand_unit_circle(), 180.0f));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpvzero, bevel));
@@ -261,7 +261,7 @@ static cpSpace *init_ComplexTerrainHexagons_1000(){
 	
 	for(int i=0; i<1000; i++){
 		cpFloat mass = radius*radius;
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 6, hexagon, cpvzero)));
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 6, hexagon, cpvzero, 0.0f)));
 		cpBodySetPosition(body, cpvadd(cpvmult(frand_unit_circle(), 180.0f), cpv(0.0f, 300.0f)));
 		
 		cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 6, hexagon, cpvzero, bevel));
@@ -365,7 +365,7 @@ static cpSpace *init_BouncyTerrainHexagons_500(){
 	
 	for(int i=0; i<500; i++){
 		cpFloat mass = radius*radius;
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 6, hexagon, cpvzero)));
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 6, hexagon, cpvzero, 0.0f)));
 		cpBodySetPosition(body, cpvadd(cpvmult(frand_unit_circle(), 130.0f), cpvzero));
 		cpBodySetVelocity(body, cpvmult(frand_unit_circle(), 50.0f));
 		

@@ -135,8 +135,8 @@ ChipmunkDebugDrawInit(void)
 #undef MAX // Defined on some systems
 #define MAX(__a__, __b__) (__a__ > __b__ ? __a__ : __b__)
 
-static size_t triangle_capacity = 0;
-static size_t triangle_count = 0;
+static GLsizei triangle_capacity = 0;
+static GLsizei triangle_count = 0;
 static Triangle *triangle_buffer = NULL;
 
 static Triangle *PushTriangles(size_t count)

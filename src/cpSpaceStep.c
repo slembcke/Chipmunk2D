@@ -202,7 +202,7 @@ cpSpaceArbiterSetTrans(cpShape **shapes, cpSpace *space)
 }
 
 static inline cpBool
-queryReject(cpShape *a, cpShape *b)
+QueryReject(cpShape *a, cpShape *b)
 {
 	return (
 		// BBoxes must overlap
@@ -223,30 +223,23 @@ cpCollisionID
 cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 {
 	// Reject any of the simple cases
-	if(queryReject(a,b)) return id;
+	if(QueryReject(a,b)) return id;
 	
 	cpCollisionHandler *handler = cpSpaceLookupHandler(space, a->collision_type, b->collision_type);
 	
 	cpBool sensor = a->sensor || b->sensor;
 	if(sensor && handler == &cpDefaultCollisionHandler) return id;
 	
-	// Shape 'a' should have the lower shape type. (required by cpCollideShapes() )
-	if(a->klass->type > b->klass->type || (a->klass->type == b->klass->type)){
-		cpShape *temp = a;
-		a = b;
-		b = temp;
-	}
-	
 	// Narrow-phase collision detection.
-	cpCollisionInfo info = cpCollideShapes(a, b, id, cpContactBufferGetArray(space));
+	struct cpCollisionInfo info = cpCollide(a, b, id, cpContactBufferGetArray(space));
 	
 	if(info.count == 0) return info.id; // Shapes are not colliding.
 	cpSpacePushContacts(space, info.count);
 	
 	// Get an arbiter from space->arbiterSet for the two shapes.
 	// This is where the persistant contact magic comes from.
-	cpShape *shape_pair[] = {a, b};
-	cpHashValue arbHashID = CP_HASH_PAIR((cpHashValue)a, (cpHashValue)b);
+	const cpShape *shape_pair[] = {info.a, info.b};
+	cpHashValue arbHashID = CP_HASH_PAIR((cpHashValue)info.a, (cpHashValue)info.b);
 	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->cachedArbiters, arbHashID, shape_pair, space, (cpHashSetTransFunc)cpSpaceArbiterSetTrans);
 	cpArbiterUpdate(arb, &info, handler);
 	

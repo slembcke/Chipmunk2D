@@ -109,7 +109,7 @@ cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot)
 }
 
 cpFloat
-cpShapePointQuery(cpShape *shape, cpVect p, cpPointQueryInfo *info)
+cpShapePointQuery(const cpShape *shape, cpVect p, cpPointQueryInfo *info)
 {
 	cpPointQueryInfo blank = {NULL, cpvzero, INFINITY, cpvzero};
 	if(info){
@@ -124,7 +124,7 @@ cpShapePointQuery(cpShape *shape, cpVect p, cpPointQueryInfo *info)
 
 
 cpBool
-cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info){
+cpShapeSegmentQuery(const cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info){
 	cpSegmentQueryInfo blank = {NULL, b, cpvzero, 1.0f};
 	if(info){
 		(*info) = blank;
@@ -143,6 +143,30 @@ cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmen
 	}
 	
 	return (info->shape != NULL);
+}
+
+cpContactPointSet
+cpShapesCollide(const cpShape *a, const cpShape *b)
+{
+	struct cpContact contacts[CP_MAX_CONTACTS_PER_ARBITER];
+	struct cpCollisionInfo info = cpCollide(a, b, 0, contacts);
+	
+	cpContactPointSet set;
+	set.count = info.count;
+	
+	// cpCollideShapes() may have swapped the contact order. Flip the normal.
+	set.normal = (a == info.a ? info.n : cpvneg(info.n));
+	
+	for(int i=0; i<info.count; i++){
+		// cpCollideShapesInfo() returns contacts with absolute positions.
+		cpVect p1 = contacts[i].r1;
+		cpVect p2 = contacts[i].r2;
+		
+		set.points[i].point1 = p1;
+		set.points[i].distance = cpvdot(cpvsub(p2, p1), set.normal);
+	}
+	
+	return set;
 }
 
 cpCircleShape *

@@ -54,9 +54,9 @@ update(cpSpace *space, double dt)
 		cpVect centroid = cpCentroidForPoly(hullCount, verts);
 		
 		// Recalculate the body properties to match the updated shape.
-		cpFloat mass = cpAreaForPoly(hullCount, verts)*DENSITY;
+		cpFloat mass = cpAreaForPoly(hullCount, verts, 0.0f)*DENSITY;
 		cpBodySetMass(body, mass);
-		cpBodySetMoment(body, cpMomentForPoly(mass, hullCount, verts, cpvneg(centroid)));
+		cpBodySetMoment(body, cpMomentForPoly(mass, hullCount, verts, cpvneg(centroid), 0.0f));
 		cpBodySetPosition(body, cpBodyLocalToWorld(body, centroid));
 		
 		// Use the setter function from chipmunk_unsafe.h.

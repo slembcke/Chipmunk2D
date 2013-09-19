@@ -44,7 +44,7 @@ addLever(cpSpace *space, cpVect pos, cpVect boxOffset)
 	cpVect a = cpv(0,  15);
 	cpVect b = cpv(0, -15);
 	
-	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
+	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b, 0.0f)));
 	cpBodySetPosition(body, cpvadd(pos, cpvadd(boxOffset, cpv(0, -15))));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 5.0f));
@@ -61,7 +61,7 @@ addBar(cpSpace *space, cpVect pos, cpVect boxOffset)
 	cpVect a = cpv(0,  30);
 	cpVect b = cpv(0, -30);
 	
-	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b)));
+	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForSegment(mass, a, b, 0.0f)));
 	cpBodySetPosition(body, cpvadd(pos, boxOffset));
 	
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, a, b, 5.0f));
