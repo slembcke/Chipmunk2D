@@ -25,8 +25,6 @@
 
 typedef struct cpShapeClass cpShapeClass;
 
-// TODO Rename SLVNs
-
 /// Nearest point query info struct.
 typedef struct cpPointQueryInfo {
 	/// The nearest shape, NULL if no shape was within range.
@@ -51,6 +49,23 @@ typedef struct cpSegmentQueryInfo {
 	/// The normalized distance along the query segment in the range [0, 1].
 	cpFloat alpha;
 } cpSegmentQueryInfo;
+
+typedef struct cpShapeFilter {
+	cpGroup group;
+	cpBitmask categories;
+	cpBitmask mask;
+} cpShapeFilter;
+
+static const cpShapeFilter CP_SHAPE_FILTER_ALL = {CP_NO_GROUP, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES};
+static const cpShapeFilter CP_SHAPE_FILTER_NONE = {CP_NO_GROUP, ~CP_ALL_CATEGORIES, ~CP_ALL_CATEGORIES};
+
+static inline cpShapeFilter
+cpShapeFilterNew(cpGroup group, cpBitmask categories, cpBitmask mask)
+{
+	cpShapeFilter filter = {group, categories, mask};
+	return filter;
+}
+
 
 /// @private
 struct cpShapeMassInfo {
@@ -114,10 +129,8 @@ struct cpShape {
 	
 	/// Collision type of this shape used when picking collision handlers.
 	CP_PRIVATE(cpCollisionType collision_type);
-	/// Group of this shape. Shapes in the same group don't collide.
-	CP_PRIVATE(cpGroup group);
-	// Layer bitmask for this shape. Shapes only collide if the bitwise and of their layers is non-zero.
-	CP_PRIVATE(cpLayers layers);
+	
+	CP_PRIVATE(cpShapeFilter filter);
 	
 	CP_PRIVATE(cpSpace *space);
 	
@@ -179,8 +192,7 @@ CP_DefineShapeStructProperty(cpFloat, u, Friction, cpTrue)
 CP_DefineShapeStructProperty(cpVect, surface_v, SurfaceVelocity, cpTrue)
 CP_DefineShapeStructProperty(cpDataPointer, data, UserData, cpFalse)
 CP_DefineShapeStructProperty(cpCollisionType, collision_type, CollisionType, cpTrue)
-CP_DefineShapeStructProperty(cpGroup, group, Group, cpTrue)
-CP_DefineShapeStructProperty(cpLayers, layers, Layers, cpTrue)
+CP_DefineShapeStructProperty(cpShapeFilter, filter, Filter, cpTrue)
 
 /// When initializing a shape, it's hash value comes from a counter.
 /// Because the hash value may affect iteration order, you can reset the shape ID counter

@@ -40,7 +40,7 @@ static void
 update(cpSpace *space, double dt)
 {
 	if(ChipmunkDemoRightDown){
-		cpShape *nearest = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0, GRABABLE_MASK_BIT, CP_NO_GROUP, NULL);
+		cpShape *nearest = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0, GRAB_FILTER, NULL);
 		if(nearest){
 			cpBody *body = cpShapeGetBody(nearest);
 			if(cpBodyIsStatic(body)){
@@ -86,7 +86,7 @@ init(void)
 			shape = cpSpaceAddShape(space, cpPolyShapeNew(staticBody, 3, tris, offset, 0.0));
 			cpShapeSetElasticity(shape, 1.0f);
 			cpShapeSetFriction(shape, 1.0f);
-			cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+			cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 		}
 	}
 	

@@ -57,7 +57,7 @@ add_bar(cpSpace *space, cpVect a, cpVect b, int group)
 	cpBodySetPosition(body, center);
 	
 	cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(body, cpvsub(a, center), cpvsub(b, center), 10.0f));
-	cpShapeSetGroup(shape, group);
+	cpShapeSetFilter(shape, cpShapeFilterNew(group, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES));
 	
 	return body;
 }

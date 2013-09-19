@@ -43,8 +43,9 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body, struct cpSh
 	shape->surface_v = cpvzero;
 	
 	shape->collision_type = 0;
-	shape->group = CP_NO_GROUP;
-	shape->layers = CP_ALL_LAYERS;
+	shape->filter.group = CP_NO_GROUP;
+	shape->filter.categories = CP_ALL_CATEGORIES;
+	shape->filter.mask = CP_ALL_CATEGORIES;
 	
 	shape->data = NULL;
 	

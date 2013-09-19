@@ -126,7 +126,7 @@ update(cpSpace *space, double dt)
 		} else {
 			// MouseUp
 			struct SliceContext context = {sliceStart, ChipmunkDemoMouse, space};
-			cpSpaceSegmentQuery(space, sliceStart, ChipmunkDemoMouse, 0.0, GRABABLE_MASK_BIT, CP_NO_GROUP, (cpSpaceSegmentQueryFunc)SliceQuery, &context);
+			cpSpaceSegmentQuery(space, sliceStart, ChipmunkDemoMouse, 0.0, GRAB_FILTER, (cpSpaceSegmentQueryFunc)SliceQuery, &context);
 		}
 		
 		lastClickState = ChipmunkDemoRightClick;
@@ -155,7 +155,7 @@ init(void)
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-1000,-240), cpv(1000,-240), 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 
 	cpFloat width = 200.0f;
 	cpFloat height = 300.0f;

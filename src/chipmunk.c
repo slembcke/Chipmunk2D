@@ -290,17 +290,17 @@ void cpBodyEachArbiter_b(cpBody *body, void (^block)(cpArbiter *arbiter)){
 }
 
 static void PointQueryIteratorFunc(cpShape *shape, cpFloat distance, cpVect point, cpSpacePointQueryBlock block){block(shape, distance, point);}
-void cpSpacePointQuery_b(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpacePointQueryBlock block){
-	cpSpacePointQuery(space, point, maxDistance, layers, group, (cpSpacePointQueryFunc)PointQueryIteratorFunc, block);
+void cpSpacePointQuery_b(cpSpace *space, cpVect point, cpFloat maxDistance, cpShapeFilter filter, cpSpacePointQueryBlock block){
+	cpSpacePointQuery(space, point, maxDistance, filter, (cpSpacePointQueryFunc)PointQueryIteratorFunc, block);
 }
 
 static void SegmentQueryIteratorFunc(cpShape *shape, cpFloat t, cpVect n, cpSpaceSegmentQueryBlock block){block(shape, t, n);}
-void cpSpaceSegmentQuery_b(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpLayers layers, cpGroup group, cpSpaceSegmentQueryBlock block){
-	cpSpaceSegmentQuery(space, start, end, radius, layers, group, (cpSpaceSegmentQueryFunc)SegmentQueryIteratorFunc, block);
+void cpSpaceSegmentQuery_b(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpShapeFilter filter, cpSpaceSegmentQueryBlock block){
+	cpSpaceSegmentQuery(space, start, end, radius, filter, (cpSpaceSegmentQueryFunc)SegmentQueryIteratorFunc, block);
 }
 
-void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryBlock block){
-	cpSpaceBBQuery(space, bb, layers, group, (cpSpaceBBQueryFunc)IteratorFunc, block);
+void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpShapeFilter filter, cpSpaceBBQueryBlock block){
+	cpSpaceBBQuery(space, bb, filter, (cpSpaceBBQueryFunc)IteratorFunc, block);
 }
 
 static void ShapeQueryIteratorFunc(cpShape *shape, cpContactPointSet *points, cpSpaceShapeQueryBlock block){block(shape, points);}

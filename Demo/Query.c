@@ -41,7 +41,7 @@ update(cpSpace *space, double dt)
 	ChipmunkDemoPrintString("Query: Dist(%f) Point(%5.2f, %5.2f), ", cpvdist(start, end), end.x, end.y);
 	
 	cpSegmentQueryInfo segInfo = {};
-	if(cpSpaceSegmentQueryFirst(space, start, end, radius, CP_ALL_LAYERS, CP_NO_GROUP, &segInfo)){
+	if(cpSpaceSegmentQueryFirst(space, start, end, radius, CP_SHAPE_FILTER_ALL, &segInfo)){
 		cpVect point = segInfo.point;
 		cpVect n = segInfo.normal;
 		
@@ -64,7 +64,7 @@ update(cpSpace *space, double dt)
 	ChipmunkDebugDrawFatSegment(start, cpvlerp(start, end, segInfo.alpha), radius, RGBAColor(0,1,0,1), LAColor(0,0));
 	
 	cpPointQueryInfo nearestInfo = {};
-	cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 100.0, CP_ALL_LAYERS, CP_NO_GROUP, &nearestInfo);
+	cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 100.0, CP_SHAPE_FILTER_ALL, &nearestInfo);
 	if(nearestInfo.shape){
 		// Draw a grey line to the closest shape.
 		ChipmunkDebugDrawDot(3, ChipmunkDemoMouse, RGBAColor(0.5, 0.5, 0.5, 1.0));

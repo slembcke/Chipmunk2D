@@ -92,8 +92,7 @@ MAKE_PROPERTIES_REF(cpShape, Friction);
 MAKE_PROPERTIES_REF(cpShape, SurfaceVelocity);
 MAKE_PROPERTIES_REF(cpShape, UserData);
 MAKE_PROPERTIES_REF(cpShape, CollisionType);
-MAKE_PROPERTIES_REF(cpShape, Group);
-MAKE_PROPERTIES_REF(cpShape, Layers);
+MAKE_PROPERTIES_REF(cpShape, Filter);
 
 MAKE_REF(cpArbiterGetShapes);
 MAKE_REF(cpArbiterGetBodies);

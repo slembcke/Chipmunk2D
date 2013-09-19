@@ -129,22 +129,22 @@ init(void)
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 	
 	{
 		// Add the edges of the bucket
@@ -154,17 +154,17 @@ init(void)
 		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(bb.l, bb.b), cpv(bb.l, bb.t), radius));
 		cpShapeSetElasticity(shape, 1.0f);
 		cpShapeSetFriction(shape, 1.0f);
-		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+		cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 
 		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(bb.r, bb.b), cpv(bb.r, bb.t), radius));
 		cpShapeSetElasticity(shape, 1.0f);
 		cpShapeSetFriction(shape, 1.0f);
-		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+		cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 
 		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(bb.l, bb.b), cpv(bb.r, bb.b), radius));
 		cpShapeSetElasticity(shape, 1.0f);
 		cpShapeSetFriction(shape, 1.0f);
-		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+		cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 		
 		// Add the sensor for the water.
 		shape = cpSpaceAddShape(space, cpBoxShapeNew2(staticBody, bb, 0.0));

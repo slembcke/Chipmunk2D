@@ -141,7 +141,7 @@ init(void)
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(body, 8.0f, cpvzero));
 	cpShapeSetElasticity(shape, 0.0);
 	cpShapeSetFriction(shape, 0.0);
-	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 	
 	bodyCount++;
 

@@ -185,11 +185,11 @@ typedef uint32_t cpCollisionID;
 	typedef uintptr_t cpGroup;
 #endif
 
-#ifdef CP_LAYERS_TYPE
-	typedef CP_LAYERS_TYPE cpLayers;
+#ifdef CP_BITMASK_TYPE
+	typedef CP_BITMASK_TYPE cpLayers;
 #else
-/// Type used for cpShape.layers.
-	typedef unsigned int cpLayers;
+/// Type used for cpShapeFilter category and mask.
+	typedef unsigned int cpBitmask;
 #endif
 
 #ifdef CP_TIMESTAMP_TYPE
@@ -204,9 +204,9 @@ typedef uint32_t cpCollisionID;
 	#define CP_NO_GROUP ((cpGroup)0)
 #endif
 
-#ifndef CP_ALL_LAYERS
+#ifndef CP_ALL_CATEGORIES
 /// Value for cpShape.layers signifying that a shape is in every layer.
-	#define CP_ALL_LAYERS (~(cpLayers)0)
+	#define CP_ALL_CATEGORIES (~(cpBitmask)0)
 #endif
 /// @}
 

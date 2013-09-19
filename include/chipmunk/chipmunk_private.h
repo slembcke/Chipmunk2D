@@ -217,6 +217,15 @@ CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r1, cpVect a, cpVect b
 	}
 }
 
+static inline cpBool
+cpShapeFilterReject(cpShapeFilter a, cpShapeFilter b)
+{
+	return (
+		(a.group && a.group == b.group) ||
+		!((a.categories & b.mask) & (b.categories & b.mask))
+	);
+}
+
 
 //MARK: Constraint Functions
 // TODO naming conventions here

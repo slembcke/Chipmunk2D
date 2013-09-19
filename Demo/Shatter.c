@@ -182,7 +182,7 @@ update(cpSpace *space, double dt)
 	
 	if(ChipmunkDemoRightDown){
 		cpPointQueryInfo info;
-		if(cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0, GRABABLE_MASK_BIT, CP_NO_GROUP, &info)){
+		if(cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0, GRAB_FILTER, &info)){
 			cpBB bb = cpShapeGetBB(info.shape);
 			cpFloat cell_size = cpfmax(bb.r - bb.l, bb.t - bb.b)/5.0f;
 			if(cell_size > 5.0f){
@@ -212,7 +212,7 @@ init(void)
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-1000, -240), cpv( 1000, -240), 0.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 
 	cpFloat width = 200.0f;
 	cpFloat height = 200.0f;

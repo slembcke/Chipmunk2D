@@ -111,7 +111,7 @@ init(void)
 	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(planetBody, 70.0f, cpvzero));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 	
 	return space;
 }

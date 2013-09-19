@@ -221,22 +221,22 @@ cpBool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key
 /// Nearest point query callback function type.
 typedef void (*cpSpacePointQueryFunc)(cpShape *shape, cpFloat distance, cpVect point, void *data);
 /// Query the space at a point and call @c func for each shape found.
-void cpSpacePointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpSpacePointQueryFunc func, void *data);
+void cpSpacePointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpShapeFilter filter, cpSpacePointQueryFunc func, void *data);
 /// Query the space at a point and return the nearest shape found. Returns NULL if no shapes were found.
-cpShape *cpSpacePointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpLayers layers, cpGroup group, cpPointQueryInfo *out);
+cpShape *cpSpacePointQueryNearest(cpSpace *space, cpVect point, cpFloat maxDistance, cpShapeFilter filter, cpPointQueryInfo *out);
 
 /// Segment query callback function type.
 typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpVect point, cpVect normal, cpFloat alpha, void *data);
 /// Perform a directed line segment query (like a raycast) against the space calling @c func for each shape intersected.
-void cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpLayers layers, cpGroup group, cpSpaceSegmentQueryFunc func, void *data);
+void cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpShapeFilter filter, cpSpaceSegmentQueryFunc func, void *data);
 /// Perform a directed line segment query (like a raycast) against the space and return the first shape hit. Returns NULL if no shapes were hit.
-cpShape *cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpLayers layers, cpGroup group, cpSegmentQueryInfo *out);
+cpShape *cpSpaceSegmentQueryFirst(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpShapeFilter filter, cpSegmentQueryInfo *out);
 
 /// Rectangle Query callback function type.
 typedef void (*cpSpaceBBQueryFunc)(cpShape *shape, void *data);
 /// Perform a fast rectangle query on the space calling @c func for each shape found.
 /// Only the shape's bounding boxes are checked for overlap, not their full shape.
-void cpSpaceBBQuery(cpSpace *space, cpBB bb, cpLayers layers, cpGroup group, cpSpaceBBQueryFunc func, void *data);
+void cpSpaceBBQuery(cpSpace *space, cpBB bb, cpShapeFilter filter, cpSpaceBBQueryFunc func, void *data);
 
 /// Shape query callback function type.
 typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points, void *data);

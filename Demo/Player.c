@@ -120,19 +120,19 @@ init(void)
 	// Create segments around the edge of the screen.
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(-320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(320,-240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,-240), cpv(320,-240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 	
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-320,240), cpv(320,240), 0.0f));
 	shape->e = 1.0f; shape->u = 1.0f;
-	shape->layers = NOT_GRABABLE_MASK;
+	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 	
 	// Set up the player
 	body = cpSpaceAddBody(space, cpBodyNew(1.0f, INFINITY));

@@ -88,17 +88,17 @@ init(void)
 		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-3200,-240), cpv(3200,-240), 0.0f));
 		cpShapeSetElasticity(shape, 1.0f);
 		cpShapeSetFriction(shape, 1.0f);
-		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+		cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 
 		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(0,-200), cpv(240,-240), 0.0f));
 		cpShapeSetElasticity(shape, 1.0f);
 		cpShapeSetFriction(shape, 1.0f);
-		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+		cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 
 		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-240,-240), cpv(0,-200), 0.0f));
 		cpShapeSetElasticity(shape, 1.0f);
 		cpShapeSetFriction(shape, 1.0f);
-		cpShapeSetLayers(shape, NOT_GRABABLE_MASK);
+		cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 	}
 	
 	
@@ -112,7 +112,7 @@ init(void)
 		
 		cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(wheel_body, radius, cpvzero));
 		cpShapeSetFriction(shape, 0.7);
-		cpShapeSetGroup(shape, 1);
+	cpShapeSetFilter(shape, cpShapeFilterNew(1, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES));
 	}
 	
 	{
@@ -131,11 +131,11 @@ init(void)
 		
 		shape = cpSpaceAddShape(space, cpBoxShapeNew2(balance_body, bb1, 0.0));
 		cpShapeSetFriction(shape, 1.0);
-		cpShapeSetGroup(shape, 1);
+		cpShapeSetFilter(shape, cpShapeFilterNew(1, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES));
 		
 		shape = cpSpaceAddShape(space, cpBoxShapeNew2(balance_body, bb2, 0.0));
 		cpShapeSetFriction(shape, 1.0);
-		cpShapeSetGroup(shape, 1);
+		cpShapeSetFilter(shape, cpShapeFilterNew(1, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES));
 	}
 	
 	cpVect anchr1 = cpBodyWorldToLocal(balance_body, cpBodyGetPosition(wheel_body));

@@ -67,6 +67,9 @@ static cpConstraint *mouse_joint = NULL;
 
 char *ChipmunkDemoMessageString = NULL;
 
+#define GRABBABLE_MASK_BIT (1<<31)
+cpShapeFilter GRAB_FILTER = {CP_NO_GROUP, GRABBABLE_MASK_BIT, GRABBABLE_MASK_BIT};
+cpShapeFilter NOT_GRABBABLE_FILTER = {CP_NO_GROUP, ~GRABBABLE_MASK_BIT, ~GRABBABLE_MASK_BIT};
 
 cpVect translate = {0, 0};
 cpFloat scale = 1.0;
@@ -477,7 +480,7 @@ Click(int button, int state)
 {
 	if(button == GLFW_MOUSE_BUTTON_1){
 		if(state == GLFW_PRESS){
-			cpShape *shape = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0f, GRABABLE_MASK_BIT, CP_NO_GROUP, NULL);
+			cpShape *shape = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0f, GRAB_FILTER, NULL);
 			if(shape){
 				cpBody *body = shape->body;
 				mouse_joint = cpPivotJointNew2(mouse_body, body, cpvzero, cpBodyWorldToLocal(body, ChipmunkDemoMouse));
