@@ -104,8 +104,8 @@ cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect an
 	joint->anchr2 = anchr2;
 	
 	// STATIC_BODY_CHECK
-	cpVect p1 = (a ? cpBodyLocalToWorld(a, anchr1) : anchr1);
-	cpVect p2 = (b ? cpBodyLocalToWorld(b, anchr2) : anchr2);
+	cpVect p1 = (a ? cpTransformPoint(a->transform, anchr1) : anchr1);
+	cpVect p2 = (b ? cpTransformPoint(b->transform, anchr2) : anchr2);
 	joint->dist = cpvlength(cpvsub(p2, p1));
 	
 	cpAssertWarn(joint->dist > 0.0, "You created a 0 length pin joint. A pivot joint will be much more stable.");

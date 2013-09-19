@@ -332,14 +332,14 @@ cpBodyApplyForceAtWorldPoint(cpBody *body, cpVect force, cpVect point)
 	cpBodyActivate(body);
 	body->f = cpvadd(body->f, force);
 	
-	cpVect r = cpvsub(point, cpBodyLocalToWorld(body, body->cog));
+	cpVect r = cpvsub(point, cpTransformPoint(body->transform, body->cog));
 	body->t += cpvcross(r, force);
 }
 
 void
 cpBodyApplyForceAtLocalPoint(cpBody *body, cpVect force, cpVect point)
 {
-	cpBodyApplyForceAtWorldPoint(body, cpTransformVect(body->transform, force), cpBodyLocalToWorld(body, point));
+	cpBodyApplyForceAtWorldPoint(body, cpTransformVect(body->transform, force), cpTransformPoint(body->transform, point));
 }
 
 void
@@ -347,14 +347,14 @@ cpBodyApplyImpulseAtWorldPoint(cpBody *body, cpVect impulse, cpVect point)
 {
 	cpBodyActivate(body);
 	
-	cpVect r = cpvsub(point, cpBodyLocalToWorld(body, body->cog));
+	cpVect r = cpvsub(point, cpTransformPoint(body->transform, body->cog));
 	apply_impulse(body, impulse, r);
 }
 
 void
 cpBodyApplyImpulseAtLocalPoint(cpBody *body, cpVect impulse, cpVect point)
 {
-	cpBodyApplyImpulseAtWorldPoint(body, cpTransformVect(body->transform, impulse), cpBodyLocalToWorld(body, point));
+	cpBodyApplyImpulseAtWorldPoint(body, cpTransformVect(body->transform, impulse), cpTransformPoint(body->transform, point));
 }
 
 cpVect
@@ -367,7 +367,7 @@ cpBodyGetVelocityAtLocalPoint(const cpBody *body, cpVect point)
 cpVect
 cpBodyGetVelocityAtWorldPoint(const cpBody *body, cpVect point)
 {
-	cpVect r = cpvsub(point, cpBodyLocalToWorld(body, body->cog));
+	cpVect r = cpvsub(point, cpTransformPoint(body->transform, body->cog));
 	return cpvadd(body->v, cpvmult(cpvperp(r), body->w));
 }
 

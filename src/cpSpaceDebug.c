@@ -84,8 +84,8 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 	if(klass == cpPinJointGetClass()){
 		cpPinJoint *joint = (cpPinJoint *)constraint;
 		
-		cpVect a = cpBodyLocalToWorld(body_a, joint->anchr1);
-		cpVect b = cpBodyLocalToWorld(body_b, joint->anchr2);
+		cpVect a = cpTransformPoint(body_a->transform, joint->anchr1);
+		cpVect b = cpTransformPoint(body_b->transform, joint->anchr2);
 //		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
 //		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
 		
@@ -95,8 +95,8 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 	} else if(klass == cpSlideJointGetClass()){
 		cpSlideJoint *joint = (cpSlideJoint *)constraint;
 	
-		cpVect a = cpBodyLocalToWorld(body_a, joint->anchr1);
-		cpVect b = cpBodyLocalToWorld(body_b, joint->anchr2);
+		cpVect a = cpTransformPoint(body_a->transform, joint->anchr1);
+		cpVect b = cpTransformPoint(body_b->transform, joint->anchr2);
 		
 		options->drawDot(5, a, color, data);
 		options->drawDot(5, b, color, data);
@@ -104,17 +104,17 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 	} else if(klass == cpPivotJointGetClass()){
 		cpPivotJoint *joint = (cpPivotJoint *)constraint;
 	
-		cpVect a = cpBodyLocalToWorld(body_a, joint->anchr1);
-		cpVect b = cpBodyLocalToWorld(body_b, joint->anchr2);
+		cpVect a = cpTransformPoint(body_a->transform, joint->anchr1);
+		cpVect b = cpTransformPoint(body_b->transform, joint->anchr2);
 
 		options->drawDot(5, a, color, data);
 		options->drawDot(5, b, color, data);
 	} else if(klass == cpGrooveJointGetClass()){
 		cpGrooveJoint *joint = (cpGrooveJoint *)constraint;
 	
-		cpVect a = cpBodyLocalToWorld(body_a, joint->grv_a);
-		cpVect b = cpBodyLocalToWorld(body_a, joint->grv_b);
-		cpVect c = cpBodyLocalToWorld(body_b, joint->anchr2);
+		cpVect a = cpTransformPoint(body_a->transform, joint->grv_a);
+		cpVect b = cpTransformPoint(body_a->transform, joint->grv_b);
+		cpVect c = cpTransformPoint(body_b->transform, joint->anchr2);
 		
 		options->drawDot(5, c, color, data);
 		options->drawSegment(a, b, color, data);
@@ -123,8 +123,8 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 		cpDataPointer *data = options->data;
 		cpSpaceDebugColor color = options->constraintColor;
 		
-		cpVect a = cpBodyLocalToWorld(body_a, spring->anchr1);
-		cpVect b = cpBodyLocalToWorld(body_b, spring->anchr2);
+		cpVect a = cpTransformPoint(body_a->transform, spring->anchr1);
+		cpVect b = cpTransformPoint(body_b->transform, spring->anchr2);
 		
 		options->drawDot(5, a, color, data);
 		options->drawDot(5, b, color, data);

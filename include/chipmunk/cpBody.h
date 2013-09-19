@@ -198,7 +198,7 @@ void cpBodySetMoment(cpBody *body, cpFloat i);
 /// Get the position of a body.
 static inline cpVect cpBodyGetPosition(const cpBody *body)
 {
-	return cpBodyLocalToWorld(body, cpvzero);
+	return cpTransformPoint(body->CP_PRIVATE(transform), cpvzero);
 }
 
 /// Set the position of a body.
