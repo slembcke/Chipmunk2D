@@ -107,15 +107,17 @@ struct cpSpace {
 	CP_PRIVATE(cpSpatialIndex *staticShapes);
 	CP_PRIVATE(cpSpatialIndex *activeShapes);
 	
+	CP_PRIVATE(cpArray *constraints);
+	
 	CP_PRIVATE(cpArray *arbiters);
 	CP_PRIVATE(cpContactBufferHeader *contactBuffersHead);
 	CP_PRIVATE(cpHashSet *cachedArbiters);
 	CP_PRIVATE(cpArray *pooledArbiters);
-	CP_PRIVATE(cpArray *constraints);
 	
 	CP_PRIVATE(cpArray *allocatedBuffers);
-	CP_PRIVATE(int locked);
+	CP_PRIVATE(unsigned int locked);
 	
+	CP_PRIVATE(cpBool usesWildcards);
 	CP_PRIVATE(cpHashSet *collisionHandlers);
 	CP_PRIVATE(cpCollisionHandler defaultHandler);
 	

@@ -93,7 +93,7 @@ static cpCollisionHandler cpCollisionHandlerDefault = {
 static cpBool AlwaysCollide(cpArbiter *arb, cpSpace *space, void *data){return cpTrue;}
 static void DoNothing(cpArbiter *arb, cpSpace *space, void *data){}
 
-cpCollisionHandler cpCollisionHandlerWildcardDefault = {
+cpCollisionHandler cpCollisionHandlerDoNothing = {
 	CP_WILDCARD_COLLISION_TYPE, CP_WILDCARD_COLLISION_TYPE,
 	AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL
 };
@@ -158,7 +158,8 @@ cpSpaceInit(cpSpace *space)
 	
 	space->constraints = cpArrayNew(0);
 	
-	space->defaultHandler = cpCollisionHandlerDefault;
+	space->usesWildcards = cpFalse;
+	space->defaultHandler = cpCollisionHandlerDoNothing;
 	space->collisionHandlers = cpHashSetNew(0, (cpHashSetEqlFunc)handlerSetEql);
 	
 	space->postStepCallbacks = cpArrayNew(0);
@@ -226,13 +227,26 @@ cpSpaceFree(cpSpace *space)
 
 //MARK: Collision Handler Function Management
 
+static void
+cpSpaceUseWildcardDefaultHandler(cpSpace *space)
+{
+	// Spaces default to using the slightly faster "do nothing" default handler until wildcards are potentially needed.
+	if(!space->usesWildcards){
+		space->usesWildcards = cpTrue;
+		space->defaultHandler = cpCollisionHandlerDefault;
+	}
+}
+
 cpCollisionHandler *cpSpaceAddDefaultCollisionHandler(cpSpace *space)
 {
+	cpSpaceUseWildcardDefaultHandler(space);
 	return &space->defaultHandler;
 }
 
 cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
+	cpSpaceUseWildcardDefaultHandler(space);
+	
 	cpHashValue hash = CP_HASH_PAIR(a, b);
 	// TODO should use space->defaultHandler values instead?
 	cpCollisionHandler temp = {a, b, DefaultBegin, DefaultPreSolve, DefaultPostSolve, DefaultSeparate, NULL};
@@ -245,6 +259,8 @@ cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a
 cpCollisionHandler *
 cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type)
 {
+	cpSpaceUseWildcardDefaultHandler(space);
+	
 	cpHashValue hash = CP_HASH_PAIR(type, CP_WILDCARD_COLLISION_TYPE);
 	cpCollisionHandler temp = {type, CP_WILDCARD_COLLISION_TYPE, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
 	
