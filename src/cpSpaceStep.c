@@ -242,7 +242,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 	cpArbiterUpdate(arb, &info, handler);
 	
 	// Call the begin function first if it's the first step
-	if(arb->state == cpArbiterStateFirstColl && !handler->begin(arb, space, handler->data)){
+	if(arb->state == cpArbiterStateFirstColl && !handler->beginFunc(arb, space, handler->data)){
 		cpArbiterIgnore(arb); // permanently ignore the collision until separation
 	}
 	
@@ -250,7 +250,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 		// Ignore the arbiter if it has been flagged
 		(arb->state != cpArbiterStateIgnore) && 
 		// Call preSolve
-		handler->preSolve(arb, space, handler->data) &&
+		handler->preSolveFunc(arb, space, handler->data) &&
 		// Process, but don't add collisions for sensors.
 		!sensor
 	){
@@ -421,7 +421,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 			cpArbiter *arb = (cpArbiter *) arbiters->arr[i];
 			
 			cpCollisionHandler *handler = arb->handler;
-			handler->postSolve(arb, space, handler->data);
+			handler->postSolveFunc(arb, space, handler->data);
 		}
 	} cpSpaceUnlock(space, cpTrue);
 }

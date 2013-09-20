@@ -99,6 +99,7 @@ struct cpSpace {
 	
 	CP_PRIVATE(cpHashSet *collisionHandlers);
 	CP_PRIVATE(cpCollisionHandler defaultHandler);
+	CP_PRIVATE(cpCollisionType wildcardType);
 	
 	CP_PRIVATE(cpBool skipPostStep);
 	CP_PRIVATE(cpArray *postStepCallbacks);
@@ -150,33 +151,10 @@ cpSpaceIsLocked(cpSpace *space)
 	return space->CP_PRIVATE(locked);
 }
 
-// TODO: Handlers should return a struct that can be filled in.
-// TODO: Implement wildcard handlers.
+cpCollisionHandler *cpSpaceGetDefaultCollisionHandler(cpSpace *space);
+cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
 
-/// Set a default collision handler for this space.
-/// The default collision handler is invoked for each colliding pair of shapes
-/// that isn't explicitly handled by a specific collision handler.
-/// You can pass NULL for any function you don't want to implement.
-void cpSpaceSetDefaultCollisionHandler(
-	cpSpace *space,
-	cpCollisionBeginFunc begin,
-	cpCollisionPreSolveFunc preSolve,
-	cpCollisionPostSolveFunc postSolve,
-	cpCollisionSeparateFunc separate,
-	void *data
-);
-
-/// Set a collision handler to be used whenever the two shapes with the given collision types collide.
-/// You can pass NULL for any function you don't want to implement.
-void cpSpaceAddCollisionHandler(
-	cpSpace *space,
-	cpCollisionType a, cpCollisionType b,
-	cpCollisionBeginFunc begin,
-	cpCollisionPreSolveFunc preSolve,
-	cpCollisionPostSolveFunc postSolve,
-	cpCollisionSeparateFunc separate,
-	void *data
-);
+void cpSpaceSetWildcardCollisionType(cpSpace *space, cpCollisionType type);
 
 /// Add a collision shape to the simulation.
 /// If the shape is attached to a static body, it will be added as a static shape.

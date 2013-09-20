@@ -148,7 +148,9 @@ init(void)
 	cpShapeSetFriction(shape, 0.7);
 	cpShapeSetCollisionType(shape, CRATE);
 	
-	cpSpaceAddCollisionHandler(space, HOOK_SENSOR, CRATE, (cpCollisionBeginFunc)HookCrate, NULL, NULL, NULL, NULL);
+	cpCollisionHandler *handler = cpSpaceAddCollisionHandler(space, HOOK_SENSOR, CRATE);
+	handler->beginFunc = (cpCollisionBeginFunc)HookCrate;
+	
 	
 	return space;
 }

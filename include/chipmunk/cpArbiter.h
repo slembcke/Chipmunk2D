@@ -39,12 +39,11 @@ typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *da
 
 /// @private
 struct cpCollisionHandler {
-	cpCollisionType a;
-	cpCollisionType b;
-	cpCollisionBeginFunc begin;
-	cpCollisionPreSolveFunc preSolve;
-	cpCollisionPostSolveFunc postSolve;
-	cpCollisionSeparateFunc separate;
+	const cpCollisionType typeA, typeB;
+	cpCollisionBeginFunc beginFunc;
+	cpCollisionPreSolveFunc preSolveFunc;
+	cpCollisionPostSolveFunc postSolveFunc;
+	cpCollisionSeparateFunc separateFunc;
 	void *data;
 };
 

@@ -584,6 +584,7 @@ TimeTrial(int index, int count)
 	demos[index].destroyFunc(space);
 	
 	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', (end_time - start_time)*1e3f, demos[index].name);
+	fflush(stdout);
 }
 
 extern ChipmunkDemo LogoSmash;
@@ -619,6 +620,7 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
+		Convex,
 		LogoSmash,
 		PyramidStack,
 		Plink,

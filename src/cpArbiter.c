@@ -255,7 +255,7 @@ cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpCollisionHandler
 	arb->n = info->n;
 	
 	arb->handler = handler;
-	arb->swapped = (a->collision_type != handler->a);
+	arb->swapped = (a->collision_type != handler->typeA);
 	
 	arb->e = a->e * b->e;
 	arb->u = a->u * b->u;

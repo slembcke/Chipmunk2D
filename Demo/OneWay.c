@@ -99,7 +99,8 @@ init(void)
 	cpShapeSetFriction(shape, 0.9f);
 	cpShapeSetCollisionType(shape, 2);
 	
-	cpSpaceAddCollisionHandler(space, 1, 2, NULL, preSolve, NULL, NULL, NULL);
+	cpCollisionHandler *handler = cpSpaceAddCollisionHandler(space, 1, 2);
+	handler->preSolveFunc = preSolve;
 	
 	return space;
 }
