@@ -148,23 +148,15 @@ struct cpArbiter {
 	struct cpContact *contacts;
 	cpVect n;
 	
-	cpTimestamp stamp;
-	cpCollisionHandler *handler;
+	// Regular, wildcard a and wildcard b collision handlers.
+	cpCollisionHandler *handler, *handlerA, *handlerB;
 	cpBool swapped;
+	
+	cpTimestamp stamp;
 	enum cpArbiterState state;
 };
 
 cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
-
-static inline cpCollisionHandler * cpSpaceLookupHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
-
-static inline void
-cpArbiterCallSeparate(cpArbiter *arb, cpSpace *space)
-{
-	// The handler needs to be looked up again as the handler cached on the arbiter may have been deleted since the last step.
-	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->a->collision_type, arb->b->collision_type);
-	handler->separateFunc(arb, space, handler->data);
-}
 
 static inline struct cpArbiterThread *
 cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
@@ -174,7 +166,7 @@ cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
 
 void cpArbiterUnthread(cpArbiter *arb);
 
-void cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpCollisionHandler *handler);
+void cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpSpace *space);
 void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
 void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
 void cpArbiterApplyImpulse(cpArbiter *arb);
@@ -335,7 +327,6 @@ bias_coef(cpFloat errorBias, cpFloat dt)
 
 //MARK: Space Functions
 
-extern cpCollisionHandler cpDefaultCollisionHandler;
 void cpSpaceProcessComponents(cpSpace *space, cpFloat dt);
 
 void cpSpacePushFreshContactBuffer(cpSpace *space);
@@ -356,13 +347,6 @@ void cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter);
 void cpSpaceActivateBody(cpSpace *space, cpBody *body);
 void cpSpaceLock(cpSpace *space);
 void cpSpaceUnlock(cpSpace *space, cpBool runPostStep);
-
-static inline cpCollisionHandler *
-cpSpaceLookupHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
-{
-	cpCollisionType types[] = {a, b};
-	return (cpCollisionHandler *)cpHashSetFind(space->collisionHandlers, CP_HASH_PAIR(a, b), types);
-}
 
 static inline void
 cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb)

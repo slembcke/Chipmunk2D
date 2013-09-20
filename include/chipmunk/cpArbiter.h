@@ -138,4 +138,13 @@ cpVect cpArbiterGetPoint2(const cpArbiter *arb, int i);
 /// Get the depth of the @c ith contact point.
 cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i);
 
+cpBool cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space);
+cpBool cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space);
+cpBool cpArbiterCallWildcardPreSolveA(cpArbiter *arb, cpSpace *space);
+cpBool cpArbiterCallWildcardPreSolveB(cpArbiter *arb, cpSpace *space);
+void cpArbiterCallWildcardPostSolveA(cpArbiter *arb, cpSpace *space);
+void cpArbiterCallWildcardPostSolveB(cpArbiter *arb, cpSpace *space);
+void cpArbiterCallWildcardSeparateA(cpArbiter *arb, cpSpace *space);
+void cpArbiterCallWildcardSeparateB(cpArbiter *arb, cpSpace *space);
+
 /// @}

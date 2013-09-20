@@ -223,11 +223,6 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 	// Reject any of the simple cases
 	if(QueryReject(a,b)) return id;
 	
-	cpCollisionHandler *handler = cpSpaceLookupHandler(space, a->collision_type, b->collision_type);
-	
-	cpBool sensor = a->sensor || b->sensor;
-	if(sensor && handler == &cpDefaultCollisionHandler) return id;
-	
 	// Narrow-phase collision detection.
 	struct cpCollisionInfo info = cpCollide(a, b, id, cpContactBufferGetArray(space));
 	
@@ -239,7 +234,9 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 	const cpShape *shape_pair[] = {info.a, info.b};
 	cpHashValue arbHashID = CP_HASH_PAIR((cpHashValue)info.a, (cpHashValue)info.b);
 	cpArbiter *arb = (cpArbiter *)cpHashSetInsert(space->cachedArbiters, arbHashID, shape_pair, space, (cpHashSetTransFunc)cpSpaceArbiterSetTrans);
-	cpArbiterUpdate(arb, &info, handler);
+	cpArbiterUpdate(arb, &info, space);
+	
+	cpCollisionHandler *handler = arb->handler;
 	
 	// Call the begin function first if it's the first step
 	if(arb->state == cpArbiterStateFirstColl && !handler->beginFunc(arb, space, handler->data)){
@@ -251,8 +248,10 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 		(arb->state != cpArbiterStateIgnore) && 
 		// Call preSolve
 		handler->preSolveFunc(arb, space, handler->data) &&
+		// Check that the preSolve() func didn't call cpArbiterIgnore().
+		arb->state != cpArbiterStateIgnore &&
 		// Process, but don't add collisions for sensors.
-		!sensor
+		!(a->sensor || b->sensor)
 	){
 		cpArrayPush(space->arbiters, arb);
 	} else {
@@ -292,7 +291,8 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	// Arbiter was used last frame, but not this one
 	if(ticks >= 1 && arb->state != cpArbiterStateCached){
 		arb->state = cpArbiterStateCached;
-		cpArbiterCallSeparate(arb, space);
+		cpCollisionHandler *handler = arb->handler;
+		handler->separateFunc(arb, space, handler->data);
 	}
 	
 	if(ticks >= space->collisionPersistence){

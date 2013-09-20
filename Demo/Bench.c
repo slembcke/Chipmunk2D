@@ -3,15 +3,19 @@
 #include "ChipmunkDemo.h"
 
 #if 1
+	static cpSpace *MakeSpace(){
+		cpSpace *space = cpSpaceNew();
+//		cpSpaceSetWildcardCollisionType(space, ~((cpCollisionType)0));
+		return space;
+	}
+
 	#define BENCH_SPACE_NEW cpSpaceNew
 	#define BENCH_SPACE_FREE cpSpaceFree
 	#define BENCH_SPACE_STEP cpSpaceStep
 #else
 	#import "cpHastySpace.h"
 	
-	static cpSpace *
-	MakeHastySpace()
-	{
+	static cpSpace *MakeHastySpace(){
 		cpSpace *space = cpHastySpaceNew();
 		cpHastySpaceSetThreads(space, 0);
 		return space;

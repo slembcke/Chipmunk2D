@@ -40,9 +40,9 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body, struct cpSh
 	
 	shape->e = 0.0f;
 	shape->u = 0.0f;
-	shape->surface_v = cpvzero;
+	shape->surfaceV = cpvzero;
 	
-	shape->collision_type = 0;
+	shape->type = 0;
 	shape->filter.group = CP_NO_GROUP;
 	shape->filter.categories = CP_ALL_CATEGORIES;
 	shape->filter.mask = CP_ALL_CATEGORIES;

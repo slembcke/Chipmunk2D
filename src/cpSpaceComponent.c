@@ -66,7 +66,6 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 				
 				// Update the arbiter's state
 				arb->stamp = space->stamp;
-				arb->handler = cpSpaceLookupHandler(space, a->collision_type, b->collision_type);
 				cpArrayPush(space->arbiters, arb);
 				
 				cpfree(contacts);

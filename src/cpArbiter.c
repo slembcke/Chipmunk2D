@@ -187,12 +187,85 @@ cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
 	}
 }
 
+cpBool
+cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space)
+{
+	cpCollisionHandler *handler = arb->handlerA;
+	return handler->beginFunc(arb, space, handler->data);
+}
+
+cpBool
+cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space)
+{
+	cpCollisionHandler *handler = arb->handlerB;
+	arb->swapped = !arb->swapped;
+	cpBool retval = handler->beginFunc(arb, space, handler->data);
+	arb->swapped = !arb->swapped;
+	return retval;
+}
+
+cpBool
+cpArbiterCallWildcardPreSolveA(cpArbiter *arb, cpSpace *space)
+{
+	cpCollisionHandler *handler = arb->handlerA;
+	return handler->preSolveFunc(arb, space, handler->data);
+}
+
+cpBool
+cpArbiterCallWildcardPreSolveB(cpArbiter *arb, cpSpace *space)
+{
+	cpCollisionHandler *handler = arb->handlerB;
+	arb->swapped = !arb->swapped;
+	cpBool retval = handler->preSolveFunc(arb, space, handler->data);
+	arb->swapped = !arb->swapped;
+	return retval;
+}
+
+void
+cpArbiterCallWildcardPostSolveA(cpArbiter *arb, cpSpace *space)
+{
+	cpCollisionHandler *handler = arb->handlerA;
+	handler->postSolveFunc(arb, space, handler->data);
+}
+
+void
+cpArbiterCallWildcardPostSolveB(cpArbiter *arb, cpSpace *space)
+{
+	cpCollisionHandler *handler = arb->handlerB;
+	arb->swapped = !arb->swapped;
+	handler->postSolveFunc(arb, space, handler->data);
+	arb->swapped = !arb->swapped;
+}
+
+void
+cpArbiterCallWildcardSeparateA(cpArbiter *arb, cpSpace *space)
+{
+	cpCollisionHandler *handler = arb->handlerA;
+	handler->separateFunc(arb, space, handler->data);
+}
+
+void
+cpArbiterCallWildcardSeparateB(cpArbiter *arb, cpSpace *space)
+{
+	cpCollisionHandler *handler = arb->handlerB;
+	arb->swapped = !arb->swapped;
+	handler->separateFunc(arb, space, handler->data);
+	arb->swapped = !arb->swapped;
+}
+
+
+static cpBool AlwaysCollide(cpArbiter *arb, cpSpace *space, void *data){return cpTrue;}
+static void DoNothing(cpArbiter *arb, cpSpace *space, void *data){}
+static cpCollisionHandler cpCollisionHandlerWildcardDefault = {0, 0, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
 
 cpArbiter*
 cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 {
 	arb->handler = NULL;
 	arb->swapped = cpFalse;
+	
+	arb->handlerA = &cpCollisionHandlerWildcardDefault;
+	arb->handlerB = &cpCollisionHandlerWildcardDefault;
 	
 	arb->e = 0.0f;
 	arb->u = 0.0f;
@@ -217,8 +290,16 @@ cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 	return arb;
 }
 
+static inline cpCollisionHandler *
+cpSpaceLookupHandler(cpSpace *space, cpCollisionType a, cpCollisionType b, cpCollisionHandler *defaultValue)
+{
+	cpCollisionType types[] = {a, b};
+	cpCollisionHandler *handler = (cpCollisionHandler *)cpHashSetFind(space->collisionHandlers, CP_HASH_PAIR(a, b), types);
+	return (handler ? handler : defaultValue);
+}
+
 void
-cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpCollisionHandler *handler)
+cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpSpace *space)
 {
 	const cpShape *a = info->a, *b = info->b;
 	
@@ -254,15 +335,22 @@ cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpCollisionHandler
 	arb->count = info->count;
 	arb->n = info->n;
 	
-	arb->handler = handler;
-	arb->swapped = (a->collision_type != handler->typeA);
+	cpCollisionType typeA = info->a->type, typeB = info->b->type;
+	arb->handler = cpSpaceLookupHandler(space, typeA, typeB, &space->defaultHandler);
+	arb->swapped = (typeA != arb->handler->typeA);
+	
+	cpCollisionType wildcard = space->wildcardType;
+	if(wildcard){
+		arb->handlerA = cpSpaceLookupHandler(space, typeA, wildcard, &cpCollisionHandlerWildcardDefault);
+		arb->handlerA = cpSpaceLookupHandler(space, typeB, wildcard, &cpCollisionHandlerWildcardDefault);
+	}
 	
 	arb->e = a->e * b->e;
 	arb->u = a->u * b->u;
 	
 	// Currently all contacts will have the same normal.
 	// This may change in the future.
-	cpVect surface_vr = cpvsub(a->surface_v, b->surface_v);
+	cpVect surface_vr = cpvsub(b->surfaceV, a->surfaceV);
 	arb->surface_vr = cpvsub(surface_vr, cpvmult(info->n, cpvdot(surface_vr, info->n)));
 	
 	// mark it as new if it's been cached

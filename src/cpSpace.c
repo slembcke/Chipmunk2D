@@ -61,101 +61,30 @@ handlerSetTrans(cpCollisionHandler *handler, void *unused)
 //MARK: Misc Helper Funcs
 
 // Default collision functions.
-static cpBool AlwaysCollide(cpArbiter *arb, cpSpace *space, void *data){return cpTrue;}
-static void DoNothing(cpArbiter *arb, cpSpace *space, void *data){}
-cpCollisionHandler cpDefaultCollisionHandler = {0, 0, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
 
-//static cpBool
-//cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space)
-//{
-//	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->handler->typeA, space->wildcardType);
-//	return (handler != &space->defaultHandler ? handler->beginFunc(arb, space, handler->data) : cpTrue);
-//}
-//
-//static cpBool
-//cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space)
-//{
-//	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->handler->typeA, space->wildcardType);
-//	return (handler != &space->defaultHandler ? handler->beginFunc(arb, space, handler->data) : cpTrue);
-//}
-//
-//static cpBool
-//DefaultBegin(cpArbiter *arb, cpSpace *space, void *data){
-//	if(space->wildcardType){
-//		return cpArbiterCallWildcardBeginA(arb, space) && cpArbiterCallWildcardBeginB(arb, space);
-//	} else {
-//		return cpTrue;
-//	}
-//}
-//
-//static cpBool
-//cpArbiterCallWildcardPreSolveA(cpArbiter *arb, cpSpace *space)
-//{
-//	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->handler->typeA, space->wildcardType);
-//	return (handler != &space->defaultHandler ? handler->preSolveFunc(arb, space, handler->data) : cpTrue);
-//}
-//
-//static cpBool
-//cpArbiterCallWildcardPreSolveB(cpArbiter *arb, cpSpace *space)
-//{
-//	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->handler->typeA, space->wildcardType);
-//	return (handler != &space->defaultHandler ? handler->preSolveFunc(arb, space, handler->data) : cpTrue);
-//}
-//
-//static cpBool
-//DefaultPreSolve(cpArbiter *arb, cpSpace *space, void *data){
-//	if(space->wildcardType){
-//		return cpArbiterCallWildcardPreSolveA(arb, space) && cpArbiterCallWildcardPreSolveB(arb, space);
-//	} else {
-//		return cpTrue;
-//	}
-//}
-//
-//static void
-//cpArbiterCallWildcardPostSolveA(cpArbiter *arb, cpSpace *space)
-//{
-//	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->handler->typeA, space->wildcardType);
-//	if(handler != &space->defaultHandler) handler->postSolveFunc(arb, space, handler->data);
-//}
-//
-//static void
-//cpArbiterCallWildcardPostSolveB(cpArbiter *arb, cpSpace *space)
-//{
-//	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->handler->typeA, space->wildcardType);
-//	if(handler != &space->defaultHandler) handler->postSolveFunc(arb, space, handler->data);
-//}
-//
-//static void
-//DefaultPostSolve(cpArbiter *arb, cpSpace *space, void *data){
-//	if(space->wildcardType){
-//		cpArbiterCallWildcardPostSolveA(arb, space);
-//		cpArbiterCallWildcardPostSolveB(arb, space);
-//	}
-//}
-//
-//static void
-//cpArbiterCallWildcardSeparateA(cpArbiter *arb, cpSpace *space)
-//{
-//	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->handler->typeA, space->wildcardType);
-//	if(handler != &space->defaultHandler) handler->separateFunc(arb, space, handler->data);
-//}
-//
-//static void
-//cpArbiterCallWildcardSeparateB(cpArbiter *arb, cpSpace *space)
-//{
-//	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->handler->typeA, space->wildcardType);
-//	if(handler != &space->defaultHandler) handler->separateFunc(arb, space, handler->data);
-//}
-//
-//static void
-//DefaultSeparate(cpArbiter *arb, cpSpace *space, void *data){
-//	if(space->wildcardType){
-//		cpArbiterCallWildcardSeparateA(arb, space);
-//		cpArbiterCallWildcardSeparateB(arb, space);
-//	}
-//}
-//
-//cpCollisionHandler cpDefaultCollisionHandler = {0, 0, DefaultBegin, DefaultPreSolve, DefaultPostSolve, DefaultSeparate, NULL};
+static cpBool
+DefaultBegin(cpArbiter *arb, cpSpace *space, void *data){
+	return cpArbiterCallWildcardBeginA(arb, space) && cpArbiterCallWildcardBeginB(arb, space);
+}
+
+static cpBool
+DefaultPreSolve(cpArbiter *arb, cpSpace *space, void *data){
+	return cpArbiterCallWildcardPreSolveA(arb, space) && cpArbiterCallWildcardPreSolveB(arb, space);
+}
+
+static void
+DefaultPostSolve(cpArbiter *arb, cpSpace *space, void *data){
+	cpArbiterCallWildcardPostSolveA(arb, space);
+	cpArbiterCallWildcardPostSolveB(arb, space);
+}
+
+static void
+DefaultSeparate(cpArbiter *arb, cpSpace *space, void *data){
+	cpArbiterCallWildcardSeparateA(arb, space);
+	cpArbiterCallWildcardSeparateB(arb, space);
+}
+
+static cpCollisionHandler cpCollisionHandlerDefault = {0, 0, DefaultBegin, DefaultPreSolve, DefaultPostSolve, DefaultSeparate, NULL};
 
 // function to get the estimated velocity of a shape for the cpBBTree.
 static cpVect ShapeVelocityFunc(cpShape *shape){return shape->body->v;}
@@ -218,9 +147,8 @@ cpSpaceInit(cpSpace *space)
 	
 	space->constraints = cpArrayNew(0);
 	
-	space->defaultHandler = cpDefaultCollisionHandler;
+	space->defaultHandler = cpCollisionHandlerDefault;
 	space->collisionHandlers = cpHashSetNew(0, (cpHashSetEqlFunc)handlerSetEql);
-	cpHashSetSetDefaultValue(space->collisionHandlers, &space->defaultHandler);
 	
 	space->wildcardType = 0;
 	
@@ -297,22 +225,18 @@ cpCollisionHandler *cpSpaceGetDefaultCollisionHandler(cpSpace *space)
 cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
 	cpHashValue hash = CP_HASH_PAIR(a, b);
-	cpCollisionHandler temp = {a, b, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
-//	cpCollisionHandler temp = {a, b, DefaultBegin, DefaultPreSolve, DefaultPostSolve, DefaultSeparate, NULL};
+//	cpCollisionHandler temp = {a, b, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
+	cpCollisionHandler temp = {a, b, DefaultBegin, DefaultPreSolve, DefaultPostSolve, DefaultSeparate, NULL};
 	
 	cpHashSet *handlers = space->collisionHandlers;
 	cpCollisionHandler *handler = cpHashSetFind(handlers, hash, &temp);
-	
-	if(handler != &space->defaultHandler){
-		return handler;
-	} else {
-		return cpHashSetInsert(handlers, hash, &temp, NULL, (cpHashSetTransFunc)handlerSetTrans);
-	}
+	return (handler ? handler : cpHashSetInsert(handlers, hash, &temp, NULL, (cpHashSetTransFunc)handlerSetTrans));
 }
 
 void
 cpSpaceSetWildcardCollisionType(cpSpace *space, cpCollisionType type)
 {
+	cpAssertHard(!space->wildcardType, "The wildcald collision type has already been set for this space and cannot be changed.");
 	space->wildcardType = type;
 }
 
@@ -411,7 +335,10 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 		(body == arb->body_b && (shape == arb->b || shape == NULL))
 	){
 		// Call separate when removing shapes.
-		if(shape && arb->state != cpArbiterStateCached) cpArbiterCallSeparate(arb, context->space);
+		if(shape && arb->state != cpArbiterStateCached){
+			cpCollisionHandler *handler = arb->handler;
+			handler->separateFunc(arb, context->space, handler->data);
+		}
 		
 		cpArbiterUnthread(arb);
 		cpArrayDeleteObj(context->space->arbiters, arb);
