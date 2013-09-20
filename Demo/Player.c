@@ -113,7 +113,6 @@ init(void)
 	space->iterations = 10;
 	space->gravity = cpv(0, -GRAVITY);
 //	space->sleepTimeThreshold = 1000;
-	space->enableContactGraph = cpTrue;
 
 	cpBody *body, *staticBody = space->staticBody;
 	cpShape *shape;

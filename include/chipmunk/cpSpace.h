@@ -86,10 +86,6 @@ struct cpSpace {
 	/// Defaults to 3. There is probably never a reason to change this value.
 	cpTimestamp collisionPersistence;
 	
-	/// Rebuild the contact graph during each step. Must be enabled to use the cpBodyEachArbiter() function.
-	/// Disabled by default for a small performance boost. Enabled implicitly when the sleeping feature is enabled.
-	cpBool enableContactGraph;
-	
 	/// User definable data pointer.
 	/// Generally this points to your game's controller or game state
 	/// class so you can access it when given a cpSpace reference in a callback.
@@ -167,7 +163,6 @@ CP_DefineSpaceStructProperty(cpFloat, sleepTimeThreshold, SleepTimeThreshold)
 CP_DefineSpaceStructProperty(cpFloat, collisionSlop, CollisionSlop)
 CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias)
 CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence)
-CP_DefineSpaceStructProperty(cpBool, enableContactGraph, EnableContactGraph)
 CP_DefineSpaceStructProperty(cpDataPointer, data, UserData)
 CP_DefineSpaceStructGetter(cpBody*, staticBody, StaticBody)
 CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep)

@@ -149,7 +149,6 @@ cpSpaceInit(cpSpace *space)
 	
 	space->sleepTimeThreshold = INFINITY;
 	space->idleSpeedThreshold = 0.0f;
-	space->enableContactGraph = cpFalse;
 	
 	space->arbiters = cpArrayNew(0);
 	space->pooledArbiters = cpArrayNew(0);

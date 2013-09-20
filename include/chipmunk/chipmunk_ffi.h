@@ -167,7 +167,6 @@ MAKE_PROPERTIES_REF(cpSpace, SleepTimeThreshold);
 MAKE_PROPERTIES_REF(cpSpace, CollisionSlop);
 MAKE_PROPERTIES_REF(cpSpace, CollisionBias);
 MAKE_PROPERTIES_REF(cpSpace, CollisionPersistence);
-MAKE_PROPERTIES_REF(cpSpace, EnableContactGraph);
 MAKE_PROPERTIES_REF(cpSpace, UserData);
 MAKE_REF(cpSpaceGetStaticBody);
 MAKE_REF(cpSpaceGetCurrentTimeStep);
