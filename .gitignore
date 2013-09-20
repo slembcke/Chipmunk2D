@@ -1,10 +1,10 @@
 .DS_Store
 doc/index.html
 
-xcode/Chipmunk6.xcodeproj/*.pbxuser
-xcode/Chipmunk6.xcodeproj/*.perspectivev3
-xcode/Chipmunk6.xcodeproj/xcuserdata
-xcode/Chipmunk6.xcodeproj/project.xcworkspace
+*.pbxuser
+*.perspectivev3
+xcuserdata
+project.xcworkspace
 xcode/DerivedData
 
 build

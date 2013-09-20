@@ -609,7 +609,7 @@
 			attributes = {
 				LastUpgradeCheck = 0500;
 			};
-			buildConfigurationList = D3E5F01A0AA32EAC004E361B /* Build configuration list for PBXProject "Chipmunk6" */;
+			buildConfigurationList = D3E5F01A0AA32EAC004E361B /* Build configuration list for PBXProject "Chipmunk7" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -1014,7 +1014,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D3E5F01A0AA32EAC004E361B /* Build configuration list for PBXProject "Chipmunk6" */ = {
+		D3E5F01A0AA32EAC004E361B /* Build configuration list for PBXProject "Chipmunk7" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D3E5F01B0AA32EAC004E361B /* Debug */,

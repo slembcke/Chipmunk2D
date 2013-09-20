@@ -30,8 +30,8 @@ OUTPUT_DIR_NAME = "Chipmunk-Mac"
 system "rm -rf #{OUTPUT_DIR_NAME}"
 system "mkdir #{OUTPUT_DIR_NAME}"
 
-system "xcodebuild -project Chipmunk6.xcodeproj -configuration Release -target ChipmunkStatic"
-system "xcodebuild -project Chipmunk6.xcodeproj -configuration Debug -target ChipmunkStatic"
+system "xcodebuild -project Chipmunk7.xcodeproj -configuration Release -target ChipmunkStatic"
+system "xcodebuild -project Chipmunk7.xcodeproj -configuration Debug -target ChipmunkStatic"
 
 system "cp build/Debug/libChipmunk.a #{OUTPUT_DIR_NAME}/libChipmunk-Debug.a"
 system "cp build/Release/libChipmunk.a #{OUTPUT_DIR_NAME}/libChipmunk.a"

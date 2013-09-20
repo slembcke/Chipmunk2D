@@ -47,8 +47,8 @@ OUTPUT_DIR_NAME = "Chipmunk-iPhone"
 system "rm -rf #{OUTPUT_DIR_NAME}"
 system "mkdir #{OUTPUT_DIR_NAME}"
 
-system "xcodebuild -project Chipmunk6.xcodeproj -sdk iphoneos#{IOS_SDK_VERSION} -configuration Release -target ChipmunkStatic-iPhone"
-system "xcodebuild -project Chipmunk6.xcodeproj -sdk iphonesimulator#{IOS_SDK_VERSION} -arch i386 -configuration Debug -target ChipmunkStatic-iPhone"
+system "xcodebuild -project Chipmunk7.xcodeproj -sdk iphoneos#{IOS_SDK_VERSION} -configuration Release -target ChipmunkStatic-iPhone"
+system "xcodebuild -project Chipmunk7.xcodeproj -sdk iphonesimulator#{IOS_SDK_VERSION} -arch i386 -configuration Debug -target ChipmunkStatic-iPhone"
 system "lipo build/Debug-iphonesimulator/libChipmunk-iPhone.a build/Release-iphoneos/libChipmunk-iPhone.a -create -output #{OUTPUT_DIR_NAME}/libChipmunk-iPhone.a"
 
 system "rsync -r --exclude='.*' ../include/chipmunk/ #{OUTPUT_DIR_NAME}"
