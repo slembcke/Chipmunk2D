@@ -480,10 +480,15 @@ Click(int button, int state)
 {
 	if(button == GLFW_MOUSE_BUTTON_1){
 		if(state == GLFW_PRESS){
-			cpShape *shape = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0f, GRAB_FILTER, NULL);
+			// give the mouse click a little radius to make it easier to click small shapes.
+			cpFloat radius = 5.0;
+			
+			cpPointQueryInfo info = {};
+			cpShape *shape = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, radius, GRAB_FILTER, &info);
+			
 			if(shape){
 				cpBody *body = shape->body;
-				mouse_joint = cpPivotJointNew2(mouse_body, body, cpvzero, cpBodyWorldToLocal(body, ChipmunkDemoMouse));
+				mouse_joint = cpPivotJointNew2(mouse_body, body, cpvzero, cpBodyWorldToLocal(body, info.point));
 				mouse_joint->maxForce = 50000.0f;
 				mouse_joint->errorBias = cpfpow(1.0f - 0.15f, 60.0f);
 				cpSpaceAddConstraint(space, mouse_joint);

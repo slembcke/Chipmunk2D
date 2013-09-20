@@ -35,12 +35,13 @@ static void
 add_domino(cpSpace *space, cpVect pos, cpBool flipped)
 {
 	cpFloat mass = 1.0f;
+	cpFloat radius = 0.5f;
 	cpFloat moment = cpMomentForBox(mass, WIDTH, HEIGHT);
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
 	cpBodySetPosition(body, pos);
 
-	cpShape *shape = (flipped ? cpBoxShapeNew(body, HEIGHT, WIDTH, 0.0) : cpBoxShapeNew(body, WIDTH, HEIGHT, 0.0));
+	cpShape *shape = (flipped ? cpBoxShapeNew(body, HEIGHT, WIDTH, 0.0) : cpBoxShapeNew(body, WIDTH - radius*2.0f, HEIGHT, radius));
 	cpSpaceAddShape(space, shape);
 	cpShapeSetElasticity(shape, 0.0f);
 	cpShapeSetFriction(shape, 0.6f);
