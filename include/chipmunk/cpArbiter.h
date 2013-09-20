@@ -25,28 +25,6 @@
 /// allowing you to retrieve information on the collision and control it.
 /// @{
 
-/// Collision begin event function callback type.
-/// Returning false from a begin callback causes the collision to be ignored until
-/// the the separate callback is called when the objects stop colliding.
-typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, void *data);
-/// Collision pre-solve event function callback type.
-/// Returning false from a pre-step callback causes the collision to be ignored until the next step.
-typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
-/// Collision post-solve event function callback type.
-typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
-/// Collision separate event function callback type.
-typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data);
-
-/// @private
-struct cpCollisionHandler {
-	const cpCollisionType typeA, typeB;
-	cpCollisionBeginFunc beginFunc;
-	cpCollisionPreSolveFunc preSolveFunc;
-	cpCollisionPostSolveFunc postSolveFunc;
-	cpCollisionSeparateFunc separateFunc;
-	void *data;
-};
-
 #define CP_MAX_CONTACTS_PER_ARBITER 2
 
 // TODO: no definitions
@@ -55,7 +33,6 @@ void cpArbiterSetRestitution(cpArbiter *arb, cpFloat restitution);
 cpFloat cpArbiterGetFriction(const cpArbiter *arb);
 void cpArbiterSetFriction(cpArbiter *arb, cpFloat friction);
 
-// TODO is this still reversed?
 // Get the relative surface velocity of the two shapes in contact.
 cpVect cpArbiterGetSurfaceVelocity(cpArbiter *arb);
 

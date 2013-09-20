@@ -22,6 +22,8 @@
 /// @defgroup cpSpace cpSpace
 /// @{
 
+//MARK: Definitions
+
 typedef struct cpContactBufferHeader cpContactBufferHeader;
 typedef void (*cpSpaceArbiterApplyImpulseFunc)(cpArbiter *arb);
 
@@ -109,6 +111,9 @@ struct cpSpace {
 
 // TODO: Make timestep a parameter?
 
+
+//MARK: Memory and Initialization
+
 /// Allocate a cpSpace.
 cpSpace* cpSpaceAlloc(void);
 /// Initialize a cpSpace.
@@ -120,6 +125,9 @@ cpSpace* cpSpaceNew(void);
 void cpSpaceDestroy(cpSpace *space);
 /// Destroy and free a cpSpace.
 void cpSpaceFree(cpSpace *space);
+
+
+//MARK: Properties
 
 #define CP_DefineSpaceStructGetter(type, member, name) \
 static inline type cpSpaceGet##name(const cpSpace *space){return space->member;}
@@ -151,11 +159,39 @@ cpSpaceIsLocked(cpSpace *space)
 	return space->CP_PRIVATE(locked);
 }
 
+
+//MARK: Collision Handlers
+
+/// Collision begin event function callback type.
+/// Returning false from a begin callback causes the collision to be ignored until
+/// the the separate callback is called when the objects stop colliding.
+typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, void *data);
+/// Collision pre-solve event function callback type.
+/// Returning false from a pre-step callback causes the collision to be ignored until the next step.
+typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
+/// Collision post-solve event function callback type.
+typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
+/// Collision separate event function callback type.
+typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data);
+
+/// @private
+struct cpCollisionHandler {
+	const cpCollisionType typeA, typeB;
+	cpCollisionBeginFunc beginFunc;
+	cpCollisionPreSolveFunc preSolveFunc;
+	cpCollisionPostSolveFunc postSolveFunc;
+	cpCollisionSeparateFunc separateFunc;
+	void *data;
+};
+
 cpCollisionHandler *cpSpaceGetDefaultCollisionHandler(cpSpace *space);
 cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
 
 void cpSpaceSetWildcardCollisionType(cpSpace *space, cpCollisionType type);
 cpCollisionHandler *cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type);
+
+
+//MARK: Add/Remove objects
 
 /// Add a collision shape to the simulation.
 /// If the shape is attached to a static body, it will be added as a static shape.
@@ -179,12 +215,17 @@ cpBool cpSpaceContainsBody(cpSpace *space, cpBody *body);
 /// Test if a constraint has been added to the space.
 cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint);
 
+//MARK: Static <--> Dynamic Body Conversion
+
 /// Convert a dynamic rogue body to a static one.
 /// If the body is active, you must remove it from the space first.
 void cpSpaceConvertBodyToStatic(cpSpace *space, cpBody *body);
 /// Convert a body to a dynamic rogue body.
 /// If you want the body to be active after the transition, you must add it to the space also.
 void cpSpaceConvertBodyToDynamic(cpSpace *space, cpBody *body, cpFloat mass, cpFloat moment);
+
+
+//MARK: Post-Step Callbacks
 
 /// Post Step callback function type.
 typedef void (*cpPostStepFunc)(cpSpace *space, void *key, void *data);
@@ -193,6 +234,9 @@ typedef void (*cpPostStepFunc)(cpSpace *space, void *key, void *data);
 /// Returns true only if @c key has never been scheduled before.
 /// It's possible to pass @c NULL for @c func if you only want to mark @c key as being used.
 cpBool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data);
+
+
+//MARK: Queries
 
 // TODO: Queries and iterators should take a cpSpace parametery.
 // TODO: They should also be abortable.
@@ -223,6 +267,8 @@ typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points,
 cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
 
 
+//MARK: Iteration
+
 /// Space/body iterator callback function type.
 typedef void (*cpSpaceBodyIteratorFunc)(cpBody *body, void *data);
 /// Call @c func for each body in the space.
@@ -238,6 +284,9 @@ typedef void (*cpSpaceConstraintIteratorFunc)(cpConstraint *constraint, void *da
 /// Call @c func for each shape in the space.
 void cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, void *data);
 
+
+//MARK: Indexing
+
 /// Update the collision detection info for the static shapes in the space.
 void cpSpaceReindexStatic(cpSpace *space);
 /// Update the collision detection data for a specific shape in the space.
@@ -248,9 +297,14 @@ void cpSpaceReindexShapesForBody(cpSpace *space, cpBody *body);
 /// Switch the space to use a spatial has as it's spatial index.
 void cpSpaceUseSpatialHash(cpSpace *space, cpFloat dim, int count);
 
+
+//MARK: Time Stepping
+
 /// Step the space forward in time by @c dt.
 void cpSpaceStep(cpSpace *space, cpFloat dt);
 
+
+//MARK: Debug API
 
 #ifndef CP_SPACE_DISABLE_DEBUG_API
 
