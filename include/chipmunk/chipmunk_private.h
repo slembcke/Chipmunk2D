@@ -96,14 +96,14 @@ cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *k
 
 enum cpArbiterState {
 	// Arbiter is active and its the first collision.
-	cpArbiterStateFirstColl,
+	CP_ARBITER_STATE_FIRST_COLLISION,
 	// Arbiter is active and its not the first collision.
-	cpArbiterStateNormal,
+	CP_ARBITER_STATE_NORMAL,
 	// Collision has been explicitly ignored.
 	// Either by returning false from a begin collision handler or calling cpArbiterIgnore().
-	cpArbiterStateIgnore,
+	CP_ARBITER_STATE_IGNORE,
 	// Collison is no longer active. A space will cache an arbiter for up to cpSpace.collisionPersistence more steps.
-	cpArbiterStateCached,
+	CP_ARBITER_STATE_CACHED,
 };
 
 struct cpArbiterThread {

@@ -239,17 +239,17 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 	cpCollisionHandler *handler = arb->handler;
 	
 	// Call the begin function first if it's the first step
-	if(arb->state == cpArbiterStateFirstColl && !handler->beginFunc(arb, space, handler->data)){
+	if(arb->state == CP_ARBITER_STATE_FIRST_COLLISION && !handler->beginFunc(arb, space, handler->data)){
 		cpArbiterIgnore(arb); // permanently ignore the collision until separation
 	}
 	
 	if(
 		// Ignore the arbiter if it has been flagged
-		(arb->state != cpArbiterStateIgnore) && 
+		(arb->state != CP_ARBITER_STATE_IGNORE) && 
 		// Call preSolve
 		handler->preSolveFunc(arb, space, handler->data) &&
 		// Check that the preSolve() func didn't call cpArbiterIgnore().
-		arb->state != cpArbiterStateIgnore &&
+		arb->state != CP_ARBITER_STATE_IGNORE &&
 		// Process, but don't add collisions for sensors.
 		!(a->sensor || b->sensor)
 	){
@@ -262,7 +262,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 		
 		// Normally arbiters are set as used after calling the post-solve callback.
 		// However, post-solve callbacks are not called for sensors or arbiters rejected from pre-solve.
-		if(arb->state != cpArbiterStateIgnore) arb->state = cpArbiterStateNormal;
+		if(arb->state != CP_ARBITER_STATE_IGNORE) arb->state = CP_ARBITER_STATE_NORMAL;
 	}
 	
 	// Time stamp the arbiter so we know it was used recently.
@@ -289,8 +289,8 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	}
 	
 	// Arbiter was used last frame, but not this one
-	if(ticks >= 1 && arb->state != cpArbiterStateCached){
-		arb->state = cpArbiterStateCached;
+	if(ticks >= 1 && arb->state != CP_ARBITER_STATE_CACHED){
+		arb->state = CP_ARBITER_STATE_CACHED;
 		cpCollisionHandler *handler = arb->handler;
 		handler->separateFunc(arb, space, handler->data);
 	}
@@ -332,7 +332,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	// Reset and empty the arbiter lists.
 	for(int i=0; i<arbiters->num; i++){
 		cpArbiter *arb = (cpArbiter *)arbiters->arr[i];
-		arb->state = cpArbiterStateNormal;
+		arb->state = CP_ARBITER_STATE_NORMAL;
 		
 		// If both bodies are awake, unthread the arbiter from the contact graph.
 		if(!cpBodyIsSleeping(arb->body_a) && !cpBodyIsSleeping(arb->body_b)){

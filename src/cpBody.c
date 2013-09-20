@@ -400,9 +400,10 @@ cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 	while(arb){
 		cpArbiter *next = cpArbiterNext(arb, body);
 		
-		// Swap flag will get fixed on the next step.
-		arb->swapped = (body == arb->body_b);
-		func(body, arb, data);
+		cpBool swapped = arb->swapped; {
+			arb->swapped = (body == arb->body_b);
+			func(body, arb, data);
+		} arb->swapped = swapped;
 		
 		arb = next;
 	}

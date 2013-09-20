@@ -3,12 +3,6 @@
 #include "ChipmunkDemo.h"
 
 #if 1
-	static cpSpace *MakeSpace(){
-		cpSpace *space = cpSpaceNew();
-//		cpSpaceSetWildcardCollisionType(space, ~((cpCollisionType)0));
-		return space;
-	}
-
 	#define BENCH_SPACE_NEW cpSpaceNew
 	#define BENCH_SPACE_FREE cpSpaceFree
 	#define BENCH_SPACE_STEP cpSpaceStep

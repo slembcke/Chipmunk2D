@@ -27,6 +27,27 @@
 typedef struct cpContactBufferHeader cpContactBufferHeader;
 typedef void (*cpSpaceArbiterApplyImpulseFunc)(cpArbiter *arb);
 
+/// Collision begin event function callback type.
+/// Returning false from a begin callback causes the collision to be ignored until
+/// the the separate callback is called when the objects stop colliding.
+typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, void *data);
+/// Collision pre-solve event function callback type.
+/// Returning false from a pre-step callback causes the collision to be ignored until the next step.
+typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
+/// Collision post-solve event function callback type.
+typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
+/// Collision separate event function callback type.
+typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data);
+
+struct cpCollisionHandler {
+	const cpCollisionType typeA, typeB;
+	cpCollisionBeginFunc beginFunc;
+	cpCollisionPreSolveFunc preSolveFunc;
+	cpCollisionPostSolveFunc postSolveFunc;
+	cpCollisionSeparateFunc separateFunc;
+	void *data;
+};
+
 /// Basic Unit of Simulation in Chipmunk
 struct cpSpace {
 	/// Number of iterations to use in the impulse solver to solve contacts.
@@ -101,7 +122,6 @@ struct cpSpace {
 	
 	CP_PRIVATE(cpHashSet *collisionHandlers);
 	CP_PRIVATE(cpCollisionHandler defaultHandler);
-	CP_PRIVATE(cpCollisionType wildcardType);
 	
 	CP_PRIVATE(cpBool skipPostStep);
 	CP_PRIVATE(cpArray *postStepCallbacks);
@@ -162,32 +182,8 @@ cpSpaceIsLocked(cpSpace *space)
 
 //MARK: Collision Handlers
 
-/// Collision begin event function callback type.
-/// Returning false from a begin callback causes the collision to be ignored until
-/// the the separate callback is called when the objects stop colliding.
-typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, void *data);
-/// Collision pre-solve event function callback type.
-/// Returning false from a pre-step callback causes the collision to be ignored until the next step.
-typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
-/// Collision post-solve event function callback type.
-typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
-/// Collision separate event function callback type.
-typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data);
-
-/// @private
-struct cpCollisionHandler {
-	const cpCollisionType typeA, typeB;
-	cpCollisionBeginFunc beginFunc;
-	cpCollisionPreSolveFunc preSolveFunc;
-	cpCollisionPostSolveFunc postSolveFunc;
-	cpCollisionSeparateFunc separateFunc;
-	void *data;
-};
-
 cpCollisionHandler *cpSpaceGetDefaultCollisionHandler(cpSpace *space);
 cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
-
-void cpSpaceSetWildcardCollisionType(cpSpace *space, cpCollisionType type);
 cpCollisionHandler *cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type);
 
 

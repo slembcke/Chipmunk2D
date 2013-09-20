@@ -96,8 +96,6 @@ init(void)
 	shape = cpSpaceAddShape(space, cpBoxShapeNew(body, width, height, 0.0));
 	cpShapeSetFriction(shape, 0.6f);
 	cpShapeSetCollisionType(shape, 1);
-	
-	cpSpaceSetWildcardCollisionType(space, ~((cpCollisionType)0));
 		
 	return space;
 }

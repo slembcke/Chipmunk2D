@@ -103,7 +103,6 @@ init(void)
 	cpShapeSetFriction(shape, 0.9f);
 	cpShapeSetCollisionType(shape, 2);
 	
-	cpSpaceSetWildcardCollisionType(space, ~((cpCollisionType)0));
 	cpCollisionHandler *handler = cpSpaceAddWildcardHandler(space, COLLISION_TYPE_ONE_WAY);
 	handler->preSolveFunc = PreSolve;
 	

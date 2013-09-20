@@ -84,11 +84,19 @@ DefaultSeparate(cpArbiter *arb, cpSpace *space, void *data){
 	cpArbiterCallWildcardSeparateB(arb, space);
 }
 
-static cpCollisionHandler cpCollisionHandlerDefault = {0, 0, DefaultBegin, DefaultPreSolve, DefaultPostSolve, DefaultSeparate, NULL};
+// Use the wildcard identifier since  the default handler should never match any type pair.
+static cpCollisionHandler cpCollisionHandlerDefault = {
+	CP_WILDCARD_COLLISION_TYPE, CP_WILDCARD_COLLISION_TYPE,
+	DefaultBegin, DefaultPreSolve, DefaultPostSolve, DefaultSeparate, NULL
+};
 
 static cpBool AlwaysCollide(cpArbiter *arb, cpSpace *space, void *data){return cpTrue;}
 static void DoNothing(cpArbiter *arb, cpSpace *space, void *data){}
-cpCollisionHandler cpCollisionHandlerWildcardDefault = {0, 0, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
+
+cpCollisionHandler cpCollisionHandlerWildcardDefault = {
+	CP_WILDCARD_COLLISION_TYPE, CP_WILDCARD_COLLISION_TYPE,
+	AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL
+};
 
 // function to get the estimated velocity of a shape for the cpBBTree.
 static cpVect ShapeVelocityFunc(cpShape *shape){return shape->body->v;}
@@ -153,8 +161,6 @@ cpSpaceInit(cpSpace *space)
 	
 	space->defaultHandler = cpCollisionHandlerDefault;
 	space->collisionHandlers = cpHashSetNew(0, (cpHashSetEqlFunc)handlerSetEql);
-	
-	space->wildcardType = 0;
 	
 	space->postStepCallbacks = cpArrayNew(0);
 	space->skipPostStep = cpFalse;
@@ -237,21 +243,11 @@ cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a
 	return (handler ? handler : cpHashSetInsert(handlers, hash, &temp, NULL, (cpHashSetTransFunc)handlerSetTrans));
 }
 
-void
-cpSpaceSetWildcardCollisionType(cpSpace *space, cpCollisionType type)
-{
-	cpAssertHard(!space->wildcardType, "The wildcald collision type has already been set for this space and cannot be changed.");
-	space->wildcardType = type;
-}
-
 cpCollisionHandler *
 cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type)
 {
-	cpCollisionType wildcard = space->wildcardType;
-	cpAssertHard(wildcard, "The wildcald collision type has not been set. Use cpSpaceSetWildcardCollisionType() to reserve a unique type identifier for ");
-	
-	cpHashValue hash = CP_HASH_PAIR(type, wildcard);
-	cpCollisionHandler temp = {type, wildcard, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
+	cpHashValue hash = CP_HASH_PAIR(type, CP_WILDCARD_COLLISION_TYPE);
+	cpCollisionHandler temp = {type, CP_WILDCARD_COLLISION_TYPE, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
 	
 	cpHashSet *handlers = space->collisionHandlers;
 	cpCollisionHandler *handler = cpHashSetFind(handlers, hash, &temp);
@@ -354,7 +350,7 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 		(body == arb->body_b && (shape == arb->b || shape == NULL))
 	){
 		// Call separate when removing shapes.
-		if(shape && arb->state != cpArbiterStateCached){
+		if(shape && arb->state != CP_ARBITER_STATE_CACHED){
 			cpCollisionHandler *handler = arb->handler;
 			handler->separateFunc(arb, context->space, handler->data);
 		}

@@ -26,7 +26,7 @@
 #include "chipmunk/chipmunk_private.h"
 
 void
-cpMessage(const char *condition, const char *file, int line, cpBool isError, cpBool isHardError, const char *message, ...)
+cpMessage(const char *condition, const char *file, int line, int isError, int isHardError, const char *message, ...)
 {
 	fprintf(stderr, (isError ? "Aborting due to Chipmunk error: " : "Chipmunk warning: "));
 	
