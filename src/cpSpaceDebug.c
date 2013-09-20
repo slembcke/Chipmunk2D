@@ -19,9 +19,9 @@
  * SOFTWARE.
  */
 
-#ifndef CP_SPACE_DISABLE_DEBUG_API
-
 #include "chipmunk/chipmunk_private.h"
+
+#ifndef CP_SPACE_DISABLE_DEBUG_API
 
 static void
 cpSpaceDebugDrawShape(cpShape *shape, cpSpaceDebugDrawOptions *options)
@@ -86,8 +86,6 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 		
 		cpVect a = cpTransformPoint(body_a->transform, joint->anchr1);
 		cpVect b = cpTransformPoint(body_b->transform, joint->anchr2);
-//		cpVect a = cpvadd(body_a->p, cpvrotate(joint->anchr1, body_a->rot));
-//		cpVect b = cpvadd(body_b->p, cpvrotate(joint->anchr2, body_b->rot));
 		
 		options->drawDot(5, a, color, data);
 		options->drawDot(5, b, color, data);

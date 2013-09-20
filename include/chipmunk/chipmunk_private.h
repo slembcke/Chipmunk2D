@@ -96,14 +96,14 @@ cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *k
 
 enum cpArbiterState {
 	// Arbiter is active and its the first collision.
-	cpArbiterStateFirstColl,
+	CP_ARBITER_STATE_FIRST_COLLISION,
 	// Arbiter is active and its not the first collision.
-	cpArbiterStateNormal,
+	CP_ARBITER_STATE_NORMAL,
 	// Collision has been explicitly ignored.
 	// Either by returning false from a begin collision handler or calling cpArbiterIgnore().
-	cpArbiterStateIgnore,
+	CP_ARBITER_STATE_IGNORE,
 	// Collison is no longer active. A space will cache an arbiter for up to cpSpace.collisionPersistence more steps.
-	cpArbiterStateCached,
+	CP_ARBITER_STATE_CACHED,
 };
 
 struct cpArbiterThread {
@@ -148,23 +148,15 @@ struct cpArbiter {
 	struct cpContact *contacts;
 	cpVect n;
 	
-	cpTimestamp stamp;
-	cpCollisionHandler *handler;
+	// Regular, wildcard A and wildcard B collision handlers.
+	cpCollisionHandler *handler, *handlerA, *handlerB;
 	cpBool swapped;
+	
+	cpTimestamp stamp;
 	enum cpArbiterState state;
 };
 
 cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
-
-static inline cpCollisionHandler * cpSpaceLookupHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
-
-static inline void
-cpArbiterCallSeparate(cpArbiter *arb, cpSpace *space)
-{
-	// The handler needs to be looked up again as the handler cached on the arbiter may have been deleted since the last step.
-	cpCollisionHandler *handler = cpSpaceLookupHandler(space, arb->a->collision_type, arb->b->collision_type);
-	handler->separate(arb, space, handler->data);
-}
 
 static inline struct cpArbiterThread *
 cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
@@ -174,7 +166,7 @@ cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
 
 void cpArbiterUnthread(cpArbiter *arb);
 
-void cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpCollisionHandler *handler);
+void cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpSpace *space);
 void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
 void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
 void cpArbiterApplyImpulse(cpArbiter *arb);
@@ -335,7 +327,8 @@ bias_coef(cpFloat errorBias, cpFloat dt)
 
 //MARK: Space Functions
 
-extern cpCollisionHandler cpDefaultCollisionHandler;
+extern cpCollisionHandler cpCollisionHandlerWildcardDefault;
+
 void cpSpaceProcessComponents(cpSpace *space, cpFloat dt);
 
 void cpSpacePushFreshContactBuffer(cpSpace *space);
@@ -356,13 +349,6 @@ void cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter);
 void cpSpaceActivateBody(cpSpace *space, cpBody *body);
 void cpSpaceLock(cpSpace *space);
 void cpSpaceUnlock(cpSpace *space, cpBool runPostStep);
-
-static inline cpCollisionHandler *
-cpSpaceLookupHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
-{
-	cpCollisionType types[] = {a, b};
-	return (cpCollisionHandler *)cpHashSetFind(space->collisionHandlers, CP_HASH_PAIR(a, b), types);
-}
 
 static inline void
 cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb)

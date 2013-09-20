@@ -151,7 +151,7 @@ typedef uint32_t cpCollisionID;
 #ifdef CP_BOOL_TYPE
 	typedef CP_BOOL_TYPE cpBool;
 #else
-	typedef int cpBool;
+	typedef unsigned char cpBool;
 #endif
 
 #ifndef cpTrue
@@ -208,6 +208,12 @@ typedef uint32_t cpCollisionID;
 /// Value for cpShape.layers signifying that a shape is in every layer.
 	#define CP_ALL_CATEGORIES (~(cpBitmask)0)
 #endif
+
+#ifndef CP_WILDCARD_COLLISION_TYPE
+/// cpCollisionType value internally reserved for hashing wildcard handlers.
+	#define CP_WILDCARD_COLLISION_TYPE (~(cpCollisionType)0)
+#endif
+
 /// @}
 
 // CGPoints are structurally the same, and allow

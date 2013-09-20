@@ -22,6 +22,10 @@
 #include "chipmunk/chipmunk.h"
 #include "ChipmunkDemo.h"
 
+enum CollisionTypes {
+	COLLISION_TYPE_ONE_WAY = 1,
+};
+
 typedef struct OneWayPlatform {
 	cpVect n; // direction objects may pass through
 } OneWayPlatform;
@@ -29,14 +33,13 @@ typedef struct OneWayPlatform {
 static OneWayPlatform platformInstance;
 
 static cpBool
-preSolve(cpArbiter *arb, cpSpace *space, void *ignore)
+PreSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
 	OneWayPlatform *platform = (OneWayPlatform *)cpShapeGetUserData(a);
 		
 	if(cpvdot(cpArbiterGetNormal(arb), platform->n) < 0){
-		cpArbiterIgnore(arb);
-		return cpFalse;
+		return cpArbiterIgnore(arb);
 	}
 	
 	return cpTrue;
@@ -80,7 +83,7 @@ init(void)
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-160,-100), cpv(160,-100), 10.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
-	cpShapeSetCollisionType(shape, 1);
+	cpShapeSetCollisionType(shape, COLLISION_TYPE_ONE_WAY);
 	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 	
 	// We'll use the data pointer for the OneWayPlatform struct
@@ -88,7 +91,7 @@ init(void)
 	cpShapeSetUserData(shape, &platformInstance);
 	
 	
-	// Add a ball to make things more interesting
+	// Add a ball to test it out
 	cpFloat radius = 15.0f;
 	body = cpSpaceAddBody(space, cpBodyNew(10.0f, cpMomentForCircle(10.0f, 0.0f, radius, cpvzero)));
 	cpBodySetPosition(body, cpv(0, -200));
@@ -99,7 +102,8 @@ init(void)
 	cpShapeSetFriction(shape, 0.9f);
 	cpShapeSetCollisionType(shape, 2);
 	
-	cpSpaceAddCollisionHandler(space, 1, 2, NULL, preSolve, NULL, NULL, NULL);
+	cpCollisionHandler *handler = cpSpaceAddWildcardHandler(space, COLLISION_TYPE_ONE_WAY);
+	handler->preSolveFunc = PreSolve;
 	
 	return space;
 }

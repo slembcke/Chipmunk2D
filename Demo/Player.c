@@ -72,8 +72,9 @@ playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 	cpFloat target_vx = PLAYER_VELOCITY*ChipmunkDemoKeyboard.x;
 	
 	// Update the surface velocity and friction
-	cpVect surface_v = cpv(target_vx, 0.0);
-	playerShape->surface_v = surface_v;
+	// Note that the "feet" move in the opposite direction of the player.
+	cpVect surface_v = cpv(-target_vx, 0.0);
+	playerShape->surfaceV = surface_v;
 	playerShape->u = (grounded ? PLAYER_GROUND_ACCEL/GRAVITY : 0.0);
 	
 	// Apply air control if not grounded
@@ -143,7 +144,7 @@ init(void)
 	shape = cpSpaceAddShape(space, cpBoxShapeNew2(body, cpBBNew(-15.0, -27.5, 15.0, 27.5), 10.0));
 //	shape = cpSpaceAddShape(space, cpSegmentShapeNew(playerBody, cpvzero, cpv(0, radius), radius));
 	shape->e = 0.0f; shape->u = 0.0f;
-	shape->collision_type = 1;
+	shape->type = 1;
 	playerShape = shape;
 	
 	// Add some boxes to jump on

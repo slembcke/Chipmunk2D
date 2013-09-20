@@ -120,7 +120,7 @@ struct cpShape {
 	/// Coefficient of friction.
 	CP_PRIVATE(cpFloat u);
 	/// Surface velocity used when solving for friction.
-	CP_PRIVATE(cpVect surface_v);
+	CP_PRIVATE(cpVect surfaceV);
 
 	/// User definable data pointer.
 	/// Generally this points to your the game object class so you can access it
@@ -128,7 +128,7 @@ struct cpShape {
 	CP_PRIVATE(cpDataPointer data);
 	
 	/// Collision type of this shape used when picking collision handlers.
-	CP_PRIVATE(cpCollisionType collision_type);
+	CP_PRIVATE(cpCollisionType type);
 	
 	CP_PRIVATE(cpShapeFilter filter);
 	
@@ -189,9 +189,9 @@ CP_DefineShapeStructGetter(cpBB, bb, BB)
 CP_DefineShapeStructProperty(cpBool, sensor, Sensor, cpTrue)
 CP_DefineShapeStructProperty(cpFloat, e, Elasticity, cpFalse)
 CP_DefineShapeStructProperty(cpFloat, u, Friction, cpTrue)
-CP_DefineShapeStructProperty(cpVect, surface_v, SurfaceVelocity, cpTrue)
+CP_DefineShapeStructProperty(cpVect, surfaceV, SurfaceVelocity, cpTrue)
 CP_DefineShapeStructProperty(cpDataPointer, data, UserData, cpFalse)
-CP_DefineShapeStructProperty(cpCollisionType, collision_type, CollisionType, cpTrue)
+CP_DefineShapeStructProperty(cpCollisionType, type, CollisionType, cpTrue)
 CP_DefineShapeStructProperty(cpShapeFilter, filter, Filter, cpTrue)
 
 /// When initializing a shape, it's hash value comes from a counter.

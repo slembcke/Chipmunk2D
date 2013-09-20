@@ -9,9 +9,7 @@
 #else
 	#import "cpHastySpace.h"
 	
-	static cpSpace *
-	MakeHastySpace()
-	{
+	static cpSpace *MakeHastySpace(){
 		cpSpace *space = cpHastySpaceNew();
 		cpHastySpaceSetThreads(space, 0);
 		return space;
@@ -390,7 +388,9 @@ static cpSpace *init_NoCollide(){
 	cpSpace *space = BENCH_SPACE_NEW();
 	space->iterations = 10;
 	
-	cpSpaceAddCollisionHandler(space, 2, 2, NoCollide_begin, NULL, NULL, NULL, NULL);
+	cpCollisionHandler *handler = cpSpaceAddCollisionHandler(space, 2, 2);
+	handler->beginFunc = NoCollide_begin;
+	
 	
 	float radius = 4.5f;
 	

@@ -320,8 +320,6 @@ cpPolyShapeSetRadius(cpShape *shape, cpFloat radius)
 {
 	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
 	cpPolyShape *poly = (cpPolyShape *)shape;
-	cpPolyShapeDestroy(poly);
-	
 	poly->r = radius;
 
 	cpFloat mass = shape->massInfo.m;

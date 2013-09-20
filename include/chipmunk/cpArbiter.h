@@ -25,29 +25,6 @@
 /// allowing you to retrieve information on the collision and control it.
 /// @{
 
-/// Collision begin event function callback type.
-/// Returning false from a begin callback causes the collision to be ignored until
-/// the the separate callback is called when the objects stop colliding.
-typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, void *data);
-/// Collision pre-solve event function callback type.
-/// Returning false from a pre-step callback causes the collision to be ignored until the next step.
-typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
-/// Collision post-solve event function callback type.
-typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
-/// Collision separate event function callback type.
-typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data);
-
-/// @private
-struct cpCollisionHandler {
-	cpCollisionType a;
-	cpCollisionType b;
-	cpCollisionBeginFunc begin;
-	cpCollisionPreSolveFunc preSolve;
-	cpCollisionPostSolveFunc postSolve;
-	cpCollisionSeparateFunc separate;
-	void *data;
-};
-
 #define CP_MAX_CONTACTS_PER_ARBITER 2
 
 // TODO: no definitions
@@ -56,7 +33,6 @@ void cpArbiterSetRestitution(cpArbiter *arb, cpFloat restitution);
 cpFloat cpArbiterGetFriction(const cpArbiter *arb);
 void cpArbiterSetFriction(cpArbiter *arb, cpFloat friction);
 
-// TODO is this still reversed?
 // Get the relative surface velocity of the two shapes in contact.
 cpVect cpArbiterGetSurfaceVelocity(cpArbiter *arb);
 
@@ -76,10 +52,7 @@ cpVect cpArbiterTotalImpulse(const cpArbiter *arb);
 cpFloat cpArbiterTotalKE(const cpArbiter *arb);
 
 
-/// Causes a collision pair to be ignored as if you returned false from a begin callback.
-/// If called from a pre-step callback, you will still need to return false
-/// if you want it to be ignored in the current step.
-void cpArbiterIgnore(cpArbiter *arb);
+cpBool cpArbiterIgnore(cpArbiter *arb);
 
 /// Return the colliding shapes involved for this arbiter.
 /// The order of their cpSpace.collision_type values will match
@@ -138,5 +111,17 @@ cpVect cpArbiterGetPoint1(const cpArbiter *arb, int i);
 cpVect cpArbiterGetPoint2(const cpArbiter *arb, int i);
 /// Get the depth of the @c ith contact point.
 cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i);
+
+cpBool cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space);
+cpBool cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space);
+
+cpBool cpArbiterCallWildcardPreSolveA(cpArbiter *arb, cpSpace *space);
+cpBool cpArbiterCallWildcardPreSolveB(cpArbiter *arb, cpSpace *space);
+
+void cpArbiterCallWildcardPostSolveA(cpArbiter *arb, cpSpace *space);
+void cpArbiterCallWildcardPostSolveB(cpArbiter *arb, cpSpace *space);
+
+void cpArbiterCallWildcardSeparateA(cpArbiter *arb, cpSpace *space);
+void cpArbiterCallWildcardSeparateB(cpArbiter *arb, cpSpace *space);
 
 /// @}
