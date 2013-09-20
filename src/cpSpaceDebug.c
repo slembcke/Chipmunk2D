@@ -21,7 +21,7 @@
 
 #ifndef CP_SPACE_DISABLE_DEBUG_API
 
-#include "chipmunk_private.h"
+#include "chipmunk/chipmunk_private.h"
 
 static void
 cpSpaceDebugDrawShape(cpShape *shape, cpSpaceDebugDrawOptions *options)

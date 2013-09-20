@@ -19,35 +19,20 @@
  * SOFTWARE.
  */
 
-#include "chipmunk_private.h"
+#include "chipmunk/chipmunk_private.h"
 
 static void
-preStep(cpRotaryLimitJoint *joint, cpFloat dt)
+preStep(cpSimpleMotor *joint, cpFloat dt)
 {
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
-	cpFloat dist = b->a - a->a;
-	cpFloat pdist = 0.0f;
-	if(dist > joint->max) {
-		pdist = joint->max - dist;
-	} else if(dist < joint->min) {
-		pdist = joint->min - dist;
-	}
-	
 	// calculate moment of inertia coefficient.
-	joint->iSum = 1.0f/(1.0f/a->i + 1.0f/b->i);
-	
-	// calculate bias velocity
-	cpFloat maxBias = joint->constraint.maxBias;
-	joint->bias = cpfclamp(-bias_coef(joint->constraint.errorBias, dt)*pdist/dt, -maxBias, maxBias);
-
-	// If the bias is 0, the joint is not at a limit. Reset the impulse.
-	if(!joint->bias) joint->jAcc = 0.0f;
+	joint->iSum = 1.0f/(a->i_inv + b->i_inv);
 }
 
 static void
-applyCachedImpulse(cpRotaryLimitJoint *joint, cpFloat dt_coef)
+applyCachedImpulse(cpSimpleMotor *joint, cpFloat dt_coef)
 {
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
@@ -58,26 +43,20 @@ applyCachedImpulse(cpRotaryLimitJoint *joint, cpFloat dt_coef)
 }
 
 static void
-applyImpulse(cpRotaryLimitJoint *joint, cpFloat dt)
+applyImpulse(cpSimpleMotor *joint, cpFloat dt)
 {
-	if(!joint->bias) return; // early exit
-
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
 	// compute relative rotational velocity
-	cpFloat wr = b->w - a->w;
+	cpFloat wr = b->w - a->w + joint->rate;
 	
 	cpFloat jMax = joint->constraint.maxForce*dt;
 	
 	// compute normal impulse	
-	cpFloat j = -(joint->bias + wr)*joint->iSum;
+	cpFloat j = -wr*joint->iSum;
 	cpFloat jOld = joint->jAcc;
-	if(joint->bias < 0.0f){
-		joint->jAcc = cpfclamp(jOld + j, 0.0f, jMax);
-	} else {
-		joint->jAcc = cpfclamp(jOld + j, -jMax, 0.0f);
-	}
+	joint->jAcc = cpfclamp(jOld + j, -jMax, jMax);
 	j = joint->jAcc - jOld;
 	
 	// apply impulse
@@ -86,7 +65,7 @@ applyImpulse(cpRotaryLimitJoint *joint, cpFloat dt)
 }
 
 static cpFloat
-getImpulse(cpRotaryLimitJoint *joint)
+getImpulse(cpSimpleMotor *joint)
 {
 	return cpfabs(joint->jAcc);
 }
@@ -97,21 +76,20 @@ static const cpConstraintClass klass = {
 	(cpConstraintApplyImpulseImpl)applyImpulse,
 	(cpConstraintGetImpulseImpl)getImpulse,
 };
-CP_DefineClassGetter(cpRotaryLimitJoint)
+CP_DefineClassGetter(cpSimpleMotor)
 
-cpRotaryLimitJoint *
-cpRotaryLimitJointAlloc(void)
+cpSimpleMotor *
+cpSimpleMotorAlloc(void)
 {
-	return (cpRotaryLimitJoint *)cpcalloc(1, sizeof(cpRotaryLimitJoint));
+	return (cpSimpleMotor *)cpcalloc(1, sizeof(cpSimpleMotor));
 }
 
-cpRotaryLimitJoint *
-cpRotaryLimitJointInit(cpRotaryLimitJoint *joint, cpBody *a, cpBody *b, cpFloat min, cpFloat max)
+cpSimpleMotor *
+cpSimpleMotorInit(cpSimpleMotor *joint, cpBody *a, cpBody *b, cpFloat rate)
 {
 	cpConstraintInit((cpConstraint *)joint, &klass, a, b);
 	
-	joint->min = min;
-	joint->max  = max;
+	joint->rate = rate;
 	
 	joint->jAcc = 0.0f;
 	
@@ -119,7 +97,7 @@ cpRotaryLimitJointInit(cpRotaryLimitJoint *joint, cpBody *a, cpBody *b, cpFloat 
 }
 
 cpConstraint *
-cpRotaryLimitJointNew(cpBody *a, cpBody *b, cpFloat min, cpFloat max)
+cpSimpleMotorNew(cpBody *a, cpBody *b, cpFloat rate)
 {
-	return (cpConstraint *)cpRotaryLimitJointInit(cpRotaryLimitJointAlloc(), a, b, min, max);
+	return (cpConstraint *)cpSimpleMotorInit(cpSimpleMotorAlloc(), a, b, rate);
 }

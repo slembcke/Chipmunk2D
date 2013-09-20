@@ -21,7 +21,7 @@
  
 #include <string.h>
 
-#include "chipmunk.h"
+#include "chipmunk/chipmunk.h"
 #include "ChipmunkDemo.h"
 
 static cpFloat

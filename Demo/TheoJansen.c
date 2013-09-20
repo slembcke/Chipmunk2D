@@ -25,7 +25,7 @@
  * Read more here: http://en.wikipedia.org/wiki/Theo_Jansen
  */
  
-#include "chipmunk.h"
+#include "chipmunk/chipmunk.h"
 #include "ChipmunkDemo.h"
 
 static cpConstraint *motor;

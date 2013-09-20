@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
  
-#include "chipmunk_private.h"
+#include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDemo.h"
 
 #define PLAYER_VELOCITY 500.0

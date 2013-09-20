@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
  
-#include "chipmunk_private.h"
+#include "chipmunk/chipmunk_private.h"
 
 cpVect
 cpBBWrapVect(const cpBB bb, const cpVect v)

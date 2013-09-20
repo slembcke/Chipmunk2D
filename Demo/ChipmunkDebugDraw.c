@@ -25,7 +25,7 @@
 #include "GL/glew.h"
 #include "GL/glfw.h"
 
-#include "chipmunk_private.h"
+#include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDebugDraw.h"
 #include "ChipmunkDemoShaderSupport.h"
 

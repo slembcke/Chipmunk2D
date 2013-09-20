@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
  
-#include "chipmunk_private.h"
+#include "chipmunk/chipmunk_private.h"
 
 //MARK: Post Step Callback Functions
 

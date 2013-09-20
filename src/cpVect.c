@@ -21,7 +21,7 @@
  
 #include <stdio.h>
 
-#include "chipmunk_private.h"
+#include "chipmunk/chipmunk_private.h"
 
 // TODO move to header and nuke the file
 

@@ -21,7 +21,7 @@
  
 #include <string.h>
 
-#include "chipmunk_private.h"
+#include "chipmunk/chipmunk_private.h"
 
 //MARK: Sleeping Functions
 

@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "chipmunk_private.h"
+#include "chipmunk/chipmunk_private.h"
 
 #if DEBUG && 0
 #include "ChipmunkDemo.h"

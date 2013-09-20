@@ -19,57 +19,74 @@
  * SOFTWARE.
  */
 
-#include "chipmunk_private.h"
+#include "chipmunk/chipmunk_private.h"
 
 static void
-preStep(cpGearJoint *joint, cpFloat dt)
+preStep(cpRotaryLimitJoint *joint, cpFloat dt)
 {
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
+	cpFloat dist = b->a - a->a;
+	cpFloat pdist = 0.0f;
+	if(dist > joint->max) {
+		pdist = joint->max - dist;
+	} else if(dist < joint->min) {
+		pdist = joint->min - dist;
+	}
+	
 	// calculate moment of inertia coefficient.
-	joint->iSum = 1.0f/(a->i_inv*joint->ratio_inv + joint->ratio*b->i_inv);
+	joint->iSum = 1.0f/(1.0f/a->i + 1.0f/b->i);
 	
 	// calculate bias velocity
 	cpFloat maxBias = joint->constraint.maxBias;
-	joint->bias = cpfclamp(-bias_coef(joint->constraint.errorBias, dt)*(b->a*joint->ratio - a->a - joint->phase)/dt, -maxBias, maxBias);
+	joint->bias = cpfclamp(-bias_coef(joint->constraint.errorBias, dt)*pdist/dt, -maxBias, maxBias);
+
+	// If the bias is 0, the joint is not at a limit. Reset the impulse.
+	if(!joint->bias) joint->jAcc = 0.0f;
 }
 
 static void
-applyCachedImpulse(cpGearJoint *joint, cpFloat dt_coef)
+applyCachedImpulse(cpRotaryLimitJoint *joint, cpFloat dt_coef)
 {
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
 	cpFloat j = joint->jAcc*dt_coef;
-	a->w -= j*a->i_inv*joint->ratio_inv;
+	a->w -= j*a->i_inv;
 	b->w += j*b->i_inv;
 }
 
 static void
-applyImpulse(cpGearJoint *joint, cpFloat dt)
+applyImpulse(cpRotaryLimitJoint *joint, cpFloat dt)
 {
+	if(!joint->bias) return; // early exit
+
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
 	// compute relative rotational velocity
-	cpFloat wr = b->w*joint->ratio - a->w;
+	cpFloat wr = b->w - a->w;
 	
 	cpFloat jMax = joint->constraint.maxForce*dt;
 	
 	// compute normal impulse	
-	cpFloat j = (joint->bias - wr)*joint->iSum;
+	cpFloat j = -(joint->bias + wr)*joint->iSum;
 	cpFloat jOld = joint->jAcc;
-	joint->jAcc = cpfclamp(jOld + j, -jMax, jMax);
+	if(joint->bias < 0.0f){
+		joint->jAcc = cpfclamp(jOld + j, 0.0f, jMax);
+	} else {
+		joint->jAcc = cpfclamp(jOld + j, -jMax, 0.0f);
+	}
 	j = joint->jAcc - jOld;
 	
 	// apply impulse
-	a->w -= j*a->i_inv*joint->ratio_inv;
+	a->w -= j*a->i_inv;
 	b->w += j*b->i_inv;
 }
 
 static cpFloat
-getImpulse(cpGearJoint *joint)
+getImpulse(cpRotaryLimitJoint *joint)
 {
 	return cpfabs(joint->jAcc);
 }
@@ -80,22 +97,21 @@ static const cpConstraintClass klass = {
 	(cpConstraintApplyImpulseImpl)applyImpulse,
 	(cpConstraintGetImpulseImpl)getImpulse,
 };
-CP_DefineClassGetter(cpGearJoint)
+CP_DefineClassGetter(cpRotaryLimitJoint)
 
-cpGearJoint *
-cpGearJointAlloc(void)
+cpRotaryLimitJoint *
+cpRotaryLimitJointAlloc(void)
 {
-	return (cpGearJoint *)cpcalloc(1, sizeof(cpGearJoint));
+	return (cpRotaryLimitJoint *)cpcalloc(1, sizeof(cpRotaryLimitJoint));
 }
 
-cpGearJoint *
-cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio)
+cpRotaryLimitJoint *
+cpRotaryLimitJointInit(cpRotaryLimitJoint *joint, cpBody *a, cpBody *b, cpFloat min, cpFloat max)
 {
 	cpConstraintInit((cpConstraint *)joint, &klass, a, b);
 	
-	joint->phase = phase;
-	joint->ratio = ratio;
-	joint->ratio_inv = 1.0f/ratio;
+	joint->min = min;
+	joint->max  = max;
 	
 	joint->jAcc = 0.0f;
 	
@@ -103,16 +119,7 @@ cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat
 }
 
 cpConstraint *
-cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio)
+cpRotaryLimitJointNew(cpBody *a, cpBody *b, cpFloat min, cpFloat max)
 {
-	return (cpConstraint *)cpGearJointInit(cpGearJointAlloc(), a, b, phase, ratio);
-}
-
-void
-cpGearJointSetRatio(cpConstraint *constraint, cpFloat value)
-{
-	cpConstraintCheckCast(constraint, cpGearJoint);
-	((cpGearJoint *)constraint)->ratio = value;
-	((cpGearJoint *)constraint)->ratio_inv = 1.0f/value;
-	cpConstraintActivateBodies(constraint);
+	return (cpConstraint *)cpRotaryLimitJointInit(cpRotaryLimitJointAlloc(), a, b, min, max);
 }

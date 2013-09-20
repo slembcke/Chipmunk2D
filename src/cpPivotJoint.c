@@ -19,10 +19,10 @@
  * SOFTWARE.
  */
 
-#include "chipmunk_private.h"
+#include "chipmunk/chipmunk_private.h"
 
 static void
-preStep(cpSlideJoint *joint, cpFloat dt)
+preStep(cpPivotJoint *joint, cpFloat dt)
 {
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
@@ -30,68 +30,49 @@ preStep(cpSlideJoint *joint, cpFloat dt)
 	joint->r1 = cpTransformVect(a->transform, cpvsub(joint->anchr1, a->cog));
 	joint->r2 = cpTransformVect(b->transform, cpvsub(joint->anchr2, b->cog));
 	
-	cpVect delta = cpvsub(cpvadd(b->p, joint->r2), cpvadd(a->p, joint->r1));
-	cpFloat dist = cpvlength(delta);
-	cpFloat pdist = 0.0f;
-	if(dist > joint->max) {
-		pdist = dist - joint->max;
-		joint->n = cpvnormalize_safe(delta);
-	} else if(dist < joint->min) {
-		pdist = joint->min - dist;
-		joint->n = cpvneg(cpvnormalize_safe(delta));
-	} else {
-		joint->n = cpvzero;
-		joint->jnAcc = 0.0f;
-	}
-	
-	// calculate mass normal
-	joint->nMass = 1.0f/k_scalar(a, b, joint->r1, joint->r2, joint->n);
+	// Calculate mass tensor
+	joint-> k = k_tensor(a, b, joint->r1, joint->r2);
 	
 	// calculate bias velocity
-	cpFloat maxBias = joint->constraint.maxBias;
-	joint->bias = cpfclamp(-bias_coef(joint->constraint.errorBias, dt)*pdist/dt, -maxBias, maxBias);
+	cpVect delta = cpvsub(cpvadd(b->p, joint->r2), cpvadd(a->p, joint->r1));
+	joint->bias = cpvclamp(cpvmult(delta, -bias_coef(joint->constraint.errorBias, dt)/dt), joint->constraint.maxBias);
 }
 
 static void
-applyCachedImpulse(cpSlideJoint *joint, cpFloat dt_coef)
+applyCachedImpulse(cpPivotJoint *joint, cpFloat dt_coef)
 {
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
-	cpVect j = cpvmult(joint->n, joint->jnAcc*dt_coef);
-	apply_impulses(a, b, joint->r1, joint->r2, j);
+	apply_impulses(a, b, joint->r1, joint->r2, cpvmult(joint->jAcc, dt_coef));
 }
 
 static void
-applyImpulse(cpSlideJoint *joint, cpFloat dt)
+applyImpulse(cpPivotJoint *joint, cpFloat dt)
 {
-	if(cpveql(joint->n, cpvzero)) return;  // early exit
-
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
-	cpVect n = joint->n;
 	cpVect r1 = joint->r1;
 	cpVect r2 = joint->r2;
 		
 	// compute relative velocity
 	cpVect vr = relative_velocity(a, b, r1, r2);
-	cpFloat vrn = cpvdot(vr, n);
 	
 	// compute normal impulse
-	cpFloat jn = (joint->bias - vrn)*joint->nMass;
-	cpFloat jnOld = joint->jnAcc;
-	joint->jnAcc = cpfclamp(jnOld + jn, -joint->constraint.maxForce*dt, 0.0f);
-	jn = joint->jnAcc - jnOld;
+	cpVect j = cpMat2x2Transform(joint->k, cpvsub(joint->bias, vr));
+	cpVect jOld = joint->jAcc;
+	joint->jAcc = cpvclamp(cpvadd(joint->jAcc, j), joint->constraint.maxForce*dt);
+	j = cpvsub(joint->jAcc, jOld);
 	
 	// apply impulse
-	apply_impulses(a, b, joint->r1, joint->r2, cpvmult(n, jn));
+	apply_impulses(a, b, joint->r1, joint->r2, j);
 }
 
 static cpFloat
 getImpulse(cpConstraint *joint)
 {
-	return cpfabs(((cpSlideJoint *)joint)->jnAcc);
+	return cpvlength(((cpPivotJoint *)joint)->jAcc);
 }
 
 static const cpConstraintClass klass = {
@@ -100,31 +81,37 @@ static const cpConstraintClass klass = {
 	(cpConstraintApplyImpulseImpl)applyImpulse,
 	(cpConstraintGetImpulseImpl)getImpulse,
 };
-CP_DefineClassGetter(cpSlideJoint)
+CP_DefineClassGetter(cpPivotJoint)
 
-cpSlideJoint *
-cpSlideJointAlloc(void)
+cpPivotJoint *
+cpPivotJointAlloc(void)
 {
-	return (cpSlideJoint *)cpcalloc(1, sizeof(cpSlideJoint));
+	return (cpPivotJoint *)cpcalloc(1, sizeof(cpPivotJoint));
 }
 
-cpSlideJoint *
-cpSlideJointInit(cpSlideJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max)
+cpPivotJoint *
+cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
 {
 	cpConstraintInit((cpConstraint *)joint, &klass, a, b);
 	
 	joint->anchr1 = anchr1;
 	joint->anchr2 = anchr2;
-	joint->min = min;
-	joint->max = max;
 	
-	joint->jnAcc = 0.0f;
+	joint->jAcc = cpvzero;
 	
 	return joint;
 }
 
 cpConstraint *
-cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max)
+cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
 {
-	return (cpConstraint *)cpSlideJointInit(cpSlideJointAlloc(), a, b, anchr1, anchr2, min, max);
+	return (cpConstraint *)cpPivotJointInit(cpPivotJointAlloc(), a, b, anchr1, anchr2);
+}
+
+cpConstraint *
+cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot)
+{
+	cpVect anchr1 = (a ? cpBodyWorldToLocal(a, pivot) : pivot);
+	cpVect anchr2 = (b ? cpBodyWorldToLocal(b, pivot) : pivot);
+	return cpPivotJointNew2(a, b, anchr1, anchr2);
 }
