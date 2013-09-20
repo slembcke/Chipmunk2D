@@ -327,6 +327,8 @@ bias_coef(cpFloat errorBias, cpFloat dt)
 
 //MARK: Space Functions
 
+extern cpCollisionHandler cpCollisionHandlerWildcardDefault;
+
 void cpSpaceProcessComponents(cpSpace *space, cpFloat dt);
 
 void cpSpacePushFreshContactBuffer(cpSpace *space);

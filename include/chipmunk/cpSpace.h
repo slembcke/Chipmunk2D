@@ -155,6 +155,7 @@ cpCollisionHandler *cpSpaceGetDefaultCollisionHandler(cpSpace *space);
 cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
 
 void cpSpaceSetWildcardCollisionType(cpSpace *space, cpCollisionType type);
+cpCollisionHandler *cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type);
 
 /// Add a collision shape to the simulation.
 /// If the shape is attached to a static body, it will be added as a static shape.

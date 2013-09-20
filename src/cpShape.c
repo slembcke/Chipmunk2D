@@ -153,14 +153,16 @@ cpShapesCollide(const cpShape *a, const cpShape *b)
 	set.count = info.count;
 	
 	// cpCollideShapes() may have swapped the contact order. Flip the normal.
-	set.normal = (a == info.a ? info.n : cpvneg(info.n));
+	cpBool swapped = (a != info.a);
+	set.normal = (swapped ? cpvneg(info.n) : info.n);
 	
 	for(int i=0; i<info.count; i++){
 		// cpCollideShapesInfo() returns contacts with absolute positions.
 		cpVect p1 = contacts[i].r1;
 		cpVect p2 = contacts[i].r2;
 		
-		set.points[i].point1 = p1;
+		set.points[i].point1 = (swapped ? p2 : p1);
+		set.points[i].point2 = (swapped ? p1 : p2);
 		set.points[i].distance = cpvdot(cpvsub(p2, p1), set.normal);
 	}
 	

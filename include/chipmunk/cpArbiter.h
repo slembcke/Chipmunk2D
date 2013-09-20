@@ -78,7 +78,7 @@ cpFloat cpArbiterTotalKE(const cpArbiter *arb);
 /// Causes a collision pair to be ignored as if you returned false from a begin callback.
 /// If called from a pre-step callback, you will still need to return false
 /// if you want it to be ignored in the current step.
-void cpArbiterIgnore(cpArbiter *arb);
+cpBool cpArbiterIgnore(cpArbiter *arb);
 
 /// Return the colliding shapes involved for this arbiter.
 /// The order of their cpSpace.collision_type values will match

@@ -86,6 +86,10 @@ DefaultSeparate(cpArbiter *arb, cpSpace *space, void *data){
 
 static cpCollisionHandler cpCollisionHandlerDefault = {0, 0, DefaultBegin, DefaultPreSolve, DefaultPostSolve, DefaultSeparate, NULL};
 
+static cpBool AlwaysCollide(cpArbiter *arb, cpSpace *space, void *data){return cpTrue;}
+static void DoNothing(cpArbiter *arb, cpSpace *space, void *data){}
+cpCollisionHandler cpCollisionHandlerWildcardDefault = {0, 0, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
+
 // function to get the estimated velocity of a shape for the cpBBTree.
 static cpVect ShapeVelocityFunc(cpShape *shape){return shape->body->v;}
 
@@ -225,7 +229,7 @@ cpCollisionHandler *cpSpaceGetDefaultCollisionHandler(cpSpace *space)
 cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
 	cpHashValue hash = CP_HASH_PAIR(a, b);
-//	cpCollisionHandler temp = {a, b, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
+	// TODO should use space->defaultHandler values instead?
 	cpCollisionHandler temp = {a, b, DefaultBegin, DefaultPreSolve, DefaultPostSolve, DefaultSeparate, NULL};
 	
 	cpHashSet *handlers = space->collisionHandlers;
@@ -239,6 +243,21 @@ cpSpaceSetWildcardCollisionType(cpSpace *space, cpCollisionType type)
 	cpAssertHard(!space->wildcardType, "The wildcald collision type has already been set for this space and cannot be changed.");
 	space->wildcardType = type;
 }
+
+cpCollisionHandler *
+cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type)
+{
+	cpCollisionType wildcard = space->wildcardType;
+	cpAssertHard(wildcard, "The wildcald collision type has not been set. Use cpSpaceSetWildcardCollisionType() to reserve a unique type identifier for ");
+	
+	cpHashValue hash = CP_HASH_PAIR(type, wildcard);
+	cpCollisionHandler temp = {type, wildcard, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
+	
+	cpHashSet *handlers = space->collisionHandlers;
+	cpCollisionHandler *handler = cpHashSetFind(handlers, hash, &temp);
+	return (handler ? handler : cpHashSetInsert(handlers, hash, &temp, NULL, (cpHashSetTransFunc)handlerSetTrans));
+}
+
 
 //MARK: Body, Shape, and Joint Management
 static cpShape *
