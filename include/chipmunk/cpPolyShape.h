@@ -25,10 +25,9 @@
 /// @private
 typedef struct cpSplittingPlane {
 	cpVect v0, n;
-	cpFloat d;
 } cpSplittingPlane;
 
-#define CP_POLY_SHAPE_STATIC_COUNT 4
+#define CP_POLY_SHAPE_STATIC_COUNT 6
 
 /// @private
 typedef struct cpPolyShape {

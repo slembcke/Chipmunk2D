@@ -43,7 +43,6 @@ cpPolyShapeTransform(cpPolyShape *poly, cpTransform transform)
 		
 		dst[i].v0 = v;
 		dst[i].n = n;
-		dst[i].d = transform.tx*n.x + transform.ty*n.y + src[i].d;
 		
 		l = cpfmin(l, v.x);
 		r = cpfmax(r, v.x);
@@ -84,9 +83,9 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	cpBool outside = cpFalse;
 	
 	for(int i=0; i<count; i++){
-		if(cpvdot(planes[i].n, p) - planes[i].d > 0.0f) outside = cpTrue;
-		
 		cpVect v1 = planes[i].v0;
+		if(cpvdot(planes[i].n, cpvsub(p, v1)) > 0.0f) outside = cpTrue;
+		
 		cpVect closest = cpClosetPointOnSegment(p, v0, v1);
 		
 		cpFloat dist = cpvdist(p, closest);
@@ -121,7 +120,7 @@ cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpFloat r2, cpSeg
 	for(int i=0; i<count; i++){
 		cpVect n = planes[i].n;
 		cpFloat an = cpvdot(a, n);
-		cpFloat d =  an - planes[i].d - rsum;
+		cpFloat d =  an - cpvdot(planes[i].v0, n) - rsum;
 		if(d < 0.0f) continue;
 		
 		cpFloat bn = cpvdot(b, n);
@@ -186,7 +185,6 @@ SetVerts(cpPolyShape *poly, int count, const cpVect *verts)
 		
 		poly->planes[i].v0 = b;
 		poly->planes[i].n = n;
-		poly->planes[i].d = cpvdot(n, b);
 	}
 }
 
