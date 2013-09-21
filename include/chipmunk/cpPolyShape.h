@@ -24,7 +24,7 @@
 
 /// @private
 typedef struct cpSplittingPlane {
-	cpVect n;
+	cpVect v0, n;
 	cpFloat d;
 } cpSplittingPlane;
 
@@ -33,9 +33,6 @@ typedef struct cpPolyShape {
 	cpShape shape;
 	
 	int count;
-	cpVect *verts, *tVerts;
-	
-	// NUKE
 	cpSplittingPlane *planes, *tPlanes;
 	
 	cpFloat r;
