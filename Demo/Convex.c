@@ -35,7 +35,7 @@ update(cpSpace *space, double dt)
 	
 	if(ChipmunkDemoRightClick && cpShapePointQuery(shape, ChipmunkDemoMouse, NULL) > tolerance){
 		cpBody *body = cpShapeGetBody(shape);
-		int count = cpPolyShapeGetNumVerts(shape);
+		int count = cpPolyShapeGetCount(shape);
 		
 		// Allocate the space for the new vertexes on the stack.
 		cpVect *verts = (cpVect *)alloca((count + 1)*sizeof(cpVect));

@@ -108,7 +108,7 @@ SegmentSupportPoint(const cpSegmentShape *seg, const cpVect n)
 static inline struct SupportPoint
 PolySupportPoint(const cpPolyShape *poly, const cpVect n)
 {
-	const cpSplittingPlane *planes = poly->tPlanes;
+	const cpSplittingPlane *planes = poly->planes;
 	int i = PolySupportPointIndex(poly->count, planes, n);
 	return SupportPointNew(planes[i].v0, i);
 }
@@ -154,15 +154,15 @@ static struct Edge
 SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 {
 	int count = poly->count;
-	int i1 = PolySupportPointIndex(poly->count, poly->tPlanes, n);
+	int i1 = PolySupportPointIndex(poly->count, poly->planes, n);
 	
 	// TODO: get rid of mod eventually, very expensive on ARM
 	int i0 = (i1 - 1 + count)%count;
 	int i2 = (i1 + 1)%count;
 	
-	cpSplittingPlane *planes = poly->tPlanes;
+	cpSplittingPlane *planes = poly->planes;
 	cpHashValue hashid = poly->shape.hashid;
-	if(cpvdot(n, planes[i1].n) > cpvdot(n, poly->tPlanes[i2].n)){
+	if(cpvdot(n, planes[i1].n) > cpvdot(n, planes[i2].n)){
 		struct Edge edge = {{planes[i0].v0, CP_HASH_PAIR(hashid, i0)}, {planes[i1].v0, CP_HASH_PAIR(hashid, i1)}, poly->r, planes[i1].n};
 		return edge;
 	} else {
@@ -368,7 +368,7 @@ ShapePoint(const cpShape *shape, const int i)
 			cpPolyShape *poly = (cpPolyShape *)shape;
 			// Poly shapes may change vertex count.
 			int index = (i < poly->count ? i : 0);
-			return SupportPointNew(poly->tPlanes[index].v0, index);
+			return SupportPointNew(poly->planes[index].v0, index);
 		} default: {
 			return SupportPointNew(cpvzero, 0);
 		}

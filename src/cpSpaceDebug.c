@@ -47,7 +47,7 @@ cpSpaceDebugDrawShape(cpShape *shape, cpSpaceDebugDrawOptions *options)
 			cpPolyShape *poly = (cpPolyShape *)shape;
 			
 			int count = poly->count;
-			cpSplittingPlane *planes = poly->tPlanes;
+			cpSplittingPlane *planes = poly->planes;
 			cpVect *verts = (cpVect *)alloca(count*sizeof(cpVect));
 			
 			for(int i=0; i<count; i++) verts[i] = planes[i].v0;

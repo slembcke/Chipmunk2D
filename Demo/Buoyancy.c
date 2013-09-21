@@ -52,7 +52,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpFloat level = cpShapeGetBB(water).t;
 	
 	// Clip the polygon against the water level
-	int count = cpPolyShapeGetNumVerts(poly);
+	int count = cpPolyShapeGetCount(poly);
 	int clippedCount = 0;
 #ifdef _MSC_VER
 	// MSVC is pretty much the only compiler in existence that doesn't support variable sized arrays.

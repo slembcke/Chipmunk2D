@@ -117,7 +117,7 @@ ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int cell_i, int cell_j,
 	cpVect *ping = (cpVect *)alloca(MAX_VERTEXES_PER_VORONOI*sizeof(cpVect));
 	cpVect *pong = (cpVect *)alloca(MAX_VERTEXES_PER_VORONOI*sizeof(cpVect));
 	
-	int count = cpPolyShapeGetNumVerts(shape);
+	int count = cpPolyShapeGetCount(shape);
 	count = (count > MAX_VERTEXES_PER_VORONOI ? MAX_VERTEXES_PER_VORONOI : count);
 	
 	for(int i=0; i<count; i++){

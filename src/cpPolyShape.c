@@ -39,13 +39,14 @@ cpPolyShapeDestroy(cpPolyShape *poly)
 static cpBB
 cpPolyShapeCacheData(cpPolyShape *poly, cpTransform transform)
 {
-	cpSplittingPlane *src = poly->planes;
-	cpSplittingPlane *dst = poly->tPlanes;
+	int count = poly->count;
+	cpSplittingPlane *dst = poly->planes;
+	cpSplittingPlane *src = dst + count;
 	
 	cpFloat l = (cpFloat)INFINITY, r = -(cpFloat)INFINITY;
 	cpFloat b = (cpFloat)INFINITY, t = -(cpFloat)INFINITY;
 	
-	for(int i=0; i<poly->count; i++){
+	for(int i=0; i<count; i++){
 		cpVect v = cpTransformPoint(transform, src[i].v0);
 		cpVect n = cpTransformVect(transform, src[i].n);
 		
@@ -65,7 +66,7 @@ cpPolyShapeCacheData(cpPolyShape *poly, cpTransform transform)
 static void
 cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	int count = poly->count;
-	cpSplittingPlane *planes = poly->tPlanes;
+	cpSplittingPlane *planes = poly->planes;
 	cpFloat r = poly->r;
 	
 	cpVect v0 = planes[count - 1].v0;
@@ -104,7 +105,7 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 static void
 cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpFloat r2, cpSegmentQueryInfo *info)
 {
-	cpSplittingPlane *planes = poly->tPlanes;
+	cpSplittingPlane *planes = poly->planes;
 	int count = poly->count;
 	cpFloat r = poly->r;
 	cpFloat rsum = r + r2;
@@ -168,15 +169,13 @@ SetVerts(cpPolyShape *poly, int count, const cpVect *verts)
 		poly->planes = (cpSplittingPlane *)cpcalloc(2*count, sizeof(cpSplittingPlane));
 	}
 	
-	poly->tPlanes = poly->planes + count;
-	
 	for(int i=0; i<count; i++){
 		cpVect a = verts[(i - 1 + count)%count];
 		cpVect b = verts[i];
 		cpVect n = cpvnormalize(cpvrperp(cpvsub(b, a)));
 		
-		poly->planes[i].v0 = b;
-		poly->planes[i].n = n;
+		poly->planes[i + count].v0 = b;
+		poly->planes[i + count].n = n;
 	}
 }
 
@@ -269,19 +268,21 @@ cpBoxShapeNew2(cpBody *body, cpBB box, cpFloat radius)
 }
 
 int
-cpPolyShapeGetNumVerts(const cpShape *shape)
+cpPolyShapeGetCount(const cpShape *shape)
 {
 	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
 	return ((cpPolyShape *)shape)->count;
 }
 
 cpVect
-cpPolyShapeGetVert(const cpShape *shape, int idx)
+cpPolyShapeGetVert(const cpShape *shape, int i)
 {
 	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
-	cpAssertHard(0 <= idx && idx < cpPolyShapeGetNumVerts(shape), "Index out of range.");
 	
-	return ((cpPolyShape *)shape)->planes[idx].v0;
+	int count = cpPolyShapeGetCount(shape);
+	cpAssertHard(0 <= i && i < count, "Index out of range.");
+	
+	return ((cpPolyShape *)shape)->planes[i + count].v0;
 }
 
 cpFloat

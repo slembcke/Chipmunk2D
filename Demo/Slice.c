@@ -30,7 +30,7 @@ ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 {
 	cpBody *body = cpShapeGetBody(shape);
 	
-	int count = cpPolyShapeGetNumVerts(shape);
+	int count = cpPolyShapeGetCount(shape);
 	int clippedCount = 0;
 	
 	cpVect *clipped = (cpVect *)alloca((count + 1)*sizeof(cpVect));

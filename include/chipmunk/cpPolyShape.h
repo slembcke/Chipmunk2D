@@ -33,11 +33,13 @@ typedef struct cpSplittingPlane {
 typedef struct cpPolyShape {
 	cpShape shape;
 	
-	int count;
-	cpSplittingPlane *planes, *tPlanes;
-	
 	cpFloat r;
 	
+	int count;
+	// The untransformed planes are appended at the end of the transformed planes.
+	cpSplittingPlane *planes;
+	
+	// Allocate a small number of splitting planes internally for simple poly.
 	cpSplittingPlane _planes[2*CP_POLY_SHAPE_INLINE_ALLOC];
 } cpPolyShape;
 
@@ -65,7 +67,7 @@ cpShape* cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height, cpFloat radi
 cpShape* cpBoxShapeNew2(cpBody *body, cpBB box, cpFloat radius);
 
 /// Get the number of verts in a polygon shape.
-int cpPolyShapeGetNumVerts(const cpShape *shape);
+int cpPolyShapeGetCount(const cpShape *shape);
 /// Get the @c ith vertex of a polygon shape.
 cpVect cpPolyShapeGetVert(const cpShape *shape, int idx);
 /// Get the radius of a polygon shape.
