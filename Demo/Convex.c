@@ -61,7 +61,7 @@ update(cpSpace *space, double dt)
 		
 		// Use the setter function from chipmunk_unsafe.h.
 		// You could also remove and recreate the shape if you wanted.
-		cpPolyShapeSetVerts(shape, hullCount, verts, cpvneg(centroid));
+		cpPolyShapeSetVerts(shape, hullCount, verts, cpTransformTranslate(cpvneg(centroid)));
 	}
 	
 	cpSpaceStep(space, dt);

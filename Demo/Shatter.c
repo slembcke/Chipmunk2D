@@ -145,7 +145,8 @@ ShatterCell(cpSpace *space, cpShape *shape, cpVect cell, int cell_i, int cell_j,
 	cpBodySetVelocity(new_body, cpBodyGetVelocityAtWorldPoint(body, centroid));
 	cpBodySetAngularVelocity(new_body, cpBodyGetAngularVelocity(body));
 	
-	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, count, ping, cpvneg(centroid), 0.0));
+	cpTransform transform = cpTransformTranslate(cpvneg(centroid));
+	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, count, ping, transform, 0.0));
 	// Copy whatever properties you have set on the original shape that are important
 	cpShapeSetFriction(new_shape, cpShapeGetFriction(shape));
 }

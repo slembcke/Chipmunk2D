@@ -111,7 +111,7 @@ init(void)
 		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero, 0.0f)));
 		cpBodySetPosition(body, cpv(50.0f, 30.0f));
 		
-		cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero, 10.0f));
+		cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpTransformIdentity, 10.0f));
 	}
 	
 	{ // add a circle

@@ -64,7 +64,8 @@ ClipPoly(cpSpace *space, cpShape *shape, cpVect n, cpFloat dist)
 	cpBodySetVelocity(new_body, cpBodyGetVelocityAtWorldPoint(body, centroid));
 	cpBodySetAngularVelocity(new_body, cpBodyGetAngularVelocity(body));
 	
-	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, clippedCount, clipped, cpvneg(centroid), 0.0));
+	cpTransform transform = cpTransformTranslate(cpvneg(centroid));
+	cpShape *new_shape = cpSpaceAddShape(space, cpPolyShapeNew(new_body, clippedCount, clipped, transform, 0.0));
 	// Copy whatever properties you have set on the original shape that are important
 	cpShapeSetFriction(new_shape, cpShapeGetFriction(shape));
 }

@@ -179,25 +179,22 @@ cpPolyValidate(const cpVect *verts, const int count)
 }
 
 static void
-setUpVerts(cpPolyShape *poly, int count, const cpVect *verts, cpVect offset)
+SetVerts(cpPolyShape *poly, int count, const cpVect *verts)
 {
-	CP_CONVEX_HULL(count, verts, hullCount, hullVerts);
+	poly->count = count;
+	poly->verts = (cpVect *)cpcalloc(2*count, sizeof(cpVect));
+	poly->planes = (cpSplittingPlane *)cpcalloc(2*count, sizeof(cpSplittingPlane));
+	poly->tVerts = poly->verts + count;
+	poly->tPlanes = poly->planes + count;
 	
-	poly->count = hullCount;
-	poly->verts = (cpVect *)cpcalloc(2*hullCount, sizeof(cpVect));
-	poly->planes = (cpSplittingPlane *)cpcalloc(2*hullCount, sizeof(cpSplittingPlane));
-	poly->tVerts = poly->verts + hullCount;
-	poly->tPlanes = poly->planes + hullCount;
-	
-	for(int i=0; i<hullCount; i++){
-		cpVect a = hullVerts[(i - 1 + hullCount)%hullCount];
-		cpVect b = hullVerts[i];
+	for(int i=0; i<count; i++){
+		cpVect a = verts[(i - 1 + count)%count];
+		cpVect b = verts[i];
 		cpVect n = cpvnormalize(cpvrperp(cpvsub(b, a)));
-		cpVect v = cpvadd(offset, b);
 		
-		poly->verts[i] = v;
+		poly->verts[i] = b;
 		poly->planes[i].n = n;
-		poly->planes[i].d = cpvdot(n, v);
+		poly->planes[i].d = cpvdot(n, b);
 	}
 }
 
@@ -225,21 +222,34 @@ static const cpShapeClass polyClass = {
 };
 
 cpPolyShape *
-cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int count, const cpVect *verts, cpVect offset, cpFloat radius)
+cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int count, const cpVect *verts, cpTransform transform, cpFloat radius)
 {
-	poly->r = radius;
-	setUpVerts(poly, count, verts, offset);
+	cpVect *hullVerts = (cpVect *)alloca(count*sizeof(cpVect));
 	
-	cpShapeInit((cpShape *)poly, &polyClass, body, cpPolyShapeMassInfo(0.0f, poly->count, poly->verts, poly->r));
+	// Transform the verts before building the hull in case of a negative scale.
+	for(int i=0; i<count; i++) hullVerts[i] = cpTransformPoint(transform, verts[i]);
+	
+	unsigned int hullCount = cpConvexHull(count, hullVerts, hullVerts, NULL, 0.0);
+	return cpPolyShapeInitRaw(poly, body, hullCount, hullVerts, radius);
+}
+
+cpPolyShape *
+cpPolyShapeInitRaw(cpPolyShape *poly, cpBody *body, int count, const cpVect *verts, cpFloat radius)
+{
+	cpShapeInit((cpShape *)poly, &polyClass, body, cpPolyShapeMassInfo(0.0f, count, verts, radius));
+	
+	SetVerts(poly, count, verts);
+	poly->r = radius;
 
 	return poly;
 }
 
 
+
 cpShape *
-cpPolyShapeNew(cpBody *body, int count, const cpVect *verts, cpVect offset, cpFloat radius)
+cpPolyShapeNew(cpBody *body, int count, const cpVect *verts, cpTransform transform, cpFloat radius)
 {
-	return (cpShape *)cpPolyShapeInit(cpPolyShapeAlloc(), body, count, verts, offset, radius);
+	return (cpShape *)cpPolyShapeInit(cpPolyShapeAlloc(), body, count, verts, transform, radius);
 }
 
 cpPolyShape *
@@ -255,13 +265,13 @@ cpPolyShape *
 cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box, cpFloat radius)
 {
 	cpVect verts[] = {
-		cpv(box.l, box.b),
-		cpv(box.l, box.t),
-		cpv(box.r, box.t),
 		cpv(box.r, box.b),
+		cpv(box.r, box.t),
+		cpv(box.l, box.t),
+		cpv(box.l, box.b),
 	};
 	
-	return cpPolyShapeInit(poly, body, 4, verts, cpvzero, radius);
+	return cpPolyShapeInitRaw(poly, body, 4, verts, radius);
 }
 
 cpShape *
@@ -302,13 +312,25 @@ cpPolyShapeGetRadius(const cpShape *shape)
 // Unsafe API (chipmunk_unsafe.h)
 
 void
-cpPolyShapeSetVerts(cpShape *shape, int count, cpVect *verts, cpVect offset)
+cpPolyShapeSetVerts(cpShape *shape, int count, cpVect *verts, cpTransform transform)
+{
+	cpVect *hullVerts = (cpVect *)alloca(count*sizeof(cpVect));
+	
+	// Transform the verts before building the hull in case of a negative scale.
+	for(int i=0; i<count; i++) hullVerts[i] = cpTransformPoint(transform, verts[i]);
+	
+	unsigned int hullCount = cpConvexHull(count, hullVerts, hullVerts, NULL, 0.0);
+	cpPolyShapeSetVertsRaw(shape, hullCount, hullVerts);
+}
+
+void
+cpPolyShapeSetVertsRaw(cpShape *shape, int count, cpVect *verts)
 {
 	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
 	cpPolyShape *poly = (cpPolyShape *)shape;
 	cpPolyShapeDestroy(poly);
 	
-	setUpVerts(poly, count, verts, offset);
+	SetVerts(poly, count, verts);
 	
 	cpFloat mass = shape->massInfo.m;
 	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, poly->count, poly->verts, poly->r);

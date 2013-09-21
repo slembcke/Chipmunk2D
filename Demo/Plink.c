@@ -83,7 +83,7 @@ init(void)
 		for(int j=0; j<6; j++){
 			cpFloat stagger = (j%2)*40;
 			cpVect offset = cpv(i*80 - 320 + stagger, j*70 - 240);
-			shape = cpSpaceAddShape(space, cpPolyShapeNew(staticBody, 3, tris, offset, 0.0));
+			shape = cpSpaceAddShape(space, cpPolyShapeNew(staticBody, 3, tris, cpTransformTranslate(offset), 0.0));
 			cpShapeSetElasticity(shape, 1.0f);
 			cpShapeSetFriction(shape, 1.0f);
 			cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
@@ -106,7 +106,7 @@ init(void)
 		cpFloat x = rand()/(cpFloat)RAND_MAX*640 - 320;
 		cpBodySetPosition(body, cpv(x, 350));
 		
-		shape = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpvzero, 0.0));
+		shape = cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpTransformIdentity, 0.0));
 		cpShapeSetElasticity(shape, 0.0f);
 		cpShapeSetFriction(shape, 0.4f);
 	}

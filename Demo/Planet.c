@@ -90,7 +90,7 @@ add_box(cpSpace *space)
 	cpBodySetAngularVelocity(body, v);
 	cpBodySetAngle(body, cpfatan2(pos.y, pos.x));
 
-	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 4, verts, cpvzero, 0.0));
+	cpShape *shape = cpSpaceAddShape(space, cpPolyShapeNew(body, 4, verts, cpTransformIdentity, 0.0));
 	cpShapeSetElasticity(shape, 0.0f);
 	cpShapeSetFriction(shape, 0.7f);
 }
