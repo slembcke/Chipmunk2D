@@ -27,7 +27,7 @@ typedef struct cpSplittingPlane {
 	cpVect v0, n;
 } cpSplittingPlane;
 
-#define CP_POLY_SHAPE_STATIC_COUNT 6
+#define CP_POLY_SHAPE_INLINE_ALLOC 6
 
 /// @private
 typedef struct cpPolyShape {
@@ -38,7 +38,7 @@ typedef struct cpPolyShape {
 	
 	cpFloat r;
 	
-	cpSplittingPlane _planes[2*CP_POLY_SHAPE_STATIC_COUNT];
+	cpSplittingPlane _planes[2*CP_POLY_SHAPE_INLINE_ALLOC];
 } cpPolyShape;
 
 // TODO: Clean up naming here.
