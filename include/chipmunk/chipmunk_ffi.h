@@ -38,7 +38,6 @@ MAKE_REF(cpvlengthsq);
 MAKE_REF(cpvlength);
 MAKE_REF(cpvlerp);
 MAKE_REF(cpvnormalize);
-MAKE_REF(cpvnormalize_safe);
 MAKE_REF(cpvclamp);
 MAKE_REF(cpvlerpconst);
 MAKE_REF(cpvdist);

@@ -193,7 +193,7 @@ ChipmunkDemoTextDrawString(cpVect pos, char *str)
 	cpSpaceDebugColor c = LAColor(1.0f, 1.0f);
 	GLfloat x = (GLfloat)pos.x, y = (GLfloat)pos.y;
 	
-	for(unsigned long i=0, len=strlen(str); i<len; i++){
+	for(size_t i=0, len=strlen(str); i<len; i++){
 		if(str[i] == '\n'){
 			y -= LineHeight;
 			x = (GLfloat)pos.x;

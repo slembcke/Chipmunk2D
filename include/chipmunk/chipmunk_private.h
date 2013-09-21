@@ -65,7 +65,7 @@ void cpHashSetSetDefaultValue(cpHashSet *set, void *default_value);
 void cpHashSetFree(cpHashSet *set);
 
 int cpHashSetCount(cpHashSet *set);
-void *cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data, cpHashSetTransFunc trans);
+void *cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, cpHashSetTransFunc trans, void *data);
 void *cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr);
 void *cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr);
 

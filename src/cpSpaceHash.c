@@ -272,7 +272,7 @@ hashHandle(cpSpaceHash *hash, cpHandle *hand, cpBB bb)
 static void
 cpSpaceHashInsert(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 {
-	cpHandle *hand = (cpHandle *)cpHashSetInsert(hash->handleSet, hashid, obj, hash, (cpHashSetTransFunc)handleSetTrans);
+	cpHandle *hand = (cpHandle *)cpHashSetInsert(hash->handleSet, hashid, obj, (cpHashSetTransFunc)handleSetTrans, hash);
 	hashHandle(hash, hand, hash->spatialIndex.bbfunc(obj));
 }
 

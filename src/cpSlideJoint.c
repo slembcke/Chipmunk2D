@@ -35,10 +35,10 @@ preStep(cpSlideJoint *joint, cpFloat dt)
 	cpFloat pdist = 0.0f;
 	if(dist > joint->max) {
 		pdist = dist - joint->max;
-		joint->n = cpvnormalize_safe(delta);
+		joint->n = cpvnormalize(delta);
 	} else if(dist < joint->min) {
 		pdist = joint->min - dist;
-		joint->n = cpvneg(cpvnormalize_safe(delta));
+		joint->n = cpvneg(cpvnormalize(delta));
 	} else {
 		joint->n = cpvzero;
 		joint->jnAcc = 0.0f;

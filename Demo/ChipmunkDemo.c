@@ -145,7 +145,7 @@ ColorForShape(cpShape *shape, cpDataPointer *data)
 		} else if(body->node.idleTime > shape->space->sleepTimeThreshold) {
 			return LAColor(0.66f, 1.0f);
 		} else {
-			unsigned long val = (unsigned long)shape->hashid;
+			uint32_t val = (uint32_t)shape->hashid;
 			
 			// scramble the bits up using Robert Jenkins' 32 bit integer hash function
 			val = (val+0x7ed55d16) + (val<<12);

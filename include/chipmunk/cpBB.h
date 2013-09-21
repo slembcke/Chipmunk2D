@@ -149,9 +149,20 @@ cpBBClampVect(const cpBB bb, const cpVect v)
 	return cpv(cpfclamp(v.x, bb.l, bb.r), cpfclamp(v.y, bb.b, bb.t));
 }
 
-// TODO: edge case issue
 /// Wrap a vector to a bounding box.
-cpVect cpBBWrapVect(const cpBB bb, const cpVect v); // wrap a vector to a bbox
+static inline cpVect
+cpBBWrapVect(const cpBB bb, const cpVect v)
+{
+	cpFloat dx = cpfabs(bb.r - bb.l);
+	cpFloat modx = cpfmod(v.x - bb.l, dx);
+	cpFloat x = (modx > 0.0f) ? modx : modx + dx;
+	
+	cpFloat dy = cpfabs(bb.t - bb.b);
+	cpFloat mody = cpfmod(v.y - bb.b, dy);
+	cpFloat y = (mody > 0.0f) ? mody : mody + dy;
+	
+	return cpv(x + bb.l, y + bb.b);
+}
 
 ///@}
 

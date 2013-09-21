@@ -38,12 +38,6 @@ static inline cpVect cpv(const cpFloat x, const cpFloat y)
 	return v;
 }
 
-/// Spherical linearly interpolate between v1 and v2.
-cpVect cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t);
-
-/// Spherical linearly interpolate between v1 towards v2 by no more than angle a radians
-cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a);
-
 /// Check if two vectors are equal. (Be careful when comparing floating point numbers!)
 static inline cpBool cpveql(const cpVect v1, const cpVect v2)
 {
@@ -155,10 +149,30 @@ static inline cpVect cpvnormalize(const cpVect v)
 	return cpvmult(v, 1.0f/(cpvlength(v) + CPFLOAT_MIN));
 }
 
-/// @deprecated Just an alias for cpvnormalize() now.
-static inline cpVect cpvnormalize_safe(const cpVect v)
+/// Spherical linearly interpolate between v1 and v2.
+static inline cpVect
+cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t)
 {
-	return cpvnormalize(v);
+	cpFloat dot = cpvdot(cpvnormalize(v1), cpvnormalize(v2));
+	cpFloat omega = cpfacos(cpfclamp(dot, -1.0f, 1.0f));
+	
+	if(omega < 1e-3){
+		// If the angle between two vectors is very small, lerp instead to avoid precision issues.
+		return cpvlerp(v1, v2, t);
+	} else {
+		cpFloat denom = 1.0f/cpfsin(omega);
+		return cpvadd(cpvmult(v1, cpfsin((1.0f - t)*omega)*denom), cpvmult(v2, cpfsin(t*omega)*denom));
+	}
+}
+
+/// Spherical linearly interpolate between v1 towards v2 by no more than angle a radians
+static inline cpVect
+cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a)
+{
+	cpFloat dot = cpvdot(cpvnormalize(v1), cpvnormalize(v2));
+	cpFloat omega = cpfacos(cpfclamp(dot, -1.0f, 1.0f));
+	
+	return cpvslerp(v1, v2, cpfmin(a, omega)/omega);
 }
 
 /// Clamp v to length len.

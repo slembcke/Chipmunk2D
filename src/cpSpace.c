@@ -253,7 +253,7 @@ cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a
 	
 	cpHashSet *handlers = space->collisionHandlers;
 	cpCollisionHandler *handler = cpHashSetFind(handlers, hash, &temp);
-	return (handler ? handler : cpHashSetInsert(handlers, hash, &temp, NULL, (cpHashSetTransFunc)handlerSetTrans));
+	return (handler ? handler : cpHashSetInsert(handlers, hash, &temp, (cpHashSetTransFunc)handlerSetTrans, NULL));
 }
 
 cpCollisionHandler *
@@ -266,7 +266,7 @@ cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type)
 	
 	cpHashSet *handlers = space->collisionHandlers;
 	cpCollisionHandler *handler = cpHashSetFind(handlers, hash, &temp);
-	return (handler ? handler : cpHashSetInsert(handlers, hash, &temp, NULL, (cpHashSetTransFunc)handlerSetTrans));
+	return (handler ? handler : cpHashSetInsert(handlers, hash, &temp, (cpHashSetTransFunc)handlerSetTrans, NULL));
 }
 
 

@@ -62,7 +62,7 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 				const cpShape *a = arb->a, *b = arb->b;
 				const cpShape *shape_pair[] = {a, b};
 				cpHashValue arbHashID = CP_HASH_PAIR((cpHashValue)a, (cpHashValue)b);
-				cpHashSetInsert(space->cachedArbiters, arbHashID, shape_pair, arb, NULL);
+				cpHashSetInsert(space->cachedArbiters, arbHashID, shape_pair, NULL, arb);
 				
 				// Update the arbiter's state
 				arb->stamp = space->stamp;

@@ -149,9 +149,8 @@ cpHashSetCount(cpHashSet *set)
 	return set->entries;
 }
 
-// TODO Nitpick: swap the order of the last two args
 void *
-cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, void *data, cpHashSetTransFunc trans)
+cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, cpHashSetTransFunc trans, void *data)
 {
 	cpHashValue idx = hash%set->size;
 	

@@ -97,7 +97,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	
 	// Apply linear damping for the fluid drag.
 	cpVect v_centroid = cpBodyGetVelocityAtWorldPoint(body, centroid);
-	cpFloat k = k_scalar_body(body, centroid, cpvnormalize_safe(v_centroid));
+	cpFloat k = k_scalar_body(body, centroid, cpvnormalize(v_centroid));
 	cpFloat damping = clippedArea*FLUID_DRAG*FLUID_DENSITY;
 	cpFloat v_coef = cpfexp(-damping*dt*k); // linear drag
 //	cpFloat v_coef = 1.0/(1.0 + damping*dt*cpvlength(v_centroid)*k); // quadratic drag
