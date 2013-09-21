@@ -66,7 +66,9 @@ cpPolyShapeCacheData(cpPolyShape *poly, cpTransform transform)
 static void
 cpPolyShapeDestroy(cpPolyShape *poly)
 {
-	cpfree(poly->planes);
+	if(poly->count > CP_POLY_SHAPE_STATIC_COUNT){
+		cpfree(poly->planes);
+	}
 }
 
 static void
@@ -169,7 +171,12 @@ static void
 SetVerts(cpPolyShape *poly, int count, const cpVect *verts)
 {
 	poly->count = count;
-	poly->planes = (cpSplittingPlane *)cpcalloc(2*count, sizeof(cpSplittingPlane));
+	if(count <= CP_POLY_SHAPE_STATIC_COUNT){
+		poly->planes = poly->_planes;
+	} else {
+		poly->planes = (cpSplittingPlane *)cpcalloc(2*count, sizeof(cpSplittingPlane));
+	}
+	
 	poly->tPlanes = poly->planes + count;
 	
 	for(int i=0; i<count; i++){

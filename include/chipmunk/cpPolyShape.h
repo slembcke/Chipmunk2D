@@ -28,6 +28,8 @@ typedef struct cpSplittingPlane {
 	cpFloat d;
 } cpSplittingPlane;
 
+#define CP_POLY_SHAPE_STATIC_COUNT 4
+
 /// @private
 typedef struct cpPolyShape {
 	cpShape shape;
@@ -36,6 +38,8 @@ typedef struct cpPolyShape {
 	cpSplittingPlane *planes, *tPlanes;
 	
 	cpFloat r;
+	
+	cpSplittingPlane _planes[2*CP_POLY_SHAPE_STATIC_COUNT];
 } cpPolyShape;
 
 // TODO: Clean up naming here.
