@@ -380,19 +380,11 @@
 		D39ECD8E17ED70D900319DBA /* Benchmark iPhone */ = {
 			isa = PBXGroup;
 			children = (
-				D39ECD8F17ED70D900319DBA /* Supporting Files */,
-			);
-			name = "Benchmark iPhone";
-			path = Benchmark;
-			sourceTree = "<group>";
-		};
-		D39ECD8F17ED70D900319DBA /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
 				D39ECD9017ED70D900319DBA /* Benchmark-Info.plist */,
 				D39ECD9417ED70D900319DBA /* iPhoneBenchmarkMain.m */,
 			);
-			name = "Supporting Files";
+			name = "Benchmark iPhone";
+			path = Benchmark;
 			sourceTree = "<group>";
 		};
 		D3AD63A117CDB9F500B03A7F /* libGLEW */ = {
