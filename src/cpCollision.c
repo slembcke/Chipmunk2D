@@ -58,13 +58,13 @@ cpCollisionInfoPushContact(struct cpCollisionInfo *info, cpVect p1, cpVect p2, c
 //MARK: Support Points and Edges:
 
 static inline int
-PolySupportPointIndex(const int count, const cpVect *verts, const cpVect n)
+PolySupportPointIndex(const int count, const cpSplittingPlane *planes, const cpVect n)
 {
 	cpFloat max = -INFINITY;
 	int index = 0;
 	
 	for(int i=0; i<count; i++){
-		cpVect v = verts[i];
+		cpVect v = planes[i].v0;
 		cpFloat d = cpvdot(v, n);
 		if(d > max){
 			max = d;
@@ -108,9 +108,9 @@ SegmentSupportPoint(const cpSegmentShape *seg, const cpVect n)
 static inline struct SupportPoint
 PolySupportPoint(const cpPolyShape *poly, const cpVect n)
 {
-	const cpVect *verts = poly->tVerts;
-	int i = PolySupportPointIndex(poly->count, verts, n);
-	return SupportPointNew(verts[i], i);
+	const cpSplittingPlane *planes = poly->tPlanes;
+	int i = PolySupportPointIndex(poly->count, planes, n);
+	return SupportPointNew(planes[i].v0, i);
 }
 
 struct MinkowskiPoint {
@@ -154,19 +154,19 @@ static struct Edge
 SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 {
 	int count = poly->count;
-	int i1 = PolySupportPointIndex(poly->count, poly->tVerts, n);
+	int i1 = PolySupportPointIndex(poly->count, poly->tPlanes, n);
 	
 	// TODO: get rid of mod eventually, very expensive on ARM
 	int i0 = (i1 - 1 + count)%count;
 	int i2 = (i1 + 1)%count;
 	
-	cpVect *verts = poly->tVerts;
+	cpSplittingPlane *planes = poly->tPlanes;
 	cpHashValue hashid = poly->shape.hashid;
-	if(cpvdot(n, poly->tPlanes[i1].n) > cpvdot(n, poly->tPlanes[i2].n)){
-		struct Edge edge = {{verts[i0], CP_HASH_PAIR(hashid, i0)}, {verts[i1], CP_HASH_PAIR(hashid, i1)}, poly->r, poly->tPlanes[i1].n};
+	if(cpvdot(n, planes[i1].n) > cpvdot(n, poly->tPlanes[i2].n)){
+		struct Edge edge = {{planes[i0].v0, CP_HASH_PAIR(hashid, i0)}, {planes[i1].v0, CP_HASH_PAIR(hashid, i1)}, poly->r, planes[i1].n};
 		return edge;
 	} else {
-		struct Edge edge = {{verts[i1], CP_HASH_PAIR(hashid, i1)}, {verts[i2], CP_HASH_PAIR(hashid, i2)}, poly->r, poly->tPlanes[i2].n};
+		struct Edge edge = {{planes[i1].v0, CP_HASH_PAIR(hashid, i1)}, {planes[i2].v0, CP_HASH_PAIR(hashid, i2)}, poly->r, planes[i2].n};
 		return edge;
 	}
 }
@@ -368,7 +368,7 @@ ShapePoint(const cpShape *shape, const int i)
 			cpPolyShape *poly = (cpPolyShape *)shape;
 			// Poly shapes may change vertex count.
 			int index = (i < poly->count ? i : 0);
-			return SupportPointNew(poly->tVerts[index], index);
+			return SupportPointNew(poly->tPlanes[index].v0, index);
 		} default: {
 			return SupportPointNew(cpvzero, 0);
 		}

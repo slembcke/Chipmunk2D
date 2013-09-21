@@ -24,21 +24,21 @@
 
 /// @private
 typedef struct cpSplittingPlane {
-	cpVect n;
-	cpFloat d;
+	cpVect v0, n;
 } cpSplittingPlane;
+
+#define CP_POLY_SHAPE_STATIC_COUNT 6
 
 /// @private
 typedef struct cpPolyShape {
 	cpShape shape;
 	
 	int count;
-	cpVect *verts, *tVerts;
-	
-	// NUKE
 	cpSplittingPlane *planes, *tPlanes;
 	
 	cpFloat r;
+	
+	cpSplittingPlane _planes[2*CP_POLY_SHAPE_STATIC_COUNT];
 } cpPolyShape;
 
 // TODO: Clean up naming here.
