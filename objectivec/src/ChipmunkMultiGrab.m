@@ -40,7 +40,7 @@ GrabPreSolve(cpConstraint *constraint, cpSpace *space)
 	chipmunkObjects:(NSArray *)chipmunkObjects
 {
 	ChipmunkBody *grabBody = [ChipmunkBody bodyWithMass:INFINITY andMoment:INFINITY];
-	grabBody.pos = pos;
+	grabBody.position = pos;
 	
 	if((self = [super init])){
 		_pos = pos;
@@ -171,7 +171,7 @@ static void PushBodyVelocityUpdate(cpBody *body, cpVect gravity, cpFloat damping
 	
 	if(!grabbedShape && _pushMode){
 		pushBody = [ChipmunkBody bodyWithMass:_pushMass andMoment:INFINITY];
-		pushBody.pos = pos;
+		pushBody.position = pos;
 		pushBody.body->velocity_func = PushBodyVelocityUpdate;
 		
 		ChipmunkShape *pushShape = [ChipmunkCircleShape circleWithBody:pushBody radius:_grabRadius offset:cpvzero];

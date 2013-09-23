@@ -49,10 +49,10 @@
 @property(nonatomic, assign) cpFloat moment;
 
 /// The position of the rigid body's center of gravity.
-@property(nonatomic, assign) cpVect pos;
+@property(nonatomic, assign) cpVect position;
 
 /// The linear velocity of the rigid body.
-@property(nonatomic, assign) cpVect vel;
+@property(nonatomic, assign) cpVect velocity;
 
 /// The linear force applied to the rigid body. Unlike in some physics engines, the force does not reset itself during each step. Make sure that you are reseting the force between frames if that is what you intended.
 @property(nonatomic, assign) cpVect force;
@@ -61,13 +61,10 @@
 @property(nonatomic, assign) cpFloat angle;
 
 /// The angular velocity of the rigid body in radians per second.
-@property(nonatomic, assign) cpFloat angVel;
+@property(nonatomic, assign) cpFloat angularVelocity;
 
 /// The torque being applied to the rigid body. Like force, this property is not reset every frame.
 @property(nonatomic, assign) cpFloat torque;
-
-/// A unit length vector vector that stores the current rotation of the body as a 2D spinor or complex number. Can be used for fast rotation.
-@property(nonatomic, readonly) cpVect rot;
 
 /// Returns a pointer to the underlying cpBody C struct.
 @property(nonatomic, readonly) cpBody *body;
@@ -79,10 +76,10 @@
 @property(nonatomic, assign) id data;
 
 /// Maximum velocity allowed for this body. Defaults to @c INFINITY.
-@property(nonatomic, assign) cpFloat velLimit;
+@property(nonatomic, assign) cpFloat velocityLimit;
 
 /// Maximum angular velocity allowed for this body. Defaults to @c INFINITY.
-@property(nonatomic, assign) cpFloat angVelLimit;
+@property(nonatomic, assign) cpFloat angularVelocityLimit;
 
 /// Has the body been put to sleep by the space?
 @property(nonatomic, readonly) bool isSleeping;

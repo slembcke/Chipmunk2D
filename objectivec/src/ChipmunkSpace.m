@@ -589,10 +589,10 @@ static void PushConstraint(cpConstraint *constraint, NSMutableArray *arr){[arr a
 	return obj;
 }
 
-static ChipmunkStaticSegmentShape *
+static ChipmunkSegmentShape *
 boundSeg(ChipmunkBody *body, cpVect a, cpVect b, cpFloat radius, cpFloat elasticity,cpFloat friction, cpShapeFilter filter, cpCollisionType collisionType)
 {
-	ChipmunkStaticSegmentShape *seg = [ChipmunkStaticSegmentShape segmentWithBody:body from:a to:b radius:radius];
+	ChipmunkSegmentShape *seg = [ChipmunkSegmentShape segmentWithBody:body from:a to:b radius:radius];
 	seg.elasticity = elasticity;
 	seg.friction = friction;
 	seg.filter = filter;

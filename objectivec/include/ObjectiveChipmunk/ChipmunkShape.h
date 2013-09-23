@@ -234,16 +234,3 @@
 - (cpVect)getVertex:(int)index;
 
 @end
-
-/// A subclass of ChipmunkCircleShape that is added as a static shape when using ChipmunkSpace.add:.
-@interface ChipmunkStaticCircleShape : ChipmunkCircleShape
-@end
-
-
-/// A subclass of ChipmunkSegmentShape that is added as a static shape when using ChipmunkSpace.add:.
-@interface ChipmunkStaticSegmentShape : ChipmunkSegmentShape
-@end
-
-/// A subclass of ChipmunkPolyShape that is added as a static shape when using ChipmunkSpace.add:.
-@interface ChipmunkStaticPolyShape : ChipmunkPolyShape
-@end

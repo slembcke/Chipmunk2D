@@ -10,7 +10,6 @@
 		D309B22117EFE2EF00AA52C8 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D39ECDA117ED70D900319DBA /* XCTest.framework */; };
 		D309B22217EFE2EF00AA52C8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D39ECD8817ED70D900319DBA /* Foundation.framework */; };
 		D309B22317EFE2EF00AA52C8 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D39ECD8C17ED70D900319DBA /* UIKit.framework */; };
-		D309B22617EFE2EF00AA52C8 /* libObjectiveChipmunk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D309B21317EFE2EF00AA52C8 /* libObjectiveChipmunk.a */; };
 		D309B22C17EFE2EF00AA52C8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D309B22A17EFE2EF00AA52C8 /* InfoPlist.strings */; };
 		D309B22E17EFE2EF00AA52C8 /* ObjectiveChipmunkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D309B22D17EFE2EF00AA52C8 /* ObjectiveChipmunkTests.m */; };
 		D309B23D17EFFE2000AA52C8 /* libChipmunk-iPhone.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D3C3787A11063B1B003EF1D9 /* libChipmunk-iPhone.a */; };
@@ -19,6 +18,8 @@
 		D309B24E17EFFF9E00AA52C8 /* ChipmunkMultiGrab.m in Sources */ = {isa = PBXBuildFile; fileRef = D309B24817EFFF9E00AA52C8 /* ChipmunkMultiGrab.m */; };
 		D309B25017EFFF9E00AA52C8 /* ChipmunkShape.m in Sources */ = {isa = PBXBuildFile; fileRef = D309B24A17EFFF9E00AA52C8 /* ChipmunkShape.m */; };
 		D309B25117EFFF9E00AA52C8 /* ChipmunkSpace.m in Sources */ = {isa = PBXBuildFile; fileRef = D309B24B17EFFF9E00AA52C8 /* ChipmunkSpace.m */; };
+		D309B26C17F0088A00AA52C8 /* BodyTest.m in Sources */ = {isa = PBXBuildFile; fileRef = D309B25217F003FD00AA52C8 /* BodyTest.m */; };
+		D309B26D17F00B3B00AA52C8 /* libObjectiveChipmunk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D309B21317EFE2EF00AA52C8 /* libObjectiveChipmunk.a */; };
 		D3102B171119FD3000E77771 /* Tank.c in Sources */ = {isa = PBXBuildFile; fileRef = D3102B161119FD3000E77771 /* Tank.c */; };
 		D31402950E9DD07E00EF79DB /* Springies.c in Sources */ = {isa = PBXBuildFile; fileRef = D31402940E9DD07E00EF79DB /* Springies.c */; };
 		D317246613280FC900752CBE /* cpSweep1D.c in Sources */ = {isa = PBXBuildFile; fileRef = D317246513280FC900752CBE /* cpSweep1D.c */; };
@@ -200,6 +201,21 @@
 		D309B24817EFFF9E00AA52C8 /* ChipmunkMultiGrab.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ChipmunkMultiGrab.m; path = ../objectivec/src/ChipmunkMultiGrab.m; sourceTree = "<group>"; };
 		D309B24A17EFFF9E00AA52C8 /* ChipmunkShape.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ChipmunkShape.m; path = ../objectivec/src/ChipmunkShape.m; sourceTree = "<group>"; };
 		D309B24B17EFFF9E00AA52C8 /* ChipmunkSpace.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ChipmunkSpace.m; path = ../objectivec/src/ChipmunkSpace.m; sourceTree = "<group>"; };
+		D309B25217F003FD00AA52C8 /* BodyTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BodyTest.m; sourceTree = "<group>"; };
+		D309B25317F003FD00AA52C8 /* CallbacksTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CallbacksTest.m; sourceTree = "<group>"; };
+		D309B25417F003FD00AA52C8 /* ConvexTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConvexTest.m; sourceTree = "<group>"; };
+		D309B25517F003FD00AA52C8 /* GHTestMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GHTestMacros.h; sourceTree = "<group>"; };
+		D309B25617F003FD00AA52C8 /* MemoryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MemoryTest.m; sourceTree = "<group>"; };
+		D309B25717F003FD00AA52C8 /* MiscTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MiscTest.m; sourceTree = "<group>"; };
+		D309B25817F003FD00AA52C8 /* NSException+GHTestFailureExceptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSException+GHTestFailureExceptions.h"; sourceTree = "<group>"; };
+		D309B25917F003FD00AA52C8 /* NSException+GHTestFailureExceptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSException+GHTestFailureExceptions.m"; sourceTree = "<group>"; };
+		D309B25A17F003FD00AA52C8 /* NSValue+GHValueFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+GHValueFormatter.h"; sourceTree = "<group>"; };
+		D309B25B17F003FD00AA52C8 /* NSValue+GHValueFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSValue+GHValueFormatter.m"; sourceTree = "<group>"; };
+		D309B25C17F003FD00AA52C8 /* ShapeTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShapeTest.m; sourceTree = "<group>"; };
+		D309B25D17F003FD00AA52C8 /* SimpleTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleTestCase.h; sourceTree = "<group>"; };
+		D309B25E17F003FD00AA52C8 /* SimpleTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleTestCase.m; sourceTree = "<group>"; };
+		D309B25F17F003FD00AA52C8 /* SpaceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpaceTest.m; sourceTree = "<group>"; };
+		D309B26017F003FD00AA52C8 /* TestMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestMain.m; sourceTree = "<group>"; };
 		D30CE25D0B52535500427129 /* cpHashSet.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpHashSet.c; sourceTree = "<group>"; };
 		D3102B161119FD3000E77771 /* Tank.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tank.c; sourceTree = "<group>"; };
 		D31402940E9DD07E00EF79DB /* Springies.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Springies.c; sourceTree = "<group>"; };
@@ -324,9 +340,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D309B26D17F00B3B00AA52C8 /* libObjectiveChipmunk.a in Frameworks */,
 				D309B22117EFE2EF00AA52C8 /* XCTest.framework in Frameworks */,
 				D309B22317EFE2EF00AA52C8 /* UIKit.framework in Frameworks */,
-				D309B22617EFE2EF00AA52C8 /* libObjectiveChipmunk.a in Frameworks */,
 				D309B22217EFE2EF00AA52C8 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -394,6 +410,21 @@
 			isa = PBXGroup;
 			children = (
 				D309B22D17EFE2EF00AA52C8 /* ObjectiveChipmunkTests.m */,
+				D309B25217F003FD00AA52C8 /* BodyTest.m */,
+				D309B25317F003FD00AA52C8 /* CallbacksTest.m */,
+				D309B25417F003FD00AA52C8 /* ConvexTest.m */,
+				D309B25617F003FD00AA52C8 /* MemoryTest.m */,
+				D309B25717F003FD00AA52C8 /* MiscTest.m */,
+				D309B25C17F003FD00AA52C8 /* ShapeTest.m */,
+				D309B25D17F003FD00AA52C8 /* SimpleTestCase.h */,
+				D309B25E17F003FD00AA52C8 /* SimpleTestCase.m */,
+				D309B25F17F003FD00AA52C8 /* SpaceTest.m */,
+				D309B26017F003FD00AA52C8 /* TestMain.m */,
+				D309B25517F003FD00AA52C8 /* GHTestMacros.h */,
+				D309B25817F003FD00AA52C8 /* NSException+GHTestFailureExceptions.h */,
+				D309B25A17F003FD00AA52C8 /* NSValue+GHValueFormatter.h */,
+				D309B25917F003FD00AA52C8 /* NSException+GHTestFailureExceptions.m */,
+				D309B25B17F003FD00AA52C8 /* NSValue+GHValueFormatter.m */,
 				D309B22817EFE2EF00AA52C8 /* Supporting Files */,
 			);
 			path = ObjectiveChipmunkTests;
@@ -893,6 +924,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D309B22E17EFE2EF00AA52C8 /* ObjectiveChipmunkTests.m in Sources */,
+				D309B26C17F0088A00AA52C8 /* BodyTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1094,12 +1126,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/ChipmunkDemo.app/Contents/MacOS/ChipmunkDemo";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				COPY_PHASE_STRIP = NO;
@@ -1110,8 +1139,6 @@
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "ObjectiveChipmunk/ObjectiveChipmunk-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1119,7 +1146,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				INFOPLIST_FILE = "ObjectiveChipmunkTests/ObjectiveChipmunkTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				TEST_HOST = "$(BUNDLE_LOADER)";
@@ -1131,12 +1158,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/ChipmunkDemo.app/Contents/MacOS/ChipmunkDemo";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				COPY_PHASE_STRIP = YES;
@@ -1147,11 +1171,9 @@
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "ObjectiveChipmunk/ObjectiveChipmunk-Prefix.pch";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				INFOPLIST_FILE = "ObjectiveChipmunkTests/ObjectiveChipmunkTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				TEST_HOST = "$(BUNDLE_LOADER)";
