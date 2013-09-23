@@ -125,7 +125,7 @@ struct cpShape {
 	/// User definable data pointer.
 	/// Generally this points to your the game object class so you can access it
 	/// when given a cpShape reference in a callback.
-	CP_PRIVATE(cpDataPointer data);
+	CP_PRIVATE(cpDataPointer userData);
 	
 	/// Collision type of this shape used when picking collision handlers.
 	CP_PRIVATE(cpCollisionType type);
@@ -190,7 +190,7 @@ CP_DefineShapeStructProperty(cpBool, sensor, Sensor, cpTrue)
 CP_DefineShapeStructProperty(cpFloat, e, Elasticity, cpFalse)
 CP_DefineShapeStructProperty(cpFloat, u, Friction, cpTrue)
 CP_DefineShapeStructProperty(cpVect, surfaceV, SurfaceVelocity, cpTrue)
-CP_DefineShapeStructProperty(cpDataPointer, data, UserData, cpFalse)
+CP_DefineShapeStructProperty(cpDataPointer, userData, UserData, cpFalse)
 CP_DefineShapeStructProperty(cpCollisionType, type, CollisionType, cpTrue)
 CP_DefineShapeStructProperty(cpShapeFilter, filter, Filter, cpTrue)
 

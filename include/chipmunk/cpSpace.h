@@ -89,7 +89,7 @@ struct cpSpace {
 	/// User definable data pointer.
 	/// Generally this points to your game's controller or game state
 	/// class so you can access it when given a cpSpace reference in a callback.
-	cpDataPointer data;
+	cpDataPointer userData;
 	
 	/// The designated static body for this space.
 	/// You can modify this body, or replace it with your own static body.
@@ -165,7 +165,7 @@ CP_DefineSpaceStructProperty(cpFloat, sleepTimeThreshold, SleepTimeThreshold)
 CP_DefineSpaceStructProperty(cpFloat, collisionSlop, CollisionSlop)
 CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias)
 CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence)
-CP_DefineSpaceStructProperty(cpDataPointer, data, UserData)
+CP_DefineSpaceStructProperty(cpDataPointer, userData, UserData)
 CP_DefineSpaceStructGetter(cpBody*, staticBody, StaticBody)
 CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep)
 
