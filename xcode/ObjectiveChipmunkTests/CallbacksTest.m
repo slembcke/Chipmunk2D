@@ -231,12 +231,7 @@ testSleepingSensorCallbacksHelper(id self, int wakeRemoveType){
 	testSleepingSensorCallbacksHelper(self, 1);
 }
 
-- (bool)postStepRemovalBegin:(cpArbiter *)arbiter space:(ChipmunkSpace*)space {
-	CHIPMUNK_ARBITER_GET_SHAPES(arbiter, ballShape, barShape);
-	[space addPostStepRemoval:barShape];
-	
-	return TRUE;
-}
+static cpBool CallBlock(cpArbiter *arb, cpSpace *space, cpBool (^block)(cpArbiter *arb)){return block(arb);}
 
 -(void)testPostStepRemoval {
 	NSString *ballType = @"ballType";
@@ -246,11 +241,14 @@ testSleepingSensorCallbacksHelper(id self, int wakeRemoveType){
 	space.gravity = cpv(0, -100);
 	
 	// TODO
-//	[space addCollisionHandler:self
-//		typeA:ballType typeB:barType
-//		begin:@selector(postStepRemovalBegin:space:)
-//		preSolve:nil postSolve:nil separate:nil
-//	];
+	cpCollisionHandler *handler = cpSpaceAddCollisionHandler(space.space, ballType, barType);
+	handler->beginFunc = (cpCollisionBeginFunc)CallBlock,
+	handler->userData = ^(cpArbiter *arb){
+		CHIPMUNK_ARBITER_GET_SHAPES(arb, ballShape, barShape);
+		[space addPostStepRemoval:barShape];
+		
+		return TRUE;
+	};
 	
 	ChipmunkShape *shape;
 	
@@ -269,13 +267,10 @@ testSleepingSensorCallbacksHelper(id self, int wakeRemoveType){
 	
 	for(int i=0; i<100; i++) [space step:0.01];
 	
-	cpFloat cp_collision_slop = 0.5f; // TODO relpace
-	XCTAssertEqualWithAccuracy(ball.position.y, (cpFloat)2, 1.1*cp_collision_slop, @"");
+	XCTAssertEqualWithAccuracy(ball.position.y, (cpFloat)2, 1.1*space.collisionSlop, @"");
 	
 	[space release];
 }
-
-static void CallBlock(cpArbiter *arb, cpSpace *space, void (^block)(void)){block();}
 
 // Make sure that adding a post step callback from inside a post step callback works correctly.
 -(void)testPostStepFromPostStep
@@ -297,10 +292,13 @@ static void CallBlock(cpArbiter *arb, cpSpace *space, void (^block)(void)){block
 	__block bool trigger2 = FALSE;
 	__block bool trigger3 = FALSE;
 	__block bool trigger4 = FALSE;
+	__block bool trigger5 = FALSE;
+	__block bool trigger6 = FALSE;
+	__block bool trigger7 = FALSE;
 	
 	cpCollisionHandler *handler1 = cpSpaceAddCollisionHandler(space.space, staticShape, shape1);
 	handler1->separateFunc = (cpCollisionSeparateFunc)CallBlock,
-	handler1->userData = ^(){
+	handler1->userData = ^(cpArbiter *arb){
 		XCTAssertTrue(cpSpaceIsLocked(space.space), @"");
 		
 		// When body1 moves it will trigger the first separate callback.
@@ -318,7 +316,7 @@ static void CallBlock(cpArbiter *arb, cpSpace *space, void (^block)(void)){block
 	
 	cpCollisionHandler *handler2 = cpSpaceAddCollisionHandler(space.space, shape1, shape2);
 	handler2->separateFunc = (cpCollisionSeparateFunc)CallBlock,
-	handler2->userData = ^(){
+	handler2->userData = ^(cpArbiter *arb){
 		XCTAssertTrue(cpSpaceIsLocked(space.space), @"");
 		
 		// schedule a second post step callback within the old one with the same key.
@@ -328,22 +326,9 @@ static void CallBlock(cpArbiter *arb, cpSpace *space, void (^block)(void)){block
 		trigger3 = TRUE;
 	};
 	
-	[space step:1.0];
-	body1.position = cpv(10, 0);
-	[space step:1.0];
-	
-	XCTAssertTrue(trigger1, @"");
-	XCTAssertTrue(trigger2, @"");
-	XCTAssertTrue(trigger3, @"");
-	XCTAssertFalse(trigger4, @"");
-	
-	__block bool trigger5 = FALSE;
-	__block bool trigger6 = FALSE;
-	__block bool trigger7 = FALSE;
-	
-	cpCollisionHandler *handler3 = cpSpaceAddCollisionHandler(space.space, staticShape, shape1);
+	cpCollisionHandler *handler3 = cpSpaceAddCollisionHandler(space.space, staticShape, shape2);
 	handler3->separateFunc = (cpCollisionSeparateFunc)CallBlock,
-	handler3->userData = ^(){
+	handler3->userData = ^(cpArbiter *arb){
 		XCTAssertTrue(cpSpaceIsLocked(space.space), @"");
 		
 		[space addPostStepBlock:^{
@@ -354,6 +339,15 @@ static void CallBlock(cpArbiter *arb, cpSpace *space, void (^block)(void)){block
 		
 		trigger5 = TRUE;
 	};
+	
+	[space step:1.0];
+	body1.position = cpv(10, 0);
+	[space step:1.0];
+	
+	XCTAssertTrue(trigger1, @"");
+	XCTAssertTrue(trigger2, @"");
+	XCTAssertTrue(trigger3, @"");
+	XCTAssertFalse(trigger4, @"");
 	
 	[space remove:shape2];
 	

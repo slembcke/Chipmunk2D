@@ -264,15 +264,6 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	cpSpaceFree(space);
 }
 
--(bool)beginSleepSensorRemoveBug:(cpArbiter *)arb space:(ChipmunkSpace*)space
-{
-	// 'b' is the shape we are using to trigger the callback.
-	CHIPMUNK_ARBITER_GET_SHAPES(arb, a, b);
-	[space addPostStepRemoval:b];
-	
-	return FALSE;
-}
-
 static cpBool CallBlock(cpArbiter *arb, cpSpace *space, cpBool (^block)(cpArbiter *arb)){return block(arb);}
 
 static void
@@ -329,8 +320,10 @@ VerifyContactGraph(id self, ChipmunkBody *body1, ChipmunkBody *body2)
 	cpCollisionHandler *handler = cpSpaceAddCollisionHandler(space.space, nil, type);
 	handler->beginFunc = (cpCollisionBeginFunc)CallBlock,
 	handler->userData = ^(cpArbiter *arb){
+		// 'b' is the shape we are using to trigger the callback.
 		CHIPMUNK_ARBITER_GET_SHAPES(arb, a, b);
 		[space addPostStepRemoval:b];
+		
 		return FALSE;
 	};
 	
