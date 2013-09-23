@@ -61,7 +61,7 @@ testHandlersHelper(id self, bool separateByRemove, bool enableContactGraph){
 	handler->preSolveFunc = (cpCollisionPreSolveFunc)PreSolve,
 	handler->postSolveFunc = (cpCollisionPostSolveFunc)PostSolve,
 	handler->separateFunc = (cpCollisionSeparateFunc)Separate,
-	handler->data = string;
+	handler->userData = string;
 	
 	// Test for separate callback when moving:
 	[space step:0.1];
@@ -121,7 +121,7 @@ testHandlersSleepingHelper(id self, int wakeRemoveType){
 	handler->preSolveFunc = (cpCollisionPreSolveFunc)PreSolve,
 	handler->postSolveFunc = (cpCollisionPostSolveFunc)PostSolve,
 	handler->separateFunc = (cpCollisionSeparateFunc)Separate,
-	handler->data = string;
+	handler->userData = string;
 	
 	// Test for separate callback when moving:
 	[space step:0.1];
@@ -191,7 +191,7 @@ testSleepingSensorCallbacksHelper(id self, int wakeRemoveType){
 	handler->preSolveFunc = (cpCollisionPreSolveFunc)PreSolve,
 	handler->postSolveFunc = (cpCollisionPostSolveFunc)PostSolve,
 	handler->separateFunc = (cpCollisionSeparateFunc)Separate,
-	handler->data = string;
+	handler->userData = string;
 	
 	// Test for separate callback when moving:
 	[space step:0.1];
@@ -300,7 +300,7 @@ static void CallBlock(cpArbiter *arb, cpSpace *space, void (^block)(void)){block
 	
 	cpCollisionHandler *handler1 = cpSpaceAddCollisionHandler(space.space, staticShape, shape1);
 	handler1->separateFunc = (cpCollisionSeparateFunc)CallBlock,
-	handler1->data = ^(){
+	handler1->userData = ^(){
 		XCTAssertTrue(cpSpaceIsLocked(space.space), @"");
 		
 		// When body1 moves it will trigger the first separate callback.
@@ -318,7 +318,7 @@ static void CallBlock(cpArbiter *arb, cpSpace *space, void (^block)(void)){block
 	
 	cpCollisionHandler *handler2 = cpSpaceAddCollisionHandler(space.space, shape1, shape2);
 	handler2->separateFunc = (cpCollisionSeparateFunc)CallBlock,
-	handler2->data = ^(){
+	handler2->userData = ^(){
 		XCTAssertTrue(cpSpaceIsLocked(space.space), @"");
 		
 		// schedule a second post step callback within the old one with the same key.
@@ -343,7 +343,7 @@ static void CallBlock(cpArbiter *arb, cpSpace *space, void (^block)(void)){block
 	
 	cpCollisionHandler *handler3 = cpSpaceAddCollisionHandler(space.space, staticShape, shape1);
 	handler3->separateFunc = (cpCollisionSeparateFunc)CallBlock,
-	handler3->data = ^(){
+	handler3->userData = ^(){
 		XCTAssertTrue(cpSpaceIsLocked(space.space), @"");
 		
 		[space addPostStepBlock:^{

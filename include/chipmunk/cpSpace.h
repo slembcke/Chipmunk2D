@@ -45,7 +45,7 @@ struct cpCollisionHandler {
 	cpCollisionPreSolveFunc preSolveFunc;
 	cpCollisionPostSolveFunc postSolveFunc;
 	cpCollisionSeparateFunc separateFunc;
-	void *data;
+	void *userData;
 };
 
 /// Basic Unit of Simulation in Chipmunk

@@ -245,8 +245,6 @@ cpCollisionHandler *cpSpaceAddDefaultCollisionHandler(cpSpace *space)
 
 cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
 {
-	cpSpaceUseWildcardDefaultHandler(space);
-	
 	cpHashValue hash = CP_HASH_PAIR(a, b);
 	// TODO should use space->defaultHandler values instead?
 	cpCollisionHandler temp = {a, b, DefaultBegin, DefaultPreSolve, DefaultPostSolve, DefaultSeparate, NULL};
@@ -367,7 +365,7 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 		// Call separate when removing shapes.
 		if(shape && arb->state != CP_ARBITER_STATE_CACHED){
 			cpCollisionHandler *handler = arb->handler;
-			handler->separateFunc(arb, context->space, handler->data);
+			handler->separateFunc(arb, context->space, handler->userData);
 		}
 		
 		cpArbiterUnthread(arb);
