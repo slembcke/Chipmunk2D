@@ -31,7 +31,8 @@ testPropertiesHelper(id self, ChipmunkBody *body, ChipmunkShape *shape)
 	TestAccessors(shape, friction, (cpFloat)0);
 	TestAccessors(shape, surfaceVel, cpv(5,6));
 	TestAccessors(shape, collisionType, @"type");
-//	TestAccessors(shape, filter, (cpShapeFilter){123, 456, 789}); TODO fix test
+	cpShapeFilter f = {@"group", 456, 789};
+	TestAccessors(shape, filter, f);
 }
 
 -(void)testProperties {
