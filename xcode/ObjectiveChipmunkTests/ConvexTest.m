@@ -1,11 +1,6 @@
 #import <XCTest/XCTest.h>
 #import "ObjectiveChipmunk.h"
 
-// Still defined in cpPolyShape.h, but not in the header.
-// Haven't decided if it will be removed or not yet.
-cpBool cpPolyValidate(const cpVect *verts, const int count);
-
-
 @interface ConvexTest : XCTestCase {}
 @end
 
@@ -72,7 +67,6 @@ AssertHull(id self, int count, cpVect *verts, int expectedCount, cpVect *expecte
 		// Check that the windings are positive.
 		XCTAssertTrue(cpAreaForPoly(expectedCount, expectedVerts, 0.0f) >= 0.0f, @"");
 		XCTAssertTrue(cpAreaForPoly(resultCount, resultVerts, 0.0f) >= 0.0f, @"");
-		XCTAssertTrue(cpPolyValidate(resultVerts, resultCount), @"");
 		
 		XCTAssertEqual(resultVerts[0], rotated[first], @"");
 		
@@ -94,7 +88,6 @@ AssertRandomHull(id self, int count)
 	
 	AssertHullsEqual(self, resultCount, resultVerts);
 	XCTAssertTrue(cpAreaForPoly(resultCount, resultVerts, 0.0f) > 0.0f, @"");
-	XCTAssertTrue(cpPolyValidate(resultVerts, resultCount), @"");
 }
 
 -(void)testConvexHull
@@ -223,7 +216,7 @@ AssertRandomHull(id self, int count)
 	}
 	
 	CP_CONVEX_HULL(numVerts, verts, hullCount, hullVerts);
-	XCTAssertTrue(cpPolyValidate(hullVerts, hullCount), @"");
+	XCTAssertTrue(cpAreaForPoly(hullCount, hullVerts, 0.0f) >= 0.0f, @"");
 }
 
 @end
