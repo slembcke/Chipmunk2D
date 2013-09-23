@@ -9,13 +9,14 @@
    #include "TargetConditionals.h"
 #endif
 
-#if ((TARGET_OS_IPHONE == 1) || (TARGET_OS_MAC == 1)) && (!defined CP_USE_CGPOINTS)
-	#define CP_USE_CGPOINTS 1
+#if ((TARGET_OS_IPHONE == 1) || (TARGET_OS_MAC == 1)) && (!defined CP_USE_CGTYPES)
+	#define CP_USE_CGTYPES 1
 #endif
 
-#if CP_USE_CGPOINTS == 1
+#if CP_USE_CGTYPES == 1
 	#if TARGET_OS_IPHONE
 		#import <CoreGraphics/CGGeometry.h>
+		#import <CoreGraphics/CGAffineTransform.h>
 	#elif TARGET_OS_MAC
 		#include <ApplicationServices/ApplicationServices.h>
 	#endif
@@ -218,7 +219,7 @@ typedef uint32_t cpCollisionID;
 
 // CGPoints are structurally the same, and allow
 // easy interoperability with other Cocoa libraries
-#if CP_USE_CGPOINTS
+#if CP_USE_CGTYPES
 	typedef CGPoint cpVect;
 #else
 /// Chipmunk's 2D vector type.
@@ -226,10 +227,14 @@ typedef uint32_t cpCollisionID;
 	typedef struct cpVect{cpFloat x,y;} cpVect;
 #endif
 
-/// Column major affine transform.
-typedef struct cpTransform {
-  cpFloat a, b, c, d, tx, ty;
-} cpTransform;
+#if CP_USE_CGTYPES
+	typedef CGAffineTransform cpTransform;
+#else
+	/// Column major affine transform.
+	typedef struct cpTransform {
+		cpFloat a, b, c, d, tx, ty;
+	} cpTransform;
+#endif
 
 // NUKE
 typedef struct cpMat2x2 {

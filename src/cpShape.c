@@ -47,7 +47,7 @@ cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body, struct cpSh
 	shape->filter.categories = CP_ALL_CATEGORIES;
 	shape->filter.mask = CP_ALL_CATEGORIES;
 	
-	shape->data = NULL;
+	shape->userData = NULL;
 	
 	shape->space = NULL;
 	

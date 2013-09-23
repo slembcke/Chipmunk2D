@@ -45,7 +45,7 @@ struct cpCollisionHandler {
 	cpCollisionPreSolveFunc preSolveFunc;
 	cpCollisionPostSolveFunc postSolveFunc;
 	cpCollisionSeparateFunc separateFunc;
-	void *data;
+	void *userData;
 };
 
 /// Basic Unit of Simulation in Chipmunk
@@ -89,7 +89,7 @@ struct cpSpace {
 	/// User definable data pointer.
 	/// Generally this points to your game's controller or game state
 	/// class so you can access it when given a cpSpace reference in a callback.
-	cpDataPointer data;
+	cpDataPointer userData;
 	
 	/// The designated static body for this space.
 	/// You can modify this body, or replace it with your own static body.
@@ -165,7 +165,7 @@ CP_DefineSpaceStructProperty(cpFloat, sleepTimeThreshold, SleepTimeThreshold)
 CP_DefineSpaceStructProperty(cpFloat, collisionSlop, CollisionSlop)
 CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias)
 CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence)
-CP_DefineSpaceStructProperty(cpDataPointer, data, UserData)
+CP_DefineSpaceStructProperty(cpDataPointer, userData, UserData)
 CP_DefineSpaceStructGetter(cpBody*, staticBody, StaticBody)
 CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep)
 
@@ -235,7 +235,7 @@ cpBool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key
 // TODO: They should also be abortable.
 
 /// Nearest point query callback function type.
-typedef void (*cpSpacePointQueryFunc)(cpShape *shape, cpFloat distance, cpVect point, void *data);
+typedef void (*cpSpacePointQueryFunc)(cpShape *shape, cpVect point, cpFloat distance, cpVect gradient, void *data);
 /// Query the space at a point and call @c func for each shape found.
 void cpSpacePointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpShapeFilter filter, cpSpacePointQueryFunc func, void *data);
 /// Query the space at a point and return the nearest shape found. Returns NULL if no shapes were found.

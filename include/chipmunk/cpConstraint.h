@@ -79,7 +79,7 @@ struct cpConstraint {
 	/// User definable data pointer.
 	/// Generally this points to your the game object class so you can access it
 	/// when given a cpConstraint reference in a callback.
-	cpDataPointer data;
+	cpDataPointer userData;
 };
 
 /// Destroy a constraint.
@@ -119,7 +119,7 @@ CP_DefineConstraintStructProperty(cpFloat, errorBias, ErrorBias)
 CP_DefineConstraintStructProperty(cpFloat, maxBias, MaxBias)
 CP_DefineConstraintStructProperty(cpConstraintPreSolveFunc, preSolve, PreSolveFunc)
 CP_DefineConstraintStructProperty(cpConstraintPostSolveFunc, postSolve, PostSolveFunc)
-CP_DefineConstraintStructProperty(cpDataPointer, data, UserData)
+CP_DefineConstraintStructProperty(cpDataPointer, userData, UserData)
 
 // Get the last impulse applied by this constraint.
 static inline cpFloat cpConstraintGetImpulse(cpConstraint *constraint)

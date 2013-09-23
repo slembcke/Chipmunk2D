@@ -212,7 +212,7 @@ cpBool
 cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerA;
-	return handler->beginFunc(arb, space, handler->data);
+	return handler->beginFunc(arb, space, handler->userData);
 }
 
 cpBool
@@ -220,7 +220,7 @@ cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerB;
 	arb->swapped = !arb->swapped;
-	cpBool retval = handler->beginFunc(arb, space, handler->data);
+	cpBool retval = handler->beginFunc(arb, space, handler->userData);
 	arb->swapped = !arb->swapped;
 	return retval;
 }
@@ -229,7 +229,7 @@ cpBool
 cpArbiterCallWildcardPreSolveA(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerA;
-	return handler->preSolveFunc(arb, space, handler->data);
+	return handler->preSolveFunc(arb, space, handler->userData);
 }
 
 cpBool
@@ -237,7 +237,7 @@ cpArbiterCallWildcardPreSolveB(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerB;
 	arb->swapped = !arb->swapped;
-	cpBool retval = handler->preSolveFunc(arb, space, handler->data);
+	cpBool retval = handler->preSolveFunc(arb, space, handler->userData);
 	arb->swapped = !arb->swapped;
 	return retval;
 }
@@ -246,7 +246,7 @@ void
 cpArbiterCallWildcardPostSolveA(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerA;
-	handler->postSolveFunc(arb, space, handler->data);
+	handler->postSolveFunc(arb, space, handler->userData);
 }
 
 void
@@ -254,7 +254,7 @@ cpArbiterCallWildcardPostSolveB(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerB;
 	arb->swapped = !arb->swapped;
-	handler->postSolveFunc(arb, space, handler->data);
+	handler->postSolveFunc(arb, space, handler->userData);
 	arb->swapped = !arb->swapped;
 }
 
@@ -262,7 +262,7 @@ void
 cpArbiterCallWildcardSeparateA(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerA;
-	handler->separateFunc(arb, space, handler->data);
+	handler->separateFunc(arb, space, handler->userData);
 }
 
 void
@@ -270,7 +270,7 @@ cpArbiterCallWildcardSeparateB(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerB;
 	arb->swapped = !arb->swapped;
-	handler->separateFunc(arb, space, handler->data);
+	handler->separateFunc(arb, space, handler->userData);
 	arb->swapped = !arb->swapped;
 }
 
@@ -359,12 +359,13 @@ cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpSpace *space)
 	arb->surface_vr = cpvsub(surface_vr, cpvmult(info->n, cpvdot(surface_vr, info->n)));
 	
 	cpCollisionType typeA = info->a->type, typeB = info->b->type;
-	cpCollisionHandler *handler = arb->handler = cpSpaceLookupHandler(space, typeA, typeB, &space->defaultHandler);
+	cpCollisionHandler *defaultHandler = &space->defaultHandler;
+	cpCollisionHandler *handler = arb->handler = cpSpaceLookupHandler(space, typeA, typeB, defaultHandler);
 	
 	// Check if the types match, but don't swap for a default handler which use the wildcard for type A.
 	cpBool swapped = (typeA != handler->typeA && handler->typeA != CP_WILDCARD_COLLISION_TYPE);
 	
-	if(space->usesWildcards){
+	if(handler != defaultHandler || space->usesWildcards){
 		// The order of the main handler swaps the wildcard handlers too. Uffda.
 		arb->handlerA = cpSpaceLookupHandler(space, (swapped ? typeB : typeA), CP_WILDCARD_COLLISION_TYPE, &cpCollisionHandlerDoNothing);
 		arb->handlerB = cpSpaceLookupHandler(space, (swapped ? typeA : typeB), CP_WILDCARD_COLLISION_TYPE, &cpCollisionHandlerDoNothing);
