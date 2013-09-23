@@ -52,7 +52,7 @@ testPropertiesHelper(id self, ChipmunkBody *body, ChipmunkShape *shape)
 	testPropertiesHelper(self, body, segment);
 	XCTAssertEqual(segment.a, cpvzero, @"");
 	XCTAssertEqual(segment.b, cpv(1,0), @"");
-	XCTAssertEqual(segment.normal, cpv(-0.0,1), @"");
+	XCTAssertEqual(segment.normal, cpv(0,-1), @"");
 	
 	XCTAssertTrue([segment pointQuery:cpvzero].distance <= 0.0f, @"");
 	XCTAssertTrue([segment pointQuery:cpv(1,0)].distance <= 0.0f, @"");

@@ -84,12 +84,12 @@
 /// The ChipmunkShape found.
 @property(nonatomic, readonly) ChipmunkShape *shape;
 
+/// The closest point on the surface of the shape to the point.
+@property(nonatomic, readonly) cpVect point;
+
 /// The distance between the point and the surface of the shape.
 /// Negative distances mean that the point is that depth inside the shape.
 @property(nonatomic, readonly) cpFloat distance;
-
-/// The closest point on the surface of the shape to the point.
-@property(nonatomic, readonly) cpVect point;
 
 /// The gradient of the signed distance function.
 /// The same as info.point/info.dist, but accurate even for very small values of info.dist.

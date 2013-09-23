@@ -110,8 +110,9 @@ both(cpShapeFilter, filter, Filter, filter)
 
 - (cpPointQueryInfo *)info {return &_info;}
 - (ChipmunkShape *)shape {return (_info.shape ? _info.shape->userData : nil);}
-- (cpFloat)dist {return _info.distance;}
 - (cpVect)point {return _info.point;}
+- (cpFloat)distance {return _info.distance;}
+- (cpVect)gradient {return _info.gradient;}
 
 - (void)dealloc
 {
