@@ -203,10 +203,10 @@ typedef void (^ChipmunkPostStepBlock)(void);
 - (ChipmunkPointQueryInfo *)pointQueryNearest:(cpVect)point maxDistance:(cpFloat)maxDistance filter:(cpShapeFilter)filter;
 
 /// Return a NSArray of ChipmunkSegmentQueryInfo objects for all the shapes that overlap the segment. The objects are unsorted.
-- (NSArray *)segmentQueryAllFrom:(cpVect)start to:(cpVect)end filter:(cpShapeFilter)filter radius:(cpFloat)radius;
+- (NSArray *)segmentQueryAllFrom:(cpVect)start to:(cpVect)end radius:(cpFloat)radius filter:(cpShapeFilter)filter;
 
 /// Returns the first shape that overlaps the given segment. The segment is treated as having the given group and layers. 
-- (ChipmunkSegmentQueryInfo *)segmentQueryFirstFrom:(cpVect)start to:(cpVect)end filter:(cpShapeFilter)filter radius:(cpFloat)radius;
+- (ChipmunkSegmentQueryInfo *)segmentQueryFirstFrom:(cpVect)start to:(cpVect)end radius:(cpFloat)radius filter:(cpShapeFilter)filter;
 
 /// Returns a NSArray of all shapes whose bounding boxes overlap the given bounding box. The box is treated as having the given group and layers. 
 - (NSArray *)bbQueryAll:(cpBB)bb filter:(cpShapeFilter)filter;
@@ -257,13 +257,13 @@ typedef void (^ChipmunkPostStepBlock)(void);
 #define CHIPMUNK_ARBITER_GET_SHAPES(__arb__, __a__, __b__) ChipmunkShape *__a__, *__b__; { \
 	cpShape *__shapeA__, *__shapeB__; \
 	cpArbiterGetShapes(__arb__, &__shapeA__, &__shapeB__); \
-	__a__ = __shapeA__->data; __b__ = __shapeB__->data; \
+	__a__ = cpShapeGetUserData(__shapeA__); __b__ = cpShapeGetUserData(__shapeB__); \
 }
 
 #define CHIPMUNK_ARBITER_GET_BODIES(__arb__, __a__, __b__) ChipmunkBody *__a__, *__b__; { \
 	cpBody *__bodyA__, *__bodyB__; \
 	cpArbiterGetBodies(__arb__, &__bodyA__, &__bodyB__); \
-	__a__ = __bodyA__->data; __b__ = __bodyB__->data; \
+	__a__ = cpBodyGetUserData(__bodyA__); __b__ = cpBodyGetUserData(__bodyB__); \
 }
 
 

@@ -1,25 +1,25 @@
-#include "SimpleTestCase.h"
+#import <XCTest/XCTest.h>
 
-#define CP_ALLOW_PRIVATE_ACCESS
-#include "ObjectiveChipmunk.h"
+#define CP_ALLOW_PRIVATE_ACCESS 1
+#import "ObjectiveChipmunk.h"
 
-@interface SpaceTest : SimpleTestCase {}
+@interface SpaceTest : XCTestCase {}
 @end
 
 @implementation SpaceTest
 
-#define TestAccessors(o, p, v) o.p = v; XCTAssertEqual(o.p, v, nil);
-#define AssertRetainCount(obj, count) XCTAssertEqual([obj retainCount], (NSUInteger)count, nil)
+#define TestAccessors(o, p, v) o.p = v; XCTAssertEqual(o.p, v, @"");
+#define AssertRetainCount(obj, count) XCTAssertEqual([obj retainCount], (NSUInteger)count, @"")
 
 -(void)testProperties {
 	ChipmunkSpace *space = [[ChipmunkSpace alloc] init];
-	XCTAssertEqual(space.gravity, cpvzero, nil);
-	XCTAssertEqual(space.damping, (cpFloat)1.0, nil);
-	XCTAssertEqual(space.idleSpeedThreshold, (cpFloat)0, nil);
-	XCTAssertEqual(space.sleepTimeThreshold, (cpFloat)INFINITY, nil);
+	XCTAssertEqual(space.gravity, cpvzero, @"");
+	XCTAssertEqual(space.damping, (cpFloat)1.0, @"");
+	XCTAssertEqual(space.idleSpeedThreshold, (cpFloat)0, @"");
+	XCTAssertEqual(space.sleepTimeThreshold, (cpFloat)INFINITY, @"");
 	
-	GHAssertNotNULL(space.space, nil);
-	GHAssertNotNil(space.staticBody, nil);
+	XCTAssertNotEqual(space.space, NULL, @"");
+	XCTAssertNotNil(space.staticBody, @"");
 	
 	TestAccessors(space, iterations, 50);
 	TestAccessors(space, gravity, cpv(1,2));
@@ -31,10 +31,10 @@
 }
 
 static NSSet *
-nearestPointQueryInfoToShapes(NSArray *arr)
+pointQueryInfoToShapes(NSArray *arr)
 {
 	NSMutableSet *set = [NSMutableSet setWithCapacity:[arr count]];
-	for(ChipmunkNearestPointQueryInfo *info in arr)[set addObject:info.shape];
+	for(ChipmunkPointQueryInfo *info in arr)[set addObject:info.shape];
 	return set;
 }
 
@@ -59,71 +59,71 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 {
 	ChipmunkShape *circle = [space add:[[ChipmunkCircleShape alloc] initWithBody:body radius:1 offset:cpv(1,1)]];
 	ChipmunkShape *segment = [space add:[[ChipmunkSegmentShape alloc] initWithBody:body from:cpvzero to:cpv(1,1) radius:1]];
-	ChipmunkShape *box = [space add:[[ChipmunkPolyShape alloc] initBoxWithBody:body width:1 height:1]];
+	ChipmunkShape *box = [space add:[[ChipmunkPolyShape alloc] initBoxWithBody:body width:1 height:1 radius:0]];
 	
 	NSSet *set;
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	// Point queries
-	set = nearestPointQueryInfoToShapes([space nearestPointQueryAll:cpvzero maxDistance:0.0 layers:CP_ALL_LAYERS group:CP_NO_GROUP]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:segment, box, nil]), nil);
+	set = pointQueryInfoToShapes([space pointQueryAll:cpvzero maxDistance:0.0 filter:CP_SHAPE_FILTER_ALL]);
+	XCTAssertEqual(set, ([NSSet setWithObjects:segment, box, nil]), @"");
 	
-	set = nearestPointQueryInfoToShapes([space nearestPointQueryAll:cpv(1,1) maxDistance:0.0 layers:CP_ALL_LAYERS group:CP_NO_GROUP]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:circle, segment, nil]), nil);
+	set = pointQueryInfoToShapes([space pointQueryAll:cpv(1,1) maxDistance:0.0 filter:CP_SHAPE_FILTER_ALL]);
+	XCTAssertEqual(set, ([NSSet setWithObjects:circle, segment, nil]), @"");
 	
-	set = nearestPointQueryInfoToShapes([space nearestPointQueryAll:cpv(0.4, 0.4) maxDistance:0.0 layers:CP_ALL_LAYERS group:CP_NO_GROUP]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:circle, segment, box, nil]), nil);
+	set = pointQueryInfoToShapes([space pointQueryAll:cpv(0.4, 0.4) maxDistance:0.0 filter:CP_SHAPE_FILTER_ALL]);
+	XCTAssertEqual(set, ([NSSet setWithObjects:circle, segment, box, nil]), @"");
 	
-	set = nearestPointQueryInfoToShapes([space nearestPointQueryAll:cpv(-0.5, -0.5) maxDistance:0.0 layers:CP_ALL_LAYERS group:CP_NO_GROUP]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:segment, nil]), nil);
+	set = pointQueryInfoToShapes([space pointQueryAll:cpv(-0.5, -0.5) maxDistance:0.0 filter:CP_SHAPE_FILTER_ALL]);
+	XCTAssertEqual(set, ([NSSet setWithObjects:segment, nil]), @"");
 	
-	set = nearestPointQueryInfoToShapes([space nearestPointQueryAll:cpv(-1,-1) maxDistance:0.0 layers:CP_ALL_LAYERS group:CP_NO_GROUP]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:nil]), nil);
+	set = pointQueryInfoToShapes([space pointQueryAll:cpv(-1,-1) maxDistance:0.0 filter:CP_SHAPE_FILTER_ALL]);
+	XCTAssertEqual(set, ([NSSet setWithObjects:nil]), @"");
 	
-	cpSpaceNearestPointQuery_b(space.space, cpv(-0.6, -0.6), 0.0, CP_ALL_LAYERS, CP_NO_GROUP, ^(cpShape *shape, cpFloat d, cpVect p){
-		XCTAssertEqual(shape, segment.shape, nil);
-		XCTAssertEqualWithAccuracy(cpvdist(p, cpvnormalize(cpv(-1, -1))), (cpFloat)0.0, 1e-5, nil);
-		XCTAssertEqualWithAccuracy(d, cpfsqrt(2*0.6*0.6) - 1.0f, 1e-5, nil);
+	cpSpacePointQuery_b(space.space, cpv(-0.6, -0.6), 0.0, CP_SHAPE_FILTER_ALL, ^(cpShape *shape, cpFloat d, cpVect p){
+		XCTAssertEqual(shape, segment.shape, @"");
+		XCTAssertEqualWithAccuracy(cpvdist(p, cpvnormalize(cpv(-1, -1))), (cpFloat)0.0, 1e-5, @"");
+		XCTAssertEqualWithAccuracy(d, cpfsqrt(2*0.6*0.6) - 1.0f, 1e-5, @"");
 	});
 	
 	// Segment queries
-	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(-2,-2) to:cpv(4,4) layers:CP_ALL_LAYERS group:CP_NO_GROUP]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:circle, segment, box, nil]), nil);
+	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(-2,-2) to:cpv(4,4) radius:0.0 filter:CP_SHAPE_FILTER_ALL]);
+	XCTAssertEqual(set, ([NSSet setWithObjects:circle, segment, box, nil]), @"");
 	
-	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(2,-2) to:cpv(-2,2) layers:CP_ALL_LAYERS group:CP_NO_GROUP]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:segment, box, nil]), nil);
+	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(2,-2) to:cpv(-2,2) radius:0.0 filter:CP_SHAPE_FILTER_ALL]);
+	XCTAssertEqual(set, ([NSSet setWithObjects:segment, box, nil]), @"");
 	
-	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(3,-1) to:cpv(-1,3) layers:CP_ALL_LAYERS group:CP_NO_GROUP]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:circle, segment, nil]), nil);
+	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(3,-1) to:cpv(-1,3) radius:0.0 filter:CP_SHAPE_FILTER_ALL]);
+	XCTAssertEqual(set, ([NSSet setWithObjects:circle, segment, nil]), @"");
 	
-	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(2.4,-1.6) to:cpv(-1.6,2.4) layers:CP_ALL_LAYERS group:CP_NO_GROUP]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:circle, segment, box, nil]), nil);
+	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(2.4,-1.6) to:cpv(-1.6,2.4) radius:0.0 filter:CP_SHAPE_FILTER_ALL]);
+	XCTAssertEqual(set, ([NSSet setWithObjects:circle, segment, box, nil]), @"");
 	
-	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(2,2) to:cpv(3,3) layers:CP_ALL_LAYERS group:CP_NO_GROUP]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:nil]), nil);
+	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(2,2) to:cpv(3,3) radius:0.0 filter:CP_SHAPE_FILTER_ALL]);
+	XCTAssertEqual(set, ([NSSet setWithObjects:nil]), @"");
 	
 	ChipmunkSegmentQueryInfo *info;
-	info = [space segmentQueryFirstFrom:cpv(-2,-2) to:cpv(1,1) layers:CP_ALL_LAYERS group:CP_NO_GROUP];
-	GHAssertEqualObjects(info.shape, segment, nil, nil);
+	info = [space segmentQueryFirstFrom:cpv(-2,-2) to:cpv(1,1) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
+	XCTAssertEqual(info.shape, segment, @"");
 	
-	info = [space segmentQueryFirstFrom:cpv(-2,-2) to:cpv(-1,-1) layers:CP_ALL_LAYERS group:CP_NO_GROUP];
-	GHAssertEqualObjects(info.shape, nil, nil, nil);
+	info = [space segmentQueryFirstFrom:cpv(-2,-2) to:cpv(-1,-1) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
+	XCTAssertEqual(info.shape, nil, @"");
 	
-	cpSpaceSegmentQuery_b(space.space, cpv(-1.0, -0.6), cpv(1.0, -0.6), CP_ALL_LAYERS, CP_NO_GROUP, ^(cpShape *shape, cpFloat t, cpVect n){
-		XCTAssertEqual(shape, segment.shape, nil);
-		XCTAssertEqualWithAccuracy(cpvlength(n), 1.0f, 1e-5, nil);
-		XCTAssertEqualWithAccuracy(n.y, -0.6f, 1e-5, nil);
-		XCTAssertEqualWithAccuracy(cpvdist(cpv(-1.0, -0.6), n)/2.0f, t, 1e-5, nil);
+	cpSpaceSegmentQuery_b(space.space, cpv(-1.0, -0.6), cpv(1.0, -0.6), 0.0f, CP_SHAPE_FILTER_ALL, ^(cpShape *shape, cpFloat t, cpVect n){
+		XCTAssertEqual(shape, segment.shape, @"");
+		XCTAssertEqualWithAccuracy(cpvlength(n), 1.0f, 1e-5, @"");
+		XCTAssertEqualWithAccuracy(n.y, -0.6f, 1e-5, @"");
+		XCTAssertEqualWithAccuracy(cpvdist(cpv(-1.0, -0.6), n)/2.0f, t, 1e-5, @"");
 	});
 	
 	// Segment queries starting from inside a shape
-	info = [space segmentQueryFirstFrom:cpvzero to:cpv(1,1) layers:CP_ALL_LAYERS group:CP_NO_GROUP];
+	info = [space segmentQueryFirstFrom:cpvzero to:cpv(1,1) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
 	XCTAssertEqual(info.t, 0.0f, @"Starting inside a shape should return t=0.");
 	
-	info = [space segmentQueryFirstFrom:cpv(1,1) to:cpvzero layers:CP_ALL_LAYERS group:CP_NO_GROUP];
+	info = [space segmentQueryFirstFrom:cpv(1,1) to:cpvzero radius:0.0 filter:CP_SHAPE_FILTER_ALL];
 	XCTAssertEqual(info.t, 0.0f, @"Starting inside a shape should return t=0.");
 	
-	info = [space segmentQueryFirstFrom:cpv(-0.6, -0.6) to:cpvzero layers:CP_ALL_LAYERS group:CP_NO_GROUP];
+	info = [space segmentQueryFirstFrom:cpv(-0.6, -0.6) to:cpvzero radius:0.0 filter:CP_SHAPE_FILTER_ALL];
 	XCTAssertEqual(info.t, 0.0f, @"Starting inside a shape should return t=0.");
 	XCTAssertEqual(info.shape, segment, @"Should have picked the segment shape.");
 	
@@ -131,34 +131,34 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	ChipmunkBody *queryBody = [ChipmunkBody bodyWithMass:1 andMoment:1];
 	ChipmunkShape *queryShape = [ChipmunkCircleShape circleWithBody:queryBody radius:1 offset:cpvzero];
 	
-	queryBody.pos = cpvzero;
+	queryBody.position = cpvzero;
 	set = shapeQueryInfoToShapes([space shapeQueryAll:queryShape]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:circle, segment, box, nil]), nil);
+	XCTAssertEqual(set, ([NSSet setWithObjects:circle, segment, box, nil]), @"");
 	
-	queryBody.pos = cpv(1,1);
+	queryBody.position = cpv(1,1);
 	set = shapeQueryInfoToShapes([space shapeQueryAll:queryShape]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:circle, segment, box, nil]), nil);
+	XCTAssertEqual(set, ([NSSet setWithObjects:circle, segment, box, nil]), @"");
 	
-	queryBody.pos = cpv(0,-1);
+	queryBody.position = cpv(0,-1);
 	set = shapeQueryInfoToShapes([space shapeQueryAll:queryShape]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:segment, box, nil]), nil);
+	XCTAssertEqual(set, ([NSSet setWithObjects:segment, box, nil]), @"");
 	
-	queryBody.pos = cpv(0,-1.6);
+	queryBody.position = cpv(0,-1.6);
 	set = shapeQueryInfoToShapes([space shapeQueryAll:queryShape]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:segment, nil]), nil);
+	XCTAssertEqual(set, ([NSSet setWithObjects:segment, nil]), @"");
 	
 	cpSpaceShapeQuery_b(space.space, queryShape.shape, ^(cpShape *shape, cpContactPointSet *points){
-		XCTAssertEqual(shape, segment.shape, nil);
-		XCTAssertEqual(points->count, 1, nil);
+		XCTAssertEqual(shape, segment.shape, @"");
+		XCTAssertEqual(points->count, 1, @"");
 	});
 	
-	queryBody.pos = cpv(2,2);
+	queryBody.position = cpv(2,2);
 	set = shapeQueryInfoToShapes([space shapeQueryAll:queryShape]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:circle, segment, nil]), nil);
+	XCTAssertEqual(set, ([NSSet setWithObjects:circle, segment, nil]), @"");
 	
-	queryBody.pos = cpv(4,4);
+	queryBody.position = cpv(4,4);
 	set = shapeQueryInfoToShapes([space shapeQueryAll:queryShape]);
-	GHAssertEqualObjects(set, ([NSSet setWithObjects:nil]), nil);
+	XCTAssertEqual(set, ([NSSet setWithObjects:nil]), @"");
 	
 	[space remove:circle];
 	[space remove:segment];
@@ -194,19 +194,19 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	
 	// Check that static shapes get added correctly
 	shape = [space add:[ChipmunkCircleShape circleWithBody:space.staticBody radius:1 offset:cpvzero]];
-	GHAssertTrue(cpSpatialIndexContains(space.space->staticShapes, shape.shape, shape.shape->hashid), nil);
+	XCTAssertTrue(cpSpatialIndexContains(space.space->staticShapes, shape.shape, shape.shape->hashid), @"");
 	
 	shape = [space add:[ChipmunkCircleShape circleWithBody:[ChipmunkBody staticBody] radius:1 offset:cpvzero]];
-	GHAssertTrue(cpSpatialIndexContains(space.space->staticShapes, shape.shape, shape.shape->hashid), nil);
+	XCTAssertTrue(cpSpatialIndexContains(space.space->staticShapes, shape.shape, shape.shape->hashid), @"");
 	
 	// Check that normal shapes get added correctly
 	ChipmunkBody *rogue = [ChipmunkBody bodyWithMass:1 andMoment:1];
 	shape = [space add:[ChipmunkCircleShape circleWithBody:rogue radius:1 offset:cpvzero]];
-	GHAssertTrue(cpSpatialIndexContains(space.space->activeShapes, shape.shape, shape.shape->hashid), nil);
+	XCTAssertTrue(cpSpatialIndexContains(space.space->activeShapes, shape.shape, shape.shape->hashid), @"");
 	
 	ChipmunkBody *normal = [space add:[ChipmunkBody bodyWithMass:1 andMoment:1]];
 	shape = [space add:[ChipmunkCircleShape circleWithBody:normal radius:1 offset:cpvzero]];
-	GHAssertTrue(cpSpatialIndexContains(space.space->activeShapes, shape.shape, shape.shape->hashid), nil);
+	XCTAssertTrue(cpSpatialIndexContains(space.space->activeShapes, shape.shape, shape.shape->hashid), @"");
 	
 	[space release];
 }
@@ -215,21 +215,21 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	ChipmunkSpace *space = [[ChipmunkSpace alloc] init];
 	space.gravity = cpv(0, -100);
 	
-	[space addBounds:CGRectMake(-50, 0, 100, 100) thickness:1 elasticity:1 friction:1 layers:CP_ALL_LAYERS group:CP_NO_GROUP collisionType:nil];
+	[space addBounds:CGRectMake(-50, 0, 100, 100) thickness:1 elasticity:1 friction:1 filter:CP_SHAPE_FILTER_ALL collisionType:nil];
 	
 	ChipmunkBody *ball = [space add:[ChipmunkBody bodyWithMass:1 andMoment:cpMomentForCircle(1, 0, 1, cpvzero)]];
-	ball.pos = cpv(-10, 10);
+	ball.position = cpv(-10, 10);
 	[space add:[ChipmunkCircleShape circleWithBody:ball radius:1 offset:cpvzero]];
 	
 	ChipmunkBody *box = [space add:[ChipmunkBody bodyWithMass:1 andMoment:cpMomentForBox(1, 2, 2)]];
-	box.pos = cpv(10, 10);
-	[space add:[ChipmunkPolyShape boxWithBody:box width:2 height:2]];
+	box.position = cpv(10, 10);
+	[space add:[ChipmunkPolyShape boxWithBody:box width:2 height:2 radius:0]];
 	
 	for(int i=0; i<100; i++) [space step:0.01];
 	
 	space.collisionSlop = 0.5f;
-	XCTAssertEqualWithAccuracy(ball.pos.y, (cpFloat)1, 1.1*space.collisionSlop, nil);
-	XCTAssertEqualWithAccuracy(box.pos.y, (cpFloat)1, 1.1*space.collisionSlop, nil);
+	XCTAssertTrue(cpfabs(ball.position.y - 1) < 1.1*space.collisionSlop, @"");
+	XCTAssertTrue(cpfabs(box.position.y - 1) < 1.1*space.collisionSlop, @"");
 	
 	[space release];
 }
@@ -249,8 +249,8 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	[body1 sleep];
 	[space step:1.0];
 	
-	GHAssertFalse(body1.isSleeping, nil);
-	GHAssertFalse(body2.isSleeping, nil);
+	XCTAssertFalse(body1.isSleeping, @"");
+	XCTAssertFalse(body2.isSleeping, @"");
 	
 	[space release];
 }
@@ -280,13 +280,13 @@ VerifyContactGraph(id self, ChipmunkBody *body1, ChipmunkBody *body2)
 	
 	[body1 eachArbiter:^(cpArbiter *arb){
 		CHIPMUNK_ARBITER_GET_BODIES(arb, a, b);
-		GHAssertTrue(a == body1 && b == body2, @"Unexpected contact graph");
+		XCTAssertTrue(a == body1 && b == body2, @"Unexpected contact graph");
 		counter++;
 	}];
 	
 	[body2 eachArbiter:^(cpArbiter *arb){
 		CHIPMUNK_ARBITER_GET_BODIES(arb, a, b);
-		GHAssertTrue(a == body2 && b == body1, @"Unexpected contact graph");
+		XCTAssertTrue(a == body2 && b == body1, @"Unexpected contact graph");
 		counter++;
 	}];
 	
@@ -305,14 +305,14 @@ VerifyContactGraph(id self, ChipmunkBody *body1, ChipmunkBody *body2)
 	
 	ChipmunkBody *body2 = [space add:[ChipmunkBody bodyWithMass:1 andMoment:INFINITY]];
 	[space add:[ChipmunkCircleShape circleWithBody:body2 radius:1 offset:cpvzero]];
-	body2.pos = cpv(0, 1.9);
+	body2.position = cpv(0, 1.9);
 	
 	for(int i=0; !body1.isSleeping; i++){
 		[space step:0.01];
-		GHAssertLessThan(i, 100, @"body1 failed to fall asleep");
+		XCTAssertTrue(i < 100, @"body1 failed to fall asleep");
 	}
 	
-	GHAssertTrue(body2.isSleeping, @"body2 is not sleeping");
+	XCTAssertTrue(body2.isSleeping, @"body2 is not sleeping");
 	VerifyContactGraph(self, body1, body2);
 	
 	// Objects are now sleeping and have their contact graph data all set up carefully.
@@ -322,12 +322,13 @@ VerifyContactGraph(id self, ChipmunkBody *body1, ChipmunkBody *body2)
 	ChipmunkShape *shape = [space add:[ChipmunkCircleShape circleWithBody:body3 radius:1 offset:cpv(-0.5, 0)]];
 	shape.collisionType = type;
 	
-	[space addCollisionHandler:self typeA:nil typeB:type begin:@selector(beginSleepSensorRemoveBug:space:) preSolve:nil postSolve:nil separate:nil];
+	// TODO
+//	[space addCollisionHandler:self typeA:nil typeB:type begin:@selector(beginSleepSensorRemoveBug:space:) preSolve:nil postSolve:nil separate:nil];
 	
 	// Now step again and shape should get removed.
 	[space step:0.01];
 	
-	GHAssertFalse([space contains:shape], @"'shape' did not get removed.");
+	XCTAssertFalse([space contains:shape], @"'shape' did not get removed.");
 	VerifyContactGraph(self, body1, body2);
 }
 
@@ -336,8 +337,8 @@ VerifyContactGraph(id self, ChipmunkBody *body1, ChipmunkBody *body2)
 	// 'b' is the shape we are using to trigger the callback.
 	CHIPMUNK_ARBITER_GET_BODIES(arb, sleeping, awake);
 	
-	GHAssertTrue(sleeping.isSleeping, @"Body 'sleeping' should be sleeping.");
-	GHAssertFalse(awake.isSleeping, @"Body 'awake' should not be sleeping.");
+	XCTAssertTrue(sleeping.isSleeping, @"Body 'sleeping' should be sleeping.");
+	XCTAssertFalse(awake.isSleeping, @"Body 'awake' should not be sleeping.");
 	
 	[sleeping activate];
 	
@@ -363,18 +364,19 @@ VerifyContactGraph(id self, ChipmunkBody *body1, ChipmunkBody *body2)
 	ChipmunkShape *shape2 = [space add:[ChipmunkCircleShape circleWithBody:body2 radius:1 offset:cpvzero]];
 	shape2.collisionType = awakeType;
 	
-	[space addCollisionHandler:self typeA:sleepType typeB:awakeType begin:@selector(beginSleepActivateOnImpact:space:) preSolve:nil postSolve:nil separate:nil];
+//	[space addCollisionHandler:self typeA:sleepType typeB:awakeType begin:@selector(beginSleepActivateOnImpact:space:) preSolve:nil postSolve:nil separate:nil];
 	[space step:0.01];
 	
-	GHAssertFalse(body1.isSleeping, @"body1 did not awake.");
-	GHAssertFalse(body2.isSleeping, @"body2 did not awake.");
+	XCTAssertFalse(body1.isSleeping, @"body1 did not awake.");
+	XCTAssertFalse(body2.isSleeping, @"body2 did not awake.");
 }
 
 
 -(void)testAddBounds
 {
 	ChipmunkSpace *space = [[ChipmunkSpace alloc] init];
-	NSArray *objs = [space addBounds:CGRectMake(0, 0, 10, 10) thickness:5 elasticity:0 friction:1 layers:CP_ALL_LAYERS group:CP_NO_GROUP collisionType:nil];
+	NSArray *objs = [space addBounds:CGRectMake(0, 0, 10, 10) thickness:5 elasticity:0 friction:1 filter:CP_SHAPE_FILTER_ALL collisionType:nil];
+	XCTAssertTrue([space contains:objs], @"");
 	
 	[space release];
 }

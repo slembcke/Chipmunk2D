@@ -1,11 +1,11 @@
-#include "SimpleTestCase.h"
+#import <XCTest/XCTest.h>
 
 #define CP_ALLOW_PRIVATE_ACCESS 1
-#include "ObjectiveChipmunk.h"
+#import "ObjectiveChipmunk.h"
 
-#define AssertRetainCount(obj, count) XCTAssertEqual([obj retainCount], (NSUInteger)count, nil)
+#define AssertRetainCount(obj, count) XCTAssertEqual([obj retainCount], (NSUInteger)count, @"")
 
-@interface MemoryTest : SimpleTestCase {}
+@interface MemoryTest : XCTestCase {}
 @end
 
 @implementation MemoryTest
@@ -130,20 +130,20 @@
 	cpSpaceLock(space.space);
 	
 	// Registering the callback should retain the object twice
-	GHAssertTrue([space addPostStepCallback:obj1 selector:@selector(isEqual:) key:obj1], nil);
+	XCTAssertTrue([space addPostStepCallback:obj1 selector:@selector(isEqual:) key:obj1], @"");
 	AssertRetainCount(obj1, 3);
 	
 	// Registering the same callback a second time should not add more retains
-	GHAssertFalse([space addPostStepCallback:obj1 selector:@selector(isEqual:) key:obj1], nil);
+	XCTAssertFalse([space addPostStepCallback:obj1 selector:@selector(isEqual:) key:obj1], @"");
 	AssertRetainCount(obj1, 3);
 	
 	// A key can only be registered once to prevent double removals.
 	// Registering a second target with the same key is a no-op.
-	GHAssertFalse([space addPostStepCallback:obj2 selector:@selector(isEqual:) key:obj1], nil);
+	XCTAssertFalse([space addPostStepCallback:obj2 selector:@selector(isEqual:) key:obj1], @"");
 	AssertRetainCount(obj1, 3);
 	AssertRetainCount(obj2, 1);
 	
-	GHAssertTrue([space addPostStepCallback:obj1 selector:@selector(isEqual:) key:obj2], nil);
+	XCTAssertTrue([space addPostStepCallback:obj1 selector:@selector(isEqual:) key:obj2], @"");
 	AssertRetainCount(obj1, 4);
 	AssertRetainCount(obj2, 2);
 	

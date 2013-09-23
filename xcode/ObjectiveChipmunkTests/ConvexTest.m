@@ -1,9 +1,12 @@
-#include "SimpleTestCase.h"
+#import <XCTest/XCTest.h>
+#import "ObjectiveChipmunk.h"
 
-#include "ObjectiveChipmunk.h"
-#include "ChipmunkAutoGeometry.h"
+// Still defined in cpPolyShape.h, but not in the header.
+// Haven't decided if it will be removed or not yet.
+cpBool cpPolyValidate(const cpVect *verts, const int count);
 
-@interface ConvexTest : SimpleTestCase {}
+
+@interface ConvexTest : XCTestCase {}
 @end
 
 @implementation ConvexTest
@@ -28,11 +31,11 @@ static void
 AssertExpected(id self, cpVect *verts, int expectedCount, cpVect *expectedVerts)
 {
 	int firstExpected = FirstExpected(expectedCount, expectedVerts, verts);
-	GHAssertNotEquals(firstExpected, -1, nil);
+	XCTAssertNotEqual(firstExpected, -1, @"");
 	
 	// Check the verts
 	for(int i=0; i<expectedCount; i++){
-		XCTAssertEqual(verts[i], expectedVerts[(firstExpected + i)%expectedCount], nil);
+		XCTAssertEqual(verts[i], expectedVerts[(firstExpected + i)%expectedCount], @"");
 	}
 }
 
@@ -43,9 +46,9 @@ AssertHullsEqual(id self, int resultCount, cpVect *resultVerts)
 	cpVect result2Verts[resultCount];
 	int result2Count = cpConvexHull(resultCount, resultVerts, result2Verts, NULL, 0.0);
 	
-	XCTAssertEqual(resultCount, result2Count, nil);
+	XCTAssertEqual(resultCount, result2Count, @"");
 	for(int i=0; i<resultCount; i++){
-		XCTAssertEqual(resultVerts[i], result2Verts[i], nil);
+		XCTAssertEqual(resultVerts[i], result2Verts[i], @"");
 	}
 }
 
@@ -60,18 +63,18 @@ AssertHull(id self, int count, cpVect *verts, int expectedCount, cpVect *expecte
 		}
 		
 		int first = -1;
-		cpVect resultVerts[count];
+		cpVect *resultVerts = alloca(count*sizeof(cpVect));
 		int resultCount = cpConvexHull(count, rotated, resultVerts, &first, 0.0);
 		
 		// Check the count
-		XCTAssertEqual(resultCount, expectedCount, nil);
+		XCTAssertEqual(resultCount, expectedCount, @"");
 		
 		// Check that the windings are positive.
-		GHAssertGreaterThanOrEqual(cpAreaForPoly(expectedCount, expectedVerts), (cpFloat)0, nil);
-		GHAssertGreaterThanOrEqual(cpAreaForPoly(resultCount, resultVerts), (cpFloat)0, nil);
-		GHAssertTrue(cpPolyValidate(resultVerts, resultCount), nil);
+		XCTAssertTrue(cpAreaForPoly(expectedCount, expectedVerts, 0.0f) >= 0.0f, @"");
+		XCTAssertTrue(cpAreaForPoly(resultCount, resultVerts, 0.0f) >= 0.0f, @"");
+		XCTAssertTrue(cpPolyValidate(resultVerts, resultCount), @"");
 		
-		XCTAssertEqual(resultVerts[0], rotated[first], nil);
+		XCTAssertEqual(resultVerts[0], rotated[first], @"");
 		
 		AssertExpected(self, resultVerts, expectedCount, expectedVerts);
 		AssertHullsEqual(self, resultCount, resultVerts);
@@ -87,17 +90,17 @@ AssertRandomHull(id self, int count)
 	}
 	
 	cpVect resultVerts[count];
-	int resultCount = cpConvexHull(count, verts, resultVerts, NULL, 0.0);
+	int resultCount = cpConvexHull(count, verts, resultVerts, NULL, 0.0f);
 	
 	AssertHullsEqual(self, resultCount, resultVerts);
-	GHAssertGreaterThanOrEqual(cpAreaForPoly(resultCount, resultVerts), (cpFloat)0, nil);
-	GHAssertTrue(cpPolyValidate(resultVerts, resultCount), nil);
+	XCTAssertTrue(cpAreaForPoly(resultCount, resultVerts, 0.0f) > 0.0f, @"");
+	XCTAssertTrue(cpPolyValidate(resultVerts, resultCount), @"");
 }
 
 -(void)testConvexHull
 {
 	{
-		// Trivial cases
+		// Trivial cases, reversed windings up to a square.
 		cpVect verts[] = {{0,0}, {1,0}};
 		cpVect expected[] = {{0,0}, {1,0}};
 		
@@ -106,17 +109,15 @@ AssertRandomHull(id self, int count)
 	}
 	
 	{
-		// Triangle with reversed winding.
-		cpVect verts[] = {{0,0}, {1,0}, {0,1}};
-		cpVect expected[] = {{0,0}, {0,1}, {1,0}};
+		cpVect verts[] = {{0,0}, {1,1}, {1,0}};
+		cpVect expected[] = {{0,0}, {1,0}, {1,1}};
 		
 		AssertHull(self, 3, verts, 3, expected);
 	}
 	
 	{
-		// Unit square with reversed winding.
-		cpVect verts[] = {{1,0}, {1,1}, {0,1}, {0,0}};
-		cpVect expected[] = {{0,0}, {0,1}, {1,1}, {1,0}};
+		cpVect verts[] = {{0,0}, {0,1}, {1,1}, {1,0}};
+		cpVect expected[] = {{0,0}, {1,0}, {1,1}, {0,1}};
 		
 		AssertHull(self, 4, verts, 4, expected);
 	}
@@ -124,7 +125,7 @@ AssertRandomHull(id self, int count)
 	{
 		// Degenerate hourglass shaped square.
 		cpVect verts[] = {{0,0}, {1,0}, {0,1}, {1,1}};
-		cpVect expected[] = {{0,0}, {0,1}, {1,1}, {1,0}};
+		cpVect expected[] = {{0,0}, {1,0}, {1,1}, {0,1}};
 		
 		AssertHull(self, 4, verts, 4, expected);
 	}
@@ -137,7 +138,7 @@ AssertRandomHull(id self, int count)
 			{0.1, 0.3}, {0.1, 0.5}, {0.8, 0.3}, {0.3, 0.8}, {0.0, 1.0}, {0.6, 0.7},
 			{1.0, 1.0}, {0.6, 0.8}, {0.1, 0.7}, {0.7, 0.9}, {0.9, 0.2}, {0.1, 0.1}
 		};
-		cpVect expected[] = {{0,0}, {0,1}, {1,1}, {1,0}};
+		cpVect expected[] = {{0,0}, {1,0}, {1,1}, {0,1}};
 		
 		AssertHull(self, 24, verts, 4, expected);
 	}
@@ -184,7 +185,7 @@ AssertRandomHull(id self, int count)
 			{1.0f, 0.0f}, {1.0f, 0.5f}, {1.0f, 1.0f}, {0.5f, 1.0f},
 			{0.0f, 1.0f}, {0.0f, 0.5f}, {0.0f, 0.0f}, {0.5f, 0.0f},
 		};
-		cpVect expected[] = {{0,0}, {0,1}, {1,1}, {1,0}};
+		cpVect expected[] = {{0,0}, {1,0}, {1,1}, {0,1}};
 		
 		AssertHull(self, 8, verts, 4, expected);
 	}
@@ -193,7 +194,7 @@ AssertRandomHull(id self, int count)
 		// Unit square with duplicate vertexes.
 		cpVect verts1[] = {{0,0}, {0,1}, {1,1}, {1,0}, {0,0}, {0,1}, {1,1}, {1,0}};
 		cpVect verts2[] = {{0,0}, {0,0}, {0,1}, {0,1}, {1,1}, {1,1}, {1,0}, {1,0}};
-		cpVect expected[] = {{0,0}, {0,1}, {1,1}, {1,0}};
+		cpVect expected[] = {{0,0}, {1,0}, {1,1}, {0,1}};
 		
 		AssertHull(self, 8, verts1, 4, expected);
 		AssertHull(self, 8, verts2, 4, expected);
@@ -206,81 +207,6 @@ AssertRandomHull(id self, int count)
 	AssertRandomHull(self, 10000);
 	
 	// TODO Need tolerance tests.
-}
-
-static cpPolyline
-MakeLoopedPolyline(int count, cpVect *verts)
-{
-	int capacity = count + 1;
-	cpPolyline line = {capacity, capacity, cpcalloc(capacity, sizeof(cpVect))};
-	memcpy(line.verts, verts, count*sizeof(cpVect));
-	line.verts[count] = verts[0];
-	
-	return line;
-}
-
-static void
-AssertPolyline(id self, cpPolyline line, int expectedCount, cpVect *expectedVerts)
-{
-	XCTAssertEqual(line.count, expectedCount + 1, nil);
-	GHAssertTrue(cpPolylineIsLooped(line), nil);
-	AssertExpected(self, line.verts, expectedCount, expectedVerts);
-}
-
--(void)testConvexDecomposition
-{
-	{
-		cpVect verts[] = {{0,0}};
-		
-		cpPolyline line = MakeLoopedPolyline(1, verts);
-		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
-		
-		XCTAssertEqual(set->count, 1, nil);
-		AssertPolyline(self, set->lines[0], 1, verts);
-	}
-	
-	{
-		cpVect verts[] = {{0,0}, {1,0}};
-		
-		cpPolyline line = MakeLoopedPolyline(2, verts);
-		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
-		
-		XCTAssertEqual(set->count, 1, nil);
-		AssertPolyline(self, set->lines[0], 2, verts);
-	}
-	
-	{
-		cpVect verts[] = {{0,0}, {0,1}, {1,0}};
-		
-		cpPolyline line = MakeLoopedPolyline(3, verts);
-		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
-		
-		XCTAssertEqual(set->count, 1, nil);
-		AssertPolyline(self, set->lines[0], 3, verts);
-	}
-	
-	{
-		cpVect verts[] = {{0,0}, {0,1}, {1,1}, {1,0}};
-		
-		cpPolyline line = MakeLoopedPolyline(4, verts);
-		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
-		
-		XCTAssertEqual(set->count, 1, nil);
-		AssertPolyline(self, set->lines[0], 4, verts);
-	}
-	
-	{
-		cpVect verts[] = {{0,0}, {1,2}, {2,0}, {1,1}};
-		cpVect expected1[] = {{0,0}, {1,2}, {1,1}};
-		cpVect expected2[] = {{1,2}, {2,0}, {1,1}};
-		
-		cpPolyline line = MakeLoopedPolyline(4, verts);
-		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
-		
-		XCTAssertEqual(set->count, 2, nil);
-		AssertPolyline(self, set->lines[0], 3, expected1);
-		AssertPolyline(self, set->lines[1], 3, expected2);
-	}
 }
 
 -(void)testValidate
@@ -297,7 +223,7 @@ AssertPolyline(id self, cpPolyline line, int expectedCount, cpVect *expectedVert
 	}
 	
 	CP_CONVEX_HULL(numVerts, verts, hullCount, hullVerts);
-	GHAssertTrue(cpPolyValidate(hullVerts, hullCount), nil);
+	XCTAssertTrue(cpPolyValidate(hullVerts, hullCount), @"");
 }
 
 @end

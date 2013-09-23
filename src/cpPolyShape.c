@@ -151,7 +151,7 @@ cpPolyValidate(const cpVect *verts, const int count)
 		cpVect b = verts[(i+1)%count];
 		cpVect c = verts[(i+2)%count];
 		
-		if(cpvcross(cpvsub(b, a), cpvsub(c, a)) > 0.0f){
+		if(cpvcross(cpvsub(b, a), cpvsub(c, a)) < 0.0f){
 			return cpFalse;
 		}
 	}

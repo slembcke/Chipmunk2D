@@ -457,7 +457,7 @@ segmentQueryAll(cpShape *shape, cpFloat t, cpVect n, segmentQueryContext *sqc)
 	[info release];
 }
 
-- (NSArray *)segmentQueryAllFrom:(cpVect)start to:(cpVect)end filter:(cpShapeFilter)filter radius:(cpFloat)radius
+- (NSArray *)segmentQueryAllFrom:(cpVect)start to:(cpVect)end radius:(cpFloat)radius filter:(cpShapeFilter)filter
 {
 	NSMutableArray *array = [[NSMutableArray alloc] init];
 	segmentQueryContext sqc = {start, end, array};
@@ -467,7 +467,7 @@ segmentQueryAll(cpShape *shape, cpFloat t, cpVect n, segmentQueryContext *sqc)
 	return [array autorelease];
 }
 
-- (ChipmunkSegmentQueryInfo *)segmentQueryFirstFrom:(cpVect)start to:(cpVect)end filter:(cpShapeFilter)filter radius:(cpFloat)radius
+- (ChipmunkSegmentQueryInfo *)segmentQueryFirstFrom:(cpVect)start to:(cpVect)end radius:(cpFloat)radius filter:(cpShapeFilter)filter
 {
 	cpSegmentQueryInfo info;
 	cpSpaceSegmentQueryFirst(_space, start, end, radius, filter, &info);
