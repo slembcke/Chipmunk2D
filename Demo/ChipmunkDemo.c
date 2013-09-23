@@ -487,8 +487,11 @@ Click(int button, int state)
 			cpShape *shape = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, radius, GRAB_FILTER, &info);
 			
 			if(shape){
+				// Use the closest point on the surface if the click is outside of the shape.
+				cpVect nearest = (info.distance > 0.0f ? info.point : ChipmunkDemoMouse);
+				
 				cpBody *body = shape->body;
-				mouse_joint = cpPivotJointNew2(mouse_body, body, cpvzero, cpBodyWorldToLocal(body, info.point));
+				mouse_joint = cpPivotJointNew2(mouse_body, body, cpvzero, cpBodyWorldToLocal(body, nearest));
 				mouse_joint->maxForce = 50000.0f;
 				mouse_joint->errorBias = cpfpow(1.0f - 0.15f, 60.0f);
 				cpSpaceAddConstraint(space, mouse_joint);
