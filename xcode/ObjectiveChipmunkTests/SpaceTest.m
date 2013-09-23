@@ -80,7 +80,7 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	set = pointQueryInfoToShapes([space pointQueryAll:cpv(-1,-1) maxDistance:0.0 filter:CP_SHAPE_FILTER_ALL]);
 	XCTAssertEqual(set, ([NSSet setWithObjects:nil]), @"");
 	
-	cpSpacePointQuery_b(space.space, cpv(-0.6, -0.6), 0.0, CP_SHAPE_FILTER_ALL, ^(cpShape *shape, cpFloat d, cpVect p){
+	cpSpacePointQuery_b(space.space, cpv(-0.6, -0.6), 0.0, CP_SHAPE_FILTER_ALL, ^(cpShape *shape, cpVect p, cpFloat d, cpVect g){
 		XCTAssertEqual(shape, segment.shape, @"");
 		XCTAssertEqualWithAccuracy(cpvdist(p, cpvnormalize(cpv(-1, -1))), (cpFloat)0.0, 1e-5, @"");
 		XCTAssertEqualWithAccuracy(d, cpfsqrt(2*0.6*0.6) - 1.0f, 1e-5, @"");
@@ -109,7 +109,7 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	info = [space segmentQueryFirstFrom:cpv(-2,-2) to:cpv(-1,-1) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
 	XCTAssertEqual(info.shape, nil, @"");
 	
-	cpSpaceSegmentQuery_b(space.space, cpv(-1.0, -0.6), cpv(1.0, -0.6), 0.0f, CP_SHAPE_FILTER_ALL, ^(cpShape *shape, cpFloat t, cpVect n){
+	cpSpaceSegmentQuery_b(space.space, cpv(-1.0, -0.6), cpv(1.0, -0.6), 0.0f, CP_SHAPE_FILTER_ALL, ^(cpShape *shape, cpVect p, cpVect n, cpFloat t){
 		XCTAssertEqual(shape, segment.shape, @"");
 		XCTAssertEqualWithAccuracy(cpvlength(n), 1.0f, 1e-5, @"");
 		XCTAssertEqualWithAccuracy(n.y, -0.6f, 1e-5, @"");

@@ -406,13 +406,16 @@ postStepPerformBlock(cpSpace *unused, id key, ChipmunkPostStepBlock block)
 	[self addPostStepCallback:self selector:@selector(remove:) key:obj];
 }
 
-static void queryAll(cpShape *shape, NSMutableArray *array){[array addObject:shape->userData];}
-
 - (NSArray *)pointQueryAll:(cpVect)point maxDistance:(cpFloat)maxDistance filter:(cpShapeFilter)filter
 {
-	NSMutableArray *array = [[NSMutableArray alloc] init];
-	cpSpacePointQuery(_space, point, maxDistance, filter, (cpSpacePointQueryFunc)queryAll, array);
-	return [array autorelease];
+	NSMutableArray *array = [NSMutableArray array];
+	cpSpacePointQuery_b(_space, point, maxDistance, filter, ^(cpShape *shape, cpVect p, cpFloat d, cpVect g){
+		ChipmunkPointQueryInfo *info = [[ChipmunkPointQueryInfo alloc] initWithInfo:&(cpPointQueryInfo){shape, p, d, g}];
+		[array addObject:info];
+		[info release];
+	});
+	
+	return array;
 }
 
 - (ChipmunkShape *)pointQueryNearest:(cpVect)point maxDistance:(cpFloat)maxDistance filter:(cpShapeFilter)filter
@@ -422,49 +425,22 @@ static void queryAll(cpShape *shape, NSMutableArray *array){[array addObject:sha
 	return (shape ? shape->userData : nil);
 }
 
-- (NSArray *)nearestPointQueryAll:(cpVect)point maxDistance:(cpFloat)maxDistance filter:(cpShapeFilter)filter
-{
-	NSMutableArray *arr = [NSMutableArray array];
-	cpSpacePointQuery_b(_space, point, maxDistance, filter, ^(cpShape *shape, cpFloat d, cpVect p){
-		// TODO gradient
-		ChipmunkPointQueryInfo *info = [[ChipmunkPointQueryInfo alloc] initWithInfo:&(cpPointQueryInfo){shape, p, d, cpvzero}];
-		[arr addObject:info];
-		[info release];
-	});
-	
-	return arr;
-}
-
-- (ChipmunkPointQueryInfo *)nearestPointQueryNearest:(cpVect)point maxDistance:(cpFloat)maxDistance filter:(cpShapeFilter)filter
-{
-	cpPointQueryInfo info;
-	cpSpacePointQueryNearest(_space, point, maxDistance, filter, &info);
-	return [[[ChipmunkPointQueryInfo alloc] initWithInfo:&info] autorelease];
-}
-
 typedef struct segmentQueryContext {
 	cpVect start, end;
 	NSMutableArray *array;
 } segmentQueryContext;
 
-static void
-segmentQueryAll(cpShape *shape, cpFloat t, cpVect n, segmentQueryContext *sqc)
-{
-	// TODO point
-	ChipmunkSegmentQueryInfo *info = [[ChipmunkSegmentQueryInfo alloc] initWithInfo:&(cpSegmentQueryInfo){shape, cpvzero, n, t} start:sqc->start end:sqc->end];
-	
-	[sqc->array addObject:info];
-	[info release];
-}
-
 - (NSArray *)segmentQueryAllFrom:(cpVect)start to:(cpVect)end radius:(cpFloat)radius filter:(cpShapeFilter)filter
 {
-	NSMutableArray *array = [[NSMutableArray alloc] init];
-	segmentQueryContext sqc = {start, end, array};
+	NSMutableArray *array = [NSMutableArray array];
+	cpSpaceSegmentQuery_b(_space, start, end, radius, filter, ^(cpShape *shape, cpVect p, cpVect n, cpFloat t){
+		// TODO point
+		ChipmunkSegmentQueryInfo *info = [[ChipmunkSegmentQueryInfo alloc] initWithInfo:&(cpSegmentQueryInfo){shape, p, n, t} start:start end:end];
+		[array addObject:info];
+		[info release];
+	});
 	
-	cpSpaceSegmentQuery(_space, start, end, radius, filter, (cpSpaceSegmentQueryFunc)segmentQueryAll, &sqc);
-	
-	return [array autorelease];
+	return array;
 }
 
 - (ChipmunkSegmentQueryInfo *)segmentQueryFirstFrom:(cpVect)start to:(cpVect)end radius:(cpFloat)radius filter:(cpShapeFilter)filter
@@ -477,24 +453,32 @@ segmentQueryAll(cpShape *shape, cpFloat t, cpVect n, segmentQueryContext *sqc)
 
 - (NSArray *)bbQueryAll:(cpBB)bb filter:(cpShapeFilter)filter
 {
-	NSMutableArray *array = [[NSMutableArray alloc] init];
-	cpSpaceBBQuery(_space, bb, filter, (cpSpaceBBQueryFunc)queryAll, array);
-	return [array autorelease];
+	NSMutableArray *array = [NSMutableArray array];
+	cpSpaceBBQuery_b(_space, bb, filter, ^(cpShape *shape){
+		[array addObject:shape->userData];
+	});
+	
+	return array;
 }
 
-static void
-shapeQueryAll(cpShape *shape, cpContactPointSet *points, NSMutableArray *array)
-{
-	ChipmunkShapeQueryInfo *info = [[ChipmunkShapeQueryInfo alloc] initWithShape:shape->userData andPoints:points];
-	[array addObject:info];
-	[info release];
-}
+//static void
+//shapeQueryAll(cpShape *shape, cpContactPointSet *points, NSMutableArray *array)
+//{
+//	ChipmunkShapeQueryInfo *info = [[ChipmunkShapeQueryInfo alloc] initWithShape:shape->userData andPoints:points];
+//	[array addObject:info];
+//	[info release];
+//}
 
 - (NSArray *)shapeQueryAll:(ChipmunkShape *)shape
 {
-	NSMutableArray *array = [[NSMutableArray alloc] init];
-	cpSpaceShapeQuery(_space, shape.shape, (cpSpaceShapeQueryFunc)shapeQueryAll, array);
-	return [array autorelease];
+	NSMutableArray *array = [NSMutableArray array];
+	cpSpaceShapeQuery_b(_space, shape.shape, ^(cpShape *shape, cpContactPointSet *points){
+		ChipmunkShapeQueryInfo *info = [[ChipmunkShapeQueryInfo alloc] initWithShape:shape->userData andPoints:points];
+		[array addObject:info];
+		[info release];
+	});
+	
+	return array;
 }
 
 - (BOOL)shapeTest:(ChipmunkShape *)shape

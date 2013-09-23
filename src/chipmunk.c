@@ -289,12 +289,12 @@ void cpBodyEachArbiter_b(cpBody *body, void (^block)(cpArbiter *arbiter)){
 	cpBodyEachArbiter(body, (cpBodyArbiterIteratorFunc)BodyIteratorFunc, block);
 }
 
-static void PointQueryIteratorFunc(cpShape *shape, cpFloat distance, cpVect point, cpSpacePointQueryBlock block){block(shape, distance, point);}
+static void PointQueryIteratorFunc(cpShape *shape, cpVect p, cpFloat d, cpVect g, cpSpacePointQueryBlock block){block(shape, p, d, g);}
 void cpSpacePointQuery_b(cpSpace *space, cpVect point, cpFloat maxDistance, cpShapeFilter filter, cpSpacePointQueryBlock block){
 	cpSpacePointQuery(space, point, maxDistance, filter, (cpSpacePointQueryFunc)PointQueryIteratorFunc, block);
 }
 
-static void SegmentQueryIteratorFunc(cpShape *shape, cpFloat t, cpVect n, cpSpaceSegmentQueryBlock block){block(shape, t, n);}
+static void SegmentQueryIteratorFunc(cpShape *shape, cpVect p, cpVect n, cpFloat t, cpSpaceSegmentQueryBlock block){block(shape, p, n, t);}
 void cpSpaceSegmentQuery_b(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpShapeFilter filter, cpSpaceSegmentQueryBlock block){
 	cpSpaceSegmentQuery(space, start, end, radius, filter, (cpSpaceSegmentQueryFunc)SegmentQueryIteratorFunc, block);
 }

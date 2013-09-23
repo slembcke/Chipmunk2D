@@ -145,7 +145,7 @@ static void PushBodyVelocityUpdate(cpBody *body, cpVect gravity, cpFloat damping
 	__block ChipmunkShape *grabbedShape = nil;
 	
 	if(_pullMode){
-		cpSpacePointQuery_b(_space.space, pos, _grabRadius, _filter, ^(cpShape *c_shape, cpFloat dist, cpVect point){
+		cpSpacePointQuery_b(_space.space, pos, _grabRadius, _filter, ^(cpShape *c_shape, cpVect point, cpFloat dist, cpVect gradient){
 			ChipmunkShape *shape = [ChipmunkShape shapeFromCPShape:c_shape];
 			cpFloat sort = dist;
 			
