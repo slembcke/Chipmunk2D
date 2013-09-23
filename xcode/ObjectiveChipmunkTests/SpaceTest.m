@@ -8,15 +8,15 @@
 
 @implementation SpaceTest
 
-#define TestAccessors(o, p, v) o.p = v; GHAssertEquals(o.p, v, nil);
-#define AssertRetainCount(obj, count) GHAssertEquals([obj retainCount], (NSUInteger)count, nil)
+#define TestAccessors(o, p, v) o.p = v; XCTAssertEqual(o.p, v, nil);
+#define AssertRetainCount(obj, count) XCTAssertEqual([obj retainCount], (NSUInteger)count, nil)
 
 -(void)testProperties {
 	ChipmunkSpace *space = [[ChipmunkSpace alloc] init];
-	GHAssertEquals(space.gravity, cpvzero, nil);
-	GHAssertEquals(space.damping, (cpFloat)1.0, nil);
-	GHAssertEquals(space.idleSpeedThreshold, (cpFloat)0, nil);
-	GHAssertEquals(space.sleepTimeThreshold, (cpFloat)INFINITY, nil);
+	XCTAssertEqual(space.gravity, cpvzero, nil);
+	XCTAssertEqual(space.damping, (cpFloat)1.0, nil);
+	XCTAssertEqual(space.idleSpeedThreshold, (cpFloat)0, nil);
+	XCTAssertEqual(space.sleepTimeThreshold, (cpFloat)INFINITY, nil);
 	
 	GHAssertNotNULL(space.space, nil);
 	GHAssertNotNil(space.staticBody, nil);
@@ -81,9 +81,9 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	GHAssertEqualObjects(set, ([NSSet setWithObjects:nil]), nil);
 	
 	cpSpaceNearestPointQuery_b(space.space, cpv(-0.6, -0.6), 0.0, CP_ALL_LAYERS, CP_NO_GROUP, ^(cpShape *shape, cpFloat d, cpVect p){
-		GHAssertEquals(shape, segment.shape, nil);
-		GHAssertEqualsWithAccuracy(cpvdist(p, cpvnormalize(cpv(-1, -1))), (cpFloat)0.0, 1e-5, nil);
-		GHAssertEqualsWithAccuracy(d, cpfsqrt(2*0.6*0.6) - 1.0f, 1e-5, nil);
+		XCTAssertEqual(shape, segment.shape, nil);
+		XCTAssertEqualWithAccuracy(cpvdist(p, cpvnormalize(cpv(-1, -1))), (cpFloat)0.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy(d, cpfsqrt(2*0.6*0.6) - 1.0f, 1e-5, nil);
 	});
 	
 	// Segment queries
@@ -110,22 +110,22 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	GHAssertEqualObjects(info.shape, nil, nil, nil);
 	
 	cpSpaceSegmentQuery_b(space.space, cpv(-1.0, -0.6), cpv(1.0, -0.6), CP_ALL_LAYERS, CP_NO_GROUP, ^(cpShape *shape, cpFloat t, cpVect n){
-		GHAssertEquals(shape, segment.shape, nil);
-		GHAssertEqualsWithAccuracy(cpvlength(n), 1.0f, 1e-5, nil);
-		GHAssertEqualsWithAccuracy(n.y, -0.6f, 1e-5, nil);
-		GHAssertEqualsWithAccuracy(cpvdist(cpv(-1.0, -0.6), n)/2.0f, t, 1e-5, nil);
+		XCTAssertEqual(shape, segment.shape, nil);
+		XCTAssertEqualWithAccuracy(cpvlength(n), 1.0f, 1e-5, nil);
+		XCTAssertEqualWithAccuracy(n.y, -0.6f, 1e-5, nil);
+		XCTAssertEqualWithAccuracy(cpvdist(cpv(-1.0, -0.6), n)/2.0f, t, 1e-5, nil);
 	});
 	
 	// Segment queries starting from inside a shape
 	info = [space segmentQueryFirstFrom:cpvzero to:cpv(1,1) layers:CP_ALL_LAYERS group:CP_NO_GROUP];
-	GHAssertEquals(info.t, 0.0f, @"Starting inside a shape should return t=0.");
+	XCTAssertEqual(info.t, 0.0f, @"Starting inside a shape should return t=0.");
 	
 	info = [space segmentQueryFirstFrom:cpv(1,1) to:cpvzero layers:CP_ALL_LAYERS group:CP_NO_GROUP];
-	GHAssertEquals(info.t, 0.0f, @"Starting inside a shape should return t=0.");
+	XCTAssertEqual(info.t, 0.0f, @"Starting inside a shape should return t=0.");
 	
 	info = [space segmentQueryFirstFrom:cpv(-0.6, -0.6) to:cpvzero layers:CP_ALL_LAYERS group:CP_NO_GROUP];
-	GHAssertEquals(info.t, 0.0f, @"Starting inside a shape should return t=0.");
-	GHAssertEquals(info.shape, segment, @"Should have picked the segment shape.");
+	XCTAssertEqual(info.t, 0.0f, @"Starting inside a shape should return t=0.");
+	XCTAssertEqual(info.shape, segment, @"Should have picked the segment shape.");
 	
 	// Shape queries
 	ChipmunkBody *queryBody = [ChipmunkBody bodyWithMass:1 andMoment:1];
@@ -148,8 +148,8 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	GHAssertEqualObjects(set, ([NSSet setWithObjects:segment, nil]), nil);
 	
 	cpSpaceShapeQuery_b(space.space, queryShape.shape, ^(cpShape *shape, cpContactPointSet *points){
-		GHAssertEquals(shape, segment.shape, nil);
-		GHAssertEquals(points->count, 1, nil);
+		XCTAssertEqual(shape, segment.shape, nil);
+		XCTAssertEqual(points->count, 1, nil);
 	});
 	
 	queryBody.pos = cpv(2,2);
@@ -228,8 +228,8 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	for(int i=0; i<100; i++) [space step:0.01];
 	
 	space.collisionSlop = 0.5f;
-	GHAssertEqualsWithAccuracy(ball.pos.y, (cpFloat)1, 1.1*space.collisionSlop, nil);
-	GHAssertEqualsWithAccuracy(box.pos.y, (cpFloat)1, 1.1*space.collisionSlop, nil);
+	XCTAssertEqualWithAccuracy(ball.pos.y, (cpFloat)1, 1.1*space.collisionSlop, nil);
+	XCTAssertEqualWithAccuracy(box.pos.y, (cpFloat)1, 1.1*space.collisionSlop, nil);
 	
 	[space release];
 }
@@ -290,7 +290,7 @@ VerifyContactGraph(id self, ChipmunkBody *body1, ChipmunkBody *body2)
 		counter++;
 	}];
 	
-	GHAssertEquals(counter, 2, @"Wrong number of arbiters in contact graph.");
+	XCTAssertEqual(counter, 2, @"Wrong number of arbiters in contact graph.");
 }
 
 // This one was a doozy to find. :-\

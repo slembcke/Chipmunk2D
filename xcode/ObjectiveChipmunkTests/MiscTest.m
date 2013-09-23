@@ -115,15 +115,15 @@
 		CGImageRef image = [ChipmunkImageSampler loadImage:[[NSBundle mainBundle] URLForResource:@"TestImageLA" withExtension:@"png"]];
 		ChipmunkAbstractSampler *sampler = [[ChipmunkImageSampler alloc] initWithImage:image isMask:TRUE contextWidth:0 contextHeight:0];
 		
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(0.5, 0.5)], (cpFloat)0.0, 1e-5, nil);
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(0.5, 3.5)], (cpFloat)1.0, 1e-5, nil);
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(3.5, 0.5)], (cpFloat)1.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(0.5, 0.5)], (cpFloat)0.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(0.5, 3.5)], (cpFloat)1.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(3.5, 0.5)], (cpFloat)1.0, 1e-5, nil);
 		
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(2.0 - 1e-5, 0.5)], (cpFloat)0.0, 1e-5, nil);
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(2.0 + 1e-5, 0.5)], (cpFloat)1.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(2.0 - 1e-5, 0.5)], (cpFloat)0.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(2.0 + 1e-5, 0.5)], (cpFloat)1.0, 1e-5, nil);
 		
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(0.5, 2.0 - 1e-5)], (cpFloat)0.0, 1e-5, nil);
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(0.5, 2.0 + 1e-5)], (cpFloat)1.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(0.5, 2.0 - 1e-5)], (cpFloat)0.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(0.5, 2.0 + 1e-5)], (cpFloat)1.0, 1e-5, nil);
 		
 		[sampler release];
 	}
@@ -132,16 +132,16 @@
 		CGImageRef image = [ChipmunkImageSampler loadImage:[[NSBundle mainBundle] URLForResource:@"TestImageLA" withExtension:@"png"]];
 		ChipmunkAbstractSampler *sampler = [[ChipmunkImageSampler alloc] initWithImage:image isMask:FALSE contextWidth:0 contextHeight:0];
 		
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(0.5, 0.5)], (cpFloat)1.0, 1e-5, nil);
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(0.5, 3.5)], (cpFloat)1.0, 1e-5, nil);
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(3.5, 0.5)], (cpFloat)1.0, 1e-5, nil);
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(3.5, 3.5)], (cpFloat)0.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(0.5, 0.5)], (cpFloat)1.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(0.5, 3.5)], (cpFloat)1.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(3.5, 0.5)], (cpFloat)1.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(3.5, 3.5)], (cpFloat)0.0, 1e-5, nil);
 		
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(2.0 - 1e-5, 3.5)], (cpFloat)1.0, 1e-5, nil);
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(2.0 + 1e-5, 3.5)], (cpFloat)0.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(2.0 - 1e-5, 3.5)], (cpFloat)1.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(2.0 + 1e-5, 3.5)], (cpFloat)0.0, 1e-5, nil);
 		
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(3.5, 2.0 - 1e-5)], (cpFloat)1.0, 1e-5, nil);
-		GHAssertEqualsWithAccuracy([sampler sample:cpv(3.5, 2.0 + 1e-5)], (cpFloat)0.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(3.5, 2.0 - 1e-5)], (cpFloat)1.0, 1e-5, nil);
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(3.5, 2.0 + 1e-5)], (cpFloat)0.0, 1e-5, nil);
 		
 		[sampler release];
 	}
@@ -161,7 +161,7 @@
 	small.data = @1;
 	
 	ChipmunkGrab *grab1 = [multiGrab beginLocation:cpvzero];
-	GHAssertEquals(grab1.grabbedShape, big, @"Should have grabbed 'big' since it has the largest penetration depth.");
+	XCTAssertEqual(grab1.grabbedShape, big, @"Should have grabbed 'big' since it has the largest penetration depth.");
 	
 	multiGrab.grabSort = ^(ChipmunkShape *shape, cpFloat depth){
 		NSNumber *n = shape.data;
@@ -170,7 +170,7 @@
 	
 	// Should grab small since it's sorting order will be the largest;
 	ChipmunkGrab *grab2 = [multiGrab beginLocation:cpvzero];
-	GHAssertEquals(grab2.grabbedShape, small, @"Should have grabbed 'small' since it has the highest custom sort value.");
+	XCTAssertEqual(grab2.grabbedShape, small, @"Should have grabbed 'small' since it has the highest custom sort value.");
 	
 	[multiGrab release];
 	[space release];

@@ -1,5 +1,4 @@
 #import <XCTest/XCTest.h>
-
 #import "ObjectiveChipmunk.h"
 
 @interface UpdateTestBody : ChipmunkBody

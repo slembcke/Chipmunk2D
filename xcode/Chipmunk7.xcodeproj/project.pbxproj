@@ -20,6 +20,7 @@
 		D309B25117EFFF9E00AA52C8 /* ChipmunkSpace.m in Sources */ = {isa = PBXBuildFile; fileRef = D309B24B17EFFF9E00AA52C8 /* ChipmunkSpace.m */; };
 		D309B26C17F0088A00AA52C8 /* BodyTest.m in Sources */ = {isa = PBXBuildFile; fileRef = D309B25217F003FD00AA52C8 /* BodyTest.m */; };
 		D309B26D17F00B3B00AA52C8 /* libObjectiveChipmunk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D309B21317EFE2EF00AA52C8 /* libObjectiveChipmunk.a */; };
+		D309B26E17F00D5500AA52C8 /* ShapeTest.m in Sources */ = {isa = PBXBuildFile; fileRef = D309B25C17F003FD00AA52C8 /* ShapeTest.m */; };
 		D3102B171119FD3000E77771 /* Tank.c in Sources */ = {isa = PBXBuildFile; fileRef = D3102B161119FD3000E77771 /* Tank.c */; };
 		D31402950E9DD07E00EF79DB /* Springies.c in Sources */ = {isa = PBXBuildFile; fileRef = D31402940E9DD07E00EF79DB /* Springies.c */; };
 		D317246613280FC900752CBE /* cpSweep1D.c in Sources */ = {isa = PBXBuildFile; fileRef = D317246513280FC900752CBE /* cpSweep1D.c */; };
@@ -204,16 +205,9 @@
 		D309B25217F003FD00AA52C8 /* BodyTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BodyTest.m; sourceTree = "<group>"; };
 		D309B25317F003FD00AA52C8 /* CallbacksTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CallbacksTest.m; sourceTree = "<group>"; };
 		D309B25417F003FD00AA52C8 /* ConvexTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConvexTest.m; sourceTree = "<group>"; };
-		D309B25517F003FD00AA52C8 /* GHTestMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GHTestMacros.h; sourceTree = "<group>"; };
 		D309B25617F003FD00AA52C8 /* MemoryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MemoryTest.m; sourceTree = "<group>"; };
 		D309B25717F003FD00AA52C8 /* MiscTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MiscTest.m; sourceTree = "<group>"; };
-		D309B25817F003FD00AA52C8 /* NSException+GHTestFailureExceptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSException+GHTestFailureExceptions.h"; sourceTree = "<group>"; };
-		D309B25917F003FD00AA52C8 /* NSException+GHTestFailureExceptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSException+GHTestFailureExceptions.m"; sourceTree = "<group>"; };
-		D309B25A17F003FD00AA52C8 /* NSValue+GHValueFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+GHValueFormatter.h"; sourceTree = "<group>"; };
-		D309B25B17F003FD00AA52C8 /* NSValue+GHValueFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSValue+GHValueFormatter.m"; sourceTree = "<group>"; };
 		D309B25C17F003FD00AA52C8 /* ShapeTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShapeTest.m; sourceTree = "<group>"; };
-		D309B25D17F003FD00AA52C8 /* SimpleTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleTestCase.h; sourceTree = "<group>"; };
-		D309B25E17F003FD00AA52C8 /* SimpleTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleTestCase.m; sourceTree = "<group>"; };
 		D309B25F17F003FD00AA52C8 /* SpaceTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpaceTest.m; sourceTree = "<group>"; };
 		D309B26017F003FD00AA52C8 /* TestMain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestMain.m; sourceTree = "<group>"; };
 		D30CE25D0B52535500427129 /* cpHashSet.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpHashSet.c; sourceTree = "<group>"; };
@@ -411,20 +405,13 @@
 			children = (
 				D309B22D17EFE2EF00AA52C8 /* ObjectiveChipmunkTests.m */,
 				D309B25217F003FD00AA52C8 /* BodyTest.m */,
+				D309B25C17F003FD00AA52C8 /* ShapeTest.m */,
 				D309B25317F003FD00AA52C8 /* CallbacksTest.m */,
 				D309B25417F003FD00AA52C8 /* ConvexTest.m */,
 				D309B25617F003FD00AA52C8 /* MemoryTest.m */,
 				D309B25717F003FD00AA52C8 /* MiscTest.m */,
-				D309B25C17F003FD00AA52C8 /* ShapeTest.m */,
-				D309B25D17F003FD00AA52C8 /* SimpleTestCase.h */,
-				D309B25E17F003FD00AA52C8 /* SimpleTestCase.m */,
 				D309B25F17F003FD00AA52C8 /* SpaceTest.m */,
 				D309B26017F003FD00AA52C8 /* TestMain.m */,
-				D309B25517F003FD00AA52C8 /* GHTestMacros.h */,
-				D309B25817F003FD00AA52C8 /* NSException+GHTestFailureExceptions.h */,
-				D309B25A17F003FD00AA52C8 /* NSValue+GHValueFormatter.h */,
-				D309B25917F003FD00AA52C8 /* NSException+GHTestFailureExceptions.m */,
-				D309B25B17F003FD00AA52C8 /* NSValue+GHValueFormatter.m */,
 				D309B22817EFE2EF00AA52C8 /* Supporting Files */,
 			);
 			path = ObjectiveChipmunkTests;
@@ -924,6 +911,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D309B22E17EFE2EF00AA52C8 /* ObjectiveChipmunkTests.m in Sources */,
+				D309B26E17F00D5500AA52C8 /* ShapeTest.m in Sources */,
 				D309B26C17F0088A00AA52C8 /* BodyTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

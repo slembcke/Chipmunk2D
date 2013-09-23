@@ -32,7 +32,7 @@ AssertExpected(id self, cpVect *verts, int expectedCount, cpVect *expectedVerts)
 	
 	// Check the verts
 	for(int i=0; i<expectedCount; i++){
-		GHAssertEquals(verts[i], expectedVerts[(firstExpected + i)%expectedCount], nil);
+		XCTAssertEqual(verts[i], expectedVerts[(firstExpected + i)%expectedCount], nil);
 	}
 }
 
@@ -43,9 +43,9 @@ AssertHullsEqual(id self, int resultCount, cpVect *resultVerts)
 	cpVect result2Verts[resultCount];
 	int result2Count = cpConvexHull(resultCount, resultVerts, result2Verts, NULL, 0.0);
 	
-	GHAssertEquals(resultCount, result2Count, nil);
+	XCTAssertEqual(resultCount, result2Count, nil);
 	for(int i=0; i<resultCount; i++){
-		GHAssertEquals(resultVerts[i], result2Verts[i], nil);
+		XCTAssertEqual(resultVerts[i], result2Verts[i], nil);
 	}
 }
 
@@ -64,14 +64,14 @@ AssertHull(id self, int count, cpVect *verts, int expectedCount, cpVect *expecte
 		int resultCount = cpConvexHull(count, rotated, resultVerts, &first, 0.0);
 		
 		// Check the count
-		GHAssertEquals(resultCount, expectedCount, nil);
+		XCTAssertEqual(resultCount, expectedCount, nil);
 		
 		// Check that the windings are positive.
 		GHAssertGreaterThanOrEqual(cpAreaForPoly(expectedCount, expectedVerts), (cpFloat)0, nil);
 		GHAssertGreaterThanOrEqual(cpAreaForPoly(resultCount, resultVerts), (cpFloat)0, nil);
 		GHAssertTrue(cpPolyValidate(resultVerts, resultCount), nil);
 		
-		GHAssertEquals(resultVerts[0], rotated[first], nil);
+		XCTAssertEqual(resultVerts[0], rotated[first], nil);
 		
 		AssertExpected(self, resultVerts, expectedCount, expectedVerts);
 		AssertHullsEqual(self, resultCount, resultVerts);
@@ -222,7 +222,7 @@ MakeLoopedPolyline(int count, cpVect *verts)
 static void
 AssertPolyline(id self, cpPolyline line, int expectedCount, cpVect *expectedVerts)
 {
-	GHAssertEquals(line.count, expectedCount + 1, nil);
+	XCTAssertEqual(line.count, expectedCount + 1, nil);
 	GHAssertTrue(cpPolylineIsLooped(line), nil);
 	AssertExpected(self, line.verts, expectedCount, expectedVerts);
 }
@@ -235,7 +235,7 @@ AssertPolyline(id self, cpPolyline line, int expectedCount, cpVect *expectedVert
 		cpPolyline line = MakeLoopedPolyline(1, verts);
 		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
 		
-		GHAssertEquals(set->count, 1, nil);
+		XCTAssertEqual(set->count, 1, nil);
 		AssertPolyline(self, set->lines[0], 1, verts);
 	}
 	
@@ -245,7 +245,7 @@ AssertPolyline(id self, cpPolyline line, int expectedCount, cpVect *expectedVert
 		cpPolyline line = MakeLoopedPolyline(2, verts);
 		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
 		
-		GHAssertEquals(set->count, 1, nil);
+		XCTAssertEqual(set->count, 1, nil);
 		AssertPolyline(self, set->lines[0], 2, verts);
 	}
 	
@@ -255,7 +255,7 @@ AssertPolyline(id self, cpPolyline line, int expectedCount, cpVect *expectedVert
 		cpPolyline line = MakeLoopedPolyline(3, verts);
 		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
 		
-		GHAssertEquals(set->count, 1, nil);
+		XCTAssertEqual(set->count, 1, nil);
 		AssertPolyline(self, set->lines[0], 3, verts);
 	}
 	
@@ -265,7 +265,7 @@ AssertPolyline(id self, cpPolyline line, int expectedCount, cpVect *expectedVert
 		cpPolyline line = MakeLoopedPolyline(4, verts);
 		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
 		
-		GHAssertEquals(set->count, 1, nil);
+		XCTAssertEqual(set->count, 1, nil);
 		AssertPolyline(self, set->lines[0], 4, verts);
 	}
 	
@@ -277,7 +277,7 @@ AssertPolyline(id self, cpPolyline line, int expectedCount, cpVect *expectedVert
 		cpPolyline line = MakeLoopedPolyline(4, verts);
 		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
 		
-		GHAssertEquals(set->count, 2, nil);
+		XCTAssertEqual(set->count, 2, nil);
 		AssertPolyline(self, set->lines[0], 3, expected1);
 		AssertPolyline(self, set->lines[1], 3, expected2);
 	}

@@ -3,7 +3,7 @@
 #define CP_ALLOW_PRIVATE_ACCESS 1
 #include "ObjectiveChipmunk.h"
 
-#define AssertRetainCount(obj, count) GHAssertEquals([obj retainCount], (NSUInteger)count, nil)
+#define AssertRetainCount(obj, count) XCTAssertEqual([obj retainCount], (NSUInteger)count, nil)
 
 @interface MemoryTest : SimpleTestCase {}
 @end

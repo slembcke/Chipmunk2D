@@ -67,10 +67,10 @@ testHandlersHelper(id self, bool separateByRemove, bool enableContactGraph){
 	
 	// Test for separate callback when moving:
 	[space step:0.1];
-	GHAssertEqualStrings(string, @"Begin-PreSolve-PostSolve-", NULL);
+	XCTAssertEqualtrings(string, @"Begin-PreSolve-PostSolve-", NULL);
 	
 	[space step:0.1];
-	GHAssertEqualStrings(string, @"Begin-PreSolve-PostSolve-PreSolve-PostSolve-", NULL);
+	XCTAssertEqualtrings(string, @"Begin-PreSolve-PostSolve-PreSolve-PostSolve-", NULL);
 	
 	if(separateByRemove){
 		[space remove:shape2];
@@ -79,7 +79,7 @@ testHandlersHelper(id self, bool separateByRemove, bool enableContactGraph){
 		[space step:0.1];
 	}
 	
-	GHAssertEqualStrings(string, @"Begin-PreSolve-PostSolve-PreSolve-PostSolve-Separate-", NULL);
+	XCTAssertEqualtrings(string, @"Begin-PreSolve-PostSolve-PreSolve-PostSolve-Separate-", NULL);
 	
 	// Step once more to check for dangling pointers
 	[space step:0.1];
@@ -128,25 +128,25 @@ testHandlersSleepingHelper(id self, int wakeRemoveType){
 	
 	// Test for separate callback when moving:
 	[space step:0.1];
-	GHAssertEqualStrings(string, @"Begin-PreSolve-PostSolve-", NULL);
+	XCTAssertEqualtrings(string, @"Begin-PreSolve-PostSolve-", NULL);
 	
 	[space step:0.1];
-	GHAssertEqualStrings(string, @"Begin-PreSolve-PostSolve-PreSolve-", NULL);
+	XCTAssertEqualtrings(string, @"Begin-PreSolve-PostSolve-PreSolve-", NULL);
 	
 	[space step:0.1];
-	GHAssertEqualStrings(string, @"Begin-PreSolve-PostSolve-PreSolve-", NULL);
+	XCTAssertEqualtrings(string, @"Begin-PreSolve-PostSolve-PreSolve-", NULL);
 	
 	switch(wakeRemoveType){
 		case 0:
 			// Separate by removal
 			[space remove:shape2];
-			GHAssertEqualStrings(string, @"Begin-PreSolve-PostSolve-PreSolve-Separate-", NULL);
+			XCTAssertEqualtrings(string, @"Begin-PreSolve-PostSolve-PreSolve-Separate-", NULL);
 			break;
 		case 1:
 			// Separate by move
 			body2.pos = cpv(100, 100);
 			[space step:0.1];
-			GHAssertEqualStrings(string, @"Begin-PreSolve-PostSolve-PreSolve-Separate-", NULL);
+			XCTAssertEqualtrings(string, @"Begin-PreSolve-PostSolve-PreSolve-Separate-", NULL);
 			break;
 			
 		default:break;
@@ -199,25 +199,25 @@ testSleepingSensorCallbacksHelper(id self, int wakeRemoveType){
 	
 	// Test for separate callback when moving:
 	[space step:0.1];
-	GHAssertEqualStrings(string, @"Begin-PreSolve-", NULL);
+	XCTAssertEqualtrings(string, @"Begin-PreSolve-", NULL);
 	
 	[space step:0.1];
-	GHAssertEqualStrings(string, @"Begin-PreSolve-PreSolve-", NULL);
+	XCTAssertEqualtrings(string, @"Begin-PreSolve-PreSolve-", NULL);
 	
 	[space step:0.1];
-	GHAssertEqualStrings(string, @"Begin-PreSolve-PreSolve-", NULL);
+	XCTAssertEqualtrings(string, @"Begin-PreSolve-PreSolve-", NULL);
 	
 	switch(wakeRemoveType){
 		case 0:
 			// Separate by removal
 			[space remove:shape2];
-			GHAssertEqualStrings(string, @"Begin-PreSolve-PreSolve-Separate-", NULL);
+			XCTAssertEqualtrings(string, @"Begin-PreSolve-PreSolve-Separate-", NULL);
 			break;
 		case 1:
 			// Separate by move
 			body1.pos = cpv(100, 100);
 			[space step:0.1];
-			GHAssertEqualStrings(string, @"Begin-PreSolve-PreSolve-Separate-", NULL);
+			XCTAssertEqualtrings(string, @"Begin-PreSolve-PreSolve-Separate-", NULL);
 			break;
 			
 		default:break;
@@ -273,7 +273,7 @@ testSleepingSensorCallbacksHelper(id self, int wakeRemoveType){
 	for(int i=0; i<100; i++) [space step:0.01];
 	
 	cpFloat cp_collision_slop = 0.5f; // TODO relpace
-	GHAssertEqualsWithAccuracy(ball.pos.y, (cpFloat)2, 1.1*cp_collision_slop, nil);
+	XCTAssertEqualWithAccuracy(ball.pos.y, (cpFloat)2, 1.1*cp_collision_slop, nil);
 	
 	[space release];
 }
@@ -374,48 +374,48 @@ static void CallBlock(cpArbiter *arb, cpSpace *space, void (^block)(void)){block
 		__block int counter = 0;
 		
 		cpSpaceEachBody_b(space.space, ^(cpBody *body){
-			GHAssertEquals(body, _body, nil);
+			XCTAssertEqual(body, _body, nil);
 			counter++;
 		});
 		
 		cpSpaceEachShape_b(space.space, ^(cpShape *shape){
 			if(cpBodyIsStatic(shape->body)){
-				GHAssertEquals(shape, _staticShape.shape, nil);
+				XCTAssertEqual(shape, _staticShape.shape, nil);
 			} else {
-				GHAssertEquals(shape, _shape.shape, nil);
+				XCTAssertEqual(shape, _shape.shape, nil);
 			}
 			
 			counter++;
 		});
 		
 		cpSpaceEachConstraint_b(space.space, ^(cpConstraint *constraint){
-			GHAssertEquals(constraint, _constraint.constraint, nil);
+			XCTAssertEqual(constraint, _constraint.constraint, nil);
 			counter++;
 		});
 		
 		
 		cpBodyEachShape_b(space.staticBody.body, ^(cpShape *shape){
-			GHAssertEquals(shape, _staticShape.shape, nil);
+			XCTAssertEqual(shape, _staticShape.shape, nil);
 			counter++;
 		});
 		
 		cpBodyEachConstraint_b(space.staticBody.body, ^(cpConstraint *constraint){
-			GHAssertEquals(constraint, _constraint.constraint, nil);
+			XCTAssertEqual(constraint, _constraint.constraint, nil);
 			counter++;
 		});
 		
 		
 		cpBodyEachShape_b(_body.body, ^(cpShape *shape){
-			GHAssertEquals(shape, _shape.shape, nil);
+			XCTAssertEqual(shape, _shape.shape, nil);
 			counter++;
 		});
 		
 		cpBodyEachConstraint_b(_body.body, ^(cpConstraint *constraint){
-			GHAssertEquals(constraint, _constraint.constraint, nil);
+			XCTAssertEqual(constraint, _constraint.constraint, nil);
 			counter++;
 		});
 		
-		GHAssertEquals(counter, 0, nil);
+		XCTAssertEqual(counter, 0, nil);
 	}
 	
 	[space add:_staticShape];
@@ -427,48 +427,48 @@ static void CallBlock(cpArbiter *arb, cpSpace *space, void (^block)(void)){block
 		__block int counter = 0;
 		
 		cpSpaceEachBody_b(space.space, ^(cpBody *body){
-			GHAssertEquals(body, _body.body, nil);
+			XCTAssertEqual(body, _body.body, nil);
 			counter++;
 		});
 		
 		cpSpaceEachShape_b(space.space, ^(cpShape *shape){
 			if(cpBodyIsStatic(shape->body)){
-				GHAssertEquals(shape, _staticShape.shape, nil);
+				XCTAssertEqual(shape, _staticShape.shape, nil);
 			} else {
-				GHAssertEquals(shape, _shape.shape, nil);
+				XCTAssertEqual(shape, _shape.shape, nil);
 			}
 			
 			counter++;
 		});
 		
 		cpSpaceEachConstraint_b(space.space, ^(cpConstraint *constraint){
-			GHAssertEquals(constraint, _constraint.constraint, nil);
+			XCTAssertEqual(constraint, _constraint.constraint, nil);
 			counter++;
 		});
 		
 		
 		cpBodyEachShape_b(space.staticBody.body, ^(cpShape *shape){
-			GHAssertEquals(shape, _staticShape.shape, nil);
+			XCTAssertEqual(shape, _staticShape.shape, nil);
 			counter++;
 		});
 		
 		cpBodyEachConstraint_b(space.staticBody.body, ^(cpConstraint *constraint){
-			GHAssertEquals(constraint, _constraint.constraint, nil);
+			XCTAssertEqual(constraint, _constraint.constraint, nil);
 			counter++;
 		});
 		
 		
 		cpBodyEachShape_b(_body.body, ^(cpShape *shape){
-			GHAssertEquals(shape, _shape.shape, nil);
+			XCTAssertEqual(shape, _shape.shape, nil);
 			counter++;
 		});
 		
 		cpBodyEachConstraint_b(_body.body, ^(cpConstraint *constraint){
-			GHAssertEquals(constraint, _constraint.constraint, nil);
+			XCTAssertEqual(constraint, _constraint.constraint, nil);
 			counter++;
 		});
 		
-		GHAssertEquals(counter, 8, nil);
+		XCTAssertEqual(counter, 8, nil);
 	}
 	
 	[space release];

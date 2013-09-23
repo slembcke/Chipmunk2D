@@ -86,7 +86,7 @@
 
 /// The distance between the point and the surface of the shape.
 /// Negative distances mean that the point is that depth inside the shape.
-@property(nonatomic, readonly) cpFloat dist;
+@property(nonatomic, readonly) cpFloat distance;
 
 /// The closest point on the surface of the shape to the point.
 @property(nonatomic, readonly) cpVect point;
