@@ -14,7 +14,7 @@
 */
 @interface ChipmunkConstraint : NSObject <ChipmunkBaseObject> {
 @private
-	id data;
+	id _userData;
 }
 
 /// Returns a pointer to the underlying cpConstraint C struct.
@@ -59,7 +59,7 @@
 	An object that this constraint is associated with. You can use this get a reference to your game object or controller object from within callbacks.
 	@attention Like most @c delegate properties this is a weak reference and does not call @c retain. This prevents reference cycles from occuring.
 */
-@property(nonatomic, assign) id data;
+@property(nonatomic, assign) id userData;
 
 /// Override this method to update a constraints parameters just before running the physics each step.
 -(void)preSolve:(ChipmunkSpace *)space;

@@ -7,8 +7,8 @@
 
 /// Abstract base class for collsion shape types.
 @interface ChipmunkShape : NSObject <ChipmunkBaseObject> {
-@public
-	id data;
+@private
+	id _userData;
 }
 
 /// Get the ChipmunkShape object associciated with a cpShape pointer.

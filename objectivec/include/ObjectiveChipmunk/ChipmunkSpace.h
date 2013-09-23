@@ -17,7 +17,7 @@ struct cpSpace;
 	NSMutableSet *_children;
 	NSMutableArray *_handlers;
 	
-	id _data;
+	id _userData;
 }
 
 /**
@@ -91,7 +91,7 @@ __attribute__((__deprecated__));
 	An object that this space is associated with. You can use this get a reference to your game state or controller object from within callbacks.
 	@attention Like most @c delegate properties this is a weak reference and does not call @c retain. This prevents reference cycles from occuring.
 */
-@property(nonatomic, assign) id data;
+@property(nonatomic, assign) id userData;
 
 /// Get the ChipmunkSpace object associciated with a cpSpace pointer.
 /// Undefined if the cpSpace wasn't created using Objective-Chipmunk.

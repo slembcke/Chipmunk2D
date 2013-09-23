@@ -24,7 +24,7 @@ static void
 GrabPreSolve(cpConstraint *constraint, cpSpace *space)
 {
 	cpBody *grabBody = cpConstraintGetA(constraint);
-	ChipmunkGrab *grab = [ChipmunkConstraint constraintFromCPConstraint:constraint].data;
+	ChipmunkGrab *grab = [ChipmunkConstraint constraintFromCPConstraint:constraint].userData;
 	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
 	cpFloat coef = cpfpow(grab->_smoothing, dt);
 	
@@ -50,7 +50,7 @@ GrabPreSolve(cpConstraint *constraint, cpSpace *space)
 		if(body){
 			ChipmunkPivotJoint *pivot = [ChipmunkPivotJoint pivotJointWithBodyA:grabBody bodyB:body anchr1:cpvzero anchr2:[body worldToLocal:nearest]];
 			pivot.maxForce = multiGrab.grabForce;
-			pivot.data = self;
+			pivot.userData = self;
 			cpConstraintSetPreSolveFunc(pivot.constraint, GrabPreSolve);
 			chipmunkObjects = [chipmunkObjects arrayByAddingObject:pivot];
 			

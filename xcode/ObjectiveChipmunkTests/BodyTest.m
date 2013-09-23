@@ -37,9 +37,9 @@
 	XCTAssertEqual(body.moment, (cpFloat)123, @"");
 	
 	XCTAssertNotEqual(body.body, NULL, @"");
-	XCTAssertNil(body.data, @"");
+	XCTAssertNil(body.userData, @"");
 	
-	TestAccessors(body, data, @"object");
+	TestAccessors(body, userData, @"object");
 	TestAccessors(body, mass, (cpFloat)5);
 	TestAccessors(body, moment, (cpFloat)5);
 	TestAccessors(body, position, cpv(5,6));

@@ -31,7 +31,7 @@ NSSet * ChipmunkObjectFlatten(id <ChipmunkObject> firstObject, ...) __attribute_
 */
 @protocol ChipmunkBaseObject <ChipmunkObject>
 
-@property(nonatomic, assign) id data;
+@property(nonatomic, assign) id userData;
 
 - (void)addToSpace:(ChipmunkSpace *)space;
 - (void)removeFromSpace:(ChipmunkSpace *)space;

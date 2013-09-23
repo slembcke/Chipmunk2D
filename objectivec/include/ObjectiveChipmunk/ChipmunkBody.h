@@ -11,7 +11,7 @@
 @interface ChipmunkBody : NSObject <ChipmunkBaseObject> {
 @private
 	cpBody _body;
-	id data;
+	id _userData;
 }
 
 /// Get the ChipmunkBody object associciated with a cpBody pointer.
@@ -66,6 +66,9 @@
 /// The torque being applied to the rigid body. Like force, this property is not reset every frame.
 @property(nonatomic, assign) cpFloat torque;
 
+/// The rigid transform of the body.
+@property(nonatomic, readonly) cpTransform transform;
+
 /// Returns a pointer to the underlying cpBody C struct.
 @property(nonatomic, readonly) cpBody *body;
 
@@ -73,7 +76,7 @@
 	An object that this constraint is associated with. You can use this get a reference to your game object or controller object from within callbacks.
 	@attention Like most @c delegate properties this is a weak reference and does not call @c retain. This prevents reference cycles from occuring.
 */
-@property(nonatomic, assign) id data;
+@property(nonatomic, assign) id userData;
 
 /// Maximum velocity allowed for this body. Defaults to @c INFINITY.
 @property(nonatomic, assign) cpFloat velocityLimit;

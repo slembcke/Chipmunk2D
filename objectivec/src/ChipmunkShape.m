@@ -13,7 +13,7 @@
 
 @implementation ChipmunkShape
 
-@synthesize data;
+@synthesize userData = _userData;
 
 +(ChipmunkShape *)shapeFromCPShape:(cpShape *)shape
 {

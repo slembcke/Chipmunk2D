@@ -174,7 +174,7 @@ static NSString *dialogMessage = @"This copy of Chipmunk Pro is a trial, please 
 
 - (cpSpace *)space {return _space;}
 
-@synthesize data = _data;
+@synthesize userData = _userData;
 
 // accessor macros
 #define getter(type, lower, upper) \

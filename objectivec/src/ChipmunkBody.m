@@ -101,11 +101,11 @@ PositionFunction
 	[super dealloc];
 }
 
-
+- (cpTransform)transform {return _body.transform;}
 - (cpBody *)body {return &_body;}
 
 
-@synthesize data;
+@synthesize userData = _userData;
 
 // accessor macros
 #define getter(type, lower, upper) \

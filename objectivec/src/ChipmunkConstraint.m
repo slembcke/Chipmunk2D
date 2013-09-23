@@ -13,7 +13,7 @@
 
 @implementation ChipmunkConstraint
 
-@synthesize data;
+@synthesize userData = _userData;
 
 +(ChipmunkConstraint *)constraintFromCPConstraint:(cpConstraint *)constraint
 {	
