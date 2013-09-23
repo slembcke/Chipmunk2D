@@ -68,13 +68,19 @@ cpArbiterGetNormal(const cpArbiter *arb)
 	return cpvmult(arb->n, arb->swapped ? -1.0f : 1.0);
 }
 
-//cpVect
-//cpArbiterGetPoint(const cpArbiter *arb, int i)
-//{
-//	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
-//	
-//	return arb->contacts[i].p;
-//}
+cpVect
+cpArbiterGetPoint1(const cpArbiter *arb, int i)
+{
+	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
+	return cpvadd(arb->body_a->p, arb->contacts[i].r1);
+}
+
+cpVect
+cpArbiterGetPoint2(const cpArbiter *arb, int i)
+{
+	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
+	return cpvadd(arb->body_a->p, arb->contacts[i].r2);
+}
 
 cpFloat
 cpArbiterGetDepth(const cpArbiter *arb, int i)
@@ -92,7 +98,8 @@ cpArbiterGetContactPointSet(const cpArbiter *arb)
 	set.count = cpArbiterGetCount(arb);
 	
 	cpBool swapped = arb->swapped;
-	set.normal = (swapped ? cpvneg(arb->n) : arb->n);
+	cpVect n = arb->n;
+	set.normal = (swapped ? cpvneg(n) : n);
 	
 	for(int i=0; i<set.count; i++){
 		// Contact points are relative to body CoGs;
@@ -101,24 +108,30 @@ cpArbiterGetContactPointSet(const cpArbiter *arb)
 		
 		set.points[i].point1 = (swapped ? p2 : p1);
 		set.points[i].point2 = (swapped ? p1 : p2);
-		set.points[i].distance = cpvdot(cpvsub(p2, p1), set.normal);
+		set.points[i].distance = cpvdot(cpvsub(p2, p1), n);
 	}
 	
 	return set;
 }
 
-//void
-//cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
-//{
-//	int count = set->count;
-//	cpAssertHard(count == arb->count, "The number of contact points cannot be changed.");
-//	
-//	for(int i=0; i<count; i++){
-////		arb->contacts[i].p = set->points[i].point;
-////		arb->contacts[i].n = set->points[i].normal;
-////		arb->contacts[i].dist = set->points[i].dist;
-//	}
-//}
+void
+cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
+{
+	int count = set->count;
+	cpAssertHard(count == arb->count, "The number of contact points cannot be changed.");
+	
+	cpBool swapped = arb->swapped;
+	arb->n = (swapped ? cpvneg(set->normal) : set->normal);
+	
+	for(int i=0; i<count; i++){
+		// Convert back to CoG relative offsets.
+		cpVect p1 = set->points[i].point1;
+		cpVect p2 = set->points[i].point2;
+		
+		arb->contacts[i].r1 = cpvsub(swapped ? p2 : p1, arb->body_a->p);
+		arb->contacts[i].r2 = cpvsub(swapped ? p1 : p2, arb->body_b->p);
+	}
+}
 
 cpVect
 cpArbiterTotalImpulse(const cpArbiter *arb)
