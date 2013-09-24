@@ -196,7 +196,6 @@
 		D309B23E17EFFF8700AA52C8 /* ChipmunkBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ChipmunkBody.h; path = ../objectivec/include/ObjectiveChipmunk/ChipmunkBody.h; sourceTree = "<group>"; };
 		D309B23F17EFFF8700AA52C8 /* ChipmunkConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ChipmunkConstraint.h; path = ../objectivec/include/ObjectiveChipmunk/ChipmunkConstraint.h; sourceTree = "<group>"; };
 		D309B24117EFFF8700AA52C8 /* ChipmunkMultiGrab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ChipmunkMultiGrab.h; path = ../objectivec/include/ObjectiveChipmunk/ChipmunkMultiGrab.h; sourceTree = "<group>"; };
-		D309B24217EFFF8700AA52C8 /* ChipmunkObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ChipmunkObject.h; path = ../objectivec/include/ObjectiveChipmunk/ChipmunkObject.h; sourceTree = "<group>"; };
 		D309B24317EFFF8700AA52C8 /* ChipmunkShape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ChipmunkShape.h; path = ../objectivec/include/ObjectiveChipmunk/ChipmunkShape.h; sourceTree = "<group>"; };
 		D309B24417EFFF8700AA52C8 /* ChipmunkSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ChipmunkSpace.h; path = ../objectivec/include/ObjectiveChipmunk/ChipmunkSpace.h; sourceTree = "<group>"; };
 		D309B24517EFFF8700AA52C8 /* ObjectiveChipmunk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObjectiveChipmunk.h; path = ../objectivec/include/ObjectiveChipmunk/ObjectiveChipmunk.h; sourceTree = "<group>"; };
@@ -387,7 +386,6 @@
 			isa = PBXGroup;
 			children = (
 				D309B24517EFFF8700AA52C8 /* ObjectiveChipmunk.h */,
-				D309B24217EFFF8700AA52C8 /* ChipmunkObject.h */,
 				D309B23E17EFFF8700AA52C8 /* ChipmunkBody.h */,
 				D309B24617EFFF9E00AA52C8 /* ChipmunkBody.m */,
 				D309B24317EFFF8700AA52C8 /* ChipmunkShape.h */,
