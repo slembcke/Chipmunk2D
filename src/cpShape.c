@@ -93,6 +93,10 @@ cpShapeSetMass(cpShape *shape, cpFloat mass){
 cpFloat cpShapeGetDensity(cpShape *shape){ return shape->massInfo.m/shape->massInfo.area; }
 void cpShapeSetDensity(cpShape *shape, cpFloat density){ cpShapeSetMass(shape, density*shape->massInfo.area); }
 
+cpFloat cpShapeGetMoment(cpShape *shape){ return shape->massInfo.m*shape->massInfo.i; }
+cpFloat cpShapeGetArea(cpShape *shape){ return shape->massInfo.area; }
+cpVect cpShapeGetCenterOfGravity(cpShape *shape) { return shape->massInfo.cog; }
+
 
 cpBB
 cpShapeCacheBB(cpShape *shape)

@@ -185,6 +185,10 @@ void cpShapeSetMass(cpShape *shape, cpFloat mass);
 cpFloat cpShapeGetDensity(cpShape *shape);
 void cpShapeSetDensity(cpShape *shape, cpFloat density);
 
+cpFloat cpShapeGetMoment(cpShape *shape);
+cpFloat cpShapeGetArea(cpShape *shape);
+cpVect cpShapeGetCenterOfGravity(cpShape *shape);
+
 CP_DefineShapeStructGetter(cpBB, bb, BB)
 CP_DefineShapeStructProperty(cpBool, sensor, Sensor, cpTrue)
 CP_DefineShapeStructProperty(cpFloat, e, Elasticity, cpFalse)

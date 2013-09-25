@@ -47,6 +47,16 @@
 	}
 }
 
+-(cpFloat)mass {return cpShapeGetMass(self.shape);}
+-(void)setMass:(cpFloat)mass {cpShapeSetMass(self.shape, mass);}
+
+-(cpFloat)density {return cpShapeGetDensity(self.shape);}
+-(void)setDensity:(cpFloat)density {cpShapeSetDensity(self.shape, density);}
+
+-(cpFloat)moment {return cpShapeGetMoment(self.shape);}
+-(cpFloat)area {return cpShapeGetArea(self.shape);}
+-(cpVect)centerOfGravity {return cpShapeGetCenterOfGravity(self.shape);}
+
 // accessor macros
 #define getter(type, lower, upper, member) \
 - (type)lower {return self.shape->member;}

@@ -21,6 +21,13 @@
 /// The ChipmunkBody that this shape is attached to.
 @property(nonatomic, retain) ChipmunkBody *body;
 
+// TODO doc
+@property(nonatomic, assign) cpFloat mass;
+@property(nonatomic, assign) cpFloat density;
+@property(nonatomic, readonly) cpFloat moment;
+@property(nonatomic, readonly) cpFloat area;
+@property(nonatomic, readonly) cpVect centerOfGravity;
+
 /// The axis-aligned bounding box for this shape.
 @property(nonatomic, readonly) cpBB bb;
 
@@ -37,7 +44,7 @@
 	The velocity of the shape's surface.
 	This velocity is used in the collision response when calculating the friction only.
 */
-@property(nonatomic, assign) cpVect surfaceVel;
+@property(nonatomic, assign) cpVect surfaceVelocity;
 
 /**
 	An object reference used as a collision type identifier. This is used when defining collision handlers.
