@@ -104,6 +104,8 @@ enum cpArbiterState {
 	CP_ARBITER_STATE_IGNORE,
 	// Collison is no longer active. A space will cache an arbiter for up to cpSpace.collisionPersistence more steps.
 	CP_ARBITER_STATE_CACHED,
+	// Collison arbiter is invalid because one of the shapes was removed.
+	CP_ARBITER_STATE_INVALIDATED,
 };
 
 struct cpArbiterThread {

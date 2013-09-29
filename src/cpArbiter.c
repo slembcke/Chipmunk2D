@@ -56,10 +56,15 @@ cpBool cpArbiterIsFirstContact(const cpArbiter *arb)
 	return arb->CP_PRIVATE(state) == CP_ARBITER_STATE_FIRST_COLLISION;
 }
 
+cpBool cpArbiterIsRemoval(const cpArbiter *arb)
+{
+	return arb->CP_PRIVATE(state) == CP_ARBITER_STATE_INVALIDATED;
+}
+
 int cpArbiterGetCount(const cpArbiter *arb)
 {
 	// Return 0 contacts if we are in a separate callback.
-	return (arb->state != CP_ARBITER_STATE_CACHED ? arb->count : 0);
+	return (arb->state < CP_ARBITER_STATE_CACHED ? arb->count : 0);
 }
 
 cpVect

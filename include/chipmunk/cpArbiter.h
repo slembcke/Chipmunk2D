@@ -101,6 +101,9 @@ void cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set);
 
 /// Returns true if this is the first step a pair of objects started colliding.
 cpBool cpArbiterIsFirstContact(const cpArbiter *arb);
+/// Returns true if in separate callback due to a shape being removed from the space.
+cpBool cpArbiterIsRemoval(const cpArbiter *arb);
+
 /// Get the number of contact points for this arbiter.
 int cpArbiterGetCount(const cpArbiter *arb);
 /// Get the normal of the collision.

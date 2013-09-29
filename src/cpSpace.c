@@ -364,6 +364,9 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 	){
 		// Call separate when removing shapes.
 		if(shape && arb->state != CP_ARBITER_STATE_CACHED){
+			// Invalidate the arbiter since one of the shapes was removed.
+			arb->state = CP_ARBITER_STATE_INVALIDATED;
+			
 			cpCollisionHandler *handler = arb->handler;
 			handler->separateFunc(arb, context->space, handler->userData);
 		}

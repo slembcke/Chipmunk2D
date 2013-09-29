@@ -248,7 +248,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 		(arb->state != CP_ARBITER_STATE_IGNORE) && 
 		// Call preSolve
 		handler->preSolveFunc(arb, space, handler->userData) &&
-		// Check that the preSolve() func didn't call cpArbiterIgnore().
+		// Check (again) in case the pre-solve() callback called cpArbiterIgnored().
 		arb->state != CP_ARBITER_STATE_IGNORE &&
 		// Process, but don't add collisions for sensors.
 		!(a->sensor || b->sensor)
@@ -261,7 +261,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 		arb->count = 0;
 		
 		// Normally arbiters are set as used after calling the post-solve callback.
-		// However, post-solve callbacks are not called for sensors or arbiters rejected from pre-solve.
+		// However, post-solve() callbacks are not called for sensors or arbiters rejected from pre-solve.
 		if(arb->state != CP_ARBITER_STATE_IGNORE) arb->state = CP_ARBITER_STATE_NORMAL;
 	}
 	
