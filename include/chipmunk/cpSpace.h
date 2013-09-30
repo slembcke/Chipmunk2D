@@ -91,21 +91,17 @@ struct cpSpace {
 	/// class so you can access it when given a cpSpace reference in a callback.
 	cpDataPointer userData;
 	
-	/// The designated static body for this space.
-	/// You can modify this body, or replace it with your own static body.
-	/// By default it points to a statically allocated cpBody in the cpSpace struct.
-	cpBody *staticBody;
-	
 	CP_PRIVATE(cpTimestamp stamp);
 	CP_PRIVATE(cpFloat curr_dt);
 
-	CP_PRIVATE(cpArray *bodies);
+	CP_PRIVATE(cpArray *dynamicBodies);
+	CP_PRIVATE(cpArray *otherBodies);
 	CP_PRIVATE(cpArray *rousedBodies);
 	CP_PRIVATE(cpArray *sleepingComponents);
 	
 	CP_PRIVATE(cpHashValue shapeIDCounter);
 	CP_PRIVATE(cpSpatialIndex *staticShapes);
-	CP_PRIVATE(cpSpatialIndex *activeShapes);
+	CP_PRIVATE(cpSpatialIndex *dynamicShapes);
 	
 	CP_PRIVATE(cpArray *constraints);
 	
@@ -166,7 +162,7 @@ CP_DefineSpaceStructProperty(cpFloat, collisionSlop, CollisionSlop)
 CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias)
 CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence)
 CP_DefineSpaceStructProperty(cpDataPointer, userData, UserData)
-CP_DefineSpaceStructGetter(cpBody*, staticBody, StaticBody)
+cpBody * cpSpaceGetStaticBody(cpSpace *space);
 CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep)
 
 /// returns true from inside a callback and objects cannot be added/removed.
@@ -207,16 +203,6 @@ cpBool cpSpaceContainsShape(cpSpace *space, cpShape *shape);
 cpBool cpSpaceContainsBody(cpSpace *space, cpBody *body);
 /// Test if a constraint has been added to the space.
 cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint);
-
-//MARK: Static <--> Dynamic Body Conversion
-
-/// Convert a dynamic rogue body to a static one.
-/// If the body is active, you must remove it from the space first.
-void cpSpaceConvertBodyToStatic(cpSpace *space, cpBody *body);
-/// Convert a body to a dynamic rogue body.
-/// If you want the body to be active after the transition, you must add it to the space also.
-void cpSpaceConvertBodyToDynamic(cpSpace *space, cpBody *body, cpFloat mass, cpFloat moment);
-
 
 //MARK: Post-Step Callbacks
 

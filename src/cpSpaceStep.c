@@ -325,7 +325,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 	cpFloat prev_dt = space->curr_dt;
 	space->curr_dt = dt;
 		
-	cpArray *bodies = space->bodies;
+	cpArray *bodies = space->dynamicBodies;
 	cpArray *constraints = space->constraints;
 	cpArray *arbiters = space->arbiters;
 	
@@ -350,8 +350,8 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		
 		// Find colliding pairs.
 		cpSpacePushFreshContactBuffer(space);
-		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)cpShapeUpdateFunc, NULL);
-		cpSpatialIndexReindexQuery(space->activeShapes, (cpSpatialIndexQueryFunc)cpSpaceCollideShapes, space);
+		cpSpatialIndexEach(space->dynamicShapes, (cpSpatialIndexIteratorFunc)cpShapeUpdateFunc, NULL);
+		cpSpatialIndexReindexQuery(space->dynamicShapes, (cpSpatialIndexQueryFunc)cpSpaceCollideShapes, space);
 	} cpSpaceUnlock(space, cpFalse);
 	
 	// Rebuild the contact graph (and detect sleeping components if sleeping is enabled)

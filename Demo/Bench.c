@@ -87,7 +87,7 @@ SetupSpace_simpleTerrain(){
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(simple_terrain_count - 1); i++){
 		cpVect a = simple_terrain_verts[i], b = simple_terrain_verts[i+1];
-		cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpvadd(a, offset), cpvadd(b, offset), 0.0f));
+		cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpvadd(a, offset), cpvadd(b, offset), 0.0f));
 	}
 	
 	return space;
@@ -222,7 +222,7 @@ static cpSpace *init_ComplexTerrainCircles_1000(){
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(complex_terrain_count - 1); i++){
 		cpVect a = complex_terrain_verts[i], b = complex_terrain_verts[i+1];
-		cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpvadd(a, offset), cpvadd(b, offset), 0.0f));
+		cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpvadd(a, offset), cpvadd(b, offset), 0.0f));
 	}
 	
 	for(int i=0; i<1000; i++){
@@ -247,7 +247,7 @@ static cpSpace *init_ComplexTerrainHexagons_1000(){
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(complex_terrain_count - 1); i++){
 		cpVect a = complex_terrain_verts[i], b = complex_terrain_verts[i+1];
-		cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpvadd(a, offset), cpvadd(b, offset), 0.0f));
+		cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpvadd(a, offset), cpvadd(b, offset), 0.0f));
 	}
 	
 	cpFloat radius = 5.0f;
@@ -325,7 +325,7 @@ static cpSpace *init_BouncyTerrainCircles_500(){
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(bouncy_terrain_count - 1); i++){
 		cpVect a = bouncy_terrain_verts[i], b = bouncy_terrain_verts[i+1];
-		cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpvadd(a, offset), cpvadd(b, offset), 0.0f));
+		cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpvadd(a, offset), cpvadd(b, offset), 0.0f));
 		cpShapeSetElasticity(shape, 1.0);
 	}
 	
@@ -350,7 +350,7 @@ static cpSpace *init_BouncyTerrainHexagons_500(){
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(bouncy_terrain_count - 1); i++){
 		cpVect a = bouncy_terrain_verts[i], b = bouncy_terrain_verts[i+1];
-		cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpvadd(a, offset), cpvadd(b, offset), 0.0f));
+		cpShape *shape = cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpvadd(a, offset), cpvadd(b, offset), 0.0f));
 		cpShapeSetElasticity(shape, 1.0);
 	}
 	
@@ -394,14 +394,14 @@ static cpSpace *init_NoCollide(){
 	
 	float radius = 4.5f;
 	
-	cpShapeSetElasticity(cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpv(-330-radius, -250-radius), cpv( 330+radius, -250-radius), 0.0f)), 1.0f);
-	cpShapeSetElasticity(cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpv( 330+radius,  250+radius), cpv( 330+radius, -250-radius), 0.0f)), 1.0f);
-	cpShapeSetElasticity(cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpv( 330+radius,  250+radius), cpv(-330-radius,  250+radius), 0.0f)), 1.0f);
-	cpShapeSetElasticity(cpSpaceAddShape(space, cpSegmentShapeNew(space->staticBody, cpv(-330-radius, -250-radius), cpv(-330-radius,  250+radius), 0.0f)), 1.0f);
+	cpShapeSetElasticity(cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpv(-330-radius, -250-radius), cpv( 330+radius, -250-radius), 0.0f)), 1.0f);
+	cpShapeSetElasticity(cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpv( 330+radius,  250+radius), cpv( 330+radius, -250-radius), 0.0f)), 1.0f);
+	cpShapeSetElasticity(cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpv( 330+radius,  250+radius), cpv(-330-radius,  250+radius), 0.0f)), 1.0f);
+	cpShapeSetElasticity(cpSpaceAddShape(space, cpSegmentShapeNew(cpSpaceGetStaticBody(space), cpv(-330-radius, -250-radius), cpv(-330-radius,  250+radius), 0.0f)), 1.0f);
 	
 	for(int x=-320; x<=320; x+=20){
 		for(int y=-240; y<=240; y+=20){
-			cpSpaceAddShape(space, cpCircleShapeNew(space->staticBody, radius, cpv(x, y)));
+			cpSpaceAddShape(space, cpCircleShapeNew(cpSpaceGetStaticBody(space), radius, cpv(x, y)));
 		}
 	}
 	

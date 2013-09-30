@@ -78,7 +78,7 @@ MAKE_PROPERTIES_REF(cpBody, AngularVelocityLimit);
 MAKE_PROPERTIES_REF(cpBody, UserData);
 MAKE_REF(cpBodyIsSleeping);
 MAKE_REF(cpBodyIsStatic);
-MAKE_REF(cpBodyIsRogue);
+//MAKE_REF(cpBodyIsRogue);
 MAKE_REF(cpBodyLocalToWorld);
 MAKE_REF(cpBodyWorldToLocal);
 MAKE_REF(cpBodyKineticEnergy);

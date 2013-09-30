@@ -139,24 +139,42 @@ void cpBodySleep(cpBody *body);
 /// Force a body to fall asleep immediately along with other bodies in a group.
 void cpBodySleepWithGroup(cpBody *body, cpBody *group);
 
+void cpBodyMakeStatic(cpBody *body);
+void cpBodyMakeDynamic(cpBody *body, cpFloat mass, cpFloat moment);
+
+
 /// Returns true if the body is sleeping.
 static inline cpBool cpBodyIsSleeping(const cpBody *body)
 {
 	return (CP_PRIVATE(body->node).root != ((cpBody*)0));
 }
 
-/// Returns true if the body is static.
+// TODO what to do with these?
+static cpBool
+cpBodyIsKinematic(cpBody *body)
+{
+	// TODO need to make a flag for this...
+	return (CP_PRIVATE(body->space) == NULL);
+}
+
 static inline cpBool cpBodyIsStatic(const cpBody *body)
 {
 	return CP_PRIVATE(body->node).idleTime == INFINITY;
 }
 
+static inline cpBool
+cpBodyIsDynamic(cpBody *body)
+{
+	return (!cpBodyIsStatic(body) && !cpBodyIsKinematic(body));
+}
+
+// TODO what to do about rogue bodies?
 /// Returns true if the body has not been added to a space.
 /// Note: Static bodies are a subtype of rogue bodies.
-static inline cpBool cpBodyIsRogue(const cpBody *body)
-{
-	return (body->CP_PRIVATE(space) == ((cpSpace*)0));
-}
+//static inline cpBool cpBodyIsRogue(const cpBody *body)
+//{
+//	return (body->CP_PRIVATE(space) == ((cpSpace*)0));
+//}
 
 /// Convert body relative/local coordinates to absolute/world coordinates.
 static inline cpVect cpBodyLocalToWorld(const cpBody *body, const cpVect point)

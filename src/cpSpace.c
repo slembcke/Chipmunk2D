@@ -60,6 +60,12 @@ handlerSetTrans(cpCollisionHandler *handler, void *unused)
 
 //MARK: Misc Helper Funcs
 
+#define cpAssertSpaceUnlocked(space) \
+	cpAssertHard(!space->locked, \
+		"This operation cannot be done safely during a call to cpSpaceStep() or during a query. " \
+		"Put these calls into a post-step callback." \
+	);
+
 // Default collision functions.
 
 static cpBool
@@ -138,12 +144,13 @@ cpSpaceInit(cpSpace *space)
 	
 	space->shapeIDCounter = 0;
 	space->staticShapes = cpBBTreeNew((cpSpatialIndexBBFunc)cpShapeGetBB, NULL);
-	space->activeShapes = cpBBTreeNew((cpSpatialIndexBBFunc)cpShapeGetBB, space->staticShapes);
-	cpBBTreeSetVelocityFunc(space->activeShapes, (cpBBTreeVelocityFunc)ShapeVelocityFunc);
+	space->dynamicShapes = cpBBTreeNew((cpSpatialIndexBBFunc)cpShapeGetBB, space->staticShapes);
+	cpBBTreeSetVelocityFunc(space->dynamicShapes, (cpBBTreeVelocityFunc)ShapeVelocityFunc);
 	
 	space->allocatedBuffers = cpArrayNew(0);
 	
-	space->bodies = cpArrayNew(0);
+	space->dynamicBodies = cpArrayNew(0);
+	space->otherBodies = cpArrayNew(0);
 	space->sleepingComponents = cpArrayNew(0);
 	space->rousedBodies = cpArrayNew(0);
 	
@@ -165,8 +172,10 @@ cpSpaceInit(cpSpace *space)
 	space->postStepCallbacks = cpArrayNew(0);
 	space->skipPostStep = cpFalse;
 	
-	cpBodyInitStatic(&space->_staticBody);
-	space->staticBody = &space->_staticBody;
+	cpBody *staticBody = &space->_staticBody;
+	cpBodyInitStatic(staticBody);
+	staticBody->space = space;
+	cpArrayPush(space->otherBodies, staticBody);
 	
 	return space;
 }
@@ -183,9 +192,10 @@ cpSpaceDestroy(cpSpace *space)
 	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)cpBodyActivate, NULL);
 	
 	cpSpatialIndexFree(space->staticShapes);
-	cpSpatialIndexFree(space->activeShapes);
+	cpSpatialIndexFree(space->dynamicShapes);
 	
-	cpArrayFree(space->bodies);
+	cpArrayFree(space->dynamicBodies);
+	cpArrayFree(space->otherBodies);
 	cpArrayFree(space->sleepingComponents);
 	cpArrayFree(space->rousedBodies);
 	
@@ -219,11 +229,15 @@ cpSpaceFree(cpSpace *space)
 	}
 }
 
-#define cpAssertSpaceUnlocked(space) \
-	cpAssertHard(!space->locked, \
-		"This operation cannot be done safely during a call to cpSpaceStep() or during a query. " \
-		"Put these calls into a post-step callback." \
-	);
+
+//MARK: Basic properties:
+
+cpBody *
+cpSpaceGetStaticBody(cpSpace *space)
+{
+	return (cpBody *)space->otherBodies->arr[0];
+}
+
 
 //MARK: Collision Handler Function Management
 
@@ -269,41 +283,22 @@ cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type)
 
 
 //MARK: Body, Shape, and Joint Management
-static cpShape *
-cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
-{
-	cpAssertHard(shape->space != space, "You have already added this shape to this space. You must not add it a second time.");
-	cpAssertHard(!shape->space, "You have already added this shape to another space. You cannot add it to a second.");
-	cpAssertHard(cpBodyIsRogue(shape->body), "You are adding a static shape to a dynamic body. Did you mean to attach it to a static or rogue body? See the documentation for more information.");
-	cpAssertSpaceUnlocked(space);
-	
-	cpBody *body = shape->body;
-	cpBodyAddShape(body, shape);
-	
-	shape->hashid = space->shapeIDCounter++;
-	cpShapeUpdate(shape, body->transform);
-	cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
-	shape->space = space;
-	
-	return shape;
-}
-
 cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
 	cpBody *body = shape->body;
-	if(cpBodyIsStatic(body)) return cpSpaceAddStaticShape(space, shape);
 	
 	cpAssertHard(shape->space != space, "You have already added this shape to this space. You must not add it a second time.");
 	cpAssertHard(!shape->space, "You have already added this shape to another space. You cannot add it to a second.");
 	cpAssertSpaceUnlocked(space);
 	
-	cpBodyActivate(body);
+	cpBool isStatic = cpBodyIsStatic(body);
+	if(!isStatic) cpBodyActivate(body);
 	cpBodyAddShape(body, shape);
 	
 	shape->hashid = space->shapeIDCounter++;
 	cpShapeUpdate(shape, body->transform);
-	cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
+	cpSpatialIndexInsert(isStatic ? space->staticShapes : space->dynamicShapes, shape, shape->hashid);
 	shape->space = space;
 		
 	return shape;
@@ -312,12 +307,11 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 cpBody *
 cpSpaceAddBody(cpSpace *space, cpBody *body)
 {
-	cpAssertHard(!cpBodyIsStatic(body), "Do not add static bodies to a space. Static bodies do not move and should not be simulated.");
 	cpAssertHard(body->space != space, "You have already added this body to this space. You must not add it a second time.");
 	cpAssertHard(!body->space, "You have already added this body to another space. You cannot add it to a second.");
 	cpAssertSpaceUnlocked(space);
 	
-	cpArrayPush(space->bodies, body);
+	cpArrayPush(cpBodyIsStatic(body) ? space->otherBodies : space->dynamicBodies, body);
 	body->space = space;
 	
 	return body;
@@ -390,49 +384,37 @@ cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter)
 	} cpSpaceUnlock(space, cpTrue);
 }
 
-static void
-cpSpaceRemoveStaticShape(cpSpace *space, cpShape *shape)
+void
+cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 {
-	cpAssertHard(cpSpaceContainsShape(space, shape), "Cannot remove a static or sleeping shape that was not added to the space. (Removed twice maybe?)");
+	cpBody *body = shape->body;
+	cpAssertHard(cpSpaceContainsShape(space, shape), "Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
-	cpBody *body = shape->body;
-	if(cpBodyIsStatic(body)) cpBodyActivateStatic(body, shape);
+	cpBool isStatic = cpBodyIsStatic(body);
+	if(isStatic){
+		cpBodyActivateStatic(body, shape);
+	} else {
+		cpBodyActivate(body);
+	}
+
 	cpBodyRemoveShape(body, shape);
 	cpSpaceFilterArbiters(space, body, shape);
-	cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
+	cpSpatialIndexRemove(isStatic ? space->staticShapes : space->dynamicShapes, shape, shape->hashid);
 	shape->space = NULL;
 	shape->hashid = 0;
 }
 
 void
-cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
-{
-	cpBody *body = shape->body;
-	if(cpBodyIsStatic(body)){
-		cpSpaceRemoveStaticShape(space, shape);
-	} else {
-		cpAssertHard(cpSpaceContainsShape(space, shape), "Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
-		cpAssertSpaceUnlocked(space);
-		
-		cpBodyActivate(body);
-		cpBodyRemoveShape(body, shape);
-		cpSpaceFilterArbiters(space, body, shape);
-		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
-		shape->space = NULL;
-		shape->hashid = 0;
-	}
-}
-
-void
 cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 {
+	cpAssertHard(body != cpSpaceGetStaticBody(space), "Cannot remove the designated static body for the space.");
 	cpAssertHard(cpSpaceContainsBody(space, body), "Cannot remove a body that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
 //	cpSpaceFilterArbiters(space, body, NULL);
-	cpArrayDeleteObj(space->bodies, body);
+	cpArrayDeleteObj(cpBodyIsStatic(body) ? space->otherBodies : space->dynamicBodies, body);
 	body->space = NULL;
 }
 
@@ -466,53 +448,13 @@ cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)
 	return (constraint->space == space);
 }
 
-//MARK: Static/rogue body conversion.
-
-void
-cpSpaceConvertBodyToStatic(cpSpace *space, cpBody *body)
-{
-	cpAssertHard(!cpBodyIsStatic(body), "Body is already static.");
-	cpAssertHard(cpBodyIsRogue(body), "Remove the body from the space before calling this function.");
-	cpAssertSpaceUnlocked(space);
-	
-	cpBodySetMass(body, INFINITY);
-	cpBodySetMoment(body, INFINITY);
-	
-	cpBodySetVelocity(body, cpvzero);
-	cpBodySetAngularVelocity(body, 0.0f);
-	
-	body->node.idleTime = INFINITY;
-	CP_BODY_FOREACH_SHAPE(body, shape){
-		cpSpatialIndexRemove(space->activeShapes, shape, shape->hashid);
-		cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
-	}
-}
-
-void
-cpSpaceConvertBodyToDynamic(cpSpace *space, cpBody *body, cpFloat m, cpFloat i)
-{
-	cpAssertHard(cpBodyIsStatic(body), "Body is already dynamic.");
-	cpAssertSpaceUnlocked(space);
-	
-	cpBodyActivateStatic(body, NULL);
-	
-	cpBodySetMass(body, m);
-	cpBodySetMoment(body, i);
-	
-	body->node.idleTime = 0.0f;
-	CP_BODY_FOREACH_SHAPE(body, shape){
-		cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
-		cpSpatialIndexInsert(space->activeShapes, shape, shape->hashid);
-	}
-}
-
 //MARK: Iteration
 
 void
 cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 {
 	cpSpaceLock(space); {
-		cpArray *bodies = space->bodies;
+		cpArray *bodies = space->dynamicBodies;
 		
 		for(int i=0; i<bodies->num; i++){
 			func((cpBody *)bodies->arr[i], data);
@@ -548,7 +490,7 @@ cpSpaceEachShape(cpSpace *space, cpSpaceShapeIteratorFunc func, void *data)
 {
 	cpSpaceLock(space); {
 		spaceShapeContext context = {func, data};
-		cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)spaceEachShapeIterator, &context);
+		cpSpatialIndexEach(space->dynamicShapes, (cpSpatialIndexIteratorFunc)spaceEachShapeIterator, &context);
 		cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)spaceEachShapeIterator, &context);
 	} cpSpaceUnlock(space, cpTrue);
 }
@@ -584,7 +526,7 @@ cpSpaceReindexShape(cpSpace *space, cpShape *shape)
 	cpShapeCacheBB(shape);
 	
 	// attempt to rehash the shape in both hashes
-	cpSpatialIndexReindexObject(space->activeShapes, shape, shape->hashid);
+	cpSpatialIndexReindexObject(space->dynamicShapes, shape, shape->hashid);
 	cpSpatialIndexReindexObject(space->staticShapes, shape, shape->hashid);
 }
 
@@ -605,14 +547,14 @@ void
 cpSpaceUseSpatialHash(cpSpace *space, cpFloat dim, int count)
 {
 	cpSpatialIndex *staticShapes = cpSpaceHashNew(dim, count, (cpSpatialIndexBBFunc)cpShapeGetBB, NULL);
-	cpSpatialIndex *activeShapes = cpSpaceHashNew(dim, count, (cpSpatialIndexBBFunc)cpShapeGetBB, staticShapes);
+	cpSpatialIndex *dynamicShapes = cpSpaceHashNew(dim, count, (cpSpatialIndexBBFunc)cpShapeGetBB, staticShapes);
 	
 	cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)copyShapes, staticShapes);
-	cpSpatialIndexEach(space->activeShapes, (cpSpatialIndexIteratorFunc)copyShapes, activeShapes);
+	cpSpatialIndexEach(space->dynamicShapes, (cpSpatialIndexIteratorFunc)copyShapes, dynamicShapes);
 	
 	cpSpatialIndexFree(space->staticShapes);
-	cpSpatialIndexFree(space->activeShapes);
+	cpSpatialIndexFree(space->dynamicShapes);
 	
 	space->staticShapes = staticShapes;
-	space->activeShapes = activeShapes;
+	space->dynamicShapes = dynamicShapes;
 }

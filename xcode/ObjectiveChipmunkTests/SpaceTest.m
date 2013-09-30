@@ -202,11 +202,11 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	// Check that normal shapes get added correctly
 	ChipmunkBody *rogue = [ChipmunkBody bodyWithMass:1 andMoment:1];
 	shape = [space add:[ChipmunkCircleShape circleWithBody:rogue radius:1 offset:cpvzero]];
-	XCTAssertTrue(cpSpatialIndexContains(space.space->activeShapes, shape.shape, shape.shape->hashid), @"");
+	XCTAssertTrue(cpSpatialIndexContains(space.space->dynamicShapes, shape.shape, shape.shape->hashid), @"");
 	
 	ChipmunkBody *normal = [space add:[ChipmunkBody bodyWithMass:1 andMoment:1]];
 	shape = [space add:[ChipmunkCircleShape circleWithBody:normal radius:1 offset:cpvzero]];
-	XCTAssertTrue(cpSpatialIndexContains(space.space->activeShapes, shape.shape, shape.shape->hashid), @"");
+	XCTAssertTrue(cpSpatialIndexContains(space.space->dynamicShapes, shape.shape, shape.shape->hashid), @"");
 	
 	[space release];
 }

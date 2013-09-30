@@ -135,6 +135,44 @@ cpBodySanityCheck(const cpBody *body)
 }
 #endif
 
+//void
+//cpSpaceConvertBodyToStatic(cpSpace *space, cpBody *body)
+//{
+//	cpAssertHard(!cpBodyIsStatic(body), "Body is already static.");
+//	cpAssertHard(cpBodyIsRogue(body), "Remove the body from the space before calling this function.");
+//	cpAssertSpaceUnlocked(space);
+//	
+//	cpBodySetMass(body, INFINITY);
+//	cpBodySetMoment(body, INFINITY);
+//	
+//	cpBodySetVelocity(body, cpvzero);
+//	cpBodySetAngularVelocity(body, 0.0f);
+//	
+//	body->node.idleTime = INFINITY;
+//	CP_BODY_FOREACH_SHAPE(body, shape){
+//		cpSpatialIndexRemove(space->dynamicShapes, shape, shape->hashid);
+//		cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
+//	}
+//}
+//
+//void
+//cpSpaceConvertBodyToDynamic(cpSpace *space, cpBody *body, cpFloat m, cpFloat i)
+//{
+//	cpAssertHard(cpBodyIsStatic(body), "Body is already dynamic.");
+//	cpAssertSpaceUnlocked(space);
+//	
+//	cpBodyActivateStatic(body, NULL);
+//	
+//	cpBodySetMass(body, m);
+//	cpBodySetMoment(body, i);
+//	
+//	body->node.idleTime = 0.0f;
+//	CP_BODY_FOREACH_SHAPE(body, shape){
+//		cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
+//		cpSpatialIndexInsert(space->dynamicShapes, shape, shape->hashid);
+//	}
+//}
+
 // Should only be called for a shape with mass info set.
 void
 cpBodyAccumulateMassForShape(cpBody *body, cpShape *shape)

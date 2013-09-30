@@ -238,7 +238,7 @@ DrawInfo()
 		"Constraints x Iterations: %d (%d)\n"
 		"Time:% 5.2fs, KE:% 5.2e";
 	
-	cpArray *bodies = space->bodies;
+	cpArray *bodies = space->dynamicBodies;
 	cpFloat ke = 0.0f;
 	for(int i=0; i<bodies->num; i++){
 		cpBody *body = (cpBody *)bodies->arr[i];

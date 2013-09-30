@@ -83,7 +83,7 @@ init(void)
 	
 	{
 		cpShape *shape = NULL;
-		cpBody *staticBody = space->staticBody;
+		cpBody *staticBody = cpSpaceGetStaticBody(space);
 		
 		shape = cpSpaceAddShape(space, cpSegmentShapeNew(staticBody, cpv(-3200,-240), cpv(3200,-240), 0.0f));
 		cpShapeSetElasticity(shape, 1.0f);
