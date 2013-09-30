@@ -179,6 +179,30 @@ cpArbiterIgnore(cpArbiter *arb)
 	return cpFalse;
 }
 
+cpFloat
+cpArbiterGetRestitution(const cpArbiter *arb)
+{
+	return arb->e;
+}
+
+void
+cpArbiterSetRestitution(cpArbiter *arb, cpFloat restitution)
+{
+	arb->e = restitution;
+}
+
+cpFloat
+cpArbiterGetFriction(const cpArbiter *arb)
+{
+	return arb->u;
+}
+
+void
+cpArbiterSetFriction(cpArbiter *arb, cpFloat friction)
+{
+	arb->u = friction;
+}
+
 cpVect
 cpArbiterGetSurfaceVelocity(cpArbiter *arb)
 {

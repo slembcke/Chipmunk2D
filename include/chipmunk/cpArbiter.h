@@ -27,7 +27,7 @@
 
 #define CP_MAX_CONTACTS_PER_ARBITER 2
 
-// TODO: no definitions
+// TODO: Document
 cpFloat cpArbiterGetRestitution(const cpArbiter *arb);
 void cpArbiterSetRestitution(cpArbiter *arb, cpFloat restitution);
 cpFloat cpArbiterGetFriction(const cpArbiter *arb);
