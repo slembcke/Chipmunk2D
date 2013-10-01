@@ -175,7 +175,7 @@ init(void)
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 	
-	scaleStaticBody = cpBodyNewStatic();
+	scaleStaticBody = cpSpaceAddBody(space, cpBodyNewStatic());
 	shape = cpSpaceAddShape(space, cpSegmentShapeNew(scaleStaticBody, cpv(-240,-180), cpv(-140,-180), 4.0f));
 	cpShapeSetElasticity(shape, 1.0f);
 	cpShapeSetFriction(shape, 1.0f);
@@ -208,8 +208,6 @@ destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
 	cpSpaceFree(space);
-	
-	cpBodyFree(scaleStaticBody);
 }
 
 ChipmunkDemo ContactGraph = {

@@ -99,14 +99,15 @@ static cpSpace *
 init(void)
 {
 	// Create a rouge body to control the planet manually.
-	planetBody = cpBodyNew(INFINITY, INFINITY);
-	cpBodySetAngularVelocity(planetBody, 0.2f);
-	
 	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 20);
 	
-	for(int i=0; i<30; i++)
+	planetBody = cpSpaceAddBody(space, cpBodyNewKinematic());
+	cpBodySetAngularVelocity(planetBody, 0.2f);
+	
+	for(int i=0; i<30; i++){
 		add_box(space);
+	}
 	
 	cpShape *shape = cpSpaceAddShape(space, cpCircleShapeNew(planetBody, 70.0f, cpvzero));
 	cpShapeSetElasticity(shape, 1.0f);
@@ -120,7 +121,6 @@ static void
 destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
-	cpBodyFree(planetBody);
 	cpSpaceFree(space);
 }
 

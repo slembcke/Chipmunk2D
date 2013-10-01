@@ -669,7 +669,7 @@ main(int argc, const char **argv)
 //		time_trial('d' - 'a', 10000);
 		exit(0);
 	} else {
-		mouse_body = cpBodyNew(INFINITY, INFINITY);
+		mouse_body = cpBodyNewKinematic();
 		
 		RunDemo(demo_index);
 		SetupGLFW();

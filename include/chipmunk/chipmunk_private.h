@@ -78,11 +78,15 @@ void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);
 
 //MARK: Body Functions
 
+static inline cpBool cpBodyIsDynamic(cpBody *body){return (cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC);}
+static inline cpBool cpBodyIsKinematic(cpBody *body){return (cpBodyGetType(body) == CP_BODY_TYPE_KINEMATIC);}
+static inline cpBool cpBodyIsStatic(cpBody *body){return (cpBodyGetType(body) == CP_BODY_TYPE_STATIC);}
+
 void cpBodyAddShape(cpBody *body, cpShape *shape);
 void cpBodyRemoveShape(cpBody *body, cpShape *shape);
 
-void cpBodyAccumulateMassForShape(cpBody *body, cpShape *shape);
-void cpBodyAccumulateMass(cpBody *body);
+//void cpBodyAccumulateMassForShape(cpBody *body, cpShape *shape);
+void cpBodyAccumulateMassFromShapes(cpBody *body);
 
 void cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint);
 
@@ -328,6 +332,12 @@ bias_coef(cpFloat errorBias, cpFloat dt)
 
 
 //MARK: Space Functions
+
+#define cpAssertSpaceUnlocked(space) \
+	cpAssertHard(!space->locked, \
+		"This operation cannot be done safely during a call to cpSpaceStep() or during a query. " \
+		"Put these calls into a post-step callback." \
+	);
 
 extern cpCollisionHandler cpCollisionHandlerDoNothing;
 

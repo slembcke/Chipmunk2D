@@ -25,6 +25,12 @@
 /// They are given a shape by creating collision shapes (cpShape) that point to the body.
 /// @{
 
+typedef enum cpBodyType {
+	CP_BODY_TYPE_DYNAMIC,
+	CP_BODY_TYPE_KINEMATIC,
+	CP_BODY_TYPE_STATIC,
+} cpBodyType;
+
 /// Rigid body velocity update function type.
 typedef void (*cpBodyVelocityFunc)(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);
 /// Rigid body position update function type.
@@ -104,16 +110,14 @@ struct cpBody {
 /// Allocate a cpBody.
 cpBody* cpBodyAlloc(void);
 /// Initialize a cpBody.
-cpBody* cpBodyInit(cpBody *body, cpFloat m, cpFloat i);
+cpBody* cpBodyInit(cpBody *body, cpFloat mass, cpFloat moment);
 /// Allocate and initialize a cpBody.
-cpBody* cpBodyNew(cpFloat m, cpFloat i);
+cpBody* cpBodyNew(cpFloat mass, cpFloat moment);
 
-/// Initialize a static cpBody.
-cpBody* cpBodyInitStatic(cpBody *body);
-/// Allocate and initialize a static cpBody.
+/// Allocate and initialize a cpBody, and set it as a kinematic body.
+cpBody* cpBodyNewKinematic(void);
+/// Allocate and initialize a cpBody, and set it as a static body.
 cpBody* cpBodyNewStatic(void);
-
-// TODO kinematic bodies.
 
 /// Destroy a cpBody.
 void cpBodyDestroy(cpBody *body);
@@ -139,34 +143,24 @@ void cpBodySleep(cpBody *body);
 /// Force a body to fall asleep immediately along with other bodies in a group.
 void cpBodySleepWithGroup(cpBody *body, cpBody *group);
 
-void cpBodyMakeStatic(cpBody *body);
-void cpBodyMakeDynamic(cpBody *body, cpFloat mass, cpFloat moment);
-
-
 /// Returns true if the body is sleeping.
 static inline cpBool cpBodyIsSleeping(const cpBody *body)
 {
 	return (CP_PRIVATE(body->node).root != ((cpBody*)0));
 }
 
-// TODO what to do with these?
-static cpBool
-cpBodyIsKinematic(cpBody *body)
+static inline cpBodyType cpBodyGetType(cpBody *body)
 {
-	// TODO need to make a flag for this...
-	return (CP_PRIVATE(body->space) == NULL);
+	if(body->CP_PRIVATE(node).idleTime == INFINITY){
+		return CP_BODY_TYPE_STATIC;
+	} else if(body->CP_PRIVATE(m) == INFINITY){
+		return CP_BODY_TYPE_KINEMATIC;
+	} else {
+		return CP_BODY_TYPE_DYNAMIC;
+	}
 }
 
-static inline cpBool cpBodyIsStatic(const cpBody *body)
-{
-	return CP_PRIVATE(body->node).idleTime == INFINITY;
-}
-
-static inline cpBool
-cpBodyIsDynamic(cpBody *body)
-{
-	return (!cpBodyIsStatic(body) && !cpBodyIsKinematic(body));
-}
+void cpBodySetType(cpBody *body, cpBodyType type);
 
 // TODO what to do about rogue bodies?
 /// Returns true if the body has not been added to a space.

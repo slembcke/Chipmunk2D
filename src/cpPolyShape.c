@@ -315,9 +315,10 @@ cpPolyShapeSetVertsRaw(cpShape *shape, int count, cpVect *verts)
 	
 	SetVerts(poly, count, verts);
 	
-//	cpFloat mass = shape->massInfo.m;
+	cpFloat mass = shape->massInfo.m;
 //	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, poly->count, poly->verts, poly->r);
-//	if(mass > 0.0f) cpBodyAccumulateMass(shape->body);
+//	if(mass > 0.0f) cpBodyAccumulateMassFromShapes(shape->body);
+	cpAssertHard(mass == 0.0, "Not Yet Implemented."); // TODO
 }
 
 void
@@ -327,7 +328,8 @@ cpPolyShapeSetRadius(cpShape *shape, cpFloat radius)
 	cpPolyShape *poly = (cpPolyShape *)shape;
 	poly->r = radius;
 
-//	cpFloat mass = shape->massInfo.m;
+	cpFloat mass = shape->massInfo.m;
 //	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, poly->count, poly->verts, poly->r);
-//	if(mass > 0.0f) cpBodyAccumulateMass(shape->body);
+//	if(mass > 0.0f) cpBodyAccumulateMassFromShapes(shape->body);
+	cpAssertHard(mass == 0.0, "Not Yet Implemented."); // TODO
 }

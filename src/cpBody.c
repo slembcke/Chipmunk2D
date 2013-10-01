@@ -24,9 +24,6 @@
 
 #include "chipmunk/chipmunk_private.h"
 
-// initialized in cpInitChipmunk()
-cpBody cpStaticBodySingleton;
-
 cpBody*
 cpBodyAlloc(void)
 {
@@ -34,7 +31,7 @@ cpBodyAlloc(void)
 }
 
 cpBody *
-cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
+cpBodyInit(cpBody *body, cpFloat mass, cpFloat moment)
 {
 	body->space = NULL;
 	body->shapeList = NULL;
@@ -63,33 +60,35 @@ cpBodyInit(cpBody *body, cpFloat m, cpFloat i)
 	body->userData = NULL;
 	
 	// Setters must be called after full initialization so the sanity checks don't assert on garbage data.
-	cpBodySetMass(body, m);
-	cpBodySetMoment(body, i);
+	cpBodySetMass(body, mass);
+	cpBodySetMoment(body, moment);
 	cpBodySetAngle(body, 0.0f);
 	
 	return body;
 }
 
 cpBody*
-cpBodyNew(cpFloat m, cpFloat i)
+cpBodyNew(cpFloat mass, cpFloat moment)
 {
-	return cpBodyInit(cpBodyAlloc(), m, i);
+	return cpBodyInit(cpBodyAlloc(), mass, moment);
 }
 
-// TODO static bodies should be addable
-cpBody *
-cpBodyInitStatic(cpBody *body)
+cpBody*
+cpBodyNewKinematic()
 {
-	cpBodyInit(body, (cpFloat)INFINITY, (cpFloat)INFINITY);
-	body->node.idleTime = (cpFloat)INFINITY;
+	cpBody *body = cpBodyNew(INFINITY, INFINITY);
+	cpBodySetType(body, CP_BODY_TYPE_KINEMATIC);
 	
 	return body;
 }
 
-cpBody *
-cpBodyNewStatic(void)
+cpBody*
+cpBodyNewStatic()
 {
-	return cpBodyInitStatic(cpBodyAlloc());
+	cpBody *body = cpBodyNew(INFINITY, INFINITY);
+	cpBodySetType(body, CP_BODY_TYPE_STATIC);
+	
+	return body;
 }
 
 void cpBodyDestroy(cpBody *body){}
@@ -135,77 +134,82 @@ cpBodySanityCheck(const cpBody *body)
 }
 #endif
 
-//void
-//cpSpaceConvertBodyToStatic(cpSpace *space, cpBody *body)
-//{
-//	cpAssertHard(!cpBodyIsStatic(body), "Body is already static.");
-//	cpAssertHard(cpBodyIsRogue(body), "Remove the body from the space before calling this function.");
-//	cpAssertSpaceUnlocked(space);
-//	
-//	cpBodySetMass(body, INFINITY);
-//	cpBodySetMoment(body, INFINITY);
-//	
-//	cpBodySetVelocity(body, cpvzero);
-//	cpBodySetAngularVelocity(body, 0.0f);
-//	
-//	body->node.idleTime = INFINITY;
-//	CP_BODY_FOREACH_SHAPE(body, shape){
-//		cpSpatialIndexRemove(space->dynamicShapes, shape, shape->hashid);
-//		cpSpatialIndexInsert(space->staticShapes, shape, shape->hashid);
-//	}
-//}
-//
-//void
-//cpSpaceConvertBodyToDynamic(cpSpace *space, cpBody *body, cpFloat m, cpFloat i)
-//{
-//	cpAssertHard(cpBodyIsStatic(body), "Body is already dynamic.");
-//	cpAssertSpaceUnlocked(space);
-//	
-//	cpBodyActivateStatic(body, NULL);
-//	
-//	cpBodySetMass(body, m);
-//	cpBodySetMoment(body, i);
-//	
-//	body->node.idleTime = 0.0f;
-//	CP_BODY_FOREACH_SHAPE(body, shape){
-//		cpSpatialIndexRemove(space->staticShapes, shape, shape->hashid);
-//		cpSpatialIndexInsert(space->dynamicShapes, shape, shape->hashid);
-//	}
-//}
 
-// Should only be called for a shape with mass info set.
 void
-cpBodyAccumulateMassForShape(cpBody *body, cpShape *shape)
+cpBodySetType(cpBody *body, cpBodyType type)
 {
-	// Cache the position to realign it at the end.
-	cpVect pos = cpBodyGetPosition(body);
+	cpBodyType oldType = cpBodyGetType(body);
+	if(oldType == type) return;
 	
-	struct cpShapeMassInfo *info = &shape->massInfo;
-	cpFloat msum = body->m + info->m;
+	// Static bodies have their idle timers set to infinity.
+	// Non-static bodies should have their idle timer reset.
+	body->node.idleTime = (type == CP_BODY_TYPE_STATIC ? INFINITY : 0.0f);
 	
-	body->i += info->m*info->i + cpvdistsq(body->cog, info->cog)*(info->m*body->m)/msum;
-	body->cog = cpvlerp(body->cog, info->cog, info->m/msum);
-	body->m = msum;
+	// If the body is added to a space already, we'll need to update some space data structures.
+	cpSpace *space = cpBodyGetSpace(body);
+	if(space != NULL){
+		cpAssertSpaceUnlocked(space);
+		
+		// Move the bodies to the correct array.
+		cpArrayDeleteObj(oldType == CP_BODY_TYPE_DYNAMIC ? space->dynamicBodies : space->otherBodies, body);
+		cpArrayPush(type == CP_BODY_TYPE_DYNAMIC ? space->dynamicBodies : space->otherBodies, body);
+		
+		// TODO This is probably not necessary
+//		if(oldType == CP_BODY_TYPE_STATIC) cpBodyActivateStatic(body, NULL);
+		
+		// Move the body's shapes to the correct spatial index.
+		cpSpatialIndex *fromIndex = (oldType == CP_BODY_TYPE_STATIC ? space->staticShapes : space->dynamicShapes);
+		cpSpatialIndex *toIndex = (type == CP_BODY_TYPE_STATIC ? space->dynamicShapes : space->staticShapes);
+		CP_BODY_FOREACH_SHAPE(body, shape){
+			cpSpatialIndexRemove(fromIndex, shape, shape->hashid);
+			cpSpatialIndexInsert(toIndex, shape, shape->hashid);
+		}
+	}
 	
-	body->m_inv = 1.0f/body->m;
-	body->i_inv = 1.0f/body->i;
-	
-	cpBodySetPosition(body, pos);
-	cpAssertSaneBody(body);
+	if(type == CP_BODY_TYPE_DYNAMIC){
+		// This will reset the mass/moment to 1.0/INFINITY if shapes have no mass set.
+		cpBodyAccumulateMassFromShapes(body);
+	} else {
+		cpBodySetMass(body, INFINITY);
+		cpBodySetMoment(body, INFINITY);
+		
+		cpBodySetVelocity(body, cpvzero);
+		cpBodySetAngularVelocity(body, 0.0f);
+	}
 }
 
-// Should only be called when shapes with mass info are modified.
+
+// Should *only* be called when shapes with mass info are modified, added or removed.
 void
-cpBodyAccumulateMass(cpBody *body)
+cpBodyAccumulateMassFromShapes(cpBody *body)
 {
 	if(body == NULL) return;
 	
+	// Reset the body's mass data.
 	body->m = body->i = 0.0f;
-	body->m_inv = body->i_inv = INFINITY;
+	body->cog = cpvzero;
 	
+	// Cache the position to realign it at the end.
+	cpVect pos = cpBodyGetPosition(body);
+	
+	// Accumulate mass from shapes.
 	CP_BODY_FOREACH_SHAPE(body, shape){
-		if(shape->massInfo.m > 0.0f) cpBodyAccumulateMassForShape(body, shape);
+		struct cpShapeMassInfo *info = &shape->massInfo;
+		cpFloat m = info->m;
+		cpFloat msum = body->m + m;
+		
+		body->i += m*info->i + cpvdistsq(body->cog, info->cog)*(m*body->m)/msum;
+		body->cog = cpvlerp(body->cog, info->cog, m/msum);
+		body->m = msum;
 	}
+	
+	// Recalculate the inverses.
+	body->m_inv = 1.0f/body->m;
+	body->i_inv = 1.0f/body->i;
+	
+	// Realign the body since the CoG has probably moved.
+	cpBodySetPosition(body, pos);
+	cpAssertSaneBody(body);
 }
 
 void
@@ -246,7 +250,7 @@ cpBodyAddShape(cpBody *body, cpShape *shape)
 	body->shapeList = shape;
 	
 	if(shape->massInfo.m > 0.0f){
-		cpBodyAccumulateMassForShape(body, shape);
+		cpBodyAccumulateMassFromShapes(body);
 	}
 }
 
@@ -269,8 +273,8 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
   shape->prev = NULL;
   shape->next = NULL;
 	
-	if(!cpBodyIsStatic(body) && shape->massInfo.m > 0.0f){
-		cpBodyAccumulateMass(body);
+	if(cpBodyIsDynamic(body) && shape->massInfo.m > 0.0f){
+		cpBodyAccumulateMassFromShapes(body);
 	}
 }
 

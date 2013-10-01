@@ -87,7 +87,7 @@ cpShapeSetMass(cpShape *shape, cpFloat mass){
 	cpBodyActivate(body);
 	
 	shape->massInfo.m = mass;
-	cpBodyAccumulateMass(body);
+	cpBodyAccumulateMassFromShapes(body);
 }
 
 cpFloat cpShapeGetDensity(cpShape *shape){ return shape->massInfo.m/shape->massInfo.area; }
@@ -415,7 +415,7 @@ cpCircleShapeSetRadius(cpShape *shape, cpFloat radius)
 	
 	cpFloat mass = shape->massInfo.m;
 	shape->massInfo = cpCircleShapeMassInfo(mass, circle->r, circle->c);
-	if(mass > 0.0f) cpBodyAccumulateMass(shape->body);
+	if(mass > 0.0f) cpBodyAccumulateMassFromShapes(shape->body);
 }
 
 void
@@ -428,7 +428,7 @@ cpCircleShapeSetOffset(cpShape *shape, cpVect offset)
 
 	cpFloat mass = shape->massInfo.m;
 	shape->massInfo = cpCircleShapeMassInfo(shape->massInfo.m, circle->r, circle->c);
-	if(mass > 0.0f) cpBodyAccumulateMass(shape->body);
+	if(mass > 0.0f) cpBodyAccumulateMassFromShapes(shape->body);
 }
 
 void
@@ -443,7 +443,7 @@ cpSegmentShapeSetEndpoints(cpShape *shape, cpVect a, cpVect b)
 
 	cpFloat mass = shape->massInfo.m;
 	shape->massInfo = cpSegmentShapeMassInfo(shape->massInfo.m, seg->a, seg->b, seg->r);
-	if(mass > 0.0f) cpBodyAccumulateMass(shape->body);
+	if(mass > 0.0f) cpBodyAccumulateMassFromShapes(shape->body);
 }
 
 void
@@ -456,5 +456,5 @@ cpSegmentShapeSetRadius(cpShape *shape, cpFloat radius)
 
 	cpFloat mass = shape->massInfo.m;
 	shape->massInfo = cpSegmentShapeMassInfo(shape->massInfo.m, seg->a, seg->b, seg->r);
-	if(mass > 0.0f) cpBodyAccumulateMass(shape->body);
+	if(mass > 0.0f) cpBodyAccumulateMassFromShapes(shape->body);
 }

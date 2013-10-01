@@ -104,7 +104,7 @@ init(void)
 	}
 	
 	// We joint the tank to the control body and control the tank indirectly by modifying the control body.
-	tankControlBody = cpBodyNew(INFINITY, INFINITY);
+	tankControlBody = cpSpaceAddBody(space, cpBodyNewKinematic());
 	tankBody = add_box(space, 30, 10);
 	
 	cpConstraint *pivot = cpSpaceAddConstraint(space, cpPivotJointNew2(tankControlBody, tankBody, cpvzero, cpvzero));
@@ -123,7 +123,6 @@ static void
 destroy(cpSpace *space)
 {
 	ChipmunkDemoFreeSpaceChildren(space);
-	cpBodyFree(tankControlBody);
 	cpSpaceFree(space);
 }
 
