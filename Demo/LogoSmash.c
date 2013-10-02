@@ -134,7 +134,7 @@ init(void)
 		}
 	}
 	
-	body = cpSpaceAddBody(space, cpBodyNew(INFINITY, INFINITY));
+	body = cpSpaceAddBody(space, cpBodyNew(1e9, INFINITY));
 	cpBodySetPosition(body, cpv(-1000, -10));
 	cpBodySetVelocity(body, cpv(400, 0));
 

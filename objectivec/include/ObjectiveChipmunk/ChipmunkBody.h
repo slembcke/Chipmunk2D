@@ -25,10 +25,14 @@
 + (id)bodyWithMass:(cpFloat)mass andMoment:(cpFloat)moment;
 
 /**
-  Create an autoreleased rigid body with infinite mass and moment.
-  This is most useful when you want to create a rogue body for controlling a moving platform or some other strictly controlled object.
+  Create an autoreleased static body.
 */
 + (id)staticBody;
+
+/**
+  Create an autoreleased kinematic body.
+*/
++ (id)kinematicBody;
 
 /**
   Initialize a rigid body with the given mass and moment of inertia.
@@ -36,11 +40,8 @@
 */
 - (id)initWithMass:(cpFloat)mass andMoment:(cpFloat)moment;
 
-/**
-  Initialize a rigid body with infinite mass and moment.
-  This is most useful when you want to create a rogue body for controlling a moving platform or some other strictly controlled object.
-*/
-- (id)initStaticBody;
+/// Type of the body (dynamic, kinematic, static).
+@property(nonatomic, assign) cpBodyType type;
 
 /// Mass of the rigid body. Mass does not have to be expressed in any particular units, but relative masses should be consistent.
 @property(nonatomic, assign) cpFloat mass;
@@ -86,12 +87,6 @@
 
 /// Has the body been put to sleep by the space?
 @property(nonatomic, readonly) bool isSleeping;
-
-/// Has the body <strong>not</strong> been added to any spaces?
-@property(nonatomic, readonly) bool isRogue;
-
-/// Is the body the static body associated with a space?
-@property(nonatomic, readonly) bool isStatic;
 
 /// Get the kinetic energy of this body.
 @property(nonatomic, readonly) cpFloat kineticEnergy;

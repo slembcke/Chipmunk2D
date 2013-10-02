@@ -227,7 +227,6 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	
 	for(int i=0; i<100; i++) [space step:0.01];
 	
-	space.collisionSlop = 0.5f;
 	XCTAssertTrue(cpfabs(ball.position.y - 1) < 1.1*space.collisionSlop, @"");
 	XCTAssertTrue(cpfabs(box.position.y - 1) < 1.1*space.collisionSlop, @"");
 	

@@ -13,11 +13,11 @@ testPropertiesHelper(id self, ChipmunkBody *body, ChipmunkShape *shape)
 {
 	XCTAssertNotEqual(shape.shape, NULL, @"");
 	XCTAssertEqual(body, shape.body, @"");
-	XCTAssertNil(shape.data, @"");
+	XCTAssertNil(shape.userData, @"");
 	XCTAssertFalse(shape.sensor, @"");
 	XCTAssertEqual(shape.elasticity, (cpFloat)0, @"");
 	XCTAssertEqual(shape.friction, (cpFloat)0, @"");
-	XCTAssertEqual(shape.surfaceVel, cpvzero, @"");
+	XCTAssertEqual(shape.surfaceVelocity, cpvzero, @"");
 	XCTAssertNil(shape.collisionType, @"");
 	XCTAssertNil(shape.group, @"");
 	XCTAssertEqual(shape.filter, CP_SHAPE_FILTER_ALL, @"");
@@ -25,11 +25,11 @@ testPropertiesHelper(id self, ChipmunkBody *body, ChipmunkShape *shape)
 	cpBB bb = [shape cacheBB];
 	XCTAssertEqual(shape.bb, bb, @"");
 	
-	TestAccessors(shape, data, @"object");
+	TestAccessors(shape, userData, @"object");
 	TestAccessors(shape, sensor, YES);
 	TestAccessors(shape, elasticity, (cpFloat)0);
 	TestAccessors(shape, friction, (cpFloat)0);
-	TestAccessors(shape, surfaceVel, cpv(5,6));
+	TestAccessors(shape, surfaceVelocity, cpv(5,6));
 	TestAccessors(shape, collisionType, @"type");
 	cpShapeFilter f = {@"group", 456, 789};
 	TestAccessors(shape, filter, f);

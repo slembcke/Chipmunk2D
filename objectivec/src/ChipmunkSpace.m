@@ -138,8 +138,10 @@ static NSString *dialogMessage = @"This copy of Chipmunk Pro is a trial, please 
 		
 		_space = space;
 		cpSpaceSetUserData(_space, self);
-		_staticBody = [[ChipmunkBody alloc] initStaticBody];
-		_space->staticBody = _staticBody.body;
+		
+		_staticBody = [[ChipmunkBody alloc] initWithMass:INFINITY andMoment:INFINITY];
+		_staticBody.type = CP_BODY_TYPE_STATIC;
+		cpSpaceSetStaticBody(_space, _staticBody.body);
 	}
 	
 	return self;

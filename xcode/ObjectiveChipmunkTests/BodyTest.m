@@ -55,8 +55,7 @@
 	// TODO transform tests
 	
 	XCTAssertFalse(body.isSleeping, @"");
-	XCTAssertFalse(body.isStatic, @"");
-	XCTAssertTrue(body.isRogue, @"");
+	XCTAssertEqual(body.type, CP_BODY_TYPE_DYNAMIC, @"");
 }
 
 -(void)testBasic {
@@ -81,15 +80,13 @@
 -(void)testMisc {
 	ChipmunkBody *staticBody = [ChipmunkBody staticBody];
 	XCTAssertFalse(staticBody.isSleeping, @"");
-	XCTAssertTrue(staticBody.isStatic, @"");
-	XCTAssertTrue(staticBody.isRogue, @"");
+	XCTAssertEqual(staticBody.type, CP_BODY_TYPE_STATIC, @"");
 	
 	ChipmunkSpace *space = [[ChipmunkSpace alloc] init];
 	ChipmunkBody *body = [ChipmunkBody bodyWithMass:1 andMoment:1];
 	[space add:body];
 	XCTAssertFalse(body.isSleeping, @"");
-	XCTAssertFalse(body.isStatic, @"");
-	XCTAssertFalse(body.isRogue, @"");
+	XCTAssertEqual(body.type, CP_BODY_TYPE_DYNAMIC, @"");
 	
 	[body sleep];
 	XCTAssertTrue(body.isSleeping, @"");

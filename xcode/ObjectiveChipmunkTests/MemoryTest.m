@@ -36,11 +36,10 @@
 	AssertRetainCount(joint1, 2);
 	AssertRetainCount(joint2, 2);
 	
-	[space remove:body1];
 	[space remove:shape1];
 	[space remove:joint1];
 	
-	AssertRetainCount(body1, 4);
+	AssertRetainCount(body1, 5);
 	AssertRetainCount(body2, 5);
 	AssertRetainCount(shape1, 1);
 	AssertRetainCount(shape2, 2);
@@ -93,7 +92,7 @@
 }
 
 -(void)testSetters {
-	ChipmunkBody *body = [[ChipmunkBody alloc] initStaticBody];
+	ChipmunkBody *body = [[ChipmunkBody alloc] initWithMass:1.0 andMoment:1.0];
 	
 	
 	ChipmunkShape *shape = [ChipmunkCircleShape circleWithBody:nil radius:1 offset:cpvzero];
@@ -116,9 +115,6 @@
 //	
 //	joint.bodyA = nil; joint.bodyB = nil;
 //	AssertRetainCount(body, 1);
-	
-	
-	[body release];
 }
 
 -(void)testPostStepCallbacks {

@@ -178,7 +178,7 @@ testSleepingSensorCallbacksHelper(id self, int wakeRemoveType){
 	
 	[space add:[ChipmunkCircleShape circleWithBody:body1 radius:radius offset:cpvzero]];
 	
-	ChipmunkBody *body2 = [ChipmunkBody staticBody];
+	ChipmunkBody *body2 = [space add:[ChipmunkBody staticBody]];
 	body2.position = cpv(1*radius*1.5,0);
 	
 	ChipmunkShape *shape2 = [space add:[ChipmunkCircleShape circleWithBody:body2 radius:radius offset:cpvzero]];
@@ -280,13 +280,15 @@ static cpBool CallBlock(cpArbiter *arb, cpSpace *space, cpBool (^block)(cpArbite
 	ChipmunkShape *staticShape = [space add:[ChipmunkCircleShape circleWithBody:space.staticBody radius:1.0 offset:cpvzero]];
 	staticShape.collisionType = staticShape;
 	
-	ChipmunkBody *body1 = [ChipmunkBody bodyWithMass:1.0 andMoment:1.0];
+	ChipmunkBody *body1 = [space add:[ChipmunkBody kinematicBody]];
 	ChipmunkShape *shape1 = [space add:[ChipmunkCircleShape circleWithBody:body1 radius:1.0 offset:cpvzero]];
 	shape1.collisionType = shape1;
+	shape1.sensor = TRUE;
 	
-	ChipmunkBody *body2 = [ChipmunkBody bodyWithMass:1.0 andMoment:1.0];
+	ChipmunkBody *body2 = [space add:[ChipmunkBody kinematicBody]];
 	ChipmunkShape *shape2 = [space add:[ChipmunkCircleShape circleWithBody:body2 radius:10.0 offset:cpvzero]];
 	shape2.collisionType = shape2;
+	shape2.sensor = TRUE;
 	
 	__block bool trigger1 = FALSE;
 	__block bool trigger2 = FALSE;
@@ -376,7 +378,7 @@ static cpBool CallBlock(cpArbiter *arb, cpSpace *space, cpBool (^block)(cpArbite
 		});
 		
 		cpSpaceEachShape_b(space.space, ^(cpShape *shape){
-			if(cpBodyIsStatic(cpShapeGetBody(shape))){
+			if(cpBodyGetType(cpShapeGetBody(shape)) == CP_BODY_TYPE_STATIC){
 				XCTAssertEqual(shape, _staticShape.shape, @"");
 			} else {
 				XCTAssertEqual(shape, _shape.shape, @"");
@@ -429,7 +431,7 @@ static cpBool CallBlock(cpArbiter *arb, cpSpace *space, cpBool (^block)(cpArbite
 		});
 		
 		cpSpaceEachShape_b(space.space, ^(cpShape *shape){
-			if(cpBodyIsStatic(cpShapeGetBody(shape))){
+			if(cpBodyGetType(cpShapeGetBody(shape)) == CP_BODY_TYPE_STATIC){
 				XCTAssertEqual(shape, _staticShape.shape, @"");
 			} else {
 				XCTAssertEqual(shape, _shape.shape, @"");

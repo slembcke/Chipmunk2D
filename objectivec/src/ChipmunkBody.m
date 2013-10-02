@@ -63,7 +63,18 @@ PositionFunction
 
 + (id)staticBody
 {
-	return [[[self alloc] initStaticBody] autorelease];
+	ChipmunkBody *body = [[self alloc] initWithMass:INFINITY andMoment:INFINITY];
+	body.type = CP_BODY_TYPE_STATIC;
+	
+	return [body autorelease];
+}
+
++ (id)kinematicBody
+{
+	ChipmunkBody *body = [[self alloc] initWithMass:INFINITY andMoment:INFINITY];
+	body.type = CP_BODY_TYPE_KINEMATIC;
+	
+	return [body autorelease];
 }
 
 - (id)initWithMass:(cpFloat)mass andMoment:(cpFloat)moment
@@ -80,16 +91,6 @@ PositionFunction
 		if([self methodIsOverriden:@selector(updatePosition:)]){
 			_body.position_func = PositionFunction;
 		}
-	}
-	
-	return self;
-}
-
-- (id)initStaticBody
-{
-	if((self = [super init])){
-		cpBodyInitStatic(&_body);
-		_body.userData = self;
 	}
 	
 	return self;
@@ -117,6 +118,7 @@ getter(type, lower, upper) \
 setter(type, lower, upper)
 
 
+both(cpBodyType, type, Type)
 both(cpFloat, mass, Mass)
 both(cpFloat, moment, Moment)
 both(cpVect, position, Position)
@@ -147,8 +149,6 @@ both(cpFloat, angularVelocityLimit, AngularVelocityLimit);
 - (void)applyImpulse:(cpVect)impulse atWorldPoint:(cpVect)point {cpBodyApplyImpulseAtWorldPoint(&_body, impulse, point);}
 
 - (bool)isSleeping {return cpBodyIsSleeping(&_body);}
-- (bool)isRogue {return cpBodyIsRogue(&_body);}
-- (bool)isStatic {return cpBodyIsStatic(&_body);}
 
 - (void)activate {cpBodyActivate(&_body);}
 - (void)activateStatic:(ChipmunkShape *)filter {cpBodyActivateStatic(&_body, filter.shape);}

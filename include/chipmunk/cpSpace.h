@@ -120,6 +120,7 @@ struct cpSpace {
 	CP_PRIVATE(cpBool skipPostStep);
 	CP_PRIVATE(cpArray *postStepCallbacks);
 	
+	CP_PRIVATE(cpBody *staticBody);
 	CP_PRIVATE(cpBody _staticBody);
 };
 
@@ -162,7 +163,7 @@ CP_DefineSpaceStructProperty(cpFloat, collisionSlop, CollisionSlop)
 CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias)
 CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence)
 CP_DefineSpaceStructProperty(cpDataPointer, userData, UserData)
-cpBody * cpSpaceGetStaticBody(cpSpace *space);
+CP_DefineSpaceStructGetter(cpBody *, CP_PRIVATE(staticBody), StaticBody)
 CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep)
 
 /// returns true from inside a callback and objects cannot be added/removed.

@@ -211,8 +211,8 @@ QueryReject(cpShape *a, cpShape *b)
 		|| a->body == b->body
 		// Don't collide shapes that are filtered.
 		|| cpShapeFilterReject(a->filter, b->filter)
-		// Don't collide infinite mass objects
-		|| (a->body->m == INFINITY && b->body->m == INFINITY)
+		// Don't collide infinite mass objects unless one of them is a sensor.
+		|| (a->body->m == INFINITY && b->body->m == INFINITY && !(a->sensor || b->sensor))
 	);
 }
 

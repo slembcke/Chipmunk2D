@@ -339,6 +339,8 @@ bias_coef(cpFloat errorBias, cpFloat dt)
 		"Put these calls into a post-step callback." \
 	);
 
+void cpSpaceSetStaticBody(cpSpace *space, cpBody *body);
+
 extern cpCollisionHandler cpCollisionHandlerDoNothing;
 
 void cpSpaceProcessComponents(cpSpace *space, cpFloat dt);

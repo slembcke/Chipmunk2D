@@ -168,8 +168,7 @@ cpSpaceInit(cpSpace *space)
 	
 	cpBody *staticBody = cpBodyInit(&space->_staticBody, INFINITY, INFINITY);
 	cpBodySetType(staticBody, CP_BODY_TYPE_STATIC);
-	// The designated static body will always be the first body in the static body list.
-	cpSpaceAddBody(space, staticBody);
+	cpSpaceSetStaticBody(space, staticBody);
 	
 	return space;
 }
@@ -226,12 +225,17 @@ cpSpaceFree(cpSpace *space)
 
 //MARK: Basic properties:
 
-cpBody *
-cpSpaceGetStaticBody(cpSpace *space)
+void
+cpSpaceSetStaticBody(cpSpace *space, cpBody *body)
 {
-	return (cpBody *)space->otherBodies->arr[0];
+	if(space->staticBody != NULL){
+		cpAssertHard(space->staticBody->shapeList == NULL, "Internal Error: Changing the designated static body while the old one still had shapes attached.");
+		space->staticBody->space = NULL;
+	}
+	
+	space->staticBody = body;
+	body->space = space;
 }
-
 
 //MARK: Collision Handler Function Management
 
@@ -284,7 +288,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	
 	cpAssertHard(shape->space != space, "You have already added this shape to this space. You must not add it a second time.");
 	cpAssertHard(!shape->space, "You have already added this shape to another space. You cannot add it to a second.");
-	cpAssertHard(body->space == space, "The shape's body must be added to the space before the shape.");
+//	cpAssertHard(body->space == space, "The shape's body must be added to the space before the shape.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBool isStatic = cpBodyIsStatic(body);
@@ -321,7 +325,7 @@ cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
 	
 	cpBody *a = constraint->a, *b = constraint->b;
 	cpAssertHard(a != NULL && b != NULL, "Constraint is attached to a NULL body.");
-	cpAssertHard(a->space == space && b->space == space, "The constraint's bodies must be added to the space before the constraint.");
+//	cpAssertHard(a->space == space && b->space == space, "The constraint's bodies must be added to the space before the constraint.");
 	
 	cpBodyActivate(a);
 	cpBodyActivate(b);
@@ -407,8 +411,8 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 {
 	cpAssertHard(body != cpSpaceGetStaticBody(space), "Cannot remove the designated static body for the space.");
 	cpAssertHard(cpSpaceContainsBody(space, body), "Cannot remove a body that was not added to the space. (Removed twice maybe?)");
-	cpAssertHard(body->shapeList == NULL, "Cannot remove a body from the space before removing the bodies attached to it.");
-	cpAssertHard(body->constraintList == NULL, "Cannot remove a body from the space before removing the constraints attached to it.");
+//	cpAssertHard(body->shapeList == NULL, "Cannot remove a body from the space before removing the bodies attached to it.");
+//	cpAssertHard(body->constraintList == NULL, "Cannot remove a body from the space before removing the constraints attached to it.");
 	cpAssertSpaceUnlocked(space);
 	
 	cpBodyActivate(body);
@@ -459,8 +463,7 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 		}
 		
 		cpArray *otherBodies = space->otherBodies;
-		// Skip the designated static body at i=0;
-		for(int i=1; i<otherBodies->num; i++){
+		for(int i=0; i<otherBodies->num; i++){
 			func((cpBody *)otherBodies->arr[i], data);
 		}
 		

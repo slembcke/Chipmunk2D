@@ -120,14 +120,14 @@
 	ChipmunkShape *small = [space add:[ChipmunkCircleShape circleWithBody:body radius:5.0 offset:cpvzero]];
 	
 	// Used for the custom sorting orders.
-	big.data = @0;
-	small.data = @1;
+	big.userData = @0;
+	small.userData = @1;
 	
 	ChipmunkGrab *grab1 = [multiGrab beginLocation:cpvzero];
 	XCTAssertEqual(grab1.grabbedShape, big, @"Should have grabbed 'big' since it has the largest penetration depth.");
 	
 	multiGrab.grabSort = ^(ChipmunkShape *shape, cpFloat depth){
-		NSNumber *n = shape.data;
+		NSNumber *n = shape.userData;
 		return (cpFloat)n.floatValue;
 	};
 	
