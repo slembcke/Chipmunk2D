@@ -63,7 +63,7 @@ PositionFunction
 
 + (id)staticBody
 {
-	ChipmunkBody *body = [[self alloc] initWithMass:INFINITY andMoment:INFINITY];
+	ChipmunkBody *body = [[self alloc] initWithMass:0.0f andMoment:0.0f];
 	body.type = CP_BODY_TYPE_STATIC;
 	
 	return [body autorelease];
@@ -71,7 +71,7 @@ PositionFunction
 
 + (id)kinematicBody
 {
-	ChipmunkBody *body = [[self alloc] initWithMass:INFINITY andMoment:INFINITY];
+	ChipmunkBody *body = [[self alloc] initWithMass:0.0f andMoment:0.0f];
 	body.type = CP_BODY_TYPE_KINEMATIC;
 	
 	return [body autorelease];

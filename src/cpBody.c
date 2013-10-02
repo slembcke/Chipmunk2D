@@ -76,7 +76,7 @@ cpBodyNew(cpFloat mass, cpFloat moment)
 cpBody*
 cpBodyNewKinematic()
 {
-	cpBody *body = cpBodyNew(INFINITY, INFINITY);
+	cpBody *body = cpBodyNew(0.0f, 0.0f);
 	cpBodySetType(body, CP_BODY_TYPE_KINEMATIC);
 	
 	return body;
@@ -85,7 +85,7 @@ cpBodyNewKinematic()
 cpBody*
 cpBodyNewStatic()
 {
-	cpBody *body = cpBodyNew(INFINITY, INFINITY);
+	cpBody *body = cpBodyNew(0.0f, 0.0f);
 	cpBodySetType(body, CP_BODY_TYPE_STATIC);
 	
 	return body;
@@ -145,36 +145,48 @@ cpBodySetType(cpBody *body, cpBodyType type)
 	// Non-static bodies should have their idle timer reset.
 	body->node.idleTime = (type == CP_BODY_TYPE_STATIC ? INFINITY : 0.0f);
 	
+	if(type == CP_BODY_TYPE_DYNAMIC){
+		body->m = body->i = 0.0f;
+		body->m_inv = body->i_inv = INFINITY;
+		
+		cpBodyAccumulateMassFromShapes(body);
+	} else {
+		body->m = body->i = INFINITY;
+		body->m_inv = body->i_inv = 0.0f;
+		
+		body->v = cpvzero;
+		body->w = 0.0f;
+	}
+	
 	// If the body is added to a space already, we'll need to update some space data structures.
 	cpSpace *space = cpBodyGetSpace(body);
 	if(space != NULL){
 		cpAssertSpaceUnlocked(space);
 		
-		// Move the bodies to the correct array.
-		cpArrayDeleteObj(oldType == CP_BODY_TYPE_DYNAMIC ? space->dynamicBodies : space->otherBodies, body);
-		cpArrayPush(type == CP_BODY_TYPE_DYNAMIC ? space->dynamicBodies : space->otherBodies, body);
+		if(oldType == CP_BODY_TYPE_STATIC){
+			// TODO This is probably not necessary
+//			cpBodyActivateStatic(body, NULL);
+		} else {
+			cpBodyActivate(body);
+		}
 		
-		// TODO This is probably not necessary
-//		if(oldType == CP_BODY_TYPE_STATIC) cpBodyActivateStatic(body, NULL);
+		// Move the bodies to the correct array.
+		cpArray *fromArray = (oldType == CP_BODY_TYPE_DYNAMIC ? space->dynamicBodies : space->otherBodies);
+		cpArray *toArray = (type == CP_BODY_TYPE_DYNAMIC ? space->dynamicBodies : space->otherBodies);
+		if(fromArray != toArray){
+			cpArrayDeleteObj(fromArray, body);
+			cpArrayPush(toArray, body);
+		}
 		
 		// Move the body's shapes to the correct spatial index.
 		cpSpatialIndex *fromIndex = (oldType == CP_BODY_TYPE_STATIC ? space->staticShapes : space->dynamicShapes);
-		cpSpatialIndex *toIndex = (type == CP_BODY_TYPE_STATIC ? space->dynamicShapes : space->staticShapes);
-		CP_BODY_FOREACH_SHAPE(body, shape){
-			cpSpatialIndexRemove(fromIndex, shape, shape->hashid);
-			cpSpatialIndexInsert(toIndex, shape, shape->hashid);
+		cpSpatialIndex *toIndex = (type == CP_BODY_TYPE_STATIC ? space->staticShapes : space->dynamicShapes);
+		if(fromIndex != toIndex){
+			CP_BODY_FOREACH_SHAPE(body, shape){
+				cpSpatialIndexRemove(fromIndex, shape, shape->hashid);
+				cpSpatialIndexInsert(toIndex, shape, shape->hashid);
+			}
 		}
-	}
-	
-	if(type == CP_BODY_TYPE_DYNAMIC){
-		// This will reset the mass/moment to 1.0/INFINITY if shapes have no mass set.
-		cpBodyAccumulateMassFromShapes(body);
-	} else {
-		cpBodySetMass(body, INFINITY);
-		cpBodySetMoment(body, INFINITY);
-		
-		cpBodySetVelocity(body, cpvzero);
-		cpBodySetAngularVelocity(body, 0.0f);
 	}
 }
 
@@ -196,11 +208,14 @@ cpBodyAccumulateMassFromShapes(cpBody *body)
 	CP_BODY_FOREACH_SHAPE(body, shape){
 		struct cpShapeMassInfo *info = &shape->massInfo;
 		cpFloat m = info->m;
-		cpFloat msum = body->m + m;
 		
-		body->i += m*info->i + cpvdistsq(body->cog, info->cog)*(m*body->m)/msum;
-		body->cog = cpvlerp(body->cog, info->cog, m/msum);
-		body->m = msum;
+		if(m > 0.0f){
+			cpFloat msum = body->m + m;
+			
+			body->i += m*info->i + cpvdistsq(body->cog, info->cog)*(m*body->m)/msum;
+			body->cog = cpvlerp(body->cog, info->cog, m/msum);
+			body->m = msum;
+		}
 	}
 	
 	// Recalculate the inverses.
@@ -215,7 +230,8 @@ cpBodyAccumulateMassFromShapes(cpBody *body)
 void
 cpBodySetMass(cpBody *body, cpFloat mass)
 {
-	cpAssertHard(mass >= 0.0f, "Mass must be positive.");
+	cpAssertHard(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC, "You cannot set the mass of kinematic or static bodies.");
+	cpAssertHard(0.0f <= mass && mass < INFINITY, "Mass must be positive and finite.");
 	
 	cpBodyActivate(body);
 	body->m = mass;

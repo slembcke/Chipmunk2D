@@ -39,19 +39,19 @@ eachBody(cpBody *body, void *unused)
 static void
 update(cpSpace *space, double dt)
 {
-//	if(ChipmunkDemoRightDown){
-//		cpShape *nearest = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0, GRAB_FILTER, NULL);
-//		if(nearest){
-//			cpBody *body = cpShapeGetBody(nearest);
-//			if(cpBodyIsStatic(body)){
-//				cpSpaceConvertBodyToDynamic(space, body, pentagon_mass, pentagon_moment);
-//				cpSpaceAddBody(space, body);
-//			} else {
-//				cpSpaceRemoveBody(space, body);
-//				cpSpaceConvertBodyToStatic(space, body);
-//			}
-//		}
-//	}
+	if(ChipmunkDemoRightDown){
+		cpShape *nearest = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0, GRAB_FILTER, NULL);
+		if(nearest){
+			cpBody *body = cpShapeGetBody(nearest);
+			if(cpBodyGetType(body) == CP_BODY_TYPE_STATIC){
+				cpBodySetType(body, CP_BODY_TYPE_DYNAMIC);
+				cpBodySetMass(body, pentagon_mass);
+				cpBodySetMoment(body, pentagon_moment);
+			} else if(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC) {
+				cpBodySetType(body, CP_BODY_TYPE_STATIC);
+			}
+		}
+	}
 	
 	cpSpaceEachBody(space, &eachBody, NULL);
 	cpSpaceStep(space, dt);

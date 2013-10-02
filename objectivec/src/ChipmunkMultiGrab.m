@@ -39,8 +39,10 @@ GrabPreSolve(cpConstraint *constraint, cpSpace *space)
 	body:(ChipmunkBody *)body grabbedShape:(ChipmunkShape *)grabbedShape
 	chipmunkObjects:(NSArray *)chipmunkObjects
 {
-	ChipmunkBody *grabBody = [ChipmunkBody bodyWithMass:INFINITY andMoment:INFINITY];
+	ChipmunkBody *grabBody = [ChipmunkBody kinematicBody];
 	grabBody.position = pos;
+	// TODO the repeated appending is a little silly here.
+	chipmunkObjects = [chipmunkObjects arrayByAddingObject:grabBody];
 	
 	if((self = [super init])){
 		_pos = pos;

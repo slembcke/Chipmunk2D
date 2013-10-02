@@ -166,7 +166,7 @@ cpSpaceInit(cpSpace *space)
 	space->postStepCallbacks = cpArrayNew(0);
 	space->skipPostStep = cpFalse;
 	
-	cpBody *staticBody = cpBodyInit(&space->_staticBody, INFINITY, INFINITY);
+	cpBody *staticBody = cpBodyInit(&space->_staticBody, 0.0f, 0.0f);
 	cpBodySetType(staticBody, CP_BODY_TYPE_STATIC);
 	cpSpaceSetStaticBody(space, staticBody);
 	
