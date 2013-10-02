@@ -318,7 +318,7 @@ typedef struct cpSpaceDebugDrawOptions {
 	cpSpaceDebugColor constraintColor;
 	cpSpaceDebugColor collisionPointColor;
 	
-	cpDataPointer *data;
+	cpDataPointer data;
 } cpSpaceDebugDrawOptions;
 
 void cpSpaceDebugDraw(cpSpace *space, cpSpaceDebugDrawOptions *options);
