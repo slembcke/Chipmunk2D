@@ -183,7 +183,7 @@ cpBodySetType(cpBody *body, cpBodyType type)
 void
 cpBodyAccumulateMassFromShapes(cpBody *body)
 {
-	if(body == NULL) return;
+	if(body == NULL || !cpBodyIsDynamic(body)) return;
 	
 	// Reset the body's mass data.
 	body->m = body->i = 0.0f;
