@@ -314,6 +314,7 @@ cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint)
 	body->constraintList = filterConstraints(body->constraintList, body, constraint);
 }
 
+// 'p' is the position of the CoG
 void
 SetTransform(cpBody *body, cpVect p, cpFloat a)
 {
@@ -321,8 +322,8 @@ SetTransform(cpBody *body, cpVect p, cpFloat a)
 	cpVect c = body->cog;
 	
 	body->transform = cpTransformNewTranspose(
-		rot.x, -rot.y, p.x - c.x*(rot.x + rot.y),
-		rot.y,  rot.x, p.y - c.y*(rot.x - rot.y)
+		rot.x, -rot.y, p.x - (c.x*rot.x - c.y*rot.y),
+		rot.y,  rot.x, p.y - (c.x*rot.y + c.y*rot.x)
 	);
 }
 
