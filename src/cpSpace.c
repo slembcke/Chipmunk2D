@@ -64,12 +64,16 @@ handlerSetTrans(cpCollisionHandler *handler, void *unused)
 
 static cpBool
 DefaultBegin(cpArbiter *arb, cpSpace *space, void *data){
-	return cpArbiterCallWildcardBeginA(arb, space) && cpArbiterCallWildcardBeginB(arb, space);
+	cpBool retA = cpArbiterCallWildcardBeginA(arb, space);
+	cpBool retB = cpArbiterCallWildcardBeginB(arb, space);
+	return retA && retB;
 }
 
 static cpBool
 DefaultPreSolve(cpArbiter *arb, cpSpace *space, void *data){
-	return cpArbiterCallWildcardPreSolveA(arb, space) && cpArbiterCallWildcardPreSolveB(arb, space);
+	cpBool retA = cpArbiterCallWildcardPreSolveA(arb, space);
+	cpBool retB = cpArbiterCallWildcardPreSolveB(arb, space);
+	return retA && retB;
 }
 
 static void
