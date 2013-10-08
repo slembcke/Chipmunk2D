@@ -30,14 +30,14 @@ typedef void (*cpSpaceArbiterApplyImpulseFunc)(cpArbiter *arb);
 /// Collision begin event function callback type.
 /// Returning false from a begin callback causes the collision to be ignored until
 /// the the separate callback is called when the objects stop colliding.
-typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, void *data);
+typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
 /// Collision pre-solve event function callback type.
 /// Returning false from a pre-step callback causes the collision to be ignored until the next step.
-typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
+typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
 /// Collision post-solve event function callback type.
-typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *data);
+typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
 /// Collision separate event function callback type.
-typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data);
+typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
 
 struct cpCollisionHandler {
 	const cpCollisionType typeA, typeB;
@@ -45,7 +45,7 @@ struct cpCollisionHandler {
 	cpCollisionPreSolveFunc preSolveFunc;
 	cpCollisionPostSolveFunc postSolveFunc;
 	cpCollisionSeparateFunc separateFunc;
-	void *userData;
+	cpDataPointer userData;
 };
 
 /// Basic Unit of Simulation in Chipmunk
