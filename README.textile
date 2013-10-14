@@ -1,5 +1,9 @@
 !http://files.slembcke.net/chipmunk/logo/logo1_med.png!
 
+h2. NOTE!
+
+The master branch is the in progress Chipmunk2D 7.0. The documentation on Chipmunk2D's website may not completely match. While the code should be pretty stable (there are some unit tests), the API is still evolving. You can check out the 6.2.x branch if you want the last released version.
+
 h2. ABOUT:
 
 Chipmunk2D is a simple, lightweight, fast and portable 2D rigid body physics library written in C. It's licensed under the unrestrictive, OSI approved MIT license. My aim is to give 2D developers access to the same quality of physics you find in newer 3D games. I hope you enjoy using Chipmunk2D, and please consider donating to help make it worth our time to continue to support Chipmunk2D with great new features.
@@ -29,7 +33,7 @@ h2. FEATURES:
 
 h2. CHIPMUNK PRO:
 
-We also make a bunch of extra for Chipmunk called "Chipmunk Pro":http://chipmunk2d.net/chipmunkPro.php. Currently we have a nice Objective-C wrapper that should be of particular interest to Mac and iPhone developers. It also offers auto-geometry features and multithreading/SIMD optimizations as well. Check out the link above for more information!
+We also make a bunch of extra for Chipmunk called "Chipmunk Pro":http://chipmunk2d.net/chipmunkPro.php. It offers features such as auto-geometry for creating collision shapes from images or implicit functions and also multithreading/SIMD optimizations. Check out the link above for more information!
 
 
 h2. CONTRACTING:
