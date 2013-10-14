@@ -36,6 +36,10 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
   option(FORCE_CLANG_BLOCKS "Force enable Clang blocks" YES)
 endif()
 
+if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+  option(FORCE_CLANG_BLOCKS "Force enable Clang blocks" YES)
+endif()
+
 # sanity checks...
 if(INSTALL_DEMOS)
   set(BUILD_DEMOS ON FORCE)
