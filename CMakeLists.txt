@@ -32,6 +32,10 @@ else()
   option(INSTALL_STATIC "Install the static library" ON)
 endif()
 
+if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+  option(FORCE_CLANG_BLOCKS "Force enable Clang blocks" YES)
+endif()
+
 # sanity checks...
 if(INSTALL_DEMOS)
   set(BUILD_DEMOS ON FORCE)
@@ -44,6 +48,9 @@ endif()
 
 if(NOT MSVC)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99") # always use gnu99
+  if(FORCE_CLANG_BLOCKS)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fblocks")
+  endif()
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -ffast-math") # extend release-profile with fast-math
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall") # extend debug-profile with -Wall
 endif()
