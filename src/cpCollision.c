@@ -120,7 +120,7 @@ struct MinkowskiPoint {
 };
 
 static inline struct MinkowskiPoint
-MinkoskiPointNew(const struct SupportPoint a, const struct SupportPoint b)
+MinkowskiPointNew(const struct SupportPoint a, const struct SupportPoint b)
 {
 	struct MinkowskiPoint point = {a.p, b.p, cpvsub(b.p, a.p), (a.id & 0xFF)<<8 | (b.id & 0xFF)};
 	return point;
@@ -136,7 +136,7 @@ Support(const struct SupportContext *ctx, const cpVect n)
 {
 	struct SupportPoint a = ctx->func1(ctx->shape1, cpvneg(n));
 	struct SupportPoint b = ctx->func2(ctx->shape2, n);
-	return MinkoskiPointNew(a, b);
+	return MinkowskiPointNew(a, b);
 }
 
 struct EdgePoint {
@@ -418,8 +418,8 @@ GJK(const struct SupportContext *ctx, cpCollisionID *id)
 	
 	struct MinkowskiPoint v0, v1;
 	if(*id && ENABLE_CACHING){
-		v0 = MinkoskiPointNew(ShapePoint(ctx->shape1, (*id>>24)&0xFF), ShapePoint(ctx->shape2, (*id>>16)&0xFF));
-		v1 = MinkoskiPointNew(ShapePoint(ctx->shape1, (*id>> 8)&0xFF), ShapePoint(ctx->shape2, (*id    )&0xFF));
+		v0 = MinkowskiPointNew(ShapePoint(ctx->shape1, (*id>>24)&0xFF), ShapePoint(ctx->shape2, (*id>>16)&0xFF));
+		v1 = MinkowskiPointNew(ShapePoint(ctx->shape1, (*id>> 8)&0xFF), ShapePoint(ctx->shape2, (*id    )&0xFF));
 	} else {
 		cpVect axis = cpvperp(cpvsub(cpBBCenter(ctx->shape1->bb), cpBBCenter(ctx->shape2->bb)));
 		v0 = Support(ctx, axis);
