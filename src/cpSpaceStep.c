@@ -211,8 +211,6 @@ QueryReject(cpShape *a, cpShape *b)
 		|| a->body == b->body
 		// Don't collide shapes that are filtered.
 		|| cpShapeFilterReject(a->filter, b->filter)
-		// Don't collide infinite mass objects unless one of them is a sensor.
-		|| (a->body->m == INFINITY && b->body->m == INFINITY && !(a->sensor || b->sensor))
 	);
 }
 
@@ -251,7 +249,9 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 		// Check (again) in case the pre-solve() callback called cpArbiterIgnored().
 		arb->state != CP_ARBITER_STATE_IGNORE &&
 		// Process, but don't add collisions for sensors.
-		!(a->sensor || b->sensor)
+		!(a->sensor || b->sensor) &&
+		// Don't process collisions between two infinite mass bodies.
+		!(a->body->m == INFINITY && b->body->m == INFINITY)
 	){
 		cpArrayPush(space->arbiters, arb);
 	} else {
