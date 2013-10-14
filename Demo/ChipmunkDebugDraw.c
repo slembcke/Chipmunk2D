@@ -115,8 +115,13 @@ ChipmunkDebugDrawInit(void)
 	CHECK_GL_ERRORS();
 	
 	// Setu VBO and VAO.
+#if __APPLE__
 	glGenVertexArraysAPPLE(1, &vao);
 	glBindVertexArrayAPPLE(vao);
+#else
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+#endif
 	
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -127,8 +132,12 @@ ChipmunkDebugDrawInit(void)
 	SET_ATTRIBUTE(program, struct Vertex, outline_color, GL_FLOAT);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+#if __APPLE__
 	glBindVertexArrayAPPLE(0);
-	
+#else
+	glBindVertexArray(0);
+#endif
+
 	CHECK_GL_ERRORS();
 }
 
@@ -307,7 +316,11 @@ ChipmunkDebugDrawFlushRenderer(void)
 	glUseProgram(program);
 	glUniform1f(glGetUniformLocation(program, "u_outline_coef"), ChipmunkDebugDrawPointLineScale);
 	
+#if __APPLE__
 	glBindVertexArrayAPPLE(vao);
+#else
+	glBindVertexArray(vao);
+#endif
 	glDrawArrays(GL_TRIANGLES, 0, triangle_count*3);
 		
 	CHECK_GL_ERRORS();
