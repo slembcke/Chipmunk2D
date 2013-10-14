@@ -213,8 +213,6 @@ queryReject(cpShape *a, cpShape *b)
 		|| (a->group && a->group == b->group)
 		// Don't collide objects that don't share at least on layer.
 		|| !(a->layers & b->layers)
-		// Don't collide infinite mass objects
-		|| (a->body->m == INFINITY && b->body->m == INFINITY)
 	);
 }
 
@@ -262,7 +260,11 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 		// Call preSolve
 		handler->preSolve(arb, space, handler->data) &&
 		// Process, but don't add collisions for sensors.
-		!sensor
+		!sensor &&
+		// Check the arbiter state again in case preSolve set it.
+		(arb->state != cpArbiterStateIgnore) && 
+		// Don't collide infinite mass objects
+		!(a->body->m == INFINITY && b->body->m == INFINITY)
 	){
 		cpArrayPush(space->arbiters, arb);
 	} else {
