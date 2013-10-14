@@ -187,7 +187,7 @@ cpCircleShapeCacheData(cpCircleShape *circle, cpTransform transform)
 }
 
 static void
-cpCicleShapePointQuery(cpCircleShape *circle, cpVect p, cpPointQueryInfo *info)
+cpCircleShapePointQuery(cpCircleShape *circle, cpVect p, cpPointQueryInfo *info)
 {
 	cpVect delta = cpvsub(p, circle->tc);
 	cpFloat d = cpvlength(delta);
@@ -223,7 +223,7 @@ static const cpShapeClass cpCircleShapeClass = {
 	CP_CIRCLE_SHAPE,
 	(cpShapeCacheDataImpl)cpCircleShapeCacheData,
 	NULL,
-	(cpShapePointQueryImpl)cpCicleShapePointQuery,
+	(cpShapePointQueryImpl)cpCircleShapePointQuery,
 	(cpShapeSegmentQueryImpl)cpCircleShapeSegmentQuery,
 };
 
