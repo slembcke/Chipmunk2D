@@ -135,6 +135,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo ContactPoints = {
 	"ContactPoints",
+	1.0/60.0,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

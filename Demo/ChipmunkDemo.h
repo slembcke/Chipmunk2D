@@ -66,3 +66,7 @@ void ChipmunkDemoPrintString(char *fmt, ...);
 
 void ChipmunkDemoDefaultDrawImpl(cpSpace *space);
 void ChipmunkDemoFreeSpaceChildren(cpSpace *space);
+
+#undef cpAssertHard
+#define cpAssertHard(exp, ...) if(exp){}
+

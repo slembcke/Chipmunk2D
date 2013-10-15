@@ -226,14 +226,14 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 	cpBool sleep = (space->sleepTimeThreshold != INFINITY);
 	cpArray *bodies = space->bodies;
 	
-#ifndef NDEBUG
-	for(int i=0; i<bodies->num; i++){
-		cpBody *body = (cpBody*)bodies->arr[i];
-		
-		cpAssertSoft(body->node.next == NULL, "Internal Error: Dangling next pointer detected in contact graph.");
-		cpAssertSoft(body->node.root == NULL, "Internal Error: Dangling root pointer detected in contact graph.");
-	}
-#endif
+//#ifndef NDEBUG
+//	for(int i=0; i<bodies->num; i++){
+//		cpBody *body = (cpBody*)bodies->arr[i];
+//		
+//		cpAssertSoft(body->node.next == NULL, "Internal Error: Dangling next pointer detected in contact graph.");
+//		cpAssertSoft(body->node.root == NULL, "Internal Error: Dangling root pointer detected in contact graph.");
+//	}
+//#endif
 	
 	// Calculate the kinetic energy of all the bodies.
 	if(sleep){

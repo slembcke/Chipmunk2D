@@ -15,3 +15,9 @@ build
 msvc/vc10/chipmunk/Win32/
 msvc/vc10/demo/ipch/
 msvc/vc10/demo/Win32/
+
+*.pdb
+*.vcxproj.user
+msvc/vc12/chipmunk/Win32/
+msvc/vc12/demo/ipch/
+msvc/vc12/demo/Win32/

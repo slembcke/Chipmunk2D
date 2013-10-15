@@ -228,6 +228,7 @@ cpSegmentShape* cpSegmentShapeInit(cpSegmentShape *seg, cpBody *body, cpVect a, 
 /// Allocate and initialize a segment shape.
 cpShape* cpSegmentShapeNew(cpBody *body, cpVect a, cpVect b, cpFloat radius);
 
+/// Let Chipmunk know about the geometry of adjacent segments to avoid colliding with endcaps.
 void cpSegmentShapeSetNeighbors(cpShape *shape, cpVect prev, cpVect next);
 
 CP_DeclareShapeGetter(cpSegmentShape, cpVect, A);

@@ -36,16 +36,8 @@
 #include <limits.h>
 #include <stdarg.h>
 
-#ifdef __APPLE__
-	#include "glew.h"
-	#include "glfw.h"
-#else
-#ifdef WIN32
-	#include <windows.h>
-#endif
-	#include <GL/gl.h>
-	#include <GL/glu.h>
-#endif
+#include "GL/glew.h"
+#include "GL/glfw.h"
 
 #include "chipmunk_private.h"
 #include "ChipmunkDemo.h"
@@ -246,8 +238,8 @@ Display(void)
 {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glTranslatef(translate.x, translate.y, 0.0f);
-	glScalef(scale, scale, 1.0f);
+	glTranslatef((GLfloat)translate.x, (GLfloat)translate.y, 0.0f);
+	glScalef((GLfloat)scale, (GLfloat)scale, 1.0f);
 	
 	Update();
 	
@@ -286,12 +278,12 @@ Reshape(int width, int height)
 {
 	glViewport(0, 0, width, height);
 	
-	double scale = cpfmin(width/640.0, height/480.0);
-	double hw = width*(0.5/scale);
-	double hh = height*(0.5/scale);
+	float scale = (float)cpfmin(width/640.0, height/480.0);
+	float hw = width*(0.5f/scale);
+	float hh = height*(0.5f/scale);
 	
 	ChipmunkDebugDrawPointLineScale = scale;
-	glLineWidth(scale);
+	glLineWidth((GLfloat)scale);
 	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -351,12 +343,12 @@ Keyboard(int key, int state)
 		glDisable(GL_POINT_SMOOTH);
 	}
 	
-	GLfloat translate_increment = 50.0/scale;
-	GLfloat scale_increment = 1.2;
+	GLfloat translate_increment = 50.0f/(GLfloat)scale;
+	GLfloat scale_increment = 1.2f;
 	if(key == '5'){
-		translate.x = 0.0;
-		translate.y = 0.0;
-		scale = 1.0;
+		translate.x = 0.0f;
+		translate.y = 0.0f;
+		scale = 1.0f;
 	}else if(key == '4'){
 		translate.x += translate_increment;
 	}else if(key == '6'){
@@ -453,7 +445,7 @@ SetupGL(void)
 	ChipmunkDebugDrawInit();
 	ChipmunkDemoTextInit();
 	
-	glClearColor(52.0/255.0, 62.0/255.0, 72.0/255.0, 1.0);
+	glClearColor(52.0f/255.0f, 62.0f/255.0f, 72.0f/255.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 	glEnable(GL_LINE_SMOOTH);
@@ -487,45 +479,21 @@ SetupGLFW()
 	glfwSetMouseButtonCallback(Click);
 }
 
-#ifdef WIN32
-
-static double GetMilliseconds(){
-	__int64 count, freq;
-	QueryPerformanceCounter((LARGE_INTEGER*)&count);
-	QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
-
-	return 1000.0*(double)count/(double)freq;
-}
-
-#else
-
-#include <sys/time.h>
-#include <unistd.h>
-
-static double GetMilliseconds(){
-	struct timeval time;
-	gettimeofday(&time, NULL);
-	
-	return (time.tv_sec*1000.0 + time.tv_usec/1000.0);
-}
-
-#endif
-
 void TimeTrial(int index, int count)
 {
 	space = demos[index].initFunc();
 	
-	double start_time = GetMilliseconds();
+	double start_time = glfwGetTime();
 	double dt = demos[index].timestep;
 	
 	for(int i=0; i<count; i++)
 		demos[index].updateFunc(space, dt);
 	
-	double end_time = GetMilliseconds();
+	double end_time = glfwGetTime();
 	
 	demos[index].destroyFunc(space);
 	
-	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', end_time - start_time, demos[index].name);
+	printf("Time(%c) = %8.2f ms (%s)\n", index + 'a', (end_time - start_time)*1e3f, demos[index].name);
 }
 
 extern ChipmunkDemo LogoSmash;
@@ -604,6 +572,7 @@ main(int argc, const char **argv)
 	}
 	
 	if(trial){
+		cpAssertHard(glfwInit(), "Error initializing GLFW.");
 //		sleep(1);
 		for(int i=0; i<demo_count; i++) TimeTrial(i, 1000);
 //		time_trial('d' - 'a', 10000);

@@ -32,7 +32,7 @@ static cpBool DrawContacts(cpArbiter *arb, cpSpace *space, void *data){
 	
 	for(int i=0; i<set.count; i++){
 		cpVect p = set.points[i].point;
-		ChipmunkDebugDrawPoints(6.0, 1, &p, RGBAColor(1, 0, 0, 1));
+		ChipmunkDebugDrawDot(6.0, p, RGBAColor(1, 0, 0, 1));
 		ChipmunkDebugDrawSegment(p, cpvadd(p, cpvmult(set.points[i].normal, 10.0)), RGBAColor(1, 0, 0, 1));
 	}
 	
@@ -133,6 +133,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo Smooth = {
 	"Smooth",
+	1.0f/60.0f,
 	init,
 	update,
 	ChipmunkDemoDefaultDrawImpl,

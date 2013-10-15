@@ -18,11 +18,23 @@ endif()
 # other options for the build, you can i.e. activate the shared library by passing
 #   -D BUILD_SHARED=ON
 # to cmake. Other options analog
-option(BUILD_DEMOS "Build the demo applications" ON)
-option(INSTALL_DEMOS "Install the demo applications" OFF)
-option(BUILD_SHARED "Build and install the shared library" ON)
-option(BUILD_STATIC "Build as static library" ON)
-option(INSTALL_STATIC "Install the static library" ON)
+if(ANDROID)
+  option(BUILD_DEMOS "Build the demo applications" OFF)
+  option(INSTALL_DEMOS "Install the demo applications" OFF)
+  option(BUILD_SHARED "Build and install the shared library" ON)
+  option(BUILD_STATIC "Build as static library" ON)
+  option(INSTALL_STATIC "Install the static library" OFF)
+else()
+  option(BUILD_DEMOS "Build the demo applications" ON)
+  option(INSTALL_DEMOS "Install the demo applications" OFF)
+  option(BUILD_SHARED "Build and install the shared library" ON)
+  option(BUILD_STATIC "Build as static library" ON)
+  option(INSTALL_STATIC "Install the static library" ON)
+endif()
+
+if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+  option(FORCE_CLANG_BLOCKS "Force enable Clang blocks" YES)
+endif()
 
 # sanity checks...
 if(INSTALL_DEMOS)
@@ -36,6 +48,9 @@ endif()
 
 if(NOT MSVC)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99") # always use gnu99
+  if(FORCE_CLANG_BLOCKS)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fblocks")
+  endif()
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -ffast-math") # extend release-profile with fast-math
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall") # extend debug-profile with -Wall
 endif()

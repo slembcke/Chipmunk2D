@@ -158,8 +158,8 @@ ShatterShape(cpSpace *space, cpShape *shape, cpFloat cellSize, cpVect focus)
 	cpSpaceRemoveBody(space, shape->body);
 	
 	cpBB bb = cpShapeGetBB(shape);
-	int width = (bb.r - bb.l)/cellSize + 1;
-	int height = (bb.t - bb.b)/cellSize + 1;
+	int width = (int)((bb.r - bb.l)/cellSize) + 1;
+	int height = (int)((bb.t - bb.b)/cellSize) + 1;
 //	printf("Splitting as %dx%d\n", width, height);
 	struct WorleyContex context = {rand(), cellSize, width, height, bb, focus};
 	

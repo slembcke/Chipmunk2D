@@ -161,6 +161,7 @@ destroy(cpSpace *space)
 
 ChipmunkDemo GJK = {
 	"GJK",
+	1.0f/60.0f,
 	init,
 	update,
 	draw,
