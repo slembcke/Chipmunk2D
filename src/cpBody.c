@@ -335,7 +335,7 @@ static inline cpVect
 cpBodyGetVelAtPoint(cpBody *body, cpVect r)
 {
 	cpVect r_cog = cpvsub(r, cpvrotate(body->cog, body->rot));
-	return cpvadd(body->v, cpvmult(cpvperp(r_cog), body->w));
+	return cpvadd(body->v, cpvmult(cpvrperp(r_cog), body->w));
 }
 
 cpVect
