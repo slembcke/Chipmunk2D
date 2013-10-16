@@ -202,6 +202,21 @@ cpSpaceArbiterSetTrans(cpShape **shapes, cpSpace *space)
 }
 
 static inline cpBool
+QueryRejectConstraint(cpBody *a, cpBody *b)
+{
+	CP_BODY_FOREACH_CONSTRAINT(a, constraint){
+		if(
+			!constraint->collideBodies && (
+				(constraint->a == a && constraint->b == b) ||
+				(constraint->a == b && constraint->b == a)
+			)
+		) return cpTrue;
+	}
+	
+	return cpFalse;
+}
+
+static inline cpBool
 QueryReject(cpShape *a, cpShape *b)
 {
 	return (
@@ -211,6 +226,8 @@ QueryReject(cpShape *a, cpShape *b)
 		|| a->body == b->body
 		// Don't collide shapes that are filtered.
 		|| cpShapeFilterReject(a->filter, b->filter)
+		// Don't collide bodies if they have a constraint with collideBodies == cpFalse.
+		|| QueryRejectConstraint(a->body, b->body)
 	);
 }
 

@@ -68,6 +68,11 @@ struct cpConstraint {
 	/// Defaults to infinity.
 	cpFloat maxBias;
 	
+	/// Whether or not the connected bodies should checked for collisions.
+	/// Collisions are filtered before calling callbacks.
+	/// Defaults to cpTrue.
+	cpBool collideBodies;
+	
 	/// Function called before the solver runs.
 	/// Animate your joint anchors, update your motor torque, etc.
 	cpConstraintPreSolveFunc preSolve;
@@ -117,6 +122,7 @@ CP_DefineConstraintStructGetter(cpBody*, b, B)
 CP_DefineConstraintStructProperty(cpFloat, maxForce, MaxForce)
 CP_DefineConstraintStructProperty(cpFloat, errorBias, ErrorBias)
 CP_DefineConstraintStructProperty(cpFloat, maxBias, MaxBias)
+CP_DefineConstraintStructProperty(cpBool, collideBodies, CollideBodies)
 CP_DefineConstraintStructProperty(cpConstraintPreSolveFunc, preSolve, PreSolveFunc)
 CP_DefineConstraintStructProperty(cpConstraintPostSolveFunc, postSolve, PostSolveFunc)
 CP_DefineConstraintStructProperty(cpDataPointer, userData, UserData)

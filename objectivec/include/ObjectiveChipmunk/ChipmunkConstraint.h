@@ -49,6 +49,13 @@
 */
 @property(nonatomic, assign) cpFloat maxBias;
 
+/**
+	Whether or not the connected bodies should checked for collisions.
+	Collisions are filtered before calling callbacks.
+	Defaults to TRUE.
+*/
+@property(nonatomic, assign) BOOL collideBodies;
+
 /// Get the most recent impulse applied by this constraint.
 @property(nonatomic, readonly) cpFloat impulse;
 
