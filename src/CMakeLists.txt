@@ -16,7 +16,7 @@ if(BUILD_SHARED)
   # set the lib's version number
   # But avoid on Android because symlinks to version numbered .so's don't work with Android's Java-side loadLibrary.
   if(NOT ANDROID)
-	  set_target_properties(chipmunk PROPERTIES VERSION 6.2.0)
+	  set_target_properties(chipmunk PROPERTIES VERSION 6.2.1)
   endif(NOT ANDROID)
   if(ANDROID)
 	  # need to explicitly link to the math library because the CMake/Android toolchains may not do it automatically
