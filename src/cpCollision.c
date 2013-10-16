@@ -157,12 +157,12 @@ SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 	int i1 = PolySupportPointIndex(poly->count, poly->planes, n);
 	
 	// TODO: get rid of mod eventually, very expensive on ARM
-	int i0 = (i1 - 1 + count)%count;
 	int i2 = (i1 + 1)%count;
 	
 	cpSplittingPlane *planes = poly->planes;
 	cpHashValue hashid = poly->shape.hashid;
 	if(cpvdot(n, planes[i1].n) > cpvdot(n, planes[i2].n)){
+		int i0 = (i1 - 1 + count)%count;
 		struct Edge edge = {{planes[i0].v0, CP_HASH_PAIR(hashid, i0)}, {planes[i1].v0, CP_HASH_PAIR(hashid, i1)}, poly->r, planes[i1].n};
 		return edge;
 	} else {
