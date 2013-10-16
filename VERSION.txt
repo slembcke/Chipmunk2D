@@ -1,3 +1,10 @@
+What's new in 6.2.1:
+* Added Androud support to the CMake files. (Thanks Eric Wing!)
+* Added a MSVC 2012 project file. (Thanks Leonid Usov!)
+* Merged a fix for VAOs on Windows. (Thanks Leonid Usov!)
+* Merged a couple of other minor fixes.
+* BUG: Fixed a crash issue with the ChipmunkTileCache and ChipmunkPointCloudSampler classes. (Pro only).
+
 What's new in 6.2.0:
 * Collision detection now primarily uses the GJK and EPA algorithms instead of SAT. Internally this was a rather huge change. o_O
 * Improved collision point quality and better collision point identification.
