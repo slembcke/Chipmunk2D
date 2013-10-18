@@ -392,7 +392,7 @@ cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpSpace *space)
 	cpCollisionHandler *handler = arb->handler = cpSpaceLookupHandler(space, typeA, typeB, defaultHandler);
 	
 	// Check if the types match, but don't swap for a default handler which use the wildcard for type A.
-	cpBool swapped = (typeA != handler->typeA && handler->typeA != CP_WILDCARD_COLLISION_TYPE);
+	cpBool swapped = arb->swapped = (typeA != handler->typeA && handler->typeA != CP_WILDCARD_COLLISION_TYPE);
 	
 	if(handler != defaultHandler || space->usesWildcards){
 		// The order of the main handler swaps the wildcard handlers too. Uffda.
