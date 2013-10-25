@@ -225,8 +225,6 @@ cpPolyShapeInitRaw(cpPolyShape *poly, cpBody *body, int count, const cpVect *ver
 	return poly;
 }
 
-
-
 cpShape *
 cpPolyShapeNew(cpBody *body, int count, const cpVect *verts, cpTransform transform, cpFloat radius)
 {
@@ -316,9 +314,8 @@ cpPolyShapeSetVertsRaw(cpShape *shape, int count, cpVect *verts)
 	SetVerts(poly, count, verts);
 	
 	cpFloat mass = shape->massInfo.m;
-//	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, poly->count, poly->verts, poly->r);
-//	if(mass > 0.0f) cpBodyAccumulateMassFromShapes(shape->body);
-	cpAssertHard(mass == 0.0, "Not Yet Implemented."); // TODO
+	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, count, verts, poly->r);
+	if(mass > 0.0f) cpBodyAccumulateMassFromShapes(shape->body);
 }
 
 void
@@ -327,9 +324,10 @@ cpPolyShapeSetRadius(cpShape *shape, cpFloat radius)
 	cpAssertHard(shape->klass == &polyClass, "Shape is not a poly shape.");
 	cpPolyShape *poly = (cpPolyShape *)shape;
 	poly->r = radius;
-
-	cpFloat mass = shape->massInfo.m;
+	
+	
+	// TODO radius is not handled by moment/area
+//	cpFloat mass = shape->massInfo.m;
 //	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, poly->count, poly->verts, poly->r);
 //	if(mass > 0.0f) cpBodyAccumulateMassFromShapes(shape->body);
-	cpAssertHard(mass == 0.0, "Not Yet Implemented."); // TODO
 }
