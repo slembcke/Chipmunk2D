@@ -486,7 +486,7 @@ Click(int button, int state)
 			cpPointQueryInfo info = {};
 			cpShape *shape = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, radius, GRAB_FILTER, &info);
 			
-			if(shape){
+			if(shape && !cpBodyIsStatic(shape->body)){
 				// Use the closest point on the surface if the click is outside of the shape.
 				cpVect nearest = (info.distance > 0.0f ? info.point : ChipmunkDemoMouse);
 				
