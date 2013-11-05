@@ -397,8 +397,8 @@ Click(int button, int state)
 	if(button == GLFW_MOUSE_BUTTON_1){
 		if(state == GLFW_PRESS){
 			cpShape *shape = cpSpacePointQueryFirst(space, ChipmunkDemoMouse, GRABABLE_MASK_BIT, CP_NO_GROUP);
-			if(shape){
-				cpBody *body = shape->body;
+			if(shape && cpBodyGetMass(cpShapeGetBody(shape)) < INFINITY){
+				cpBody *body = cpShapeGetBody(shape);
 				mouse_joint = cpPivotJointNew2(mouse_body, body, cpvzero, cpBodyWorld2Local(body, ChipmunkDemoMouse));
 				mouse_joint->maxForce = 50000.0f;
 				mouse_joint->errorBias = cpfpow(1.0f - 0.15f, 60.0f);
