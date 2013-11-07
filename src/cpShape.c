@@ -345,9 +345,8 @@ cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpFloat r2, 
 static struct cpShapeMassInfo
 cpSegmentShapeMassInfo(cpFloat mass, cpVect a, cpVect b, cpFloat r)
 {
-	cpFloat w = 2.0f*r;
 	struct cpShapeMassInfo info = {
-		mass, cpMomentForBox(1.0f, cpvdist(a, b) + w, w), // TODO is an approximation.
+		mass, cpMomentForBox(1.0f, cpvdist(a, b) + 2.0f*r, 2.0f*r), // TODO is an approximation.
 		cpvlerp(a, b, 0.5f),
 		cpAreaForSegment(a, b, r),
 	};

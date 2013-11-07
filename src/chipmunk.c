@@ -62,11 +62,13 @@ cpAreaForCircle(cpFloat r1, cpFloat r2)
 }
 
 cpFloat
-cpMomentForSegment(cpFloat m, cpVect a, cpVect b, cpFloat radius)
+cpMomentForSegment(cpFloat m, cpVect a, cpVect b, cpFloat r)
 {
-	// TODO account for radius
-	cpVect offset = cpvmult(cpvadd(a, b), 0.5f);
-	return m*(cpvdistsq(b, a)/12.0f + cpvlengthsq(offset));
+	cpVect offset = cpvlerp(a, b, 0.5f);
+	
+	// This approximates the shape as a box for rounded segments, but it's quite close.
+	cpFloat length = cpvdist(b, a) + 2.0f*r;
+	return m*((length*length + 4.0f*r*r)/12.0f + cpvlengthsq(offset));
 }
 
 cpFloat
