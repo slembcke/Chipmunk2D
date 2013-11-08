@@ -139,4 +139,19 @@
 	[space release];
 }
 
+-(void)testPolyArea
+{
+	cpFloat area1 = cpAreaForCircle(0.0, 1.0);
+	cpFloat area2 = cpAreaForPoly(1, (cpVect[]){cpvzero}, 1.0);
+	XCTAssertEqualWithAccuracy(area1, area2, 1e-3, @"");
+	
+	cpFloat area3 = cpAreaForSegment(cpv(-1,0), cpv(1,0), 1.0);
+	cpFloat area4 = cpAreaForPoly(2, (cpVect[]){cpv(-1,0), cpv(1,0)}, 1.0);
+	XCTAssertEqualWithAccuracy(area3, area4, 1e-3, @"");
+	
+	cpFloat area5 = area1 + 4.0;
+	cpFloat area6 = cpAreaForPoly(2, (cpVect[]){cpv(-1,-1), cpv(1,-1), cpv(1,1), cpv(-1,1)}, 1.0);
+	XCTAssertEqualWithAccuracy(area5, area6, 1e-3, @"");
+}
+
 @end

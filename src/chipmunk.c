@@ -78,9 +78,10 @@ cpAreaForSegment(cpVect a, cpVect b, cpFloat r)
 }
 
 cpFloat
-cpMomentForPoly(cpFloat m, const int count, const cpVect *verts, cpVect offset, cpFloat radius)
+cpMomentForPoly(cpFloat m, const int count, const cpVect *verts, cpVect offset, cpFloat r)
 {
-	if(count == 2) return cpMomentForSegment(m, verts[0], verts[1], radius);
+	// TODO account for radius.
+	if(count == 2) return cpMomentForSegment(m, verts[0], verts[1], 0.0f);
 	
 	cpFloat sum1 = 0.0f;
 	cpFloat sum2 = 0.0f;
@@ -95,20 +96,23 @@ cpMomentForPoly(cpFloat m, const int count, const cpVect *verts, cpVect offset, 
 		sum2 += a;
 	}
 	
-	// TODO account for radius.
 	return (m*sum1)/(6.0f*sum2);
 }
 
 cpFloat
-cpAreaForPoly(const int count, const cpVect *verts, cpFloat radius)
+cpAreaForPoly(const int count, const cpVect *verts, cpFloat r)
 {
 	cpFloat area = 0.0f;
+	cpFloat perimeter = 0.0f;
 	for(int i=0; i<count; i++){
-		area += cpvcross(verts[(i+1)%count], verts[i]);
+		cpVect v1 = verts[i];
+		cpVect v2 = verts[(i+1)%count];
+		
+		area += cpvcross(v1, v2);
+		perimeter += cpvdist(v1, v2);
 	}
 	
-	// TODO add circle area + perimeter*radius
-	return -area/2.0f;
+	return r*(M_PI*cpfabs(r) + perimeter) + area/2.0f;
 }
 
 cpVect
