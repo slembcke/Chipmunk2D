@@ -11,7 +11,10 @@
 
 @end
 
-@implementation ChipmunkBody
+@implementation ChipmunkBody {
+	cpBody _body;
+	id _userData;
+}
 
 // MARK: Integration Helpers
 
@@ -127,8 +130,6 @@ both(cpVect, force, Force)
 both(cpFloat, angle, Angle)
 both(cpFloat, angularVelocity, AngularVelocity)
 both(cpFloat, torque, Torque)
-both(cpFloat, velocityLimit, VelocityLimit);
-both(cpFloat, angularVelocityLimit, AngularVelocityLimit);
 
 -(ChipmunkSpace *)space {
 	cpSpace *space = cpBodyGetSpace(&_body);

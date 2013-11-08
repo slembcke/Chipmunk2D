@@ -479,7 +479,7 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 			
 			cpBody *body = root;
 			while(body){
-				cpBody *next = body->node.next;
+				cpBody *next = body->sleeping.next;
 				func(body, data);
 				body = next;
 			}

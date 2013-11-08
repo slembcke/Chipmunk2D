@@ -35,6 +35,49 @@
 // TODO: Eww. Magic numbers.
 #define MAGIC_EPSILON 1e-5
 
+//MARK: Private struct definitions.
+
+struct cpBody {
+	cpBodyVelocityFunc velocity_func;
+	cpBodyPositionFunc position_func;
+	
+	cpFloat m;
+	cpFloat m_inv;
+	
+	cpFloat i;
+	cpFloat i_inv;
+	
+	cpVect cog;
+	
+	cpVect p;
+	cpVect v;
+	cpVect f;
+	
+	cpFloat a;
+	cpFloat w;
+	cpFloat t;
+	
+	cpTransform transform;
+	
+	cpDataPointer userData;
+	
+	cpVect v_bias;
+	cpFloat w_bias;
+	
+	cpSpace *space;
+	
+	cpShape *shapeList;
+	cpArbiter *arbiterList;
+	cpConstraint *constraintList;
+	
+	struct {
+		cpBody *root;
+		cpBody *next;
+		cpFloat idleTime;
+	} sleeping;
+};
+
+
 //MARK: cpArray
 
 struct cpArray {
@@ -406,6 +449,6 @@ cpArbiterNext(cpArbiter *node, cpBody *body)
 	for(cpShape *var = body->shapeList; var; var = var->next)
 
 #define CP_BODY_FOREACH_COMPONENT(root, var)\
-	for(cpBody *var = root; var; var = var->node.next)
+	for(cpBody *var = root; var; var = var->sleeping.next)
 
 #endif

@@ -8,11 +8,7 @@
 	Rigid bodies are the basic unit of simulation in Chipmunk.
 	They hold the physical properties of an object (mass, position, rotation, velocity, etc.). After creating a ChipmunkBody object, you can attach collision shapes (ChipmunkShape) and joints (ChipmunkConstraint) to it.
 */
-@interface ChipmunkBody : NSObject <ChipmunkBaseObject> {
-@private
-	cpBody _body;
-	id _userData;
-}
+@interface ChipmunkBody : NSObject <ChipmunkBaseObject>
 
 /// Get the ChipmunkBody object associciated with a cpBody pointer.
 /// Undefined if the cpBody wasn't created using Objective-Chipmunk.
@@ -78,12 +74,6 @@
 	@attention Like most @c delegate properties this is a weak reference and does not call @c retain. This prevents reference cycles from occuring.
 */
 @property(nonatomic, assign) id userData;
-
-/// Maximum velocity allowed for this body. Defaults to @c INFINITY.
-@property(nonatomic, assign) cpFloat velocityLimit;
-
-/// Maximum angular velocity allowed for this body. Defaults to @c INFINITY.
-@property(nonatomic, assign) cpFloat angularVelocityLimit;
 
 /// Has the body been put to sleep by the space?
 @property(nonatomic, readonly) bool isSleeping;

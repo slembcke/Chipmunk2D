@@ -41,8 +41,9 @@ cpBodyInit(cpBody *body, cpFloat mass, cpFloat moment)
 	body->velocity_func = cpBodyUpdateVelocity;
 	body->position_func = cpBodyUpdatePosition;
 	
-	cpComponentNode node = {NULL, NULL, 0.0f};
-	body->node = node;
+	body->sleeping.root = NULL;
+	body->sleeping.next = NULL;
+	body->sleeping.idleTime = 0.0f;
 	
 	body->p = cpvzero;
 	body->v = cpvzero;
@@ -53,9 +54,6 @@ cpBodyInit(cpBody *body, cpFloat mass, cpFloat moment)
 	
 	body->v_bias = cpvzero;
 	body->w_bias = 0.0f;
-	
-	body->v_limit = (cpFloat)INFINITY;
-	body->w_limit = (cpFloat)INFINITY;
 	
 	body->userData = NULL;
 	
@@ -125,15 +123,29 @@ cpBodySanityCheck(const cpBody *body)
 	cpAssertHard(body->a == body->a && cpfabs(body->a) != INFINITY, "Body's angle is invalid.");
 	cpAssertHard(body->w == body->w && cpfabs(body->w) != INFINITY, "Body's angular velocity is invalid.");
 	cpAssertHard(body->t == body->t && cpfabs(body->t) != INFINITY, "Body's torque is invalid.");
-	
-	cpAssertHard(body->v_limit == body->v_limit, "Body's velocity limit is invalid.");
-	cpAssertHard(body->w_limit == body->w_limit, "Body's angular velocity limit is invalid.");
 }
 
 #ifdef __cplusplus
 }
 #endif
 
+cpBool
+cpBodyIsSleeping(const cpBody *body)
+{
+	return (body->sleeping.root != ((cpBody*)0));
+}
+
+cpBodyType
+cpBodyGetType(cpBody *body)
+{
+	if(body->sleeping.idleTime == INFINITY){
+		return CP_BODY_TYPE_STATIC;
+	} else if(body->m == INFINITY){
+		return CP_BODY_TYPE_KINEMATIC;
+	} else {
+		return CP_BODY_TYPE_DYNAMIC;
+	}
+}
 
 void
 cpBodySetType(cpBody *body, cpBodyType type)
@@ -143,7 +155,7 @@ cpBodySetType(cpBody *body, cpBodyType type)
 	
 	// Static bodies have their idle timers set to infinity.
 	// Non-static bodies should have their idle timer reset.
-	body->node.idleTime = (type == CP_BODY_TYPE_STATIC ? INFINITY : 0.0f);
+	body->sleeping.idleTime = (type == CP_BODY_TYPE_STATIC ? INFINITY : 0.0f);
 	
 	if(type == CP_BODY_TYPE_DYNAMIC){
 		body->m = body->i = 0.0f;
@@ -191,6 +203,7 @@ cpBodySetType(cpBody *body, cpBodyType type)
 }
 
 
+
 // Should *only* be called when shapes with mass info are modified, added or removed.
 void
 cpBodyAccumulateMassFromShapes(cpBody *body)
@@ -227,6 +240,18 @@ cpBodyAccumulateMassFromShapes(cpBody *body)
 	cpAssertSaneBody(body);
 }
 
+cpSpace *
+cpBodyGetSpace(const cpBody *body)
+{
+	return body->space;
+}
+
+cpFloat
+cpBodyGetMass(const cpBody *body)
+{
+	return body->m;
+}
+
 void
 cpBodySetMass(cpBody *body, cpFloat mass)
 {
@@ -237,6 +262,12 @@ cpBodySetMass(cpBody *body, cpFloat mass)
 	body->m = mass;
 	body->m_inv = 1.0f/mass;
 	cpAssertSaneBody(body);
+}
+
+cpFloat
+cpBodyGetMoment(const cpBody *body)
+{
+	return body->i;
 }
 
 void
@@ -336,6 +367,12 @@ SetAngle(cpBody *body, cpFloat a)
 	return a;
 }
 
+cpVect
+cpBodyGetPosition(const cpBody *body)
+{
+	return cpTransformPoint(body->transform, cpvzero);
+}
+
 void
 cpBodySetPosition(cpBody *body, cpVect position)
 {
@@ -344,6 +381,51 @@ cpBodySetPosition(cpBody *body, cpVect position)
 	cpAssertSaneBody(body);
 	
 	SetTransform(body, p, body->a);
+}
+
+cpVect
+cpBodyGetCenterOfGravity(const cpBody *body)
+{
+	return body->cog;
+}
+
+void
+cpBodySetCenterOfGravity(cpBody *body, cpVect cog)
+{
+	body->cog = cog;
+	cpAssertSaneBody(body);
+}
+
+cpVect
+cpBodyGetVelocity(const cpBody *body)
+{
+	return body->v;
+}
+
+void
+cpBodySetVelocity(cpBody *body, cpVect velocity)
+{
+	body->v = velocity;
+	cpAssertSaneBody(body);
+}
+
+cpVect
+cpBodyGetForce(const cpBody *body)
+{
+	return body->f;
+}
+
+void
+cpBodySetForce(cpBody *body, cpVect force)
+{
+	body->f = force;
+	cpAssertSaneBody(body);
+}
+
+cpFloat
+cpBodyGetAngle(const cpBody *body)
+{
+	return body->a;
 }
 
 void
@@ -355,15 +437,51 @@ cpBodySetAngle(cpBody *body, cpFloat angle)
 	SetTransform(body, body->p, angle);
 }
 
+cpFloat
+cpBodyGetAngularVelocity(const cpBody *body)
+{
+	return body->w;
+}
+
+void
+cpBodySetAngularVelocity(cpBody *body, cpFloat angularVelocity)
+{
+	body->w = angularVelocity;
+	cpAssertSaneBody(body);
+}
+
+cpFloat
+cpBodyGetTorque(const cpBody *body)
+{
+	return body->t;
+}
+
+void
+cpBodySetTorque(cpBody *body, cpFloat torque)
+{
+	body->t = torque;
+	cpAssertSaneBody(body);
+}
+
+cpDataPointer
+cpBodyGetUserData(const cpBody *body)
+{
+	return body->userData;
+}
+
+void
+cpBodySetUserData(cpBody *body, cpDataPointer userData)
+{
+	body->userData = userData;
+}
+
 void
 cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
 	cpAssertSoft(body->m > 0.0f && body->i > 0.0f, "Body's mass and moment must be positive to simulate. (Mass: %f Moment: %f)", body->m, body->i);
 	
-	body->v = cpvclamp(cpvadd(cpvmult(body->v, damping), cpvmult(cpvadd(gravity, cpvmult(body->f, body->m_inv)), dt)), body->v_limit);
-	
-	cpFloat w_limit = body->w_limit;
-	body->w = cpfclamp(body->w*damping + body->t*body->i_inv*dt, -w_limit, w_limit);
+	body->v = cpvadd(cpvmult(body->v, damping), cpvmult(cpvadd(gravity, cpvmult(body->f, body->m_inv)), dt));
+	body->w = body->w*damping + body->t*body->i_inv*dt;
 	
 	// Reset forces.
 	body->f = cpvzero;
@@ -383,6 +501,18 @@ cpBodyUpdatePosition(cpBody *body, cpFloat dt)
 	body->w_bias = 0.0f;
 	
 	cpAssertSaneBody(body);
+}
+
+cpVect
+cpBodyLocalToWorld(const cpBody *body, const cpVect point)
+{
+	return cpTransformPoint(body->transform, point);
+}
+
+cpVect
+cpBodyWorldToLocal(const cpBody *body, const cpVect point)
+{
+	return cpTransformPoint(cpTransformRigidInverse(body->transform), point);
 }
 
 void
@@ -428,6 +558,15 @@ cpBodyGetVelocityAtWorldPoint(const cpBody *body, cpVect point)
 {
 	cpVect r = cpvsub(point, cpTransformPoint(body->transform, body->cog));
 	return cpvadd(body->v, cpvmult(cpvperp(r), body->w));
+}
+
+cpFloat
+cpBodyKineticEnergy(const cpBody *body)
+{
+	// Need to do some fudging to avoid NaNs
+	cpFloat vsq = cpvdot(body->v, body->v);
+	cpFloat wsq = body->w*body->w;
+	return (vsq ? vsq*body->m : 0.0f) + (wsq ? wsq*body->i : 0.0f);
 }
 
 void
