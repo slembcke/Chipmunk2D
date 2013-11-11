@@ -115,6 +115,9 @@ static inline cpFloat cpBBMergedArea(cpBB a, cpBB b)
 static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
 {
 	cpFloat idx = 1.0f/(b.x - a.x);
+#ifdef _MSC_VER
+#pragma warning(disable: 4056)
+#endif
 	cpFloat tx1 = (bb.l == a.x ? -INFINITY : (bb.l - a.x)*idx);
 	cpFloat tx2 = (bb.r == a.x ?  INFINITY : (bb.r - a.x)*idx);
 	cpFloat txmin = cpfmin(tx1, tx2);
@@ -123,6 +126,9 @@ static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
 	cpFloat idy = 1.0f/(b.y - a.y);
 	cpFloat ty1 = (bb.b == a.y ? -INFINITY : (bb.b - a.y)*idy);
 	cpFloat ty2 = (bb.t == a.y ?  INFINITY : (bb.t - a.y)*idy);
+#ifdef _MSC_VER
+#pragma warning(default: 4056)
+#endif
 	cpFloat tymin = cpfmin(ty1, ty2);
 	cpFloat tymax = cpfmax(ty1, ty2);
 	
