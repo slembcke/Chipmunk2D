@@ -392,6 +392,7 @@ cpBodyGetCenterOfGravity(const cpBody *body)
 void
 cpBodySetCenterOfGravity(cpBody *body, cpVect cog)
 {
+	cpBodyActivate(body);
 	body->cog = cog;
 	cpAssertSaneBody(body);
 }
@@ -405,6 +406,7 @@ cpBodyGetVelocity(const cpBody *body)
 void
 cpBodySetVelocity(cpBody *body, cpVect velocity)
 {
+	cpBodyActivate(body);
 	body->v = velocity;
 	cpAssertSaneBody(body);
 }
@@ -418,6 +420,7 @@ cpBodyGetForce(const cpBody *body)
 void
 cpBodySetForce(cpBody *body, cpVect force)
 {
+	cpBodyActivate(body);
 	body->f = force;
 	cpAssertSaneBody(body);
 }
@@ -446,6 +449,7 @@ cpBodyGetAngularVelocity(const cpBody *body)
 void
 cpBodySetAngularVelocity(cpBody *body, cpFloat angularVelocity)
 {
+	cpBodyActivate(body);
 	body->w = angularVelocity;
 	cpAssertSaneBody(body);
 }
@@ -459,6 +463,7 @@ cpBodyGetTorque(const cpBody *body)
 void
 cpBodySetTorque(cpBody *body, cpFloat torque)
 {
+	cpBodyActivate(body);
 	body->t = torque;
 	cpAssertSaneBody(body);
 }
@@ -473,6 +478,18 @@ void
 cpBodySetUserData(cpBody *body, cpDataPointer userData)
 {
 	body->userData = userData;
+}
+
+void
+cpBodySetVelocityUpdateFunc(cpBody *body, cpBodyVelocityFunc velocityFunc)
+{
+	body->velocity_func = velocityFunc;
+}
+
+void
+cpBodySetPositionUpdateFunc(cpBody *body, cpBodyPositionFunc positionFunc)
+{
+	body->position_func = positionFunc;
 }
 
 void

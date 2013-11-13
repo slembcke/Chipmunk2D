@@ -23,8 +23,6 @@
 /// The cpShape struct defines the shape of a rigid body.
 /// @{
 
-typedef struct cpShapeClass cpShapeClass;
-
 /// Nearest point query info struct.
 typedef struct cpPointQueryInfo {
 	/// The nearest shape, NULL if no shape was within range.
@@ -66,80 +64,6 @@ cpShapeFilterNew(cpGroup group, cpBitmask categories, cpBitmask mask)
 	return filter;
 }
 
-
-/// @private
-struct cpShapeMassInfo {
-	cpFloat m;
-	cpFloat i;
-	cpVect cog;
-	cpFloat area;
-};
-
-/// @private
-typedef enum cpShapeType{
-	CP_CIRCLE_SHAPE,
-	CP_SEGMENT_SHAPE,
-	CP_POLY_SHAPE,
-	CP_NUM_SHAPES
-} cpShapeType;
-
-typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpTransform transform);
-typedef void (*cpShapeDestroyImpl)(cpShape *shape);
-typedef void (*cpShapePointQueryImpl)(const cpShape *shape, cpVect p, cpPointQueryInfo *info);
-typedef void (*cpShapeSegmentQueryImpl)(const cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
-
-/// @private
-struct cpShapeClass {
-	cpShapeType type;
-	
-	cpShapeCacheDataImpl cacheData;
-	cpShapeDestroyImpl destroy;
-	cpShapePointQueryImpl pointQuery;
-	cpShapeSegmentQueryImpl segmentQuery;
-};
-
-/// Opaque collision shape struct.
-struct cpShape {
-	CP_PRIVATE(const cpShapeClass *klass);
-	
-	/// The rigid body this collision shape is attached to.
-	CP_PRIVATE(cpBody *body);
-	
-	// Optional mass of the shape.
-	CP_PRIVATE(struct cpShapeMassInfo massInfo);
-
-	/// The current bounding box of the shape.
-	CP_PRIVATE(cpBB bb);
-	
-	/// Sensor flag.
-	/// Sensor shapes call collision callbacks but don't produce collisions.
-	CP_PRIVATE(cpBool sensor);
-	
-	/// Coefficient of restitution. (elasticity)
-	CP_PRIVATE(cpFloat e);
-	/// Coefficient of friction.
-	CP_PRIVATE(cpFloat u);
-	/// Surface velocity used when solving for friction.
-	CP_PRIVATE(cpVect surfaceV);
-
-	/// User definable data pointer.
-	/// Generally this points to your the game object class so you can access it
-	/// when given a cpShape reference in a callback.
-	CP_PRIVATE(cpDataPointer userData);
-	
-	/// Collision type of this shape used when picking collision handlers.
-	CP_PRIVATE(cpCollisionType type);
-	
-	CP_PRIVATE(cpShapeFilter filter);
-	
-	CP_PRIVATE(cpSpace *space);
-	
-	CP_PRIVATE(cpShape *next);
-	CP_PRIVATE(cpShape *prev);
-	
-	CP_PRIVATE(cpHashValue hashid);
-};
-
 /// Destroy a shape.
 void cpShapeDestroy(cpShape *shape);
 /// Destroy and Free a shape.
@@ -160,61 +84,73 @@ cpBool cpShapeSegmentQuery(const cpShape *shape, cpVect a, cpVect b, cpFloat rad
 /// Return contact information about two shapes.
 cpContactPointSet cpShapesCollide(const cpShape *a, const cpShape *b);
 
+/// The cpSpace this body is added to.
+cpSpace* cpShapeGetSpace(const cpShape *shape);
 
-#define CP_DefineShapeStructGetter(type, member, name) \
-static inline type cpShapeGet##name(const cpShape *shape){return shape->CP_PRIVATE(member);}
-
-#define CP_DefineShapeStructSetter(type, member, name, activates) \
-static inline void cpShapeSet##name(cpShape *shape, type value){ \
-	if(activates) cpBodyActivate(shape->CP_PRIVATE(body)); \
-	shape->CP_PRIVATE(member) = value; \
-}
-
-#define CP_DefineShapeStructProperty(type, member, name, activates) \
-CP_DefineShapeStructGetter(type, member, name) \
-CP_DefineShapeStructSetter(type, member, name, activates)
-
-CP_DefineShapeStructGetter(cpSpace*, space, Space)
-
-CP_DefineShapeStructGetter(cpBody*, body, Body)
+/// The cpBody this shape is connected to.
+cpBody* cpShapeGetBody(const cpShape *shape);
+/// Set the cpBody this shape is connected to.
+/// Can only be used if the shape is not currently added to a space.
 void cpShapeSetBody(cpShape *shape, cpBody *body);
 
+/// Get the mass of the shape if you are having Chipmunk calculate mass properties for you.
 cpFloat cpShapeGetMass(cpShape *shape);
+/// Set the mass of this shape to have Chipmunk calculate mass properties for you.
 void cpShapeSetMass(cpShape *shape, cpFloat mass);
 
+/// Get the density of the shape if you are having Chipmunk calculate mass properties for you.
 cpFloat cpShapeGetDensity(cpShape *shape);
+/// Set the density  of this shape to have Chipmunk calculate mass properties for you.
 void cpShapeSetDensity(cpShape *shape, cpFloat density);
 
+/// Get the calculated moment of inertia for this shape.
 cpFloat cpShapeGetMoment(cpShape *shape);
+/// Get the calculated area of this shape.
 cpFloat cpShapeGetArea(cpShape *shape);
+/// Get the centroid of this shape.
 cpVect cpShapeGetCenterOfGravity(cpShape *shape);
 
-CP_DefineShapeStructGetter(cpBB, bb, BB)
-CP_DefineShapeStructProperty(cpBool, sensor, Sensor, cpTrue)
-CP_DefineShapeStructProperty(cpFloat, e, Elasticity, cpFalse)
-CP_DefineShapeStructProperty(cpFloat, u, Friction, cpTrue)
-CP_DefineShapeStructProperty(cpVect, surfaceV, SurfaceVelocity, cpTrue)
-CP_DefineShapeStructProperty(cpDataPointer, userData, UserData, cpFalse)
-CP_DefineShapeStructProperty(cpCollisionType, type, CollisionType, cpTrue)
-CP_DefineShapeStructProperty(cpShapeFilter, filter, Filter, cpTrue)
+/// Get the bounding box that contains the shape given it's current position and angle.
+cpBB cpShapeGetBB(const cpShape *shape);
 
-/// When initializing a shape, it's hash value comes from a counter.
-/// Because the hash value may affect iteration order, you can reset the shape ID counter
-/// when recreating a space. This will make the simulation be deterministic.
-void cpResetShapeIdCounter(void);
+/// Get if the shape is set to be a sensor or not.
+cpBool cpShapeGetSensor(const cpShape *shape);
+/// Set if the shape is a sensor or not.
+void cpShapeSetSensor(cpShape *shape, cpBool sensor);
 
-#define CP_DeclareShapeGetter(struct, type, name) type struct##Get##name(const cpShape *shape)
+/// Get the elasticity of this shape.
+cpFloat cpShapeGetElasticity(const cpShape *shape);
+/// Set the elasticity of this shape.
+void cpShapeSetElasticity(cpShape *shape, cpFloat elasticity);
+
+/// Get the friction of this shape.
+cpFloat cpShapeGetFriction(const cpShape *shape);
+/// Set the friction of this shape.
+void cpShapeSetFriction(cpShape *shape, cpFloat friction);
+
+/// Get the surface velocity of this shape.
+cpVect cpShapeGetSurfaceVelocity(const cpShape *shape);
+/// Set the surface velocity of this shape.
+void cpShapeSetSurfaceVelocity(cpShape *shape, cpVect surfaceVelocity);
+
+/// Get the user definable data pointer of this shape.
+cpDataPointer cpShapeGetUserData(const cpShape *shape);
+/// Set the user definable data pointer of this shape.
+void cpShapeSetUserData(cpShape *shape, cpDataPointer userData);
+
+/// Set the collision type of this shape.
+cpCollisionType cpShapeGetCollisionType(const cpShape *shape);
+/// Get the collision type of this shape.
+void cpShapeSetCollisionType(cpShape *shape, cpCollisionType collisionType);
+
+/// Get the collision filtering parameters of this shape.
+cpShapeFilter cpShapeGetFilter(const cpShape *shape);
+/// Set the collision filtering parameters of this shape.
+void cpShapeSetFilter(cpShape *shape, cpShapeFilter filter);
+
 
 /// @}
 /// @defgroup cpCircleShape cpCircleShape
-
-/// @private
-typedef struct cpCircleShape {
-	cpShape shape;
-	
-	cpVect c, tc;
-	cpFloat r;
-} cpCircleShape;
 
 /// Allocate a circle shape.
 cpCircleShape* cpCircleShapeAlloc(void);
@@ -223,22 +159,13 @@ cpCircleShape* cpCircleShapeInit(cpCircleShape *circle, cpBody *body, cpFloat ra
 /// Allocate and initialize a circle shape.
 cpShape* cpCircleShapeNew(cpBody *body, cpFloat radius, cpVect offset);
 
-CP_DeclareShapeGetter(cpCircleShape, cpVect, Offset);
-CP_DeclareShapeGetter(cpCircleShape, cpFloat, Radius);
+/// Get the offset of a circle shape.
+cpVect cpCircleShapeGetOffset(const cpShape *shape);
+/// Get the radius of a circle shape.
+cpFloat cpCircleShapeGetRadius(const cpShape *shape);
 
 /// @}
 /// @defgroup cpSegmentShape cpSegmentShape
-
-/// @private
-typedef struct cpSegmentShape {
-	cpShape shape;
-	
-	cpVect a, b, n;
-	cpVect ta, tb, tn;
-	cpFloat r;
-	
-	cpVect a_tangent, b_tangent;
-} cpSegmentShape;
 
 /// Allocate a segment shape.
 cpSegmentShape* cpSegmentShapeAlloc(void);
@@ -250,9 +177,13 @@ cpShape* cpSegmentShapeNew(cpBody *body, cpVect a, cpVect b, cpFloat radius);
 /// Let Chipmunk know about the geometry of adjacent segments to avoid colliding with endcaps.
 void cpSegmentShapeSetNeighbors(cpShape *shape, cpVect prev, cpVect next);
 
-CP_DeclareShapeGetter(cpSegmentShape, cpVect, A);
-CP_DeclareShapeGetter(cpSegmentShape, cpVect, B);
-CP_DeclareShapeGetter(cpSegmentShape, cpVect, Normal);
-CP_DeclareShapeGetter(cpSegmentShape, cpFloat, Radius);
+/// Get the first endpoint of a segment shape.
+cpVect cpSegmentShapeGetA(const cpShape *shape);
+/// Get the second endpoint of a segment shape.
+cpVect cpSegmentShapeGetB(const cpShape *shape);
+/// Get the normal of a segment shape.
+cpVect cpSegmentShapeGetNormal(const cpShape *shape);
+/// Get the first endpoint of a segment shape.
+cpFloat cpSegmentShapeGetRadius(const cpShape *shape);
 
 /// @}

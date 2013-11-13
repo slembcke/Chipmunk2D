@@ -65,12 +65,8 @@ void cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b);
 /// Return the colliding bodies involved for this arbiter.
 /// The order of the cpSpace.collision_type the bodies are associated with values will match
 /// the order set when the collision handler was registered.
-static inline void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)
-{
-	CP_ARBITER_GET_SHAPES(arb, shape_a, shape_b);
-	(*a) = shape_a->CP_PRIVATE(body);
-	(*b) = shape_b->CP_PRIVATE(body);
-}
+void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b);
+
 /// A macro shortcut for defining and retrieving the bodies from an arbiter.
 #define CP_ARBITER_GET_BODIES(__arb__, __a__, __b__) cpBody *__a__, *__b__; cpArbiterGetBodies(__arb__, &__a__, &__b__);
 

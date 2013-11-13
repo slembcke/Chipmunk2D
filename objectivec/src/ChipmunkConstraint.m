@@ -135,21 +135,23 @@ getter2(type, struct, lower, upper) \
 setter2(type, struct, lower, upper)
 
 
-@implementation ChipmunkPinJoint
+@implementation ChipmunkPinJoint {
+	cpPinJoint _constraint;
+}
 
-+ (id)pinJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2
++ (id)pinJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB
 {
-	return [[[self alloc] initWithBodyA:a bodyB:b anchr1:anchr1 anchr2:anchr2] autorelease];
+	return [[[self alloc] initWithBodyA:a bodyB:b anchorA:anchorA anchorB:anchorB] autorelease];
 }
 
 - (cpConstraint *)constraint {return (cpConstraint *)&_constraint;}
 
-- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2
+- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB
 {
 	if((self = [super init])){
 		[a retain];
 		[b retain];
-		cpPinJointInit(&_constraint, a.body, b.body, anchr1, anchr2);
+		cpPinJointInit(&_constraint, a.body, b.body, anchorA, anchorB);
 		self.constraint->userData = self;
 		
 		[self setupCallbacks];
@@ -158,28 +160,30 @@ setter2(type, struct, lower, upper)
 	return self;
 }
 
-both2(cpVect, cpPinJoint, anchr1, Anchr1)
-both2(cpVect, cpPinJoint, anchr2, Anchr2)
+both2(cpVect, cpPinJoint, anchorA, AnchorA)
+both2(cpVect, cpPinJoint, anchorB, AnchorB)
 both2(cpFloat, cpPinJoint, dist, Dist)
 
 @end
 
 
-@implementation ChipmunkSlideJoint
+@implementation ChipmunkSlideJoint {
+	cpSlideJoint _constraint;
+}
 
-+ (id)slideJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2 min:(cpFloat)min max:(cpFloat)max
++ (id)slideJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB min:(cpFloat)min max:(cpFloat)max
 {
-	return [[[self alloc] initWithBodyA:a bodyB:b anchr1:anchr1 anchr2:anchr2 min:min max:max] autorelease];
+	return [[[self alloc] initWithBodyA:a bodyB:b anchorA:anchorA anchorB:anchorB min:min max:max] autorelease];
 }
 
 - (cpConstraint *)constraint {return (cpConstraint *)&_constraint;}
 
-- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2 min:(cpFloat)min max:(cpFloat)max
+- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB min:(cpFloat)min max:(cpFloat)max
 {
 	if((self = [super init])){
 		[a retain];
 		[b retain];
-		cpSlideJointInit(&_constraint, a.body, b.body, anchr1, anchr2, min, max);
+		cpSlideJointInit(&_constraint, a.body, b.body, anchorA, anchorB, min, max);
 		self.constraint->userData = self;
 		
 		[self setupCallbacks];
@@ -188,19 +192,21 @@ both2(cpFloat, cpPinJoint, dist, Dist)
 	return self;
 }
 
-both2(cpVect, cpSlideJoint, anchr1, Anchr1)
-both2(cpVect, cpSlideJoint, anchr2, Anchr2)
+both2(cpVect, cpSlideJoint, anchorA, AnchorA)
+both2(cpVect, cpSlideJoint, anchorB, AnchorB)
 both2(cpFloat, cpSlideJoint, min, Min)
 both2(cpFloat, cpSlideJoint, max, Max)
 
 @end
 
 
-@implementation ChipmunkPivotJoint
+@implementation ChipmunkPivotJoint {
+	cpPivotJoint _constraint;
+}
 
-+ (id)pivotJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2
++ (id)pivotJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB
 {
-	return [[[self alloc] initWithBodyA:a bodyB:b anchr1:anchr1 anchr2:anchr2] autorelease];
+	return [[[self alloc] initWithBodyA:a bodyB:b anchorA:anchorA anchorB:anchorB] autorelease];
 }
 
 + (id)pivotJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b pivot:(cpVect)pivot
@@ -210,12 +216,12 @@ both2(cpFloat, cpSlideJoint, max, Max)
 
 - (cpConstraint *)constraint {return (cpConstraint *)&_constraint;}
 
-- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2
+- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB
 {
 	if((self = [super init])){
 		[a retain];
 		[b retain];
-		cpPivotJointInit(&_constraint, a.body, b.body, anchr1, anchr2);
+		cpPivotJointInit(&_constraint, a.body, b.body, anchorA, anchorB);
 		self.constraint->userData = self;
 		
 		[self setupCallbacks];
@@ -226,30 +232,32 @@ both2(cpFloat, cpSlideJoint, max, Max)
 
 - (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b pivot:(cpVect)pivot
 {
-	return [self initWithBodyA:a bodyB:b anchr1:[a worldToLocal:pivot] anchr2:[b worldToLocal:pivot]];
+	return [self initWithBodyA:a bodyB:b anchorA:[a worldToLocal:pivot] anchorB:[b worldToLocal:pivot]];
 }
 
-both2(cpVect, cpPivotJoint, anchr1, Anchr1)
-both2(cpVect, cpPivotJoint, anchr2, Anchr2)
+both2(cpVect, cpPivotJoint, anchorA, AnchorA)
+both2(cpVect, cpPivotJoint, anchorB, AnchorB)
 
 @end
 
 
-@implementation ChipmunkGrooveJoint
+@implementation ChipmunkGrooveJoint {
+	cpGrooveJoint _constraint;
+}
 
-+ (id)grooveJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b groove_a:(cpVect)groove_a groove_b:(cpVect)groove_b anchr2:(cpVect)anchr2
++ (id)grooveJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b groove_a:(cpVect)groove_a groove_b:(cpVect)groove_b anchorB:(cpVect)anchorB
 {
-	return [[[self alloc] initWithBodyA:a bodyB:b groove_a:groove_a groove_b:groove_b anchr2:anchr2] autorelease];
+	return [[[self alloc] initWithBodyA:a bodyB:b groove_a:groove_a groove_b:groove_b anchorB:anchorB] autorelease];
 }
 
 - (cpConstraint *)constraint {return (cpConstraint *)&_constraint;}
 
-- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b groove_a:(cpVect)groove_a groove_b:(cpVect)groove_b anchr2:(cpVect)anchr2
+- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b groove_a:(cpVect)groove_a groove_b:(cpVect)groove_b anchorB:(cpVect)anchorB
 {
 	if((self = [super init])){
 		[a retain];
 		[b retain];
-		cpGrooveJointInit(&_constraint, a.body, b.body, groove_a, groove_b, anchr2);
+		cpGrooveJointInit(&_constraint, a.body, b.body, groove_a, groove_b, anchorB);
 		self.constraint->userData = self;
 		
 		[self setupCallbacks];
@@ -260,26 +268,28 @@ both2(cpVect, cpPivotJoint, anchr2, Anchr2)
 
 both2(cpVect, cpGrooveJoint, grooveA, GrooveA)
 both2(cpVect, cpGrooveJoint, grooveB, GrooveB)
-both2(cpVect, cpPivotJoint, anchr2, Anchr2)
+both2(cpVect, cpPivotJoint, anchorB, AnchorB)
 
 @end
 
 
-@implementation ChipmunkDampedSpring
+@implementation ChipmunkDampedSpring {
+	cpDampedSpring _constraint;
+}
 
-+ (id)dampedSpringWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2 restLength:(cpFloat)restLength stiffness:(cpFloat)stiffness damping:(cpFloat)damping
++ (id)dampedSpringWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB restLength:(cpFloat)restLength stiffness:(cpFloat)stiffness damping:(cpFloat)damping
 {
-	return [[[self alloc] initWithBodyA:a bodyB:b anchr1:anchr1 anchr2:anchr2 restLength:restLength stiffness:stiffness damping:damping] autorelease];
+	return [[[self alloc] initWithBodyA:a bodyB:b anchorA:anchorA anchorB:anchorB restLength:restLength stiffness:stiffness damping:damping] autorelease];
 }
 
 - (cpConstraint *)constraint {return (cpConstraint *)&_constraint;}
 
-- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2 restLength:(cpFloat)restLength stiffness:(cpFloat)stiffness damping:(cpFloat)damping
+- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB restLength:(cpFloat)restLength stiffness:(cpFloat)stiffness damping:(cpFloat)damping
 {
 	if((self = [super init])){
 		[a retain];
 		[b retain];
-		cpDampedSpringInit(&_constraint, a.body, b.body, anchr1, anchr2, restLength, stiffness, damping);
+		cpDampedSpringInit(&_constraint, a.body, b.body, anchorA, anchorB, restLength, stiffness, damping);
 		self.constraint->userData = self;
 		
 		[self setupCallbacks];
@@ -288,8 +298,8 @@ both2(cpVect, cpPivotJoint, anchr2, Anchr2)
 	return self;
 }
 
-both2(cpVect, cpDampedSpring, anchr1, Anchr1)
-both2(cpVect, cpDampedSpring, anchr2, Anchr2)
+both2(cpVect, cpDampedSpring, anchorA, AnchorA)
+both2(cpVect, cpDampedSpring, anchorB, AnchorB)
 both2(cpFloat, cpDampedSpring, restLength, RestLength)
 both2(cpFloat, cpDampedSpring, stiffness, Stiffness)
 both2(cpFloat, cpDampedSpring, damping, Damping)
@@ -297,7 +307,9 @@ both2(cpFloat, cpDampedSpring, damping, Damping)
 @end
 
 
-@implementation ChipmunkDampedRotarySpring
+@implementation ChipmunkDampedRotarySpring {
+	cpDampedRotarySpring _constraint;
+}
 
 + (id)dampedRotarySpringWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b restAngle:(cpFloat)restAngle stiffness:(cpFloat)stiffness damping:(cpFloat)damping
 {
@@ -327,7 +339,9 @@ both2(cpFloat, cpDampedRotarySpring, damping, Damping)
 @end
 
 
-@implementation ChipmunkRotaryLimitJoint
+@implementation ChipmunkRotaryLimitJoint {
+	cpRotaryLimitJoint _constraint;
+}
 
 + (id)rotaryLimitJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b min:(cpFloat)min max:(cpFloat)max
 {
@@ -356,7 +370,9 @@ both2(cpFloat, cpRotaryLimitJoint, max, Max)
 @end
 
 
-@implementation ChipmunkSimpleMotor
+@implementation ChipmunkSimpleMotor {
+	cpSimpleMotor _constraint;
+}
 
 + (id)simpleMotorWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b rate:(cpFloat)rate
 {
@@ -384,7 +400,9 @@ both2(cpFloat, cpSimpleMotor, rate, Rate)
 @end
 
 
-@implementation ChipmunkGearJoint
+@implementation ChipmunkGearJoint {
+	cpGearJoint _constraint;
+}
 
 + (id)gearJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b phase:(cpFloat)phase ratio:(cpFloat)ratio
 {
@@ -413,7 +431,9 @@ both2(cpFloat, cpGearJoint, ratio, Ratio)
 @end
 
 
-@implementation ChipmunkRatchetJoint
+@implementation ChipmunkRatchetJoint {
+	cpRatchetJoint _constraint;
+}
 
 + (id)ratchetJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b phase:(cpFloat)phase ratchet:(cpFloat)ratchet
 {

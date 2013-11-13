@@ -22,17 +22,11 @@
 /// @defgroup cpSimpleMotor cpSimpleMotor
 /// @{
 
-const cpConstraintClass *cpSimpleMotorGetClass(void);
+/// Opaque struct type for damped rotary springs.
+typedef struct cpSimpleMotor cpSimpleMotor;
 
-/// @private
-typedef struct cpSimpleMotor {
-	cpConstraint constraint;
-	cpFloat rate;
-	
-	cpFloat iSum;
-		
-	cpFloat jAcc;
-} cpSimpleMotor;
+/// Check if a constraint is a damped rotary springs.
+cpBool cpConstraintIsSimpleMotor(const cpConstraint *constraint);
 
 /// Allocate a simple motor.
 cpSimpleMotor* cpSimpleMotorAlloc(void);
@@ -41,6 +35,9 @@ cpSimpleMotor* cpSimpleMotorInit(cpSimpleMotor *joint, cpBody *a, cpBody *b, cpF
 /// Allocate and initialize a simple motor.
 cpConstraint* cpSimpleMotorNew(cpBody *a, cpBody *b, cpFloat rate);
 
-CP_DefineConstraintProperty(cpSimpleMotor, cpFloat, rate, Rate)
+/// Get the rate of the motor.
+cpFloat cpSimpleMotorGetRate(const cpConstraint *constraint);
+/// Set the rate of the motor.
+void cpSimpleMotorSetRate(cpConstraint *constraint, cpFloat rate);
 
 /// @}

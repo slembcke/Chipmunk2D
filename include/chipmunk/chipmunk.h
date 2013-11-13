@@ -90,8 +90,23 @@ typedef struct cpArray cpArray;
 typedef struct cpHashSet cpHashSet;
 
 typedef struct cpBody cpBody;
+
 typedef struct cpShape cpShape;
+typedef struct cpCircleShape cpCircleShape;
+typedef struct cpSegmentShape cpSegmentShape;
+typedef struct cpPolyShape cpPolyShape;
+
 typedef struct cpConstraint cpConstraint;
+typedef struct cpPinJoint cpPinJoint;
+typedef struct cpSlideJoint cpSlideJoint;
+typedef struct cpPivotJoint cpPivotJoint;
+typedef struct cpGrooveJoint cpGrooveJoint;
+typedef struct cpDampedSpring cpDampedSpring;
+typedef struct cpDampedRotarySpring cpDampedRotarySpring;
+typedef struct cpRotaryLimitJoint cpRotaryLimitJoint;
+typedef struct cpRatchetJoint cpRatchetJoint;
+typedef struct cpGearJoint cpGearJoint;
+typedef struct cpSimpleMotorJoint cpSimpleMotorJoint;
 
 typedef struct cpCollisionHandler cpCollisionHandler;
 typedef struct cpContactPointSet cpContactPointSet;

@@ -27,8 +27,8 @@ preStep(cpPivotJoint *joint, cpFloat dt)
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	
-	joint->r1 = cpTransformVect(a->transform, cpvsub(joint->anchr1, a->cog));
-	joint->r2 = cpTransformVect(b->transform, cpvsub(joint->anchr2, b->cog));
+	joint->r1 = cpTransformVect(a->transform, cpvsub(joint->anchorA, a->cog));
+	joint->r2 = cpTransformVect(b->transform, cpvsub(joint->anchorB, b->cog));
 	
 	// Calculate mass tensor
 	joint-> k = k_tensor(a, b, joint->r1, joint->r2);
@@ -81,7 +81,6 @@ static const cpConstraintClass klass = {
 	(cpConstraintApplyImpulseImpl)applyImpulse,
 	(cpConstraintGetImpulseImpl)getImpulse,
 };
-CP_DefineClassGetter(cpPivotJoint)
 
 cpPivotJoint *
 cpPivotJointAlloc(void)
@@ -90,12 +89,12 @@ cpPivotJointAlloc(void)
 }
 
 cpPivotJoint *
-cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
+cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB)
 {
 	cpConstraintInit((cpConstraint *)joint, &klass, a, b);
 	
-	joint->anchr1 = anchr1;
-	joint->anchr2 = anchr2;
+	joint->anchorA = anchorA;
+	joint->anchorB = anchorB;
 	
 	joint->jAcc = cpvzero;
 	
@@ -103,15 +102,51 @@ cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVec
 }
 
 cpConstraint *
-cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
+cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB)
 {
-	return (cpConstraint *)cpPivotJointInit(cpPivotJointAlloc(), a, b, anchr1, anchr2);
+	return (cpConstraint *)cpPivotJointInit(cpPivotJointAlloc(), a, b, anchorA, anchorB);
 }
 
 cpConstraint *
 cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot)
 {
-	cpVect anchr1 = (a ? cpBodyWorldToLocal(a, pivot) : pivot);
-	cpVect anchr2 = (b ? cpBodyWorldToLocal(b, pivot) : pivot);
-	return cpPivotJointNew2(a, b, anchr1, anchr2);
+	cpVect anchorA = (a ? cpBodyWorldToLocal(a, pivot) : pivot);
+	cpVect anchorB = (b ? cpBodyWorldToLocal(b, pivot) : pivot);
+	return cpPivotJointNew2(a, b, anchorA, anchorB);
+}
+
+cpBool
+cpConstraintIsPivotJoint(const cpConstraint *constraint)
+{
+	return (constraint->klass == &klass);
+}
+
+cpVect
+cpPivotJointGetAnchorA(const cpConstraint *constraint)
+{
+	cpAssertHard(cpConstraintIsPivotJoint(constraint), "Constraint is not a pivot joint.");
+	return ((cpPivotJoint *)constraint)->anchorA;
+}
+
+void
+cpPivotJointSetAnchorA(cpConstraint *constraint, cpVect anchorA)
+{
+	cpAssertHard(cpConstraintIsPivotJoint(constraint), "Constraint is not a pivot joint.");
+	cpConstraintActivateBodies(constraint);
+	((cpPivotJoint *)constraint)->anchorA = anchorA;
+}
+
+cpVect
+cpPivotJointGetAnchorB(const cpConstraint *constraint)
+{
+	cpAssertHard(cpConstraintIsPivotJoint(constraint), "Constraint is not a pivot joint.");
+	return ((cpPivotJoint *)constraint)->anchorB;
+}
+
+void
+cpPivotJointSetAnchorB(cpConstraint *constraint, cpVect anchorB)
+{
+	cpAssertHard(cpConstraintIsPivotJoint(constraint), "Constraint is not a pivot joint.");
+	cpConstraintActivateBodies(constraint);
+	((cpPivotJoint *)constraint)->anchorB = anchorB;
 }

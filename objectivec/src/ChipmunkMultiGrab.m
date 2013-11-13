@@ -23,7 +23,7 @@
 static void 
 GrabPreSolve(cpConstraint *constraint, cpSpace *space)
 {
-	cpBody *grabBody = cpConstraintGetA(constraint);
+	cpBody *grabBody = cpConstraintGetBodyA(constraint);
 	ChipmunkGrab *grab = [ChipmunkConstraint constraintFromCPConstraint:constraint].userData;
 	cpFloat dt = cpSpaceGetCurrentTimeStep(space);
 	cpFloat coef = cpfpow(grab->_smoothing, dt);
@@ -50,7 +50,7 @@ GrabPreSolve(cpConstraint *constraint, cpSpace *space)
 		_grabbedShape = grabbedShape;
 		
 		if(body){
-			ChipmunkPivotJoint *pivot = [ChipmunkPivotJoint pivotJointWithBodyA:grabBody bodyB:body anchr1:cpvzero anchr2:[body worldToLocal:nearest]];
+			ChipmunkPivotJoint *pivot = [ChipmunkPivotJoint pivotJointWithBodyA:grabBody bodyB:body anchorA:cpvzero anchorB:[body worldToLocal:nearest]];
 			pivot.maxForce = multiGrab.grabForce;
 			pivot.userData = self;
 			cpConstraintSetPreSolveFunc(pivot.constraint, GrabPreSolve);
@@ -59,7 +59,7 @@ GrabPreSolve(cpConstraint *constraint, cpSpace *space)
 			if(grabbedShape){
 				cpFloat frictionForce = multiGrab.grabFriction;
 				if(frictionForce > 0.0 && (1.0/body.mass + 1.0/grabBody.mass != 0.0)){
-					ChipmunkPivotJoint *friction = [ChipmunkPivotJoint pivotJointWithBodyA:grabBody bodyB:body anchr1:cpvzero anchr2:[body worldToLocal:nearest]];
+					ChipmunkPivotJoint *friction = [ChipmunkPivotJoint pivotJointWithBodyA:grabBody bodyB:body anchorA:cpvzero anchorB:[body worldToLocal:nearest]];
 					friction.maxForce = frictionForce;
 					friction.maxBias = 0.0;
 					chipmunkObjects = [chipmunkObjects arrayByAddingObject:friction];
@@ -174,7 +174,7 @@ static void PushBodyVelocityUpdate(cpBody *body, cpVect gravity, cpFloat damping
 	if(!grabbedShape && _pushMode){
 		pushBody = [ChipmunkBody bodyWithMass:_pushMass andMoment:INFINITY];
 		pushBody.position = pos;
-		pushBody.body->velocity_func = PushBodyVelocityUpdate;
+		cpBodySetVelocityUpdateFunc(pushBody.body, PushBodyVelocityUpdate);
 		
 		ChipmunkShape *pushShape = [ChipmunkCircleShape circleWithBody:pushBody radius:_grabRadius offset:cpvzero];
 		pushShape.friction = _pushFriction;

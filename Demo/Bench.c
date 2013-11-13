@@ -80,9 +80,9 @@ static void add_hexagon(cpSpace *space, int index, cpFloat radius){
 static cpSpace *
 SetupSpace_simpleTerrain(){
 	cpSpace *space = BENCH_SPACE_NEW();
-	space->iterations = 10;
-	space->gravity = cpv(0, -100);
-	space->collisionSlop = 0.5f;
+	cpSpaceSetIterations(space, 10);
+	cpSpaceSetGravity(space, cpv(0, -100));
+	cpSpaceSetCollisionSlop(space, 0.5f);
 	
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(simple_terrain_count - 1); i++){
@@ -215,9 +215,9 @@ static int complex_terrain_count = sizeof(complex_terrain_verts)/sizeof(cpVect);
 
 static cpSpace *init_ComplexTerrainCircles_1000(){
 	cpSpace *space = BENCH_SPACE_NEW();
-	space->iterations = 10;
-	space->gravity = cpv(0, -100);
-	space->collisionSlop = 0.5f;
+	cpSpaceSetIterations(space, 10);
+	cpSpaceSetGravity(space, cpv(0, -100));
+	cpSpaceSetCollisionSlop(space, 0.5f);
 	
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(complex_terrain_count - 1); i++){
@@ -240,9 +240,9 @@ static cpSpace *init_ComplexTerrainCircles_1000(){
 
 static cpSpace *init_ComplexTerrainHexagons_1000(){
 	cpSpace *space = BENCH_SPACE_NEW();
-	space->iterations = 10;
-	space->gravity = cpv(0, -100);
-	space->collisionSlop = 0.5f;
+	cpSpaceSetIterations(space, 10);
+	cpSpaceSetGravity(space, cpv(0, -100));
+	cpSpaceSetCollisionSlop(space, 0.5f);
 	
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(complex_terrain_count - 1); i++){
@@ -320,7 +320,7 @@ static int bouncy_terrain_count = sizeof(bouncy_terrain_verts)/sizeof(cpVect);
 
 static cpSpace *init_BouncyTerrainCircles_500(){
 	cpSpace *space = BENCH_SPACE_NEW();
-	space->iterations = 10;
+	cpSpaceSetIterations(space, 10);
 	
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(bouncy_terrain_count - 1); i++){
@@ -345,7 +345,7 @@ static cpSpace *init_BouncyTerrainCircles_500(){
 
 static cpSpace *init_BouncyTerrainHexagons_500(){
 	cpSpace *space = BENCH_SPACE_NEW();
-	space->iterations = 10;
+	cpSpaceSetIterations(space, 10);
 	
 	cpVect offset = cpv(-320, -240);
 	for(int i=0; i<(bouncy_terrain_count - 1); i++){
@@ -386,7 +386,7 @@ static cpBool NoCollide_begin(cpArbiter *arb, cpSpace *space, void *data){
 
 static cpSpace *init_NoCollide(){
 	cpSpace *space = BENCH_SPACE_NEW();
-	space->iterations = 10;
+	cpSpaceSetIterations(space, 10);
 	
 	cpCollisionHandler *handler = cpSpaceAddCollisionHandler(space, 2, 2);
 	handler->beginFunc = NoCollide_begin;

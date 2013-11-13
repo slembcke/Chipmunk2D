@@ -22,30 +22,26 @@
 /// @defgroup cpPivotJoint cpPivotJoint
 /// @{
 
-const cpConstraintClass *cpPivotJointGetClass(void);
-
-/// @private
-typedef struct cpPivotJoint {
-	cpConstraint constraint;
-	cpVect anchr1, anchr2;
-	
-	cpVect r1, r2;
-	cpMat2x2 k;
-	
-	cpVect jAcc;
-	cpVect bias;
-} cpPivotJoint;
+/// Check if a constraint is a slide joint.
+cpBool cpConstraintIsPivotJoint(const cpConstraint *constraint);
 
 /// Allocate a pivot joint
 cpPivotJoint* cpPivotJointAlloc(void);
 /// Initialize a pivot joint.
-cpPivotJoint* cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
+cpPivotJoint* cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB);
 /// Allocate and initialize a pivot joint.
 cpConstraint* cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot);
 /// Allocate and initialize a pivot joint with specific anchors.
-cpConstraint* cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
+cpConstraint* cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB);
 
-CP_DefineConstraintProperty(cpPivotJoint, cpVect, anchr1, Anchr1)
-CP_DefineConstraintProperty(cpPivotJoint, cpVect, anchr2, Anchr2)
+/// Get the location of the first anchor relative to the first body.
+cpVect cpPivotJointGetAnchorA(const cpConstraint *constraint);
+/// Set the location of the first anchor relative to the first body.
+void cpPivotJointSetAnchorA(cpConstraint *constraint, cpVect anchorA);
+
+/// Get the location of the second anchor relative to the second body.
+cpVect cpPivotJointGetAnchorB(const cpConstraint *constraint);
+/// Set the location of the second anchor relative to the second body.
+void cpPivotJointSetAnchorB(cpConstraint *constraint, cpVect anchorB);
 
 /// @}

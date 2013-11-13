@@ -47,7 +47,7 @@ cpSpaceDebugDrawShape(cpShape *shape, cpSpaceDebugDrawOptions *options)
 			cpPolyShape *poly = (cpPolyShape *)shape;
 			
 			int count = poly->count;
-			cpSplittingPlane *planes = poly->planes;
+			struct cpSplittingPlane *planes = poly->planes;
 			cpVect *verts = (cpVect *)alloca(count*sizeof(cpVect));
 			
 			for(int i=0; i<count; i++) verts[i] = planes[i].v0;
@@ -86,49 +86,48 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 	cpBody *body_a = constraint->a;
 	cpBody *body_b = constraint->b;
 
-	const cpConstraintClass *klass = constraint->klass;
-	if(klass == cpPinJointGetClass()){
+	if(cpConstraintIsPinJoint(constraint)){
 		cpPinJoint *joint = (cpPinJoint *)constraint;
 		
-		cpVect a = cpTransformPoint(body_a->transform, joint->anchr1);
-		cpVect b = cpTransformPoint(body_b->transform, joint->anchr2);
+		cpVect a = cpTransformPoint(body_a->transform, joint->anchorA);
+		cpVect b = cpTransformPoint(body_b->transform, joint->anchorB);
 		
 		options->drawDot(5, a, color, data);
 		options->drawDot(5, b, color, data);
 		options->drawSegment(a, b, color, data);
-	} else if(klass == cpSlideJointGetClass()){
+	} else if(cpConstraintIsSlideJoint(constraint)){
 		cpSlideJoint *joint = (cpSlideJoint *)constraint;
 	
-		cpVect a = cpTransformPoint(body_a->transform, joint->anchr1);
-		cpVect b = cpTransformPoint(body_b->transform, joint->anchr2);
+		cpVect a = cpTransformPoint(body_a->transform, joint->anchorA);
+		cpVect b = cpTransformPoint(body_b->transform, joint->anchorB);
 		
 		options->drawDot(5, a, color, data);
 		options->drawDot(5, b, color, data);
 		options->drawSegment(a, b, color, data);
-	} else if(klass == cpPivotJointGetClass()){
+	} else if(cpConstraintIsPivotJoint(constraint)){
 		cpPivotJoint *joint = (cpPivotJoint *)constraint;
 	
-		cpVect a = cpTransformPoint(body_a->transform, joint->anchr1);
-		cpVect b = cpTransformPoint(body_b->transform, joint->anchr2);
+		cpVect a = cpTransformPoint(body_a->transform, joint->anchorA);
+		cpVect b = cpTransformPoint(body_b->transform, joint->anchorB);
 
 		options->drawDot(5, a, color, data);
 		options->drawDot(5, b, color, data);
-	} else if(klass == cpGrooveJointGetClass()){
+	} else if(cpConstraintIsGrooveJoint(constraint)){
 		cpGrooveJoint *joint = (cpGrooveJoint *)constraint;
 	
 		cpVect a = cpTransformPoint(body_a->transform, joint->grv_a);
 		cpVect b = cpTransformPoint(body_a->transform, joint->grv_b);
-		cpVect c = cpTransformPoint(body_b->transform, joint->anchr2);
+		cpVect c = cpTransformPoint(body_b->transform, joint->anchorB);
 		
 		options->drawDot(5, c, color, data);
 		options->drawSegment(a, b, color, data);
-	} else if(klass == cpDampedSpringGetClass()){
+	} else if(cpConstraintIsDampedSpring(constraint)){
 		cpDampedSpring *spring = (cpDampedSpring *)constraint;
 		cpDataPointer *data = options->data;
 		cpSpaceDebugColor color = options->constraintColor;
 		
-		cpVect a = cpTransformPoint(body_a->transform, spring->anchr1);
-		cpVect b = cpTransformPoint(body_b->transform, spring->anchr2);
+		cpVect a = cpTransformPoint(body_a->transform, spring->anchorA);
+		cpVect b = cpTransformPoint(body_b->transform, spring->anchorB);
 		
 		options->drawDot(5, a, color, data);
 		options->drawDot(5, b, color, data);

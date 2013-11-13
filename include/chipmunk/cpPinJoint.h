@@ -22,31 +22,29 @@
 /// @defgroup cpPinJoint cpPinJoint
 /// @{
 
-const cpConstraintClass *cpPinJointGetClass(void);
-
-/// @private
-typedef struct cpPinJoint {
-	cpConstraint constraint;
-	cpVect anchr1, anchr2;
-	cpFloat dist;
-	
-	cpVect r1, r2;
-	cpVect n;
-	cpFloat nMass;
-	
-	cpFloat jnAcc;
-	cpFloat bias;
-} cpPinJoint;
+/// Check if a constraint is a pin joint.
+cpBool cpConstraintIsPinJoint(const cpConstraint *constraint);
 
 /// Allocate a pin joint.
 cpPinJoint* cpPinJointAlloc(void);
 /// Initialize a pin joint.
-cpPinJoint* cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
+cpPinJoint* cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB);
 /// Allocate and initialize a pin joint.
-cpConstraint* cpPinJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2);
+cpConstraint* cpPinJointNew(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB);
 
-CP_DefineConstraintProperty(cpPinJoint, cpVect, anchr1, Anchr1)
-CP_DefineConstraintProperty(cpPinJoint, cpVect, anchr2, Anchr2)
-CP_DefineConstraintProperty(cpPinJoint, cpFloat, dist, Dist)
+/// Get the location of the first anchor relative to the first body.
+cpVect cpPinJointGetAnchorA(const cpConstraint *constraint);
+/// Set the location of the first anchor relative to the first body.
+void cpPinJointSetAnchorA(cpConstraint *constraint, cpVect anchorA);
+
+/// Get the location of the second anchor relative to the second body.
+cpVect cpPinJointGetAnchorB(const cpConstraint *constraint);
+/// Set the location of the second anchor relative to the second body.
+void cpPinJointSetAnchorB(cpConstraint *constraint, cpVect anchorB);
+
+/// Get the distance the joint will maintain between the two anchors.
+cpFloat cpPinJointGetDist(const cpConstraint *constraint);
+/// Set the distance the joint will maintain between the two anchors.
+void cpPinJointSetDist(cpConstraint *constraint, cpFloat dist);
 
 ///@}

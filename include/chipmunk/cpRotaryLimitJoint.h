@@ -22,18 +22,8 @@
 /// @defgroup cpRotaryLimitJoint cpRotaryLimitJoint
 /// @{
 
-const cpConstraintClass *cpRotaryLimitJointGetClass(void);
-
-/// @private
-typedef struct cpRotaryLimitJoint {
-	cpConstraint constraint;
-	cpFloat min, max;
-	
-	cpFloat iSum;
-		
-	cpFloat bias;
-	cpFloat jAcc;
-} cpRotaryLimitJoint;
+/// Check if a constraint is a damped rotary springs.
+cpBool cpConstraintIsRotaryLimitJoint(const cpConstraint *constraint);
 
 /// Allocate a damped rotary limit joint.
 cpRotaryLimitJoint* cpRotaryLimitJointAlloc(void);
@@ -42,7 +32,14 @@ cpRotaryLimitJoint* cpRotaryLimitJointInit(cpRotaryLimitJoint *joint, cpBody *a,
 /// Allocate and initialize a damped rotary limit joint.
 cpConstraint* cpRotaryLimitJointNew(cpBody *a, cpBody *b, cpFloat min, cpFloat max);
 
-CP_DefineConstraintProperty(cpRotaryLimitJoint, cpFloat, min, Min)
-CP_DefineConstraintProperty(cpRotaryLimitJoint, cpFloat, max, Max)
+/// Get the minimum distance the joint will maintain between the two anchors.
+cpFloat cpRotaryLimitJointGetMin(const cpConstraint *constraint);
+/// Set the minimum distance the joint will maintain between the two anchors.
+void cpRotaryLimitJointSetMin(cpConstraint *constraint, cpFloat min);
+
+/// Get the maximum distance the joint will maintain between the two anchors.
+cpFloat cpRotaryLimitJointGetMax(const cpConstraint *constraint);
+/// Set the maximum distance the joint will maintain between the two anchors.
+void cpRotaryLimitJointSetMax(cpConstraint *constraint, cpFloat max);
 
 /// @}

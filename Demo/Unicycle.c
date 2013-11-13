@@ -138,14 +138,14 @@ init(void)
 		cpShapeSetFilter(shape, cpShapeFilterNew(1, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES));
 	}
 	
-	cpVect anchr1 = cpBodyWorldToLocal(balance_body, cpBodyGetPosition(wheel_body));
-	cpVect groove_a = cpvadd(anchr1, cpv(0.0,  30.0));
-	cpVect groove_b = cpvadd(anchr1, cpv(0.0, -10.0));
+	cpVect anchorA = cpBodyWorldToLocal(balance_body, cpBodyGetPosition(wheel_body));
+	cpVect groove_a = cpvadd(anchorA, cpv(0.0,  30.0));
+	cpVect groove_b = cpvadd(anchorA, cpv(0.0, -10.0));
 	cpSpaceAddConstraint(space, cpGrooveJointNew(balance_body, wheel_body, groove_a, groove_b, cpvzero));
-	cpSpaceAddConstraint(space, cpDampedSpringNew(balance_body, wheel_body, anchr1, cpvzero, 0.0, 6.0e2, 30.0));
+	cpSpaceAddConstraint(space, cpDampedSpringNew(balance_body, wheel_body, anchorA, cpvzero, 0.0, 6.0e2, 30.0));
 	
 	motor = cpSpaceAddConstraint(space, cpSimpleMotorNew(wheel_body, balance_body, 0.0));
-	motor->preSolve = motor_preSolve;
+	cpConstraintSetPreSolveFunc(motor, motor_preSolve);
 	
 	{
 		cpFloat width = 100.0;

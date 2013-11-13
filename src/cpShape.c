@@ -72,6 +72,18 @@ cpShapeFree(cpShape *shape)
 	}
 }
 
+cpSpace *
+cpShapeGetSpace(const cpShape *shape)
+{
+	return shape->space;
+}
+
+cpBody *
+cpShapeGetBody(const cpShape *shape)
+{
+	return shape->body;
+}
+
 void
 cpShapeSetBody(cpShape *shape, cpBody *body)
 {
@@ -97,6 +109,102 @@ cpFloat cpShapeGetMoment(cpShape *shape){ return shape->massInfo.m*shape->massIn
 cpFloat cpShapeGetArea(cpShape *shape){ return shape->massInfo.area; }
 cpVect cpShapeGetCenterOfGravity(cpShape *shape) { return shape->massInfo.cog; }
 
+cpBB
+cpShapeGetBB(const cpShape *shape)
+{
+	return shape->bb;
+}
+
+cpBool
+cpShapeGetSensor(const cpShape *shape)
+{
+	return shape->sensor;
+}
+
+void
+cpShapeSetSensor(cpShape *shape, cpBool sensor)
+{
+	cpBodyActivate(shape->body);
+	shape->sensor = sensor;
+}
+
+cpFloat
+cpShapeGetElasticity(const cpShape *shape)
+{
+	return shape->e;
+}
+
+void
+cpShapeSetElasticity(cpShape *shape, cpFloat elasticity)
+{
+	cpAssertHard(elasticity >= 0.0f, "Elasticity must be positive and non-zero.");
+	cpBodyActivate(shape->body);
+	shape->e = elasticity;
+}
+
+cpFloat
+cpShapeGetFriction(const cpShape *shape)
+{
+	return shape->u;
+}
+
+void
+cpShapeSetFriction(cpShape *shape, cpFloat friction)
+{
+	cpAssertHard(friction >= 0.0f, "Friction must be postive and non-zero.");
+	cpBodyActivate(shape->body);
+	shape->u = friction;
+}
+
+cpVect
+cpShapeGetSurfaceVelocity(const cpShape *shape)
+{
+	return shape->surfaceV;
+}
+
+void
+cpShapeSetSurfaceVelocity(cpShape *shape, cpVect surfaceVelocity)
+{
+	cpBodyActivate(shape->body);
+	shape->surfaceV = surfaceVelocity;
+}
+
+cpDataPointer
+cpShapeGetUserData(const cpShape *shape)
+{
+	return shape->userData;
+}
+
+void
+cpShapeSetUserData(cpShape *shape, cpDataPointer userData)
+{
+	shape->userData = userData;
+}
+
+cpCollisionType
+cpShapeGetCollisionType(const cpShape *shape)
+{
+	return shape->type;
+}
+
+void
+cpShapeSetCollisionType(cpShape *shape, cpCollisionType collisionType)
+{
+	shape->type = collisionType;
+}
+
+cpShapeFilter
+cpShapeGetFilter(const cpShape *shape)
+{
+	return shape->filter;
+}
+
+void
+cpShapeSetFilter(cpShape *shape, cpShapeFilter filter)
+{
+	cpBodyActivate(shape->body);
+	shape->filter = filter;
+}
 
 cpBB
 cpShapeCacheBB(cpShape *shape)
@@ -244,8 +352,20 @@ cpCircleShapeNew(cpBody *body, cpFloat radius, cpVect offset)
 	return (cpShape *)cpCircleShapeInit(cpCircleShapeAlloc(), body, radius, offset);
 }
 
-CP_DefineShapeGetter(cpCircleShape, cpVect, c, Offset)
-CP_DefineShapeGetter(cpCircleShape, cpFloat, r, Radius)
+cpVect
+cpCircleShapeGetOffset(const cpShape *shape)
+{
+	cpAssertHard(shape->klass == &cpCircleShapeClass, "Shape is not a circle shape.");
+	return ((cpCircleShape *)shape)->c;
+}
+
+cpFloat
+cpCircleShapeGetRadius(const cpShape *shape)
+{
+	cpAssertHard(shape->klass == &cpCircleShapeClass, "Shape is not a circle shape.");
+	return ((cpCircleShape *)shape)->r;
+}
+
 
 cpSegmentShape *
 cpSegmentShapeAlloc(void)
@@ -385,10 +505,33 @@ cpSegmentShapeNew(cpBody *body, cpVect a, cpVect b, cpFloat r)
 	return (cpShape *)cpSegmentShapeInit(cpSegmentShapeAlloc(), body, a, b, r);
 }
 
-CP_DefineShapeGetter(cpSegmentShape, cpVect, a, A)
-CP_DefineShapeGetter(cpSegmentShape, cpVect, b, B)
-CP_DefineShapeGetter(cpSegmentShape, cpVect, n, Normal)
-CP_DefineShapeGetter(cpSegmentShape, cpFloat, r, Radius)
+cpVect
+cpSegmentShapeGetA(const cpShape *shape)
+{
+	cpAssertHard(shape->klass == &cpSegmentShapeClass, "Shape is not a segment shape.");
+	return ((cpSegmentShape *)shape)->a;
+}
+
+cpVect
+cpSegmentShapeGetB(const cpShape *shape)
+{
+	cpAssertHard(shape->klass == &cpSegmentShapeClass, "Shape is not a segment shape.");
+	return ((cpSegmentShape *)shape)->b;
+}
+
+cpVect
+cpSegmentShapeGetNormal(const cpShape *shape)
+{
+	cpAssertHard(shape->klass == &cpSegmentShapeClass, "Shape is not a segment shape.");
+	return ((cpSegmentShape *)shape)->n;
+}
+
+cpFloat
+cpSegmentShapeGetRadius(const cpShape *shape)
+{
+	cpAssertHard(shape->klass == &cpSegmentShapeClass, "Shape is not a segment shape.");
+	return ((cpSegmentShape *)shape)->r;
+}
 
 void
 cpSegmentShapeSetNeighbors(cpShape *shape, cpVect prev, cpVect next)

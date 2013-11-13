@@ -80,7 +80,6 @@ static const cpConstraintClass klass = {
 	(cpConstraintApplyImpulseImpl)applyImpulse,
 	(cpConstraintGetImpulseImpl)getImpulse,
 };
-CP_DefineClassGetter(cpGearJoint)
 
 cpGearJoint *
 cpGearJointAlloc(void)
@@ -108,11 +107,39 @@ cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio)
 	return (cpConstraint *)cpGearJointInit(cpGearJointAlloc(), a, b, phase, ratio);
 }
 
-void
-cpGearJointSetRatio(cpConstraint *constraint, cpFloat value)
+cpBool
+cpConstraintIsGearJoint(const cpConstraint *constraint)
 {
-	cpConstraintCheckCast(constraint, cpGearJoint);
-	((cpGearJoint *)constraint)->ratio = value;
-	((cpGearJoint *)constraint)->ratio_inv = 1.0f/value;
+	return (constraint->klass == &klass);
+}
+
+cpFloat
+cpGearJointGetPhase(const cpConstraint *constraint)
+{
+	cpAssertHard(cpConstraintIsGearJoint(constraint), "Constraint is not a ratchet joint.");
+	return ((cpGearJoint *)constraint)->phase;
+}
+
+void
+cpGearJointSetPhase(cpConstraint *constraint, cpFloat phase)
+{
+	cpAssertHard(cpConstraintIsGearJoint(constraint), "Constraint is not a ratchet joint.");
 	cpConstraintActivateBodies(constraint);
+	((cpGearJoint *)constraint)->phase = phase;
+}
+
+cpFloat
+cpGearJointGetRatio(const cpConstraint *constraint)
+{
+	cpAssertHard(cpConstraintIsGearJoint(constraint), "Constraint is not a ratchet joint.");
+	return ((cpGearJoint *)constraint)->ratio;
+}
+
+void
+cpGearJointSetRatio(cpConstraint *constraint, cpFloat ratio)
+{
+	cpAssertHard(cpConstraintIsGearJoint(constraint), "Constraint is not a ratchet joint.");
+	cpConstraintActivateBodies(constraint);
+	((cpGearJoint *)constraint)->ratio = ratio;
+	((cpGearJoint *)constraint)->ratio_inv = 1.0f/ratio;
 }

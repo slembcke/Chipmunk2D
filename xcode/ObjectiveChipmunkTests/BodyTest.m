@@ -1,4 +1,6 @@
 #import <XCTest/XCTest.h>
+
+#define CP_ALLOW_PRIVATE_ACCESS 1
 #import "ObjectiveChipmunk.h"
 
 @interface UpdateTestBody : ChipmunkBody
@@ -114,7 +116,7 @@
 	XCTAssertNil(body.space, @"body.space should be nil.");
 	
 	[space add:body];
-	XCTAssertEqual(body.space, space, @"body.space should be nil.");
+	XCTAssertEqual(body.space, space, @"body.space should be space.");
 	
 	[space release];
 }

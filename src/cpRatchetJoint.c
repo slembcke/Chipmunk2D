@@ -100,7 +100,6 @@ static const cpConstraintClass klass = {
 	(cpConstraintApplyImpulseImpl)applyImpulse,
 	(cpConstraintGetImpulseImpl)getImpulse,
 };
-CP_DefineClassGetter(cpRatchetJoint)
 
 cpRatchetJoint *
 cpRatchetJointAlloc(void)
@@ -127,4 +126,54 @@ cpConstraint *
 cpRatchetJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratchet)
 {
 	return (cpConstraint *)cpRatchetJointInit(cpRatchetJointAlloc(), a, b, phase, ratchet);
+}
+
+cpBool
+cpConstraintIsRatchetJoint(const cpConstraint *constraint)
+{
+	return (constraint->klass == &klass);
+}
+
+cpFloat
+cpRatchetJointGetAngle(const cpConstraint *constraint)
+{
+	cpAssertHard(cpConstraintIsRatchetJoint(constraint), "Constraint is not a ratchet joint.");
+	return ((cpRatchetJoint *)constraint)->angle;
+}
+
+void
+cpRatchetJointSetAngle(cpConstraint *constraint, cpFloat angle)
+{
+	cpAssertHard(cpConstraintIsRatchetJoint(constraint), "Constraint is not a ratchet joint.");
+	cpConstraintActivateBodies(constraint);
+	((cpRatchetJoint *)constraint)->angle = angle;
+}
+
+cpFloat
+cpRatchetJointGetPhase(const cpConstraint *constraint)
+{
+	cpAssertHard(cpConstraintIsRatchetJoint(constraint), "Constraint is not a ratchet joint.");
+	return ((cpRatchetJoint *)constraint)->phase;
+}
+
+void
+cpRatchetJointSetPhase(cpConstraint *constraint, cpFloat phase)
+{
+	cpAssertHard(cpConstraintIsRatchetJoint(constraint), "Constraint is not a ratchet joint.");
+	cpConstraintActivateBodies(constraint);
+	((cpRatchetJoint *)constraint)->phase = phase;
+}
+cpFloat
+cpRatchetJointGetRatchet(const cpConstraint *constraint)
+{
+	cpAssertHard(cpConstraintIsRatchetJoint(constraint), "Constraint is not a ratchet joint.");
+	return ((cpRatchetJoint *)constraint)->ratchet;
+}
+
+void
+cpRatchetJointSetRatchet(cpConstraint *constraint, cpFloat ratchet)
+{
+	cpAssertHard(cpConstraintIsRatchetJoint(constraint), "Constraint is not a ratchet joint.");
+	cpConstraintActivateBodies(constraint);
+	((cpRatchetJoint *)constraint)->ratchet = ratchet;
 }

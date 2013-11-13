@@ -104,8 +104,9 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpBodyApplyImpulseAtWorldPoint(body, cpvmult(cpvsub(cpvmult(v_centroid, v_coef), v_centroid), 1.0/k), centroid);
 	
 	// Apply angular damping for the fluid drag.
-	cpFloat w_damping = cpMomentForPoly(FLUID_DRAG*FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(body->CP_PRIVATE(p)), 0.0f);
-	body->CP_PRIVATE(w) *= cpfexp(-w_damping*dt*body->CP_PRIVATE(i_inv));
+	cpVect cog = cpBodyLocalToWorld(body, cpBodyGetCenterOfGravity(body));
+	cpFloat w_damping = cpMomentForPoly(FLUID_DRAG*FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(cog), 0.0f);
+	cpBodySetAngularVelocity(body, cpBodyGetAngularVelocity(body)*cpfexp(-w_damping*dt/cpBodyGetMoment(body)));
 	
 	return cpTrue;
 }

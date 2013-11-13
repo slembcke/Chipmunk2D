@@ -81,7 +81,7 @@ cpBodyType cpBodyGetType(cpBody *body);
 void cpBodySetType(cpBody *body, cpBodyType type);
 
 /// Get the space this body is added to.
-cpSpace * cpBodyGetSpace(const cpBody *body);
+cpSpace* cpBodyGetSpace(const cpBody *body);
 
 /// Get the mass of the body.
 cpFloat cpBodyGetMass(const cpBody *body);
@@ -135,6 +135,12 @@ cpVect cpBodyGetRotation(const cpBody *body);
 cpDataPointer cpBodyGetUserData(const cpBody *body);
 /// Set the user data pointer assigned to the body.
 void cpBodySetUserData(cpBody *body, cpDataPointer userData);
+
+/// Set the callback used to update a body's velocity.
+void cpBodySetVelocityUpdateFunc(cpBody *body, cpBodyVelocityFunc velocityFunc);
+/// Set the callback used to update a body's position.
+/// NOTE: It's not generally recommended to override this.
+void cpBodySetPositionUpdateFunc(cpBody *body, cpBodyPositionFunc positionFunc);
 
 /// Default velocity integration function..
 void cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);

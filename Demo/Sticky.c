@@ -65,9 +65,9 @@ StickyPreSolve(cpArbiter *arb, cpSpace *space, void *data)
 		CP_ARBITER_GET_BODIES(arb, bodyA, bodyB);
 		
 		// Create a joint at the contact point to hold the body in place.
-		cpVect anchr1 = cpBodyWorldToLocal(bodyA, contacts.points[0].point1);
-		cpVect anchr2 = cpBodyWorldToLocal(bodyB, contacts.points[0].point2);
-		cpConstraint *joint = cpPivotJointNew2(bodyA, bodyB, anchr1, anchr2);
+		cpVect anchorA = cpBodyWorldToLocal(bodyA, contacts.points[0].point1);
+		cpVect anchorB = cpBodyWorldToLocal(bodyB, contacts.points[0].point2);
+		cpConstraint *joint = cpPivotJointNew2(bodyA, bodyB, anchorA, anchorB);
 		
 		// Give it a finite force for the stickyness.
 		cpConstraintSetMaxForce(joint, 3e3);

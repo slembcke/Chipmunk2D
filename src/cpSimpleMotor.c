@@ -76,7 +76,6 @@ static const cpConstraintClass klass = {
 	(cpConstraintApplyImpulseImpl)applyImpulse,
 	(cpConstraintGetImpulseImpl)getImpulse,
 };
-CP_DefineClassGetter(cpSimpleMotor)
 
 cpSimpleMotor *
 cpSimpleMotorAlloc(void)
@@ -100,4 +99,25 @@ cpConstraint *
 cpSimpleMotorNew(cpBody *a, cpBody *b, cpFloat rate)
 {
 	return (cpConstraint *)cpSimpleMotorInit(cpSimpleMotorAlloc(), a, b, rate);
+}
+
+cpBool
+cpConstraintIsSimpleMotor(const cpConstraint *constraint)
+{
+	return (constraint->klass == &klass);
+}
+
+cpFloat
+cpSimpleMotorGetRate(const cpConstraint *constraint)
+{
+	cpAssertHard(cpConstraintIsSimpleMotor(constraint), "Constraint is not a pin joint.");
+	return ((cpSimpleMotor *)constraint)->rate;
+}
+
+void
+cpSimpleMotorSetRate(cpConstraint *constraint, cpFloat rate)
+{
+	cpAssertHard(cpConstraintIsSimpleMotor(constraint), "Constraint is not a pin joint.");
+	cpConstraintActivateBodies(constraint);
+	((cpSimpleMotor *)constraint)->rate = rate;
 }

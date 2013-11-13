@@ -157,10 +157,7 @@
 
 
 /// A perfect circle shape.
-@interface ChipmunkCircleShape : ChipmunkShape {
-@private
-	cpCircleShape _shape;
-}
+@interface ChipmunkCircleShape : ChipmunkShape
 
 /// Create an autoreleased circle shape with the given radius and offset from the center of gravity.
 + (id)circleWithBody:(ChipmunkBody *)body radius:(cpFloat)radius offset:(cpVect)offset;
@@ -178,10 +175,7 @@
 
 
 /// A beveled (rounded) segment shape.
-@interface ChipmunkSegmentShape : ChipmunkShape {
-@private
-	cpSegmentShape _shape;
-}
+@interface ChipmunkSegmentShape : ChipmunkShape
 
 /// Create an autoreleased segment shape with the given endpoints and radius.
 + (id)segmentWithBody:(ChipmunkBody *)body from:(cpVect)a to:(cpVect)b radius:(cpFloat)radius;
@@ -208,10 +202,7 @@
 
 
 /// A convex polygon shape.
-@interface ChipmunkPolyShape : ChipmunkShape {
-@private
-	cpPolyShape _shape;
-}
+@interface ChipmunkPolyShape : ChipmunkShape
 
 /// Create an autoreleased polygon shape from the given vertexes after applying the transform and with the given rounding radius.
 + (id)polyWithBody:(ChipmunkBody *)body count:(int)count verts:(const cpVect *)verts transform:(cpTransform)transform radius:(cpFloat)radius;

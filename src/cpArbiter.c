@@ -53,12 +53,12 @@ cpArbiterUnthread(cpArbiter *arb)
 
 cpBool cpArbiterIsFirstContact(const cpArbiter *arb)
 {
-	return arb->CP_PRIVATE(state) == CP_ARBITER_STATE_FIRST_COLLISION;
+	return arb->state == CP_ARBITER_STATE_FIRST_COLLISION;
 }
 
 cpBool cpArbiterIsRemoval(const cpArbiter *arb)
 {
-	return arb->CP_PRIVATE(state) == CP_ARBITER_STATE_INVALIDATED;
+	return arb->state == CP_ARBITER_STATE_INVALIDATED;
 }
 
 int cpArbiterGetCount(const cpArbiter *arb)
@@ -235,6 +235,13 @@ cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
 	} else {
 		(*a) = (cpShape *)arb->a, (*b) = (cpShape *)arb->b;
 	}
+}
+
+void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)
+{
+	CP_ARBITER_GET_SHAPES(arb, shape_a, shape_b);
+	(*a) = shape_a->body;
+	(*b) = shape_b->body;
 }
 
 cpBool

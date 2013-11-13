@@ -58,7 +58,7 @@ cpCollisionInfoPushContact(struct cpCollisionInfo *info, cpVect p1, cpVect p2, c
 //MARK: Support Points and Edges:
 
 static inline int
-PolySupportPointIndex(const int count, const cpSplittingPlane *planes, const cpVect n)
+PolySupportPointIndex(const int count, const struct cpSplittingPlane *planes, const cpVect n)
 {
 	cpFloat max = -INFINITY;
 	int index = 0;
@@ -108,7 +108,7 @@ SegmentSupportPoint(const cpSegmentShape *seg, const cpVect n)
 static inline struct SupportPoint
 PolySupportPoint(const cpPolyShape *poly, const cpVect n)
 {
-	const cpSplittingPlane *planes = poly->planes;
+	const struct cpSplittingPlane *planes = poly->planes;
 	int i = PolySupportPointIndex(poly->count, planes, n);
 	return SupportPointNew(planes[i].v0, i);
 }
@@ -160,7 +160,7 @@ SupportEdgeForPoly(const cpPolyShape *poly, const cpVect n)
 	int i0 = (i1 - 1 + count)%count;
 	int i2 = (i1 + 1)%count;
 	
-	cpSplittingPlane *planes = poly->planes;
+	const struct cpSplittingPlane *planes = poly->planes;
 	cpHashValue hashid = poly->shape.hashid;
 	if(cpvdot(n, planes[i1].n) > cpvdot(n, planes[i2].n)){
 		struct Edge edge = {{planes[i0].v0, CP_HASH_PAIR(hashid, i0)}, {planes[i1].v0, CP_HASH_PAIR(hashid, i1)}, poly->r, planes[i1].n};

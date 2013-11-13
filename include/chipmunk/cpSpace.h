@@ -48,82 +48,6 @@ struct cpCollisionHandler {
 	cpDataPointer userData;
 };
 
-/// Basic Unit of Simulation in Chipmunk
-struct cpSpace {
-	/// Number of iterations to use in the impulse solver to solve contacts.
-	int iterations;
-	
-	/// Gravity to pass to rigid bodies when integrating velocity.
-	cpVect gravity;
-	
-	/// Damping rate expressed as the fraction of velocity bodies retain each second.
-	/// A value of 0.9 would mean that each body's velocity will drop 10% per second.
-	/// The default value is 1.0, meaning no damping is applied.
-	/// @note This damping value is different than those of cpDampedSpring and cpDampedRotarySpring.
-	cpFloat damping;
-	
-	/// Speed threshold for a body to be considered idle.
-	/// The default value of 0 means to let the space guess a good threshold based on gravity.
-	cpFloat idleSpeedThreshold;
-	
-	/// Time a group of bodies must remain idle in order to fall asleep.
-	/// Enabling sleeping also implicitly enables the the contact graph.
-	/// The default value of INFINITY disables the sleeping algorithm.
-	cpFloat sleepTimeThreshold;
-	
-	/// Amount of encouraged penetration between colliding shapes.
-	/// Used to reduce oscillating contacts and keep the collision cache warm.
-	/// Defaults to 0.1. If you have poor simulation quality,
-	/// increase this number as much as possible without allowing visible amounts of overlap.
-	cpFloat collisionSlop;
-	
-	/// Determines how fast overlapping shapes are pushed apart.
-	/// Expressed as a fraction of the error remaining after each second.
-	/// Defaults to pow(1.0 - 0.1, 60.0) meaning that Chipmunk fixes 10% of overlap each frame at 60Hz.
-	cpFloat collisionBias;
-	
-	/// Number of frames that contact information should persist.
-	/// Defaults to 3. There is probably never a reason to change this value.
-	cpTimestamp collisionPersistence;
-	
-	/// User definable data pointer.
-	/// Generally this points to your game's controller or game state
-	/// class so you can access it when given a cpSpace reference in a callback.
-	cpDataPointer userData;
-	
-	CP_PRIVATE(cpTimestamp stamp);
-	CP_PRIVATE(cpFloat curr_dt);
-
-	CP_PRIVATE(cpArray *dynamicBodies);
-	CP_PRIVATE(cpArray *otherBodies);
-	CP_PRIVATE(cpArray *rousedBodies);
-	CP_PRIVATE(cpArray *sleepingComponents);
-	
-	CP_PRIVATE(cpHashValue shapeIDCounter);
-	CP_PRIVATE(cpSpatialIndex *staticShapes);
-	CP_PRIVATE(cpSpatialIndex *dynamicShapes);
-	
-	CP_PRIVATE(cpArray *constraints);
-	
-	CP_PRIVATE(cpArray *arbiters);
-	CP_PRIVATE(cpContactBufferHeader *contactBuffersHead);
-	CP_PRIVATE(cpHashSet *cachedArbiters);
-	CP_PRIVATE(cpArray *pooledArbiters);
-	
-	CP_PRIVATE(cpArray *allocatedBuffers);
-	CP_PRIVATE(unsigned int locked);
-	
-	CP_PRIVATE(cpBool usesWildcards);
-	CP_PRIVATE(cpHashSet *collisionHandlers);
-	CP_PRIVATE(cpCollisionHandler defaultHandler);
-	
-	CP_PRIVATE(cpBool skipPostStep);
-	CP_PRIVATE(cpArray *postStepCallbacks);
-	
-	CP_PRIVATE(cpBody *staticBody);
-	CP_PRIVATE(cpBody _staticBody);
-};
-
 // TODO: Make timestep a parameter?
 
 
@@ -144,34 +68,66 @@ void cpSpaceFree(cpSpace *space);
 
 //MARK: Properties
 
-#define CP_DefineSpaceStructGetter(type, member, name) \
-static inline type cpSpaceGet##name(const cpSpace *space){return space->member;}
+/// Number of iterations to use in the impulse solver to solve contacts and other constraints.
+int cpSpaceGetIterations(const cpSpace *space);
+void cpSpaceSetIterations(cpSpace *space, int iterations);
 
-#define CP_DefineSpaceStructSetter(type, member, name) \
-static inline void cpSpaceSet##name(cpSpace *space, type value){space->member = value;}
+/// Gravity to pass to rigid bodies when integrating velocity.
+cpVect cpSpaceGetGravity(const cpSpace *space);
+void cpSpaceSetGravity(cpSpace *space, cpVect gravity);
 
-#define CP_DefineSpaceStructProperty(type, member, name) \
-CP_DefineSpaceStructGetter(type, member, name) \
-CP_DefineSpaceStructSetter(type, member, name)
+/// Damping rate expressed as the fraction of velocity bodies retain each second.
+/// A value of 0.9 would mean that each body's velocity will drop 10% per second.
+/// The default value is 1.0, meaning no damping is applied.
+/// @note This damping value is different than those of cpDampedSpring and cpDampedRotarySpring.
+cpFloat cpSpaceGetDamping(const cpSpace *space);
+void cpSpaceSetDamping(cpSpace *space, cpFloat damping);
 
-CP_DefineSpaceStructProperty(int, iterations, Iterations)
-CP_DefineSpaceStructProperty(cpVect, gravity, Gravity)
-CP_DefineSpaceStructProperty(cpFloat, damping, Damping)
-CP_DefineSpaceStructProperty(cpFloat, idleSpeedThreshold, IdleSpeedThreshold)
-CP_DefineSpaceStructProperty(cpFloat, sleepTimeThreshold, SleepTimeThreshold)
-CP_DefineSpaceStructProperty(cpFloat, collisionSlop, CollisionSlop)
-CP_DefineSpaceStructProperty(cpFloat, collisionBias, CollisionBias)
-CP_DefineSpaceStructProperty(cpTimestamp, collisionPersistence, CollisionPersistence)
-CP_DefineSpaceStructProperty(cpDataPointer, userData, UserData)
-CP_DefineSpaceStructGetter(cpBody *, CP_PRIVATE(staticBody), StaticBody)
-CP_DefineSpaceStructGetter(cpFloat, CP_PRIVATE(curr_dt), CurrentTimeStep)
+/// Speed threshold for a body to be considered idle.
+/// The default value of 0 means to let the space guess a good threshold based on gravity.
+cpFloat cpSpaceGetIdleSpeedThreshold(const cpSpace *space);
+void cpSpaceSetIdleSpeedThreshold(cpSpace *space, cpFloat idleSpeedThreshold);
 
-/// returns true from inside a callback and objects cannot be added/removed.
-static inline cpBool
-cpSpaceIsLocked(cpSpace *space)
-{
-	return space->CP_PRIVATE(locked);
-}
+/// Time a group of bodies must remain idle in order to fall asleep.
+/// Enabling sleeping also implicitly enables the the contact graph.
+/// The default value of INFINITY disables the sleeping algorithm.
+cpFloat cpSpaceGetSleepTimeThreshold(const cpSpace *space);
+void cpSpaceSetSleepTimeThreshold(cpSpace *space, cpFloat sleepTimeThreshold);
+
+/// Amount of encouraged penetration between colliding shapes.
+/// Used to reduce oscillating contacts and keep the collision cache warm.
+/// Defaults to 0.1. If you have poor simulation quality,
+/// increase this number as much as possible without allowing visible amounts of overlap.
+cpFloat cpSpaceGetCollisionSlop(const cpSpace *space);
+void cpSpaceSetCollisionSlop(cpSpace *space, cpFloat collisionSlop);
+
+/// Determines how fast overlapping shapes are pushed apart.
+/// Expressed as a fraction of the error remaining after each second.
+/// Defaults to pow(1.0 - 0.1, 60.0) meaning that Chipmunk fixes 10% of overlap each frame at 60Hz.
+cpFloat cpSpaceGetCollisionBias(const cpSpace *space);
+void cpSpaceSetCollisionBias(cpSpace *space, cpFloat collisionBias);
+
+/// Number of frames that contact information should persist.
+/// Defaults to 3. There is probably never a reason to change this value.
+cpTimestamp cpSpaceGetCollisionPersistence(const cpSpace *space);
+void cpSpaceSetCollisionPersistence(cpSpace *space, cpTimestamp collisionPersistence);
+
+/// User definable data pointer.
+/// Generally this points to your game's controller or game state
+/// class so you can access it when given a cpSpace reference in a callback.
+cpDataPointer cpSpaceGetUserData(const cpSpace *space);
+void cpSpaceSetUserData(cpSpace *space, cpDataPointer userData);
+
+/// The Space provided static body for a given cpSpace.
+/// This is merely provided for convenience and you are not required to use it.
+cpBody* cpSpaceGetStaticBody(const cpSpace *space);
+
+/// Returns the current (or most recent) time step used with the given space.
+/// Useful from callbacks if your time step is not a compile-time global.
+cpFloat cpSpaceGetCurrentTimeStep(const cpSpace *space);
+
+/// returns true from inside a callback when objects cannot be added/removed.
+cpBool cpSpaceIsLocked(cpSpace *space);
 
 
 //MARK: Collision Handlers

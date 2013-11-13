@@ -22,19 +22,8 @@
 /// @defgroup cpGearJoint cpGearJoint
 /// @{
 
-const cpConstraintClass *cpGearJointGetClass(void);
-
-/// @private
-typedef struct cpGearJoint {
-	cpConstraint constraint;
-	cpFloat phase, ratio;
-	cpFloat ratio_inv;
-	
-	cpFloat iSum;
-		
-	cpFloat bias;
-	cpFloat jAcc;
-} cpGearJoint;
+/// Check if a constraint is a damped rotary springs.
+cpBool cpConstraintIsGearJoint(const cpConstraint *constraint);
 
 /// Allocate a gear joint.
 cpGearJoint* cpGearJointAlloc(void);
@@ -43,9 +32,14 @@ cpGearJoint* cpGearJointInit(cpGearJoint *joint, cpBody *a, cpBody *b, cpFloat p
 /// Allocate and initialize a gear joint.
 cpConstraint* cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio);
 
-CP_DefineConstraintProperty(cpGearJoint, cpFloat, phase, Phase)
-CP_DefineConstraintGetter(cpGearJoint, cpFloat, ratio, Ratio)
+/// Get the phase offset of the gears.
+cpFloat cpGearJointGetPhase(const cpConstraint *constraint);
+/// Set the phase offset of the gears.
+void cpGearJointSetPhase(cpConstraint *constraint, cpFloat phase);
+
+/// Get the angular distance of each ratchet.
+cpFloat cpGearJointGetRatio(const cpConstraint *constraint);
 /// Set the ratio of a gear joint.
-void cpGearJointSetRatio(cpConstraint *constraint, cpFloat value);
+void cpGearJointSetRatio(cpConstraint *constraint, cpFloat ratio);
 
 /// @}

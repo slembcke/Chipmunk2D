@@ -22,36 +22,29 @@
 /// @defgroup cpGrooveJoint cpGrooveJoint
 /// @{
 
-const cpConstraintClass *cpGrooveJointGetClass(void);
-
-/// @private
-typedef struct cpGrooveJoint {
-	cpConstraint constraint;
-	cpVect grv_n, grv_a, grv_b;
-	cpVect  anchr2;
-	
-	cpVect grv_tn;
-	cpFloat clamp;
-	cpVect r1, r2;
-	cpMat2x2 k;
-	
-	cpVect jAcc;
-	cpVect bias;
-} cpGrooveJoint;
+/// Check if a constraint is a slide joint.
+cpBool cpConstraintIsGrooveJoint(const cpConstraint *constraint);
 
 /// Allocate a groove joint.
 cpGrooveJoint* cpGrooveJointAlloc(void);
 /// Initialize a groove joint.
-cpGrooveJoint* cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);
+cpGrooveJoint* cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchorB);
 /// Allocate and initialize a groove joint.
-cpConstraint* cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2);
+cpConstraint* cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchorB);
 
-CP_DefineConstraintGetter(cpGrooveJoint, cpVect, grv_a, GrooveA)
-/// Set endpoint a of a groove joint's groove
-void cpGrooveJointSetGrooveA(cpConstraint *constraint, cpVect value);
-CP_DefineConstraintGetter(cpGrooveJoint, cpVect, grv_b, GrooveB)
-/// Set endpoint b of a groove joint's groove
-void cpGrooveJointSetGrooveB(cpConstraint *constraint, cpVect value);
-CP_DefineConstraintProperty(cpGrooveJoint, cpVect, anchr2, Anchr2)
+/// Get the first endpoint of the groove relative to the first body.
+cpVect cpGrooveJointGetGrooveA(const cpConstraint *constraint);
+/// Set the first endpoint of the groove relative to the first body.
+void cpGrooveJointSetGrooveA(cpConstraint *constraint, cpVect grooveA);
+
+/// Get the first endpoint of the groove relative to the first body.
+cpVect cpGrooveJointGetGrooveB(const cpConstraint *constraint);
+/// Set the first endpoint of the groove relative to the first body.
+void cpGrooveJointSetGrooveB(cpConstraint *constraint, cpVect grooveB);
+
+/// Get the location of the second anchor relative to the second body.
+cpVect cpGrooveJointGetAnchorB(const cpConstraint *constraint);
+/// Set the location of the second anchor relative to the second body.
+void cpGrooveJointSetAnchorB(cpConstraint *constraint, cpVect anchorB);
 
 /// @}

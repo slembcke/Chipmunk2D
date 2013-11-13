@@ -22,43 +22,47 @@
 /// @defgroup cpDampedSpring cpDampedSpring
 /// @{
 
-typedef struct cpDampedSpring cpDampedSpring;
+/// Check if a constraint is a slide joint.
+cpBool cpConstraintIsDampedSpring(const cpConstraint *constraint);
 
+/// Function type used for damped spring force callbacks.
 typedef cpFloat (*cpDampedSpringForceFunc)(cpConstraint *spring, cpFloat dist);
-
-const cpConstraintClass *cpDampedSpringGetClass(void);
-
-/// @private
-struct cpDampedSpring {
-	cpConstraint constraint;
-	cpVect anchr1, anchr2;
-	cpFloat restLength;
-	cpFloat stiffness;
-	cpFloat damping;
-	cpDampedSpringForceFunc springForceFunc;
-	
-	cpFloat target_vrn;
-	cpFloat v_coef;
-	
-	cpVect r1, r2;
-	cpFloat nMass;
-	cpVect n;
-	
-	cpFloat jAcc;
-};
 
 /// Allocate a damped spring.
 cpDampedSpring* cpDampedSpringAlloc(void);
 /// Initialize a damped spring.
-cpDampedSpring* cpDampedSpringInit(cpDampedSpring *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping);
+cpDampedSpring* cpDampedSpringInit(cpDampedSpring *joint, cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB, cpFloat restLength, cpFloat stiffness, cpFloat damping);
 /// Allocate and initialize a damped spring.
-cpConstraint* cpDampedSpringNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiffness, cpFloat damping);
+cpConstraint* cpDampedSpringNew(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB, cpFloat restLength, cpFloat stiffness, cpFloat damping);
 
-CP_DefineConstraintProperty(cpDampedSpring, cpVect, anchr1, Anchr1)
-CP_DefineConstraintProperty(cpDampedSpring, cpVect, anchr2, Anchr2)
-CP_DefineConstraintProperty(cpDampedSpring, cpFloat, restLength, RestLength)
-CP_DefineConstraintProperty(cpDampedSpring, cpFloat, stiffness, Stiffness)
-CP_DefineConstraintProperty(cpDampedSpring, cpFloat, damping, Damping)
-CP_DefineConstraintProperty(cpDampedSpring, cpDampedSpringForceFunc, springForceFunc, SpringForceFunc)
+/// Get the location of the first anchor relative to the first body.
+cpVect cpDampedSpringGetAnchorA(const cpConstraint *constraint);
+/// Set the location of the first anchor relative to the first body.
+void cpDampedSpringSetAnchorA(cpConstraint *constraint, cpVect anchorA);
+
+/// Get the location of the second anchor relative to the second body.
+cpVect cpDampedSpringGetAnchorB(const cpConstraint *constraint);
+/// Set the location of the second anchor relative to the second body.
+void cpDampedSpringSetAnchorB(cpConstraint *constraint, cpVect anchorB);
+
+/// Get the rest length of the spring.
+cpFloat cpDampedSpringGetRestLength(const cpConstraint *constraint);
+/// Set the rest length of the spring.
+void cpDampedSpringSetRestLength(cpConstraint *constraint, cpFloat restLength);
+
+/// Get the stiffness of the spring in force/distance.
+cpFloat cpDampedSpringGetStiffness(const cpConstraint *constraint);
+/// Set the stiffness of the spring in force/distance.
+void cpDampedSpringSetStiffness(cpConstraint *constraint, cpFloat stiffness);
+
+/// Get the damping of the spring.
+cpFloat cpDampedSpringGetDamping(const cpConstraint *constraint);
+/// Set the damping of the spring.
+void cpDampedSpringSetDamping(cpConstraint *constraint, cpFloat damping);
+
+/// Get the damping of the spring.
+cpDampedSpringForceFunc cpDampedSpringGetSpringForceFunc(const cpConstraint *constraint);
+/// Set the damping of the spring.
+void cpDampedSpringSetSpringForceFunc(cpConstraint *constraint, cpDampedSpringForceFunc springForceFunc);
 
 /// @}

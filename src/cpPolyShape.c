@@ -40,8 +40,8 @@ static cpBB
 cpPolyShapeCacheData(cpPolyShape *poly, cpTransform transform)
 {
 	int count = poly->count;
-	cpSplittingPlane *dst = poly->planes;
-	cpSplittingPlane *src = dst + count;
+	struct cpSplittingPlane *dst = poly->planes;
+	struct cpSplittingPlane *src = dst + count;
 	
 	cpFloat l = (cpFloat)INFINITY, r = -(cpFloat)INFINITY;
 	cpFloat b = (cpFloat)INFINITY, t = -(cpFloat)INFINITY;
@@ -66,7 +66,7 @@ cpPolyShapeCacheData(cpPolyShape *poly, cpTransform transform)
 static void
 cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	int count = poly->count;
-	cpSplittingPlane *planes = poly->planes;
+	struct cpSplittingPlane *planes = poly->planes;
 	cpFloat r = poly->r;
 	
 	cpVect v0 = planes[count - 1].v0;
@@ -105,7 +105,7 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 static void
 cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpFloat r2, cpSegmentQueryInfo *info)
 {
-	cpSplittingPlane *planes = poly->planes;
+	struct cpSplittingPlane *planes = poly->planes;
 	int count = poly->count;
 	cpFloat r = poly->r;
 	cpFloat rsum = r + r2;
@@ -166,7 +166,7 @@ SetVerts(cpPolyShape *poly, int count, const cpVect *verts)
 	if(count <= CP_POLY_SHAPE_INLINE_ALLOC){
 		poly->planes = poly->_planes;
 	} else {
-		poly->planes = (cpSplittingPlane *)cpcalloc(2*count, sizeof(cpSplittingPlane));
+		poly->planes = (struct cpSplittingPlane *)cpcalloc(2*count, sizeof(struct cpSplittingPlane));
 	}
 	
 	for(int i=0; i<count; i++){

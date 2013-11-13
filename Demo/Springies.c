@@ -32,9 +32,9 @@ springForce(cpConstraint *spring, cpFloat dist)
 }
 
 static cpConstraint *
-new_spring(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat restLength, cpFloat stiff, cpFloat damp)
+new_spring(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB, cpFloat restLength, cpFloat stiff, cpFloat damp)
 {
-	cpConstraint *spring = cpDampedSpringNew(a, b, anchr1, anchr2, restLength, stiff, damp);
+	cpConstraint *spring = cpDampedSpringNew(a, b, anchorA, anchorB, restLength, stiff, damp);
 	cpDampedSpringSetSpringForceFunc(spring, springForce);
 	
 	return spring;

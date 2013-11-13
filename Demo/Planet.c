@@ -76,7 +76,7 @@ add_box(cpSpace *space)
 	cpVect pos = rand_pos(radius);
 	
 	cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 4, verts, cpvzero, 0.0f)));
-	body->velocity_func = planetGravityVelocityFunc;
+	cpBodySetVelocityUpdateFunc(body, planetGravityVelocityFunc);
 	cpBodySetPosition(body, pos);
 
 	// Set the box's velocity to put it into a circular orbit from its

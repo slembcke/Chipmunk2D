@@ -22,138 +22,64 @@
 /// @defgroup cpConstraint cpConstraint
 /// @{
 
-typedef struct cpConstraintClass cpConstraintClass;
-
-typedef void (*cpConstraintPreStepImpl)(cpConstraint *constraint, cpFloat dt);
-typedef void (*cpConstraintApplyCachedImpulseImpl)(cpConstraint *constraint, cpFloat dt_coef);
-typedef void (*cpConstraintApplyImpulseImpl)(cpConstraint *constraint, cpFloat dt);
-typedef cpFloat (*cpConstraintGetImpulseImpl)(cpConstraint *constraint);
-
-/// @private
-struct cpConstraintClass {
-	cpConstraintPreStepImpl preStep;
-	cpConstraintApplyCachedImpulseImpl applyCachedImpulse;
-	cpConstraintApplyImpulseImpl applyImpulse;
-	cpConstraintGetImpulseImpl getImpulse;
-};
-
 /// Callback function type that gets called before solving a joint.
 typedef void (*cpConstraintPreSolveFunc)(cpConstraint *constraint, cpSpace *space);
 /// Callback function type that gets called after solving a joint.
 typedef void (*cpConstraintPostSolveFunc)(cpConstraint *constraint, cpSpace *space);
-
-
-/// Opaque cpConstraint struct.
-struct cpConstraint {
-	CP_PRIVATE(const cpConstraintClass *klass);
-	
-	/// The first body connected to this constraint.
-	cpBody *a;
-	/// The second body connected to this constraint.
-	cpBody *b;
-	
-	CP_PRIVATE(cpSpace *space);
-	
-	CP_PRIVATE(cpConstraint *next_a);
-	CP_PRIVATE(cpConstraint *next_b);
-	
-	/// The maximum force that this constraint is allowed to use.
-	/// Defaults to infinity.
-	cpFloat maxForce;
-	/// The rate at which joint error is corrected.
-	/// Defaults to pow(1.0 - 0.1, 60.0) meaning that it will
-	/// correct 10% of the error every 1/60th of a second.
-	cpFloat errorBias;
-	/// The maximum rate at which joint error is corrected.
-	/// Defaults to infinity.
-	cpFloat maxBias;
-	
-	/// Whether or not the connected bodies should checked for collisions.
-	/// Collisions are filtered before calling callbacks.
-	/// Defaults to cpTrue.
-	cpBool collideBodies;
-	
-	/// Function called before the solver runs.
-	/// Animate your joint anchors, update your motor torque, etc.
-	cpConstraintPreSolveFunc preSolve;
-	
-	/// Function called after the solver runs.
-	/// Use the applied impulse to perform effects like breakable joints.
-	cpConstraintPostSolveFunc postSolve;
-	
-	/// User definable data pointer.
-	/// Generally this points to your the game object class so you can access it
-	/// when given a cpConstraint reference in a callback.
-	cpDataPointer userData;
-};
 
 /// Destroy a constraint.
 void cpConstraintDestroy(cpConstraint *constraint);
 /// Destroy and free a constraint.
 void cpConstraintFree(cpConstraint *constraint);
 
-/// @private
-static inline void cpConstraintActivateBodies(cpConstraint *constraint)
-{
-	cpBody *a = constraint->a; cpBodyActivate(a);
-	cpBody *b = constraint->b; cpBodyActivate(b);
-}
+/// Get the cpSpace this constraint is added to.
+cpSpace* cpConstraintGetSpace(const cpConstraint *constraint);
 
-/// @private
-#define CP_DefineConstraintStructGetter(type, member, name) \
-static inline type cpConstraint##Get##name(const cpConstraint *constraint){return constraint->member;}
+/// Get the first body the constraint is attached to.
+cpBody* cpConstraintGetBodyA(const cpConstraint *constraint);
 
-/// @private
-#define CP_DefineConstraintStructSetter(type, member, name) \
-static inline void cpConstraint##Set##name(cpConstraint *constraint, type value){ \
-	cpConstraintActivateBodies(constraint); \
-	constraint->member = value; \
-}
+/// Get the second body the constraint is attached to.
+cpBody* cpConstraintGetBodyB(const cpConstraint *constraint);
 
-/// @private
-#define CP_DefineConstraintStructProperty(type, member, name) \
-CP_DefineConstraintStructGetter(type, member, name) \
-CP_DefineConstraintStructSetter(type, member, name)
+/// Get the maximum force that this constraint is allowed to use.
+cpFloat cpConstraintGetMaxForce(const cpConstraint *constraint);
+/// Set the maximum force that this constraint is allowed to use. (defaults to INFINITY)
+void cpConstraintSetMaxForce(cpConstraint *constraint, cpFloat maxForce);
 
-CP_DefineConstraintStructGetter(cpSpace*, CP_PRIVATE(space), Space)
+/// Get rate at which joint error is corrected.
+cpFloat cpConstraintGetErrorBias(const cpConstraint *constraint);
+/// Set rate at which joint error is corrected.
+/// Defaults to pow(1.0 - 0.1, 60.0) meaning that it will
+/// correct 10% of the error every 1/60th of a second.
+void cpConstraintSetErrorBias(cpConstraint *constraint, cpFloat errorBias);
 
-CP_DefineConstraintStructGetter(cpBody*, a, A)
-CP_DefineConstraintStructGetter(cpBody*, b, B)
-CP_DefineConstraintStructProperty(cpFloat, maxForce, MaxForce)
-CP_DefineConstraintStructProperty(cpFloat, errorBias, ErrorBias)
-CP_DefineConstraintStructProperty(cpFloat, maxBias, MaxBias)
-CP_DefineConstraintStructProperty(cpBool, collideBodies, CollideBodies)
-CP_DefineConstraintStructProperty(cpConstraintPreSolveFunc, preSolve, PreSolveFunc)
-CP_DefineConstraintStructProperty(cpConstraintPostSolveFunc, postSolve, PostSolveFunc)
-CP_DefineConstraintStructProperty(cpDataPointer, userData, UserData)
+/// Get the maximum rate at which joint error is corrected.
+cpFloat cpConstraintGetMaxBias(const cpConstraint *constraint);
+/// Set the maximum rate at which joint error is corrected. (defaults to INFINITY)
+void cpConstraintSetMaxBias(cpConstraint *constraint, cpFloat maxBias);
 
-// Get the last impulse applied by this constraint.
-static inline cpFloat cpConstraintGetImpulse(cpConstraint *constraint)
-{
-	return constraint->CP_PRIVATE(klass)->getImpulse(constraint);
-}
+/// Get if the two bodies connected by the constraint are allowed to collide or not.
+cpBool cpConstraintGetCollideBodies(const cpConstraint *constraint);
+/// Set if the two bodies connected by the constraint are allowed to collide or not. (defaults to cpFalse)
+void cpConstraintSetCollideBodies(cpConstraint *constraint, cpBool collideBodies);
 
-/// @}
+/// Get the pre-solve function that is called before the solver runs.
+cpConstraintPreSolveFunc cpConstraintGetPreSolveFunc(const cpConstraint *constraint);
+/// Set the pre-solve function that is called before the solver runs.
+void cpConstraintSetPreSolveFunc(cpConstraint *constraint, cpConstraintPreSolveFunc preSolveFunc);
 
-#define cpConstraintCheckCast(constraint, struct) \
-	cpAssertHard(constraint->CP_PRIVATE(klass) == struct##GetClass(), "Constraint is not a "#struct)
+/// Get the post-solve function that is called before the solver runs.
+cpConstraintPostSolveFunc cpConstraintGetPostSolveFunc(const cpConstraint *constraint);
+/// Set the post-solve function that is called before the solver runs.
+void cpConstraintSetPostSolveFunc(cpConstraint *constraint, cpConstraintPostSolveFunc postSolveFunc);
 
-#define CP_DefineConstraintGetter(struct, type, member, name) \
-static inline type struct##Get##name(const cpConstraint *constraint){ \
-	cpConstraintCheckCast(constraint, struct); \
-	return ((struct *)constraint)->member; \
-}
+/// Get the user definable data pointer for this constraint
+cpDataPointer cpConstraintGetUserData(const cpConstraint *constraint);
+/// Set the user definable data pointer for this constraint
+void cpConstraintSetUserData(cpConstraint *constraint, cpDataPointer userData);
 
-#define CP_DefineConstraintSetter(struct, type, member, name) \
-static inline void struct##Set##name(cpConstraint *constraint, type value){ \
-	cpConstraintCheckCast(constraint, struct); \
-	cpConstraintActivateBodies(constraint); \
-	((struct *)constraint)->member = value; \
-}
-
-#define CP_DefineConstraintProperty(struct, type, member, name) \
-CP_DefineConstraintGetter(struct, type, member, name) \
-CP_DefineConstraintSetter(struct, type, member, name)
+/// Get the last impulse applied by this constraint.
+cpFloat cpConstraintGetImpulse(cpConstraint *constraint);
 
 #include "cpPinJoint.h"
 #include "cpSlideJoint.h"

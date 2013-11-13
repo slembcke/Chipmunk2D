@@ -138,11 +138,11 @@ ColorForShape(cpShape *shape, cpDataPointer *data)
 	if(cpShapeGetSensor(shape)){
 		return LAColor(1.0f, 0.1f);
 	} else {
-		cpBody *body = shape->body;
+		cpBody *body = cpShapeGetBody(shape);
 		
 		if(cpBodyIsSleeping(body)){
 			return LAColor(0.2f, 1.0f);
-		} else if(body->node.idleTime > shape->space->sleepTimeThreshold) {
+		} else if(body->sleeping.idleTime > shape->space->sleepTimeThreshold) {
 			return LAColor(0.66f, 1.0f);
 		} else {
 			uint32_t val = (uint32_t)shape->hashid;

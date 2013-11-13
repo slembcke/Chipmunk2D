@@ -37,7 +37,7 @@ static void
 update(cpSpace *space, double dt)
 {
 	// Set the first anchor point (the one attached to the static body) of the dolly servo to the mouse's x position.
-	cpPivotJointSetAnchr1(dollyServo, cpv(ChipmunkDemoMouse.x, 100));
+	cpPivotJointSetAnchorA(dollyServo, cpv(ChipmunkDemoMouse.x, 100));
 	
 	// Set the max length of the winch servo to match the mouse's height.
 	cpSlideJointSetMax(winchServo, cpfmax(100 - ChipmunkDemoMouse.y, 50));

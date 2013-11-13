@@ -231,6 +231,128 @@ cpSpaceFree(cpSpace *space)
 
 //MARK: Basic properties:
 
+int
+cpSpaceGetIterations(const cpSpace *space)
+{
+	return space->iterations;
+}
+
+void
+cpSpaceSetIterations(cpSpace *space, int iterations)
+{
+	cpAssertHard(iterations > 0, "Iterations must be positive and non-zero.");
+	space->iterations = iterations;
+}
+
+cpVect
+cpSpaceGetGravity(const cpSpace *space)
+{
+	return space->gravity;
+}
+
+void
+cpSpaceSetGravity(cpSpace *space, cpVect gravity)
+{
+	space->gravity = gravity;
+}
+
+cpFloat
+cpSpaceGetDamping(const cpSpace *space)
+{
+	return space->damping;
+}
+
+void
+cpSpaceSetDamping(cpSpace *space, cpFloat damping)
+{
+	cpAssertHard(damping >= 0.0, "Damping must be positive.");
+	space->damping = damping;
+}
+
+cpFloat
+cpSpaceGetIdleSpeedThreshold(const cpSpace *space)
+{
+	return space->idleSpeedThreshold;
+}
+
+void
+cpSpaceSetIdleSpeedThreshold(cpSpace *space, cpFloat idleSpeedThreshold)
+{
+	space->idleSpeedThreshold = idleSpeedThreshold;
+}
+
+cpFloat
+cpSpaceGetSleepTimeThreshold(const cpSpace *space)
+{
+	return space->sleepTimeThreshold;
+}
+
+void
+cpSpaceSetSleepTimeThreshold(cpSpace *space, cpFloat sleepTimeThreshold)
+{
+	space->sleepTimeThreshold = sleepTimeThreshold;
+}
+
+cpFloat
+cpSpaceGetCollisionSlop(const cpSpace *space)
+{
+	return space->collisionSlop;
+}
+
+void
+cpSpaceSetCollisionSlop(cpSpace *space, cpFloat collisionSlop)
+{
+	space->collisionSlop = collisionSlop;
+}
+
+cpFloat
+cpSpaceGetCollisionBias(const cpSpace *space)
+{
+	return space->collisionBias;
+}
+
+void
+cpSpaceSetCollisionBias(cpSpace *space, cpFloat collisionBias)
+{
+	space->collisionBias = collisionBias;
+}
+
+cpTimestamp
+cpSpaceGetCollisionPersistence(const cpSpace *space)
+{
+	return space->collisionPersistence;
+}
+
+void
+cpSpaceSetCollisionPersistence(cpSpace *space, cpTimestamp collisionPersistence)
+{
+	space->collisionPersistence = collisionPersistence;
+}
+
+cpDataPointer
+cpSpaceGetUserData(const cpSpace *space)
+{
+	return space->userData;
+}
+
+void
+cpSpaceSetUserData(cpSpace *space, cpDataPointer userData)
+{
+	space->userData = userData;
+}
+
+cpBody *
+cpSpaceGetStaticBody(const cpSpace *space)
+{
+	return space->staticBody;
+}
+
+cpFloat
+cpSpaceGetCurrentTimeStep(const cpSpace *space)
+{
+	return space->curr_dt;
+}
+
 void
 cpSpaceSetStaticBody(cpSpace *space, cpBody *body)
 {
@@ -241,6 +363,12 @@ cpSpaceSetStaticBody(cpSpace *space, cpBody *body)
 	
 	space->staticBody = body;
 	body->space = space;
+}
+
+cpBool
+cpSpaceIsLocked(cpSpace *space)
+{
+	return space->locked;
 }
 
 //MARK: Collision Handler Function Management

@@ -190,7 +190,10 @@ both(cpShapeFilter, filter, Filter, filter)
 
 @end
 
-@implementation ChipmunkCircleShape
+@implementation ChipmunkCircleShape {
+	cpCircleShape _shape;
+}
+
 
 + (ChipmunkCircleShape *)circleWithBody:(ChipmunkBody *)body radius:(cpFloat)radius offset:(cpVect)offset
 {
@@ -215,7 +218,9 @@ both(cpShapeFilter, filter, Filter, filter)
 @end
 
 
-@implementation ChipmunkSegmentShape
+@implementation ChipmunkSegmentShape {
+	cpSegmentShape _shape;
+}
 
 + (ChipmunkSegmentShape *)segmentWithBody:(ChipmunkBody *)body from:(cpVect)a to:(cpVect)b radius:(cpFloat)radius
 {
@@ -247,7 +252,9 @@ both(cpShapeFilter, filter, Filter, filter)
 @end
 
 
-@implementation ChipmunkPolyShape
+@implementation ChipmunkPolyShape {
+	cpPolyShape _shape;
+}
 
 + (id)polyWithBody:(ChipmunkBody *)body count:(int)count verts:(const cpVect *)verts transform:(cpTransform)transform radius:(cpFloat)radius
 {

@@ -82,28 +82,25 @@
 	Pin joints hold a set distance between points on two bodies.
 	Think of them as connecting a solid pin or rod between the two anchor points.
 */
-@interface ChipmunkPinJoint : ChipmunkConstraint {
-@private
-	cpPinJoint _constraint;
-}
+@interface ChipmunkPinJoint : ChipmunkConstraint
 
 /**
 	Create an autoreleased pin joint between the two bodies with the given anchor points.
 	The distance is calculated when the joint is initialized. It can be set explicitly using the property.
 */
-+ (ChipmunkPinJoint *)pinJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2;
++ (ChipmunkPinJoint *)pinJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB;
 
 /**
 	Initialize a pin joint between the two bodies with the given anchor points.
 	The distance is calculated when the joint is initialized. It can be set explicitly using the property.
 */
-- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2;
+- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB;
 
 /// The anchor point on the first body.
-@property(nonatomic, assign) cpVect anchr1;
+@property(nonatomic, assign) cpVect anchorA;
 
 /// The anchor point on the second body.
-@property(nonatomic, assign) cpVect anchr2;
+@property(nonatomic, assign) cpVect anchorB;
 
 /// The distance between the two anchor points that the joint keeps.
 @property(nonatomic, assign) cpFloat dist;
@@ -115,26 +112,23 @@
 	Slide joints hold the distance between points on two bodies between a minimum and a maximum.
 	Think of them as a telescoping ChipmunkPinJoint.
 */
-@interface ChipmunkSlideJoint : ChipmunkConstraint {
-@private
-	cpSlideJoint _constraint;
-}
+@interface ChipmunkSlideJoint : ChipmunkConstraint
 
 /**
 	Create an autoreleased slide joint between the two bodies with the given anchor points and distance range.
 */
-+ (ChipmunkSlideJoint *)slideJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2 min:(cpFloat)min max:(cpFloat)max;
++ (ChipmunkSlideJoint *)slideJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB min:(cpFloat)min max:(cpFloat)max;
 
 /**
 	Initialize a slide joint between the two bodies with the given anchor points and distance range.
 */
-- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2 min:(cpFloat)min max:(cpFloat)max;
+- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB min:(cpFloat)min max:(cpFloat)max;
 
 /// The anchor point on the first body.
-@property(nonatomic, assign) cpVect anchr1;
+@property(nonatomic, assign) cpVect anchorA;
 
 /// The anchor point on the second body.
-@property(nonatomic, assign) cpVect anchr2;
+@property(nonatomic, assign) cpVect anchorB;
 
 /// The minimum allowed distance between anchor points.
 @property(nonatomic, assign) cpFloat min;
@@ -148,16 +142,13 @@
 /**
 	Pivot joints hold two points on two bodies together allowing them to rotate freely around the pivot.
 */
-@interface ChipmunkPivotJoint : ChipmunkConstraint {
-@private
-	cpPivotJoint _constraint;
-}
+@interface ChipmunkPivotJoint : ChipmunkConstraint
 
 /**
 	Create an autoreleased pivot joint between the two bodies with the two anchor points.
 	Make sure you have the bodies in the right place as the joint will fix itself as soon as you start simulating the space.
 */
-+ (ChipmunkPivotJoint *)pivotJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2;
++ (ChipmunkPivotJoint *)pivotJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB;
 
 /**
 	Create an autoreleased pivot joint between the two bodies by calculating the anchor points from the pivot point given in absolute coordinates.
@@ -168,7 +159,7 @@
 	Initialize a pivot joint between the two bodies with the two anchor points.
 	Make sure you have the bodies in the right place as the joint will fix itself as soon as you start simulating the space.
 */
-- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2;
+- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB;
 
 /**
 	Initialize a pivot joint between the two bodies by calculating the anchor points from the pivot point given in absolute coordinates.
@@ -176,10 +167,10 @@
 - (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b pivot:(cpVect)pivot;
 
 /// The anchor point on the first body.
-@property(nonatomic, assign) cpVect anchr1;
+@property(nonatomic, assign) cpVect anchorA;
 
 /// The anchor point on the second body.
-@property(nonatomic, assign) cpVect anchr2;
+@property(nonatomic, assign) cpVect anchorB;
 
 @end
 
@@ -187,28 +178,25 @@
 /**
 	Groove joints hold a pivot point on one body to line along a line segment on another like a pin in a groove.
 */
-@interface ChipmunkGrooveJoint : ChipmunkConstraint {
-@private
-	cpGrooveJoint _constraint;
-}
+@interface ChipmunkGrooveJoint : ChipmunkConstraint
 
 /**
 	Create an autoreleased groove joint between the two bodies.
 	Make sure you have the bodies in the right place as the joint will snap into shape as soon as you start simulating the space.
 	@param groove_a The start of the line segment on the first body.
 	@param groove_b The end of the line segment on the first body.
-	@param anchr2 The anchor point on the second body that is held to the line segment on the first.
+	@param anchorB The anchor point on the second body that is held to the line segment on the first.
 */
-+ (ChipmunkGrooveJoint *)grooveJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b groove_a:(cpVect)groove_a groove_b:(cpVect)groove_b anchr2:(cpVect)anchr2;
++ (ChipmunkGrooveJoint *)grooveJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b groove_a:(cpVect)groove_a groove_b:(cpVect)groove_b anchorB:(cpVect)anchorB;
 
 /**
 	Initialize a groove joint between the two bodies.
 	Make sure you have the bodies in the right place as the joint will snap into shape as soon as you start simulating the space.
 	@param groove_a The start of the line segment on the first body.
 	@param groove_b The end of the line segment on the first body.
-	@param anchr2 The anchor point on the second body that is held to the line segment on the first.
+	@param anchorB The anchor point on the second body that is held to the line segment on the first.
 */
-- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b groove_a:(cpVect)groove_a groove_b:(cpVect)groove_b anchr2:(cpVect)anchr2;
+- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b groove_a:(cpVect)groove_a groove_b:(cpVect)groove_b anchorB:(cpVect)anchorB;
 
 /// The start point of the groove on the first body.
 @property(nonatomic, assign) cpVect grooveA;
@@ -216,7 +204,7 @@
 @property(nonatomic, assign) cpVect grooveB;
 
 /// The anchor point on the second body.
-@property(nonatomic, assign) cpVect anchr2;
+@property(nonatomic, assign) cpVect anchorB;
 
 @end
 
@@ -225,10 +213,7 @@
 	A spring with a damper.
 	While a spring is not technically a constraint, the damper is. The spring forces are simply a convenience.
 */
-@interface ChipmunkDampedSpring : ChipmunkConstraint {
-@private
-	cpDampedSpring _constraint;
-}
+@interface ChipmunkDampedSpring : ChipmunkConstraint
 
 /**
 	Create an autoreleased damped spring between two bodies at the given anchor points.
@@ -236,7 +221,7 @@
 	@param stiffness The <a href="http://en.wikipedia.org/wiki/Young's_modulus">young's modulus</a> of the spring.
 	@param damping The amount of viscous damping to apply.
 */
-+ (ChipmunkDampedSpring *)dampedSpringWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2 restLength:(cpFloat)restLength stiffness:(cpFloat)stiffness damping:(cpFloat)damping;
++ (ChipmunkDampedSpring *)dampedSpringWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB restLength:(cpFloat)restLength stiffness:(cpFloat)stiffness damping:(cpFloat)damping;
 
 /**
 	Initialize a damped spring between two bodies at the given anchor points.
@@ -244,13 +229,13 @@
 	@param stiffness The <a href="http://en.wikipedia.org/wiki/Young's_modulus">young's modulus</a> of the spring.
 	@param damping The amount of viscous damping to apply.
 */
-- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchr1:(cpVect)anchr1 anchr2:(cpVect)anchr2 restLength:(cpFloat)restLength stiffness:(cpFloat)stiffness damping:(cpFloat)damping;
+- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b anchorA:(cpVect)anchorA anchorB:(cpVect)anchorB restLength:(cpFloat)restLength stiffness:(cpFloat)stiffness damping:(cpFloat)damping;
 
 /// The anchor point on the first body.
-@property(nonatomic, assign) cpVect anchr1;
+@property(nonatomic, assign) cpVect anchorA;
 
 /// The anchor point on the second body.
-@property(nonatomic, assign) cpVect anchr2;
+@property(nonatomic, assign) cpVect anchorB;
 
 /// The length the spring wants to contract or expand to.
 @property(nonatomic, assign) cpFloat restLength;
@@ -267,10 +252,7 @@
 /**
 	Like a ChipmunkDampedSpring, but operates in a rotational fashion.
 */
-@interface ChipmunkDampedRotarySpring : ChipmunkConstraint {
-@private
-	cpDampedRotarySpring _constraint;
-}
+@interface ChipmunkDampedRotarySpring : ChipmunkConstraint
 
 
 /**
@@ -305,10 +287,7 @@
 	Constrains the angle between two bodies.
 	This joint is often used in conjuction with a separate ChipmunkPivotJoint in order to limit the rotation around the pivot.
 */
-@interface ChipmunkRotaryLimitJoint : ChipmunkConstraint {
-@private
-	cpRotaryLimitJoint _constraint;
-}
+@interface ChipmunkRotaryLimitJoint : ChipmunkConstraint
 
 /**
 	Create an autoreleased rotary limit joint between the two bodies and angular range in radians.
@@ -335,10 +314,7 @@
 	Simple motors make two objects spin relative to each other.
 	They are most often used with the ChipmunkConstraint.maxForce property set to a finite value.
 */
-@interface ChipmunkSimpleMotor : ChipmunkConstraint {
-@private
-	cpSimpleMotor _constraint;
-}
+@interface ChipmunkSimpleMotor : ChipmunkConstraint
 
 /// Create an autoreleased simple motor between the given bodies and relative rotation rate in radians per second.
 + (ChipmunkSimpleMotor *)simpleMotorWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b rate:(cpFloat)rate;
@@ -357,10 +333,7 @@
 	A ratio of 1.0 will lock the rotation of two bodies together, and negative ratios will cause them to spin in opposite directions.
 	You can also use gear joints as rotary servos by setting ChipmunkConstraint.maxForce and ChipmunkConstraint.maxBias to finite values and changing the ChipmunkGearJoint.phase property.
 */
-@interface ChipmunkGearJoint : ChipmunkConstraint {
-@private
-	cpGearJoint _constraint;
-}
+@interface ChipmunkGearJoint : ChipmunkConstraint
 
 /**
 	Create an autoreleased gear joint between the given bodies.
@@ -386,10 +359,7 @@
 /**
 	Ratchet joints create rotary ratches similar to a socket wrench.
 */
-@interface ChipmunkRatchetJoint : ChipmunkConstraint {
-@private
-	cpRatchetJoint _constraint;
-}
+@interface ChipmunkRatchetJoint : ChipmunkConstraint
 
 /**
 	Create an autoreleased ratchet joint between the given bodies.

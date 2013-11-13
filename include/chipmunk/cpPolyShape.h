@@ -22,30 +22,6 @@
 /// @defgroup cpPolyShape cpPolyShape
 /// @{
 
-/// @private
-typedef struct cpSplittingPlane {
-	cpVect v0, n;
-} cpSplittingPlane;
-
-#define CP_POLY_SHAPE_INLINE_ALLOC 6
-
-/// @private
-typedef struct cpPolyShape {
-	cpShape shape;
-	
-	cpFloat r;
-	
-	int count;
-	// The untransformed planes are appended at the end of the transformed planes.
-	cpSplittingPlane *planes;
-	
-	// Allocate a small number of splitting planes internally for simple poly.
-	cpSplittingPlane _planes[2*CP_POLY_SHAPE_INLINE_ALLOC];
-} cpPolyShape;
-
-// TODO: Clean up naming here.
-// TODO: Use transforms.
-
 /// Allocate a polygon shape.
 cpPolyShape* cpPolyShapeAlloc(void);
 /// Initialize a polygon shape with rounded corners.
@@ -69,7 +45,7 @@ cpShape* cpBoxShapeNew2(cpBody *body, cpBB box, cpFloat radius);
 /// Get the number of verts in a polygon shape.
 int cpPolyShapeGetCount(const cpShape *shape);
 /// Get the @c ith vertex of a polygon shape.
-cpVect cpPolyShapeGetVert(const cpShape *shape, int idx);
+cpVect cpPolyShapeGetVert(const cpShape *shape, int index);
 /// Get the radius of a polygon shape.
 cpFloat cpPolyShapeGetRadius(const cpShape *shape);
 

@@ -97,7 +97,6 @@ static const cpConstraintClass klass = {
 	(cpConstraintApplyImpulseImpl)applyImpulse,
 	(cpConstraintGetImpulseImpl)getImpulse,
 };
-CP_DefineClassGetter(cpRotaryLimitJoint)
 
 cpRotaryLimitJoint *
 cpRotaryLimitJointAlloc(void)
@@ -122,4 +121,40 @@ cpConstraint *
 cpRotaryLimitJointNew(cpBody *a, cpBody *b, cpFloat min, cpFloat max)
 {
 	return (cpConstraint *)cpRotaryLimitJointInit(cpRotaryLimitJointAlloc(), a, b, min, max);
+}
+
+cpBool
+cpConstraintIsRotaryLimitJoint(const cpConstraint *constraint)
+{
+	return (constraint->klass == &klass);
+}
+
+cpFloat
+cpRotaryLimitJointGetMin(const cpConstraint *constraint)
+{
+	cpAssertHard(cpConstraintIsRotaryLimitJoint(constraint), "Constraint is not a rotary limit joint.");
+	return ((cpRotaryLimitJoint *)constraint)->min;
+}
+
+void
+cpRotaryLimitJointSetMin(cpConstraint *constraint, cpFloat min)
+{
+	cpAssertHard(cpConstraintIsRotaryLimitJoint(constraint), "Constraint is not a rotary limit joint.");
+	cpConstraintActivateBodies(constraint);
+	((cpRotaryLimitJoint *)constraint)->min = min;
+}
+
+cpFloat
+cpRotaryLimitJointGetMax(const cpConstraint *constraint)
+{
+	cpAssertHard(cpConstraintIsRotaryLimitJoint(constraint), "Constraint is not a rotary limit joint.");
+	return ((cpRotaryLimitJoint *)constraint)->max;
+}
+
+void
+cpRotaryLimitJointSetMax(cpConstraint *constraint, cpFloat max)
+{
+	cpAssertHard(cpConstraintIsRotaryLimitJoint(constraint), "Constraint is not a rotary limit joint.");
+	cpConstraintActivateBodies(constraint);
+	((cpRotaryLimitJoint *)constraint)->max = max;
 }

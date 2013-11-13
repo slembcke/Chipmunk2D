@@ -915,7 +915,7 @@ p(expl). The most recent impulse that @constraint@ applied. To convert this to a
 
 <%= pop_open_example "BreakableJoint" %>
 
-To access properties of specific joint types, use the getter and setter functions provided (ex: @cpPinJointGetAnchr1()@). See the lists of properties for more information.
+To access properties of specific joint types, use the getter and setter functions provided (ex: @cpPinJointGetanchorA()@). See the lists of properties for more information.
 
 <%= h 2, "Error correction by Feedback:", "ErrorCorrection" %>
 
@@ -951,17 +951,17 @@ p(expl). @Destroy@ and @Free@ functions are shared by all joint types. Allocatio
 <%= h 2, "Pin Joints:", "cpPinJoint" %>
 
 <pre><code>cpPinJoint *cpPinJointAlloc(void)
-cpPinJoint *cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
-cpConstraint *cpPinJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)</code></pre>
+cpPinJoint *cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB)
+cpConstraint *cpPinJointNew(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB)</code></pre>
 
-p(expl). @a@ and @b@ are the two bodies to connect, and @anchr1@ and @anchr2@ are the anchor points on those bodies. The distance between the two anchor points is measured when the joint is created. If you want to set a specific distance, use the setter function to override it.
+p(expl). @a@ and @b@ are the two bodies to connect, and @anchorA@ and @anchorB@ are the anchor points on those bodies. The distance between the two anchor points is measured when the joint is created. If you want to set a specific distance, use the setter function to override it.
 
 <%= h 3, "Properties", "Properties" %>
 
-* @cpVect cpPinJointGetAnchr1(const cpConstraint *constraint)@
-* @void cpPinJointSetAnchr1(cpConstraint *constraint, cpVect value)@
-* @cpVect cpPinJointGetAnchr2(const cpConstraint *constraint)@
-* @void cpPinJointSetAnchr2(cpConstraint *constraint, cpVect value)@
+* @cpVect cpPinJointGetanchorA(const cpConstraint *constraint)@
+* @void cpPinJointSetanchorA(cpConstraint *constraint, cpVect value)@
+* @cpVect cpPinJointGetanchorB(const cpConstraint *constraint)@
+* @void cpPinJointSetanchorB(cpConstraint *constraint, cpVect value)@
 * @cpFloat cpPinJointGetDist(const cpConstraint *constraint)@
 * @void cpPinJointSetDist(cpConstraint *constraint, cpFloat value)@
 
@@ -971,19 +971,19 @@ p(expl). @a@ and @b@ are the two bodies to connect, and @anchr1@ and @anchr2@ ar
 
 cpSlideJoint *cpSlideJointInit(
 	cpSlideJoint *joint, cpBody *a, cpBody *b,
-	cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max
+	cpVect anchorA, cpVect anchorB, cpFloat min, cpFloat max
 )
 
-cpConstraint *cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2, cpFloat min, cpFloat max)</code></pre>
+cpConstraint *cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB, cpFloat min, cpFloat max)</code></pre>
 
-p(expl). @a@ and @b@ are the two bodies to connect, @anchr1@ and @anchr2@ are the anchor points on those bodies, and @min@ and @max@ define the allowed distances of the anchor points.
+p(expl). @a@ and @b@ are the two bodies to connect, @anchorA@ and @anchorB@ are the anchor points on those bodies, and @min@ and @max@ define the allowed distances of the anchor points.
 
 <%= h 3, "Properties", "Properties" %>
 
-* @cpVect cpSlideJointGetAnchr1(const cpConstraint *constraint)@
-* @void cpSlideJointSetAnchr1(cpConstraint *constraint, cpVect value)@
-* @cpVect cpSlideJointGetAnchr2(const cpConstraint *constraint)@
-* @void cpSlideJointSetAnchr2(cpConstraint *constraint, cpVect value)@
+* @cpVect cpSlideJointGetanchorA(const cpConstraint *constraint)@
+* @void cpSlideJointSetanchorA(cpConstraint *constraint, cpVect value)@
+* @cpVect cpSlideJointGetanchorB(const cpConstraint *constraint)@
+* @void cpSlideJointSetanchorB(cpConstraint *constraint, cpVect value)@
 * @cpFloat cpSlideJointGetMin(const cpConstraint *constraint)@
 * @void cpSlideJointSetMin(cpConstraint *constraint, cpFloat value)@
 * @cpFloat cpSlideJointGetMax(const cpConstraint *constraint)@
@@ -994,16 +994,16 @@ p(expl). @a@ and @b@ are the two bodies to connect, @anchr1@ and @anchr2@ are th
 <pre><code>cpPivotJoint *cpPivotJointAlloc(void)
 cpPivotJoint *cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect pivot)
 cpConstraint *cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot)
-cpConstraint *cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)</code></pre>
+cpConstraint *cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB)</code></pre>
 
 p(expl). @a@ and @b@ are the two bodies to connect, and @pivot@ is the point in world coordinates of the pivot. Because the pivot location is given in world coordinates, you must have the bodies moved into the correct positions already. Alternatively you can specify the joint based on a pair of anchor points, but make sure you have the bodies in the right place as the joint will fix itself as soon as you start simulating the space.
 
 <%= h 3, "Properties", "Properties" %>
 
-* @cpVect cpPivotJointGetAnchr1(const cpConstraint *constraint)@
-* @void cpPivotJointSetAnchr1(cpConstraint *constraint, cpVect value)@
-* @cpVect cpPivotJointGetAnchr2(const cpConstraint *constraint)@
-* @void cpPivotJointSetAnchr2(cpConstraint *constraint, cpVect value)@
+* @cpVect cpPivotJointGetanchorA(const cpConstraint *constraint)@
+* @void cpPivotJointSetanchorA(cpConstraint *constraint, cpVect value)@
+* @cpVect cpPivotJointGetanchorB(const cpConstraint *constraint)@
+* @void cpPivotJointSetanchorB(cpConstraint *constraint, cpVect value)@
 
 <%= h 2, "Groove Joint:", "cpGrooveJoint" %>
 
@@ -1011,12 +1011,12 @@ p(expl). @a@ and @b@ are the two bodies to connect, and @pivot@ is the point in 
 
 cpGrooveJoint *cpGrooveJointInit(
 	cpGrooveJoint *joint, cpBody *a, cpBody *b,
-	cpVect groove_a, cpVect groove_b, cpVect anchr2
+	cpVect groove_a, cpVect groove_b, cpVect anchorB
 )
 
-cpConstraint *cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchr2)</code></pre>
+cpConstraint *cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchorB)</code></pre>
 
-p(expl). The groove goes from @groov_a@ to @groove_b@ on body @a@, and the pivot is attached to @anchr2@ on body @b@. All coordinates are body local.
+p(expl). The groove goes from @groov_a@ to @groove_b@ on body @a@, and the pivot is attached to @anchorB@ on body @b@. All coordinates are body local.
 
 <%= h 3, "Properties", "Properties" %>
 
@@ -1024,20 +1024,20 @@ p(expl). The groove goes from @groov_a@ to @groove_b@ on body @a@, and the pivot
 * @void cpGrooveJointSetGrooveA(cpConstraint *constraint, cpVect value)@
 * @cpVect cpGrooveJointGetGrooveB(const cpConstraint *constraint)@
 * @void cpGrooveJointSetGrooveB(cpConstraint *constraint, cpVect value)@
-* @cpVect cpGrooveJointGetAnchr2(const cpConstraint *constraint)@
-* @void cpGrooveJointSetAnchr2(cpConstraint *constraint, cpVect value)@
+* @cpVect cpGrooveJointGetanchorB(const cpConstraint *constraint)@
+* @void cpGrooveJointSetanchorB(cpConstraint *constraint, cpVect value)@
 
 <%= h 2, "Damped Spring:", "cpDampedSpring" %>
 
 <pre><code>cpDampedSpring *cpDampedSpringAlloc(void)
 
 cpDampedSpring *cpDampedSpringInit(
-	cpDampedSpring *joint, cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2,
+	cpDampedSpring *joint, cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB,
 	cpFloat restLength, cpFloat stiffness, cpFloat damping
 )
 
 cpConstraint *cpDampedSpringNew(
-	cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2,
+	cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB,
 	cpFloat restLength, cpFloat stiffness, cpFloat damping
 )</code></pre>
 
@@ -1045,10 +1045,10 @@ p(expl). Defined much like a slide joint. @restLength@ is the distance the sprin
 
 <%= h 3, "Properties", "Properties" %>
 
-* @cpVect cpDampedSpringGetAnchr1(const cpConstraint *constraint)@
-* @void cpDampedSpringSetAnchr1(cpConstraint *constraint, cpVect value)@
-* @cpVect cpDampedSpringGetAnchr2(const cpConstraint *constraint)@
-* @void cpDampedSpringSetAnchr2(cpConstraint *constraint, cpVect value)@
+* @cpVect cpDampedSpringGetanchorA(const cpConstraint *constraint)@
+* @void cpDampedSpringSetanchorA(cpConstraint *constraint, cpVect value)@
+* @cpVect cpDampedSpringGetanchorB(const cpConstraint *constraint)@
+* @void cpDampedSpringSetanchorB(cpConstraint *constraint, cpVect value)@
 * @cpFloat cpDampedSpringGetRestLength(const cpConstraint *constraint)@
 * @void cpDampedSpringSetRestLength(cpConstraint *constraint, cpFloat value)@
 * @cpFloat cpDampedSpringGetStiffness(const cpConstraint *constraint)@

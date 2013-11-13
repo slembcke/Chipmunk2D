@@ -35,48 +35,6 @@
 // TODO: Eww. Magic numbers.
 #define MAGIC_EPSILON 1e-5
 
-//MARK: Private struct definitions.
-
-struct cpBody {
-	cpBodyVelocityFunc velocity_func;
-	cpBodyPositionFunc position_func;
-	
-	cpFloat m;
-	cpFloat m_inv;
-	
-	cpFloat i;
-	cpFloat i_inv;
-	
-	cpVect cog;
-	
-	cpVect p;
-	cpVect v;
-	cpVect f;
-	
-	cpFloat a;
-	cpFloat w;
-	cpFloat t;
-	
-	cpTransform transform;
-	
-	cpDataPointer userData;
-	
-	cpVect v_bias;
-	cpFloat w_bias;
-	
-	cpSpace *space;
-	
-	cpShape *shapeList;
-	cpArbiter *arbiterList;
-	cpConstraint *constraintList;
-	
-	struct {
-		cpBody *root;
-		cpBody *next;
-		cpFloat idleTime;
-	} sleeping;
-};
-
 
 //MARK: cpArray
 
@@ -119,7 +77,55 @@ typedef cpBool (*cpHashSetFilterFunc)(void *elt, void *data);
 void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);
 
 
-//MARK: Body Functions
+//MARK: Bodies
+
+struct cpBody {
+	// Integration functions
+	cpBodyVelocityFunc velocity_func;
+	cpBodyPositionFunc position_func;
+	
+	// mass and it's inverse
+	cpFloat m;
+	cpFloat m_inv;
+	
+	// moment of inertia and it's inverse
+	cpFloat i;
+	cpFloat i_inv;
+	
+	// center of gravity
+	cpVect cog;
+	
+	// position, velocity, force
+	cpVect p;
+	cpVect v;
+	cpVect f;
+	
+	// Angle, angular velocity, torque (radians)
+	cpFloat a;
+	cpFloat w;
+	cpFloat t;
+	
+	cpTransform transform;
+	
+	cpDataPointer userData;
+	
+	// "pseudo-velocities" used for eliminating overlap.
+	// Erin Catto has some papers that talk about what these are.
+	cpVect v_bias;
+	cpFloat w_bias;
+	
+	cpSpace *space;
+	
+	cpShape *shapeList;
+	cpArbiter *arbiterList;
+	cpConstraint *constraintList;
+	
+	struct {
+		cpBody *root;
+		cpBody *next;
+		cpFloat idleTime;
+	} sleeping;
+};
 
 static inline cpBool cpBodyIsDynamic(cpBody *body){return (cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC);}
 static inline cpBool cpBodyIsKinematic(cpBody *body){return (cpBodyGetType(body) == CP_BODY_TYPE_KINEMATIC);}
@@ -221,14 +227,107 @@ void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
 void cpArbiterApplyImpulse(cpArbiter *arb);
 
 
-//MARK: Shape/Collision Functions
+//MARK: Shapes/Collisions
+
+struct cpShapeMassInfo {
+	cpFloat m;
+	cpFloat i;
+	cpVect cog;
+	cpFloat area;
+};
+
+typedef enum cpShapeType{
+	CP_CIRCLE_SHAPE,
+	CP_SEGMENT_SHAPE,
+	CP_POLY_SHAPE,
+	CP_NUM_SHAPES
+} cpShapeType;
+
+typedef cpBB (*cpShapeCacheDataImpl)(cpShape *shape, cpTransform transform);
+typedef void (*cpShapeDestroyImpl)(cpShape *shape);
+typedef void (*cpShapePointQueryImpl)(const cpShape *shape, cpVect p, cpPointQueryInfo *info);
+typedef void (*cpShapeSegmentQueryImpl)(const cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info);
+
+typedef struct cpShapeClass cpShapeClass;
+
+struct cpShapeClass {
+	cpShapeType type;
+	
+	cpShapeCacheDataImpl cacheData;
+	cpShapeDestroyImpl destroy;
+	cpShapePointQueryImpl pointQuery;
+	cpShapeSegmentQueryImpl segmentQuery;
+};
+
+struct cpShape {
+	const cpShapeClass *klass;
+	
+	cpSpace *space;
+	cpBody *body;
+	struct cpShapeMassInfo massInfo;
+	cpBB bb;
+	
+	cpBool sensor;
+	
+	cpFloat e;
+	cpFloat u;
+	cpVect surfaceV;
+
+	cpDataPointer userData;
+	
+	cpCollisionType type;
+	cpShapeFilter filter;
+	
+	cpShape *next;
+	cpShape *prev;
+	
+	cpHashValue hashid;
+};
+
+struct cpCircleShape {
+	cpShape shape;
+	
+	cpVect c, tc;
+	cpFloat r;
+};
+
+struct cpSegmentShape {
+	cpShape shape;
+	
+	cpVect a, b, n;
+	cpVect ta, tb, tn;
+	cpFloat r;
+	
+	cpVect a_tangent, b_tangent;
+};
+
+struct cpSplittingPlane {
+	cpVect v0, n;
+};
+
+#define CP_POLY_SHAPE_INLINE_ALLOC 6
+
+struct cpPolyShape {
+	cpShape shape;
+	
+	cpFloat r;
+	
+	int count;
+	// The untransformed planes are appended at the end of the transformed planes.
+	struct cpSplittingPlane *planes;
+	
+	// Allocate a small number of splitting planes internally for simple poly.
+	struct cpSplittingPlane _planes[2*CP_POLY_SHAPE_INLINE_ALLOC];
+};
 
 cpShape *cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body, struct cpShapeMassInfo massInfo);
 
 static inline cpBool
 cpShapeActive(cpShape *shape)
 {
-	return shape->prev || (shape->body && shape->body->shapeList == shape);
+	// checks if the shape is added to a shape list.
+	// TODO could this just check the space now?
+	return (shape->prev || (shape->body && shape->body->shapeList == shape));
 }
 
 // Note: This function returns contact points with r1/r2 in absolute coordinates, not body relative.
@@ -272,12 +371,172 @@ cpShapeFilterReject(cpShapeFilter a, cpShapeFilter b)
 }
 
 
-//MARK: Constraint Functions
+//MARK: Constraints
 // TODO naming conventions here
 
-#define CP_DefineClassGetter(t) const cpConstraintClass * t##GetClass(void){return (cpConstraintClass *)&klass;}
+typedef void (*cpConstraintPreStepImpl)(cpConstraint *constraint, cpFloat dt);
+typedef void (*cpConstraintApplyCachedImpulseImpl)(cpConstraint *constraint, cpFloat dt_coef);
+typedef void (*cpConstraintApplyImpulseImpl)(cpConstraint *constraint, cpFloat dt);
+typedef cpFloat (*cpConstraintGetImpulseImpl)(cpConstraint *constraint);
 
-void cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBody *a, cpBody *b);
+typedef struct cpConstraintClass {
+	cpConstraintPreStepImpl preStep;
+	cpConstraintApplyCachedImpulseImpl applyCachedImpulse;
+	cpConstraintApplyImpulseImpl applyImpulse;
+	cpConstraintGetImpulseImpl getImpulse;
+} cpConstraintClass;
+
+struct cpConstraint {
+	const cpConstraintClass *klass;
+	
+	cpSpace *space;
+	
+	cpBody *a, *b;
+	cpConstraint *next_a, *next_b;
+	
+	cpFloat maxForce;
+	cpFloat errorBias;
+	cpFloat maxBias;
+	
+	cpBool collideBodies;
+	
+	cpConstraintPreSolveFunc preSolve;
+	cpConstraintPostSolveFunc postSolve;
+	
+	cpDataPointer userData;
+};
+
+struct cpPinJoint {
+	cpConstraint constraint;
+	cpVect anchorA, anchorB;
+	cpFloat dist;
+	
+	cpVect r1, r2;
+	cpVect n;
+	cpFloat nMass;
+	
+	cpFloat jnAcc;
+	cpFloat bias;
+};
+
+struct cpSlideJoint {
+	cpConstraint constraint;
+	cpVect anchorA, anchorB;
+	cpFloat min, max;
+	
+	cpVect r1, r2;
+	cpVect n;
+	cpFloat nMass;
+	
+	cpFloat jnAcc;
+	cpFloat bias;
+};
+
+struct cpPivotJoint {
+	cpConstraint constraint;
+	cpVect anchorA, anchorB;
+	
+	cpVect r1, r2;
+	cpMat2x2 k;
+	
+	cpVect jAcc;
+	cpVect bias;
+};
+
+struct cpGrooveJoint {
+	cpConstraint constraint;
+	cpVect grv_n, grv_a, grv_b;
+	cpVect  anchorB;
+	
+	cpVect grv_tn;
+	cpFloat clamp;
+	cpVect r1, r2;
+	cpMat2x2 k;
+	
+	cpVect jAcc;
+	cpVect bias;
+};
+
+struct cpDampedSpring {
+	cpConstraint constraint;
+	cpVect anchorA, anchorB;
+	cpFloat restLength;
+	cpFloat stiffness;
+	cpFloat damping;
+	cpDampedSpringForceFunc springForceFunc;
+	
+	cpFloat target_vrn;
+	cpFloat v_coef;
+	
+	cpVect r1, r2;
+	cpFloat nMass;
+	cpVect n;
+	
+	cpFloat jAcc;
+};
+
+struct cpDampedRotarySpring {
+	cpConstraint constraint;
+	cpFloat restAngle;
+	cpFloat stiffness;
+	cpFloat damping;
+	cpDampedRotarySpringTorqueFunc springTorqueFunc;
+	
+	cpFloat target_wrn;
+	cpFloat w_coef;
+	
+	cpFloat iSum;
+	cpFloat jAcc;
+};
+
+struct cpRotaryLimitJoint {
+	cpConstraint constraint;
+	cpFloat min, max;
+	
+	cpFloat iSum;
+		
+	cpFloat bias;
+	cpFloat jAcc;
+};
+
+struct cpRatchetJoint {
+	cpConstraint constraint;
+	cpFloat angle, phase, ratchet;
+	
+	cpFloat iSum;
+		
+	cpFloat bias;
+	cpFloat jAcc;
+};
+
+struct cpGearJoint {
+	cpConstraint constraint;
+	cpFloat phase, ratio;
+	cpFloat ratio_inv;
+	
+	cpFloat iSum;
+		
+	cpFloat bias;
+	cpFloat jAcc;
+};
+
+struct cpSimpleMotor {
+	cpConstraint constraint;
+	cpFloat rate;
+	
+	cpFloat iSum;
+		
+	cpFloat jAcc;
+};
+
+void cpConstraintInit(cpConstraint *constraint, const struct cpConstraintClass *klass, cpBody *a, cpBody *b);
+
+static inline void
+cpConstraintActivateBodies(cpConstraint *constraint)
+{
+	cpBody *a = constraint->a; cpBodyActivate(a);
+	cpBody *b = constraint->b; cpBodyActivate(b);
+}
 
 static inline cpVect
 relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2){
@@ -378,7 +637,55 @@ bias_coef(cpFloat errorBias, cpFloat dt)
 }
 
 
-//MARK: Space Functions
+//MARK: Spaces
+
+struct cpSpace {
+	int iterations;
+	
+	cpVect gravity;
+	cpFloat damping;
+	
+	cpFloat idleSpeedThreshold;
+	cpFloat sleepTimeThreshold;
+	
+	cpFloat collisionSlop;
+	cpFloat collisionBias;
+	cpTimestamp collisionPersistence;
+	
+	cpDataPointer userData;
+	
+	cpTimestamp stamp;
+	cpFloat curr_dt;
+
+	cpArray *dynamicBodies;
+	cpArray *otherBodies;
+	cpArray *rousedBodies;
+	cpArray *sleepingComponents;
+	
+	cpHashValue shapeIDCounter;
+	cpSpatialIndex *staticShapes;
+	cpSpatialIndex *dynamicShapes;
+	
+	cpArray *constraints;
+	
+	cpArray *arbiters;
+	cpContactBufferHeader *contactBuffersHead;
+	cpHashSet *cachedArbiters;
+	cpArray *pooledArbiters;
+	
+	cpArray *allocatedBuffers;
+	unsigned int locked;
+	
+	cpBool usesWildcards;
+	cpHashSet *collisionHandlers;
+	cpCollisionHandler defaultHandler;
+	
+	cpBool skipPostStep;
+	cpArray *postStepCallbacks;
+	
+	cpBody *staticBody;
+	cpBody _staticBody;
+};
 
 #define cpAssertSpaceUnlocked(space) \
 	cpAssertHard(!space->locked, \
