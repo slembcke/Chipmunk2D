@@ -19,7 +19,6 @@ testPropertiesHelper(id self, ChipmunkBody *body, ChipmunkShape *shape)
 	XCTAssertEqual(shape.friction, (cpFloat)0, @"");
 	XCTAssertEqual(shape.surfaceVelocity, cpvzero, @"");
 	XCTAssertNil(shape.collisionType, @"");
-	XCTAssertNil(shape.group, @"");
 	XCTAssertEqual(shape.filter, CP_SHAPE_FILTER_ALL, @"");
 	
 	cpBB bb = [shape cacheBB];

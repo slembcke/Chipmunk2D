@@ -53,11 +53,8 @@
 @property(nonatomic, assign) cpCollisionType collisionType;
 
 /**
-	An object reference used as a collision group identifier. Shapes with the same group do not collide.
-	@attention Like most @c delegate properties this is a weak reference and does not call @c retain.
+	The collision filtering parameters of this shape.
 */
-@property(nonatomic, assign) cpGroup group;
-
 @property(nonatomic, assign) cpShapeFilter filter;
 
 /// Get the space the body is added to.
