@@ -86,6 +86,14 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 		XCTAssertEqualWithAccuracy(d, cpfsqrt(2*0.6*0.6) - 1.0f, 1e-5, @"");
 	});
 	
+	ChipmunkPointQueryInfo *pointInfo = nil;
+	pointInfo = [space pointQueryNearest:cpv(-3, -3) maxDistance:10 filter:CP_SHAPE_FILTER_ALL];
+	XCTAssertEqual(pointInfo.shape, segment, @"");
+	
+	// A point query that misses should return nil.
+	pointInfo = [space pointQueryNearest:cpv(-3, -3) maxDistance:0 filter:CP_SHAPE_FILTER_ALL];
+	XCTAssertNil(pointInfo, @"");
+	
 	// Segment queries
 	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(-2,-2) to:cpv(4,4) radius:0.0 filter:CP_SHAPE_FILTER_ALL]);
 	XCTAssertEqualObjects(set, ([NSSet setWithObjects:circle, segment, box, nil]), @"");
@@ -102,12 +110,12 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(2,2) to:cpv(3,3) radius:0.0 filter:CP_SHAPE_FILTER_ALL]);
 	XCTAssertEqualObjects(set, ([NSSet setWithObjects:nil]), @"");
 	
-	ChipmunkSegmentQueryInfo *info;
-	info = [space segmentQueryFirstFrom:cpv(-2,-2) to:cpv(1,1) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
-	XCTAssertEqual(info.shape, segment, @"");
+	ChipmunkSegmentQueryInfo *segmentInfo = nil;
+	segmentInfo = [space segmentQueryFirstFrom:cpv(-2,-2) to:cpv(1,1) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
+	XCTAssertEqual(segmentInfo.shape, segment, @"");
 	
-	info = [space segmentQueryFirstFrom:cpv(-2,-2) to:cpv(-1,-1) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
-	XCTAssertEqualObjects(info.shape, nil, @"");
+	segmentInfo = [space segmentQueryFirstFrom:cpv(-2,-2) to:cpv(-1,-1) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
+	XCTAssertEqualObjects(segmentInfo.shape, nil, @"");
 	
 	cpSpaceSegmentQuery_b(space.space, cpv(-1.0, -0.6), cpv(1.0, -0.6), 0.0f, CP_SHAPE_FILTER_ALL, ^(cpShape *shape, cpVect p, cpVect n, cpFloat t){
 		XCTAssertEqual(shape, segment.shape, @"");
@@ -117,15 +125,19 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	});
 	
 	// Segment queries starting from inside a shape
-	info = [space segmentQueryFirstFrom:cpvzero to:cpv(1,1) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
-	XCTAssertEqual(info.t, 0.0f, @"Starting inside a shape should return t=0.");
+	segmentInfo = [space segmentQueryFirstFrom:cpvzero to:cpv(1,1) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
+	XCTAssertEqual(segmentInfo.t, 0.0f, @"Starting inside a shape should return t=0.");
 	
-	info = [space segmentQueryFirstFrom:cpv(1,1) to:cpvzero radius:0.0 filter:CP_SHAPE_FILTER_ALL];
-	XCTAssertEqual(info.t, 0.0f, @"Starting inside a shape should return t=0.");
+	segmentInfo = [space segmentQueryFirstFrom:cpv(1,1) to:cpvzero radius:0.0 filter:CP_SHAPE_FILTER_ALL];
+	XCTAssertEqual(segmentInfo.t, 0.0f, @"Starting inside a shape should return t=0.");
 	
-	info = [space segmentQueryFirstFrom:cpv(-0.6, -0.6) to:cpvzero radius:0.0 filter:CP_SHAPE_FILTER_ALL];
-	XCTAssertEqual(info.t, 0.0f, @"Starting inside a shape should return t=0.");
-	XCTAssertEqual(info.shape, segment, @"Should have picked the segment shape.");
+	segmentInfo = [space segmentQueryFirstFrom:cpv(-0.6, -0.6) to:cpvzero radius:0.0 filter:CP_SHAPE_FILTER_ALL];
+	XCTAssertEqual(segmentInfo.t, 0.0f, @"Starting inside a shape should return t=0.");
+	XCTAssertEqual(segmentInfo.shape, segment, @"Should have picked the segment shape.");
+	
+	// A segment query that misses should return nil.
+	segmentInfo = [space segmentQueryFirstFrom:cpv(-10, 0) to:cpv(-10, -10) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
+	XCTAssertNil(segmentInfo, @"");
 	
 	// Shape queries
 	ChipmunkBody *queryBody = [ChipmunkBody bodyWithMass:1 andMoment:1];
@@ -181,9 +193,14 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	testPointQueries_helper(self, space, space.staticBody);
 	testPointQueries_helper(self, space, [ChipmunkBody staticBody]);
 	
+	// Kinematic bodies
+	testPointQueries_helper(self, space, [space add:[ChipmunkBody kinematicBody]]);
+	
 	// With regular bodies.
-	testPointQueries_helper(self, space, [ChipmunkBody bodyWithMass:1 andMoment:1]);
 	testPointQueries_helper(self, space, [space add:[ChipmunkBody bodyWithMass:1 andMoment:1]]);
+	
+	// Rogue bodies
+	testPointQueries_helper(self, space, [ChipmunkBody bodyWithMass:1 andMoment:1]);
 	
 	[space release];
 }

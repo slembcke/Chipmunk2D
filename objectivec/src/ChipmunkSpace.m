@@ -420,11 +420,11 @@ postStepPerformBlock(cpSpace *unused, id key, ChipmunkPostStepBlock block)
 	return array;
 }
 
-- (ChipmunkShape *)pointQueryNearest:(cpVect)point maxDistance:(cpFloat)maxDistance filter:(cpShapeFilter)filter
+- (ChipmunkPointQueryInfo *)pointQueryNearest:(cpVect)point maxDistance:(cpFloat)maxDistance filter:(cpShapeFilter)filter
 {
 	cpPointQueryInfo info;
-	cpShape *shape = cpSpacePointQueryNearest(_space, point, maxDistance, filter, &info);
-	return (shape ? shape->userData : nil);
+	cpSpacePointQueryNearest(_space, point, maxDistance, filter, &info);
+	return (info.shape ? [[[ChipmunkPointQueryInfo alloc] initWithInfo:&info] autorelease] : nil);
 }
 
 typedef struct segmentQueryContext {
@@ -450,7 +450,7 @@ typedef struct segmentQueryContext {
 	cpSegmentQueryInfo info;
 	cpSpaceSegmentQueryFirst(_space, start, end, radius, filter, &info);
 	
-	return [[[ChipmunkSegmentQueryInfo alloc] initWithInfo:&info start:start end:end] autorelease];
+	return (info.shape ? [[[ChipmunkSegmentQueryInfo alloc] initWithInfo:&info start:start end:end] autorelease] : nil);
 }
 
 - (NSArray *)bbQueryAll:(cpBB)bb filter:(cpShapeFilter)filter
