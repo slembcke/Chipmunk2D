@@ -3,6 +3,7 @@ doc/index.html
 
 *.pbxuser
 *.perspectivev3
+xcshareddata
 xcuserdata
 project.xcworkspace
 xcode/DerivedData
