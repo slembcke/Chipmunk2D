@@ -57,6 +57,9 @@ cpCollisionInfoPushContact(struct cpCollisionInfo *info, cpVect p1, cpVect p2, c
 
 //MARK: Support Points and Edges:
 
+// Support points are the maximal points on a shape's perimeter along a certain axis.
+// The GJK and EPA algorithms use support points to iteratively sample the surface of the two shapes' minkowski difference.
+
 static inline int
 PolySupportPointIndex(const int count, const struct cpSplittingPlane *planes, const cpVect n)
 {
@@ -77,13 +80,14 @@ PolySupportPointIndex(const int count, const struct cpSplittingPlane *planes, co
 
 struct SupportPoint {
 	cpVect p;
-	cpCollisionID id;
+	// Save an index of the point so it can be cheaply looked up as a starting point for the next frame.
+	cpCollisionID index;
 };
 
 static inline struct SupportPoint
-SupportPointNew(cpVect p, cpCollisionID id)
+SupportPointNew(cpVect p, cpCollisionID index)
 {
-	struct SupportPoint point = {p, id};
+	struct SupportPoint point = {p, index};
 	return point;
 }
 
@@ -113,16 +117,20 @@ PolySupportPoint(const cpPolyShape *poly, const cpVect n)
 	return SupportPointNew(planes[i].v0, i);
 }
 
+// A point on the surface of two shape's minkowski difference.
 struct MinkowskiPoint {
+	// Cache the two original support points.
 	cpVect a, b;
+	// b - a
 	cpVect ab;
+	// Concatenate the two support point indexes.
 	cpCollisionID id;
 };
 
 static inline struct MinkowskiPoint
 MinkowskiPointNew(const struct SupportPoint a, const struct SupportPoint b)
 {
-	struct MinkowskiPoint point = {a.p, b.p, cpvsub(b.p, a.p), (a.id & 0xFF)<<8 | (b.id & 0xFF)};
+	struct MinkowskiPoint point = {a.p, b.p, cpvsub(b.p, a.p), (a.index & 0xFF)<<8 | (b.index & 0xFF)};
 	return point;
 }
 
@@ -131,6 +139,7 @@ struct SupportContext {
 	SupportPointFunc func1, func2;
 };
 
+// Calculate the maximal point on the minkowski difference of two shapes along a particular axis.
 static inline struct MinkowskiPoint
 Support(const struct SupportContext *ctx, const cpVect n)
 {
@@ -141,9 +150,11 @@ Support(const struct SupportContext *ctx, const cpVect n)
 
 struct EdgePoint {
 	cpVect p;
+	// Keep a hash value for Chipmunk's collision hashing mechanism.
 	cpHashValue hash;
 };
 
+// Support edges are the edges of a polygon or segment shape that are in contact.
 struct Edge {
 	struct EdgePoint a, b;
 	cpFloat r;
@@ -184,6 +195,8 @@ SupportEdgeForSegment(const cpSegmentShape *seg, const cpVect n)
 	}
 }
 
+// Find the closest p(t) to (0, 0) where p(t) = a*(1-t)/2 + b*(1+t)/2
+// The range for t is [-1, 1] to avoid floating point issues if the parameters are swapped.
 static inline cpFloat
 ClosestT(const cpVect a, const cpVect b)
 {
@@ -191,6 +204,7 @@ ClosestT(const cpVect a, const cpVect b)
 	return -cpfclamp(cpvdot(delta, cpvadd(a, b))/cpvlengthsq(delta), -1.0f, 1.0f);
 }
 
+// Basically the same as cpvlerp(), except t = [-1, 1]
 static inline cpVect
 LerpT(const cpVect a, const cpVect b, const cpFloat t)
 {
@@ -198,35 +212,48 @@ LerpT(const cpVect a, const cpVect b, const cpFloat t)
 	return cpvadd(cpvmult(a, 0.5f - ht), cpvmult(b, 0.5f + ht));
 }
 
+// Closest points on the surface of two shapes.
 struct ClosestPoints {
+	// Surface points in absolute coordinates.
 	cpVect a, b;
+	// Minimum separating axis of the two shapes.
 	cpVect n;
+	// Signed distance between the points.
 	cpFloat d;
+	// Concatenation of the id's of the minkoski points.
 	cpCollisionID id;
 };
 
+// Calculate the closest points on two shapes given the closest edge on their minkowski difference to (0, 0)
 static inline struct ClosestPoints
 ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
 {
+	// Find the closest p(t) on the minkowski difference to (0, 0)
 	cpFloat t = ClosestT(v0.ab, v1.ab);
 	cpVect p = LerpT(v0.ab, v1.ab, t);
 	
+	// Interpolate the original support points using the same 't' value as above.
+	// This gives you the closest surface points in absolute coordinates. NEAT!
 	cpVect pa = LerpT(v0.a, v1.a, t);
 	cpVect pb = LerpT(v0.b, v1.b, t);
 	cpCollisionID id = (v0.id & 0xFFFF)<<16 | (v1.id & 0xFFFF);
 	
+	// First try calculating the MSA from the minkowski difference edge.
+	// This gives us a nice, accurate MSA when the surfaces are close together.
 	cpVect delta = cpvsub(v1.ab, v0.ab);
-	cpVect n = cpvnormalize(cpvperp(delta));
-	cpFloat d = -cpvdot(n, p);
+	cpVect n = cpvnormalize(cpvrperp(delta));
+	cpFloat d = cpvdot(n, p);
 	
-	if(d <= 0.0f || (0.0f < t && t < 1.0f)){
-		struct ClosestPoints points = {pa, pb, cpvneg(n), d, id};
+	if(d <= 0.0f || (-1.0f < t && t < 1.0f)){
+		// If the shapes are overlapping, or we have a regular vertex/edge collision, we are done.
+		struct ClosestPoints points = {pa, pb, n, d, id};
 		return points;
 	} else {
-		cpFloat d2 = cpvlength(p);
-		cpVect n = cpvmult(p, 1.0f/(d2 + CPFLOAT_MIN));
+		// Vertex/vertex collisions need special treatment since the MSA won't be shared with an axis of the minkowski difference.
+		cpFloat d = cpvlength(p);
+		cpVect n = cpvmult(p, 1.0f/(d + CPFLOAT_MIN));
 		
-		struct ClosestPoints points = {pa, pb, n, d2, id};
+		struct ClosestPoints points = {pa, pb, n, d, id};
 		return points;
 	}
 }
@@ -239,6 +266,8 @@ ClosestDist(const cpVect v0,const cpVect v1)
 	return cpvlengthsq(LerpT(v0, v1, ClosestT(v0, v1)));
 }
 
+// Recursive implementation of the EPA loop.
+// Each recursion adds a point to the convex hull until it's known that we have the closest point on the surface.
 static struct ClosestPoints
 EPARecurse(const struct SupportContext *ctx, const int count, const struct MinkowskiPoint *hull, const int iteration)
 {
@@ -246,6 +275,7 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 	cpFloat minDist = INFINITY;
 	
 	// TODO: precalculate this when building the hull and save a step.
+	// Find the closest segment hull[i] and hull[i + 1] to (0, 0)
 	for(int j=0, i=count-1; j<count; i=j, j++){
 		cpFloat d = ClosestDist(hull[i].ab, hull[j].ab);
 		if(d < minDist){
@@ -258,6 +288,7 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 	struct MinkowskiPoint v1 = hull[(mini + 1)%count];
 	cpAssertSoft(!cpveql(v0.ab, v1.ab), "Internal Error: EPA vertexes are the same (%d and %d)", mini, (mini + 1)%count);
 	
+	// Check if there is a point on the minkowski difference beyond this edge.
 	struct MinkowskiPoint p = Support(ctx, cpvperp(cpvsub(v1.ab, v0.ab)));
 	
 #if DRAW_EPA
@@ -270,10 +301,12 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 	ChipmunkDebugDrawDot(5, p.ab, LAColor(1, 1));
 #endif
 	
+	// The signed area of the triangle [v0.ab, v1.ab, p] will be positive if p lies beyond v0.ab, v1.ab.
 	cpFloat area2x = cpvcross(cpvsub(v1.ab, v0.ab), cpvadd(cpvsub(p.ab, v0.ab), cpvsub(p.ab, v1.ab)));
 	if(area2x > 0.0f && iteration < MAX_EPA_ITERATIONS){
-		int count2 = 1;
+		// Rebuild the convex hull by inserting p.
 		struct MinkowskiPoint *hull2 = (struct MinkowskiPoint *)alloca((count + 1)*sizeof(struct MinkowskiPoint));
+		int count2 = 1;
 		hull2[0] = p;
 		
 		for(int i=0; i<count; i++){
@@ -292,11 +325,15 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 		
 		return EPARecurse(ctx, count2, hull2, iteration + 1);
 	} else {
+		// Could not find a new point to insert, so we have found the closest edge of the minkowski difference.
 		cpAssertWarn(iteration < WARN_EPA_ITERATIONS, "High EPA iterations: %d", iteration);
 		return ClosestPointsNew(v0, v1);
 	}
 }
 
+// Find the closest points on the surface of two overlapping shapes using the EPA algorithm.
+// EPA is called from GJK when two shapes overlap.
+// This is moderately expensive step! Avoid it by adding radii to your shapes so their inner polygons won't overlap.
 static struct ClosestPoints
 EPA(const struct SupportContext *ctx, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, const struct MinkowskiPoint v2)
 {
@@ -307,6 +344,7 @@ EPA(const struct SupportContext *ctx, const struct MinkowskiPoint v0, const stru
 
 //MARK: GJK Functions.
 
+// Recursive implementatino of the GJK loop.
 static inline struct ClosestPoints
 GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, const int iteration)
 {
@@ -316,9 +354,10 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 	}
 	
 	cpVect delta = cpvsub(v1.ab, v0.ab);
+	// TODO: should this be an area2x check?
 	if(cpvcross(delta, cpvadd(v0.ab, v1.ab)) > 0.0f){
 		// Origin is behind axis. Flip and try again.
-		return GJKRecurse(ctx, v1, v0, iteration + 1);
+		return GJKRecurse(ctx, v1, v0, iteration);
 	} else {
 		cpFloat t = ClosestT(v0.ab, v1.ab);
 		cpVect n = (-1.0f < t && t < 1.0f ? cpvperp(delta) : cpvneg(LerpT(v0.ab, v1.ab, t)));
@@ -336,15 +375,17 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 			cpvcross(cpvsub(v1.ab, p.ab), cpvadd(v1.ab, p.ab)) > 0.0f &&
 			cpvcross(cpvsub(v0.ab, p.ab), cpvadd(v0.ab, p.ab)) < 0.0f
 		){
-			cpAssertWarn(iteration < WARN_GJK_ITERATIONS, "High GJK->EPA iterations: %d", iteration);
 			// The triangle v0, p, v1 contains the origin. Use EPA to find the MSA.
+			cpAssertWarn(iteration < WARN_GJK_ITERATIONS, "High GJK->EPA iterations: %d", iteration);
 			return EPA(ctx, v0, p, v1);
 		} else {
-			// The new point must be farther along the normal than the existing points.
 			if(cpvdot(p.ab, n) <= cpfmax(cpvdot(v0.ab, n), cpvdot(v1.ab, n))){
+				// The edge v0, v1 that we already have is the closest to (0, 0) since p was not closer.
 				cpAssertWarn(iteration < WARN_GJK_ITERATIONS, "High GJK iterations: %d", iteration);
 				return ClosestPointsNew(v0, v1);
 			} else {
+				// p was closer to the origin than our existing edge.
+				// Need to figure out which existing point to drop.
 				if(ClosestDist(v0.ab, p.ab) < ClosestDist(p.ab, v1.ab)){
 					return GJKRecurse(ctx, v0, p, iteration + 1);
 				} else {
@@ -355,6 +396,7 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 	}
 }
 
+// Get a SupportPoint from a cached shape and index.
 static struct SupportPoint
 ShapePoint(const cpShape *shape, const int i)
 {
@@ -375,6 +417,7 @@ ShapePoint(const cpShape *shape, const int i)
 	}
 }
 
+// Find the closest points between two shapes using the GJK algorithm.
 static struct ClosestPoints
 GJK(const struct SupportContext *ctx, cpCollisionID *id)
 {
@@ -418,9 +461,11 @@ GJK(const struct SupportContext *ctx, cpCollisionID *id)
 	
 	struct MinkowskiPoint v0, v1;
 	if(*id && ENABLE_CACHING){
+		// Use the minkowski points from the last frame as a starting point using the cached indexes.
 		v0 = MinkowskiPointNew(ShapePoint(ctx->shape1, (*id>>24)&0xFF), ShapePoint(ctx->shape2, (*id>>16)&0xFF));
 		v1 = MinkowskiPointNew(ShapePoint(ctx->shape1, (*id>> 8)&0xFF), ShapePoint(ctx->shape2, (*id    )&0xFF));
 	} else {
+		// No cached indexes, use the shapes' bounding box centers as a guess for a starting axis.
 		cpVect axis = cpvperp(cpvsub(cpBBCenter(ctx->shape1->bb), cpBBCenter(ctx->shape2->bb)));
 		v0 = Support(ctx, axis);
 		v1 = Support(ctx, cpvneg(axis));
@@ -433,6 +478,7 @@ GJK(const struct SupportContext *ctx, cpCollisionID *id)
 
 //MARK: Contact Clipping
 
+// Given two support edges, find contact point pairs on their surfaces.
 static inline void
 ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPoints points, struct cpCollisionInfo *info)
 {
@@ -453,6 +499,8 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 		cpFloat e1_denom = 1.0f/(d_e1_b - d_e1_a);
 		cpFloat e2_denom = 1.0f/(d_e2_b - d_e2_a);
 		
+		// Project the endpoints of the two edges onto the opposing edge, clamping them as necessary.
+		// Compare the projected points to the collision normal to see if the shapes overlap there.
 		{
 			cpVect p1 = cpvadd(cpvmult(n,  e1.r), cpvlerp(e1.a.p, e1.b.p, cpfclamp01((d_e2_b - d_e1_a)*e1_denom)));
 			cpVect p2 = cpvadd(cpvmult(n, -e2.r), cpvlerp(e2.a.p, e2.b.p, cpfclamp01((d_e1_a - d_e2_a)*e2_denom)));
@@ -499,16 +547,19 @@ CircleToSegment(const cpCircleShape *circle, const cpSegmentShape *segment, stru
 	cpVect seg_b = segment->tb;
 	cpVect center = circle->tc;
 	
+	// Find the closest point on the segment to the circle.
 	cpVect seg_delta = cpvsub(seg_b, seg_a);
 	cpFloat closest_t = cpfclamp01(cpvdot(seg_delta, cpvsub(center, seg_a))/cpvlengthsq(seg_delta));
 	cpVect closest = cpvadd(seg_a, cpvmult(seg_delta, closest_t));
 	
+	// Compare the radii of the two shapes to see if they are colliding.
 	cpFloat mindist = circle->r + segment->r;
 	cpVect delta = cpvsub(closest, center);
 	cpFloat distsq = cpvlengthsq(delta);
 	if(distsq < mindist*mindist){
 		cpFloat dist = cpfsqrt(distsq);
-		cpVect n = info->n = (dist ? cpvmult(delta, 1.0f/dist) : cpv(1.0f, 0.0f));
+		// Handle coincident shapes as gracefully as possible.
+		cpVect n = info->n = (dist ? cpvmult(delta, 1.0f/dist) : segment->tn);
 		
 		// Reject endcap collisions if tangents are provided.
 		cpVect rot = cpBodyGetRotation(segment->shape.body);
@@ -541,9 +592,12 @@ SegmentToSegment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, struct 
 	cpVect n = points.n;
 	cpVect rot1 = cpBodyGetRotation(seg1->shape.body);
 	cpVect rot2 = cpBodyGetRotation(seg2->shape.body);
+	
+	// If the closest points are nearer than the sum of the radii...
 	if(
 		points.d <= (seg1->r + seg2->r) &&
 		(
+			// Reject endcap collisions if tangents are provided.
 			(!cpveql(points.a, seg1->ta) || cpvdot(n, cpvrotate(seg1->a_tangent, rot1)) <= 0.0) &&
 			(!cpveql(points.a, seg1->tb) || cpvdot(n, cpvrotate(seg1->b_tangent, rot1)) <= 0.0) &&
 			(!cpveql(points.b, seg2->ta) || cpvdot(n, cpvrotate(seg2->a_tangent, rot2)) >= 0.0) &&
@@ -571,6 +625,7 @@ PolyToPoly(const cpPolyShape *poly1, const cpPolyShape *poly2, struct cpCollisio
 	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
 	
+	// If the closest points are nearer than the sum of the radii...
 	if(points.d - poly1->r - poly2->r <= 0.0){
 		ContactPoints(SupportEdgeForPoly(poly1, points.n), SupportEdgeForPoly(poly2, cpvneg(points.n)), points, info);
 	}
@@ -593,12 +648,14 @@ SegmentToPoly(const cpSegmentShape *seg, const cpPolyShape *poly, struct cpColli
 	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
 	
-	// Reject endcap collisions if tangents are provided.
 	cpVect n = points.n;
 	cpVect rot = cpBodyGetRotation(seg->shape.body);
+	
 	if(
+		// If the closest points are nearer than the sum of the radii...
 		points.d - seg->r - poly->r <= 0.0 &&
 		(
+			// Reject endcap collisions if tangents are provided.
 			(!cpveql(points.a, seg->ta) || cpvdot(n, cpvrotate(seg->a_tangent, rot)) <= 0.0) &&
 			(!cpveql(points.a, seg->tb) || cpvdot(n, cpvrotate(seg->b_tangent, rot)) <= 0.0)
 		)
@@ -620,8 +677,8 @@ CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, struct cpColl
 	ChipmunkDebugDrawSegment(points.a, cpvadd(points.a, cpvmult(points.n, 10.0)), RGBAColor(1, 0, 0, 1));
 #endif
 	
-	cpFloat mindist = circle->r + poly->r;
-	if(points.d - mindist <= 0.0){
+	// If the closest points are nearer than the sum of the radii...
+	if(points.d <= circle->r + poly->r){
 		cpVect n = info->n = points.n;
 		cpCollisionInfoPushContact(info, cpvadd(points.a, cpvmult(n, circle->r)), cpvadd(points.b, cpvmult(n, poly->r)), 0);
 	}
