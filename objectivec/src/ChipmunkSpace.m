@@ -623,7 +623,7 @@ boundSeg(ChipmunkBody *body, cpVect a, cpVect b, cpFloat radius, cpFloat elastic
 	]];
 	
 	[self add:segs];
-	return segs;
+	return [segs autorelease];
 }
 
 @end

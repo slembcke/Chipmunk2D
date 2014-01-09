@@ -59,9 +59,9 @@
 
 // accessor macros
 #define getter(type, lower, upper) \
-- (type)lower {return self.constraint->lower;}
+- (type)lower {return cpConstraintGet##upper(self.constraint);}
 #define setter(type, lower, upper) \
-- (void)set##upper:(type)value {self.constraint->lower = value;};
+- (void)set##upper:(type)value {cpConstraintSet##upper(self.constraint, value);};
 #define both(type, lower, upper) \
 getter(type, lower, upper) \
 setter(type, lower, upper)
@@ -79,8 +79,8 @@ both(cpFloat, maxBias, MaxBias)
 
 - (ChipmunkBody *)bodyA
 {
-	cpBody *body = self.constraint->a;
-	return (body ? body->userData : nil);
+	cpBody *body = cpConstraintGetBodyA(self.constraint);
+	return (body ? cpBodyGetUserData(body) : nil);
 }
 
 //- (void)setBodyA:(ChipmunkBody *)value {
@@ -92,8 +92,8 @@ both(cpFloat, maxBias, MaxBias)
 
 - (ChipmunkBody *)bodyB
 {
-	cpBody *body = self.constraint->b;
-	return (body ? body->userData : nil);
+	cpBody *body = cpConstraintGetBodyB(self.constraint);
+	return (body ? cpBodyGetUserData(body) : nil);
 }
 
 //- (void)setBodyB:(ChipmunkBody *)value {

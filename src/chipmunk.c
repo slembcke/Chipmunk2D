@@ -38,8 +38,6 @@ cpMessage(const char *condition, const char *file, int line, int isError, int is
 	
 	fprintf(stderr, "\tFailed condition: %s\n", condition);
 	fprintf(stderr, "\tSource:%s:%d\n", file, line);
-	
-	if(isError) abort();
 }
 
 #define STR(s) #s

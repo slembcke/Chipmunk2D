@@ -54,14 +54,14 @@
 }
 
 - (ChipmunkBody *)body {
-	cpBody *body = self.shape->body;
-	return (body ? body->userData : nil);
+	cpBody *body = cpShapeGetBody(self.shape);
+	return (body ? cpBodyGetUserData(body) : nil);
 }
 
-- (void)setBody:(ChipmunkBody *)value {
-	if(self.body != value){
+- (void)setBody:(ChipmunkBody *)body {
+	if(self.body != body){
 		[self.body release];
-		self.shape->body = [[value retain] body];
+		cpShapeSetBody(self.shape, [body retain].body);
 	}
 }
 
@@ -76,21 +76,21 @@
 -(cpVect)centerOfGravity {return cpShapeGetCenterOfGravity(self.shape);}
 
 // accessor macros
-#define getter(type, lower, upper, member) \
-- (type)lower {return self.shape->member;}
-#define setter(type, lower, upper, member) \
-- (void)set##upper:(type)value {self.shape->member = value;};
-#define both(type, lower, upper, member) \
-getter(type, lower, upper, member) \
-setter(type, lower, upper, member)
+#define getter(type, lower, upper) \
+- (type)lower {return cpShapeGet##upper(self.shape);}
+#define setter(type, lower, upper) \
+- (void)set##upper:(type)value {cpShapeSet##upper(self.shape, value);};
+#define both(type, lower, upper) \
+getter(type, lower, upper) \
+setter(type, lower, upper)
 
-getter(cpBB, bb, BB, bb)
-both(BOOL, sensor, Sensor, sensor)
-both(cpFloat, elasticity, Elasticity, e)
-both(cpFloat, friction, Friction, u)
-both(cpVect, surfaceVelocity, SurfaceVelocity, surfaceV)
-both(cpCollisionType, collisionType, CollisionType, type)
-both(cpShapeFilter, filter, Filter, filter)
+getter(cpBB, bb, BB)
+both(BOOL, sensor, Sensor)
+both(cpFloat, elasticity, Elasticity)
+both(cpFloat, friction, Friction)
+both(cpVect, surfaceVelocity, SurfaceVelocity)
+both(cpCollisionType, collisionType, CollisionType)
+both(cpShapeFilter, filter, Filter)
 
 -(ChipmunkSpace *)space {
 	cpSpace *space = cpShapeGetSpace(self.shape);
