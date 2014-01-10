@@ -368,7 +368,7 @@ cpSpaceSetStaticBody(cpSpace *space, cpBody *body)
 cpBool
 cpSpaceIsLocked(cpSpace *space)
 {
-	return space->locked;
+	return (space->locked > 0);
 }
 
 //MARK: Collision Handler Function Management

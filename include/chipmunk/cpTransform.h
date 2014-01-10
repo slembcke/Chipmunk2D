@@ -52,7 +52,7 @@ cpTransformNewTranspose(cpFloat a, cpFloat c, cpFloat tx, cpFloat b, cpFloat d, 
 static inline cpTransform
 cpTransformInverse(cpTransform t)
 {
-  float inv_det = 1.0/(t.a*t.d - t.c*t.b);
+  cpFloat inv_det = 1.0/(t.a*t.d - t.c*t.b);
   return cpTransformNewTranspose(
      t.d*inv_det, -t.c*inv_det, (t.c*t.ty - t.tx*t.d)*inv_det,
     -t.b*inv_det,  t.a*inv_det, (t.tx*t.b - t.a*t.ty)*inv_det
@@ -183,7 +183,7 @@ cpTransformBoneScale(cpVect v0, cpVect v1)
 }
 
 static inline cpTransform
-cpTransformAxialScale(cpVect axis, cpVect pivot, float scale)
+cpTransformAxialScale(cpVect axis, cpVect pivot, cpFloat scale)
 {
   cpFloat A = axis.x*axis.y*(scale - 1.0);
   cpFloat B = cpvdot(axis, pivot)*(1.0 - scale);

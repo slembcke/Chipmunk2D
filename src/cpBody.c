@@ -346,7 +346,7 @@ cpBodyRemoveConstraint(cpBody *body, cpConstraint *constraint)
 }
 
 // 'p' is the position of the CoG
-void
+static void
 SetTransform(cpBody *body, cpVect p, cpFloat a)
 {
 	cpVect rot = cpvforangle(a);
