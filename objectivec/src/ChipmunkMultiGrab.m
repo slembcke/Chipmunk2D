@@ -49,7 +49,7 @@ GrabPreSolve(cpConstraint *constraint, cpSpace *space)
 	// Smooth out the mouse position.
 	cpVect pos = cpvlerp(grab->_pos, cpBodyGetPosition(grabBody), coef);
 	cpBodySetVelocity(grabBody, cpvmult(cpvsub(pos, cpBodyGetPosition(grabBody)), 1.0/dt));
-	cpBodySetPosition(grabBody, pos);
+//	cpBodySetPosition(grabBody, pos);
 }
 
 // Body will be nil if no object was grabbed.

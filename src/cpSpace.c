@@ -148,7 +148,7 @@ cpSpaceInit(cpSpace *space)
 	space->allocatedBuffers = cpArrayNew(0);
 	
 	space->dynamicBodies = cpArrayNew(0);
-	space->otherBodies = cpArrayNew(0);
+	space->staticBodies = cpArrayNew(0);
 	space->sleepingComponents = cpArrayNew(0);
 	space->rousedBodies = cpArrayNew(0);
 	
@@ -194,7 +194,7 @@ cpSpaceDestroy(cpSpace *space)
 	cpSpatialIndexFree(space->dynamicShapes);
 	
 	cpArrayFree(space->dynamicBodies);
-	cpArrayFree(space->otherBodies);
+	cpArrayFree(space->staticBodies);
 	cpArrayFree(space->sleepingComponents);
 	cpArrayFree(space->rousedBodies);
 	
@@ -444,7 +444,7 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 	cpAssertHard(!body->space, "You have already added this body to another space. You cannot add it to a second.");
 	cpAssertSpaceUnlocked(space);
 	
-	cpArrayPush(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC ? space->dynamicBodies : space->otherBodies, body);
+	cpArrayPush(cpSpaceArrayForBodyType(space, cpBodyGetType(body)), body);
 	body->space = space;
 	
 	return body;
@@ -551,7 +551,7 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 	
 	cpBodyActivate(body);
 //	cpSpaceFilterArbiters(space, body, NULL);
-	cpArrayDeleteObj(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC ? space->dynamicBodies : space->otherBodies, body);
+	cpArrayDeleteObj(cpSpaceArrayForBodyType(space, cpBodyGetType(body)), body);
 	body->space = NULL;
 }
 
@@ -596,7 +596,7 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 			func((cpBody *)bodies->arr[i], data);
 		}
 		
-		cpArray *otherBodies = space->otherBodies;
+		cpArray *otherBodies = space->staticBodies;
 		for(int i=0; i<otherBodies->num; i++){
 			func((cpBody *)otherBodies->arr[i], data);
 		}

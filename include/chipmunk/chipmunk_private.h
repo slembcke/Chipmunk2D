@@ -654,7 +654,7 @@ struct cpSpace {
 	cpFloat curr_dt;
 
 	cpArray *dynamicBodies;
-	cpArray *otherBodies;
+	cpArray *staticBodies;
 	cpArray *rousedBodies;
 	cpArray *sleepingComponents;
 	
@@ -722,6 +722,12 @@ cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb)
 	cpHashValue arbHashID = CP_HASH_PAIR((cpHashValue)a, (cpHashValue)b);
 	cpHashSetRemove(space->cachedArbiters, arbHashID, shape_pair);
 	cpArrayDeleteObj(space->arbiters, arb);
+}
+
+static inline cpArray *
+cpSpaceArrayForBodyType(cpSpace *space, cpBodyType type)
+{
+	return (type == CP_BODY_TYPE_STATIC ? space->staticBodies : space->dynamicBodies);
 }
 
 void cpShapeUpdateFunc(cpShape *shape, void *unused);

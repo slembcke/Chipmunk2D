@@ -142,4 +142,44 @@
 	[space release];
 }
 
+-(void)testTimeSteping {
+	ChipmunkSpace *space = [[ChipmunkSpace alloc] init];
+	space.gravity = cpv(0, -1);
+	
+	ChipmunkBody *dynamicBody = [space add:[ChipmunkBody bodyWithMass:1.0 andMoment:1.0]];
+	ChipmunkBody *staticBody = [space add:[ChipmunkBody staticBody]];
+	ChipmunkBody *kinematicBody = [space add:[ChipmunkBody kinematicBody]];
+	kinematicBody.velocity = cpv(1, 0);
+	
+	[space step:1.0];
+	
+	// Should have accelerated but not moved.
+	XCTAssert(cpveql(dynamicBody.position, cpvzero), @"");
+	XCTAssert(cpveql(dynamicBody.velocity, cpv(0, -1)), @"");
+	
+	// Should not have moved nor accelerated.
+	XCTAssert(cpveql(staticBody.position, cpvzero), @"");
+	XCTAssert(cpveql(staticBody.velocity, cpvzero), @"");
+	
+	// Should have moved right but not accelerated downward.
+	XCTAssert(cpveql(kinematicBody.position, cpv(1, 0)), @"");
+	XCTAssert(cpveql(kinematicBody.velocity, cpv(1, 0)), @"");
+	
+	[space step:1.0];
+	
+	// Should have moved and accelerated more.
+	XCTAssert(cpveql(dynamicBody.position, cpv(0, -1)), @"");
+	XCTAssert(cpveql(dynamicBody.velocity, cpv(0, -2)), @"");
+	
+	// Still should not have moved nor accelerated.
+	XCTAssert(cpveql(staticBody.position, cpvzero), @"");
+	XCTAssert(cpveql(staticBody.velocity, cpvzero), @"");
+	
+	// Should have moved right more but still not accelerated downward.
+	XCTAssert(cpveql(kinematicBody.position, cpv(2, 0)), @"");
+	XCTAssert(cpveql(kinematicBody.velocity, cpv(1, 0)), @"");
+	
+	[space release];
+}
+
 @end

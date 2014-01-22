@@ -183,8 +183,8 @@ cpBodySetType(cpBody *body, cpBodyType type)
 		}
 		
 		// Move the bodies to the correct array.
-		cpArray *fromArray = (oldType == CP_BODY_TYPE_DYNAMIC ? space->dynamicBodies : space->otherBodies);
-		cpArray *toArray = (type == CP_BODY_TYPE_DYNAMIC ? space->dynamicBodies : space->otherBodies);
+		cpArray *fromArray = cpSpaceArrayForBodyType(space, oldType);
+		cpArray *toArray = cpSpaceArrayForBodyType(space, type);
 		if(fromArray != toArray){
 			cpArrayDeleteObj(fromArray, body);
 			cpArrayPush(toArray, body);
@@ -495,6 +495,9 @@ cpBodySetPositionUpdateFunc(cpBody *body, cpBodyPositionFunc positionFunc)
 void
 cpBodyUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 {
+	// Skip kinematic bodies.
+	if(cpBodyGetType(body) == CP_BODY_TYPE_KINEMATIC) return;
+	
 	cpAssertSoft(body->m > 0.0f && body->i > 0.0f, "Body's mass and moment must be positive to simulate. (Mass: %f Moment: %f)", body->m, body->i);
 	
 	body->v = cpvadd(cpvmult(body->v, damping), cpvmult(cpvadd(gravity, cpvmult(body->f, body->m_inv)), dt));
