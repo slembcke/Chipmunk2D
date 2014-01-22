@@ -127,10 +127,6 @@ struct cpBody {
 	} sleeping;
 };
 
-static inline cpBool cpBodyIsDynamic(cpBody *body){return (cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC);}
-static inline cpBool cpBodyIsKinematic(cpBody *body){return (cpBodyGetType(body) == CP_BODY_TYPE_KINEMATIC);}
-static inline cpBool cpBodyIsStatic(cpBody *body){return (cpBodyGetType(body) == CP_BODY_TYPE_STATIC);}
-
 void cpBodyAddShape(cpBody *body, cpShape *shape);
 void cpBodyRemoveShape(cpBody *body, cpShape *shape);
 

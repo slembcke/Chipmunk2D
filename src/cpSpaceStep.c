@@ -299,8 +299,8 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 	// Preserve arbiters on sensors and rejected arbiters for sleeping objects.
 	// This prevents errant separate callbacks from happenening.
 	if(
-		(cpBodyIsStatic(a) || cpBodyIsSleeping(a)) &&
-		(cpBodyIsStatic(b) || cpBodyIsSleeping(b))
+		(cpBodyGetType(a) == CP_BODY_TYPE_STATIC || cpBodyIsSleeping(a)) &&
+		(cpBodyGetType(b) == CP_BODY_TYPE_STATIC || cpBodyIsSleeping(b))
 	){
 		return cpTrue;
 	}

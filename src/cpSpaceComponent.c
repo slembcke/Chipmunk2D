@@ -28,7 +28,7 @@
 void
 cpSpaceActivateBody(cpSpace *space, cpBody *body)
 {
-	cpAssertHard(cpBodyIsDynamic(body), "Internal error: Attempting to activate a non-dynamic body.");
+	cpAssertHard(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC, "Internal error: Attempting to activate a non-dynamic body.");
 		
 	if(space->locked){
 		// cpSpaceActivateBody() is called again once the space is unlocked
@@ -49,7 +49,7 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 			// You only want to restore the arbiter once, so bodyA is arbitrarily chosen to own the arbiter.
 			// The edge case is when static bodies are involved as the static bodies never actually sleep.
 			// If the static body is bodyB then all is good. If the static body is bodyA, that can easily be checked.
-			if(body == bodyA || cpBodyIsStatic(bodyA)){
+			if(body == bodyA || cpBodyGetType(bodyA) == CP_BODY_TYPE_STATIC){
 				int numContacts = arb->count;
 				struct cpContact *contacts = arb->contacts;
 				
@@ -74,7 +74,7 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 		
 		CP_BODY_FOREACH_CONSTRAINT(body, constraint){
 			cpBody *bodyA = constraint->a;
-			if(body == bodyA || cpBodyIsStatic(bodyA)) cpArrayPush(space->constraints, constraint);
+			if(body == bodyA || cpBodyGetType(bodyA) == CP_BODY_TYPE_STATIC) cpArrayPush(space->constraints, constraint);
 		}
 	}
 }
@@ -82,7 +82,7 @@ cpSpaceActivateBody(cpSpace *space, cpBody *body)
 static void
 cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 {
-	cpAssertHard(cpBodyIsDynamic(body), "Internal error: Attempting to deactivate a non-dynamic body.");
+	cpAssertHard(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC, "Internal error: Attempting to deactivate a non-dynamic body.");
 	
 	cpArrayDeleteObj(space->dynamicBodies, body);
 	
@@ -93,7 +93,7 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 	
 	CP_BODY_FOREACH_ARBITER(body, arb){
 		cpBody *bodyA = arb->body_a;
-		if(body == bodyA || cpBodyIsStatic(bodyA)){
+		if(body == bodyA || cpBodyGetType(bodyA) == CP_BODY_TYPE_STATIC){
 			cpSpaceUncacheArbiter(space, arb);
 			
 			// Save contact values to a new block of memory so they won't time out
@@ -106,7 +106,7 @@ cpSpaceDeactivateBody(cpSpace *space, cpBody *body)
 		
 	CP_BODY_FOREACH_CONSTRAINT(body, constraint){
 		cpBody *bodyA = constraint->a;
-		if(body == bodyA || cpBodyIsStatic(bodyA)) cpArrayDeleteObj(space->constraints, constraint);
+		if(body == bodyA || cpBodyGetType(bodyA) == CP_BODY_TYPE_STATIC) cpArrayDeleteObj(space->constraints, constraint);
 	}
 }
 
@@ -119,13 +119,13 @@ ComponentRoot(cpBody *body)
 void
 cpBodyActivate(cpBody *body)
 {
-	if(body != NULL && cpBodyIsDynamic(body)){
+	if(body != NULL && cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC){
 		body->sleeping.idleTime = 0.0f;
 		
 		cpBody *root = ComponentRoot(body);
 		if(root && cpBodyIsSleeping(root)){
 			// TODO should cpBodyIsSleeping(root) be an assertion?
-			cpAssertSoft(cpBodyIsDynamic(root), "Internal Error: Non-dynamic body component root detected.");
+			cpAssertSoft(cpBodyGetType(root) == CP_BODY_TYPE_DYNAMIC, "Internal Error: Non-dynamic body component root detected.");
 			
 			cpSpace *space = root->space;
 			cpBody *body = root;
@@ -147,7 +147,7 @@ cpBodyActivate(cpBody *body)
 			// Reset the idle timer of things the body is touching as well.
 			// That way things don't get left hanging in the air.
 			cpBody *other = (arb->body_a == body ? arb->body_b : arb->body_a);
-			if(!cpBodyIsStatic(other)) other->sleeping.idleTime = 0.0f;
+			if(cpBodyGetType(other) != CP_BODY_TYPE_STATIC) other->sleeping.idleTime = 0.0f;
 		}
 	}
 }
@@ -155,7 +155,7 @@ cpBodyActivate(cpBody *body)
 void
 cpBodyActivateStatic(cpBody *body, cpShape *filter)
 {
-	cpAssertHard(cpBodyIsStatic(body), "cpBodyActivateStatic() called on a non-static body.");
+	cpAssertHard(cpBodyGetType(body) == CP_BODY_TYPE_STATIC, "cpBodyActivateStatic() called on a non-static body.");
 	
 	CP_BODY_FOREACH_ARBITER(body, arb){
 		if(!filter || filter == arb->a || filter == arb->b){
@@ -195,7 +195,7 @@ FloodFillComponent(cpBody *root, cpBody *body)
 {
 	// Kinematic bodies cannot be put to sleep and prevent bodies they are touching from sleeping.
 	// Static bodies are effectively sleeping all the time.
-	if(cpBodyIsDynamic(body)){
+	if(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC){
 		cpBody *other_root = ComponentRoot(body);
 		if(other_root == NULL){
 			ComponentAdd(root, body);
@@ -255,8 +255,8 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		
 		if(sleep){
 			// TODO checking cpBodyIsSleepin() redundant?
-			if(cpBodyIsKinematic(b) || cpBodyIsSleeping(a)) cpBodyActivate(a);
-			if(cpBodyIsKinematic(a) || cpBodyIsSleeping(b)) cpBodyActivate(b);
+			if(cpBodyGetType(b) == CP_BODY_TYPE_KINEMATIC || cpBodyIsSleeping(a)) cpBodyActivate(a);
+			if(cpBodyGetType(a) == CP_BODY_TYPE_KINEMATIC || cpBodyIsSleeping(b)) cpBodyActivate(b);
 		}
 		
 		cpBodyPushArbiter(a, arb);
@@ -270,8 +270,8 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 			cpConstraint *constraint = (cpConstraint *)constraints->arr[i];
 			cpBody *a = constraint->a, *b = constraint->b;
 			
-			if(cpBodyIsKinematic(b)) cpBodyActivate(a);
-			if(cpBodyIsKinematic(a)) cpBodyActivate(b);
+			if(cpBodyGetType(b) == CP_BODY_TYPE_KINEMATIC) cpBodyActivate(a);
+			if(cpBodyGetType(a) == CP_BODY_TYPE_KINEMATIC) cpBodyActivate(b);
 		}
 		
 		// Generate components and deactivate sleeping ones
@@ -311,7 +311,7 @@ cpBodySleep(cpBody *body)
 
 void
 cpBodySleepWithGroup(cpBody *body, cpBody *group){
-	cpAssertHard(cpBodyIsDynamic(body), "Non-dynamic bodies cannot be put to sleep.");
+	cpAssertHard(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC, "Non-dynamic bodies cannot be put to sleep.");
 	
 	cpSpace *space = body->space;
 	cpAssertHard(!space->locked, "Bodies cannot be put to sleep during a query or a call to cpSpaceStep(). Put these calls into a post-step callback.");

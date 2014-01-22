@@ -161,7 +161,7 @@ ColorForShape(cpShape *shape, cpDataPointer *data)
 			
 			GLfloat max = (GLfloat)cpfmax(cpfmax(r, g), b);
 			GLfloat min = (GLfloat)cpfmin(cpfmin(r, g), b);
-			GLfloat intensity = (cpBodyIsStatic(body) ? 0.15f : 0.75f);
+			GLfloat intensity = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC ? 0.15f : 0.75f);
 			
 			// Saturate and scale the color
 			if(min == max){
@@ -196,6 +196,7 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 		ColorForShape,
 		{0.0f, 0.75f, 0.0f, 1.0f},
 		{1.0f, 0.0f, 0.0f, 1.0f},
+		NULL,
 	};
 	
 	cpSpaceDebugDraw(space, &drawOptions);

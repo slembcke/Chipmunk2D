@@ -208,7 +208,7 @@ cpBodySetType(cpBody *body, cpBodyType type)
 void
 cpBodyAccumulateMassFromShapes(cpBody *body)
 {
-	if(body == NULL || !cpBodyIsDynamic(body)) return;
+	if(body == NULL || cpBodyGetType(body) != CP_BODY_TYPE_DYNAMIC) return;
 	
 	// Reset the body's mass data.
 	body->m = body->i = 0.0f;
@@ -320,7 +320,7 @@ cpBodyRemoveShape(cpBody *body, cpShape *shape)
   shape->prev = NULL;
   shape->next = NULL;
 	
-	if(cpBodyIsDynamic(body) && shape->massInfo.m > 0.0f){
+	if(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC && shape->massInfo.m > 0.0f){
 		cpBodyAccumulateMassFromShapes(body);
 	}
 }

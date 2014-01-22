@@ -425,7 +425,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 //	cpAssertHard(body->space == space, "The shape's body must be added to the space before the shape.");
 	cpAssertSpaceUnlocked(space);
 	
-	cpBool isStatic = cpBodyIsStatic(body);
+	cpBool isStatic = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC);
 	if(!isStatic) cpBodyActivate(body);
 	cpBodyAddShape(body, shape);
 	
@@ -444,7 +444,7 @@ cpSpaceAddBody(cpSpace *space, cpBody *body)
 	cpAssertHard(!body->space, "You have already added this body to another space. You cannot add it to a second.");
 	cpAssertSpaceUnlocked(space);
 	
-	cpArrayPush(cpBodyIsDynamic(body) ? space->dynamicBodies : space->otherBodies, body);
+	cpArrayPush(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC ? space->dynamicBodies : space->otherBodies, body);
 	body->space = space;
 	
 	return body;
@@ -526,7 +526,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 	cpAssertHard(cpSpaceContainsShape(space, shape), "Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
-	cpBool isStatic = cpBodyIsStatic(body);
+	cpBool isStatic = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC);
 	if(isStatic){
 		cpBodyActivateStatic(body, shape);
 	} else {
@@ -551,7 +551,7 @@ cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 	
 	cpBodyActivate(body);
 //	cpSpaceFilterArbiters(space, body, NULL);
-	cpArrayDeleteObj(cpBodyIsDynamic(body) ? space->dynamicBodies : space->otherBodies, body);
+	cpArrayDeleteObj(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC ? space->dynamicBodies : space->otherBodies, body);
 	body->space = NULL;
 }
 
