@@ -366,6 +366,8 @@ cpShapeFilterReject(cpShapeFilter a, cpShapeFilter b)
 	);
 }
 
+void cpLoopIndexes(const cpVect *verts, int count, int *start, int *end);
+
 
 //MARK: Constraints
 // TODO naming conventions here

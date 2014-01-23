@@ -143,22 +143,6 @@ cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpFloat r2, cpSeg
 	}
 }
 
-//static cpBool
-//cpPolyValidate(const cpVect *verts, const int count)
-//{
-//	for(int i=0; i<count; i++){
-//		cpVect a = verts[i];
-//		cpVect b = verts[(i+1)%count];
-//		cpVect c = verts[(i+2)%count];
-//		
-//		if(cpvcross(cpvsub(b, a), cpvsub(c, a)) < 0.0f){
-//			return cpFalse;
-//		}
-//	}
-//	
-//	return cpTrue;
-//}
-
 static void
 SetVerts(cpPolyShape *poly, int count, const cpVect *verts)
 {

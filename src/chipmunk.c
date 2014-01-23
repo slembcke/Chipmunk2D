@@ -159,7 +159,7 @@ cpMomentForBox2(cpFloat m, cpBB box)
 
 //MARK: Quick Hull
 
-static void
+void
 cpLoopIndexes(const cpVect *verts, int count, int *start, int *end)
 {
 	(*start) = (*end) = 0;
