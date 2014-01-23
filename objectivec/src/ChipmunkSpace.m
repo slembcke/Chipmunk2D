@@ -22,6 +22,7 @@
 #define CP_ALLOW_PRIVATE_ACCESS
 #import "ObjectiveChipmunk.h"
 
+#import <objc/message.h>
 #import <TargetConditionals.h>
 
 #ifdef CHIPMUNK_PRO_TRIAL
@@ -82,19 +83,15 @@
 
 @end
 
-typedef struct handlerContext {
-	id delegate;
+typedef struct HandlerContext {
 	ChipmunkSpace *space;
+	id delegate;
 	cpCollisionType typeA, typeB;
 	SEL beginSelector;
-	bool (*beginFunc)(id self, SEL selector, cpArbiter *arb, ChipmunkSpace *space);
 	SEL preSolveSelector;
-	bool (*preSolveFunc)(id self, SEL selector, cpArbiter *arb, ChipmunkSpace *space);
 	SEL postSolveSelector;
-	void (*postSolveFunc)(id self, SEL selector, cpArbiter *arb, ChipmunkSpace *space);
 	SEL separateSelector;
-	void (*separateFunc)(id self, SEL selector, cpArbiter *arb, ChipmunkSpace *space);
-} handlerContext;
+} HandlerContext;
 
 @implementation ChipmunkSpace
 
@@ -217,96 +214,51 @@ getter(cpFloat, currentTimeStep, CurrentTimeStep);
 
 - (ChipmunkBody *)staticBody {return _staticBody;}
 
-//static bool Begin(cpArbiter *arb, struct cpSpace *space, handlerContext *ctx){return ctx->beginFunc(ctx->delegate, ctx->beginSelector, arb, ctx->space);}
-//static bool PreSolve(cpArbiter *arb, struct cpSpace *space, handlerContext *ctx){return ctx->preSolveFunc(ctx->delegate, ctx->preSolveSelector, arb, ctx->space);}
-//static void PostSolve(cpArbiter *arb, struct cpSpace *space, handlerContext *ctx){return ctx->postSolveFunc(ctx->delegate, ctx->postSolveSelector, arb, ctx->space);}
-//static void Separate(cpArbiter *arb, struct cpSpace *space, handlerContext *ctx){return ctx->separateFunc(ctx->delegate, ctx->separateSelector, arb, ctx->space);}
-//
-//
-////#define HFUNC(fname, Fname) (fname ? (cpCollision##Fname##Func)fname : NULL)
-////#define HFUNCS() \
-////HFUNC(begin, Begin), \
-////HFUNC(preSolve, PreSolve), \
-////HFUNC(postSolve, PostSolve), \
-////HFUNC(separate, Separate)
-//
-//// Free collision handler delegates for the given type pair
-//static void
-//FilterHandlers(NSMutableArray **handlers, cpCollisionType typeA, cpCollisionType typeB)
-//{
-//	NSMutableArray *newHandlers = [[NSMutableArray alloc] initWithCapacity:[(*handlers) count]];
-//	
-//	for(NSData *data in (*handlers)){
-//		const handlerContext *context = [data bytes];
-//		if(
-//			!(context->typeA == typeA && context->typeB == typeB) &&
-//			!(context->typeA == typeB && context->typeB == typeA)
-//		){
-//			[newHandlers addObject:data];
-//		}
-//	}
-//	
-//	[(*handlers) release];
-//	(*handlers) = newHandlers;
-//}
-//
-//- (void)setDefaultCollisionHandler:(id)delegate
-//	begin:(SEL)begin
-//	preSolve:(SEL)preSolve
-//	postSolve:(SEL)postSolve
-//	separate:(SEL)separate
-//{
-//	cpCollisionType sentinel = (cpCollisionType)@"DEFAULT";
-//	FilterHandlers(&_handlers, sentinel, sentinel);
-//	
-//	handlerContext handler = {
-//		delegate, self, sentinel, sentinel,
-//		begin, (void *)(begin ? [delegate methodForSelector:begin] : NULL),
-//		preSolve, (void *)(preSolve ? [delegate methodForSelector:preSolve] : NULL),
-//		postSolve, (void *)(postSolve ? [delegate methodForSelector:postSolve] : NULL),
-//		separate, (void *)(separate ? [delegate methodForSelector:separate] : NULL),
-//	};
-//	NSData *data = [NSData dataWithBytes:&handler length:sizeof(handler)];
-//	[_handlers addObject:data];
-//	
-//	cpSpaceSetDefaultCollisionHandler(_space,
-//		(begin ? (cpCollisionBeginFunc)Begin : NULL),
-//		(preSolve ? (cpCollisionPreSolveFunc)PreSolve : NULL),
-//		(postSolve ? (cpCollisionPostSolveFunc)PostSolve : NULL),
-//		(separate ? (cpCollisionSeparateFunc)Separate : NULL),
-//		(void *)[data bytes]
-//	);
-//}
-//	
-//- (void)addCollisionHandler:(id)delegate
-//	typeA:(cpCollisionType)a typeB:(cpCollisionType)b
-//	begin:(SEL)begin
-//	preSolve:(SEL)preSolve
-//	postSolve:(SEL)postSolve
-//	separate:(SEL)separate
-//{
-//	[self removeCollisionHandlerForTypeA:a andB:b];
-//	
-//	handlerContext handler = {
-//		delegate, self, a, b,
-//		begin, (void *)(begin ? [delegate methodForSelector:begin] : NULL),
-//		preSolve, (void *)(preSolve ? [delegate methodForSelector:preSolve] : NULL),
-//		postSolve, (void *)(postSolve ? [delegate methodForSelector:postSolve] : NULL),
-//		separate, (void *)(separate ? [delegate methodForSelector:separate] : NULL),
-//	};
-//	NSData *data = [NSData dataWithBytes:&handler length:sizeof(handler)];
-//	
-//	cpSpaceAddCollisionHandler(
-//		_space, a, b,
-//		(begin ? (cpCollisionBeginFunc)Begin : NULL),
-//		(preSolve ? (cpCollisionPreSolveFunc)PreSolve : NULL),
-//		(postSolve ? (cpCollisionPostSolveFunc)PostSolve : NULL),
-//		(separate ? (cpCollisionSeparateFunc)Separate : NULL),
-//		(void *)[data bytes]
-//	);
-//	
-//	[_handlers addObject:data];
-//}
+static bool Begin(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){return objc_msgSend(ctx->delegate, ctx->beginSelector, arb, ctx->space);}
+static bool PreSolve(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){return objc_msgSend(ctx->delegate, ctx->preSolveSelector, arb, ctx->space);}
+static void PostSolve(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){objc_msgSend(ctx->delegate, ctx->postSolveSelector, arb, ctx->space);}
+static void Separate(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){objc_msgSend(ctx->delegate, ctx->separateSelector, arb, ctx->space);}
+
+// TODO handlers are never filtered.
+
+- (void)setDefaultCollisionHandler:(id)delegate
+	begin:(SEL)begin
+	preSolve:(SEL)preSolve
+	postSolve:(SEL)postSolve
+	separate:(SEL)separate
+{
+	cpCollisionType sentinel = (cpCollisionType)@"DEFAULT";
+	
+	HandlerContext context = {self, delegate, sentinel, sentinel, begin, preSolve, postSolve, separate};
+	NSData *data = [NSData dataWithBytes:&context length:sizeof(context)];
+	[_handlers addObject:data];
+	
+	cpCollisionHandler *handler = cpSpaceAddDefaultCollisionHandler(_space);
+	if(begin) handler->beginFunc = (cpCollisionBeginFunc)Begin;
+	if(preSolve) handler->preSolveFunc = (cpCollisionPreSolveFunc)PreSolve;
+	if(postSolve) handler->postSolveFunc = (cpCollisionPostSolveFunc)PostSolve;
+	if(separate) handler->separateFunc = (cpCollisionSeparateFunc)Separate;
+	handler->userData = (void *)[data bytes];
+}
+	
+- (void)addCollisionHandler:(id)delegate
+	typeA:(cpCollisionType)a typeB:(cpCollisionType)b
+	begin:(SEL)begin
+	preSolve:(SEL)preSolve
+	postSolve:(SEL)postSolve
+	separate:(SEL)separate
+{
+	HandlerContext context = {self, delegate, a, b, begin, preSolve, postSolve, separate};
+	NSData *data = [NSData dataWithBytes:&context length:sizeof(context)];
+	[_handlers addObject:data];
+	
+	cpCollisionHandler *handler = cpSpaceAddCollisionHandler(_space, a, b);
+	if(begin) handler->beginFunc = (cpCollisionBeginFunc)Begin;
+	if(preSolve) handler->preSolveFunc = (cpCollisionPreSolveFunc)PreSolve;
+	if(postSolve) handler->postSolveFunc = (cpCollisionPostSolveFunc)PostSolve;
+	if(separate) handler->separateFunc = (cpCollisionSeparateFunc)Separate;
+	handler->userData = (void *)[data bytes];
+}
 
 - (id)add:(NSObject<ChipmunkObject> *)obj
 {

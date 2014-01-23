@@ -301,7 +301,15 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	cpSpaceFree(space);
 }
 
-static cpBool CallBlock(cpArbiter *arb, cpSpace *space, cpBool (^block)(cpArbiter *arb)){return block(arb);}
+-(bool)beginSleepSensorRemoveBug:(cpArbiter *)arb space:(ChipmunkSpace*)space
+{
+	// 'b' is the shape we are using to trigger the callback.
+	CHIPMUNK_ARBITER_GET_SHAPES(arb, a, b);
+	NSLog(@"space: %p, arb: %p, a: %p, b: %p", space.space, arb, a.shape, a.body);
+	[space addPostStepRemoval:b];
+	
+	return FALSE;
+}
 
 static void
 VerifyContactGraph(id self, ChipmunkBody *body1, ChipmunkBody *body2)
@@ -352,17 +360,7 @@ VerifyContactGraph(id self, ChipmunkBody *body1, ChipmunkBody *body2)
 	ChipmunkShape *shape = [space add:[ChipmunkCircleShape circleWithBody:body3 radius:1 offset:cpv(-0.5, 0)]];
 	shape.collisionType = type;
 	
-	// TODO
-//	[space addCollisionHandler:self typeA:nil typeB:type begin:@selector(beginSleepSensorRemoveBug:space:) preSolve:nil postSolve:nil separate:nil];
-	cpCollisionHandler *handler = cpSpaceAddCollisionHandler(space.space, nil, type);
-	handler->beginFunc = (cpCollisionBeginFunc)CallBlock,
-	handler->userData = ^(cpArbiter *arb){
-		// 'b' is the shape we are using to trigger the callback.
-		CHIPMUNK_ARBITER_GET_SHAPES(arb, a, b);
-		[space addPostStepRemoval:b];
-		
-		return FALSE;
-	};
+	[space addCollisionHandler:self typeA:nil typeB:type begin:@selector(beginSleepSensorRemoveBug:space:) preSolve:nil postSolve:nil separate:nil];
 	
 	// Now step again and shape should get removed.
 	[space step:0.01];
@@ -403,7 +401,7 @@ VerifyContactGraph(id self, ChipmunkBody *body1, ChipmunkBody *body2)
 	ChipmunkShape *shape2 = [space add:[ChipmunkCircleShape circleWithBody:body2 radius:1 offset:cpvzero]];
 	shape2.collisionType = awakeType;
 	
-//	[space addCollisionHandler:self typeA:sleepType typeB:awakeType begin:@selector(beginSleepActivateOnImpact:space:) preSolve:nil postSolve:nil separate:nil];
+	[space addCollisionHandler:self typeA:sleepType typeB:awakeType begin:@selector(beginSleepActivateOnImpact:space:) preSolve:nil postSolve:nil separate:nil];
 	[space step:0.01];
 	
 	XCTAssertFalse(body1.isSleeping, @"body1 did not awake.");
