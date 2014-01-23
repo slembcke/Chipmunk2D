@@ -51,7 +51,12 @@ system "xcodebuild -project Chipmunk7.xcodeproj -sdk iphoneos#{IOS_SDK_VERSION} 
 system "xcodebuild -project Chipmunk7.xcodeproj -sdk iphonesimulator#{IOS_SDK_VERSION} -arch i386 -configuration Debug -target ChipmunkStatic-iPhone"
 system "lipo build/Debug-iphonesimulator/libChipmunk-iPhone.a build/Release-iphoneos/libChipmunk-iPhone.a -create -output #{OUTPUT_DIR_NAME}/libChipmunk-iPhone.a"
 
-system "rsync -r --exclude='.*' ../include/chipmunk/ #{OUTPUT_DIR_NAME}"
+system "xcodebuild -project Chipmunk7.xcodeproj -sdk iphoneos#{IOS_SDK_VERSION} -configuration Release -target ObjectiveChipmunk-iPhone"
+system "xcodebuild -project Chipmunk7.xcodeproj -sdk iphonesimulator#{IOS_SDK_VERSION} -arch i386 -configuration Debug -target ObjectiveChipmunk-iPhone"
+system "lipo build/Debug-iphonesimulator/libObjectiveChipmunk-iPhone.a build/Release-iphoneos/libObjectiveChipmunk-iPhone.a -create -output #{OUTPUT_DIR_NAME}/libObjectiveChipmunk-iPhone.a"
+
+system "rsync -r --exclude='.*' ../include/ #{OUTPUT_DIR_NAME}"
+system "rsync -r --exclude='.*' ../objectivec/include/ #{OUTPUT_DIR_NAME}"
 system "open #{OUTPUT_DIR_NAME}"
 
 puts "Copy #{OUTPUT_DIR_NAME} into your project and enjoy."

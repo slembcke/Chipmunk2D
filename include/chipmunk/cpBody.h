@@ -53,14 +53,6 @@ void cpBodyDestroy(cpBody *body);
 /// Destroy and free a cpBody.
 void cpBodyFree(cpBody *body);
 
-/// Check that the properties of a body is sane. (Only in debug mode)
-#ifdef NDEBUG
-	#define	cpAssertSaneBody(body)
-#else
-	void cpBodySanityCheck(const cpBody *body);
-	#define	cpAssertSaneBody(body) cpBodySanityCheck(body)
-#endif
-
 // Defined in cpSpace.c
 /// Wake up a sleeping or idle body.
 void cpBodyActivate(cpBody *body);
