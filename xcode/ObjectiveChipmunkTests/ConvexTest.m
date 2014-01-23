@@ -20,7 +20,7 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "ObjectiveChipmunk.h"
+#import "ObjectiveChipmunk/ObjectiveChipmunk.h"
 
 @interface ConvexTest : XCTestCase {}
 @end
