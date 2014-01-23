@@ -10,6 +10,7 @@ DerivedData
 build
 Chipmunk-Mac
 Chipmunk-iPhone
+generated_docs
 
 *.opensdf
 *.sdf
