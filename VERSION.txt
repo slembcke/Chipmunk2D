@@ -1,3 +1,27 @@
+What's new in 7.0.0:
+* Removed many deprecated functions.
+* Lots of cleanup to the API naming for better consistency.
+* Replaced templated accessor functions with concrete ones. Should be simpler to deal with for FFIs.
+* Added radius parameters to many functions dealing with shapes (moment calculation, initialization, etc).
+* Renamed nearest point queries to simply point queries.
+* Struct definitions have become fully opaque instead of mangling names with the CP_PRIVATE() macro.
+* The convex hull and winding is automatically calculated when creating a poly shape.
+* The cpArbiterTotalImpulseWithFriction() function was renamed to cpArbiterTotalImpulse(). The old useless cpArbiterTotalImpulse() implementation was removed.
+* Contacts now store the colliding point on the surface of both shapes.
+* cpArbiterIsRemoval() to check if a separate callback is called due to a removal and not a true separating collision.
+* Arbiters now only store one normal per pair of colliding shapes.
+* Collision handlers now return a collision handler struct to make it simpler to set up callbacks.
+* Wildcard collision types.
+* cpBBNewForExtents().
+* Added a concrete kinematic body type to replace the confusing "rogue" body concept.
+* Added a 2x3 affine transform type, cpTransform.
+* Added a cpShapesCollide() function to check overlap of arbitrary shapes.
+* Optional automatic mass properties for shapes. Calculates the moment of inertia and center of gravity for you.
+* Optional anchor point for bodies that is separate from the center of gravity.
+* Added a new debug rendering API.
+* Improvements to the collision detection.
+* Open sourcing Objective-Chipmunk.
+
 What's new in 6.2.1:
 * Added Androud support to the CMake files. (Thanks Eric Wing!)
 * Added a MSVC 2012 project file. (Thanks Leonid Usov!)
