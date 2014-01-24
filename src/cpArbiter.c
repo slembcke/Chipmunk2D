@@ -84,7 +84,7 @@ cpVect
 cpArbiterGetPointB(const cpArbiter *arb, int i)
 {
 	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
-	return cpvadd(arb->body_a->p, arb->contacts[i].r2);
+	return cpvadd(arb->body_b->p, arb->contacts[i].r2);
 }
 
 cpFloat
