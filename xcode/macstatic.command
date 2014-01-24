@@ -32,11 +32,16 @@ system "mkdir #{OUTPUT_DIR_NAME}"
 
 system "xcodebuild -project Chipmunk7.xcodeproj -configuration Release -target ChipmunkStatic"
 system "xcodebuild -project Chipmunk7.xcodeproj -configuration Debug -target ChipmunkStatic"
+system "xcodebuild -project Chipmunk7.xcodeproj -configuration Release -target ObjectiveChipmunk"
+system "xcodebuild -project Chipmunk7.xcodeproj -configuration Debug -target ObjectiveChipmunk"
 
 system "cp build/Debug/libChipmunk.a #{OUTPUT_DIR_NAME}/libChipmunk-Debug.a"
 system "cp build/Release/libChipmunk.a #{OUTPUT_DIR_NAME}/libChipmunk.a"
+system "cp build/Debug/libObjectiveChipmunk.a #{OUTPUT_DIR_NAME}/libObjectiveChipmunk-Debug.a"
+system "cp build/Release/libObjectiveChipmunk.a #{OUTPUT_DIR_NAME}/libObjectiveChipmunk.a"
 
-system "rsync -r --exclude='.*' ../include/chipmunk/ #{OUTPUT_DIR_NAME}"
+system "rsync -r --exclude='.*' ../include/ #{OUTPUT_DIR_NAME}"
+system "rsync -r --exclude='.*' ../objectivec/include/ #{OUTPUT_DIR_NAME}"
 system "open #{OUTPUT_DIR_NAME}"
 
 puts "Copy #{OUTPUT_DIR_NAME} into your project and enjoy."

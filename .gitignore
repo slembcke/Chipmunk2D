@@ -6,9 +6,11 @@ doc/index.html
 xcshareddata
 xcuserdata
 project.xcworkspace
-xcode/DerivedData
-
+DerivedData
 build
+Chipmunk-Mac
+Chipmunk-iPhone
+generated_docs
 
 *.opensdf
 *.sdf

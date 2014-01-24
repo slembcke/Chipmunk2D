@@ -20,7 +20,7 @@
  */
 
 #define CP_ALLOW_PRIVATE_ACCESS
-#import "ObjectiveChipmunk.h"
+#import "ObjectiveChipmunk/ObjectiveChipmunk.h"
 
 #import <objc/message.h>
 #import <TargetConditionals.h>
