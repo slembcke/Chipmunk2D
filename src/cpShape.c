@@ -273,8 +273,8 @@ cpShapesCollide(const cpShape *a, const cpShape *b)
 		cpVect p1 = contacts[i].r1;
 		cpVect p2 = contacts[i].r2;
 		
-		set.points[i].point1 = (swapped ? p2 : p1);
-		set.points[i].point2 = (swapped ? p1 : p2);
+		set.points[i].pointA = (swapped ? p2 : p1);
+		set.points[i].pointB = (swapped ? p1 : p2);
 		set.points[i].distance = cpvdot(cpvsub(p2, p1), set.normal);
 	}
 	

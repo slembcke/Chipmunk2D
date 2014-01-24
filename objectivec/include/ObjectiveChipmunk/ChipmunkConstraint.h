@@ -201,20 +201,20 @@
 /**
 	Create an autoreleased groove joint between the two bodies.
 	Make sure you have the bodies in the right place as the joint will snap into shape as soon as you start simulating the space.
-	@param groove_a The start of the line segment on the first body.
-	@param groove_b The end of the line segment on the first body.
+	@param grooveA The start of the line segment on the first body.
+	@param grooveB The end of the line segment on the first body.
 	@param anchorB The anchor point on the second body that is held to the line segment on the first.
 */
-+ (ChipmunkGrooveJoint *)grooveJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b groove_a:(cpVect)groove_a groove_b:(cpVect)groove_b anchorB:(cpVect)anchorB;
++ (ChipmunkGrooveJoint *)grooveJointWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b grooveA:(cpVect)grooveA grooveB:(cpVect)grooveB anchorB:(cpVect)anchorB;
 
 /**
 	Initialize a groove joint between the two bodies.
 	Make sure you have the bodies in the right place as the joint will snap into shape as soon as you start simulating the space.
-	@param groove_a The start of the line segment on the first body.
-	@param groove_b The end of the line segment on the first body.
+	@param grooveA The start of the line segment on the first body.
+	@param grooveB The end of the line segment on the first body.
 	@param anchorB The anchor point on the second body that is held to the line segment on the first.
 */
-- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b groove_a:(cpVect)groove_a groove_b:(cpVect)groove_b anchorB:(cpVect)anchorB;
+- (id)initWithBodyA:(ChipmunkBody *)a bodyB:(ChipmunkBody *)b grooveA:(cpVect)grooveA grooveB:(cpVect)grooveB anchorB:(cpVect)anchorB;
 
 /// The start point of the groove on the first body.
 @property(nonatomic, assign) cpVect grooveA;
