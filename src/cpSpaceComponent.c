@@ -241,6 +241,9 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 		for(int i=0; i<bodies->num; i++){
 			cpBody *body = (cpBody*)bodies->arr[i];
 			
+			// TODO should make a separate array for kinematic bodies.
+			if(cpBodyGetType(body) != CP_BODY_TYPE_DYNAMIC) continue;
+			
 			// Need to deal with infinite mass objects
 			cpFloat keThreshold = (dvsq ? body->m*dvsq : 0.0f);
 			body->sleeping.idleTime = (cpBodyKineticEnergy(body) > keThreshold ? 0.0f : body->sleeping.idleTime + dt);
