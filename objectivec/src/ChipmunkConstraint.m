@@ -286,7 +286,7 @@ both2(cpVect, cpPivotJoint, anchorB, AnchorB)
 
 both2(cpVect, cpGrooveJoint, grooveA, GrooveA)
 both2(cpVect, cpGrooveJoint, grooveB, GrooveB)
-both2(cpVect, cpPivotJoint, anchorB, AnchorB)
+both2(cpVect, cpGrooveJoint, anchorB, AnchorB)
 
 @end
 
