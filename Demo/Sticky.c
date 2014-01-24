@@ -51,8 +51,8 @@ StickyPreSolve(cpArbiter *arb, cpSpace *space, void *data)
 	cpContactPointSet contacts = cpArbiterGetContactPointSet(arb);
 	for(int i=0; i<contacts.count; i++){
 		// Sink the contact points into the surface of each shape.
-		contacts.points[i].point1 = cpvsub(contacts.points[i].point1, cpvmult(contacts.normal, STICK_SENSOR_THICKNESS));
-		contacts.points[i].point2 = cpvadd(contacts.points[i].point2, cpvmult(contacts.normal, STICK_SENSOR_THICKNESS));
+		contacts.points[i].pointA = cpvsub(contacts.points[i].pointA, cpvmult(contacts.normal, STICK_SENSOR_THICKNESS));
+		contacts.points[i].pointB = cpvadd(contacts.points[i].pointB, cpvmult(contacts.normal, STICK_SENSOR_THICKNESS));
 		deepest = cpfmin(deepest, contacts.points[i].distance);// + 2.0f*STICK_SENSOR_THICKNESS);
 	}
 	
@@ -65,8 +65,8 @@ StickyPreSolve(cpArbiter *arb, cpSpace *space, void *data)
 		CP_ARBITER_GET_BODIES(arb, bodyA, bodyB);
 		
 		// Create a joint at the contact point to hold the body in place.
-		cpVect anchorA = cpBodyWorldToLocal(bodyA, contacts.points[0].point1);
-		cpVect anchorB = cpBodyWorldToLocal(bodyB, contacts.points[0].point2);
+		cpVect anchorA = cpBodyWorldToLocal(bodyA, contacts.points[0].pointA);
+		cpVect anchorB = cpBodyWorldToLocal(bodyB, contacts.points[0].pointB);
 		cpConstraint *joint = cpPivotJointNew2(bodyA, bodyB, anchorA, anchorB);
 		
 		// Give it a finite force for the stickyness.

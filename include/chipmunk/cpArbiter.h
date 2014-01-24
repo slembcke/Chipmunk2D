@@ -81,7 +81,7 @@ struct cpContactPointSet {
 	/// The array of contact points.
 	struct {
 		/// The position of the contact on the surface of each shape.
-		cpVect point1, point2;
+		cpVect pointA, pointB;
 		/// Penetration distance of the two shapes. Overlapping means it will be negative.
 		/// This value is calculated as cpvdot(cpvsub(point2, point1), normal) and is ignored by cpArbiterSetContactPointSet().
 		cpFloat distance;
@@ -105,9 +105,9 @@ int cpArbiterGetCount(const cpArbiter *arb);
 /// Get the normal of the collision.
 cpVect cpArbiterGetNormal(const cpArbiter *arb);
 /// Get the position of the @c ith contact point on the surface of the first shape.
-cpVect cpArbiterGetPoint1(const cpArbiter *arb, int i);
+cpVect cpArbiterGetPointA(const cpArbiter *arb, int i);
 /// Get the position of the @c ith contact point on the surface of the second shape.
-cpVect cpArbiterGetPoint2(const cpArbiter *arb, int i);
+cpVect cpArbiterGetPointB(const cpArbiter *arb, int i);
 /// Get the depth of the @c ith contact point.
 cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i);
 

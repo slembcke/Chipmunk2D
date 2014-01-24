@@ -74,14 +74,14 @@ cpArbiterGetNormal(const cpArbiter *arb)
 }
 
 cpVect
-cpArbiterGetPoint1(const cpArbiter *arb, int i)
+cpArbiterGetPointA(const cpArbiter *arb, int i)
 {
 	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
 	return cpvadd(arb->body_a->p, arb->contacts[i].r1);
 }
 
 cpVect
-cpArbiterGetPoint2(const cpArbiter *arb, int i)
+cpArbiterGetPointB(const cpArbiter *arb, int i)
 {
 	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
 	return cpvadd(arb->body_a->p, arb->contacts[i].r2);
@@ -111,8 +111,8 @@ cpArbiterGetContactPointSet(const cpArbiter *arb)
 		cpVect p1 = cpvadd(arb->body_a->p, arb->contacts[i].r1);
 		cpVect p2 = cpvadd(arb->body_b->p, arb->contacts[i].r2);
 		
-		set.points[i].point1 = (swapped ? p2 : p1);
-		set.points[i].point2 = (swapped ? p1 : p2);
+		set.points[i].pointA = (swapped ? p2 : p1);
+		set.points[i].pointB = (swapped ? p1 : p2);
 		set.points[i].distance = cpvdot(cpvsub(p2, p1), n);
 	}
 	
@@ -130,8 +130,8 @@ cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
 	
 	for(int i=0; i<count; i++){
 		// Convert back to CoG relative offsets.
-		cpVect p1 = set->points[i].point1;
-		cpVect p2 = set->points[i].point2;
+		cpVect p1 = set->points[i].pointA;
+		cpVect p2 = set->points[i].pointB;
 		
 		arb->contacts[i].r1 = cpvsub(swapped ? p2 : p1, arb->body_a->p);
 		arb->contacts[i].r2 = cpvsub(swapped ? p1 : p2, arb->body_b->p);
