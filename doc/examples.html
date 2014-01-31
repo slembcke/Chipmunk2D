@@ -38,10 +38,10 @@ GLFloat matrix[<span style="color:#0000ff;">16</span>] = {
 <span style="color:#003369;">postStepRemove</span>(cpSpace *space, cpShape *shape, <strong><span style="color:#881350;">void</span></strong> *unused)
 {
   <span style="color:#003369;">cpSpaceRemoveBody</span>(space, shape-&gt;body);
-  <span style="color:#003369;">cpBodyFree</span>(shape-&gt;body);
-  
   <span style="color:#003369;">cpSpaceRemoveShape</span>(space, shape);
+  
   <span style="color:#003369;">cpShapeFree</span>(shape);
+  <span style="color:#003369;">cpBodyFree</span>(shape-&gt;body);
 }
 
 <strong><span style="color:#881350;">static</span></strong> <strong><span style="color:#881350;">int</span></strong>
