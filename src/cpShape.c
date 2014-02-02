@@ -190,6 +190,7 @@ cpShapeGetCollisionType(const cpShape *shape)
 void
 cpShapeSetCollisionType(cpShape *shape, cpCollisionType collisionType)
 {
+	cpBodyActivate(shape->body);
 	shape->type = collisionType;
 }
 
