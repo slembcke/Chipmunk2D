@@ -181,7 +181,7 @@ __attribute__((__deprecated__));
 
 /// Handy utility method to add a border of collision segments around a box. See ChipmunkShape for more information on the other parameters.
 /// Returns an NSArray of the shapes. Since NSArray implements the ChipmunkObject protocol, you can use the [ChipmunkSpace remove:] method to remove the bounds.
-- (NSArray *)addBounds:(CGRect)bounds thickness:(cpFloat)radius
+- (NSArray *)addBounds:(cpBB)bounds thickness:(cpFloat)radius
 	elasticity:(cpFloat)elasticity friction:(cpFloat)friction
 	filter:(cpShapeFilter)filter collisionType:(id)collisionType;
 

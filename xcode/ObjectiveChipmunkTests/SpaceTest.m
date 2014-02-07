@@ -147,13 +147,13 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	
 	// Segment queries starting from inside a shape
 	segmentInfo = [space segmentQueryFirstFrom:cpvzero to:cpv(1,1) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
-	XCTAssertEqual(segmentInfo.t, 0.0f, @"Starting inside a shape should return t=0.");
+	XCTAssertEqual(segmentInfo.t, (cpFloat)0, @"Starting inside a shape should return t=0.");
 	
 	segmentInfo = [space segmentQueryFirstFrom:cpv(1,1) to:cpvzero radius:0.0 filter:CP_SHAPE_FILTER_ALL];
-	XCTAssertEqual(segmentInfo.t, 0.0f, @"Starting inside a shape should return t=0.");
+	XCTAssertEqual(segmentInfo.t, (cpFloat)0, @"Starting inside a shape should return t=0.");
 	
 	segmentInfo = [space segmentQueryFirstFrom:cpv(-0.6, -0.6) to:cpvzero radius:0.0 filter:CP_SHAPE_FILTER_ALL];
-	XCTAssertEqual(segmentInfo.t, 0.0f, @"Starting inside a shape should return t=0.");
+	XCTAssertEqual(segmentInfo.t, (cpFloat)0, @"Starting inside a shape should return t=0.");
 	XCTAssertEqual(segmentInfo.shape, segment, @"Should have picked the segment shape.");
 	
 	// A segment query that misses should return nil.
@@ -253,7 +253,7 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	ChipmunkSpace *space = [[ChipmunkSpace alloc] init];
 	space.gravity = cpv(0, -100);
 	
-	[space addBounds:CGRectMake(-50, 0, 100, 100) thickness:1 elasticity:1 friction:1 filter:CP_SHAPE_FILTER_ALL collisionType:nil];
+	[space addBounds:cpBBNew(-50, 0, 50, 100) thickness:1 elasticity:1 friction:1 filter:CP_SHAPE_FILTER_ALL collisionType:nil];
 	
 	ChipmunkBody *ball = [space add:[ChipmunkBody bodyWithMass:1 andMoment:cpMomentForCircle(1, 0, 1, cpvzero)]];
 	ball.position = cpv(-10, 10);
@@ -412,7 +412,7 @@ VerifyContactGraph(id self, ChipmunkBody *body1, ChipmunkBody *body2)
 -(void)testAddBounds
 {
 	ChipmunkSpace *space = [[ChipmunkSpace alloc] init];
-	NSArray *objs = [space addBounds:CGRectMake(0, 0, 10, 10) thickness:5 elasticity:0 friction:1 filter:CP_SHAPE_FILTER_ALL collisionType:nil];
+	NSArray *objs = [space addBounds:cpBBNew(0, 0, 10, 10) thickness:5 elasticity:0 friction:1 filter:CP_SHAPE_FILTER_ALL collisionType:nil];
 	XCTAssertTrue([space contains:objs], @"");
 	
 	[space release];

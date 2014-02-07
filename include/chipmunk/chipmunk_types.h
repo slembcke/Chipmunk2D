@@ -30,11 +30,18 @@
    #include "TargetConditionals.h"
 #endif
 
-#if ((TARGET_OS_IPHONE == 1) || (TARGET_OS_MAC == 1)) && (!defined CP_USE_CGTYPES)
-	#define CP_USE_CGTYPES 1
+#if __arm__ || __arm64__
+	// Avoid doubles on ARM (and ARM64) since most CPUs don't seem to be able to handle them efficiently.
+	#define CP_USE_DOUBLES 0
 #endif
 
-#if CP_USE_CGTYPES == 1
+#ifndef CP_USE_CGTYPES
+	// Don't use CG types by default.
+	// It used to be convenient, but is not really recommended anymore.
+	#define CP_USE_CGTYPES 0
+#endif
+
+#if CP_USE_CGTYPES
 	#if TARGET_OS_IPHONE
 		#import <CoreGraphics/CGGeometry.h>
 		#import <CoreGraphics/CGAffineTransform.h>

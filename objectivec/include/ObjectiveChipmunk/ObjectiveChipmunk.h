@@ -21,9 +21,6 @@
 
 #import <Foundation/Foundation.h>
 
-// Override some Chipmunk types for Objective-Chipmunk
-#define CP_USE_CGTYPES 1
-
 #if __has_feature(objc_arc)
 	#define CP_DATA_POINTER_TYPE __unsafe_unretained id
 	#define CP_GROUP_TYPE __unsafe_unretained id

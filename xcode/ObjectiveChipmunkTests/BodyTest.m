@@ -106,6 +106,8 @@
 	XCTAssertEqual(staticBody.type, CP_BODY_TYPE_STATIC, @"");
 	
 	ChipmunkSpace *space = [[ChipmunkSpace alloc] init];
+	space.sleepTimeThreshold = 1.0;
+	
 	ChipmunkBody *body = [ChipmunkBody bodyWithMass:1 andMoment:1];
 	[space add:body];
 	XCTAssertFalse(body.isSleeping, @"");

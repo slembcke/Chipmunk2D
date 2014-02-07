@@ -557,14 +557,14 @@ boundSeg(ChipmunkBody *body, cpVect a, cpVect b, cpFloat radius, cpFloat elastic
 	return seg;
 }
 
-- (NSArray *)addBounds:(CGRect)bounds thickness:(cpFloat)radius
+- (NSArray *)addBounds:(cpBB)bounds thickness:(cpFloat)radius
 	elasticity:(cpFloat)elasticity friction:(cpFloat)friction
 	filter:(cpShapeFilter)filter collisionType:(cpCollisionType)collisionType
 {
-	cpFloat l = bounds.origin.x - radius;
-	cpFloat r = bounds.origin.x + bounds.size.width + radius;
-	cpFloat b = bounds.origin.y - radius;
-	cpFloat t = bounds.origin.y + bounds.size.height + radius;
+	cpFloat l = bounds.l - radius;
+	cpFloat b = bounds.b - radius;
+	cpFloat r = bounds.r + radius;
+	cpFloat t = bounds.t + radius;
 	
 	NSArray *segs = [[NSArrayChipmunkObject alloc] initWithArray:[NSArray arrayWithObjects:
 		boundSeg(_staticBody, cpv(l,b), cpv(l,t), radius, elasticity, friction, filter, collisionType),
