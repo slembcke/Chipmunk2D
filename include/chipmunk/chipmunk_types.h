@@ -30,8 +30,8 @@
    #include "TargetConditionals.h"
 #endif
 
-#if __arm__ || __arm64__
-	// Avoid doubles on ARM (and ARM64) since most CPUs don't seem to be able to handle them efficiently.
+#if TARGET_OS_IPHONE
+	// Avoid doubles on iPhone as the performance is not as good. (even on 64 bit)
 	#define CP_USE_DOUBLES 0
 #endif
 

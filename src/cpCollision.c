@@ -266,6 +266,12 @@ ClosestDist(const cpVect v0,const cpVect v1)
 	return cpvlengthsq(LerpT(v0, v1, ClosestT(v0, v1)));
 }
 
+static inline cpBool
+CheckArea(cpVect v1, cpVect v2)
+{
+	return (v1.x*v2.y) > (v1.y*v2.x);
+}
+
 // Recursive implementation of the EPA loop.
 // Each recursion adds a point to the convex hull until it's known that we have the closest point on the surface.
 static struct ClosestPoints
@@ -301,9 +307,7 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 	ChipmunkDebugDrawDot(5, p.ab, LAColor(1, 1));
 #endif
 	
-	// The signed area of the triangle [v0.ab, v1.ab, p] will be positive if p lies beyond v0.ab, v1.ab.
-	cpFloat area2x = cpvcross(cpvsub(v1.ab, v0.ab), cpvadd(cpvsub(p.ab, v0.ab), cpvsub(p.ab, v1.ab)));
-	if(area2x > 0.0f && iteration < MAX_EPA_ITERATIONS){
+	if(CheckArea(cpvsub(v1.ab, v0.ab), cpvadd(cpvsub(p.ab, v0.ab), cpvsub(p.ab, v1.ab))) && iteration < MAX_EPA_ITERATIONS){
 		// Rebuild the convex hull by inserting p.
 		struct MinkowskiPoint *hull2 = (struct MinkowskiPoint *)alloca((count + 1)*sizeof(struct MinkowskiPoint));
 		int count2 = 1;
@@ -316,8 +320,7 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 			cpVect h1 = hull[index].ab;
 			cpVect h2 = (i + 1 < count ? hull[(index + 1)%count] : p).ab;
 			
-			// TODO: Should this be changed to an area2x check?
-			if(cpvcross(cpvsub(h2, h0), cpvsub(h1, h0)) > 0.0f){
+			if(CheckArea(cpvsub(h2, h0), cpvadd(cpvsub(h1, h0), cpvsub(h1, h2)))){
 				hull2[count2] = hull[index];
 				count2++;
 			}
@@ -354,8 +357,7 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 	}
 	
 	cpVect delta = cpvsub(v1.ab, v0.ab);
-	// TODO: should this be an area2x check?
-	if(cpvcross(delta, cpvadd(v0.ab, v1.ab)) > 0.0f){
+	if(CheckArea(delta, cpvadd(v0.ab, v1.ab))){
 		// Origin is behind axis. Flip and try again.
 		return GJKRecurse(ctx, v1, v0, iteration);
 	} else {
@@ -372,8 +374,8 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 #endif
 		
 		if(
-			cpvcross(cpvsub(v1.ab, p.ab), cpvadd(v1.ab, p.ab)) > 0.0f &&
-			cpvcross(cpvsub(v0.ab, p.ab), cpvadd(v0.ab, p.ab)) < 0.0f
+			CheckArea(cpvsub(v1.ab, p.ab), cpvadd(v1.ab, p.ab)) &&
+			CheckArea(cpvadd(v0.ab, p.ab), cpvsub(v0.ab, p.ab))
 		){
 			// The triangle v0, p, v1 contains the origin. Use EPA to find the MSA.
 			cpAssertWarn(iteration < WARN_GJK_ITERATIONS, "High GJK->EPA iterations: %d", iteration);

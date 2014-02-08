@@ -214,10 +214,17 @@ getter(cpFloat, currentTimeStep, CurrentTimeStep);
 
 - (ChipmunkBody *)staticBody {return _staticBody;}
 
-static bool Begin(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){return objc_msgSend(ctx->delegate, ctx->beginSelector, arb, ctx->space);}
-static bool PreSolve(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){return objc_msgSend(ctx->delegate, ctx->preSolveSelector, arb, ctx->space);}
-static void PostSolve(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){objc_msgSend(ctx->delegate, ctx->postSolveSelector, arb, ctx->space);}
-static void Separate(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){objc_msgSend(ctx->delegate, ctx->separateSelector, arb, ctx->space);}
+typedef BOOL (*BeginProto)(id, SEL, cpArbiter *, ChipmunkSpace *);
+static bool Begin(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){return ((BeginProto)objc_msgSend)(ctx->delegate, ctx->beginSelector, arb, ctx->space);}
+
+typedef BOOL (*PreSolveProto)(id, SEL, cpArbiter *, ChipmunkSpace *);
+static bool PreSolve(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){return ((PreSolveProto)objc_msgSend)(ctx->delegate, ctx->preSolveSelector, arb, ctx->space);}
+
+typedef void (*PostSolveProto)(id, SEL, cpArbiter *, ChipmunkSpace *);
+static void PostSolve(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){((PostSolveProto)objc_msgSend)(ctx->delegate, ctx->postSolveSelector, arb, ctx->space);}
+
+typedef void (*SeparateProto)(id, SEL, cpArbiter *, ChipmunkSpace *);
+static void Separate(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx){((SeparateProto)objc_msgSend)(ctx->delegate, ctx->separateSelector, arb, ctx->space);}
 
 // TODO handlers are never filtered.
 
