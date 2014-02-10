@@ -2,11 +2,8 @@
 #include "chipmunk_unsafe.h"
 #include "ChipmunkDemo.h"
 
-#if 1
-	#define BENCH_SPACE_NEW cpSpaceNew
-	#define BENCH_SPACE_FREE cpSpaceFree
-	#define BENCH_SPACE_STEP cpSpaceStep
-#else
+#define ENABLE_HASTY 0
+#if ENABLE_HASTY
 	#import "cpHastySpace.h"
 	
 	static cpSpace *MakeHastySpace(){
@@ -18,6 +15,10 @@
 	#define BENCH_SPACE_NEW MakeHastySpace
 	#define BENCH_SPACE_FREE cpHastySpaceFree
 	#define BENCH_SPACE_STEP cpHastySpaceStep
+#else
+	#define BENCH_SPACE_NEW cpSpaceNew
+	#define BENCH_SPACE_FREE cpSpaceFree
+	#define BENCH_SPACE_STEP cpSpaceStep
 #endif
 
 const cpFloat bevel = 1.0;
