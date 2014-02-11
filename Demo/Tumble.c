@@ -27,11 +27,6 @@ static cpBody *KinematicBoxBody;
 static void
 update(cpSpace *space, double dt)
 {
-	// Manually update the position of the box body so that the box rotates.
-	// Normally Chipmunk calls this and cpBodyUpdateVelocity() for you,
-	// but we wanted to control the angular velocity explicitly.
-	cpBodyUpdatePosition(KinematicBoxBody, dt);
-	
 	cpSpaceStep(space, dt);
 }
 

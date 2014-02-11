@@ -30,9 +30,6 @@ static void
 update(cpSpace *space, double dt)
 {
 	cpSpaceStep(space, dt);
-	
-	// Update the static body spin so that it looks like it's rotating.
-	cpBodyUpdatePosition(planetBody, dt);
 }
 
 static void
