@@ -82,13 +82,6 @@
 */
 @property(nonatomic, assign) cpTimestamp collisionPersistence;
 
-/**
-	@deprecated 6.0.4
-	Does nothing, and is a no-op. The contact graph is always enabled now.
-*/
-@property(nonatomic, assign) bool enableContactGraph
-__attribute__((__deprecated__));
-
 /// Returns a pointer to the underlying cpSpace C struct
 @property(nonatomic, readonly) cpSpace *space;
 
@@ -102,6 +95,11 @@ __attribute__((__deprecated__));
 	Retrieves the current (if you are in a callback from [ChipmunkSpace step:]) or most recent (outside of a [ChipmunkSpace step:] call) timestep.
 */
 @property(nonatomic, readonly) cpFloat currentTimeStep;
+
+/**
+	Returns true if the space is currently executing a timestep.
+*/
+@property(nonatomic, readonly) BOOL locked;
 
 /**
 	An object that this space is associated with. You can use this get a reference to your game state or controller object from within callbacks.

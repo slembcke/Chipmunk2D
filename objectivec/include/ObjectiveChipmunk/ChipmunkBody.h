@@ -63,6 +63,9 @@
 /// Moment of inertia of the body. The mass tells you how hard it is to push an object, the MoI tells you how hard it is to spin the object. Don't try to guess the MoI, use the cpMomentFor*() functions to try and estimate it.
 @property(nonatomic, assign) cpFloat moment;
 
+/// Location of the body's center of gravity relative to it's position. Defaults to @c cpvzero.
+@property(nonatomic, assign) cpVect centerOfGravity;
+
 /// The position of the rigid body's center of gravity.
 @property(nonatomic, assign) cpVect position;
 
