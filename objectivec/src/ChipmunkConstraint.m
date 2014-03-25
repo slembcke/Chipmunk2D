@@ -69,6 +69,7 @@ setter(type, lower, upper)
 both(cpFloat, maxForce, MaxForce)
 both(cpFloat, errorBias, ErrorBias)
 both(cpFloat, maxBias, MaxBias)
+both(BOOL, collideBodies, CollideBodies)
 
 -(cpFloat)impulse {return cpConstraintGetImpulse(self.constraint);}
 
