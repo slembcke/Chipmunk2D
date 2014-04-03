@@ -624,30 +624,30 @@ int
 main(int argc, const char **argv)
 {
 	ChipmunkDemo demo_list[] = {
-		LogoSmash,
-		PyramidStack,
-		Plink,
-		BouncyHexagons,
-		Tumble,
-		PyramidTopple,
-		Planet,
-		Springies,
-		Pump,
-		TheoJansen,
-		Query,
-		OneWay,
-		Joints,
-		Tank,
-		Chains,
-		Crane,
-		ContactGraph,
-		Buoyancy,
-		Player,
-		Slice,
-		Convex,
-		Unicycle,
-		Sticky,
-		Shatter,
+		LogoSmash,//A
+		PyramidStack,//B
+		Plink,//C
+		BouncyHexagons,//D
+		Tumble,//E
+		PyramidTopple,//F
+		Planet,//G
+		Springies,//H
+		Pump,//I
+		TheoJansen,//J
+		Query,//K
+		OneWay,//L
+		Joints,//M
+		Tank,//N
+		Chains,//O
+		Crane,//P
+		ContactGraph,//Q
+		Buoyancy,//R
+		Player,//S
+		Slice,//T
+		Convex,//U
+		Unicycle,//V
+		Sticky,//W
+		Shatter,//X
 	};
 	
 	demos = demo_list;
