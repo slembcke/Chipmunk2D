@@ -125,12 +125,12 @@ typedef struct cpSpace cpSpace;
 #include "cpTransform.h"
 #include "cpSpatialIndex.h"
 
+#include "cpArbiter.h"
+#include "cpConstraint.h"
+
 #include "cpBody.h"
 #include "cpShape.h"
 #include "cpPolyShape.h"
-
-#include "cpArbiter.h"	
-#include "cpConstraint.h"
 
 #include "cpSpace.h"
 
