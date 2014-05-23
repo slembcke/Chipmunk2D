@@ -251,10 +251,10 @@ ClosestPointsNew(const struct MinkowskiPoint v0, const struct MinkowskiPoint v1)
 		return points;
 	} else {
 		// Vertex/vertex collisions need special treatment since the MSA won't be shared with an axis of the minkowski difference.
-		cpFloat d = cpvlength(p);
-		cpVect n = cpvmult(p, 1.0f/(d + CPFLOAT_MIN));
+		cpFloat d2 = cpvlength(p);
+		cpVect n2 = cpvmult(p, 1.0f/(d2 + CPFLOAT_MIN));
 		
-		struct ClosestPoints points = {pa, pb, n, d, id};
+		struct ClosestPoints points = {pa, pb, n2, d2, id};
 		return points;
 	}
 }
