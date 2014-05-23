@@ -1,112 +1,43 @@
-﻿Build started 5/23/2014 2:45:54 PM.
+﻿Build started 5/23/2014 2:47:06 PM.
      1>Project "C:\bin\src\Chipmunk2D\msvc\vc13\chipmunk\chipmunk.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I..\..\..\include /I..\..\..\include\chipmunk /ZI /nologo /W3 /WX- /Od /Oy- /D _CRT_SECURE_NO_WARNINGS /D WIN32 /D _DEBUG /D _LIB /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Win32\Debug\\" /Fd"Win32\Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\..\src\chipmunk.c ..\..\..\src\cpArbiter.c ..\..\..\src\cpArray.c ..\..\..\src\cpBBTree.c ..\..\..\src\cpBody.c ..\..\..\src\cpCollision.c ..\..\..\src\cpConstraint.c ..\..\..\src\cpDampedRotarySpring.c ..\..\..\src\cpDampedSpring.c ..\..\..\src\cpGearJoint.c ..\..\..\src\cpGrooveJoint.c ..\..\..\src\cpHashSet.c ..\..\..\src\cpPinJoint.c ..\..\..\src\cpPivotJoint.c ..\..\..\src\cpPolyShape.c ..\..\..\src\cpRatchetJoint.c ..\..\..\src\cpRotaryLimitJoint.c ..\..\..\src\cpShape.c ..\..\..\src\cpSimpleMotor.c ..\..\..\src\cpSlideJoint.c ..\..\..\src\cpSpace.c ..\..\..\src\cpSpaceComponent.c ..\..\..\src\cpSpaceDebug.c ..\..\..\src\cpSpaceHash.c ..\..\..\src\cpSpaceQuery.c ..\..\..\src\cpSpaceStep.c ..\..\..\src\cpSpatialIndex.c ..\..\..\src\cpSweep1D.c
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I..\..\..\include /I..\..\..\include\chipmunk /ZI /nologo /W3 /WX- /Od /Oy- /D _CRT_SECURE_NO_WARNINGS /D WIN32 /D _DEBUG /D _LIB /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Win32\Debug\\" /Fd"Win32\Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\..\src\cpSpace.c
          cpSpace.c
      1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
      1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\src\cpspace.c(399): error C2440: 'initializing' : cannot convert from 'void *' to 'cpCollisionHandler *'
-                 Conversion from 'void*' to pointer to non-'void' requires an explicit cast
-     1>c:\bin\src\chipmunk2d\src\cpspace.c(400): error C2440: 'return' : cannot convert from 'void *' to 'cpCollisionHandler *'
-                 Conversion from 'void*' to pointer to non-'void' requires an explicit cast
      1>c:\bin\src\chipmunk2d\src\cpspace.c(408): warning C4307: '*' : integral constant overflow
-     1>c:\bin\src\chipmunk2d\src\cpspace.c(412): error C2440: 'initializing' : cannot convert from 'void *' to 'cpCollisionHandler *'
-                 Conversion from 'void*' to pointer to non-'void' requires an explicit cast
-     1>c:\bin\src\chipmunk2d\src\cpspace.c(413): error C2440: 'return' : cannot convert from 'void *' to 'cpCollisionHandler *'
-                 Conversion from 'void*' to pointer to non-'void' requires an explicit cast
-         Generating Code...
-         Compiling...
-         chipmunk.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         Generating Code...
-         Compiling...
-         cpSweep1D.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpSpatialIndex.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpSpaceStep.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpSpaceQuery.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpSpaceHash.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpSpaceDebug.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpSpaceComponent.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpSlideJoint.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpSimpleMotor.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpShape.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpRotaryLimitJoint.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpRatchetJoint.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpPolyShape.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpPivotJoint.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpPinJoint.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpHashSet.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpGrooveJoint.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpGearJoint.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpDampedSpring.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpDampedRotarySpring.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         Generating Code...
-         Compiling...
-         cpConstraint.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpCollision.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\src\cpcollision.c(66): warning C4056: overflow in floating-point constant arithmetic
-         cpBody.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpBBTree.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpArray.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         cpArbiter.c
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(118): warning C4056: overflow in floating-point constant arithmetic
-     1>c:\bin\src\chipmunk2d\include\chipmunk\cpbb.h(124): warning C4056: overflow in floating-point constant arithmetic
-         Generating Code...
-     1>c:\bin\src\chipmunk2d\src\cpbody.c(156): warning C4756: overflow in constant arithmetic
-     1>c:\bin\src\chipmunk2d\src\cpbody.c(156): warning C4756: overflow in constant arithmetic
-     1>Done Building Project "C:\bin\src\Chipmunk2D\msvc\vc13\chipmunk\chipmunk.vcxproj" (Build target(s)) -- FAILED.
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"Win32\Debug\chipmunk.lib" /NOLOGO Win32\Debug\chipmunk.obj
+         Win32\Debug\cpArbiter.obj
+         Win32\Debug\cpArray.obj
+         Win32\Debug\cpBBTree.obj
+         Win32\Debug\cpBody.obj
+         Win32\Debug\cpCollision.obj
+         Win32\Debug\cpConstraint.obj
+         Win32\Debug\cpDampedRotarySpring.obj
+         Win32\Debug\cpDampedSpring.obj
+         Win32\Debug\cpGearJoint.obj
+         Win32\Debug\cpGrooveJoint.obj
+         Win32\Debug\cpHashSet.obj
+         Win32\Debug\cpPinJoint.obj
+         Win32\Debug\cpPivotJoint.obj
+         Win32\Debug\cpPolyShape.obj
+         Win32\Debug\cpRatchetJoint.obj
+         Win32\Debug\cpRotaryLimitJoint.obj
+         Win32\Debug\cpShape.obj
+         Win32\Debug\cpSimpleMotor.obj
+         Win32\Debug\cpSlideJoint.obj
+         Win32\Debug\cpSpace.obj
+         Win32\Debug\cpSpaceComponent.obj
+         Win32\Debug\cpSpaceDebug.obj
+         Win32\Debug\cpSpaceHash.obj
+         Win32\Debug\cpSpaceQuery.obj
+         Win32\Debug\cpSpaceStep.obj
+         Win32\Debug\cpSpatialIndex.obj
+         Win32\Debug\cpSweep1D.obj
+         chipmunk.vcxproj -> C:\bin\src\Chipmunk2D\msvc\vc13\chipmunk\Win32\Debug\chipmunk.lib
+     1>Done Building Project "C:\bin\src\Chipmunk2D\msvc\vc13\chipmunk\chipmunk.vcxproj" (Build target(s)).
 
-Build FAILED.
+Build succeeded.
 
-Time Elapsed 00:00:02.59
+Time Elapsed 00:00:00.71
