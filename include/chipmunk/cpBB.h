@@ -164,6 +164,18 @@ cpBBWrapVect(const cpBB bb, const cpVect v)
 	return cpv(x + bb.l, y + bb.b);
 }
 
+/// Returns a bounding box offseted by @c v.
+static inline cpBB
+cpBBOffset(const cpBB bb, const cpVect v)
+{
+	return cpBBNew(
+		bb.l + v.x,
+		bb.b + v.y,
+		bb.r + v.x,
+		bb.t + v.y
+	);
+}
+
 ///@}
 
 #endif
