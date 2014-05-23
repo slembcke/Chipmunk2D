@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#ifdef __WIN32__
+#ifdef WIN32
 	// For alloca().
 	#include <malloc.h>
 #else
@@ -125,12 +125,13 @@ typedef struct cpSpace cpSpace;
 #include "cpTransform.h"
 #include "cpSpatialIndex.h"
 
-#include "cpArbiter.h"
-#include "cpConstraint.h"
+#include "cpArbiter.h"	
 
 #include "cpBody.h"
 #include "cpShape.h"
 #include "cpPolyShape.h"
+
+#include "cpConstraint.h"
 
 #include "cpSpace.h"
 

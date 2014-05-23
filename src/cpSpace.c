@@ -396,8 +396,8 @@ cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a
 	cpCollisionHandler temp = {a, b, DefaultBegin, DefaultPreSolve, DefaultPostSolve, DefaultSeparate, NULL};
 	
 	cpHashSet *handlers = space->collisionHandlers;
-	cpCollisionHandler *handler = cpHashSetFind(handlers, hash, &temp);
-	return (handler ? handler : cpHashSetInsert(handlers, hash, &temp, (cpHashSetTransFunc)handlerSetTrans, NULL));
+	cpCollisionHandler *handler = (cpCollisionHandler*)cpHashSetFind(handlers, hash, &temp);
+	return (handler ? handler : (cpCollisionHandler*)cpHashSetInsert(handlers, hash, &temp, (cpHashSetTransFunc)handlerSetTrans, NULL));
 }
 
 cpCollisionHandler *
@@ -409,8 +409,8 @@ cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type)
 	cpCollisionHandler temp = {type, CP_WILDCARD_COLLISION_TYPE, AlwaysCollide, AlwaysCollide, DoNothing, DoNothing, NULL};
 	
 	cpHashSet *handlers = space->collisionHandlers;
-	cpCollisionHandler *handler = cpHashSetFind(handlers, hash, &temp);
-	return (handler ? handler : cpHashSetInsert(handlers, hash, &temp, (cpHashSetTransFunc)handlerSetTrans, NULL));
+	cpCollisionHandler *handler = (cpCollisionHandler*)cpHashSetFind(handlers, hash, &temp);
+	return (handler ? handler : (cpCollisionHandler*)cpHashSetInsert(handlers, hash, &temp, (cpHashSetTransFunc)handlerSetTrans, NULL));
 }
 
 

@@ -27,7 +27,7 @@ static void
 cpSpaceDebugDrawShape(cpShape *shape, cpSpaceDebugDrawOptions *options)
 {
 	cpBody *body = shape->body;
-	cpDataPointer *data = options->data;
+	cpDataPointer data = options->data;
 	
 	cpSpaceDebugColor outline_color = options->shapeOutlineColor;
 	cpSpaceDebugColor fill_color = options->colorForShape(shape, data);
@@ -80,7 +80,7 @@ static const int spring_count = sizeof(spring_verts)/sizeof(cpVect);
 static void
 cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *options)
 {
-	cpDataPointer *data = options->data;
+	cpDataPointer data = options->data;
 	cpSpaceDebugColor color = options->constraintColor;
 	
 	cpBody *body_a = constraint->a;
@@ -123,7 +123,7 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 		options->drawSegment(a, b, color, data);
 	} else if(cpConstraintIsDampedSpring(constraint)){
 		cpDampedSpring *spring = (cpDampedSpring *)constraint;
-		cpDataPointer *data = options->data;
+		cpDataPointer data = options->data;
 		cpSpaceDebugColor color = options->constraintColor;
 		
 		cpVect a = cpTransformPoint(body_a->transform, spring->anchorA);
@@ -167,7 +167,7 @@ cpSpaceDebugDraw(cpSpace *space, cpSpaceDebugDrawOptions *options)
 		cpArray *arbiters = space->arbiters;
 		cpSpaceDebugColor color = options->collisionPointColor;
 		cpSpaceDebugDrawSegmentImpl draw_seg = options->drawSegment;
-		cpDataPointer *data = options->data;
+		cpDataPointer data = options->data;
 		
 		for(int i=0; i<arbiters->num; i++){
 			cpArbiter *arb = (cpArbiter*)arbiters->arr[i];

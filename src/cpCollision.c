@@ -21,7 +21,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <alloca.h>
 
 #include "chipmunk/chipmunk_private.h"
 
