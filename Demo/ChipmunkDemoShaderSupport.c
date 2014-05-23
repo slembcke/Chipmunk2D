@@ -41,9 +41,6 @@ CheckGLErrors(void)
 	}
 }
 
-//typedef GLAPIENTRY void (*GETIV)(GLuint shader, GLenum pname, GLint *params);
-//typedef GLAPIENTRY void (*GETINFOLOG)(GLuint shader, GLsizei maxLength, GLsizei *length, GLchar *infoLog);
-
 static cpBool
 CheckError(GLint obj, GLenum status, PFNGLGETSHADERIVPROC getiv, PFNGLGETSHADERINFOLOGPROC getInfoLog)
 {
