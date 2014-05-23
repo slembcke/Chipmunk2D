@@ -149,7 +149,7 @@ static GLsizei triangle_capacity = 0;
 static GLsizei triangle_count = 0;
 static Triangle *triangle_buffer = NULL;
 
-static Triangle *PushTriangles(size_t count)
+static Triangle *PushTriangles(GLsizei count)
 {
 	if(triangle_count + count > triangle_capacity){
 		triangle_capacity += MAX(triangle_capacity, count);

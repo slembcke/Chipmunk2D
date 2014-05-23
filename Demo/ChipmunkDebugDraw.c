@@ -148,7 +148,7 @@ static GLsizei triangle_capacity = 0;
 static GLsizei triangle_count = 0;
 static Triangle *triangle_buffer = NULL;
 
-static Triangle *PushTriangles(size_t count)
+static Triangle *PushTriangles(GLsizei count)
 {
 	if(triangle_count + count > triangle_capacity){
 		triangle_capacity += MAX(triangle_capacity, count);
@@ -166,10 +166,10 @@ void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceD
 	Triangle *triangles = PushTriangles(2);
 	
 	cpFloat r = radius + 1.0f/ChipmunkDebugDrawPointLineScale;
-	Vertex a = {{pos.x - r, pos.y - r}, {-1.0, -1.0}, fillColor, outlineColor};
-	Vertex b = {{pos.x - r, pos.y + r}, {-1.0,  1.0}, fillColor, outlineColor};
-	Vertex c = {{pos.x + r, pos.y + r}, { 1.0,  1.0}, fillColor, outlineColor};
-	Vertex d = {{pos.x + r, pos.y - r}, { 1.0, -1.0}, fillColor, outlineColor};
+	Vertex a = {{(GLfloat)(pos.x - r), (GLfloat)(pos.y - r)}, {-1.0f, -1.0f}, fillColor, outlineColor};
+	Vertex b = {{(GLfloat)(pos.x - r), (GLfloat)(pos.y + r)}, {-1.0f,  1.0f}, fillColor, outlineColor};
+	Vertex c = {{(GLfloat)(pos.x + r), (GLfloat)(pos.y + r)}, { 1.0f,  1.0f}, fillColor, outlineColor};
+	Vertex d = {{(GLfloat)(pos.x + r), (GLfloat)(pos.y - r)}, { 1.0f, -1.0f}, fillColor, outlineColor};
 	
 	Triangle t0 = {a, b, c}; triangles[0] = t0;
 	Triangle t1 = {a, c, d}; triangles[1] = t1;
