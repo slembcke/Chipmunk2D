@@ -98,7 +98,7 @@ ValidateProgram(GLint program)
 }
 
 void
-SetAttribute(GLuint program, char *name, GLint size, GLenum gltype, GLsizei stride, GLvoid *offset)
+SetAttribute(GLuint program, char const *name, GLint size, GLenum gltype, GLsizei stride, GLvoid *offset)
 {
 	GLint index = glGetAttribLocation(program, name);
 	glEnableVertexAttribArray(index);

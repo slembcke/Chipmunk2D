@@ -197,7 +197,7 @@ PushChar(int character, GLfloat x, GLfloat y, cpSpaceDebugColor color)
 #undef ChipmunkDemoTextDrawString
 
 void
-ChipmunkDemoTextDrawString(cpVect pos, char *str)
+ChipmunkDemoTextDrawString(cpVect pos, char const *str)
 {
 	cpSpaceDebugColor c = LAColor(1.0f, 1.0f);
 	GLfloat x = (GLfloat)pos.x, y = (GLfloat)pos.y;

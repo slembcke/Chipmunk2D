@@ -35,8 +35,6 @@
 #define PRINT_LOG 0
 #endif
 
-#define ENABLE_CACHING 1
-
 #define MAX_GJK_ITERATIONS 30
 #define MAX_EPA_ITERATIONS 30
 #define WARN_GJK_ITERATIONS 20
@@ -462,7 +460,7 @@ GJK(const struct SupportContext *ctx, cpCollisionID *id)
 #endif
 	
 	struct MinkowskiPoint v0, v1;
-	if(*id && ENABLE_CACHING){
+	if(*id){
 		// Use the minkowski points from the last frame as a starting point using the cached indexes.
 		v0 = MinkowskiPointNew(ShapePoint(ctx->shape1, (*id>>24)&0xFF), ShapePoint(ctx->shape2, (*id>>16)&0xFF));
 		v1 = MinkowskiPointNew(ShapePoint(ctx->shape1, (*id>> 8)&0xFF), ShapePoint(ctx->shape2, (*id    )&0xFF));

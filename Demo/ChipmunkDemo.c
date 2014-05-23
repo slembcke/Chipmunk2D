@@ -65,7 +65,7 @@ cpVect ChipmunkDemoKeyboard = {};
 static cpBody *mouse_body = NULL;
 static cpConstraint *mouse_joint = NULL;
 
-char *ChipmunkDemoMessageString = NULL;
+char const *ChipmunkDemoMessageString = NULL;
 
 #define GRABBABLE_MASK_BIT (1<<31)
 cpShapeFilter GRAB_FILTER = {CP_NO_GROUP, GRABBABLE_MASK_BIT, GRABBABLE_MASK_BIT};
@@ -113,27 +113,27 @@ ChipmunkDemoFreeSpaceChildren(cpSpace *space)
 }
 
 static void
-DrawCircle(cpVect p, cpFloat a, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer *data)
+DrawCircle(cpVect p, cpFloat a, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
 {ChipmunkDebugDrawCircle(p, a, r, outline, fill);}
 
 static void
-DrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color, cpDataPointer *data)
+DrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color, cpDataPointer data)
 {ChipmunkDebugDrawSegment(a, b, color);}
 
 static void
-DrawFatSegment(cpVect a, cpVect b, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer *data)
+DrawFatSegment(cpVect a, cpVect b, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
 {ChipmunkDebugDrawFatSegment(a, b, r, outline, fill);}
 
 static void
-DrawPolygon(int count, const cpVect *verts, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer *data)
+DrawPolygon(int count, const cpVect *verts, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
 {ChipmunkDebugDrawPolygon(count, verts, r, outline, fill);}
 
 static void
-DrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor color, cpDataPointer *data)
+DrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor color, cpDataPointer data)
 {ChipmunkDebugDrawDot(size, pos, color);}
 
 static cpSpaceDebugColor
-ColorForShape(cpShape *shape, cpDataPointer *data)
+ColorForShape(cpShape *shape, cpDataPointer data)
 {
 	if(cpShapeGetSensor(shape)){
 		return LAColor(1.0f, 0.1f);
@@ -190,7 +190,7 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 		DrawPolygon,
 		DrawDot,
 		
-		CP_SPACE_DEBUG_DRAW_SHAPES | CP_SPACE_DEBUG_DRAW_CONSTRAINTS | CP_SPACE_DEBUG_DRAW_COLLISION_POINTS,
+		(cpSpaceDebugDrawFlags)(CP_SPACE_DEBUG_DRAW_SHAPES | CP_SPACE_DEBUG_DRAW_CONSTRAINTS | CP_SPACE_DEBUG_DRAW_COLLISION_POINTS),
 		
 		{200.0f/255.0f, 210.0f/255.0f, 230.0f/255.0f, 1.0f},
 		ColorForShape,
@@ -263,7 +263,7 @@ static char PrintStringBuffer[1024*8];
 static char *PrintStringCursor;
 
 void
-ChipmunkDemoPrintString(char *fmt, ...)
+ChipmunkDemoPrintString(char const *fmt, ...)
 {
 	ChipmunkDemoMessageString = PrintStringBuffer;
 	
