@@ -165,8 +165,8 @@ static inline cpFloat cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 }
 
 /// Hash value type.
-#ifdef CP_HASHVALUE_TYPE
-	typedef CP_HASHVALUE_TYPE cpHashValue;
+#ifdef CP_HASH_VALUE_TYPE
+	typedef CP_HASH_VALUE_TYPE cpHashValue;
 #else
 	typedef uintptr_t cpHashValue;
 #endif
