@@ -1,26 +1,32 @@
 What's new in 7.0.0:
-* Removed many deprecated functions.
-* Lots of cleanup to the API naming for better consistency.
-* Replaced templated accessor functions with concrete ones. Should be simpler to deal with for FFIs.
-* Added radius parameters to many functions dealing with shapes (moment calculation, initialization, etc).
-* Renamed nearest point queries to simply point queries.
-* Struct definitions have become fully opaque instead of mangling names with the CP_PRIVATE() macro.
-* The convex hull and winding is automatically calculated when creating a poly shape.
-* The cpArbiterTotalImpulseWithFriction() function was renamed to cpArbiterTotalImpulse(). The old useless cpArbiterTotalImpulse() implementation was removed.
-* Contacts now store the colliding point on the surface of both shapes.
-* cpArbiterIsRemoval() to check if a separate callback is called due to a removal and not a true separating collision.
-* Arbiters now only store one normal per pair of colliding shapes.
-* Collision handlers now return a collision handler struct to make it simpler to set up callbacks.
-* Wildcard collision types.
-* cpBBNewForExtents().
-* Added a concrete kinematic body type to replace the confusing "rogue" body concept.
-* Added a 2x3 affine transform type, cpTransform.
-* Added a cpShapesCollide() function to check overlap of arbitrary shapes.
-* Optional automatic mass properties for shapes. Calculates the moment of inertia and center of gravity for you.
-* Optional anchor point for bodies that is separate from the center of gravity.
-* Added a new debug rendering API.
-* Improvements to the collision detection.
-* Open sourcing Objective-Chipmunk.
+* API: Lots of cleanup to the API naming for better consistency.
+* API: Renamed nearest point queries to simply point queries.
+* API: Removed many deprecated functions.
+* API: Struct definitions have become fully opaque instead of mangling names with the CP_PRIVATE() macro.
+* API: Replaced templated accessor functions with concrete ones. Should be simpler to deal with for FFIs.
+* API: Optional automatic mass properties for shapes. Calculates the moment of inertia and center of gravity for you.
+* API: Optional anchor point for bodies that is separate from the center of gravity.
+* API: Added radius parameters to many functions dealing with shapes (moment calculation, initialization, etc).
+* API: The convex hull and winding is automatically calculated when creating a poly shape.
+* API: Added a cpShapesCollide() function to check overlap of arbitrary shapes.
+* API: cpShape filter property to replace layers and groups.
+* API: Collision handlers now return a collision handler struct to make it simpler to set up callbacks.
+* API: Wildcard collision types.
+* API: The cpArbiterTotalImpulseWithFriction() function was renamed to cpArbiterTotalImpulse(). The old useless cpArbiterTotalImpulse() implementation was removed.
+* API: Contacts now store the colliding point on the surface of both shapes.
+* API: cpArbiterIsRemoval() to check if a separate callback is called due to a removal and not a true separating collision.
+* API: Arbiters now only store one normal per pair of colliding shapes.
+* API: cpBBNewForExtents().
+* API: Added a concrete kinematic body type to replace the confusing "rogue" body concept.
+* API: Added a 2x3 affine transform type, cpTransform.
+* API: Added a new debug rendering API.
+* MISC: Numerous improvements to the collision detection.
+* MISC: Objective-Chipmunk released as open source.
+* PRO: cpPolyline structs are passed by reference instead of value. (I've regretted that for years.)
+
+What's new in 6.2.2:
+* Fixed some issues on arm64.
+* PRO: Added a 64 bit NEON solver to use on arm64.
 
 What's new in 6.2.1:
 * Added Androud support to the CMake files. (Thanks Eric Wing!)
