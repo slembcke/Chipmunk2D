@@ -18,13 +18,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+#ifndef CHIPMUNK_PRIVATE_H
+#define CHIPMUNK_PRIVATE_H
 #ifdef CHIPMUNK_H
 #error Cannot include chipmunk_private.h after chipmunk.h.
 #endif
-
-#ifndef CHIPMUNK_PRIVATE_H
-#define CHIPMUNK_PRIVATE_H
 
 #define CP_ALLOW_PRIVATE_ACCESS 1
 #include "chipmunk.h"
