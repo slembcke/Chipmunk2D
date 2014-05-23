@@ -1,0 +1,8 @@
+﻿Build started 5/23/2014 2:00:41 PM.
+     1>Project "C:\bin\src\Chipmunk2D\msvc\vc12\chipmunk\chipmunk.vcxproj" on node 2 (Build target(s)).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.Cpp.Platform.targets(64,5): error MSB8020: The build tools for Visual Studio 2012 (Platform Toolset = 'v110') cannot be found. To build using the v110 build tools, please install Visual Studio 2012 build tools.  Alternatively, you may upgrade to the current Visual Studio tools by selecting the Project menu or right-click the solution, and then selecting "Upgrade Solution...".
+     1>Done Building Project "C:\bin\src\Chipmunk2D\msvc\vc12\chipmunk\chipmunk.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:00.02
