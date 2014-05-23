@@ -222,7 +222,7 @@ void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cp
 	struct ExtrudeVerts {cpVect offset, n;};
 	size_t bytes = sizeof(struct ExtrudeVerts)*count;
 	struct ExtrudeVerts *extrude = (struct ExtrudeVerts *)alloca(bytes);
-	memset(extrude, 0, sizeof(bytes));
+	memset(extrude, 0, bytes);
 	
 	for(int i=0; i<count; i++){
 		cpVect v0 = verts[(i-1+count)%count];
