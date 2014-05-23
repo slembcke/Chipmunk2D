@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#ifdef __WIN32__
+#ifdef WIN32
 	// For alloca().
 	#include <malloc.h>
 #else
