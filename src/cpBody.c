@@ -45,6 +45,14 @@ cpBodyInit(cpBody *body, cpFloat mass, cpFloat moment)
 	body->sleeping.next = NULL;
 	body->sleeping.idleTime = 0.0f;
 	
+	body->m = 0.0f;
+	body->m_inv = 0.0f;
+
+	body->i = 0.0f;
+	body->i_inv = 0.0f;
+
+	body->cog = cpvzero;
+
 	body->p = cpvzero;
 	body->v = cpvzero;
 	body->f = cpvzero;
