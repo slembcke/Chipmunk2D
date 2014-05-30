@@ -25,6 +25,7 @@ EXPORTS
 	cpBodyActivate
 	cpBodyActivateStatic
 	cpBodyAlloc
+	cpBodyApplyImpulse
 	cpBodyDestroy
 	cpBodyEachArbiter
 	cpBodyFree
@@ -169,3 +170,57 @@ EXPORTS
 	cpvslerp
 	cpvslerpconst
 	cpvstr
+
+	cpBodyResetForces
+	cpBodyApplyForce
+	cpBodyGetVelAtLocalPoint
+	cpBodyEachShape
+	cpBodyEachConstraint
+	cpCircleShapeGetOffset
+	cpCircleShapeGetRadius
+	cpSegmentShapeGetA
+	cpSegmentShapeGetB
+	cpSegmentShapeGetNormal
+	cpSegmentShapeGetRadius
+	cpArbiterGetSurfaceVelocity
+	cpArbiterSetSurfaceVelocity
+	cpArbiterSetContactPointSet
+	cpConstraintDestroy
+	cpPinJointAlloc
+	cpPinJointInit
+	cpSlideJointAlloc
+	cpSlideJointInit
+	cpPivotJointAlloc
+	cpPivotJointInit
+	cpGrooveJointAlloc
+	cpGrooveJointInit
+	cpGrooveJointSetGrooveA
+	cpGrooveJointSetGrooveB
+	cpDampedSpringAlloc
+	cpDampedSpringInit
+	cpDampedRotarySpringGetClass
+	cpDampedRotarySpringAlloc
+	cpDampedRotarySpringInit
+	cpRotaryLimitJointGetClass
+	cpRotaryLimitJointAlloc
+	cpRotaryLimitJointInit
+	cpRatchetJointGetClass
+	cpRatchetJointAlloc
+	cpRatchetJointInit
+	cpGearJointGetClass
+	cpGearJointAlloc
+	cpGearJointInit
+	cpGearJointSetRatio
+	cpSimpleMotorAlloc
+	cpSimpleMotorInit
+	cpSpaceConvertBodyToStatic
+	cpSpaceConvertBodyToDynamic
+	cpInitChipmunk
+	cpEnableSegmentToSegmentCollisions
+	cpAreaForCircle
+	cpAreaForSegment
+	cpRecenterPoly
+	cpVersionString
+
+
+

@@ -5,6 +5,11 @@
    #include "TargetConditionals.h"
 #endif
 
+/* For piece of junk Visual Studio */
+#if defined(_MSC_VER)
+	#define inline __inline
+#endif
+
 #if ((TARGET_OS_IPHONE == 1) || (TARGET_OS_MAC == 1)) && (!defined CP_USE_CGPOINTS)
 	#define CP_USE_CGPOINTS 1
 #endif
