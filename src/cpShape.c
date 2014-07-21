@@ -20,7 +20,7 @@
  */
 
 #include "chipmunk/chipmunk_private.h"
-#include "chipmunk_unsafe.h"
+#include "chipmunk/chipmunk_unsafe.h"
 
 #define CP_DefineShapeGetter(struct, type, member, name) \
 CP_DeclareShapeGetter(struct, type, name){ \
