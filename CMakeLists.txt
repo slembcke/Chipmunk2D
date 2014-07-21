@@ -29,6 +29,7 @@ else()
   option(INSTALL_DEMOS "Install the demo applications" OFF)
   option(BUILD_SHARED "Build and install the shared library" ON)
   option(BUILD_STATIC "Build as static library" ON)
+  option(FUNCTION_POINTERS "Generate function pointers for backwards FFI compatibility" ON)
   option(INSTALL_STATIC "Install the static library" ON)
 endif()
 

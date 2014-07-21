@@ -121,31 +121,31 @@
 
 
 /// Return the max of two cpFloats.
-static inline cpFloat cpfmax(cpFloat a, cpFloat b)
+inline cpFloat cpfmax(cpFloat a, cpFloat b)
 {
 	return (a > b) ? a : b;
 }
 
 /// Return the min of two cpFloats.
-static inline cpFloat cpfmin(cpFloat a, cpFloat b)
+inline cpFloat cpfmin(cpFloat a, cpFloat b)
 {
 	return (a < b) ? a : b;
 }
 
 /// Return the absolute value of a cpFloat.
-static inline cpFloat cpfabs(cpFloat f)
+inline cpFloat cpfabs(cpFloat f)
 {
 	return (f < 0) ? -f : f;
 }
 
 /// Clamp @c f to be between @c min and @c max.
-static inline cpFloat cpfclamp(cpFloat f, cpFloat min, cpFloat max)
+inline cpFloat cpfclamp(cpFloat f, cpFloat min, cpFloat max)
 {
 	return cpfmin(cpfmax(f, min), max);
 }
 
 /// Clamp @c f to be between 0 and 1.
-static inline cpFloat cpfclamp01(cpFloat f)
+inline cpFloat cpfclamp01(cpFloat f)
 {
 	return cpfmax(0.0f, cpfmin(f, 1.0f));
 }
@@ -153,13 +153,13 @@ static inline cpFloat cpfclamp01(cpFloat f)
 
 
 /// Linearly interpolate (or extrapolate) between @c f1 and @c f2 by @c t percent.
-static inline cpFloat cpflerp(cpFloat f1, cpFloat f2, cpFloat t)
+inline cpFloat cpflerp(cpFloat f1, cpFloat f2, cpFloat t)
 {
 	return f1*(1.0f - t) + f2*t;
 }
 
 /// Linearly interpolate from @c f1 to @c f2 by no more than @c d.
-static inline cpFloat cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
+inline cpFloat cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 {
 	return f1 + cpfclamp(f2 - f1, -d, d);
 }
