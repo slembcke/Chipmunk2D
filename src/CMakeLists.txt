@@ -18,10 +18,10 @@ if(BUILD_SHARED)
   if(NOT ANDROID)
 	  set_target_properties(chipmunk PROPERTIES VERSION 6.2.1)
   endif(NOT ANDROID)
-  if(ANDROID)
+  if(ANDROID OR UNIX)
 	  # need to explicitly link to the math library because the CMake/Android toolchains may not do it automatically
 	  target_link_libraries(chipmunk m)
-  endif(ANDROID)
+  endif(ANDROID OR UNIX)
   install(TARGETS chipmunk RUNTIME DESTINATION lib LIBRARY DESTINATION lib)
 endif(BUILD_SHARED)
 
