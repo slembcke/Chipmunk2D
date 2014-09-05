@@ -23,7 +23,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "chipmunk/chipmunk_private.h"
+#include "chipmunk_private.h"
 
 void
 cpMessage(const char *condition, const char *file, int line, int isError, int isHardError, const char *message, ...)
