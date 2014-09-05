@@ -15,6 +15,12 @@ if(NOT CMAKE_BUILD_TYPE)
       FORCE)
 endif()
 
+# to manually select install locations of libraries and executables
+#   -D LIB_INSTALL_DIR mylib
+#   -D BIN_INSTALL_DIR newbin
+set(LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries")
+set(BIN_INSTALL_DIR bin CACHE STRING "Install location of executables")
+
 # other options for the build, you can i.e. activate the shared library by passing
 #   -D BUILD_SHARED=ON
 # to cmake. Other options analog
