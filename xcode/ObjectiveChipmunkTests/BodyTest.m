@@ -53,6 +53,7 @@
 @implementation BodyTest
 
 #define TestAccessors(o, p, v) o.p = v; XCTAssertEqual(o.p, v, @"");
+#define TestAccessorsV(o, p, v) o.p = v; XCTAssertTrue(cpveql(o.p, v), @"");
 
 -(void)testProperties {
 	ChipmunkBody *body = [ChipmunkBody bodyWithMass:123 andMoment:123];
@@ -65,9 +66,9 @@
 	TestAccessors(body, userData, @"object");
 	TestAccessors(body, mass, (cpFloat)5);
 	TestAccessors(body, moment, (cpFloat)5);
-	TestAccessors(body, position, cpv(5,6));
-	TestAccessors(body, velocity, cpv(5,6));
-	TestAccessors(body, force, cpv(5,6));
+	TestAccessorsV(body, position, cpv(5,6));
+	TestAccessorsV(body, velocity, cpv(5,6));
+	TestAccessorsV(body, force, cpv(5,6));
 	TestAccessors(body, angle, (cpFloat)5);
 	TestAccessors(body, angularVelocity, (cpFloat)5);
 	TestAccessors(body, torque, (cpFloat)5);
@@ -91,7 +92,7 @@
 	
 	body.force = cpvzero;
 	body.torque = 0.0f;
-	XCTAssertEqual(body.force, cpvzero, @"");
+	XCTAssertTrue(cpveql(body.force, cpvzero), @"");
 	XCTAssertEqual(body.torque, (cpFloat)0, @"");
 	
 	[body applyImpulse:cpv(0,1) atWorldPoint:cpv(1,0)];
