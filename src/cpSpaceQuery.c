@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-#include "chipmunk/chipmunk_private.h"
+#include "chipmunk_private.h"
 
 //MARK: Nearest Point Query Functions
 
