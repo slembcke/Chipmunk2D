@@ -33,7 +33,7 @@ static const cpTransform cpTransformIdentity = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.
 /// (a, b) is the x basis vector.
 /// (c, d) is the y basis vector.
 /// (tx, ty) is the translation.
-static inline cpTransform
+inline cpTransform
 cpTransformNew(cpFloat a, cpFloat b, cpFloat c, cpFloat d, cpFloat tx, cpFloat ty)
 {
 	cpTransform t = {a, b, c, d, tx, ty};
@@ -41,7 +41,7 @@ cpTransformNew(cpFloat a, cpFloat b, cpFloat c, cpFloat d, cpFloat tx, cpFloat t
 }
 
 /// Construct a new transform matrix in transposed order.
-static inline cpTransform
+inline cpTransform
 cpTransformNewTranspose(cpFloat a, cpFloat c, cpFloat tx, cpFloat b, cpFloat d, cpFloat ty)
 {
 	cpTransform t = {a, b, c, d, tx, ty};
@@ -49,7 +49,7 @@ cpTransformNewTranspose(cpFloat a, cpFloat c, cpFloat tx, cpFloat b, cpFloat d, 
 }
 
 /// Get the inverse of a transform matrix.
-static inline cpTransform
+inline cpTransform
 cpTransformInverse(cpTransform t)
 {
   cpFloat inv_det = 1.0/(t.a*t.d - t.c*t.b);
@@ -60,7 +60,7 @@ cpTransformInverse(cpTransform t)
 }
 
 /// Multiply two transformation matrices.
-static inline cpTransform
+inline cpTransform
 cpTransformMult(cpTransform t1, cpTransform t2)
 {
   return cpTransformNewTranspose(
@@ -70,21 +70,21 @@ cpTransformMult(cpTransform t1, cpTransform t2)
 }
 
 /// Transform an absolute point. (i.e. a vertex)
-static inline cpVect
+inline cpVect
 cpTransformPoint(cpTransform t, cpVect p)
 {
   return cpv(t.a*p.x + t.c*p.y + t.tx, t.b*p.x + t.d*p.y + t.ty);
 }
 
 /// Transform a vector (i.e. a normal)
-static inline cpVect
+inline cpVect
 cpTransformVect(cpTransform t, cpVect v)
 {
   return cpv(t.a*v.x + t.c*v.y, t.b*v.x + t.d*v.y);
 }
 
 /// Transform a cpBB.
-static inline cpBB
+inline cpBB
 cpTransformbBB(cpTransform t, cpBB bb)
 {
 	cpVect center = cpBBCenter(bb);
@@ -98,7 +98,7 @@ cpTransformbBB(cpTransform t, cpBB bb)
 }
 
 /// Create a transation matrix.
-static inline cpTransform
+inline cpTransform
 cpTransformTranslate(cpVect translate)
 {
   return cpTransformNewTranspose(
@@ -108,7 +108,7 @@ cpTransformTranslate(cpVect translate)
 }
 
 /// Create a scale matrix.
-static inline cpTransform
+inline cpTransform
 cpTransformScale(cpFloat scaleX, cpFloat scaleY)
 {
 	return cpTransformNewTranspose(
@@ -118,7 +118,7 @@ cpTransformScale(cpFloat scaleX, cpFloat scaleY)
 }
 
 /// Create a rotation matrix.
-static inline cpTransform
+inline cpTransform
 cpTransformRotate(cpFloat radians)
 {
 	cpVect rot = cpvforangle(radians);
@@ -129,7 +129,7 @@ cpTransformRotate(cpFloat radians)
 }
 
 /// Create a rigid transformation matrix. (transation + rotation)
-static inline cpTransform
+inline cpTransform
 cpTransformRigid(cpVect translate, cpFloat radians)
 {
 	cpVect rot = cpvforangle(radians);
@@ -140,7 +140,7 @@ cpTransformRigid(cpVect translate, cpFloat radians)
 }
 
 /// Fast inverse of a rigid transformation matrix.
-static inline cpTransform
+inline cpTransform
 cpTransformRigidInverse(cpTransform t)
 {
   return cpTransformNewTranspose(
@@ -151,19 +151,19 @@ cpTransformRigidInverse(cpTransform t)
 
 // Miscelaneous (but useful) transformation matrices.
 
-static inline cpTransform
+inline cpTransform
 cpTransformWrap(cpTransform outer, cpTransform inner)
 {
   return cpTransformMult(cpTransformInverse(outer), cpTransformMult(inner, outer));
 }
 
-static inline cpTransform
+inline cpTransform
 cpTransformWrapInverse(cpTransform outer, cpTransform inner)
 {
   return cpTransformMult(outer, cpTransformMult(inner, cpTransformInverse(outer)));
 }
 
-static inline cpTransform
+inline cpTransform
 cpTransformOrtho(cpBB bb)
 {
   return cpTransformNewTranspose(
@@ -172,7 +172,7 @@ cpTransformOrtho(cpBB bb)
   );
 }
 
-static inline cpTransform
+inline cpTransform
 cpTransformBoneScale(cpVect v0, cpVect v1)
 {
   cpVect d = cpvsub(v1, v0); 
@@ -182,7 +182,7 @@ cpTransformBoneScale(cpVect v0, cpVect v1)
   );
 }
 
-static inline cpTransform
+inline cpTransform
 cpTransformAxialScale(cpVect axis, cpVect pivot, cpFloat scale)
 {
   cpFloat A = axis.x*axis.y*(scale - 1.0);

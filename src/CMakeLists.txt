@@ -2,7 +2,7 @@ file(GLOB chipmunk_source_files "*.c" "constraints/*.c")
 file(GLOB chipmunk_public_header "${chipmunk_SOURCE_DIR}/include/chipmunk/*.h")
 file(GLOB chipmunk_constraint_header "${chipmunk_SOURCE_DIR}/include/chipmunk/constraints/*.h")
 
-include_directories(${chipmunk_SOURCE_DIR}/include/chipmunk)
+include_directories(${chipmunk_SOURCE_DIR}/include)
 
 if(BUILD_SHARED)
   add_library(chipmunk SHARED
@@ -42,6 +42,12 @@ if(BUILD_STATIC)
 endif(BUILD_STATIC)
 
 if(BUILD_SHARED OR INSTALL_STATIC)
+  # Exports inlined functions in a separate translation unit
+  add_definitions(-DCHIPMUNK_FFI)
+  # Provides function pointers for compatibility with older libraries
+  if(FUNCTION_POINTERS)
+    add_definitions(-DCHIPMUNK_LEGACY_FFI)
+  endif()
   # FIXME: change to PUBLIC_HEADER to allow building frameworks
   install(FILES ${chipmunk_public_header} DESTINATION include/chipmunk)
   install(FILES ${chipmunk_constraint_header} DESTINATION include/chipmunk/constraints)
