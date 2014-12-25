@@ -75,6 +75,7 @@
 	#define cpfpow pow
 	#define cpffloor floor
 	#define cpfceil ceil
+	#define cpfcopysign copysign
 	#define CPFLOAT_MIN DBL_MIN
 #else
 	typedef float cpFloat;
@@ -88,6 +89,7 @@
 	#define cpfpow powf
 	#define cpffloor floorf
 	#define cpfceil ceilf
+	#define cpfcopysign copysignf
 	#define CPFLOAT_MIN FLT_MIN
 #endif
 
