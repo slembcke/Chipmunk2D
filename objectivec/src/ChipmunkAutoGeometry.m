@@ -7,7 +7,7 @@
 
 @implementation ChipmunkPolyline
 
--(id)initWithPolyline:(cpPolyline *)line;
+-(id)initWithPolyline:(cpPolyline *)line
 {
 	if((self = [super init])){
 		_line = line;
@@ -23,7 +23,7 @@
 	[super dealloc];
 }
 
-+(ChipmunkPolyline *)fromPolyline:(cpPolyline *)line;
++(ChipmunkPolyline *)fromPolyline:(cpPolyline *)line
 {
 	return [[[self alloc] initWithPolyline:line] autorelease];
 }
@@ -48,7 +48,7 @@
 	return cpCentroidForPoly(_line->count - 1, _line->verts);
 }
 
--(cpFloat)momentForMass:(cpFloat)mass offset:(cpVect)offset;
+-(cpFloat)momentForMass:(cpFloat)mass offset:(cpVect)offset
 {
 	cpAssertHard([self isClosed], "Cannot compute the moment of a non-looped polyline.");
 	return cpMomentForPoly(mass, _line->count - 1, _line->verts, offset, 0.0);
@@ -57,17 +57,17 @@
 -(NSUInteger)count {return _line->count;}
 -(const cpVect *)verts {return _line->verts;}
 
--(ChipmunkPolyline *)simplifyCurves:(cpFloat)tolerance;
+-(ChipmunkPolyline *)simplifyCurves:(cpFloat)tolerance
 {
 	return [ChipmunkPolyline fromPolyline:cpPolylineSimplifyCurves(_line, tolerance)];
 }
 
--(ChipmunkPolyline *)simplifyVertexes:(cpFloat)tolerance;
+-(ChipmunkPolyline *)simplifyVertexes:(cpFloat)tolerance
 {
 	return [ChipmunkPolyline fromPolyline:cpPolylineSimplifyVertexes(_line, tolerance)];
 }
 
--(ChipmunkPolyline *)toConvexHull:(cpFloat)tolerance;
+-(ChipmunkPolyline *)toConvexHull:(cpFloat)tolerance
 {
 	return [ChipmunkPolyline fromPolyline:cpPolylineToConvexHull(_line, tolerance)];
 }
@@ -77,7 +77,7 @@
 	return [self toConvexHull:0.0];
 }
 
--(ChipmunkPolylineSet *)toConvexHulls_BETA:(cpFloat)tolerance;
+-(ChipmunkPolylineSet *)toConvexHulls_BETA:(cpFloat)tolerance
 {
 	cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(_line, tolerance);
 	ChipmunkPolylineSet *value = [ChipmunkPolylineSet fromPolylineSet:set];
@@ -86,7 +86,7 @@
 	return value;
 }
 
--(NSArray *)asChipmunkSegmentsWithBody:(ChipmunkBody *)body radius:(cpFloat)radius offset:(cpVect)offset;
+-(NSArray *)asChipmunkSegmentsWithBody:(ChipmunkBody *)body radius:(cpFloat)radius offset:(cpVect)offset
 {
 	NSMutableArray *arr = [NSMutableArray arrayWithCapacity:_line->count];
 	
@@ -113,7 +113,7 @@
 
 @implementation ChipmunkPolylineSet
 
--(id)initWithPolylineSet:(cpPolylineSet *)set;
+-(id)initWithPolylineSet:(cpPolylineSet *)set
 {
 	if((self = [super init])){
 		_lines = [[NSMutableArray alloc] initWithCapacity:set->count];
@@ -130,14 +130,14 @@
 	[super dealloc];
 }
 
-+(ChipmunkPolylineSet *)fromPolylineSet:(cpPolylineSet *)set;
++(ChipmunkPolylineSet *)fromPolylineSet:(cpPolylineSet *)set
 {
 	return [[[self alloc] initWithPolylineSet:set] autorelease];
 }
 
 -(NSUInteger)count {return _lines.count;}
 
--(ChipmunkPolyline *)lineAtIndex:(NSUInteger)index;
+-(ChipmunkPolyline *)lineAtIndex:(NSUInteger)index
 {
 	return [_lines objectAtIndex:index];
 }
@@ -164,7 +164,7 @@
 	];
 }
 
--(id)initWithSamplingFunction:(cpMarchSampleFunc)sampleFunc;
+-(id)initWithSamplingFunction:(cpMarchSampleFunc)sampleFunc
 {
 	if((self = [super init])){
 		_sampleFunc = sampleFunc;
@@ -174,13 +174,13 @@
 	return self;
 }
 
--(cpFloat)sample:(cpVect)pos;
+-(cpFloat)sample:(cpVect)pos
 {
 	return _sampleFunc(pos, self);
 }
 
 
--(ChipmunkPolylineSet *)march:(cpBB)bb xSamples:(NSUInteger)xSamples ySamples:(NSUInteger)ySamples hard:(bool)hard;
+-(ChipmunkPolylineSet *)march:(cpBB)bb xSamples:(NSUInteger)xSamples ySamples:(NSUInteger)ySamples hard:(bool)hard
 {
 	cpPolylineSet set;
 	cpPolylineSetInit(&set);
@@ -209,7 +209,7 @@ SampleFromBlock(cpVect point, ChipmunkBlockSampler *self)
 	return self->_block(point);
 }
 
--(id)initWithBlock:(ChipmunkMarchSampleBlock)block;
+-(id)initWithBlock:(ChipmunkMarchSampleBlock)block
 {
 	if((self = [super initWithSamplingFunction:(cpMarchSampleFunc)SampleFromBlock])){
 		_block = [block copy];
@@ -218,7 +218,7 @@ SampleFromBlock(cpVect point, ChipmunkBlockSampler *self)
 	return self;
 }
 
-+(ChipmunkBlockSampler *)samplerWithBlock:(ChipmunkMarchSampleBlock)block;
++(ChipmunkBlockSampler *)samplerWithBlock:(ChipmunkMarchSampleBlock)block
 {
 	return [[[self alloc] initWithBlock:block] autorelease];
 }

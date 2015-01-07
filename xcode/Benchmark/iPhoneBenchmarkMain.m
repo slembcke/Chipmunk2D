@@ -21,7 +21,7 @@
 
 #import <stdlib.h>
 #import <stdio.h>
-#import "chipmunk.h"
+#import "chipmunk/chipmunk.h"
 
 #import "ChipmunkDemo.h"
 

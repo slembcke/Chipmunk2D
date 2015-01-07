@@ -21,6 +21,7 @@
 
 #import <XCTest/XCTest.h>
 #import "ObjectiveChipmunk/ObjectiveChipmunk.h"
+#import "ObjectiveChipmunk/ChipmunkAutoGeometry.h"
 
 
 @interface MiscTest : XCTestCase {}
@@ -131,6 +132,46 @@
 	}
 }
 
+-(void)testImageSamplerLA
+{
+	{
+		NSBundle *bundle = [NSBundle bundleForClass:self.class];
+		CGImageRef image = [ChipmunkImageSampler loadImage:[bundle URLForResource:@"TestImageLA" withExtension:@"png"]];
+		ChipmunkAbstractSampler *sampler = [[ChipmunkImageSampler alloc] initWithImage:image isMask:TRUE contextWidth:0 contextHeight:0];
+		
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(0.5, 0.5)], (cpFloat)0.0, 1e-5, @"");
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(0.5, 3.5)], (cpFloat)1.0, 1e-5, @"");
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(3.5, 0.5)], (cpFloat)1.0, 1e-5, @"");
+		
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(2.0 - 1e-5, 0.5)], (cpFloat)0.0, 1e-5, @"");
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(2.0 + 1e-5, 0.5)], (cpFloat)1.0, 1e-5, @"");
+		
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(0.5, 2.0 - 1e-5)], (cpFloat)0.0, 1e-5, @"");
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(0.5, 2.0 + 1e-5)], (cpFloat)1.0, 1e-5, @"");
+		
+		[sampler release];
+	}
+	
+	{
+		NSBundle *bundle = [NSBundle bundleForClass:self.class];
+		CGImageRef image = [ChipmunkImageSampler loadImage:[bundle URLForResource:@"TestImageLA" withExtension:@"png"]];
+		ChipmunkAbstractSampler *sampler = [[ChipmunkImageSampler alloc] initWithImage:image isMask:FALSE contextWidth:0 contextHeight:0];
+		
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(0.5, 0.5)], (cpFloat)1.0, 1e-5, @"");
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(0.5, 3.5)], (cpFloat)1.0, 1e-5, @"");
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(3.5, 0.5)], (cpFloat)1.0, 1e-5, @"");
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(3.5, 3.5)], (cpFloat)0.0, 1e-5, @"");
+		
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(2.0 - 1e-5, 3.5)], (cpFloat)1.0, 1e-5, @"");
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(2.0 + 1e-5, 3.5)], (cpFloat)0.0, 1e-5, @"");
+		
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(3.5, 2.0 - 1e-5)], (cpFloat)1.0, 1e-5, @"");
+		XCTAssertEqualWithAccuracy([sampler sample:cpv(3.5, 2.0 + 1e-5)], (cpFloat)0.0, 1e-5, @"");
+		
+		[sampler release];
+	}
+}
+
 -(void)testMultiGrabSort
 {
 	ChipmunkSpace *space = [[ChipmunkSpace alloc] init];
@@ -174,5 +215,7 @@
 	cpFloat area6 = cpAreaForPoly(2, (cpVect[]){cpv(-1,-1), cpv(1,-1), cpv(1,1), cpv(-1,1)}, 1.0);
 	XCTAssertEqualWithAccuracy(area5, area6, 1e-3, @"");
 }
+
+
 
 @end

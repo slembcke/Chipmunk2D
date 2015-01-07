@@ -3,8 +3,8 @@
 
 #import "ObjectiveChipmunk/ObjectiveChipmunk.h"
 
-#import "cpMarch.h"
-#import "cpPolyline.h"
+#import "chipmunk/cpMarch.h"
+#import "chipmunk/cpPolyline.h"
 
 @class ChipmunkPolylineSet;
 

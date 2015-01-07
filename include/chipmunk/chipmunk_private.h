@@ -25,7 +25,7 @@
 #endif
 
 #define CP_ALLOW_PRIVATE_ACCESS 1
-#include "chipmunk.h"
+#include "chipmunk/chipmunk.h"
 
 #define CP_HASH_COEF (3344921057ul)
 #define CP_HASH_PAIR(A, B) ((cpHashValue)(A)*CP_HASH_COEF ^ (cpHashValue)(B)*CP_HASH_COEF)

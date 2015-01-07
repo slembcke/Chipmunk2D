@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "chipmunk.h"
-#include "cpMarch.h"
+#include "chipmunk/chipmunk.h"
+#include "chipmunk/cpMarch.h"
 
 
 typedef void (*cpMarchCellFunc)(
@@ -30,9 +30,9 @@ cpMarchCells(
 	
 	// Keep a copy of the previous row to avoid double lookups.
 	cpFloat *buffer = (cpFloat *)cpcalloc(x_samples, sizeof(cpFloat));
-	for(int i=0; i<x_samples; i++) buffer[i] = sample(cpv(cpflerp(bb.l, bb.r, i*x_denom), bb.b), sample_data);
+	for(unsigned long i=0; i<x_samples; i++) buffer[i] = sample(cpv(cpflerp(bb.l, bb.r, i*x_denom), bb.b), sample_data);
 	
-	for(int j=0; j<y_samples-1; j++){
+	for(unsigned long j=0; j<y_samples-1; j++){
 		cpFloat y0 = cpflerp(bb.b, bb.t, (j+0)*y_denom);
 		cpFloat y1 = cpflerp(bb.b, bb.t, (j+1)*y_denom);
 		
@@ -40,7 +40,7 @@ cpMarchCells(
 		cpFloat c, d = sample(cpv(bb.l, y1), sample_data);
 		buffer[0] = d;
 		
-		for(int i=0; i<x_samples-1; i++){
+		for(unsigned long i=0; i<x_samples-1; i++){
 			cpFloat x0 = cpflerp(bb.l, bb.r, (i+0)*x_denom);
 			cpFloat x1 = cpflerp(bb.l, bb.r, (i+1)*x_denom);
 			

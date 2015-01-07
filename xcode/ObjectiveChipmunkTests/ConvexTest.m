@@ -21,6 +21,7 @@
 
 #import <XCTest/XCTest.h>
 #import "ObjectiveChipmunk/ObjectiveChipmunk.h"
+#import "ObjectiveChipmunk/ChipmunkAutogeometry.h"
 
 @interface ConvexTest : XCTestCase {}
 @end
@@ -238,6 +239,89 @@ AssertRandomHull(id self, int count)
 	
 	CP_CONVEX_HULL(numVerts, verts, hullCount, hullVerts);
 	XCTAssertTrue(cpAreaForPoly(hullCount, hullVerts, 0.0f) >= 0.0f, @"");
+}
+
+static cpPolyline *
+MakeLoopedPolyline(id self, int count, cpVect *verts)
+{
+	cpPolylineSet *set = cpPolylineSetNew();
+	
+	cpPolylineSetCollectSegment(verts[count - 1], verts[0], set);
+	for(int i=1; i<count; i++){
+		cpPolylineSetCollectSegment(verts[i - 1], verts[i], set);
+	}
+	
+	XCTAssert(set->count == 1, @"");
+	XCTAssert(cpPolylineIsClosed(set->lines[0]), @"");
+	
+	cpPolyline *line = set->lines[0];
+	cpPolylineSetFree(set, cpFalse);
+	
+	return line;
+}
+
+static void
+AssertPolyline(id self, cpPolyline *line, int expectedCount, cpVect *expectedVerts)
+{
+	XCTAssertEqual(line->count, expectedCount + 1, @"");
+	XCTAssert(cpPolylineIsClosed(line), @"");
+	AssertExpected(self, line->verts, expectedCount, expectedVerts);
+}
+
+-(void)testConvexDecomposition
+{
+	{
+		cpVect verts[] = {{0,0}};
+		
+		cpPolyline *line = MakeLoopedPolyline(self, 1, verts);
+		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
+		
+		XCTAssertEqual(set->count, 1, @"");
+		AssertPolyline(self, set->lines[0], 1, verts);
+	}
+	
+	{
+		cpVect verts[] = {{0,0}, {1,0}};
+		
+		cpPolyline *line = MakeLoopedPolyline(self, 2, verts);
+		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
+		
+		XCTAssertEqual(set->count, 1, @"");
+		AssertPolyline(self, set->lines[0], 2, verts);
+	}
+	
+	{
+		cpVect verts[] = {{0,0}, {1,0}, {0,1}};
+		
+		cpPolyline *line = MakeLoopedPolyline(self, 3, verts);
+		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
+		
+		XCTAssertEqual(set->count, 1, @"");
+		AssertPolyline(self, set->lines[0], 3, verts);
+	}
+	
+	{
+		cpVect verts[] = {{0,0}, {1,0}, {1,1}, {0,1}};
+		
+		cpPolyline *line = MakeLoopedPolyline(self, 4, verts);
+		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
+		
+		XCTAssertEqual(set->count, 1, @"");
+		AssertPolyline(self, set->lines[0], 4, verts);
+	}
+	
+	{
+		cpVect verts[] = {{0,0}, {1,1}, {2,0}, {1,2}};
+		cpVect expected1[] = {{1,1}, {2,0}, {1,2}};
+		cpVect expected2[] = {{0,0}, {1,1}, {1,2}};
+		
+		cpPolyline *line = MakeLoopedPolyline(self, 4, verts);
+		cpPolylineSet *set = cpPolylineConvexDecomposition_BETA(line, 0.0);
+		
+		XCTAssertEqual(set->count, 2, @"");
+		AssertPolyline(self, set->lines[0], 3, expected1);
+		AssertPolyline(self, set->lines[1], 3, expected2);
+	}
 }
 
 @end

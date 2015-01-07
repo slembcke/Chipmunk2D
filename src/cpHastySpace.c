@@ -183,7 +183,7 @@ cpArbiterApplyImpulse_NEON(cpArbiter *arb)
 struct ThreadContext {
 	pthread_t thread;
 	cpHastySpace *space;
-	unsigned int thread_num;
+	unsigned long thread_num;
 };
 
 typedef	void (*cpHastySpaceWorkFunction)(cpSpace *space, unsigned long worker, unsigned long worker_count);
@@ -271,7 +271,7 @@ Solver(cpSpace *space, unsigned long worker, unsigned long worker_count)
 	cpFloat dt = space->curr_dt;
 	unsigned long iterations = (space->iterations + worker_count - 1)/worker_count;
 	
-	for(int i=0; i<iterations; i++){
+	for(unsigned long i=0; i<iterations; i++){
 		for(int j=0; j<arbiters->num; j++){
 			cpArbiter *arb = (cpArbiter *)arbiters->arr[j];
 			#ifdef __ARM_NEON__
@@ -299,7 +299,7 @@ HaltThreads(cpHastySpace *hasty)
 		pthread_cond_broadcast(&hasty->cond_work);
 	} pthread_mutex_unlock(mutex);
 	
-	for(int i=0; i<(hasty->num_threads-1); i++){
+	for(unsigned long i=0; i<(hasty->num_threads-1); i++){
 		pthread_join(hasty->workers[i].thread, NULL);
 	}
 }
@@ -331,7 +331,7 @@ cpHastySpaceSetThreads(cpSpace *space, unsigned long threads)
 	// Create the worker threads and wait for them to signal ready.
 	if(hasty->num_working > 0){
 		pthread_mutex_lock(&hasty->mutex);
-		for(int i=0; i<(hasty->num_threads-1); i++){
+		for(unsigned long i=0; i<(hasty->num_threads-1); i++){
 			hasty->workers[i].space = hasty;
 			hasty->workers[i].thread_num = i + 1;
 			
@@ -469,7 +469,7 @@ cpHastySpaceStep(cpSpace *space, cpFloat dt)
 		
 		// Run the impulse solver.
 		cpHastySpace *hasty = (cpHastySpace *)space;
-		if(arbiters->num + constraints->num > hasty->constraint_count_threshold){
+		if((unsigned long)(arbiters->num + constraints->num) > hasty->constraint_count_threshold){
 			RunWorkers(hasty, Solver);
 		} else {
 			Solver(space, 0, 1);

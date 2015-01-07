@@ -45,7 +45,7 @@ PointCloudSample(ChipmunkPointCloudSampler *cloud, cpVect pos)
 	return density;
 }
 
-- (id)initWithCellSize:(cpFloat)cellSize;
+- (id)initWithCellSize:(cpFloat)cellSize
 {
 	if((self = [super initWithSamplingFunction:(cpMarchSampleFunc)PointCloudSample])){
 		_cellSize = cellSize;
@@ -66,7 +66,7 @@ static void freeWrap(void *ptr, void *unused){cpfree(ptr);}
 	[super dealloc];
 }
 
--(cpBB)addPoint:(cpVect)pos radius:(cpFloat)radius fuzz:(cpFloat)fuzz;
+-(cpBB)addPoint:(cpVect)pos radius:(cpFloat)radius fuzz:(cpFloat)fuzz
 {
 	DeformPoint *point = (DeformPoint *)cpcalloc(1, sizeof(DeformPoint));
 	point->pos = pos;

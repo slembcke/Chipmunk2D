@@ -62,7 +62,7 @@ ChipmunkCachedTileQuery(cpVect *pos, ChipmunkCachedTile *tile, cpCollisionID id,
 
 @synthesize marchHard = _marchHard, sampler = _sampler, tileOffset = _tileOffset;
 
--(id)initWithSampler:(ChipmunkAbstractSampler *)sampler space:(ChipmunkSpace *)space tileSize:(cpFloat)tileSize samplesPerTile:(NSUInteger)samplesPerTile cacheSize:(NSUInteger)cacheSize;
+-(id)initWithSampler:(ChipmunkAbstractSampler *)sampler space:(ChipmunkSpace *)space tileSize:(cpFloat)tileSize samplesPerTile:(NSUInteger)samplesPerTile cacheSize:(NSUInteger)cacheSize
 {
 	if((self = [super init])){
 		_sampler = [sampler retain];
@@ -184,7 +184,7 @@ TileRectForBB(cpBB bb, cpFloat size, cpVect offset, cpFloat spt_inv)
 	};
 }
 
--(void)markDirtyRect:(cpBB)bounds;
+-(void)markDirtyRect:(cpBB)bounds
 {
 	cpFloat size = _tileSize;
 	cpVect offset = _tileOffset;
@@ -229,7 +229,7 @@ TileRectForBB(cpBB bb, cpFloat size, cpVect offset, cpFloat spt_inv)
 
 //extern double GetMilliseconds();
 
--(void)ensureRect:(cpBB)bounds;
+-(void)ensureRect:(cpBB)bounds
 {
 //	double time = GetMilliseconds();
 	
@@ -282,7 +282,7 @@ TileRectForBB(cpBB bb, cpFloat size, cpVect offset, cpFloat spt_inv)
 //	NSLog(@"Updated %3d tiles in %6.3fms", count, GetMilliseconds() - time);
 }
 
--(cpPolyline *)simplify:(cpPolyline *)polyline;
+-(cpPolyline *)simplify:(cpPolyline *)polyline
 {
 	@throw [NSException
 		exceptionWithName:NSInternalInconsistencyException
@@ -291,7 +291,7 @@ TileRectForBB(cpBB bb, cpFloat size, cpVect offset, cpFloat spt_inv)
 	];
 }
 
--(ChipmunkSegmentShape *)makeSegmentFor:(ChipmunkBody *)staticBody from:(cpVect)a to:(cpVect)b;
+-(ChipmunkSegmentShape *)makeSegmentFor:(ChipmunkBody *)staticBody from:(cpVect)a to:(cpVect)b
 {
 	@throw [NSException
 		exceptionWithName:NSInternalInconsistencyException
@@ -317,7 +317,7 @@ TileRectForBB(cpBB bb, cpFloat size, cpVect offset, cpFloat spt_inv)
 
 @synthesize segmentCollisionType = _segmentCollisionType;
 
--(id)initWithSampler:(ChipmunkAbstractSampler *)sampler space:(ChipmunkSpace *)space tileSize:(cpFloat)tileSize samplesPerTile:(NSUInteger)samplesPerTile cacheSize:(NSUInteger)cacheSize;
+-(id)initWithSampler:(ChipmunkAbstractSampler *)sampler space:(ChipmunkSpace *)space tileSize:(cpFloat)tileSize samplesPerTile:(NSUInteger)samplesPerTile cacheSize:(NSUInteger)cacheSize
 {
 	if((self = [super initWithSampler:sampler space:space tileSize:tileSize samplesPerTile:samplesPerTile cacheSize:cacheSize])){
 		_simplifyThreshold = 2.0;
@@ -335,12 +335,12 @@ TileRectForBB(cpBB bb, cpFloat size, cpVect offset, cpFloat spt_inv)
 	return self;
 }
 
--(cpPolyline *)simplify:(cpPolyline *)polyline;
+-(cpPolyline *)simplify:(cpPolyline *)polyline
 {
 	return cpPolylineSimplifyCurves(polyline, _simplifyThreshold);
 }
 
--(ChipmunkSegmentShape *)makeSegmentFor:(ChipmunkBody *)staticBody from:(cpVect)a to:(cpVect)b;
+-(ChipmunkSegmentShape *)makeSegmentFor:(ChipmunkBody *)staticBody from:(cpVect)a to:(cpVect)b
 {
 	ChipmunkSegmentShape *segment = [ChipmunkSegmentShape segmentWithBody:staticBody from:a to:b radius:_segmentRadius];
 	segment.friction = _segmentFriction;

@@ -109,12 +109,12 @@ SampleFunc8Border(cpVect point, ChipmunkBitmapSampler *self)
 	[super dealloc];
 }
 
--(void)setBorderRepeat;
+-(void)setBorderRepeat
 {
 	_sampleFunc = (cpMarchSampleFunc)SampleFunc8Clamp;
 }
 
--(void)setBorderValue:(cpFloat)borderValue;
+-(void)setBorderValue:(cpFloat)borderValue
 {
 	_sampleFunc = (cpMarchSampleFunc)SampleFunc8Border;
 	_borderValue = borderValue;
@@ -129,7 +129,7 @@ BorderedBB(cpBB bb, NSUInteger width, NSUInteger height)
 	return cpBBNew(bb.l - xBorder, bb.b - yBorder, bb.r + xBorder, bb.t + yBorder);
 }
 
--(ChipmunkPolylineSet *)marchAllWithBorder:(bool)bordered hard:(bool)hard;
+-(ChipmunkPolylineSet *)marchAllWithBorder:(bool)bordered hard:(bool)hard
 {
 	NSUInteger width = self.width;
 	NSUInteger height = self.height;
@@ -152,7 +152,7 @@ BorderedBB(cpBB bb, NSUInteger width, NSUInteger height)
 
 -(NSMutableData *)pixelData {return (NSMutableData *)super.pixelData;}
 
--(id)initWithWidth:(unsigned long)width height:(unsigned long)height colorSpace:(CGColorSpaceRef)colorSpace bitmapInfo:(CGBitmapInfo)bitmapInfo component:(NSUInteger)component;
+-(id)initWithWidth:(unsigned long)width height:(unsigned long)height colorSpace:(CGColorSpaceRef)colorSpace bitmapInfo:(CGBitmapInfo)bitmapInfo component:(NSUInteger)component
 {
 	// Need to create a context to get info about the context.
 	// If you let the context allocate it's own memory it seems to move it around. O_o
@@ -185,7 +185,7 @@ BorderedBB(cpBB bb, NSUInteger width, NSUInteger height)
 
 @implementation ChipmunkImageSampler
 
-+(CGImageRef)loadImage:(NSURL *)url;
++(CGImageRef)loadImage:(NSURL *)url
 {
 	CGImageSourceRef image_source = CGImageSourceCreateWithURL((CFURLRef)url, NULL);
 	CGImageRef image = CGImageSourceCreateImageAtIndex(image_source, 0, NULL);
@@ -195,13 +195,13 @@ BorderedBB(cpBB bb, NSUInteger width, NSUInteger height)
 	return image;
 }
 
--(id)initWithImage:(CGImageRef)image isMask:(bool)isMask contextWidth:(NSUInteger)width contextHeight:(NSUInteger)height;
+-(id)initWithImage:(CGImageRef)image isMask:(bool)isMask contextWidth:(NSUInteger)width contextHeight:(NSUInteger)height
 {
 	if(width == 0) width = CGImageGetWidth(image);
 	if(height == 0)  height = CGImageGetHeight(image);
 	
 	CGColorSpaceRef colorSpace = (isMask ? CGColorSpaceCreateDeviceGray() : NULL);
-	CGBitmapInfo bitmapInfo = (isMask ? kCGImageAlphaNone : kCGImageAlphaOnly);
+	CGBitmapInfo bitmapInfo = (CGBitmapInfo)(isMask ? kCGImageAlphaNone : kCGImageAlphaOnly);
 	
 	if((self = [super initWithWidth:width height:height colorSpace:colorSpace bitmapInfo:bitmapInfo component:0])){
 		CGContextDrawImage(self.context, CGRectMake(0, 0, width, height), image);
@@ -212,7 +212,7 @@ BorderedBB(cpBB bb, NSUInteger width, NSUInteger height)
 	return self;
 }
 
--(id)initWithImageFile:(NSURL *)url isMask:(bool)isMask;
+-(id)initWithImageFile:(NSURL *)url isMask:(bool)isMask
 {
 	CGImageRef image = [[self class] loadImage:url];
 	unsigned long width = CGImageGetWidth(image);
@@ -225,7 +225,7 @@ BorderedBB(cpBB bb, NSUInteger width, NSUInteger height)
 	return self;
 }
 
-+(ChipmunkImageSampler *)samplerWithImageFile:(NSURL *)url isMask:(bool)isMask;
++(ChipmunkImageSampler *)samplerWithImageFile:(NSURL *)url isMask:(bool)isMask
 {
 	return [[[self alloc] initWithImageFile:url	isMask:isMask] autorelease];
 }
