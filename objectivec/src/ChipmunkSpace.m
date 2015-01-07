@@ -21,6 +21,7 @@
 
 #define CP_ALLOW_PRIVATE_ACCESS
 #import "ObjectiveChipmunk/ObjectiveChipmunk.h"
+#import "chipmunk/cpHastySpace.h"
 
 #import <objc/message.h>
 #import <TargetConditionals.h>
@@ -145,6 +146,17 @@ static NSString *dialogMessage = @"This copy of Chipmunk Pro is a trial, please 
 	return obj;
 }
 
++(instancetype)allocWithZone:(struct _NSZone *)zone
+{
+#if CHIPMUNK_SPACE_USE_HASTY_SPACE
+	Class class = [ChipmunkHastySpace class];
+#else
+	Class class = [ChipmunkSpace class];
+#endif
+
+	return NSAllocateObject(class, 0, zone);
+}
+
 - (id)initWithSpace:(cpSpace *)space
 {
 	if((self = [super init])){
@@ -163,15 +175,7 @@ static NSString *dialogMessage = @"This copy of Chipmunk Pro is a trial, please 
 }
 
 - (id)init {
-	// Use a fast space instead if the class is available.
-	// However if you don't specify -ObjC as a linker flag the dynamic substitution won't work.
-	Class hastySpace = NSClassFromString(@"ChipmunkHastySpace");
-	if(hastySpace && [self isMemberOfClass:[ChipmunkSpace class]]){
-		[self release];
-		return [[hastySpace alloc] init];
-	} else {
-		return [self initWithSpace:cpSpaceNew()];
-	}
+	return [self initWithSpace:cpSpaceNew()];
 }
 
 -(void)freeSpace
@@ -585,6 +589,35 @@ boundSeg(ChipmunkBody *body, cpVect a, cpVect b, cpFloat radius, cpFloat elastic
 	
 	[self add:segs];
 	return [segs autorelease];
+}
+
+@end
+
+
+@implementation ChipmunkHastySpace
+
+- (id)init {
+	return [self initWithSpace:cpHastySpaceNew()];
+}
+
+-(void)freeSpace
+{
+	cpHastySpaceFree(_space);
+}
+
+- (void)step:(cpFloat)dt
+{
+	cpHastySpaceStep(_space, dt);
+}
+
+-(NSUInteger)threads
+{
+	return cpHastySpaceGetThreads(_space);
+}
+
+-(void)setThreads:(NSUInteger)threads
+{
+	cpHastySpaceSetThreads(_space, threads);
 }
 
 @end

@@ -20,6 +20,10 @@
  */
 
 
+/// Default to using the NEON optimized solver.
+#define CHIPMUNK_SPACE_USE_HASTY_SPACE 1
+
+
 /**
 	Chipmunk spaces are simulation containers. You add a bunch of physics objects to a space (rigid bodies, collision shapes, and joints) and step the entire space forward through time as a whole.
 	If you have Chipmunk Pro, you'll want to use the ChipmunkHastySpace subclass instead as it has iPhone specific optimizations.
@@ -264,6 +268,21 @@ typedef void (^ChipmunkPostStepBlock)(void);
 - (void)step:(cpFloat)dt;
 
 @end
+
+
+/// ChipmunkHastySpace is an Objective-Chipmunk wrapper for cpHastySpace.
+/// Subclass this class instead of ChipmunkSpace if you want to enable the cpHastySpace optimizations.
+/// If ChipmunkHastySpace is linked correctly, calling [[ChipmunkSpace alloc] init] will actually return a ChipmunkHastySpace.
+@interface ChipmunkHastySpace : ChipmunkSpace
+
+/// Number of threads to use for the solver.
+///	Setting 0 will choose the thread count automatically (recommended).
+/// There is currently little benefit in using more than 2 threads.
+/// Defaults to 1.
+@property(nonatomic, assign) NSUInteger threads;
+
+@end
+
 
 //MARK: Misc
 
