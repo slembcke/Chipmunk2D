@@ -14,6 +14,18 @@ ObjectiveChipmunk-Mac
 ObjectiveChipmunk-iOS
 generated_docs
 
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+*.dll
+*.so
+*.so.*
+*.a
+*.exe
+
 # Visual studio
 *.opensdf
 *.sdf
