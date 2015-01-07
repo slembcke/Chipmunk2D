@@ -1,4 +1,7 @@
-DOC_FILE = open("generated_docs", "w")
+OUTPUT_NAME = "generated_docs"
+exit if File.exists?(OUTPUT_NAME)
+
+DOC_FILE = open(OUTPUT_NAME, "w")
 
 FUNCS = {}
 IO.readlines("|ruby extract_protos.rb").each{|line|
