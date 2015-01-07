@@ -10,7 +10,7 @@ FIND_PATH(GLEW_INCLUDE_DIR GL/glew.h /usr/include/GL)
 
 
 set(chipmunk_demos_include_dirs
-  ${chipmunk_SOURCE_DIR}/include/chipmunk
+  ${chipmunk_SOURCE_DIR}/include
   ${GLFW_INCLUDE_DIR}
   ${GLEW_INCLUDE_DIR}
   ${OPENGL_INCLUDE_DIR}

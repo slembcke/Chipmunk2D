@@ -1,21 +1,21 @@
 // Copyright 2013 Howling Moon Software. All rights reserved.
 // See http://chipmunk2d.net/legal.php for more information.
 
-#import <stdlib.h>
-#import <stdio.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-#import <pthread.h>
-//#import <sys/param.h >
-#import <sys/sysctl.h>
+#include <pthread.h>
+//#include <sys/param.h >
+#include <sys/sysctl.h>
 
-#import "chipmunk/chipmunk_private.h"
-#import "cpHastySpace.h"
+#include "chipmunk/chipmunk_private.h"
+#include "chipmunk/cpHastySpace.h"
 
 
 //MARK: ARM NEON Solver
 
 #if __ARM_NEON__
-#import <arm_neon.h>
+#include <arm_neon.h>
 
 // Tested and known to work fine with Clang 3.0 and GCC 4.2
 // Doesn't work with Clang 1.6, and I have no idea why.

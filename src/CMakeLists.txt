@@ -1,8 +1,7 @@
-file(GLOB chipmunk_source_files "*.c" "constraints/*.c")
+file(GLOB chipmunk_source_files "*.c")
 file(GLOB chipmunk_public_header "${chipmunk_SOURCE_DIR}/include/chipmunk/*.h")
-file(GLOB chipmunk_constraint_header "${chipmunk_SOURCE_DIR}/include/chipmunk/constraints/*.h")
 
-include_directories(${chipmunk_SOURCE_DIR}/include/chipmunk)
+include_directories(${chipmunk_SOURCE_DIR}/include)
 
 if(BUILD_SHARED)
   add_library(chipmunk SHARED
@@ -16,7 +15,7 @@ if(BUILD_SHARED)
   # set the lib's version number
   # But avoid on Android because symlinks to version numbered .so's don't work with Android's Java-side loadLibrary.
   if(NOT ANDROID)
-	  set_target_properties(chipmunk PROPERTIES VERSION 6.2.1)
+	  set_target_properties(chipmunk PROPERTIES VERSION 7.0.0)
   endif(NOT ANDROID)
   if(ANDROID)
 	  # need to explicitly link to the math library because the CMake/Android toolchains may not do it automatically
