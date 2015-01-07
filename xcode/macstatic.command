@@ -11,6 +11,7 @@ def log(string)
 	open(BUILD_LOG_PATH, 'a'){|f| f.puts string}
 end
 
+PROJECT = "Chipmunk7.xcodeproj"
 VERBOSE = (not ARGV.include?("--quiet"))
 
 def system(command)
@@ -26,24 +27,35 @@ def system(command)
 	end
 end
 
-OUTPUT_DIR_NAME = "Chipmunk-Mac"
-system "rm -rf #{OUTPUT_DIR_NAME}"
-system "mkdir #{OUTPUT_DIR_NAME}"
+def build(target, configuration)
+	command = "xcodebuild -project #{PROJECT} -configuration #{configuration} -arch x86_64 -target #{target}"
+	system command
+	
+	return "build/#{configuration}/lib#{target}.a"
+end
 
-system "xcodebuild -project Chipmunk7.xcodeproj -configuration Release -target ChipmunkStatic"
-system "xcodebuild -project Chipmunk7.xcodeproj -configuration Debug -target ChipmunkStatic"
-system "xcodebuild -project Chipmunk7.xcodeproj -configuration Release -target ObjectiveChipmunk"
-system "xcodebuild -project Chipmunk7.xcodeproj -configuration Debug -target ObjectiveChipmunk"
+def build_lib(target, copy_list)
+	debug_lib = build(target, "Debug")
+	release_lib = build(target, "Release")
+	
+	dirname = "#{target}"
+	
+	system "rm -rf '#{dirname}'"
+	system "mkdir '#{dirname}'"
+	
+	system "cp '#{debug_lib}' '#{dirname}/lib#{target}-Debug.a'"
+	system "cp '#{release_lib}' '#{dirname}/lib#{target}.a'"
+	
+	copy_list.each{|src| system "rsync -r --exclude='.*'  '#{src}' '#{dirname}'"}
+end
 
-system "cp build/Debug/libChipmunk.a #{OUTPUT_DIR_NAME}/libChipmunk-Debug.a"
-system "cp build/Release/libChipmunk.a #{OUTPUT_DIR_NAME}/libChipmunk.a"
-system "cp build/Debug/libObjectiveChipmunk.a #{OUTPUT_DIR_NAME}/libObjectiveChipmunk-Debug.a"
-system "cp build/Release/libObjectiveChipmunk.a #{OUTPUT_DIR_NAME}/libObjectiveChipmunk.a"
+build_lib("Chipmunk-Mac", [
+	"../include",
+])
 
-system "rsync -r --exclude='.*' ../include/ #{OUTPUT_DIR_NAME}"
-system "rsync -r --exclude='.*' ../objectivec/include/ #{OUTPUT_DIR_NAME}"
-system "open #{OUTPUT_DIR_NAME}"
-
-puts "Copy #{OUTPUT_DIR_NAME} into your project and enjoy."
+build_lib("ObjectiveChipmunk-Mac", [
+	"../include",
+	"../objectivec/include",
+])
 
 BUILD_LOG.delete
