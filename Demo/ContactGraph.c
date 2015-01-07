@@ -42,7 +42,7 @@ static cpBody *ballBody;
 static void
 ScaleIterator(cpBody *body, cpArbiter *arb, cpVect *sum)
 {
-	(*sum) = cpvadd(*sum, cpArbiterTotalImpulseWithFriction(arb));
+	(*sum) = cpvadd(*sum, cpArbiterTotalImpulse(arb));
 }
 
 static void
@@ -64,7 +64,7 @@ struct CrushingContext {
 static void
 EstimateCrushing(cpBody *body, cpArbiter *arb, struct CrushingContext *context)
 {
-	cpVect j = cpArbiterTotalImpulseWithFriction(arb);
+	cpVect j = cpArbiterTotalImpulse(arb);
 	context->magnitudeSum += cpvlength(j);
 	context->vectorSum = cpvadd(context->vectorSum, j);
 }

@@ -1,10 +1,10 @@
 #include "chipmunk/chipmunk.h"
-#include "chipmunk_unsafe.h"
+#include "chipmunk/chipmunk_unsafe.h"
 #include "ChipmunkDemo.h"
 
 #define ENABLE_HASTY 0
 #if ENABLE_HASTY
-	#import "cpHastySpace.h"
+	#import "chipmunk/cpHastySpace.h"
 	
 	static cpSpace *MakeHastySpace(){
 		cpSpace *space = cpHastySpaceNew();

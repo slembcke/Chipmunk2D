@@ -20,8 +20,8 @@
  */
  
 #include "chipmunk/chipmunk.h"
+#include "chipmunk/chipmunk_unsafe.h"
 #include "ChipmunkDemo.h"
-#include "chipmunk_unsafe.h"
 
 static void
 update(cpSpace *space, double dt)

@@ -14,9 +14,6 @@
     <Filter Include="include\constraints">
       <UniqueIdentifier>{2af6495e-94a8-4200-8b69-e531cfdb9518}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\constraints">
-      <UniqueIdentifier>{23a179d1-3a41-426c-8528-edba78d4969c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\chipmunk\chipmunk.h">
@@ -105,9 +102,6 @@
     <ClCompile Include="..\..\..\src\cpArray.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\cpBB.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\cpBody.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -129,42 +123,6 @@
     <ClCompile Include="..\..\..\src\cpSpaceHash.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\cpVect.c">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\constraints\cpConstraint.c">
-      <Filter>src\constraints</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\constraints\cpDampedRotarySpring.c">
-      <Filter>src\constraints</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\constraints\cpDampedSpring.c">
-      <Filter>src\constraints</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\constraints\cpGearJoint.c">
-      <Filter>src\constraints</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\constraints\cpGrooveJoint.c">
-      <Filter>src\constraints</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\constraints\cpPinJoint.c">
-      <Filter>src\constraints</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\constraints\cpPivotJoint.c">
-      <Filter>src\constraints</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\constraints\cpRatchetJoint.c">
-      <Filter>src\constraints</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\constraints\cpRotaryLimitJoint.c">
-      <Filter>src\constraints</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\constraints\cpSimpleMotor.c">
-      <Filter>src\constraints</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\constraints\cpSlideJoint.c">
-      <Filter>src\constraints</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\cpSpaceComponent.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -181,6 +139,42 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\cpSweep1D.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpConstraint.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpDampedRotarySpring.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpDampedSpring.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpGearJoint.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpGrooveJoint.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpPinJoint.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpPivotJoint.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpRatchetJoint.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpRotaryLimitJoint.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpSimpleMotor.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpSlideJoint.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\cpSpaceDebug.c">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

@@ -55,34 +55,33 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\chipmunk.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpConstraint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpDampedRotarySpring.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpDampedSpring.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpGearJoint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpGrooveJoint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpPinJoint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpPivotJoint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpRatchetJoint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpRotaryLimitJoint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpSimpleMotor.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpSlideJoint.c" />
     <ClCompile Include="..\..\..\src\cpArbiter.c" />
     <ClCompile Include="..\..\..\src\cpArray.c" />
-    <ClCompile Include="..\..\..\src\cpBB.c" />
     <ClCompile Include="..\..\..\src\cpBBTree.c" />
     <ClCompile Include="..\..\..\src\cpBody.c" />
     <ClCompile Include="..\..\..\src\cpCollision.c" />
+    <ClCompile Include="..\..\..\src\cpConstraint.c" />
+    <ClCompile Include="..\..\..\src\cpDampedRotarySpring.c" />
+    <ClCompile Include="..\..\..\src\cpDampedSpring.c" />
+    <ClCompile Include="..\..\..\src\cpGearJoint.c" />
+    <ClCompile Include="..\..\..\src\cpGrooveJoint.c" />
     <ClCompile Include="..\..\..\src\cpHashSet.c" />
+    <ClCompile Include="..\..\..\src\cpPinJoint.c" />
+    <ClCompile Include="..\..\..\src\cpPivotJoint.c" />
     <ClCompile Include="..\..\..\src\cpPolyShape.c" />
+    <ClCompile Include="..\..\..\src\cpRatchetJoint.c" />
+    <ClCompile Include="..\..\..\src\cpRotaryLimitJoint.c" />
     <ClCompile Include="..\..\..\src\cpShape.c" />
+    <ClCompile Include="..\..\..\src\cpSimpleMotor.c" />
+    <ClCompile Include="..\..\..\src\cpSlideJoint.c" />
     <ClCompile Include="..\..\..\src\cpSpace.c" />
     <ClCompile Include="..\..\..\src\cpSpaceComponent.c" />
+    <ClCompile Include="..\..\..\src\cpSpaceDebug.c" />
     <ClCompile Include="..\..\..\src\cpSpaceHash.c" />
     <ClCompile Include="..\..\..\src\cpSpaceQuery.c" />
     <ClCompile Include="..\..\..\src\cpSpaceStep.c" />
     <ClCompile Include="..\..\..\src\cpSpatialIndex.c" />
     <ClCompile Include="..\..\..\src\cpSweep1D.c" />
-    <ClCompile Include="..\..\..\src\cpVect.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="chipmunk.def" />
@@ -213,7 +212,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\include\chipmunk</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
