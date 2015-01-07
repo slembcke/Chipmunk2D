@@ -394,7 +394,7 @@ static cpBool CallBlock(cpArbiter *arb, cpSpace *space, cpBool (^block)(cpArbite
 		__block int counter = 0;
 		
 		cpSpaceEachBody_b(space.space, ^(cpBody *body){
-			XCTAssertEqual(body, _body, @"");
+			XCTAssertEqual(cpBodyGetUserData(body), _body, @"");
 			counter++;
 		});
 		

@@ -23,7 +23,7 @@
 
 void ChipmunkDemoTextInit(void);
 //#define ChipmunkDemoTextDrawString(...)
-void ChipmunkDemoTextDrawString(cpVect pos, char *str);
+void ChipmunkDemoTextDrawString(cpVect pos, char const *str);
 void ChipmunkDemoTextFlushRenderer(void);
 void ChipmunkDemoTextClearRenderer(void);
 

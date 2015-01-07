@@ -51,7 +51,7 @@ AssertExpected(id self, cpVect *verts, int expectedCount, cpVect *expectedVerts)
 	
 	// Check the verts
 	for(int i=0; i<expectedCount; i++){
-		XCTAssertEqual(verts[i], expectedVerts[(firstExpected + i)%expectedCount], @"");
+		XCTAssertTrue(cpveql(verts[i], expectedVerts[(firstExpected + i)%expectedCount]), @"");
 	}
 }
 
@@ -64,7 +64,7 @@ AssertHullsEqual(id self, int resultCount, cpVect *resultVerts)
 	
 	XCTAssertEqual(resultCount, result2Count, @"");
 	for(int i=0; i<resultCount; i++){
-		XCTAssertEqual(resultVerts[i], result2Verts[i], @"");
+		XCTAssertTrue(cpveql(resultVerts[i], result2Verts[i]), @"");
 	}
 }
 
@@ -89,7 +89,7 @@ AssertHull(id self, int count, cpVect *verts, int expectedCount, cpVect *expecte
 		XCTAssertTrue(cpAreaForPoly(expectedCount, expectedVerts, 0.0f) >= 0.0f, @"");
 		XCTAssertTrue(cpAreaForPoly(resultCount, resultVerts, 0.0f) >= 0.0f, @"");
 		
-		XCTAssertEqual(resultVerts[0], rotated[first], @"");
+		XCTAssertTrue(cpveql(resultVerts[0], rotated[first]), @"");
 		
 		AssertExpected(self, resultVerts, expectedCount, expectedVerts);
 		AssertHullsEqual(self, resultCount, resultVerts);

@@ -30,11 +30,12 @@
 @implementation SpaceTest
 
 #define TestAccessors(o, p, v) o.p = v; XCTAssertEqual(o.p, v, @"");
+#define TestAccessorsV(o, p, v) o.p = v; XCTAssertTrue(cpveql(o.p, v), @"");
 #define AssertRetainCount(obj, count) XCTAssertEqual([obj retainCount], (NSUInteger)count, @"")
 
 -(void)testProperties {
 	ChipmunkSpace *space = [[ChipmunkSpace alloc] init];
-	XCTAssertEqual(space.gravity, cpvzero, @"");
+	XCTAssertTrue(cpveql(space.gravity, cpvzero), @"");
 	XCTAssertEqual(space.damping, (cpFloat)1.0, @"");
 	XCTAssertEqual(space.idleSpeedThreshold, (cpFloat)0, @"");
 	XCTAssertEqual(space.sleepTimeThreshold, (cpFloat)INFINITY, @"");
@@ -43,7 +44,7 @@
 	XCTAssertNotNil(space.staticBody, @"");
 	
 	TestAccessors(space, iterations, 50);
-	TestAccessors(space, gravity, cpv(1,2));
+	TestAccessorsV(space, gravity, cpv(1,2));
 	TestAccessors(space, damping, (cpFloat)5);
 	TestAccessors(space, idleSpeedThreshold, (cpFloat)5);
 	TestAccessors(space, sleepTimeThreshold, (cpFloat)5);

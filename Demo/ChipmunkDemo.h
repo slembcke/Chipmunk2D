@@ -58,8 +58,8 @@ extern cpVect ChipmunkDemoMouse;
 extern cpBool ChipmunkDemoRightClick;
 extern cpBool ChipmunkDemoRightDown;
 
-extern char *ChipmunkDemoMessageString;
-void ChipmunkDemoPrintString(char *fmt, ...);
+extern char const *ChipmunkDemoMessageString;
+void ChipmunkDemoPrintString(char const *fmt, ...);
 
 extern cpShapeFilter GRAB_FILTER;
 extern cpShapeFilter NOT_GRABBABLE_FILTER;

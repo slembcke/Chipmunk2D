@@ -27,7 +27,10 @@
 
 @implementation ShapeTest
 
+#define AssertEqualStruct(a, b, m) {typeof(a) __a = a; typeof(b) __b = b; XCTAssertTrue(memcmp(&__a, &__b, sizeof(a)) == 0, m);}
 #define TestAccessors(o, p, v) o.p = v; XCTAssertEqual(o.p, v, @"");
+#define TestAccessorsV(o, p, v) o.p = v; XCTAssertTrue(cpveql(o.p, v), @"");
+#define TestAccessorsS(o, p, v) o.p = v; AssertEqualStruct(o.p, v, @"");
 
 static void
 testPropertiesHelper(id self, ChipmunkBody *body, ChipmunkShape *shape)
@@ -38,21 +41,21 @@ testPropertiesHelper(id self, ChipmunkBody *body, ChipmunkShape *shape)
 	XCTAssertFalse(shape.sensor, @"");
 	XCTAssertEqual(shape.elasticity, (cpFloat)0, @"");
 	XCTAssertEqual(shape.friction, (cpFloat)0, @"");
-	XCTAssertEqual(shape.surfaceVelocity, cpvzero, @"");
+	XCTAssertTrue(cpveql(shape.surfaceVelocity, cpvzero), @"");
 	XCTAssertNil(shape.collisionType, @"");
-	XCTAssertEqual(shape.filter, CP_SHAPE_FILTER_ALL, @"");
+	AssertEqualStruct(shape.filter, CP_SHAPE_FILTER_ALL, @"");
 	
 	cpBB bb = [shape cacheBB];
-	XCTAssertEqual(shape.bb, bb, @"");
+	AssertEqualStruct(shape.bb, bb, @"");
 	
 	TestAccessors(shape, userData, @"object");
 	TestAccessors(shape, sensor, YES);
 	TestAccessors(shape, elasticity, (cpFloat)0);
 	TestAccessors(shape, friction, (cpFloat)0);
-	TestAccessors(shape, surfaceVelocity, cpv(5,6));
+	TestAccessorsV(shape, surfaceVelocity, cpv(5,6));
 	TestAccessors(shape, collisionType, @"type");
 	cpShapeFilter f = {@"group", 456, 789};
-	TestAccessors(shape, filter, f);
+	TestAccessorsS(shape, filter, f);
 }
 
 -(void)testProperties {
@@ -61,7 +64,7 @@ testPropertiesHelper(id self, ChipmunkBody *body, ChipmunkShape *shape)
 	ChipmunkCircleShape *circle = [ChipmunkCircleShape circleWithBody:body radius:1 offset:cpv(1,2)];
 	testPropertiesHelper(self, body, circle);
 	XCTAssertEqual(circle.radius, (cpFloat)1, @"");
-	XCTAssertEqual(circle.offset, cpv(1,2), @"");
+	XCTAssertTrue(cpveql(circle.offset, cpv(1,2)), @"");
 	
 	XCTAssertTrue([circle pointQuery:cpv(1,2)].distance <= 0.0f, @"");
 	XCTAssertTrue([circle pointQuery:cpv(1,2.9)].distance <= 0.0f, @"");
@@ -70,9 +73,9 @@ testPropertiesHelper(id self, ChipmunkBody *body, ChipmunkShape *shape)
 	
 	ChipmunkSegmentShape *segment = [ChipmunkSegmentShape segmentWithBody:body from:cpvzero to:cpv(1,0) radius:1];
 	testPropertiesHelper(self, body, segment);
-	XCTAssertEqual(segment.a, cpvzero, @"");
-	XCTAssertEqual(segment.b, cpv(1,0), @"");
-	XCTAssertEqual(segment.normal, cpv(0,-1), @"");
+	XCTAssertTrue(cpveql(segment.a, cpvzero), @"");
+	XCTAssertTrue(cpveql(segment.b, cpv(1,0)), @"");
+	XCTAssertTrue(cpveql(segment.normal, cpv(0,-1)), @"");
 	
 	XCTAssertTrue([segment pointQuery:cpvzero].distance <= 0.0f, @"");
 	XCTAssertTrue([segment pointQuery:cpv(1,0)].distance <= 0.0f, @"");
