@@ -215,7 +215,7 @@ typedef uint32_t cpCollisionID;
 #endif
 
 #ifdef CP_BITMASK_TYPE
-	typedef CP_BITMASK_TYPE cpLayers;
+	typedef CP_BITMASK_TYPE cpBitmask;
 #else
 /// Type used for cpShapeFilter category and mask.
 	typedef unsigned int cpBitmask;
