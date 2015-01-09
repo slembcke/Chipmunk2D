@@ -196,38 +196,38 @@
     <ProjectReference />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Demo\Bench.c" />
-    <ClCompile Include="..\..\..\Demo\Buoyancy.c" />
-    <ClCompile Include="..\..\..\Demo\Chains.c" />
-    <ClCompile Include="..\..\..\Demo\ChipmunkDebugDraw.c" />
-    <ClCompile Include="..\..\..\Demo\ChipmunkDemo.c" />
-    <ClCompile Include="..\..\..\Demo\ChipmunkDemoShaderSupport.c" />
-    <ClCompile Include="..\..\..\Demo\ChipmunkDemoTextSupport.c" />
-    <ClCompile Include="..\..\..\Demo\ContactGraph.c" />
-    <ClCompile Include="..\..\..\Demo\Convex.c" />
-    <ClCompile Include="..\..\..\Demo\Crane.c" />
-    <ClCompile Include="..\..\..\Demo\Joints.c" />
-    <ClCompile Include="..\..\..\Demo\LogoSmash.c" />
-    <ClCompile Include="..\..\..\Demo\OneWay.c" />
-    <ClCompile Include="..\..\..\Demo\Planet.c" />
-    <ClCompile Include="..\..\..\Demo\Player.c" />
-    <ClCompile Include="..\..\..\Demo\Plink.c" />
-    <ClCompile Include="..\..\..\Demo\Pump.c" />
-    <ClCompile Include="..\..\..\Demo\PyramidStack.c" />
-    <ClCompile Include="..\..\..\Demo\PyramidTopple.c" />
-    <ClCompile Include="..\..\..\Demo\Query.c" />
-    <ClCompile Include="..\..\..\Demo\Shatter.c" />
-    <ClCompile Include="..\..\..\Demo\Slice.c" />
-    <ClCompile Include="..\..\..\Demo\Springies.c" />
-    <ClCompile Include="..\..\..\Demo\Sticky.c" />
-    <ClCompile Include="..\..\..\Demo\Tank.c" />
-    <ClCompile Include="..\..\..\Demo\TheoJansen.c" />
-    <ClCompile Include="..\..\..\Demo\Tumble.c" />
-    <ClCompile Include="..\..\..\Demo\Unicycle.c" />
+    <ClCompile Include="..\..\..\demo\Bench.c" />
+    <ClCompile Include="..\..\..\demo\Buoyancy.c" />
+    <ClCompile Include="..\..\..\demo\Chains.c" />
+    <ClCompile Include="..\..\..\demo\ChipmunkDebugDraw.c" />
+    <ClCompile Include="..\..\..\demo\ChipmunkDemo.c" />
+    <ClCompile Include="..\..\..\demo\ChipmunkDemoShaderSupport.c" />
+    <ClCompile Include="..\..\..\demo\ChipmunkDemoTextSupport.c" />
+    <ClCompile Include="..\..\..\demo\ContactGraph.c" />
+    <ClCompile Include="..\..\..\demo\Convex.c" />
+    <ClCompile Include="..\..\..\demo\Crane.c" />
+    <ClCompile Include="..\..\..\demo\Joints.c" />
+    <ClCompile Include="..\..\..\demo\LogoSmash.c" />
+    <ClCompile Include="..\..\..\demo\OneWay.c" />
+    <ClCompile Include="..\..\..\demo\Planet.c" />
+    <ClCompile Include="..\..\..\demo\Player.c" />
+    <ClCompile Include="..\..\..\demo\Plink.c" />
+    <ClCompile Include="..\..\..\demo\Pump.c" />
+    <ClCompile Include="..\..\..\demo\PyramidStack.c" />
+    <ClCompile Include="..\..\..\demo\PyramidTopple.c" />
+    <ClCompile Include="..\..\..\demo\Query.c" />
+    <ClCompile Include="..\..\..\demo\Shatter.c" />
+    <ClCompile Include="..\..\..\demo\Slice.c" />
+    <ClCompile Include="..\..\..\demo\Springies.c" />
+    <ClCompile Include="..\..\..\demo\Sticky.c" />
+    <ClCompile Include="..\..\..\demo\Tank.c" />
+    <ClCompile Include="..\..\..\demo\TheoJansen.c" />
+    <ClCompile Include="..\..\..\demo\Tumble.c" />
+    <ClCompile Include="..\..\..\demo\Unicycle.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Demo\ChipmunkDebugDraw.h" />
-    <ClInclude Include="..\..\..\Demo\ChipmunkDemo.h" />
+    <ClInclude Include="..\..\..\demo\ChipmunkDebugDraw.h" />
+    <ClInclude Include="..\..\..\demo\ChipmunkDemo.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\chipmunk\chipmunk.vcxproj">
