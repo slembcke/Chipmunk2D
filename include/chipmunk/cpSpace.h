@@ -24,9 +24,6 @@
 
 //MARK: Definitions
 
-typedef struct cpContactBufferHeader cpContactBufferHeader;
-typedef void (*cpSpaceArbiterApplyImpulseFunc)(cpArbiter *arb);
-
 /// Collision begin event function callback type.
 /// Returning false from a begin callback causes the collision to be ignored until
 /// the the separate callback is called when the objects stop colliding.
@@ -39,12 +36,26 @@ typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, cpDataP
 /// Collision separate event function callback type.
 typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
 
+/// Struct that holds function callback pointers to configure custom collision handling.
+/// Collision handlers have a pair of types; when a collision occurs between two shapes that have these types, the collision handler functions are triggered.
 struct cpCollisionHandler {
-	cpCollisionType typeA, typeB;
+	/// Collision type identifier of the first shape that this handler recognizes.
+	/// In the collision handler callback, the shape with this type will be the first argument. Read only.
+	const cpCollisionType typeA;
+	/// Collision type identifier of the second shape that this handler recognizes.
+	/// In the collision handler callback, the shape with this type will be the second argument. Read only.
+	const cpCollisionType typeB;
+	/// This function is called when two shapes with types that match this collision handler begin colliding.
 	cpCollisionBeginFunc beginFunc;
+	/// This function is called each step when two shapes with types that match this collision handler are colliding.
+	/// It's called before the collision solver runs so that you can affect a collision's outcome.
 	cpCollisionPreSolveFunc preSolveFunc;
+	/// This function is called each step when two shapes with types that match this collision handler are colliding.
+	/// It's called after the collision solver runs so that you can read back information about the collision to trigger events in your game.
 	cpCollisionPostSolveFunc postSolveFunc;
+	/// This function is called when two shapes with types that match this collision handler stop colliding.
 	cpCollisionSeparateFunc separateFunc;
+	/// This is a user definable context pointer that is passed to all of the collision handler functions.
 	cpDataPointer userData;
 };
 
@@ -132,8 +143,12 @@ cpBool cpSpaceIsLocked(cpSpace *space);
 
 //MARK: Collision Handlers
 
+/// Create or return the existing collision handler that is called for all collisions that are not handled by a more specific collision handler.
 cpCollisionHandler *cpSpaceAddDefaultCollisionHandler(cpSpace *space);
+/// Create or return the existing collision handler for the specified pair of collision types.
+/// If wildcard handlers are used with either of the collision types, it's the responibility of the custom handler to invoke the wildcard handlers.
 cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b);
+/// Create or return the existing wildcard collision handler for the specified type.
 cpCollisionHandler *cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type);
 
 
@@ -244,15 +259,22 @@ void cpSpaceStep(cpSpace *space, cpFloat dt);
 
 #ifndef CP_SPACE_DISABLE_DEBUG_API
 
+/// Color type to use with the space debug drawing API.
 typedef struct cpSpaceDebugColor {
 	float r, g, b, a;
 } cpSpaceDebugColor;
 
+/// Callback type for a function that draws a filled, stroked circle.
 typedef void (*cpSpaceDebugDrawCircleImpl)(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor, cpDataPointer data);
+/// Callback type for a function that draws a line segment.
 typedef void (*cpSpaceDebugDrawSegmentImpl)(cpVect a, cpVect b, cpSpaceDebugColor color, cpDataPointer data);
+/// Callback type for a function that draws a thick line segment.
 typedef void (*cpSpaceDebugDrawFatSegmentImpl)(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor, cpDataPointer data);
+/// Callback type for a function that draws a convex polygon.
 typedef void (*cpSpaceDebugDrawPolygonImpl)(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor, cpDataPointer data);
+/// Callback type for a function that draws a dot.
 typedef void (*cpSpaceDebugDrawDotImpl)(cpFloat size, cpVect pos, cpSpaceDebugColor color, cpDataPointer data);
+/// Callback type for a function that returns a color for a given shape. This gives you an opportunity to color shapes based on how they are used in your engine.
 typedef cpSpaceDebugColor (*cpSpaceDebugDrawColorForShapeImpl)(cpShape *shape, cpDataPointer data);
 
 typedef enum cpSpaceDebugDrawFlags {
@@ -261,22 +283,35 @@ typedef enum cpSpaceDebugDrawFlags {
 	CP_SPACE_DEBUG_DRAW_COLLISION_POINTS = 1<<2,
 } cpSpaceDebugDrawFlags;
 
+/// Struct used with cpSpaceDebugDraw() containing drawing callbacks and other drawing settings.
 typedef struct cpSpaceDebugDrawOptions {
+	/// Function that will be invoked to draw circles.
 	cpSpaceDebugDrawCircleImpl drawCircle;
+	/// Function that will be invoked to draw line segments.
 	cpSpaceDebugDrawSegmentImpl drawSegment;
+	/// Function that will be invoked to draw thick line segments.
 	cpSpaceDebugDrawFatSegmentImpl drawFatSegment;
+	/// Function that will be invoked to draw convex polygons.
 	cpSpaceDebugDrawPolygonImpl drawPolygon;
+	/// Function that will be invoked to draw dots.
 	cpSpaceDebugDrawDotImpl drawDot;
 	
+	/// Flags that request which things to draw (collision shapes, constraints, contact points).
 	cpSpaceDebugDrawFlags flags;
+	/// Outline color passed to the drawing function.
 	cpSpaceDebugColor shapeOutlineColor;
+	/// Function that decides what fill color to draw shapes using.
 	cpSpaceDebugDrawColorForShapeImpl colorForShape;
+	/// Color passed to drawing functions for constraints.
 	cpSpaceDebugColor constraintColor;
+	/// Color passed to drawing functions for collision points.
 	cpSpaceDebugColor collisionPointColor;
 	
+	/// User defined context pointer passed to all of the callback functions as the 'data' argument.
 	cpDataPointer data;
 } cpSpaceDebugDrawOptions;
 
+/// Debug draw the current state of the space using the supplied drawing options.
 void cpSpaceDebugDraw(cpSpace *space, cpSpaceDebugDrawOptions *options);
 
 #endif

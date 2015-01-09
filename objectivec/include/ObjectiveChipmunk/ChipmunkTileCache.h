@@ -7,7 +7,7 @@
 
 @class ChipmunkCachedTile;
 
-/// PRO: A tile cache enables an efficient means of updating a large deformable terrain.
+/// A tile cache enables an efficient means of updating a large deformable terrain.
 /// General usage would be to pass a rectangle covering the viewport to ensureRect:
 /// and calling markDirtyRect: each time a change is made that requires an area to be resampled.
 @interface ChipmunkAbstractTileCache : NSObject {
@@ -64,7 +64,7 @@
 @end
 
 
-/// PRO: Generic tile cache. Configurable enough to be useful for most uses.
+/// Generic tile cache. Configurable enough to be useful for most uses.
 @interface ChipmunkBasicTileCache : ChipmunkAbstractTileCache {
 @private
 	cpFloat _simplifyThreshold;

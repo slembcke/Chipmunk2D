@@ -27,10 +27,14 @@ cpPolyShape* cpPolyShapeAlloc(void);
 /// Initialize a polygon shape with rounded corners.
 /// A convex hull will be created from the vertexes.
 cpPolyShape* cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int count, const cpVect *verts, cpTransform transform, cpFloat radius);
+/// Initialize a polygon shape with rounded corners.
+/// The vertexes must be convex with a counter-clockwise winding.
 cpPolyShape* cpPolyShapeInitRaw(cpPolyShape *poly, cpBody *body, int count, const cpVect *verts, cpFloat radius);
 /// Allocate and initialize a polygon shape with rounded corners.
 /// A convex hull will be created from the vertexes.
 cpShape* cpPolyShapeNew(cpBody *body, int count, const cpVect *verts, cpTransform transform, cpFloat radius);
+/// Allocate and initialize a polygon shape with rounded corners.
+/// The vertexes must be convex with a counter-clockwise winding.
 cpShape* cpPolyShapeNewRaw(cpBody *body, int count, const cpVect *verts, cpFloat radius);
 
 /// Initialize a box shaped polygon shape with rounded corners.

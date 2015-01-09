@@ -12,7 +12,7 @@
 
 
 /**
-	PRO: Generic sampler used with bitmap data.
+	Generic sampler used with bitmap data.
 	Currently limited to 8 bit per component data.
 	Bitmap samplers currently provide no filtering, but could be easily extended to do so.
 */
@@ -72,7 +72,7 @@
 
 
 
-/// PRO: Sampler built on top of a CGBitmapContext to allow deformable geometry.
+/// Sampler built on top of a CGBitmapContext to allow deformable geometry.
 /// Very efficient when paired with a ChipmunkTileCache.
 @interface ChipmunkCGContextSampler : ChipmunkBitmapSampler {
 @private
@@ -93,7 +93,7 @@
 
 
 
-/// PRO: A CGBitmapContext sampler initialized with an CGImage.
+/// A CGBitmapContext sampler initialized with an CGImage.
 @interface ChipmunkImageSampler : ChipmunkCGContextSampler
 
 /// Helper method to easily load CGImageRefs by path. You are responsible for releasing the CGImage.

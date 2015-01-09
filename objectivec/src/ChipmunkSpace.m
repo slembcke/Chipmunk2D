@@ -26,14 +26,6 @@
 #import <objc/message.h>
 #import <TargetConditionals.h>
 
-#ifdef CHIPMUNK_PRO_TRIAL
-#if TARGET_OS_IPHONE == 1
-	#import <UIKit/UIKit.h>
-#else
-	#import <AppKit/AppKit.h>
-#endif
-#endif
-
 // Just in case the user doesn't have -ObjC in their linker flags.
 // Annoyingly, this is the case more often than not.
 @interface NSArrayChipmunkObject : NSArray<ChipmunkObject>
@@ -95,48 +87,6 @@ typedef struct HandlerContext {
 } HandlerContext;
 
 @implementation ChipmunkSpace
-
-#ifdef CHIPMUNK_PRO_TRIAL
-static NSString *dialogTitle = @"Chipmunk Pro Trial";
-static NSString *dialogMessage = @"This copy of Chipmunk Pro is a trial, please consider purchasing if you continue using it.";
-
-+(void)initialize
-{
-	[super initialize];
-
-	static BOOL done = FALSE;
-	if(done) return; else done = TRUE;
-	
-#if TARGET_OS_IPHONE == 1
-	UIAlertView *alert = [[UIAlertView alloc]
-		initWithTitle:dialogTitle
-		message:dialogMessage
-		delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil
-	];
-	
-	[alert show];
-	[alert release];
-#else
-	[self performSelectorOnMainThread:@selector(dialog) withObject:nil waitUntilDone:FALSE];
-#endif
-
-}
-
-#if TARGET_OS_IPHONE != 1
-+(void)dialog
-{
-	[NSApplication sharedApplication];
-	[[NSAlert
-		alertWithMessageText:dialogTitle
-		defaultButton:@"OK"
-		alternateButton:nil
-		otherButton:nil
-		informativeTextWithFormat:dialogMessage
-	] runModal];
-}
-#endif
-
-#endif
 
 +(ChipmunkSpace *)spaceFromCPSpace:(cpSpace *)space
 {	

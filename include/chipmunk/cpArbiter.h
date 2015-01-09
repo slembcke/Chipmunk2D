@@ -20,28 +20,34 @@
  */
 
 /// @defgroup cpArbiter cpArbiter
-/// The cpArbiter struct controls pairs of colliding shapes.
+/// The cpArbiter struct tracks pairs of colliding shapes.
 /// They are also used in conjuction with collision handler callbacks
-/// allowing you to retrieve information on the collision and control it.
+/// allowing you to retrieve information on the collision or change it.
+/// A unique arbiter value is used for each pair of colliding objects. It persists until the shapes separate.
 /// @{
 
 #define CP_MAX_CONTACTS_PER_ARBITER 2
 
-// TODO: Document
+/// Get the restitution (elasticity) that will be applied to the pair of colliding objects.
 cpFloat cpArbiterGetRestitution(const cpArbiter *arb);
+/// Override the restitution (elasticity) that will be applied to the pair of colliding objects.
 void cpArbiterSetRestitution(cpArbiter *arb, cpFloat restitution);
+/// Get the friction coefficient that will be applied to the pair of colliding objects.
 cpFloat cpArbiterGetFriction(const cpArbiter *arb);
+/// Override the friction coefficient that will be applied to the pair of colliding objects.
 void cpArbiterSetFriction(cpArbiter *arb, cpFloat friction);
 
 // Get the relative surface velocity of the two shapes in contact.
 cpVect cpArbiterGetSurfaceVelocity(cpArbiter *arb);
 
 // Override the relative surface velocity of the two shapes in contact.
-// By default this is calculated to be the difference of the two
-// surface velocities clamped to the tangent plane.
+// By default this is calculated to be the difference of the two surface velocities clamped to the tangent plane.
 void cpArbiterSetSurfaceVelocity(cpArbiter *arb, cpVect vr);
 
+/// Get the user data pointer associated with this pair of colliding objects.
 cpDataPointer cpArbiterGetUserData(const cpArbiter *arb);
+/// Set a user data point associated with this pair of colliding objects.
+/// If you need to perform any cleanup for this pointer, you must do it yourself, in the separate callback for instance.
 void cpArbiterSetUserData(cpArbiter *arb, cpDataPointer userData);
 
 /// Calculate the total impulse including the friction that was applied by this arbiter.
@@ -51,7 +57,8 @@ cpVect cpArbiterTotalImpulse(const cpArbiter *arb);
 /// This function should only be called from a post-solve, post-step or cpBodyEachArbiter callback.
 cpFloat cpArbiterTotalKE(const cpArbiter *arb);
 
-
+/// Mark a collision pair to be ignored until the two objects separate.
+/// Pre-solve and post-solve callbacks will not be called, but the separate callback will be called.
 cpBool cpArbiterIgnore(cpArbiter *arb);
 
 /// Return the colliding shapes involved for this arbiter.
@@ -97,7 +104,7 @@ void cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set);
 
 /// Returns true if this is the first step a pair of objects started colliding.
 cpBool cpArbiterIsFirstContact(const cpArbiter *arb);
-/// Returns true if in separate callback due to a shape being removed from the space.
+/// Returns true if the separate callback is due to a shape being removed from the space.
 cpBool cpArbiterIsRemoval(const cpArbiter *arb);
 
 /// Get the number of contact points for this arbiter.
@@ -111,16 +118,28 @@ cpVect cpArbiterGetPointB(const cpArbiter *arb, int i);
 /// Get the depth of the @c ith contact point.
 cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i);
 
+/// If you want a custom callback to invoke the wildcard callback for the first collision type, you must call this function explicitly.
+/// You must decide how to handle the wildcard's return value since it may disagree with the other wildcard handler's return value or your own.
 cpBool cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space);
+/// If you want a custom callback to invoke the wildcard callback for the second collision type, you must call this function explicitly.
+/// You must decide how to handle the wildcard's return value since it may disagree with the other wildcard handler's return value or your own.
 cpBool cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space);
 
+/// If you want a custom callback to invoke the wildcard callback for the first collision type, you must call this function explicitly.
+/// You must decide how to handle the wildcard's return value since it may disagree with the other wildcard handler's return value or your own.
 cpBool cpArbiterCallWildcardPreSolveA(cpArbiter *arb, cpSpace *space);
+/// If you want a custom callback to invoke the wildcard callback for the second collision type, you must call this function explicitly.
+/// You must decide how to handle the wildcard's return value since it may disagree with the other wildcard handler's return value or your own.
 cpBool cpArbiterCallWildcardPreSolveB(cpArbiter *arb, cpSpace *space);
 
+/// If you want a custom callback to invoke the wildcard callback for the first collision type, you must call this function explicitly.
 void cpArbiterCallWildcardPostSolveA(cpArbiter *arb, cpSpace *space);
+/// If you want a custom callback to invoke the wildcard callback for the second collision type, you must call this function explicitly.
 void cpArbiterCallWildcardPostSolveB(cpArbiter *arb, cpSpace *space);
 
+/// If you want a custom callback to invoke the wildcard callback for the first collision type, you must call this function explicitly.
 void cpArbiterCallWildcardSeparateA(cpArbiter *arb, cpSpace *space);
+/// If you want a custom callback to invoke the wildcard callback for the second collision type, you must call this function explicitly.
 void cpArbiterCallWildcardSeparateB(cpArbiter *arb, cpSpace *space);
 
 /// @}

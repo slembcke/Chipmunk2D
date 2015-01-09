@@ -8,7 +8,7 @@
 
 @class ChipmunkPolylineSet;
 
-/// PRO: Wrapper for the cpPolyline type.
+/// Wrapper for the cpPolyline type.
 @interface ChipmunkPolyline : NSObject {
 @private
 	cpPolyline *_line;
@@ -70,7 +70,7 @@
 @end
 
 
-/// PRO: Wrapper for the cpPolylineSet type.
+/// Wrapper for the cpPolylineSet type.
 @interface ChipmunkPolylineSet : NSObject<NSFastEnumeration> {
 @private
 	NSMutableArray *_lines;
@@ -87,7 +87,7 @@
 
 
 /**
-	PRO: A sampler is an object that provides a basis function to build shapes from.
+	A sampler is an object that provides a basis function to build shapes from.
 	This can be from a block of pixel data (loaded from a file, or dumped from the screen), or even a mathematical function such as Perlin noise.
 */
 @interface ChipmunkAbstractSampler : NSObject {
@@ -116,7 +116,7 @@
 
 
 
-/// PRO: A simple sampler type that wraps a block as it's sampling function.
+/// A simple sampler type that wraps a block as it's sampling function.
 typedef cpFloat (^ChipmunkMarchSampleBlock)(cpVect point);
 
 @interface ChipmunkBlockSampler : ChipmunkAbstractSampler {

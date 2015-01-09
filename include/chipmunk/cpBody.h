@@ -26,8 +26,17 @@
 /// @{
 
 typedef enum cpBodyType {
+	/// A dynamic body is one that is affected by gravity, forces, and collisions.
+	/// This is the default body type.
 	CP_BODY_TYPE_DYNAMIC,
+	/// A kinematic body is an infinite mass, user controlled body that is not affected by gravity, forces or collisions.
+	/// Instead the body only moves based on it's velocity.
+	/// Dynamic bodies collide normally with kinematic bodies, though the kinematic body will be unaffected.
+	/// Collisions between two kinematic bodies, or a kinematic body and a static body produce collision callbacks, but no collision response.
 	CP_BODY_TYPE_KINEMATIC,
+	/// A static body is a body that never (or rarely) moves. If you move a static body, you must call one of the cpSpaceReindex*() functions.
+	/// Chipmunk uses this information to optimize the collision detection.
+	/// Static bodies do not produce collision callbacks when colliding with other static bodies.
 	CP_BODY_TYPE_STATIC,
 } cpBodyType;
 
@@ -131,7 +140,7 @@ void cpBodySetUserData(cpBody *body, cpDataPointer userData);
 /// Set the callback used to update a body's velocity.
 void cpBodySetVelocityUpdateFunc(cpBody *body, cpBodyVelocityFunc velocityFunc);
 /// Set the callback used to update a body's position.
-/// NOTE: It's not generally recommended to override this.
+/// NOTE: It's not generally recommended to override this unless you call the default position update function.
 void cpBodySetPositionUpdateFunc(cpBody *body, cpBodyPositionFunc positionFunc);
 
 /// Default velocity integration function..
