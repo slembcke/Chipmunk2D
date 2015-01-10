@@ -1,4 +1,5 @@
 What's new in 7.0.0:
+* All features from Chipmunk Pro are now free and open source! (threaded and NEON solver, autogeometry)
 * API: Lots of cleanup to the API naming for better consistency.
 * API: Renamed nearest point queries to simply point queries.
 * API: Removed many deprecated functions.
@@ -9,7 +10,7 @@ What's new in 7.0.0:
 * API: Added radius parameters to many functions dealing with shapes (moment calculation, initialization, etc).
 * API: The convex hull and winding is automatically calculated when creating a poly shape.
 * API: Added a cpShapesCollide() function to check overlap of arbitrary shapes.
-* API: cpShape filter property to replace layers and groups.
+* API: cpShape filter property to supersede layers and groups.
 * API: Collision handlers now return a collision handler struct to make it simpler to set up callbacks.
 * API: Wildcard collision types.
 * API: The cpArbiterTotalImpulseWithFriction() function was renamed to cpArbiterTotalImpulse(). The old useless cpArbiterTotalImpulse() implementation was removed.
@@ -21,15 +22,14 @@ What's new in 7.0.0:
 * API: Added a 2x3 affine transform type, cpTransform.
 * API: Added a new debug rendering API.
 * MISC: Numerous improvements to the collision detection.
-* MISC: Objective-Chipmunk released as open source.
-* PRO: cpPolyline structs are passed by reference instead of value. (I've regretted that for years.)
+* MISC: cpPolyline structs are passed by reference instead of value. (I've regretted that decision for years!)
 
 What's new in 6.2.2:
 * Fixed some issues on arm64.
 * PRO: Added a 64 bit NEON solver to use on arm64.
 
 What's new in 6.2.1:
-* Added Androud support to the CMake files. (Thanks Eric Wing!)
+* Added Android support to the CMake files. (Thanks Eric Wing!)
 * Added a MSVC 2012 project file. (Thanks Leonid Usov!)
 * Merged a fix for VAOs on Windows. (Thanks Leonid Usov!)
 * Merged a couple of other minor fixes.

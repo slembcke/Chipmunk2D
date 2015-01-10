@@ -268,6 +268,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 		// Process, but don't add collisions for sensors.
 		!(a->sensor || b->sensor) &&
 		// Don't process collisions between two infinite mass bodies.
+		// This includes collisions between two kinematic bodies, or a kinematic body and a static body.
 		!(a->body->m == INFINITY && b->body->m == INFINITY)
 	){
 		cpArrayPush(space->arbiters, arb);

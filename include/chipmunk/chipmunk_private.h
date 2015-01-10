@@ -635,6 +635,9 @@ bias_coef(cpFloat errorBias, cpFloat dt)
 
 //MARK: Spaces
 
+typedef struct cpContactBufferHeader cpContactBufferHeader;
+typedef void (*cpSpaceArbiterApplyImpulseFunc)(cpArbiter *arb);
+
 struct cpSpace {
 	int iterations;
 	
