@@ -600,7 +600,7 @@ cpShape* cpSegmentShapeNew(cpBody *body, cpVect a, cpVect b, cpFloat radius)</co
 p(expl). @body@ is the body to attach the segment to, @a@ and @b@ are the endpoints, and @radius@ is the thickness of the segment.
 
 <pre><code>cpVect cpSegmentShapeGetA(cpShape *shape)
-cpVect cpSegmentShapeGetA(cpShape *shape)
+cpVect cpSegmentShapeGetB(cpShape *shape)
 cpVect cpSegmentShapeGetNormal(cpShape *shape)
 cpFloat cpSegmentShapeGetRadius(cpShape *shape)</code></pre>
 
