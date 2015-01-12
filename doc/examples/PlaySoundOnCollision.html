@@ -1,0 +1,15 @@
+<div style="text-align:left;color:#000000; background-color:#ffffff; border:solid black 1px; padding:0.5em 1em 0.5em 1em; overflow:auto;font-size:small; font-family:monospace; "><br />
+<span style="color:#236e25;">// Callback function<br />
+</span><span style="color:#881350;">static</span> cpBool <span style="color:#003369;">PlaySoundOnImpact</span>(cpArbiter *arb, cpSpace *space, <span style="color:#881350;">void</span> *data){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#003369;">PlayCrashSound</span>();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#881350;">return</span> cpTrue;<br />
+}<br />
+<br />
+<span style="color:#236e25;">// When setting up, reference your callback function:<br />
+</span>{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;...<br />
+&nbsp;&nbsp;&nbsp;&nbsp;cpCollisionHandler *handler = <span style="color:#003369;">cpSpaceAddCollisionHandler</span>(space, PLAYER, WALL);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;handler-&gt;postSolveFunc = PlaySoundOnImpact;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;...<br />
+} &nbsp;&nbsp;<br />
+</div>
