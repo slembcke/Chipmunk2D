@@ -53,7 +53,7 @@ static void *
 handlerSetTrans(cpCollisionHandler *handler, void *unused)
 {
 	cpCollisionHandler *copy = (cpCollisionHandler *)cpcalloc(1, sizeof(cpCollisionHandler));
-	(*copy) = (*handler);
+	memcpy(copy, handler, sizeof(cpCollisionHandler));
 	
 	return copy;
 }
@@ -164,7 +164,7 @@ cpSpaceInit(cpSpace *space)
 	space->constraints = cpArrayNew(0);
 	
 	space->usesWildcards = cpFalse;
-	space->defaultHandler = cpCollisionHandlerDoNothing;
+	memcpy(&space->defaultHandler, &cpCollisionHandlerDoNothing, sizeof(cpCollisionHandler));
 	space->collisionHandlers = cpHashSetNew(0, (cpHashSetEqlFunc)handlerSetEql);
 	
 	space->postStepCallbacks = cpArrayNew(0);
@@ -379,7 +379,7 @@ cpSpaceUseWildcardDefaultHandler(cpSpace *space)
 	// Spaces default to using the slightly faster "do nothing" default handler until wildcards are potentially needed.
 	if(!space->usesWildcards){
 		space->usesWildcards = cpTrue;
-		space->defaultHandler = cpCollisionHandlerDefault;
+		memcpy(&space->defaultHandler, &cpCollisionHandlerDefault, sizeof(cpCollisionHandler));
 	}
 }
 
