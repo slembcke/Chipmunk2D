@@ -676,7 +676,7 @@
 			path = lib;
 			sourceTree = "<group>";
 		};
-		D3CCDF5B0AE35DA00080442F /* Demo */ = {
+		D3CCDF5B0AE35DA00080442F /* demo */ = {
 			isa = PBXGroup;
 			children = (
 				D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */,
@@ -715,8 +715,8 @@
 				D3AD63A117CDB9F500B03A7F /* libGLEW */,
 				D3AD63A817CDB9F500B03A7F /* libglfw */,
 			);
-			name = Demo;
-			path = ../Demo;
+			name = demo;
+			path = ../demo;
 			sourceTree = "<group>";
 		};
 		D3E5F0170AA32EAC004E361B = {
@@ -725,7 +725,7 @@
 				D3C517841279B38300C2AFEB /* TODO.txt */,
 				D390FDAD146EF0F8005D1E06 /* VERSION.txt */,
 				D38BB1D1149933F20000EC41 /* chipmunk-docs.textile */,
-				D3CCDF5B0AE35DA00080442F /* Demo */,
+				D3CCDF5B0AE35DA00080442F /* demo */,
 				D3E5F0C40AA75CC3004E361B /* chipmunk.h */,
 				D3C2B4581282178B0080A718 /* chipmunk_private.h */,
 				D39F478A0FD4AB4E00B244CA /* chipmunk_types.h */,

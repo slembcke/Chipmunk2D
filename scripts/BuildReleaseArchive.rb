@@ -27,7 +27,7 @@ Dir.chdir(CHIPMUNK_TMP_PATH){
 	
 	white_list = [
 		"CMakeLists.txt",
-		"Demo",
+		"demo",
 		"doc",
 		"extract_protos.rb",
 		"include",

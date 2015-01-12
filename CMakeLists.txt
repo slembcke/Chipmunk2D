@@ -58,5 +58,5 @@ endif()
 add_subdirectory(src)
 
 if(BUILD_DEMOS)
-  add_subdirectory(Demo)
+  add_subdirectory(demo)
 endif()
