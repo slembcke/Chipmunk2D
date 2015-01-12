@@ -1191,23 +1191,21 @@ struct cpCollisionHandler {
 };
 </code></pre>
 
-p(expl). This collision handler processes collisions between objects of type @typeA@ and @typeB@. Fill the desired collision callback functions- they are documented above. A user definable context pointer @userData@ is included for your convenience. This pointer is provided as an argument in each callback function. When a new collision handler is created, the @begin()@ and @preSolve()@ callbacks are set to a function that alway
+p(expl). This collision handler processes collisions between objects of type @typeA@ and @typeB@. Fill the desired collision callback functions- they are documented above. A user definable context pointer @userData@ is included for your convenience. This pointer is provided as an argument in each callback function.
 
 <pre><code>cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)</code></pre>
 
-p(expl). Add a @cpCollisionHandler@ for given collision type pair or return the existing one. Whenever shapes with collision type (@cpShape.collision_type@) @a@ and collision type @b@ collide, this handler will be used to process the collision events.
-
-Chipmunk will call its own default versions for callbacks you do not wish to implement. Note that these are not the default ones you've set up for the space. If you need to fall back on the space's default callbacks, you'll have to provide them individually to each handler definition.
+p(expl). Add a @cpCollisionHandler@ for specific collision type pair or return the existing handler for the type pair. Whenever shapes with collision types (@cpShape.collision_type@) @a@ and @b@ collide, this handler will be used to process the collision events. When a new collision handler is created, the callbacks will all be set to builtin callbacks that perform the default behavior (call the wildcard handlers, and accept all collisions).
 
 <%= pop_open_example "PlaySoundOnCollision" %>
 
 <pre><code>cpCollisionHandler *cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type)</code></pre>
 
-p(expl). Add a collision handler for given collision type pair. A @cpCollisionHandler@ is returned, where the desired collision callback functions can be filled in. Whenever shapes with collision type (@cpShape.collision_type@) @a@ and collision type @b@ collide, these callbacks will be used to process the collision. Chipmunk will call its own default versions for callbacks you do not wish to implement. Note that these are not the default ones you've set up for the space. If you need to fall back on the space's default callbacks, you'll have to provide them individually to each handler definition.
+p(expl). Add a wildcard collision handler for given collision type. This handler will be used any time an object with this type collides with another object, regardless of it's type. A good example is a projectile that should be destroyed the first time it hits anything. There may be a specific collision handler and two wildcard handlers. It's up to the specific handler to decide when and if to call the wildcard handlers and what to do with their return values. (See @cpArbiterCallWildcard*()@ below) When a new wildcard handler is created, the callbacks will all be set to builtin callbacks that perform the default behavior. (accept all collisions in @begin()@ and @preSolve()@, or do nothing for @postSolve()@ and @separate()@.
 
 <pre><code>cpCollisionHandler *cpSpaceAddDefaultCollisionHandler(cpSpace *space)</code></pre>
 
-p(expl). Return a reference to the default collision handler that is used to process all collisions that don't have a more specific handler. The default behavior for each of the callbacks is to call the wildcard handlers. For the @begin()@ and @preSolve()@ callbacks, the return value is the logical AND of the two wildcard handlers. By default, wildcard @begin()@ and @preSolve()@ callbacks return @cpTrue@.
+p(expl). Return a reference to the default collision handler or that is used to process all collisions that don't have a more specific handler. The default behavior for each of the callbacks is to call the wildcard handlers, ANDing their return values together if applicable.
 
 <%= h 2, "Post-Step Callbacks:", "PostStep" %>
 
