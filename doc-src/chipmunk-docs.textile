@@ -541,29 +541,32 @@ void cpShapeSetUserData(cpShape *shape, cpDataPointer value)</code></pre>
 p(expl). A user definable data pointer. If you set this to point at the game object the shapes is for, then you can access your game object from Chipmunk callbacks.
 
 
-<%= h 2, "Filtering Collisions:", "Filtering" %>
+<%= h 2, "Fast Collision Filtering using cpShapeFilter:", "Filtering" %>
 
 Chipmunk has two primary means of ignoring collisions: groups and category masks.
 
-*Groups* are meant to ignore collisions between parts on a complex object. A ragdoll is a good example. When jointing an arm onto the torso, you'll want them to allow them to overlap. Groups allow you to do exactly that. Shapes that have the same group don't generate collisions. So by placing all of the shapes in a ragdoll in the same group, you'll prevent it from colliding against other parts of itself.
+*Groups* are used to ignore collisions between parts on a complex object. A ragdoll is a good example. When jointing an arm onto the torso, you'll want them to allow them to overlap. Groups allow you to do exactly that. Shapes that have the same group don't generate collisions. So by placing all of the shapes in a ragdoll in the same group, you'll prevent it from colliding against other parts of itself.
 
-*Category masks* allow you to mark what categories an object belongs to and what categories it collidies with. 
+*Category masks* allow you to mark which categories an object belongs to and which categories it collidies with.
 
-TODO
+For example, a game has four collision categories: player (0), enemy (1), player bullet (2), and enemy bullet (3). Neither players nor enemies should not collide with their own bullets, and bullets should not collide with other bullets. However, players collide with enemy bullets, and enemies collide with player bullets. 
 
-separate collision shapes into mutually exclusive planes. Shapes can be in more than one layer, and shapes only collide with other shapes that are in at least one of the same layers. As a simple example, say shape A is in layer 1, shape B is in layer 2, and shape C is in layer 1 and 2. Shape A and B won't collide with each other, but shape C will collide with both A and B.
+| Object | Object Category | Category Mask |
+| "Player" | 1 | 4, 5 |
+| "Enemy" | 2 | 2, 3, 5 |
+| "Player Bullet" | 3 | 1, 5  |
+| "Enemy Bullet" | 4 | 2, 5 |
+| "Walls" | 5 | 1, 2, 3, 4 |
 
-Layers can also be used to set up rule based collisions. Say you have four types of shapes in your game. The player, the enemies, player bullets and enemy bullets. The are that the player should collide with enemies, and bullets shouldn't collide with the type (player or enemy) that fired them. Making a chart would look like this:
+Note that everything in this example collides with walls. Additionally, the enemies collide with eachother.
 
-| | Player | Enemy | Player Bullet | Enemy Bullet |
-| Player | - | (1) |  | (2) |
-| Enemy | - | - | (3) |  |
-| Player Bullet | - | - | - |  |
-| Enemy Bullet | - | - | - | - |
+By default, objects exist in every category and collide with every category.
 
-The '-'s are for redundant spots in the chart, and the numbers are spots where types should collide. You can use a layer for each rule that you want to define. Then add the layers to each type: The player should be in layers 1 and 2, the enemy should be in layers 1 and 3, the player bullets should be in layer 3, and the enemy bullets should be in layer 2. Treating layers as rules this way, you can define up to 32 rules. The default @cpLayers@ type is @unsigned int@ which has a resolution of 32 bits on most systems. You can redefine the @cpLayers@ type in @chipmunk_types.h@ if you need more bits to work with.
+Objects can fall into multiple categories. For instance, you might have a category for a red team, and have a red player bullet. In the above example, each object only has one category. If you make use of multiple categories on an object, you may also wish to consider replacing the @cpShapeFilter@ struct and the @cpShapeFilterReject()@ function in @chipmunk_private.h@ to customize it to better suit your game's needs.
 
-There is one last way of filtering collisions using collision handlers. See the "section on callbacks":#Callbacks for more information. While collision handlers can be more flexible, they are also the slowest method. So you try to use groups or layers first.
+The default type of @categories@ and @mask@ in @cpShapeFilter@ is @unsigned int@ which has a resolution of 32 bits on most systems. You can redefine @cpBitmask@ in @chipmunk_types.h@ if you need more bits to work with.
+
+There is one last way of filtering collisions using collision handlers. See the "section on callbacks":#Callbacks for more information. Collision handlers can be more flexible, but can be slower. Fast collision filtering rejects collisions before running the expensive collision detection code, so using groups or category masks is preferred.
 
 <%= h 2, "Memory Management Functions:", "Memory" %>
 
@@ -576,7 +579,6 @@ p(expl). @Destroy@ and @Free@ functions are shared by all shape types. Allocatio
 
 * @cpBB cpShapeCacheBB(cpShape *shape)@ - Synchronizes @shape@ with the body its attached to.
 * @cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot)@ - Sets the position and rotation of the shape to 
-* @void cpResetShapeIdCounter(void)@ - Chipmunk keeps a counter so that every new shape is given a unique hash value to be used in the spatial index. Because this affects the order in which the collisions are found and handled, you can reset the shape counter every time you populate a space with new shapes. If you don't, there might be (very) slight differences in the simulation.
 
 <%= h 2, "Working With Circle Shapes:", "Circles" %>
 
