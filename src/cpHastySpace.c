@@ -28,7 +28,6 @@
 		#error Cannot use CP_USE_DOUBLES on 32 bit ARM.
 	#endif
 	
-	#warning double
 	typedef float64_t cpFloat_t;
 	typedef float64x2_t cpFloatx2_t;
 	#define vld vld1q_f64
@@ -47,7 +46,6 @@
 	#define vmax vmaxq_f64
 	#define vrev(__a) __builtin_shufflevector(__a, __a, 1, 0)
 #else
-	#warning single
 	typedef float32_t cpFloat_t;
 	typedef float32x2_t cpFloatx2_t;
 	#define vld vld1_f32
