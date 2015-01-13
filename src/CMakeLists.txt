@@ -26,10 +26,10 @@ if(BUILD_SHARED)
       SOVERSION ${CHIPMUNK_VERSION_MAJOR}
       VERSION ${CHIPMUNK_VERSION})
   endif(NOT ANDROID)
-  if(ANDROID)
+  if(ANDROID OR UNIX)
 	  # need to explicitly link to the math library because the CMake/Android toolchains may not do it automatically
 	  target_link_libraries(chipmunk m)
-  endif(ANDROID)
+  endif(ANDROID OR UNIX)
   install(TARGETS chipmunk RUNTIME DESTINATION lib LIBRARY DESTINATION lib)
 endif(BUILD_SHARED)
 
