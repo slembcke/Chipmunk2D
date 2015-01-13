@@ -5,7 +5,7 @@
 # match 4 is the arguments
 PATTERN = /.*?((static inline )?(\w*\*?)\s(cp\w*)\((.*?)\))/
 
-IO.readlines("|gcc -DNDEBUG -E include/chipmunk/chipmunk.h").each do|line|
+IO.readlines("|gcc -DNDEBUG -E ../include/chipmunk/chipmunk.h").each do|line|
 	str = line
 	
 	while match = PATTERN.match(str)
