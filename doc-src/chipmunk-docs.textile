@@ -1201,7 +1201,7 @@ p(expl). Add a @cpCollisionHandler@ for specific collision type pair or return t
 
 <pre><code>cpCollisionHandler *cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type)</code></pre>
 
-p(expl). Add a wildcard collision handler for given collision type. This handler will be used any time an object with this type collides with another object, regardless of it's type. A good example is a projectile that should be destroyed the first time it hits anything. There may be a specific collision handler and two wildcard handlers. It's up to the specific handler to decide when and if to call the wildcard handlers and what to do with their return values. (See @cpArbiterCallWildcard*()@ below) When a new wildcard handler is created, the callbacks will all be set to builtin callbacks that perform the default behavior. (accept all collisions in @begin()@ and @preSolve()@, or do nothing for @postSolve()@ and @separate()@.
+p(expl). Add a wildcard collision handler for given collision type. This handler will be used any time an object with this type collides with another object, regardless of its type. A good example is a projectile that should be destroyed the first time it hits anything. There may be a specific collision handler and two wildcard handlers. It's up to the specific handler to decide if and when  to call the wildcard handlers and what to do with their return values. (See @cpArbiterCallWildcard*()@ below) When a new wildcard handler is created, the callbacks will all be set to builtin callbacks that perform the default behavior. (accept all collisions in @begin()@ and @preSolve()@, or do nothing for @postSolve()@ and @separate()@.
 
 <pre><code>cpCollisionHandler *cpSpaceAddDefaultCollisionHandler(cpSpace *space)</code></pre>
 
