@@ -77,7 +77,7 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	
 	for(int i=0; i<count; i++){
 		cpVect v1 = planes[i].v0;
-		outside = cpvdot(planes[i].n, cpvsub(p,v1)) > 0.0f;
+		outside = outside || cpvdot(planes[i].n, cpvsub(p,v1)) > 0.0f;
 		
 		cpVect closest = cpClosetPointOnSegment(p, v0, v1);
 		
