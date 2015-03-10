@@ -97,7 +97,7 @@ SliceShapePostStep(cpSpace *space, cpShape *shape, struct SliceContext *context)
 }
 
 static void
-SliceQuery(cpShape *shape, cpFloat t, cpVect n, struct SliceContext *context)
+SliceQuery(cpShape *shape, cpVect point, cpVect normal, cpFloat alpha, struct SliceContext *context)
 {
 	cpVect a = context->a;
 	cpVect b = context->b;
