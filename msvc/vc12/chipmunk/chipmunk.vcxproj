@@ -27,22 +27,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\include\chipmunk\chipmunk_private.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpConstraint.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpDampedRotarySpring.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpDampedSpring.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpGearJoint.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpGrooveJoint.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpPinJoint.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpPivotJoint.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpRatchetJoint.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpRotaryLimitJoint.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpSimpleMotor.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpSlideJoint.h" />
+    <ClInclude Include="..\..\..\include\chipmunk\cpTransform.h" />
     <ClInclude Include="..\..\..\include\chipmunk\chipmunk.h" />
     <ClInclude Include="..\..\..\include\chipmunk\chipmunk_ffi.h" />
     <ClInclude Include="..\..\..\include\chipmunk\chipmunk_types.h" />
     <ClInclude Include="..\..\..\include\chipmunk\chipmunk_unsafe.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\constraints\cpConstraint.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\constraints\cpDampedRotarySpring.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\constraints\cpDampedSpring.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\constraints\cpGearJoint.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\constraints\cpGrooveJoint.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\constraints\cpPinJoint.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\constraints\cpPivotJoint.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\constraints\cpRatchetJoint.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\constraints\cpRotaryLimitJoint.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\constraints\cpSimpleMotor.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\constraints\cpSlideJoint.h" />
-    <ClInclude Include="..\..\..\include\chipmunk\constraints\util.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpArbiter.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpBB.h" />
     <ClInclude Include="..\..\..\include\chipmunk\cpBody.h" />
@@ -54,21 +55,21 @@
     <ClInclude Include="..\..\..\src\prime.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\cpConstraint.c" />
+    <ClCompile Include="..\..\..\src\cpDampedRotarySpring.c" />
+    <ClCompile Include="..\..\..\src\cpDampedSpring.c" />
+    <ClCompile Include="..\..\..\src\cpGearJoint.c" />
+    <ClCompile Include="..\..\..\src\cpGrooveJoint.c" />
+    <ClCompile Include="..\..\..\src\cpPinJoint.c" />
+    <ClCompile Include="..\..\..\src\cpPivotJoint.c" />
+    <ClCompile Include="..\..\..\src\cpRatchetJoint.c" />
+    <ClCompile Include="..\..\..\src\cpRotaryLimitJoint.c" />
+    <ClCompile Include="..\..\..\src\cpSimpleMotor.c" />
+    <ClCompile Include="..\..\..\src\cpSlideJoint.c" />
+    <ClCompile Include="..\..\..\src\cpSpaceDebug.c" />
     <ClCompile Include="..\..\..\src\chipmunk.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpConstraint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpDampedRotarySpring.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpDampedSpring.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpGearJoint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpGrooveJoint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpPinJoint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpPivotJoint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpRatchetJoint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpRotaryLimitJoint.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpSimpleMotor.c" />
-    <ClCompile Include="..\..\..\src\constraints\cpSlideJoint.c" />
     <ClCompile Include="..\..\..\src\cpArbiter.c" />
     <ClCompile Include="..\..\..\src\cpArray.c" />
-    <ClCompile Include="..\..\..\src\cpBB.c" />
     <ClCompile Include="..\..\..\src\cpBBTree.c" />
     <ClCompile Include="..\..\..\src\cpBody.c" />
     <ClCompile Include="..\..\..\src\cpCollision.c" />
@@ -82,7 +83,6 @@
     <ClCompile Include="..\..\..\src\cpSpaceStep.c" />
     <ClCompile Include="..\..\..\src\cpSpatialIndex.c" />
     <ClCompile Include="..\..\..\src\cpSweep1D.c" />
-    <ClCompile Include="..\..\..\src\cpVect.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="chipmunk.def" />
@@ -177,8 +177,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\include\chipmunk</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -190,9 +192,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\include\chipmunk</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <CompileAs>CompileAsCpp</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -204,8 +208,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\include\chipmunk</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -219,8 +225,9 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\include\chipmunk</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -235,9 +242,10 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\include\chipmunk</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <CompileAs>CompileAsCpp</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -252,8 +260,9 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\include\chipmunk</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
