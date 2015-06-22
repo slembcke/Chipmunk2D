@@ -20,12 +20,6 @@ Unordered
 	Use a slop tolerance on joint boundaries.
 
 Website things
-	-Google analytics
-	Rename to Chipmunk2D
-	Make it so people can upgrade license versions
-	upgrade to new version
-	Coupon codes (unlimited use)
-	log purchase IP for fraud
 	Don't make any mistakes: http://www.gamasutra.com/view/feature/185773/the_top_10_mistakes_tool_.php
 	Several people want a Chipmunk Facebook page.
 	figure out and redo front page.	Chipmunk js examples.

@@ -34,7 +34,7 @@ h2. FEATURES:
 
 h2. CONTRACTING:
 
-Howling Moon Software (my company) is available for contracting if you want to make the physics in your game really stand out. Given our unique experience with the library, we can help you use Chipmunk to its fullest potential. Feel free to contact us through our webpage: http://howlingmoonsoftware.com/contracting.php
+Howling Moon Software (my company) is available for contracting if you want to make the physics in your game really stand out. Given our unique experience with the library, we can help you use Chipmunk to its fullest potential. Feel free to contact us through our webpage: http://howlingmoonsoftware.com/
 
 h2. BUILDING:
 
@@ -63,4 +63,4 @@ A good starting point is to take a look at the included Demo application. The de
 
 h2. SUPPORT:
 
-The best way to get support is to visit the "Chipmunk Forums":http://chipmunk2d.net/forum/. There are plenty of people around using Chipmunk on the just about every platform I've ever heard of. If you are working on a commercial project and want some more direct help, Howling Moon Software is also available for "contracting":http://howlingmoonsoftware.com/contracting.php.
+The best way to get support is to visit the "Chipmunk Forums":http://chipmunk2d.net/forum/. There are plenty of people around using Chipmunk on the just about every platform I've ever heard of. If you are working on a commercial project and want some more direct help, Howling Moon Software is also available for "contracting":http://howlingmoonsoftware.com/.
