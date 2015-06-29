@@ -215,6 +215,12 @@ cpPolyShapeNew(cpBody *body, int count, const cpVect *verts, cpTransform transfo
 	return (cpShape *)cpPolyShapeInit(cpPolyShapeAlloc(), body, count, verts, transform, radius);
 }
 
+cpShape *
+cpPolyShapeNewRaw(cpBody *body, int count, const cpVect *verts, cpFloat radius)
+{
+	return (cpShape *)cpPolyShapeInitRaw(cpPolyShapeAlloc(), body, count, verts, radius);
+}
+
 cpPolyShape *
 cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height, cpFloat radius)
 {
