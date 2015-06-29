@@ -683,7 +683,7 @@ p(expl). Iterations allow you to control the accuracy of the solver. Defaults to
 <pre><code>cpVect cpSpaceGetGravity(const cpSpace *space)
 void cpSpaceSetGravity(cpSpace *space, cpVect value)</code></pre>
 
-p(expl). Global gravity applied to the space. Defaults to @cpvzero@. Can be overridden on a per body basis by writing custom integration functions.
+p(expl). Global gravity applied to the space. Defaults to @cpvzero@. Can be overridden on a per body basis by writing custom integration functions. Changing the gravity will activate all sleeping bodies in the space.
 
 <pre><code>cpFloat cpSpaceGetDamping(const cpSpace *space)
 void cpSpaceSetDamping(cpSpace *space, cpFloat value)</code></pre>

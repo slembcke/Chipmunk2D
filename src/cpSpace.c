@@ -254,6 +254,12 @@ void
 cpSpaceSetGravity(cpSpace *space, cpVect gravity)
 {
 	space->gravity = gravity;
+	
+	// Wake up all of the bodies since the gravity changed.
+	cpArray *components = space->sleepingComponents;
+	for(int i=0; i<components->num; i++){
+		cpBodyActivate((cpBody *)components->arr[i]);
+	}
 }
 
 cpFloat
