@@ -73,12 +73,14 @@ MAKE_REF(cpflerp);
 MAKE_REF(cpflerpconst);
 
 MAKE_REF(cpBBNew);
+MAKE_REF(cpBBNewForExtents);
 MAKE_REF(cpBBNewForCircle);
 MAKE_REF(cpBBIntersects);
 MAKE_REF(cpBBContainsBB);
 MAKE_REF(cpBBContainsVect);
 MAKE_REF(cpBBMerge);
 MAKE_REF(cpBBExpand);
+MAKE_REF(cpBBCenter);
 MAKE_REF(cpBBArea);
 MAKE_REF(cpBBMergedArea);
 MAKE_REF(cpBBSegmentQuery);
