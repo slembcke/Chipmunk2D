@@ -32,6 +32,8 @@
 #ifdef WIN32
 	// For alloca().
 	#include <malloc.h>
+#elif defined(__FreeBSD__)
+	/* already included in <stdlib.h> */
 #else
 	#include <alloca.h>
 #endif
