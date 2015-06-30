@@ -228,7 +228,7 @@ init(void)
 	cpSpaceAddConstraint(space, cpPivotJointNew(body1, staticBody, POS_A));
 	cpSpaceAddConstraint(space, cpPivotJointNew(body2, staticBody, POS_B));
 	// Hold their rotation within 90 degrees of each other.
-	cpSpaceAddConstraint(space, cpRotaryLimitJointNew(body1, body2, -M_PI_2, M_PI_2));
+	cpSpaceAddConstraint(space, cpRotaryLimitJointNew(body1, body2, -CP_PI/2.0f, CP_PI/2.0f));
 	
 	// Ratchet Joint - A rotary ratchet, like a socket wrench
 	boxOffset = cpv(160, -120);
@@ -238,7 +238,7 @@ init(void)
 	cpSpaceAddConstraint(space, cpPivotJointNew(body1, staticBody, POS_A));
 	cpSpaceAddConstraint(space, cpPivotJointNew(body2, staticBody, POS_B));
 	// Ratchet every 90 degrees
-	cpSpaceAddConstraint(space, cpRatchetJointNew(body1, body2, 0.0f, M_PI_2));
+	cpSpaceAddConstraint(space, cpRatchetJointNew(body1, body2, 0.0f, CP_PI/2.0f));
 	
 	// Gear Joint - Maintain a specific angular velocity ratio
 	boxOffset = cpv(-320, 0);
@@ -258,7 +258,7 @@ init(void)
 	cpSpaceAddConstraint(space, cpPivotJointNew(body1, staticBody, POS_A));
 	cpSpaceAddConstraint(space, cpPivotJointNew(body2, staticBody, POS_B));
 	// Make them spin at 1/2 revolution per second in relation to each other.
-	cpSpaceAddConstraint(space, cpSimpleMotorNew(body1, body2, M_PI));
+	cpSpaceAddConstraint(space, cpSimpleMotorNew(body1, body2, CP_PI));
 	
 	// Make a car with some nice soft suspension
 	boxOffset = cpv(0, 0);

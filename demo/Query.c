@@ -104,7 +104,7 @@ init(void)
 		
 		cpVect verts[NUM_VERTS];
 		for(int i=0; i<NUM_VERTS; i++){
-			cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
+			cpFloat angle = -2.0f*CP_PI*i/((cpFloat) NUM_VERTS);
 			verts[i] = cpv(30*cos(angle), 30*sin(angle));
 		}
 		

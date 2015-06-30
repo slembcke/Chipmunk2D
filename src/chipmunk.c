@@ -56,7 +56,7 @@ cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset)
 cpFloat
 cpAreaForCircle(cpFloat r1, cpFloat r2)
 {
-	return (cpFloat)M_PI*cpfabs(r1*r1 - r2*r2);
+	return (cpFloat)CP_PI*cpfabs(r1*r1 - r2*r2);
 }
 
 cpFloat
@@ -72,7 +72,7 @@ cpMomentForSegment(cpFloat m, cpVect a, cpVect b, cpFloat r)
 cpFloat
 cpAreaForSegment(cpVect a, cpVect b, cpFloat r)
 {
-	return r*((cpFloat)M_PI*r + 2.0f*cpvdist(a, b));
+	return r*((cpFloat)CP_PI*r + 2.0f*cpvdist(a, b));
 }
 
 cpFloat
@@ -110,7 +110,7 @@ cpAreaForPoly(const int count, const cpVect *verts, cpFloat r)
 		perimeter += cpvdist(v1, v2);
 	}
 	
-	return r*(M_PI*cpfabs(r) + perimeter) + area/2.0f;
+	return r*(CP_PI*cpfabs(r) + perimeter) + area/2.0f;
 }
 
 cpVect

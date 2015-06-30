@@ -74,8 +74,8 @@
 	TestAccessors(body, torque, (cpFloat)5);
 	
 	body.angle = 0;
-	body.angle = M_PI;
-	body.angle = M_PI_2;
+	body.angle = CP_PI;
+	body.angle = CP_PI/2.0f;
 	// TODO transform tests
 	
 	XCTAssertFalse(body.isSleeping, @"");

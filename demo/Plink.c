@@ -93,7 +93,7 @@ init(void)
 	// Create vertexes for a pentagon shape.
 	cpVect verts[NUM_VERTS];
 	for(int i=0; i<NUM_VERTS; i++){
-		cpFloat angle = -2*M_PI*i/((cpFloat) NUM_VERTS);
+		cpFloat angle = -2.0f*CP_PI*i/((cpFloat) NUM_VERTS);
 		verts[i] = cpv(10*cos(angle), 10*sin(angle));
 	}
 	
