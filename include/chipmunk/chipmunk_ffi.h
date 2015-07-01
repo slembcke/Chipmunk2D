@@ -37,8 +37,9 @@
  #define MAKE_REF(name) __typeof__(name) *_##name = name
 #endif
 
-#define MAKE_PROPERTIES_REF(struct, property) \
-	MAKE_REF(struct##Get##property); MAKE_REF(struct##Set##property)
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 MAKE_REF(cpv); // makes a variable named _cpv that contains the function pointer for cpv()
 MAKE_REF(cpveql);
@@ -98,5 +99,9 @@ MAKE_REF(cpSpatialIndexReindexObject);
 MAKE_REF(cpSpatialIndexSegmentQuery);
 MAKE_REF(cpSpatialIndexQuery);
 MAKE_REF(cpSpatialIndexReindexQuery);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
