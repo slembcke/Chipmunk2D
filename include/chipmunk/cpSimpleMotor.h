@@ -26,18 +26,18 @@
 typedef struct cpSimpleMotor cpSimpleMotor;
 
 /// Check if a constraint is a damped rotary springs.
-cpBool cpConstraintIsSimpleMotor(const cpConstraint *constraint);
+CP_EXPORT cpBool cpConstraintIsSimpleMotor(const cpConstraint *constraint);
 
 /// Allocate a simple motor.
-cpSimpleMotor* cpSimpleMotorAlloc(void);
+CP_EXPORT cpSimpleMotor* cpSimpleMotorAlloc(void);
 /// initialize a simple motor.
-cpSimpleMotor* cpSimpleMotorInit(cpSimpleMotor *joint, cpBody *a, cpBody *b, cpFloat rate);
+CP_EXPORT cpSimpleMotor* cpSimpleMotorInit(cpSimpleMotor *joint, cpBody *a, cpBody *b, cpFloat rate);
 /// Allocate and initialize a simple motor.
-cpConstraint* cpSimpleMotorNew(cpBody *a, cpBody *b, cpFloat rate);
+CP_EXPORT cpConstraint* cpSimpleMotorNew(cpBody *a, cpBody *b, cpFloat rate);
 
 /// Get the rate of the motor.
-cpFloat cpSimpleMotorGetRate(const cpConstraint *constraint);
+CP_EXPORT cpFloat cpSimpleMotorGetRate(const cpConstraint *constraint);
 /// Set the rate of the motor.
-void cpSimpleMotorSetRate(cpConstraint *constraint, cpFloat rate);
+CP_EXPORT void cpSimpleMotorSetRate(cpConstraint *constraint, cpFloat rate);
 
 /// @}

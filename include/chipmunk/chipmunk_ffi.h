@@ -29,7 +29,7 @@
 
 #ifdef _MSC_VER
  #if _MSC_VER >= 1600
-  #define MAKE_REF(name) decltype(name) *_##name = name
+  #define MAKE_REF(name) CP_EXPORT decltype(name) *_##name = name
  #else
   #define MAKE_REF(name)
  #endif

@@ -23,28 +23,28 @@
 /// @{
 
 /// Check if a constraint is a pin joint.
-cpBool cpConstraintIsPinJoint(const cpConstraint *constraint);
+CP_EXPORT cpBool cpConstraintIsPinJoint(const cpConstraint *constraint);
 
 /// Allocate a pin joint.
-cpPinJoint* cpPinJointAlloc(void);
+CP_EXPORT cpPinJoint* cpPinJointAlloc(void);
 /// Initialize a pin joint.
-cpPinJoint* cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB);
+CP_EXPORT cpPinJoint* cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB);
 /// Allocate and initialize a pin joint.
-cpConstraint* cpPinJointNew(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB);
+CP_EXPORT cpConstraint* cpPinJointNew(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB);
 
 /// Get the location of the first anchor relative to the first body.
-cpVect cpPinJointGetAnchorA(const cpConstraint *constraint);
+CP_EXPORT cpVect cpPinJointGetAnchorA(const cpConstraint *constraint);
 /// Set the location of the first anchor relative to the first body.
-void cpPinJointSetAnchorA(cpConstraint *constraint, cpVect anchorA);
+CP_EXPORT void cpPinJointSetAnchorA(cpConstraint *constraint, cpVect anchorA);
 
 /// Get the location of the second anchor relative to the second body.
-cpVect cpPinJointGetAnchorB(const cpConstraint *constraint);
+CP_EXPORT cpVect cpPinJointGetAnchorB(const cpConstraint *constraint);
 /// Set the location of the second anchor relative to the second body.
-void cpPinJointSetAnchorB(cpConstraint *constraint, cpVect anchorB);
+CP_EXPORT void cpPinJointSetAnchorB(cpConstraint *constraint, cpVect anchorB);
 
 /// Get the distance the joint will maintain between the two anchors.
-cpFloat cpPinJointGetDist(const cpConstraint *constraint);
+CP_EXPORT cpFloat cpPinJointGetDist(const cpConstraint *constraint);
 /// Set the distance the joint will maintain between the two anchors.
-void cpPinJointSetDist(cpConstraint *constraint, cpFloat dist);
+CP_EXPORT void cpPinJointSetDist(cpConstraint *constraint, cpFloat dist);
 
 ///@}

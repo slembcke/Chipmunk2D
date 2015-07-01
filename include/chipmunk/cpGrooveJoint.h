@@ -23,28 +23,28 @@
 /// @{
 
 /// Check if a constraint is a slide joint.
-cpBool cpConstraintIsGrooveJoint(const cpConstraint *constraint);
+CP_EXPORT cpBool cpConstraintIsGrooveJoint(const cpConstraint *constraint);
 
 /// Allocate a groove joint.
-cpGrooveJoint* cpGrooveJointAlloc(void);
+CP_EXPORT cpGrooveJoint* cpGrooveJointAlloc(void);
 /// Initialize a groove joint.
-cpGrooveJoint* cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchorB);
+CP_EXPORT cpGrooveJoint* cpGrooveJointInit(cpGrooveJoint *joint, cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchorB);
 /// Allocate and initialize a groove joint.
-cpConstraint* cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchorB);
+CP_EXPORT cpConstraint* cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect anchorB);
 
 /// Get the first endpoint of the groove relative to the first body.
-cpVect cpGrooveJointGetGrooveA(const cpConstraint *constraint);
+CP_EXPORT cpVect cpGrooveJointGetGrooveA(const cpConstraint *constraint);
 /// Set the first endpoint of the groove relative to the first body.
-void cpGrooveJointSetGrooveA(cpConstraint *constraint, cpVect grooveA);
+CP_EXPORT void cpGrooveJointSetGrooveA(cpConstraint *constraint, cpVect grooveA);
 
 /// Get the first endpoint of the groove relative to the first body.
-cpVect cpGrooveJointGetGrooveB(const cpConstraint *constraint);
+CP_EXPORT cpVect cpGrooveJointGetGrooveB(const cpConstraint *constraint);
 /// Set the first endpoint of the groove relative to the first body.
-void cpGrooveJointSetGrooveB(cpConstraint *constraint, cpVect grooveB);
+CP_EXPORT void cpGrooveJointSetGrooveB(cpConstraint *constraint, cpVect grooveB);
 
 /// Get the location of the second anchor relative to the second body.
-cpVect cpGrooveJointGetAnchorB(const cpConstraint *constraint);
+CP_EXPORT cpVect cpGrooveJointGetAnchorB(const cpConstraint *constraint);
 /// Set the location of the second anchor relative to the second body.
-void cpGrooveJointSetAnchorB(cpConstraint *constraint, cpVect anchorB);
+CP_EXPORT void cpGrooveJointSetAnchorB(cpConstraint *constraint, cpVect anchorB);
 
 /// @}

@@ -23,36 +23,36 @@
 /// @{
 
 /// Check if a constraint is a damped rotary springs.
-cpBool cpConstraintIsDampedRotarySpring(const cpConstraint *constraint);
+CP_EXPORT cpBool cpConstraintIsDampedRotarySpring(const cpConstraint *constraint);
 
 /// Function type used for damped rotary spring force callbacks.
 typedef cpFloat (*cpDampedRotarySpringTorqueFunc)(struct cpConstraint *spring, cpFloat relativeAngle);
 
 /// Allocate a damped rotary spring.
-cpDampedRotarySpring* cpDampedRotarySpringAlloc(void);
+CP_EXPORT cpDampedRotarySpring* cpDampedRotarySpringAlloc(void);
 /// Initialize a damped rotary spring.
-cpDampedRotarySpring* cpDampedRotarySpringInit(cpDampedRotarySpring *joint, cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping);
+CP_EXPORT cpDampedRotarySpring* cpDampedRotarySpringInit(cpDampedRotarySpring *joint, cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping);
 /// Allocate and initialize a damped rotary spring.
-cpConstraint* cpDampedRotarySpringNew(cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping);
+CP_EXPORT cpConstraint* cpDampedRotarySpringNew(cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffness, cpFloat damping);
 
 /// Get the rest length of the spring.
-cpFloat cpDampedRotarySpringGetRestAngle(const cpConstraint *constraint);
+CP_EXPORT cpFloat cpDampedRotarySpringGetRestAngle(const cpConstraint *constraint);
 /// Set the rest length of the spring.
-void cpDampedRotarySpringSetRestAngle(cpConstraint *constraint, cpFloat restAngle);
+CP_EXPORT void cpDampedRotarySpringSetRestAngle(cpConstraint *constraint, cpFloat restAngle);
 
 /// Get the stiffness of the spring in force/distance.
-cpFloat cpDampedRotarySpringGetStiffness(const cpConstraint *constraint);
+CP_EXPORT cpFloat cpDampedRotarySpringGetStiffness(const cpConstraint *constraint);
 /// Set the stiffness of the spring in force/distance.
-void cpDampedRotarySpringSetStiffness(cpConstraint *constraint, cpFloat stiffness);
+CP_EXPORT void cpDampedRotarySpringSetStiffness(cpConstraint *constraint, cpFloat stiffness);
 
 /// Get the damping of the spring.
-cpFloat cpDampedRotarySpringGetDamping(const cpConstraint *constraint);
+CP_EXPORT cpFloat cpDampedRotarySpringGetDamping(const cpConstraint *constraint);
 /// Set the damping of the spring.
-void cpDampedRotarySpringSetDamping(cpConstraint *constraint, cpFloat damping);
+CP_EXPORT void cpDampedRotarySpringSetDamping(cpConstraint *constraint, cpFloat damping);
 
 /// Get the damping of the spring.
-cpDampedRotarySpringTorqueFunc cpDampedRotarySpringGetSpringTorqueFunc(const cpConstraint *constraint);
+CP_EXPORT cpDampedRotarySpringTorqueFunc cpDampedRotarySpringGetSpringTorqueFunc(const cpConstraint *constraint);
 /// Set the damping of the spring.
-void cpDampedRotarySpringSetSpringTorqueFunc(cpConstraint *constraint, cpDampedRotarySpringTorqueFunc springTorqueFunc);
+CP_EXPORT void cpDampedRotarySpringSetSpringTorqueFunc(cpConstraint *constraint, cpDampedRotarySpringTorqueFunc springTorqueFunc);
 
 /// @}

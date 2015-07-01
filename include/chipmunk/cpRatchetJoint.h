@@ -23,28 +23,28 @@
 /// @{
 
 /// Check if a constraint is a damped rotary springs.
-cpBool cpConstraintIsRatchetJoint(const cpConstraint *constraint);
+CP_EXPORT cpBool cpConstraintIsRatchetJoint(const cpConstraint *constraint);
 
 /// Allocate a ratchet joint.
-cpRatchetJoint* cpRatchetJointAlloc(void);
+CP_EXPORT cpRatchetJoint* cpRatchetJointAlloc(void);
 /// Initialize a ratched joint.
-cpRatchetJoint* cpRatchetJointInit(cpRatchetJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratchet);
+CP_EXPORT cpRatchetJoint* cpRatchetJointInit(cpRatchetJoint *joint, cpBody *a, cpBody *b, cpFloat phase, cpFloat ratchet);
 /// Allocate and initialize a ratchet joint.
-cpConstraint* cpRatchetJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratchet);
+CP_EXPORT cpConstraint* cpRatchetJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratchet);
 
 /// Get the angle of the current ratchet tooth.
-cpFloat cpRatchetJointGetAngle(const cpConstraint *constraint);
+CP_EXPORT cpFloat cpRatchetJointGetAngle(const cpConstraint *constraint);
 /// Set the angle of the current ratchet tooth.
-void cpRatchetJointSetAngle(cpConstraint *constraint, cpFloat angle);
+CP_EXPORT void cpRatchetJointSetAngle(cpConstraint *constraint, cpFloat angle);
 
 /// Get the phase offset of the ratchet.
-cpFloat cpRatchetJointGetPhase(const cpConstraint *constraint);
+CP_EXPORT cpFloat cpRatchetJointGetPhase(const cpConstraint *constraint);
 /// Get the phase offset of the ratchet.
-void cpRatchetJointSetPhase(cpConstraint *constraint, cpFloat phase);
+CP_EXPORT void cpRatchetJointSetPhase(cpConstraint *constraint, cpFloat phase);
 
 /// Get the angular distance of each ratchet.
-cpFloat cpRatchetJointGetRatchet(const cpConstraint *constraint);
+CP_EXPORT cpFloat cpRatchetJointGetRatchet(const cpConstraint *constraint);
 /// Set the angular distance of each ratchet.
-void cpRatchetJointSetRatchet(cpConstraint *constraint, cpFloat ratchet);
+CP_EXPORT void cpRatchetJointSetRatchet(cpConstraint *constraint, cpFloat ratchet);
 
 /// @}
