@@ -414,6 +414,12 @@ cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpSpace *space)
 void
 cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat slop, cpFloat bias)
 {
+	cpConstraint *custom = arb->customContact;
+	if(custom){
+		custom->klass->preStep(custom, dt);
+		return;
+	}
+	
 	cpBody *a = arb->body_a;
 	cpBody *b = arb->body_b;
 	cpVect n = arb->n;
@@ -439,6 +445,12 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat slop, cpFloat bias)
 void
 cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef)
 {
+	cpConstraint *custom = arb->customContact;
+	if(custom){
+		custom->klass->applyCachedImpulse(custom, dt_coef);
+		return;
+	}
+	
 	if(cpArbiterIsFirstContact(arb)) return;
 	
 	cpBody *a = arb->body_a;
@@ -455,8 +467,14 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef)
 // TODO: is it worth splitting velocity/position correction?
 
 void
-cpArbiterApplyImpulse(cpArbiter *arb)
+cpArbiterApplyImpulse(cpArbiter *arb, cpFloat dt)
 {
+	cpConstraint *custom = arb->customContact;
+	if(custom){
+		custom->klass->applyImpulse(custom, dt);
+		return;
+	}
+	
 	cpBody *a = arb->body_a;
 	cpBody *b = arb->body_b;
 	cpVect n = arb->n;

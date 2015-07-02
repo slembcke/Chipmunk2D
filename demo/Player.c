@@ -35,6 +35,141 @@
 #define FALL_VELOCITY 900.0
 #define GRAVITY 2000.0
 
+typedef struct cpCustomContact {
+	cpConstraint constraint;
+	cpArbiter *arb;
+	
+	cpFloat maxFriction;
+} cpCustomContact;
+
+static void
+preStep(cpCustomContact *custom, cpFloat dt)
+{
+	cpArbiter *arb = custom->arb;
+	cpFloat bias = 0.1f;
+	cpFloat slop = 0.1f;
+	
+	cpBody *a = arb->body_a;
+	cpBody *b = arb->body_b;
+	cpVect n = arb->n;
+	cpVect body_delta = cpvsub(b->p, a->p);
+	
+	for(int i=0; i<arb->count; i++){
+		struct cpContact *con = &arb->contacts[i];
+		
+		// Calculate the mass normal and mass tangent.
+		con->nMass = 1.0f/k_scalar(a, b, con->r1, con->r2, n);
+		con->tMass = 1.0f/k_scalar(a, b, con->r1, con->r2, cpvperp(n));
+				
+		// Calculate the target bias velocity.
+		cpFloat dist = cpvdot(cpvadd(cpvsub(con->r2, con->r1), body_delta), n);
+		con->bias = -bias*cpfmin(0.0f, dist + slop)/dt;
+		con->jBias = 0.0f;
+		
+		// Calculate the target bounce velocity.
+		con->bounce = normal_relative_velocity(a, b, con->r1, con->r2, n)*arb->e;
+	}
+}
+
+static void
+applyCachedImpulse(cpCustomContact *custom, cpFloat dt_coef)
+{
+	cpArbiter *arb = custom->arb;
+	
+	if(cpArbiterIsFirstContact(arb)) return;
+	
+	cpBody *a = arb->body_a;
+	cpBody *b = arb->body_b;
+	cpVect n = arb->n;
+	
+	for(int i=0; i<arb->count; i++){
+		struct cpContact *con = &arb->contacts[i];
+		cpVect j = cpvrotate(n, cpv(con->jnAcc, con->jtAcc));
+		apply_impulses(a, b, con->r1, con->r2, cpvmult(j, dt_coef));
+	}
+}
+
+static void
+applyImpulse(cpCustomContact *custom, cpFloat dt)
+{
+	cpArbiter *arb = custom->arb;
+	cpBody *a = arb->body_a;
+	cpBody *b = arb->body_b;
+	cpVect n = arb->n;
+	cpVect surface_vr = arb->surface_vr;
+	cpFloat friction = arb->u;
+
+	for(int i=0; i<arb->count; i++){
+		struct cpContact *con = &arb->contacts[i];
+		cpFloat nMass = con->nMass;
+		cpVect r1 = con->r1;
+		cpVect r2 = con->r2;
+		
+		cpVect vb1 = cpvadd(a->v_bias, cpvmult(cpvperp(r1), a->w_bias));
+		cpVect vb2 = cpvadd(b->v_bias, cpvmult(cpvperp(r2), b->w_bias));
+		cpVect vr = cpvadd(relative_velocity(a, b, r1, r2), surface_vr);
+		
+		cpFloat vbn = cpvdot(cpvsub(vb2, vb1), n);
+		cpFloat vrn = cpvdot(vr, n);
+		cpFloat vrt = cpvdot(vr, cpvperp(n));
+		
+		cpFloat jbn = (con->bias - vbn)*nMass;
+		cpFloat jbnOld = con->jBias;
+		con->jBias = cpfmax(jbnOld + jbn, 0.0f);
+		
+		cpFloat jn = -(con->bounce + vrn)*nMass;
+		cpFloat jnOld = con->jnAcc;
+		con->jnAcc = cpfmax(jnOld + jn, 0.0f);
+		
+		cpFloat jtMax = cpfmin(friction*con->jnAcc, custom->maxFriction*dt);
+		cpFloat jt = -vrt*con->tMass;
+		cpFloat jtOld = con->jtAcc;
+		con->jtAcc = cpfclamp(jtOld + jt, -jtMax, jtMax);
+		
+		apply_bias_impulses(a, b, r1, r2, cpvmult(n, con->jBias - jbnOld));
+		apply_impulses(a, b, r1, r2, cpvrotate(n, cpv(con->jnAcc - jnOld, con->jtAcc - jtOld)));
+	}
+}
+
+static cpFloat
+getImpulse(cpCustomContact *custom)
+{
+	return cpvlength(cpArbiterTotalImpulse(custom->arb));
+}
+
+static const cpConstraintClass klass = {
+	(cpConstraintPreStepImpl)preStep,
+	(cpConstraintApplyCachedImpulseImpl)applyCachedImpulse,
+	(cpConstraintApplyImpulseImpl)applyImpulse,
+	(cpConstraintGetImpulseImpl)getImpulse,
+};
+
+static cpCustomContact *
+cpCustomContactAlloc(void)
+{
+	return (cpCustomContact *)cpcalloc(1, sizeof(cpCustomContact));
+}
+
+static cpCustomContact *
+cpCustomContactInit(cpCustomContact *custom, cpArbiter *arb)
+{
+	CP_ARBITER_GET_BODIES(arb, a, b);
+	cpConstraintInit((cpConstraint *)custom, &klass, a, b);
+	
+	custom->arb = arb;
+	custom->maxFriction = INFINITY;
+	
+	return custom;
+}
+
+static cpCustomContact *
+cpCustomContactNew(cpArbiter *arb)
+{
+	return cpCustomContactInit(cpCustomContactAlloc(), arb);
+}
+
+// --------
+
 static cpBody *playerBody = NULL;
 static cpShape *playerShape = NULL;
 
@@ -75,7 +210,6 @@ playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 	// Note that the "feet" move in the opposite direction of the player.
 	cpVect surface_v = cpv(-target_vx, 0.0);
 	playerShape->surfaceV = surface_v;
-	playerShape->u = (grounded ? PLAYER_GROUND_ACCEL/GRAVITY : 0.0);
 	
 	// Apply air control if not grounded
 	if(!grounded){
@@ -104,6 +238,27 @@ update(cpSpace *space, double dt)
 	
 	remainingBoost -= dt;
 	lastJumpState = jumpState;
+}
+
+static cpBool
+Begin(cpArbiter *arb, cpSpace *space, void *ptr)
+{
+	CP_ARBITER_GET_BODIES(arb, player, other);
+	
+	cpCustomContact *custom = cpCustomContactNew(arb);
+	custom->maxFriction = PLAYER_GROUND_ACCEL*cpBodyGetMass(player);
+	arb->customContact = (cpConstraint *)custom;
+	
+	
+	return cpTrue;
+}
+
+static cpBool
+PreSolve(cpArbiter *arb, cpSpace *space, void *ptr){
+	cpFloat friction = cpfclamp01(-cpArbiterGetNormal(arb).y);
+	cpArbiterSetFriction(arb, friction);
+	
+	return cpTrue;
 }
 
 static cpSpace *
@@ -142,7 +297,7 @@ init(void)
 
 	shape = cpSpaceAddShape(space, cpBoxShapeNew2(body, cpBBNew(-15.0, -27.5, 15.0, 27.5), 10.0));
 //	shape = cpSpaceAddShape(space, cpSegmentShapeNew(playerBody, cpvzero, cpv(0, radius), radius));
-	shape->e = 0.0f; shape->u = 0.0f;
+	shape->e = 0.0f; shape->u = 1.0f;
 	shape->type = 1;
 	playerShape = shape;
 	
@@ -156,6 +311,10 @@ init(void)
 			shape->e = 0.0f; shape->u = 0.7f;
 		}
 	}
+	
+	cpCollisionHandler *handler = cpSpaceAddWildcardHandler(space, 1);
+	handler->beginFunc = (cpCollisionBeginFunc)Begin;
+	handler->preSolveFunc = (cpCollisionPreSolveFunc)PreSolve;
 	
 	return space;
 }

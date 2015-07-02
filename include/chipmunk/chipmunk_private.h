@@ -197,6 +197,9 @@ struct cpArbiter {
 	cpCollisionHandler *handler, *handlerA, *handlerB;
 	cpBool swapped;
 	
+	// Constraint that should be applied for the contact instead of the regular contact code.
+	cpConstraint *customContact;
+	
 	cpTimestamp stamp;
 	enum cpArbiterState state;
 };
@@ -214,7 +217,7 @@ void cpArbiterUnthread(cpArbiter *arb);
 void cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpSpace *space);
 void cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat bias, cpFloat slop);
 void cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef);
-void cpArbiterApplyImpulse(cpArbiter *arb);
+void cpArbiterApplyImpulse(cpArbiter *arb, cpFloat dt);
 
 
 //MARK: Shapes/Collisions

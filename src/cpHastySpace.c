@@ -82,8 +82,14 @@ vmake(cpFloat_t x, cpFloat_t y)
 }
 
 static void
-cpArbiterApplyImpulse_NEON(cpArbiter *arb)
+cpArbiterApplyImpulse_NEON(cpArbiter *arb, cpFloat dt)
 {
+	cpConstraint *custom = arb->customContact;
+	if(custom){
+		custom->klass->applyImpulse(custom, dt);
+		return;
+	}
+	
 	cpBody *a = arb->body_a;
 	cpBody *b = arb->body_b;
 	cpFloatx2_t surface_vr = vld((cpFloat_t *)&arb->surface_vr);
@@ -273,9 +279,9 @@ Solver(cpSpace *space, unsigned long worker, unsigned long worker_count)
 		for(int j=0; j<arbiters->num; j++){
 			cpArbiter *arb = (cpArbiter *)arbiters->arr[j];
 			#ifdef __ARM_NEON__
-				cpArbiterApplyImpulse_NEON(arb);
+				cpArbiterApplyImpulse_NEON(arb, dt);
 			#else
-				cpArbiterApplyImpulse(arb);
+				cpArbiterApplyImpulse(arb, dt);
 			#endif
 		}
 			

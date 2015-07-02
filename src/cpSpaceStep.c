@@ -311,6 +311,11 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 		arb->state = CP_ARBITER_STATE_CACHED;
 		cpCollisionHandler *handler = arb->handler;
 		handler->separateFunc(arb, space, handler->userData);
+		
+		if(arb->customContact){
+			cpConstraintFree(arb->customContact);
+			arb->customContact = NULL;
+		}
 	}
 	
 	if(ticks >= space->collisionPersistence){
@@ -417,7 +422,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		// Run the impulse solver.
 		for(int i=0; i<space->iterations; i++){
 			for(int j=0; j<arbiters->num; j++){
-				cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j]);
+				cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j], dt);
 			}
 				
 			for(int j=0; j<constraints->num; j++){
