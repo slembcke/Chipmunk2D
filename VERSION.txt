@@ -1,3 +1,11 @@
+What's new in 7.0.1:
+* BUG: Remove references to M_PI sinces it's not actually part of C and causes problems with MSVC.
+* BUG: Build fixes for Mac/CMake and MSVC 13.
+* BUG: Move to using __declspec(dllexport) for Windows builds.
+* BUG: Fixed a precision issue with the EPA algorithm that would cause excessive iteration.
+* BUG: cpPolyshapeNewRaw() was undefined.
+* BUG: Changing gravity will wake up all objects in a space.
+
 What's new in 7.0.0:
 * All features from Chipmunk Pro are now free and open source! (threaded and NEON solver, autogeometry)
 * API: Lots of cleanup to the API naming for better consistency.
