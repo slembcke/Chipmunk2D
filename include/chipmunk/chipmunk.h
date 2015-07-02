@@ -38,17 +38,6 @@
 extern "C" {
 #endif
 
-// NUKE
-#ifndef CP_ALLOW_PRIVATE_ACCESS
-	#define CP_ALLOW_PRIVATE_ACCESS 0
-#endif
-
-#if CP_ALLOW_PRIVATE_ACCESS == 1
-	#define CP_PRIVATE(__symbol__) __symbol__
-#else
-	#define CP_PRIVATE(__symbol__) __symbol__##_private
-#endif
-
 CP_EXPORT void cpMessage(const char *condition, const char *file, int line, int isError, int isHardError, const char *message, ...);
 #ifdef NDEBUG
 	#define	cpAssertWarn(__condition__, ...)

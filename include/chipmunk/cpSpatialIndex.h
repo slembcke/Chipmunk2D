@@ -149,9 +149,9 @@ struct cpSpatialIndexClass {
 };
 
 /// Destroy and free a spatial index.
-void cpSpatialIndexFree(cpSpatialIndex *index);
+CP_EXPORT void cpSpatialIndexFree(cpSpatialIndex *index);
 /// Collide the objects in @c dynamicIndex against the objects in @c staticIndex using the query callback function.
-void cpSpatialIndexCollideStatic(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryFunc func, void *data);
+CP_EXPORT void cpSpatialIndexCollideStatic(cpSpatialIndex *dynamicIndex, cpSpatialIndex *staticIndex, cpSpatialIndexQueryFunc func, void *data);
 
 /// Destroy a spatial index.
 static inline void cpSpatialIndexDestroy(cpSpatialIndex *index)

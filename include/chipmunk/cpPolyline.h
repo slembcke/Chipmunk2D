@@ -49,8 +49,8 @@ CP_EXPORT cpPolylineSet *cpPolylineSetNew(void);
 /// Destroy a polyline set.
 CP_EXPORT void cpPolylineSetDestroy(cpPolylineSet *set, cpBool freePolylines);
 
-CP_EXPORT /// Destroy and free a polyline set.
-void cpPolylineSetFree(cpPolylineSet *set, cpBool freePolylines);
+/// Destroy and free a polyline set.
+CP_EXPORT void cpPolylineSetFree(cpPolylineSet *set, cpBool freePolylines);
 
 /**
 	Add a line segment to a polyline set.

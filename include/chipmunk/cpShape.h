@@ -104,7 +104,7 @@ CP_EXPORT cpBody* cpShapeGetBody(const cpShape *shape);
 CP_EXPORT void cpShapeSetBody(cpShape *shape, cpBody *body);
 
 /// Get the mass of the shape if you are having Chipmunk calculate mass properties for you.
-cpFloat cpShapeGetMass(cpShape *shape);
+CP_EXPORT cpFloat cpShapeGetMass(cpShape *shape);
 /// Set the mass of this shape to have Chipmunk calculate mass properties for you.
 CP_EXPORT void cpShapeSetMass(cpShape *shape, cpFloat mass);
 

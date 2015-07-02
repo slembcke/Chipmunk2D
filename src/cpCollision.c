@@ -333,11 +333,11 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 
 // Find the closest points on the surface of two overlapping shapes using the EPA algorithm.
 // EPA is called from GJK when two shapes overlap.
-// This is moderately expensive step! Avoid it by adding radii to your shapes so their inner polygons won't overlap.
+// This is a moderately expensive step! Avoid it by adding radii to your shapes so their inner polygons won't overlap.
 static struct ClosestPoints
 EPA(const struct SupportContext *ctx, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, const struct MinkowskiPoint v2)
 {
-	// TODO: allocate a NxM array here and do an in place convex hull reduction in EPARecurse
+	// TODO: allocate a NxM array here and do an in place convex hull reduction in EPARecurse?
 	struct MinkowskiPoint hull[3] = {v0, v1, v2};
 	return EPARecurse(ctx, 3, hull, 1);
 }
