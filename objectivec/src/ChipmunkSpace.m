@@ -97,10 +97,11 @@ typedef struct HandlerContext {
 
 +(instancetype)allocWithZone:(struct _NSZone *)zone
 {
+    Class class = self;
 #if CHIPMUNK_SPACE_USE_HASTY_SPACE
-	Class class = [ChipmunkHastySpace class];
-#else
-	Class class = [ChipmunkSpace class];
+    if (self == [ChipmunkSpace class]) {
+        class = [ChipmunkHastySpace class];
+    }
 #endif
 
 	return NSAllocateObject(class, 0, zone);
