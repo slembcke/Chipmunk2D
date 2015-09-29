@@ -22,6 +22,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#if defined(ANDROID)
+#	include <android/log.h>
+#endif
 
 #include "chipmunk/chipmunk_private.h"
 
@@ -32,12 +35,22 @@ cpMessage(const char *condition, const char *file, int line, int isError, int is
 	
 	va_list vargs;
 	va_start(vargs, message); {
+#if defined(ANDROID)
+		__android_log_print( ANDROID_LOG_INFO, "Chipmunk", "%s(%d)", file, line );
+		__android_log_print( ANDROID_LOG_INFO, "Chipmunk", message, vargs );
+#else
 		vfprintf(stderr, message, vargs);
 		fprintf(stderr, "\n");
+#endif
 	} va_end(vargs);
 	
+#if defined(ANDROID)
+	__android_log_print(ANDROID_LOG_INFO, "Chipmunk", "\tFailed condition: %s\n", condition);
+	__android_log_print(ANDROID_LOG_INFO, "Chipmunk", "\tSource:%s:%d\n", file, line);
+#else
 	fprintf(stderr, "\tFailed condition: %s\n", condition);
 	fprintf(stderr, "\tSource:%s:%d\n", file, line);
+#endif
 }
 
 #define STR(s) #s
@@ -56,7 +69,7 @@ cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset)
 cpFloat
 cpAreaForCircle(cpFloat r1, cpFloat r2)
 {
-	return (cpFloat)M_PI*cpfabs(r1*r1 - r2*r2);
+	return (cpFloat)CP_PI*cpfabs(r1*r1 - r2*r2);
 }
 
 cpFloat
@@ -72,7 +85,7 @@ cpMomentForSegment(cpFloat m, cpVect a, cpVect b, cpFloat r)
 cpFloat
 cpAreaForSegment(cpVect a, cpVect b, cpFloat r)
 {
-	return r*((cpFloat)M_PI*r + 2.0f*cpvdist(a, b));
+	return r*((cpFloat)CP_PI*r + 2.0f*cpvdist(a, b));
 }
 
 cpFloat
@@ -110,7 +123,7 @@ cpAreaForPoly(const int count, const cpVect *verts, cpFloat r)
 		perimeter += cpvdist(v1, v2);
 	}
 	
-	return r*(M_PI*cpfabs(r) + perimeter) + area/2.0f;
+	return r*(CP_PI*cpfabs(r) + perimeter) + area/2.0f;
 }
 
 cpVect

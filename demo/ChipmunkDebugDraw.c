@@ -286,11 +286,11 @@ void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 {
 	Triangle *triangles = PushTriangles(2);
 	
-	float r = size*0.5f/ChipmunkDebugDrawPointLineScale;
-	Vertex a = {{pos.x - r, pos.y - r}, {-1.0f, -1.0f}, fillColor, fillColor};
-	Vertex b = {{pos.x - r, pos.y + r}, {-1.0f,  1.0f}, fillColor, fillColor};
-	Vertex c = {{pos.x + r, pos.y + r}, { 1.0f,  1.0f}, fillColor, fillColor};
-	Vertex d = {{pos.x + r, pos.y - r}, { 1.0f, -1.0f}, fillColor, fillColor};
+	float r = (float)(size*0.5f/ChipmunkDebugDrawPointLineScale);
+	Vertex a = {{(float)pos.x - r, (float)pos.y - r}, {-1.0f, -1.0f}, fillColor, fillColor};
+	Vertex b = {{(float)pos.x - r, (float)pos.y + r}, {-1.0f,  1.0f}, fillColor, fillColor};
+	Vertex c = {{(float)pos.x + r, (float)pos.y + r}, { 1.0f,  1.0f}, fillColor, fillColor};
+	Vertex d = {{(float)pos.x + r, (float)pos.y - r}, { 1.0f, -1.0f}, fillColor, fillColor};
 	
 	Triangle t0 = {a, b, c}; triangles[0] = t0;
 	Triangle t1 = {a, c, d}; triangles[1] = t1;

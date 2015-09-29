@@ -31,12 +31,7 @@
 	#define CP_COLLISION_TYPE_TYPE id
 #endif
 
-#ifdef CP_ALLOW_PRIVATE_ACCESS
-	#undef CP_ALLOW_PRIVATE_ACCESS
-	#import "chipmunk/chipmunk_private.h"
-#else
-	#import "chipmunk/chipmunk.h"
-#endif
+#import "chipmunk/chipmunk.h"
 
 /**
 	Allows you to add composite objects to a space in a single method call.

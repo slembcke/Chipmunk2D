@@ -20,11 +20,7 @@
  */
 #ifndef CHIPMUNK_PRIVATE_H
 #define CHIPMUNK_PRIVATE_H
-#ifdef CHIPMUNK_H
-#error Cannot include chipmunk_private.h after chipmunk.h.
-#endif
 
-#define CP_ALLOW_PRIVATE_ACCESS 1
 #include "chipmunk/chipmunk.h"
 
 #define CP_HASH_COEF (3344921057ul)
@@ -536,8 +532,8 @@ cpConstraintActivateBodies(cpConstraint *constraint)
 
 static inline cpVect
 relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2){
-	cpVect v1_sum = cpvadd(a->CP_PRIVATE(v), cpvmult(cpvperp(r1), a->CP_PRIVATE(w)));
-	cpVect v2_sum = cpvadd(b->CP_PRIVATE(v), cpvmult(cpvperp(r2), b->CP_PRIVATE(w)));
+	cpVect v1_sum = cpvadd(a->v, cpvmult(cpvperp(r1), a->w));
+	cpVect v2_sum = cpvadd(b->v, cpvmult(cpvperp(r2), b->w));
 	
 	return cpvsub(v2_sum, v1_sum);
 }
@@ -549,8 +545,8 @@ normal_relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n){
 
 static inline void
 apply_impulse(cpBody *body, cpVect j, cpVect r){
-	body->CP_PRIVATE(v) = cpvadd(body->CP_PRIVATE(v), cpvmult(j, body->CP_PRIVATE(m_inv)));
-	body->CP_PRIVATE(w) += body->CP_PRIVATE(i_inv)*cpvcross(r, j);
+	body->v = cpvadd(body->v, cpvmult(j, body->m_inv));
+	body->w += body->i_inv*cpvcross(r, j);
 }
 
 static inline void
@@ -563,8 +559,8 @@ apply_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
 static inline void
 apply_bias_impulse(cpBody *body, cpVect j, cpVect r)
 {
-	body->CP_PRIVATE(v_bias) = cpvadd(body->CP_PRIVATE(v_bias), cpvmult(j, body->CP_PRIVATE(m_inv)));
-	body->CP_PRIVATE(w_bias) += body->CP_PRIVATE(i_inv)*cpvcross(r, j);
+	body->v_bias = cpvadd(body->v_bias, cpvmult(j, body->m_inv));
+	body->w_bias += body->i_inv*cpvcross(r, j);
 }
 
 static inline void
@@ -578,7 +574,7 @@ static inline cpFloat
 k_scalar_body(cpBody *body, cpVect r, cpVect n)
 {
 	cpFloat rcn = cpvcross(r, n);
-	return body->CP_PRIVATE(m_inv) + body->CP_PRIVATE(i_inv)*rcn*rcn;
+	return body->m_inv + body->i_inv*rcn*rcn;
 }
 
 static inline cpFloat
@@ -593,14 +589,14 @@ k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n)
 static inline cpMat2x2
 k_tensor(cpBody *a, cpBody *b, cpVect r1, cpVect r2)
 {
-	cpFloat m_sum = a->CP_PRIVATE(m_inv) + b->CP_PRIVATE(m_inv);
+	cpFloat m_sum = a->m_inv + b->m_inv;
 	
 	// start with Identity*m_sum
 	cpFloat k11 = m_sum, k12 = 0.0f;
 	cpFloat k21 = 0.0f,  k22 = m_sum;
 	
 	// add the influence from r1
-	cpFloat a_i_inv = a->CP_PRIVATE(i_inv);
+	cpFloat a_i_inv = a->i_inv;
 	cpFloat r1xsq =  r1.x * r1.x * a_i_inv;
 	cpFloat r1ysq =  r1.y * r1.y * a_i_inv;
 	cpFloat r1nxy = -r1.x * r1.y * a_i_inv;
@@ -608,7 +604,7 @@ k_tensor(cpBody *a, cpBody *b, cpVect r1, cpVect r2)
 	k21 += r1nxy; k22 += r1xsq;
 	
 	// add the influnce from r2
-	cpFloat b_i_inv = b->CP_PRIVATE(i_inv);
+	cpFloat b_i_inv = b->i_inv;
 	cpFloat r2xsq =  r2.x * r2.x * b_i_inv;
 	cpFloat r2ysq =  r2.y * r2.y * b_i_inv;
 	cpFloat r2nxy = -r2.x * r2.y * b_i_inv;

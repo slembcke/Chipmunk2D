@@ -22,14 +22,12 @@
 #ifdef CHIPMUNK_FFI
 
 // Create non static inlined copies of Chipmunk functions, useful for working with dynamic FFIs
-// This file should only be included in chipmunk.c
-
-// TODO: get rid of the reliance on static inlines.
-// They make a mess for FFIs.
+// For many languages, it may be faster to reimplement these functions natively instead.
+// Note: This file should only be included by chipmunk.c.
 
 #ifdef _MSC_VER
  #if _MSC_VER >= 1600
-  #define MAKE_REF(name) decltype(name) *_##name = name
+  #define MAKE_REF(name) CP_EXPORT decltype(name) *_##name = name
  #else
   #define MAKE_REF(name)
  #endif
@@ -37,8 +35,9 @@
  #define MAKE_REF(name) __typeof__(name) *_##name = name
 #endif
 
-#define MAKE_PROPERTIES_REF(struct, property) \
-	MAKE_REF(struct##Get##property); MAKE_REF(struct##Set##property)
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 MAKE_REF(cpv); // makes a variable named _cpv that contains the function pointer for cpv()
 MAKE_REF(cpveql);
@@ -73,12 +72,14 @@ MAKE_REF(cpflerp);
 MAKE_REF(cpflerpconst);
 
 MAKE_REF(cpBBNew);
+MAKE_REF(cpBBNewForExtents);
 MAKE_REF(cpBBNewForCircle);
 MAKE_REF(cpBBIntersects);
 MAKE_REF(cpBBContainsBB);
 MAKE_REF(cpBBContainsVect);
 MAKE_REF(cpBBMerge);
 MAKE_REF(cpBBExpand);
+MAKE_REF(cpBBCenter);
 MAKE_REF(cpBBArea);
 MAKE_REF(cpBBMergedArea);
 MAKE_REF(cpBBSegmentQuery);
@@ -96,5 +97,9 @@ MAKE_REF(cpSpatialIndexReindexObject);
 MAKE_REF(cpSpatialIndexSegmentQuery);
 MAKE_REF(cpSpatialIndexQuery);
 MAKE_REF(cpSpatialIndexReindexQuery);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

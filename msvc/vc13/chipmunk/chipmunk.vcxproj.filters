@@ -180,5 +180,8 @@
     <ClCompile Include="..\..\..\src\cpSweep1D.c">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\cpRobust.c">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

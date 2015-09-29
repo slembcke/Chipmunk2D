@@ -12,7 +12,7 @@ typedef void (*cpMarchSegmentFunc)(cpVect v0, cpVect v1, void *data);
 /// Trace an anti-aliased contour of an image along a particular threshold.
 /// The given number of samples will be taken and spread across the bounding box area using the sampling function and context.
 /// The segment function will be called for each segment detected that lies along the density contour for @c threshold.
-void cpMarchSoft(
+CP_EXPORT void cpMarchSoft(
   cpBB bb, unsigned long x_samples, unsigned long y_samples, cpFloat threshold,
   cpMarchSegmentFunc segment, void *segment_data,
   cpMarchSampleFunc sample, void *sample_data
@@ -21,7 +21,7 @@ void cpMarchSoft(
 /// Trace an aliased curve of an image along a particular threshold.
 /// The given number of samples will be taken and spread across the bounding box area using the sampling function and context.
 /// The segment function will be called for each segment detected that lies along the density contour for @c threshold.
-void cpMarchHard(
+CP_EXPORT void cpMarchHard(
   cpBB bb, unsigned long x_samples, unsigned long y_samples, cpFloat threshold,
   cpMarchSegmentFunc segment, void *segment_data,
   cpMarchSampleFunc sample, void *sample_data

@@ -23,25 +23,25 @@
 /// @{
 
 /// Check if a constraint is a slide joint.
-cpBool cpConstraintIsPivotJoint(const cpConstraint *constraint);
+CP_EXPORT cpBool cpConstraintIsPivotJoint(const cpConstraint *constraint);
 
 /// Allocate a pivot joint
-cpPivotJoint* cpPivotJointAlloc(void);
+CP_EXPORT cpPivotJoint* cpPivotJointAlloc(void);
 /// Initialize a pivot joint.
-cpPivotJoint* cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB);
+CP_EXPORT cpPivotJoint* cpPivotJointInit(cpPivotJoint *joint, cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB);
 /// Allocate and initialize a pivot joint.
-cpConstraint* cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot);
+CP_EXPORT cpConstraint* cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot);
 /// Allocate and initialize a pivot joint with specific anchors.
-cpConstraint* cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB);
+CP_EXPORT cpConstraint* cpPivotJointNew2(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB);
 
 /// Get the location of the first anchor relative to the first body.
-cpVect cpPivotJointGetAnchorA(const cpConstraint *constraint);
+CP_EXPORT cpVect cpPivotJointGetAnchorA(const cpConstraint *constraint);
 /// Set the location of the first anchor relative to the first body.
-void cpPivotJointSetAnchorA(cpConstraint *constraint, cpVect anchorA);
+CP_EXPORT void cpPivotJointSetAnchorA(cpConstraint *constraint, cpVect anchorA);
 
 /// Get the location of the second anchor relative to the second body.
-cpVect cpPivotJointGetAnchorB(const cpConstraint *constraint);
+CP_EXPORT cpVect cpPivotJointGetAnchorB(const cpConstraint *constraint);
 /// Set the location of the second anchor relative to the second body.
-void cpPivotJointSetAnchorB(cpConstraint *constraint, cpVect anchorB);
+CP_EXPORT void cpPivotJointSetAnchorB(cpConstraint *constraint, cpVect anchorB);
 
 /// @}

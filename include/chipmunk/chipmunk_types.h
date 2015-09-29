@@ -111,13 +111,8 @@
 	#endif
 #endif
 
-#ifndef M_PI
-	#define M_PI 3.14159265358979323846264338327950288
-#endif
 
-#ifndef M_E
-	#define M_E 2.71828182845904523536028747135266250
-#endif
+#define CP_PI ((cpFloat)3.14159265358979323846264338327950288)
 
 
 /// Return the max of two cpFloats.

@@ -22,46 +22,29 @@
 #ifndef CHIPMUNK_H
 #define CHIPMUNK_H
 
-#ifdef _MSC_VER
-    #define _USE_MATH_DEFINES
-#endif
-
 #include <stdlib.h>
 #include <math.h>
 
 #ifdef WIN32
 	// For alloca().
 	#include <malloc.h>
+	#define CP_EXPORT __declspec(dllexport)
 #else
 	#include <alloca.h>
+	#define CP_EXPORT
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// NUKE
-#ifndef CP_ALLOW_PRIVATE_ACCESS
-	#define CP_ALLOW_PRIVATE_ACCESS 0
-#endif
-
-#if CP_ALLOW_PRIVATE_ACCESS == 1
-	#define CP_PRIVATE(__symbol__) __symbol__
-#else
-	#define CP_PRIVATE(__symbol__) __symbol__##_private
-#endif
-
-void cpMessage(const char *condition, const char *file, int line, int isError, int isHardError, const char *message, ...);
+CP_EXPORT void cpMessage(const char *condition, const char *file, int line, int isError, int isHardError, const char *message, ...);
 #ifdef NDEBUG
 	#define	cpAssertWarn(__condition__, ...)
-#else
-	#define cpAssertWarn(__condition__, ...) if(!(__condition__)) cpMessage(#__condition__, __FILE__, __LINE__, 0, 0, __VA_ARGS__)
-#endif
-
-#ifdef NDEBUG
 	#define	cpAssertSoft(__condition__, ...)
 #else
-	#define cpAssertSoft(__condition__, ...) if(!(__condition__)){cpMessage(#__condition__, __FILE__, __LINE__, 1, 0, __VA_ARGS__), abort();}
+	#define cpAssertSoft(__condition__, ...) if(!(__condition__)){cpMessage(#__condition__, __FILE__, __LINE__, 1, 0, __VA_ARGS__); abort();}
+	#define cpAssertWarn(__condition__, ...) if(!(__condition__)) cpMessage(#__condition__, __FILE__, __LINE__, 0, 0, __VA_ARGS__)
 #endif
 
 // Hard assertions are used in situations where the program definitely will crash anyway, and the reason is inexpensive to detect.
@@ -135,50 +118,50 @@ typedef struct cpSpace cpSpace;
 
 #include "cpSpace.h"
 
-// Chipmunk 7.0.0
+// Chipmunk 7.0.1
 #define CP_VERSION_MAJOR 7
 #define CP_VERSION_MINOR 0
-#define CP_VERSION_RELEASE 0
+#define CP_VERSION_RELEASE 1
 
 /// Version string.
-extern const char *cpVersionString;
+CP_EXPORT extern const char *cpVersionString;
 
 /// Calculate the moment of inertia for a circle.
 /// @c r1 and @c r2 are the inner and outer diameters. A solid circle has an inner diameter of 0.
-cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset);
+CP_EXPORT cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset);
 
 /// Calculate area of a hollow circle.
 /// @c r1 and @c r2 are the inner and outer diameters. A solid circle has an inner diameter of 0.
-cpFloat cpAreaForCircle(cpFloat r1, cpFloat r2);
+CP_EXPORT cpFloat cpAreaForCircle(cpFloat r1, cpFloat r2);
 
 /// Calculate the moment of inertia for a line segment.
 /// Beveling radius is not supported.
-cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b, cpFloat radius);
+CP_EXPORT cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b, cpFloat radius);
 
 /// Calculate the area of a fattened (capsule shaped) line segment.
-cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat radius);
+CP_EXPORT cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat radius);
 
 /// Calculate the moment of inertia for a solid polygon shape assuming it's center of gravity is at it's centroid. The offset is added to each vertex.
-cpFloat cpMomentForPoly(cpFloat m, int count, const cpVect *verts, cpVect offset, cpFloat radius);
+CP_EXPORT cpFloat cpMomentForPoly(cpFloat m, int count, const cpVect *verts, cpVect offset, cpFloat radius);
 
 /// Calculate the signed area of a polygon. A Clockwise winding gives positive area.
 /// This is probably backwards from what you expect, but matches Chipmunk's the winding for poly shapes.
-cpFloat cpAreaForPoly(const int count, const cpVect *verts, cpFloat radius);
+CP_EXPORT cpFloat cpAreaForPoly(const int count, const cpVect *verts, cpFloat radius);
 
 /// Calculate the natural centroid of a polygon.
-cpVect cpCentroidForPoly(const int count, const cpVect *verts);
+CP_EXPORT cpVect cpCentroidForPoly(const int count, const cpVect *verts);
 
 /// Calculate the moment of inertia for a solid box.
-cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height);
+CP_EXPORT cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height);
 
 /// Calculate the moment of inertia for a solid box.
-cpFloat cpMomentForBox2(cpFloat m, cpBB box);
+CP_EXPORT cpFloat cpMomentForBox2(cpFloat m, cpBB box);
 
 /// Calculate the convex hull of a given set of points. Returns the count of points in the hull.
 /// @c result must be a pointer to a @c cpVect array with at least @c count elements. If @c verts == @c result, then @c verts will be reduced inplace.
 /// @c first is an optional pointer to an integer to store where the first vertex in the hull came from (i.e. verts[first] == result[0])
 /// @c tol is the allowed amount to shrink the hull when simplifying it. A tolerance of 0.0 creates an exact hull.
-int cpConvexHull(int count, const cpVect *verts, cpVect *result, int *first, cpFloat tol);
+CP_EXPORT int cpConvexHull(int count, const cpVect *verts, cpVect *result, int *first, cpFloat tol);
 
 #ifdef _MSC_VER
 #include "malloc.h"

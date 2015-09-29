@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "chipmunk/chipmunk_private.h"
+#include "chipmunk/cpRobust.h"
 
 #if DEBUG && 0
 #include "ChipmunkDemo.h"
@@ -264,12 +265,6 @@ ClosestDist(const cpVect v0,const cpVect v1)
 	return cpvlengthsq(LerpT(v0, v1, ClosestT(v0, v1)));
 }
 
-static inline cpBool
-CheckArea(cpVect v1, cpVect v2)
-{
-	return (v1.x*v2.y) > (v1.y*v2.x);
-}
-
 // Recursive implementation of the EPA loop.
 // Each recursion adds a point to the convex hull until it's known that we have the closest point on the surface.
 static struct ClosestPoints
@@ -305,7 +300,11 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 	ChipmunkDebugDrawDot(5, p.ab, LAColor(1, 1));
 #endif
 	
-	if(CheckArea(cpvsub(v1.ab, v0.ab), cpvadd(cpvsub(p.ab, v0.ab), cpvsub(p.ab, v1.ab))) && iteration < MAX_EPA_ITERATIONS){
+	// The usual exit condition is a duplicated vertex.
+	// Much faster to check the ids than to check the signed area.
+	cpBool duplicate = (p.id == v0.id || p.id == v1.id);
+	
+	if(!duplicate && cpCheckSignedArea(v0.ab, v1.ab, p.ab) && iteration < MAX_EPA_ITERATIONS){
 		// Rebuild the convex hull by inserting p.
 		struct MinkowskiPoint *hull2 = (struct MinkowskiPoint *)alloca((count + 1)*sizeof(struct MinkowskiPoint));
 		int count2 = 1;
@@ -318,7 +317,7 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 			cpVect h1 = hull[index].ab;
 			cpVect h2 = (i + 1 < count ? hull[(index + 1)%count] : p).ab;
 			
-			if(CheckArea(cpvsub(h2, h0), cpvadd(cpvsub(h1, h0), cpvsub(h1, h2)))){
+			if(cpCheckSignedArea(h0, h2, h1)){
 				hull2[count2] = hull[index];
 				count2++;
 			}
@@ -334,16 +333,22 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 
 // Find the closest points on the surface of two overlapping shapes using the EPA algorithm.
 // EPA is called from GJK when two shapes overlap.
-// This is moderately expensive step! Avoid it by adding radii to your shapes so their inner polygons won't overlap.
+// This is a moderately expensive step! Avoid it by adding radii to your shapes so their inner polygons won't overlap.
 static struct ClosestPoints
 EPA(const struct SupportContext *ctx, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, const struct MinkowskiPoint v2)
 {
-	// TODO: allocate a NxM array here and do an in place convex hull reduction in EPARecurse
+	// TODO: allocate a NxM array here and do an in place convex hull reduction in EPARecurse?
 	struct MinkowskiPoint hull[3] = {v0, v1, v2};
 	return EPARecurse(ctx, 3, hull, 1);
 }
 
 //MARK: GJK Functions.
+
+static inline cpBool
+CheckArea(cpVect v1, cpVect v2)
+{
+	return (v1.x*v2.y) > (v1.y*v2.x);
+}
 
 // Recursive implementatino of the GJK loop.
 static inline struct ClosestPoints

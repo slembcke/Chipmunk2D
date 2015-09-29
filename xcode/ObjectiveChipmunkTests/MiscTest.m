@@ -66,8 +66,8 @@
 	
 	{
 		cpVect a = cpvmult(cpvforangle(0.0), 1.0);
-		cpVect b = cpvmult(cpvforangle(M_PI/2.0), 2.0);
-		cpVect c = cpvadd(cpvmult(a, cpfcos(M_PI/4.0)), cpvmult(b, cpfsin(M_PI/4.0)));
+		cpVect b = cpvmult(cpvforangle(CP_PI/2.0), 2.0);
+		cpVect c = cpvadd(cpvmult(a, cpfcos(CP_PI/4.0)), cpvmult(b, cpfsin(CP_PI/4.0)));
 		cpVect v = cpvslerp(a, b, 0.5);
 		AssertNearlyZero(cpvdist(v, c));
 	}
@@ -93,23 +93,23 @@
 	// Slerp const
 	{
 		cpVect a = cpvmult(cpvforangle(0.0), 1.0);
-		cpVect b = cpvmult(cpvforangle(M_PI/2.0), 1.0);
-		cpVect c = cpvadd(cpvmult(a, cpfcos(M_PI/4.0)), cpvmult(b, cpfsin(M_PI/4.0)));
-		cpVect v = cpvslerpconst(a, b, M_PI/4.0);
+		cpVect b = cpvmult(cpvforangle(CP_PI/2.0), 1.0);
+		cpVect c = cpvadd(cpvmult(a, cpfcos(CP_PI/4.0)), cpvmult(b, cpfsin(CP_PI/4.0)));
+		cpVect v = cpvslerpconst(a, b, CP_PI/4.0);
 		AssertNearlyZero(cpvdist(v, c));
 	}
 	
 	{
 		cpVect a = cpvmult(cpvforangle(0.0), 1.0);
-		cpVect b = cpvmult(cpvforangle(M_PI/2.0), 1.0);
+		cpVect b = cpvmult(cpvforangle(CP_PI/2.0), 1.0);
 		cpVect c = b;
-		cpVect v = cpvslerpconst(a, b, M_PI/2.0);
+		cpVect v = cpvslerpconst(a, b, CP_PI/2.0);
 		AssertNearlyZero(cpvdist(v, c));
 	}
 	
 	{
 		cpVect a = cpvmult(cpvforangle(0.0), 1.0);
-		cpVect b = cpvmult(cpvforangle(M_PI/2.0), 1.0);
+		cpVect b = cpvmult(cpvforangle(CP_PI/2.0), 1.0);
 		cpVect c = b;
 		cpVect v = cpvslerpconst(a, b, INFINITY);
 		AssertNearlyZero(cpvdist(v, c));
@@ -117,7 +117,7 @@
 	
 	{
 		cpVect a = cpvmult(cpvforangle(0.0), 1.0);
-		cpVect b = cpvmult(cpvforangle(M_PI/2.0), 1.0);
+		cpVect b = cpvmult(cpvforangle(CP_PI/2.0), 1.0);
 		cpVect c = a;
 		cpVect v = cpvslerpconst(a, b, 0);
 		AssertNearlyZero(cpvdist(v, c));
@@ -125,9 +125,9 @@
 	
 	{
 		cpVect a = cpvmult(cpvforangle(0.0), 1.0);
-		cpVect b = cpvmult(cpvforangle(M_PI/2.0), 1.0);
-		cpVect c = cpvmult(cpvforangle(M_PI/4.0), 1.0);
-		cpVect v = cpvslerpconst(a, b, M_PI/4.0);
+		cpVect b = cpvmult(cpvforangle(CP_PI/2.0), 1.0);
+		cpVect c = cpvmult(cpvforangle(CP_PI/4.0), 1.0);
+		cpVect v = cpvslerpconst(a, b, CP_PI/4.0);
 		AssertNearlyZero(cpvdist(v, c));
 	}
 }

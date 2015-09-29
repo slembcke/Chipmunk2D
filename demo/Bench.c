@@ -65,7 +65,7 @@ static void add_box(cpSpace *space, int index, cpFloat size){
 static void add_hexagon(cpSpace *space, int index, cpFloat radius){
 	cpVect hexagon[6] = {};
 	for(int i=0; i<6; i++){
-		cpFloat angle = -M_PI*2.0f*i/6.0f;
+		cpFloat angle = -CP_PI*2.0f*i/6.0f;
 		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius - bevel);
 	}
 	
@@ -254,7 +254,7 @@ static cpSpace *init_ComplexTerrainHexagons_1000(){
 	cpFloat radius = 5.0f;
 	cpVect hexagon[6] = {};
 	for(int i=0; i<6; i++){
-		cpFloat angle = -M_PI*2.0f*i/6.0f;
+		cpFloat angle = -CP_PI*2.0f*i/6.0f;
 		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius - bevel);
 	}
 	
@@ -358,7 +358,7 @@ static cpSpace *init_BouncyTerrainHexagons_500(){
 	cpFloat radius = 5.0f;
 	cpVect hexagon[6] = {};
 	for(int i=0; i<6; i++){
-		cpFloat angle = -M_PI*2.0f*i/6.0f;
+		cpFloat angle = -CP_PI*2.0f*i/6.0f;
 		hexagon[i] = cpvmult(cpv(cos(angle), sin(angle)), radius - bevel);
 	}
 	
