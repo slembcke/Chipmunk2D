@@ -387,6 +387,7 @@
 		D3F441EA1B3B17C900C881DD /* cpRobust.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpRobust.h; path = ../include/chipmunk/cpRobust.h; sourceTree = "<group>"; };
 		D3F52BD213C509DC00EB67D9 /* Chains.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Chains.c; sourceTree = "<group>"; };
 		D3F6EEDE156D581300A158A8 /* Convex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Convex.c; sourceTree = "<group>"; };
+		D3F74B131BE154FA00E41DA0 /* chipmunk_structs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_structs.h; path = ../include/chipmunk/chipmunk_structs.h; sourceTree = "<group>"; };
 		D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ChipmunkDebugDraw.c; sourceTree = "<group>"; };
 		D3FBA1B80E9B1F6300950BCC /* ChipmunkDebugDraw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChipmunkDebugDraw.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -735,6 +736,7 @@
 				D3E5F0C40AA75CC3004E361B /* chipmunk.h */,
 				D3C2B4581282178B0080A718 /* chipmunk_private.h */,
 				D39F478A0FD4AB4E00B244CA /* chipmunk_types.h */,
+				D3F74B131BE154FA00E41DA0 /* chipmunk_structs.h */,
 				D35420BF0F4E1FD70017F4F7 /* chipmunk_unsafe.h */,
 				D36C44DD10F53DEB003D48B5 /* chipmunk_ffi.h */,
 				D3B718E00AB2BC8900B500C9 /* chipmunk.c */,
