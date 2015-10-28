@@ -20,6 +20,7 @@
  */
 
 #import "ObjectiveChipmunk/ObjectiveChipmunk.h"
+#import "chipmunk/chipmunk_private.h"
 #import "chipmunk/cpHastySpace.h"
 
 #import <objc/message.h>

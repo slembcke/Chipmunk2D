@@ -22,6 +22,7 @@
 #import <XCTest/XCTest.h>
 
 #import "ObjectiveChipmunk/ObjectiveChipmunk.h"
+#import "chipmunk/chipmunk_private.h"
 
 #define AssertRetainCount(obj, count) XCTAssertEqual([obj retainCount], (NSUInteger)count, @"")
 

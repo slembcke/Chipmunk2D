@@ -99,7 +99,7 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	XCTAssertEqualObjects(set, ([NSSet setWithObjects:segment, nil]), @"");
 	
 	set = pointQueryInfoToShapes([space pointQueryAll:cpv(-1,-1) maxDistance:0.0 filter:CP_SHAPE_FILTER_ALL]);
-	XCTAssertEqualObjects(set, ([NSSet setWithObjects:nil]), @"");
+	XCTAssertEqualObjects(set, ([NSSet set]), @"");
 	
 	cpSpacePointQuery_b(space.space, cpv(-0.6, -0.6), 0.0, CP_SHAPE_FILTER_ALL, ^(cpShape *shape, cpVect p, cpFloat d, cpVect g){
 		XCTAssertEqual(shape, segment.shape, @"");
@@ -129,7 +129,7 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	XCTAssertEqualObjects(set, ([NSSet setWithObjects:circle, segment, box, nil]), @"");
 	
 	set = segmentQueryInfoToShapes([space segmentQueryAllFrom:cpv(2,2) to:cpv(3,3) radius:0.0 filter:CP_SHAPE_FILTER_ALL]);
-	XCTAssertEqualObjects(set, ([NSSet setWithObjects:nil]), @"");
+	XCTAssertEqualObjects(set, ([NSSet set]), @"");
 	
 	ChipmunkSegmentQueryInfo *segmentInfo = nil;
 	segmentInfo = [space segmentQueryFirstFrom:cpv(-2,-2) to:cpv(1,1) radius:0.0 filter:CP_SHAPE_FILTER_ALL];
@@ -191,7 +191,7 @@ testPointQueries_helper(id self, ChipmunkSpace *space, ChipmunkBody *body)
 	
 	queryBody.position = cpv(4,4);
 	set = shapeQueryInfoToShapes([space shapeQueryAll:queryShape]);
-	XCTAssertEqualObjects(set, ([NSSet setWithObjects:nil]), @"");
+	XCTAssertEqualObjects(set, ([NSSet set]), @"");
 	
 	[space remove:circle];
 	[space remove:segment];

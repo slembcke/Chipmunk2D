@@ -32,6 +32,7 @@
 #endif
 
 #import "chipmunk/chipmunk.h"
+#import "chipmunk/chipmunk_structs.h"
 
 /**
 	Allows you to add composite objects to a space in a single method call.
