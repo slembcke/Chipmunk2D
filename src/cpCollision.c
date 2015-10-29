@@ -304,7 +304,7 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 	// Much faster to check the ids than to check the signed area.
 	cpBool duplicate = (p.id == v0.id || p.id == v1.id);
 	
-	if(!duplicate && cpCheckSignedArea(v0.ab, v1.ab, p.ab) && iteration < MAX_EPA_ITERATIONS){
+	if(!duplicate && cpCheckPointGreater(v0.ab, v1.ab, p.ab) && iteration < MAX_EPA_ITERATIONS){
 		// Rebuild the convex hull by inserting p.
 		struct MinkowskiPoint *hull2 = (struct MinkowskiPoint *)alloca((count + 1)*sizeof(struct MinkowskiPoint));
 		int count2 = 1;
@@ -317,7 +317,7 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 			cpVect h1 = hull[index].ab;
 			cpVect h2 = (i + 1 < count ? hull[(index + 1)%count] : p).ab;
 			
-			if(cpCheckSignedArea(h0, h2, h1)){
+			if(cpCheckPointGreater(h0, h2, h1)){
 				hull2[count2] = hull[index];
 				count2++;
 			}
@@ -344,13 +344,7 @@ EPA(const struct SupportContext *ctx, const struct MinkowskiPoint v0, const stru
 
 //MARK: GJK Functions.
 
-static inline cpBool
-CheckArea(cpVect v1, cpVect v2)
-{
-	return (v1.x*v2.y) > (v1.y*v2.x);
-}
-
-// Recursive implementatino of the GJK loop.
+// Recursive implementation of the GJK loop.
 static inline struct ClosestPoints
 GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, const struct MinkowskiPoint v1, const int iteration)
 {
@@ -359,13 +353,12 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 		return ClosestPointsNew(v0, v1);
 	}
 	
-	cpVect delta = cpvsub(v1.ab, v0.ab);
-	if(CheckArea(delta, cpvadd(v0.ab, v1.ab))){
+	if(cpCheckPointGreater(v1.ab, v0.ab, cpvzero)){
 		// Origin is behind axis. Flip and try again.
 		return GJKRecurse(ctx, v1, v0, iteration);
 	} else {
 		cpFloat t = ClosestT(v0.ab, v1.ab);
-		cpVect n = (-1.0f < t && t < 1.0f ? cpvperp(delta) : cpvneg(LerpT(v0.ab, v1.ab, t)));
+		cpVect n = (-1.0f < t && t < 1.0f ? cpvperp(cpvsub(v1.ab, v0.ab)) : cpvneg(LerpT(v0.ab, v1.ab, t)));
 		struct MinkowskiPoint p = Support(ctx, n);
 		
 #if DRAW_GJK
@@ -376,19 +369,12 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 		ChipmunkDebugDrawDot(5.0, p.ab, LAColor(1, 1));
 #endif
 		
-		if(
-			CheckArea(cpvsub(v1.ab, p.ab), cpvadd(v1.ab, p.ab)) &&
-			CheckArea(cpvadd(v0.ab, p.ab), cpvsub(v0.ab, p.ab))
-		){
+		if(cpCheckPointGreater(p.ab, v0.ab, cpvzero) && cpCheckPointGreater(v1.ab, p.ab, cpvzero)){
 			// The triangle v0, p, v1 contains the origin. Use EPA to find the MSA.
 			cpAssertWarn(iteration < WARN_GJK_ITERATIONS, "High GJK->EPA iterations: %d", iteration);
 			return EPA(ctx, v0, p, v1);
 		} else {
-			if(cpCheckAxis(v0.ab, v1.ab, p.ab, n)){
-				// The edge v0, v1 that we already have is the closest to (0, 0) since p was not closer.
-				cpAssertWarn(iteration < WARN_GJK_ITERATIONS, "High GJK iterations: %d", iteration);
-				return ClosestPointsNew(v0, v1);
-			} else {
+			if(cpCheckPointGreater(v0.ab, v1.ab, p.ab)){
 				// p was closer to the origin than our existing edge.
 				// Need to figure out which existing point to drop.
 				if(ClosestDist(v0.ab, p.ab) < ClosestDist(p.ab, v1.ab)){
@@ -396,6 +382,10 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 				} else {
 					return GJKRecurse(ctx, p, v1, iteration + 1);
 				}
+			} else {
+				// The edge v0, v1 that we already have is the closest to (0, 0) since p was not closer.
+				cpAssertWarn(iteration < WARN_GJK_ITERATIONS, "High GJK iterations: %d", iteration);
+				return ClosestPointsNew(v0, v1);
 			}
 		}
 	}
