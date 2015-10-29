@@ -2,11 +2,9 @@
 
 
 cpBool
-cpCheckSignedArea(const cpVect a, const cpVect b, const cpVect c)
+cpCheckPointGreater(const cpVect a, const cpVect b, const cpVect c)
 {
-	const cpVect v0 = cpvsub(b, a);
-	const cpVect v1 = cpvadd(cpvsub(c, a), cpvsub(c, b));
-	return (v0.x*v1.y) > (v1.x*v0.y);
+	return (b.y - a.y)*(a.x + b.x - 2*c.x) > (b.x - a.x)*(a.y + b.y - 2*c.y);
 }
 
 cpBool
