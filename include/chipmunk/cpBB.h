@@ -114,29 +114,25 @@ static inline cpFloat cpBBMergedArea(cpBB a, cpBB b)
 /// Returns the fraction along the segment query the cpBB is hit. Returns INFINITY if it doesn't hit.
 static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
 {
-	cpFloat idx = 1.0f/(b.x - a.x);
-#ifdef _MSC_VER
-#pragma warning(disable: 4056)
-#endif
-	cpFloat tx1 = (bb.l == a.x ? -INFINITY : (bb.l - a.x)*idx);
-	cpFloat tx2 = (bb.r == a.x ?  INFINITY : (bb.r - a.x)*idx);
-	cpFloat txmin = cpfmin(tx1, tx2);
-	cpFloat txmax = cpfmax(tx1, tx2);
+	cpVect delta = cpvsub(b, a);
+	cpFloat tmin = -INFINITY, tmax = INFINITY;
 	
-	cpFloat idy = 1.0f/(b.y - a.y);
-	cpFloat ty1 = (bb.b == a.y ? -INFINITY : (bb.b - a.y)*idy);
-	cpFloat ty2 = (bb.t == a.y ?  INFINITY : (bb.t - a.y)*idy);
-#ifdef _MSC_VER
-#pragma warning(default: 4056)
-#endif
-	cpFloat tymin = cpfmin(ty1, ty2);
-	cpFloat tymax = cpfmax(ty1, ty2);
+	if(delta.x != 0.0f){
+		cpFloat t1 = (bb.l - a.x)/delta.x;
+		cpFloat t2 = (bb.r - a.x)/delta.x;
+		tmin = cpfmax(tmin, cpfmin(t1, t2));
+		tmax = cpfmin(tmax, cpfmax(t1, t2));
+	}
 	
-	if(tymin <= txmax && txmin <= tymax){
-		cpFloat min = cpfmax(txmin, tymin);
-		cpFloat max = cpfmin(txmax, tymax);
-		
-		if(0.0 <= max && min <= 1.0) return cpfmax(min, 0.0);
+	if(delta.y != 0.0f){
+		cpFloat t1 = (bb.b - a.y)/delta.y;
+		cpFloat t2 = (bb.t - a.y)/delta.y;
+		tmin = cpfmax(tmin, cpfmin(t1, t2));
+		tmax = cpfmin(tmax, cpfmax(t1, t2));
+	}
+	
+	if(tmin <= tmax && 0.0f <= tmax && tmin <= 1.0f){
+		return cpfmax(tmin, 0.0f);
 	}
 	
 	return INFINITY;

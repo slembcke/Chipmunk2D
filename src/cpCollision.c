@@ -491,6 +491,7 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 		cpFloat d_e2_a = cpvcross(e2.a.p, n);
 		cpFloat d_e2_b = cpvcross(e2.b.p, n);
 		
+		// TODO + min isn't a complete fix.
 		cpFloat e1_denom = 1.0f/(d_e1_b - d_e1_a + CPFLOAT_MIN);
 		cpFloat e2_denom = 1.0f/(d_e2_b - d_e2_a + CPFLOAT_MIN);
 		
@@ -590,8 +591,7 @@ SegmentToSegment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, struct 
 	
 	// If the closest points are nearer than the sum of the radii...
 	if(
-		points.d <= (seg1->r + seg2->r) &&
-		(
+		points.d <= (seg1->r + seg2->r) && (
 			// Reject endcap collisions if tangents are provided.
 			(!cpveql(points.a, seg1->ta) || cpvdot(n, cpvrotate(seg1->a_tangent, rot1)) <= 0.0) &&
 			(!cpveql(points.a, seg1->tb) || cpvdot(n, cpvrotate(seg1->b_tangent, rot1)) <= 0.0) &&
@@ -648,8 +648,7 @@ SegmentToPoly(const cpSegmentShape *seg, const cpPolyShape *poly, struct cpColli
 	
 	if(
 		// If the closest points are nearer than the sum of the radii...
-		points.d - seg->r - poly->r <= 0.0 &&
-		(
+		points.d - seg->r - poly->r <= 0.0 && (
 			// Reject endcap collisions if tangents are provided.
 			(!cpveql(points.a, seg->ta) || cpvdot(n, cpvrotate(seg->a_tangent, rot)) <= 0.0) &&
 			(!cpveql(points.a, seg->tb) || cpvdot(n, cpvrotate(seg->b_tangent, rot)) <= 0.0)
