@@ -491,8 +491,8 @@ ContactPoints(const struct Edge e1, const struct Edge e2, const struct ClosestPo
 		cpFloat d_e2_a = cpvcross(e2.a.p, n);
 		cpFloat d_e2_b = cpvcross(e2.b.p, n);
 		
-		cpFloat e1_denom = 1.0f/(d_e1_b - d_e1_a);
-		cpFloat e2_denom = 1.0f/(d_e2_b - d_e2_a);
+		cpFloat e1_denom = 1.0f/(d_e1_b - d_e1_a + CPFLOAT_MIN);
+		cpFloat e2_denom = 1.0f/(d_e2_b - d_e2_a + CPFLOAT_MIN);
 		
 		// Project the endpoints of the two edges onto the opposing edge, clamping them as necessary.
 		// Compare the projected points to the collision normal to see if the shapes overlap there.
