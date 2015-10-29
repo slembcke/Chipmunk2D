@@ -384,7 +384,7 @@ GJKRecurse(const struct SupportContext *ctx, const struct MinkowskiPoint v0, con
 			cpAssertWarn(iteration < WARN_GJK_ITERATIONS, "High GJK->EPA iterations: %d", iteration);
 			return EPA(ctx, v0, p, v1);
 		} else {
-			if(cpvdot(p.ab, n) <= cpfmax(cpvdot(v0.ab, n), cpvdot(v1.ab, n))){
+			if(cpCheckAxis(v0.ab, v1.ab, p.ab, n)){
 				// The edge v0, v1 that we already have is the closest to (0, 0) since p was not closer.
 				cpAssertWarn(iteration < WARN_GJK_ITERATIONS, "High GJK iterations: %d", iteration);
 				return ClosestPointsNew(v0, v1);

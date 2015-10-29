@@ -409,7 +409,7 @@ cpHastySpaceStep(cpSpace *space, cpFloat dt)
 		}
 	}
 	arbiters->num = 0;
-
+	
 	cpSpaceLock(space); {
 		// Integrate positions
 		for(int i=0; i<bodies->num; i++){
