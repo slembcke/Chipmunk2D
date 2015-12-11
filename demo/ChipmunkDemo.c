@@ -36,6 +36,16 @@
 #include <limits.h>
 #include <stdarg.h>
 
+#ifdef _MSC_VER
+  // Needed for VS 2015 compatability
+  // http://stackoverflow.com/questions/30412951/unresolved-external-symbol-imp-fprintf-and-imp-iob-func-sdl2
+  #if _MSC_VER >= 1700
+	#ifndef __iob_func
+	  extern "C" { FILE __iob_func[3] = { *stdin,*stdout,*stderr }; }
+	#endif
+  #endif
+#endif
+
 #include "GL/glew.h"
 #include "GL/glfw.h"
 
