@@ -29,6 +29,7 @@ chipmunk_demos
 
 # Visual studio
 *.opensdf
+*.opendb
 *.sdf
 *.suo
 *.pdb
@@ -46,4 +47,6 @@ msvc/vc13/chipmunk/Win32/
 msvc/vc13/chipmunk/x64/
 msvc/vc13/demo/Win32/
 msvc/vc13/demo/x64/
+msvc/vc14/demo/Win32/
+msvc/vc14/demo/x64/
 
