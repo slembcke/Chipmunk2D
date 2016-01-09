@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0001 NEW) # don't use MAKE_BACKWARDS_COMPATIBILITY but policies instead
-cmake_policy(SET CMP0042 NEW) # use MACOSX_RPATH
+# CMP0042 is an apple specific option
+if (${APPLE})
+  cmake_policy(SET CMP0042 NEW) # use MACOSX_RPATH
+endif ()
 
 project(chipmunk)
 
