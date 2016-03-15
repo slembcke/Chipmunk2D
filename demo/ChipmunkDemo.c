@@ -423,9 +423,6 @@ Keyboard(int key, int state)
 		paused = !paused;
   } else if(key == '1'){
 		step = cpTrue;
-	} else if(key == '\\'){
-		glDisable(GL_LINE_SMOOTH);
-		glDisable(GL_POINT_SMOOTH);
 	}
 	
 	GLfloat translate_increment = 50.0f/(GLfloat)scale;
@@ -531,21 +528,13 @@ WindowClose()
 static void
 SetupGL(void)
 {
-	glewExperimental = GL_TRUE;
 	cpAssertHard(glewInit() == GLEW_NO_ERROR, "There was an error initializing GLEW.");
-	cpAssertHard(GLEW_ARB_vertex_array_object, "Requires VAO support.");
 	
 	ChipmunkDebugDrawInit();
 	ChipmunkDemoTextInit();
 	
 	glClearColor(52.0f/255.0f, 62.0f/255.0f, 72.0f/255.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POINT_SMOOTH);
-
-	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-	glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
 	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -621,7 +610,7 @@ extern ChipmunkDemo bench_list[];
 extern int bench_count;
 
 int
-main(int argc, const char **argv)
+main(int argc, const char *argv[])
 {
 	ChipmunkDemo demo_list[] = {
 		LogoSmash,//A
@@ -672,13 +661,10 @@ main(int argc, const char **argv)
 	} else {
 		mouse_body = cpBodyNewKinematic();
 		
-		RunDemo(demo_index);
 		SetupGLFW();
+		RunDemo(demo_index);
 		
-		while(1){
-			Display();
-		}
+		while(1){Display();}
+		return EXIT_SUCCESS;
 	}
-
-	return 0;
 }

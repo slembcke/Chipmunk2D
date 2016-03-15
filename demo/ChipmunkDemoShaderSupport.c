@@ -36,13 +36,16 @@ CheckGLErrors(void)
 	for(GLenum err = glGetError(); err; err = glGetError()){
 		if(err){
 			fprintf(stderr, "GLError(%s:%d) 0x%04X\n", __FILE__, __LINE__, err);
-			abort();
+//			abort();
 		}
 	}
 }
 
+typedef void (* GetShaderivFunc) (GLuint shader, GLenum pname, GLint* param);
+typedef void (* GetShaderInfoLogFunc) (GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* infoLog);
+
 static cpBool
-CheckError(GLint obj, GLenum status, PFNGLGETSHADERIVPROC getiv, PFNGLGETSHADERINFOLOGPROC getInfoLog)
+CheckError(GLint obj, GLenum status, GetShaderivFunc getiv, GetShaderInfoLogFunc getInfoLog)
 {
 	GLint success;
 	getiv(obj, status, &success);
