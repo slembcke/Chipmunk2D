@@ -21,13 +21,8 @@
 
 #include <string.h>
 
-#include "GL/glew.h"
-#include "GL/glfw.h"
-
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDemo.h"
-#include "ChipmunkDemoShaderSupport.h"
-#include "ChipmunkDemoTextSupport.h"
 
 #include "VeraMoBd.ttf_sdf.h"
 
@@ -128,8 +123,7 @@ ChipmunkDemoTextInit(void)
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, sdf_tex_width, sdf_tex_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, sdf_data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);

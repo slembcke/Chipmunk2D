@@ -23,9 +23,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "GL/glew.h"
-#include "GL/glfw.h"
-
 #include "chipmunk/chipmunk.h"
 
 #include "ChipmunkDemoShaderSupport.h"

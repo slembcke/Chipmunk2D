@@ -36,12 +36,12 @@
 #include <limits.h>
 #include <stdarg.h>
 
-#include "GL/glew.h"
-#include "GL/glfw.h"
+#include <glfw.h>
+#include <Photon.h>
+//#include <OpenGL/gl3.h>
 
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDemo.h"
-#include "ChipmunkDemoTextSupport.h"
 
 static ChipmunkDemo *demos;
 static int demo_count = 0;
@@ -205,11 +205,11 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 static void
 DrawInstructions()
 {
-	ChipmunkDemoTextDrawString(cpv(-300, 220),
-		"Controls:\n"
-		"A - * Switch demos. (return restarts)\n"
-		"Use the mouse to grab objects.\n"
-	);
+//	ChipmunkDemoTextDrawString(cpv(-300, 220),
+//		"Controls:\n"
+//		"A - * Switch demos. (return restarts)\n"
+//		"Use the mouse to grab objects.\n"
+//	);
 }
 
 static int max_arbiters = 0;
@@ -256,7 +256,7 @@ DrawInfo()
 		ChipmunkDemoTime, (ke < 1e-10f ? 0.0f : ke)
 	);
 	
-	ChipmunkDemoTextDrawString(cpv(0, 220), buffer);
+//	ChipmunkDemoTextDrawString(cpv(0, 220), buffer);
 }
 
 static char PrintStringBuffer[1024*8];
@@ -281,10 +281,10 @@ Tick(double dt)
 		PrintStringBuffer[0] = 0;
 		PrintStringCursor = PrintStringBuffer;
 		
-		// Completely reset the renderer only at the beginning of a tick.
-		// That way it can always display at least the last ticks' debug drawing.
-		ChipmunkDebugDrawClearRenderer();
-		ChipmunkDemoTextClearRenderer();
+//		// Completely reset the renderer only at the beginning of a tick.
+//		// That way it can always display at least the last ticks' debug drawing.
+//		ChipmunkDebugDrawClearRenderer();
+//		ChipmunkDemoTextClearRenderer();
 		
 		cpVect new_point = cpvlerp(mouse_body->p, ChipmunkDemoMouse, 0.25f);
 		mouse_body->v = cpvmult(cpvsub(new_point, mouse_body->p), 60.0f);
@@ -298,7 +298,7 @@ Tick(double dt)
 		step = cpFalse;
 		ChipmunkDemoRightDown = cpFalse;
 		
-		ChipmunkDemoTextDrawString(cpv(-300, -200), ChipmunkDemoMessageString);
+//		ChipmunkDemoTextDrawString(cpv(-300, -200), ChipmunkDemoMessageString);
 	}
 }
 
@@ -318,41 +318,68 @@ Update(void)
 	LastTime = time;
 }
 
+#define RENDERER_COUNT 16
+PhotonRenderer *renderers[RENDERER_COUNT] = {};
+
+static PhotonRenderer *GetRenderer(){
+	for(int i = 0; i < RENDERER_COUNT; i++){
+		if(renderers[i] == NULL){
+			// All allocated renderers (or rather their buffers) are actively being used.
+			printf("Allocating new renderer.\n");
+			renderers[i] = PhotonRendererNew();
+			return renderers[i];
+		} else if(PhotonRendererReady(renderers[i])){
+			return renderers[i];
+		}
+	}
+	
+	// Pool is full and all renderers are in use!
+	printf("Renderer pool exhausted.");
+	return NULL;
+}
+
+cpTransform INPUT_TRANSFORM = {1, 0, 0, 1, 0, 0};
+cpTransform PIXEL_TRANSFORM = {1, 0, 0, 1, 0, 0};
+cpTransform PROJECTION_TRANSFORM = {1, 0, 0, 1, 0, 0};
+cpTransform VIEW_TRANSFORM = {1, 0, 0, 1, 0, 0};
+cpTransform VP_TRANSFORM = {1, 0, 0, 1, 0, 0};
+
 static void
 Display(void)
 {
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef((GLfloat)translate.x, (GLfloat)translate.y, 0.0f);
-	glScalef((GLfloat)scale, (GLfloat)scale, 1.0f);
+	PhotonPrintErrors();
 	
 	Update();
 	
-	ChipmunkDebugDrawPushRenderer();
+	PhotonRenderer *renderer = GetRenderer();
+	PhotonRendererPrepare(renderer);
+	
+	VP_TRANSFORM = PROJECTION_TRANSFORM;
+	INPUT_TRANSFORM = cpTransformMult(cpTransformInverse(VP_TRANSFORM), PIXEL_TRANSFORM);
+	
+	ChipmunkDebugDrawSetRenderer(renderer, VP_TRANSFORM);
 	demos[demo_index].drawFunc(space);
 	
 //	// Highlight the shape under the mouse because it looks neat.
 //	cpShape *nearest = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0f, CP_ALL_LAYERS, CP_NO_GROUP, NULL);
 //	if(nearest) ChipmunkDebugDrawShape(nearest, RGBAColor(1.0f, 0.0f, 0.0f, 1.0f), LAColor(0.0f, 0.0f));
 	
-	// Draw the renderer contents and reset it back to the last tick's state.
-	ChipmunkDebugDrawFlushRenderer();
-	ChipmunkDebugDrawPopRenderer();
+	PhotonRendererFlush(renderer);
+	ChipmunkDebugDrawSetRenderer(NULL, cpTransformIdentity);
 	
-	ChipmunkDemoTextPushRenderer();
 	// Now render all the UI text.
 	DrawInstructions();
 	DrawInfo();
 	
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix(); {
-		// Draw the text at fixed positions,
-		// but save the drawing matrix for the mouse picking
-		glLoadIdentity();
-		
-		ChipmunkDemoTextFlushRenderer();
-		ChipmunkDemoTextPopRenderer();
-	} glPopMatrix();
+//	glMatrixMode(GL_MODELVIEW);
+//	glPushMatrix(); {
+//		// Draw the text at fixed positions,
+//		// but save the drawing matrix for the mouse picking
+//		glLoadIdentity();
+//		
+//		ChipmunkDemoTextFlushRenderer();
+//		ChipmunkDemoTextPopRenderer();
+//	} glPopMatrix();
 	
 	glfwSwapBuffers();
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -362,17 +389,16 @@ static void
 Reshape(int width, int height)
 {
 	glViewport(0, 0, width, height);
+	PIXEL_TRANSFORM = cpTransformOrtho(cpBBNew(0, height, width, 0));
 	
 	float scale = (float)cpfmin(width/640.0, height/480.0);
 	float hw = width*(0.5f/scale);
 	float hh = height*(0.5f/scale);
+	PROJECTION_TRANSFORM = cpTransformOrtho(cpBBNew(-hw, -hh, hw, hh));
 	
 	ChipmunkDebugDrawPointLineScale = scale;
-	glLineWidth((GLfloat)scale);
 	
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(-hw, hw, -hh, hh);
+	PhotonPrintErrors();
 }
 
 static char *
@@ -423,9 +449,6 @@ Keyboard(int key, int state)
 		paused = !paused;
   } else if(key == '1'){
 		step = cpTrue;
-	} else if(key == '\\'){
-		glDisable(GL_LINE_SMOOTH);
-		glDisable(GL_POINT_SMOOTH);
 	}
 	
 	GLfloat translate_increment = 50.0f/(GLfloat)scale;
@@ -452,22 +475,7 @@ Keyboard(int key, int state)
 static cpVect
 MouseToSpace(int x, int y)
 {
-	GLdouble model[16];
-	glGetDoublev(GL_MODELVIEW_MATRIX, model);
-	
-	GLdouble proj[16];
-	glGetDoublev(GL_PROJECTION_MATRIX, proj);
- 	
-	GLint view[4];
-	glGetIntegerv(GL_VIEWPORT, view);
-	
-	int ww, wh;
-	glfwGetWindowSize(&ww, &wh);
-	
-	GLdouble mx, my, mz;
-	gluUnProject(x, wh - y, 0.0f, model, proj, view, &mx, &my, &mz);
-	
-	return cpv(mx, my);
+	return cpTransformPoint(INPUT_TRANSFORM, cpv(x, y));
 }
 
 static void
@@ -531,21 +539,11 @@ WindowClose()
 static void
 SetupGL(void)
 {
-	glewExperimental = GL_TRUE;
-	cpAssertHard(glewInit() == GLEW_NO_ERROR, "There was an error initializing GLEW.");
-	cpAssertHard(GLEW_ARB_vertex_array_object, "Requires VAO support.");
-	
 	ChipmunkDebugDrawInit();
-	ChipmunkDemoTextInit();
+//	ChipmunkDemoTextInit();
 	
 	glClearColor(52.0f/255.0f, 62.0f/255.0f, 72.0f/255.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POINT_SMOOTH);
-
-	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-	glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
 	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -556,9 +554,18 @@ SetupGLFW()
 {
 	cpAssertHard(glfwInit(), "Error initializing GLFW.");
 	
+	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
+	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
+	glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	
 	cpAssertHard(glfwOpenWindow(640, 480, 8, 8, 8, 8, 0, 0, GLFW_WINDOW), "Error opening GLFW window.");
 	glfwSetWindowTitle(DemoTitle(demo_index));
 	glfwSwapInterval(1);
+	
+	printf("GL_VENDOR: %s\n", glGetString(GL_VENDOR));
+	printf("GL_RENDERER: %s\n", glGetString(GL_RENDERER));
+	printf("GL_SHADING_LANGUAGE_VERSION: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 	
 	SetupGL();
 	

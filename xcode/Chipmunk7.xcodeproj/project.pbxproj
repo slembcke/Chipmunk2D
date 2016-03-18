@@ -152,14 +152,13 @@
 		D3C3790911063C57003EF1D9 /* cpGearJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D37BB8B10EAB01E400C70958 /* cpGearJoint.c */; };
 		D3C3790A11063C57003EF1D9 /* cpSimpleMotor.c in Sources */ = {isa = PBXBuildFile; fileRef = D37BB8F00EAB06B600C70958 /* cpSimpleMotor.c */; };
 		D3C3790B11063C57003EF1D9 /* cpRatchetJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D36D87811012D63600DB5078 /* cpRatchetJoint.c */; };
+		D3C98AE51C99E7B000E2074D /* Photon.c in Sources */ = {isa = PBXBuildFile; fileRef = D3C98AE31C99E7B000E2074D /* Photon.c */; };
 		D3DFB55D1613765700162F19 /* Sticky.c in Sources */ = {isa = PBXBuildFile; fileRef = D3DFB55C1613765700162F19 /* Sticky.c */; };
 		D3E4867613175AE000A00840 /* Bench.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E4867513175AE000A00840 /* Bench.c */; };
 		D3E4A9C80E99683200EE08BA /* cpSlideJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA60E98260200A3D7FA /* cpSlideJoint.c */; };
 		D3E4A9CA0E99683200EE08BA /* cpPivotJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA40E98260200A3D7FA /* cpPivotJoint.c */; };
 		D3E4A9CC0E99683200EE08BA /* cpGrooveJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */; };
 		D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0540AA3303F004E361B /* OpenGL.framework */; };
-		D3E76CFC17BFE2340068C3C3 /* ChipmunkDemoTextSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E76CFB17BFDD930068C3C3 /* ChipmunkDemoTextSupport.c */; };
-		D3EEF8A117BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = D3EEF8A017BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c */; };
 		D3F18B491A5DDC8B005BED54 /* ChipmunkAutoGeometry.m in Sources */ = {isa = PBXBuildFile; fileRef = D3F18B451A5DDC8B005BED54 /* ChipmunkAutoGeometry.m */; };
 		D3F18B4A1A5DDC8B005BED54 /* ChipmunkAutoGeometry.m in Sources */ = {isa = PBXBuildFile; fileRef = D3F18B451A5DDC8B005BED54 /* ChipmunkAutoGeometry.m */; };
 		D3F18B4B1A5DDC8B005BED54 /* ChipmunkImageSampler.m in Sources */ = {isa = PBXBuildFile; fileRef = D3F18B461A5DDC8B005BED54 /* ChipmunkImageSampler.m */; };
@@ -351,6 +350,8 @@
 		D3C2B4581282178B0080A718 /* chipmunk_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chipmunk_private.h; path = ../include/chipmunk/chipmunk_private.h; sourceTree = "<group>"; };
 		D3C3787A11063B1B003EF1D9 /* libChipmunk-iOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libChipmunk-iOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3C517841279B38300C2AFEB /* TODO.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = TODO.txt; path = ../TODO.txt; sourceTree = SOURCE_ROOT; };
+		D3C98AE31C99E7B000E2074D /* Photon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Photon.c; sourceTree = "<group>"; };
+		D3C98AE41C99E7B000E2074D /* Photon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Photon.h; sourceTree = "<group>"; };
 		D3CCDF460AE35D920080442F /* LogoSmash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = LogoSmash.c; sourceTree = "<group>"; };
 		D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemo.h; sourceTree = "<group>"; };
 		D3DFB55C1613765700162F19 /* Sticky.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Sticky.c; sourceTree = "<group>"; };
@@ -369,11 +370,7 @@
 		D3E5F2D90AAA5622004E361B /* cpBB.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpBB.h; path = ../include/chipmunk/cpBB.h; sourceTree = "<group>"; };
 		D3E5F2DD0AAA562B004E361B /* cpArray.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpArray.c; sourceTree = "<group>"; };
 		D3E5F2DF0AAA562B004E361B /* cpSpaceHash.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = cpSpaceHash.c; sourceTree = "<group>"; };
-		D3E76CFA17BFDD820068C3C3 /* ChipmunkDemoTextSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemoTextSupport.h; sourceTree = "<group>"; };
-		D3E76CFB17BFDD930068C3C3 /* ChipmunkDemoTextSupport.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ChipmunkDemoTextSupport.c; sourceTree = "<group>"; };
 		D3E76CFE17C007E70068C3C3 /* VeraMoBd.ttf_sdf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VeraMoBd.ttf_sdf.h; sourceTree = "<group>"; };
-		D3EEF8A017BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ChipmunkDemoShaderSupport.c; sourceTree = "<group>"; };
-		D3EEF8A217BAB5C0006B62EB /* ChipmunkDemoShaderSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemoShaderSupport.h; sourceTree = "<group>"; };
 		D3F18B451A5DDC8B005BED54 /* ChipmunkAutoGeometry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ChipmunkAutoGeometry.m; path = ../objectivec/src/ChipmunkAutoGeometry.m; sourceTree = "<group>"; };
 		D3F18B461A5DDC8B005BED54 /* ChipmunkImageSampler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ChipmunkImageSampler.m; path = ../objectivec/src/ChipmunkImageSampler.m; sourceTree = "<group>"; };
 		D3F18B471A5DDC8B005BED54 /* ChipmunkPointCloudSampler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ChipmunkPointCloudSampler.m; path = ../objectivec/src/ChipmunkPointCloudSampler.m; sourceTree = "<group>"; };
@@ -688,12 +685,10 @@
 			children = (
 				D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */,
 				D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */,
-				D3EEF8A217BAB5C0006B62EB /* ChipmunkDemoShaderSupport.h */,
-				D3EEF8A017BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c */,
+				D3C98AE41C99E7B000E2074D /* Photon.h */,
+				D3C98AE31C99E7B000E2074D /* Photon.c */,
 				D3FBA1B80E9B1F6300950BCC /* ChipmunkDebugDraw.h */,
 				D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */,
-				D3E76CFA17BFDD820068C3C3 /* ChipmunkDemoTextSupport.h */,
-				D3E76CFB17BFDD930068C3C3 /* ChipmunkDemoTextSupport.c */,
 				D3E76CFE17C007E70068C3C3 /* VeraMoBd.ttf_sdf.h */,
 				D3CCDF460AE35D920080442F /* LogoSmash.c */,
 				D3BAF9C40E9C4F250039DD5C /* PyramidStack.c */,
@@ -1166,8 +1161,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D3E76CFC17BFE2340068C3C3 /* ChipmunkDemoTextSupport.c in Sources */,
 				D3BC99C10AB381EE0025A2C0 /* ChipmunkDemo.c in Sources */,
+				D3C98AE51C99E7B000E2074D /* Photon.c in Sources */,
 				D37697200B50C53900BB33CC /* LogoSmash.c in Sources */,
 				D3FBA1A70E9B1E0400950BCC /* ChipmunkDebugDraw.c in Sources */,
 				D3BAF9C50E9C4F250039DD5C /* PyramidStack.c in Sources */,
@@ -1185,7 +1180,6 @@
 				D3102B171119FD3000E77771 /* Tank.c in Sources */,
 				D3E4867613175AE000A00840 /* Bench.c in Sources */,
 				D3F52BD313C509DC00EB67D9 /* Chains.c in Sources */,
-				D3EEF8A117BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c in Sources */,
 				D37282AD13C6432F00FFFA3F /* Crane.c in Sources */,
 				D37282D413C76C1B00FFFA3F /* Buoyancy.c in Sources */,
 				D373FF1013D0D66E000EDB87 /* ContactGraph.c in Sources */,
@@ -1655,6 +1649,12 @@
 					"\"$(SRCROOT)/libglfw/lib\"",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
+				OTHER_CFLAGS = (
+					"-DDEBUG",
+					"-ffast-math",
+					"-DGLFW_INCLUDE_GL3",
+					"-DGLFW_NO_GLU",
+				);
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -1699,8 +1699,10 @@
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
 				OTHER_CFLAGS = (
-					"-ffast-math",
 					"-DNDEBUG",
+					"-ffast-math",
+					"-DGLFW_INCLUDE_GL3",
+					"-DGLFW_NO_GLU",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",

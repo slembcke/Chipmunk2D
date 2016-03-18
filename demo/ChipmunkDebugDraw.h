@@ -19,6 +19,9 @@
  * SOFTWARE.
  */
 
+#include "Photon.h"
+
+
 static inline cpSpaceDebugColor RGBAColor(float r, float g, float b, float a){
 	cpSpaceDebugColor color = {r, g, b, a};
 	return color;
@@ -30,6 +33,7 @@ static inline cpSpaceDebugColor LAColor(float l, float a){
 }
 
 void ChipmunkDebugDrawInit(void);
+void ChipmunkDebugDrawSetRenderer(PhotonRenderer *renderer, cpTransform vpTransform);
 
 extern float ChipmunkDebugDrawPointLineScale;
 extern float ChipmunkDebugDrawOutlineWidth;
@@ -40,13 +44,3 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebu
 void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor);
 void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor);
 void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor outlineColor);
-
-// Call this at the end of the frame to draw the ChipmunkDebugDraw*() commands to the screen.
-void ChipmunkDebugDrawFlushRenderer(void);
-// Call this at the beginning of the frame to clear out any ChipmunkDebugDraw*() commands.
-void ChipmunkDebugDrawClearRenderer(void);
-
-// Save the current contents of the renderer.
-void ChipmunkDebugDrawPushRenderer(void);
-// Reset the renderer back to it's last pushed state.
-void ChipmunkDebugDrawPopRenderer(void);
