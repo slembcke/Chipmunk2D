@@ -275,12 +275,22 @@ static char *PrintStringCursor;
 void
 ChipmunkDemoPrintString(char const *fmt, ...)
 {
+	if (PrintStringCursor == NULL) {
+		return;
+	}
+
 	ChipmunkDemoMessageString = PrintStringBuffer;
-	
+
 	va_list args;
 	va_start(args, fmt);
-	// TODO: should use vsnprintf here
-	PrintStringCursor += vsprintf(PrintStringCursor, fmt, args);
+	int remaining = sizeof(PrintStringBuffer) - (PrintStringCursor - PrintStringBuffer);
+	int would_write = vsnprintf(PrintStringCursor, remaining, fmt, args);
+	if (would_write > 0 && would_write < remaining) {
+		PrintStringCursor += would_write;
+	} else {
+		// encoding error or overflow, prevent further use until reinitialized
+		PrintStringCursor = NULL;
+	}
 	va_end(args);
 }
 
