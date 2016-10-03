@@ -117,14 +117,18 @@ static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
 	cpVect delta = cpvsub(b, a);
 	cpFloat tmin = -INFINITY, tmax = INFINITY;
 	
-	if(delta.x != 0.0f){
+	if(delta.x == 0.0f){
+		if(a.x < bb.l || bb.r < a.x) return INFINITY;
+	} else {
 		cpFloat t1 = (bb.l - a.x)/delta.x;
 		cpFloat t2 = (bb.r - a.x)/delta.x;
 		tmin = cpfmax(tmin, cpfmin(t1, t2));
 		tmax = cpfmin(tmax, cpfmax(t1, t2));
 	}
 	
-	if(delta.y != 0.0f){
+	if(delta.y == 0.0f){
+		if(a.y < bb.b || bb.t < a.y) return INFINITY;
+	} else {
 		cpFloat t1 = (bb.b - a.y)/delta.y;
 		cpFloat t2 = (bb.t - a.y)/delta.y;
 		tmin = cpfmax(tmin, cpfmin(t1, t2));
@@ -133,9 +137,9 @@ static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
 	
 	if(tmin <= tmax && 0.0f <= tmax && tmin <= 1.0f){
 		return cpfmax(tmin, 0.0f);
+	} else {
+		return INFINITY;
 	}
-	
-	return INFINITY;
 }
 
 /// Return true if the bounding box intersects the line segment with ends @c a and @c b.

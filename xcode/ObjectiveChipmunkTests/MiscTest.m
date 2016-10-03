@@ -132,6 +132,121 @@
 	}
 }
 
+-(void)testBBSegmentQuery
+{
+	{ // left
+		cpVect a = cpv(-2, 0);
+		cpVect b = cpv( 0, 0);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqualWithAccuracy(t, 0.5, 1e-5);
+	}
+	
+	{ // right
+		cpVect a = cpv( 2, 0);
+		cpVect b = cpv( 0, 0);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqualWithAccuracy(t, 0.5, 1e-5);
+	}
+	
+	{ // bottom
+		cpVect a = cpv(0, -2);
+		cpVect b = cpv(0,  0);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqualWithAccuracy(t, 0.5, 1e-5);
+	}
+	
+	{ // top
+		cpVect a = cpv(0,  2);
+		cpVect b = cpv(0,  0);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqualWithAccuracy(t, 0.5, 1e-5);
+	}
+	
+	{ // diagonal corner
+		cpVect a = cpv(-2, -2);
+		cpVect b = cpv( 0,  0);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqualWithAccuracy(t, 0.5, 1e-5);
+	}
+	
+	{ // diagonal edge
+		cpVect a = cpv(-2, -1);
+		cpVect b = cpv( 0,  1);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqualWithAccuracy(t, 0.5, 1e-5);
+	}
+	
+	{ // x-aligned low.
+		cpVect a = cpv(-2, -1);
+		cpVect b = cpv( 0, -1);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqual(t, 0.5);
+	}
+	
+	{ // x-aligned high.
+		cpVect a = cpv(-2, 1);
+		cpVect b = cpv( 0, 1);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqual(t, 0.5);
+	}
+	
+	{ // y-aligned low.
+		cpVect a = cpv(-1, -2);
+		cpVect b = cpv(-1,  0);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqual(t, 0.5);
+	}
+	
+	{ // y-aligned high.
+		cpVect a = cpv(1, -2);
+		cpVect b = cpv(1,  0);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqual(t, 0.5);
+	}
+	
+	{ // Miss, x-aligned low.
+		cpVect a = cpv( 2, -2);
+		cpVect b = cpv( 0, -2);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqual(t, INFINITY);
+	}
+	
+	{ // Miss, x-aligned high.
+		cpVect a = cpv( 2, 2);
+		cpVect b = cpv( 0, 2);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqual(t, INFINITY);
+	}
+	
+	{ // Miss, y-aligned low.
+		cpVect a = cpv(-2, 2);
+		cpVect b = cpv(-2, 0);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqual(t, INFINITY);
+	}
+	
+	{ // Miss, y-aligned high.
+		cpVect a = cpv(2, 2);
+		cpVect b = cpv(2, 0);
+		cpBB bb = cpBBNew(-1, -1, 1, 1);
+		cpFloat t = cpBBSegmentQuery(bb, a, b);
+		XCTAssertEqual(t, INFINITY);
+	}
+}
+
 -(void)testImageSamplerLA
 {
 	{
