@@ -19,7 +19,7 @@ class Node
 	def outline(level)
 		children = ""
 		if level == 1
-			children = "<ul>#{@children.map{|child| child.outline(level + 1).join}}</ul>"
+			children = "<ul>#{@children.map{|child| child.outline(level + 1)}.join}</ul>"
 		end
 		
 		["<li><a href=\"##{anchor}\">#{@title}</a>#{children}</li>"]
