@@ -168,6 +168,7 @@ both(cpTimestamp, collisionPersistence, CollisionPersistence);
 getter(cpFloat, currentTimeStep, CurrentTimeStep);
 
 - (BOOL)isLocked {return cpSpaceIsLocked(_space);}
+- (BOOL)locked {return self.isLocked;}
 
 - (ChipmunkBody *)staticBody {return _staticBody;}
 

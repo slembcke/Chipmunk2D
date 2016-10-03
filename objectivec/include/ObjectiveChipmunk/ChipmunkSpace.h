@@ -103,7 +103,8 @@
 /**
 	Returns true if the space is currently executing a timestep.
 */
-@property(nonatomic, readonly) BOOL locked;
+@property(nonatomic, readonly) BOOL isLocked;
+@property(nonatomic, readonly) BOOL locked __deprecated;
 
 /**
 	An object that this space is associated with. You can use this get a reference to your game state or controller object from within callbacks.
