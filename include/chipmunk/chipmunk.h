@@ -25,12 +25,19 @@
 #include <stdlib.h>
 #include <math.h>
 
+#ifndef alloca
+	#ifdef _WIN32
+		#include <malloc.h>
+	#elif defined(__FreeBSD__)
+		/* already included in <stdlib.h> */
+	#else
+		#include <alloca.h>
+	#endif
+#endif
+
 #ifdef _WIN32
-	// For alloca().
-	#include <malloc.h>
 	#define CP_EXPORT __declspec(dllexport)
 #else
-	#include <alloca.h>
 	#define CP_EXPORT
 #endif
 
@@ -162,10 +169,6 @@ CP_EXPORT cpFloat cpMomentForBox2(cpFloat m, cpBB box);
 /// @c first is an optional pointer to an integer to store where the first vertex in the hull came from (i.e. verts[first] == result[0])
 /// @c tol is the allowed amount to shrink the hull when simplifying it. A tolerance of 0.0 creates an exact hull.
 CP_EXPORT int cpConvexHull(int count, const cpVect *verts, cpVect *result, int *first, cpFloat tol);
-
-#ifdef _MSC_VER
-#include "malloc.h"
-#endif
 
 /// Convenience macro to work with cpConvexHull.
 /// @c count and @c verts is the input array passed to cpConvexHull().

@@ -40,6 +40,10 @@ if(NOT MSVC)
   list(APPEND chipmunk_demos_libraries m)
 endif(NOT MSVC)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+  list(APPEND chipmunk_demos_libraries BlocksRuntime)
+endif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+
 file(GLOB chipmunk_demos_source_files "*.c")
 
 include_directories(${chipmunk_demos_include_dirs})
