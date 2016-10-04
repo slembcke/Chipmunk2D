@@ -248,7 +248,7 @@ cpShapeSegmentQuery(const cpShape *shape, cpVect a, cpVect b, cpFloat radius, cp
 	if(nearest.distance <= radius){
 		info->shape = shape;
 		info->alpha = 0.0;
-		info->normal = cpvnormalize(cpvsub(a, nearest.point));
+		info->normal = cpvnormalize(a - nearest.point);
 	} else {
 		shape->klass->segmentQuery(shape, a, b, radius, info);
 	}
@@ -267,7 +267,7 @@ cpShapesCollide(const cpShape *a, const cpShape *b)
 	
 	// cpCollideShapes() may have swapped the contact order. Flip the normal.
 	bool swapped = (a != info.a);
-	set.normal = (swapped ? cpvneg(info.n) : info.n);
+	set.normal = (swapped ? -info.n : info.n);
 	
 	for(int i=0; i<info.count; i++){
 		// cpCollideShapesInfo() returns contacts with absolute positions.
@@ -276,7 +276,7 @@ cpShapesCollide(const cpShape *a, const cpShape *b)
 		
 		set.points[i].pointA = (swapped ? p2 : p1);
 		set.points[i].pointB = (swapped ? p1 : p2);
-		set.points[i].distance = cpvdot(cpvsub(p2, p1), set.normal);
+		set.points[i].distance = cpvdot(p2 - p1, set.normal);
 	}
 	
 	return set;
@@ -298,16 +298,16 @@ cpCircleShapeCacheData(cpCircleShape *circle, cpTransform transform)
 static void
 cpCircleShapePointQuery(cpCircleShape *circle, cpVect p, cpPointQueryInfo *info)
 {
-	cpVect delta = cpvsub(p, circle->tc);
+	cpVect delta = p - circle->tc;
 	cpFloat d = cpvlength(delta);
 	cpFloat r = circle->r;
 	
 	info->shape = (cpShape *)circle;
-	info->point = cpvadd(circle->tc, cpvmult(delta, r/d)); // TODO: div/0
+	info->point = circle->tc + (r/d)*delta; // TODO: div/0
 	info->distance = d - r;
 	
 	// Use up for the gradient if the distance is very small.
-	info->gradient = (d > MAGIC_EPSILON ? cpvmult(delta, 1.0f/d) : cpv(0.0f, 1.0f));
+	info->gradient = (d > MAGIC_EPSILON ? delta/d : cpv(0.0f, 1.0f));
 }
 
 static void
@@ -408,13 +408,13 @@ cpSegmentShapePointQuery(cpSegmentShape *seg, cpVect p, cpPointQueryInfo *info)
 {
 	cpVect closest = cpClosetPointOnSegment(p, seg->ta, seg->tb);
 	
-	cpVect delta = cpvsub(p, closest);
+	cpVect delta = p - closest;
 	cpFloat d = cpvlength(delta);
 	cpFloat r = seg->r;
-	cpVect g = cpvmult(delta, 1.0f/d);
+	cpVect g = delta/d;
 	
 	info->shape = (cpShape *)seg;
-	info->point = (d ? cpvadd(closest, cpvmult(g, r)) : closest);
+	info->point = (d ? closest + r*g : closest);
 	info->distance = d - r;
 	
 	// Use the segment's normal if the distance is very small.
@@ -425,16 +425,16 @@ static void
 cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpFloat r2, cpSegmentQueryInfo *info)
 {
 	cpVect n = seg->tn;
-	cpFloat d = cpvdot(cpvsub(seg->ta, a), n);
+	cpFloat d = cpvdot(seg->ta - a, n);
 	cpFloat r = seg->r + r2;
 	
-	cpVect flipped_n = (d > 0.0f ? cpvneg(n) : n);
-	cpVect seg_offset = cpvsub(cpvmult(flipped_n, r), a);
+	cpVect flipped_n = (d > 0.0f ? -n : n);
+	cpVect seg_offset = r*flipped_n -  a;
 	
 	// Make the endpoints relative to 'a' and move them by the thickness of the segment.
-	cpVect seg_a = cpvadd(seg->ta, seg_offset);
-	cpVect seg_b = cpvadd(seg->tb, seg_offset);
-	cpVect delta = cpvsub(b, a);
+	cpVect seg_a = seg->ta + seg_offset;
+	cpVect seg_b = seg->tb + seg_offset;
+	cpVect delta = b - a;
 	
 	if(cpvcross(delta, seg_a)*cpvcross(delta, seg_b) <= 0.0f){
 		cpFloat d_offset = d + (d > 0.0f ? -r : r);
@@ -445,7 +445,7 @@ cpSegmentShapeSegmentQuery(cpSegmentShape *seg, cpVect a, cpVect b, cpFloat r2, 
 			cpFloat t = ad/(ad - bd);
 			
 			info->shape = (cpShape *)seg;
-			info->point = cpvsub(cpvlerp(a, b, t), cpvmult(flipped_n, r2));
+			info->point = cpvlerp(a, b, t) - r2*flipped_n;
 			info->normal = flipped_n;
 			info->alpha = t;
 		}
@@ -488,7 +488,7 @@ cpSegmentShapeInit(cpSegmentShape *seg, cpBody *body, cpVect a, cpVect b, cpFloa
 {
 	seg->a = a;
 	seg->b = b;
-	seg->n = cpvrperp(cpvnormalize(cpvsub(b, a)));
+	seg->n = cpvrperp(cpvnormalize(b - a));
 	
 	seg->r = r;
 	
@@ -540,8 +540,8 @@ cpSegmentShapeSetNeighbors(cpShape *shape, cpVect prev, cpVect next)
 	cpAssertHard(shape->klass == &cpSegmentShapeClass, "Shape is not a segment shape.");
 	cpSegmentShape *seg = (cpSegmentShape *)shape;
 	
-	seg->a_tangent = cpvsub(prev, seg->a);
-	seg->b_tangent = cpvsub(next, seg->b);
+	seg->a_tangent = prev - seg->a;
+	seg->b_tangent = next - seg->b;
 }
 
 // Unsafe API (chipmunk_unsafe.h)
@@ -582,7 +582,7 @@ cpSegmentShapeSetEndpoints(cpShape *shape, cpVect a, cpVect b)
 	
 	seg->a = a;
 	seg->b = b;
-	seg->n = cpvperp(cpvnormalize(cpvsub(b, a)));
+	seg->n = cpvperp(cpvnormalize(b - a));
 
 	cpFloat mass = shape->massInfo.m;
 	shape->massInfo = cpSegmentShapeMassInfo(shape->massInfo.m, seg->a, seg->b, seg->r);

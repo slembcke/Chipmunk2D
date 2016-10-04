@@ -77,7 +77,7 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	
 	for(int i=0; i<count; i++){
 		cpVect v1 = planes[i].v0;
-		outside = outside || (cpvdot(planes[i].n, cpvsub(p,v1)) > 0.0f);
+		outside = outside || (cpvdot(planes[i].n, p - v1) > 0.0f);
 		
 		cpVect closest = cpClosetPointOnSegment(p, v0, v1);
 		
@@ -92,10 +92,10 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	}
 	
 	cpFloat dist = (outside ? minDist : -minDist);
-	cpVect g = cpvmult(cpvsub(p, closestPoint), 1.0f/dist);
+	cpVect g = (p - closestPoint)/dist;
 	
 	info->shape = (cpShape *)poly;
-	info->point = cpvadd(closestPoint, cpvmult(g, r));
+	info->point = closestPoint + r*g;
 	info->distance = dist - r;
 	
 	// Use the normal of the closest segment if the distance is small.
@@ -127,7 +127,7 @@ cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpFloat r2, cpSeg
 		
 		if(dtMin <= dt && dt <= dtMax){
 			info->shape = (cpShape *)poly;
-			info->point = cpvsub(cpvlerp(a, b, t), cpvmult(n, r2));
+			info->point = cpvlerp(a, b, t) - r2*n;
 			info->normal = n;
 			info->alpha = t;
 		}
@@ -156,7 +156,7 @@ SetVerts(cpPolyShape *poly, int count, const cpVect *verts)
 	for(int i=0; i<count; i++){
 		cpVect a = verts[(i - 1 + count)%count];
 		cpVect b = verts[i];
-		cpVect n = cpvnormalize(cpvrperp(cpvsub(b, a)));
+		cpVect n = cpvnormalize(cpvrperp(b - a));
 		
 		poly->planes[i + count].v0 = b;
 		poly->planes[i + count].n = n;
@@ -170,7 +170,7 @@ cpPolyShapeMassInfo(cpFloat mass, int count, const cpVect *verts, cpFloat radius
 	
 	cpVect centroid = cpCentroidForPoly(count, verts);
 	struct cpShapeMassInfo info = {
-		mass, cpMomentForPoly(1.0f, count, verts, cpvneg(centroid), radius),
+		mass, cpMomentForPoly(1.0f, count, verts, -centroid, radius),
 		centroid,
 		cpAreaForPoly(count, verts, radius),
 	};
