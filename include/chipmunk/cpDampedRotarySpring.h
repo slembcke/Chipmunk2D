@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+#pragma once
+
 /// @defgroup cpDampedRotarySpring cpDampedRotarySpring
 /// @{
 

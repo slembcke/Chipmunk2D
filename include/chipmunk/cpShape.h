@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+#pragma once
+
 /// @defgroup cpShape cpShape
 /// The cpShape struct defines the shape of a rigid body.
 /// @{

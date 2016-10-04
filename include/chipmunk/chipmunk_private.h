@@ -19,8 +19,7 @@
  * SOFTWARE.
  */
 
-#ifndef CHIPMUNK_PRIVATE_H
-#define CHIPMUNK_PRIVATE_H
+#pragma once
 
 #include "chipmunk/chipmunk.h"
 #include "chipmunk/chipmunk_structs.h"
@@ -340,5 +339,3 @@ cpArbiterNext(cpArbiter *node, cpBody *body)
 
 #define CP_BODY_FOREACH_COMPONENT(root, var)\
 	for(cpBody *var = root; var; var = var->sleeping.next)
-
-#endif

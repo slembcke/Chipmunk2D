@@ -19,8 +19,7 @@
  * SOFTWARE.
  */
 
-#ifndef CHIPMUNK_TRANSFORM_H
-#define CHIPMUNK_TRANSFORM_H
+#pragma once
 
 #include "chipmunk_types.h"
 #include "cpVect.h"
@@ -194,5 +193,3 @@ cpTransformAxialScale(cpVect axis, cpVect pivot, cpFloat scale)
     A, axis.x*axis.x + scale*axis.y*axis.y, axis.y*B
   );
 }
-
-#endif

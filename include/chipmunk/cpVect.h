@@ -19,8 +19,7 @@
  * SOFTWARE.
  */
 
-#ifndef CHIPMUNK_VECT_H
-#define CHIPMUNK_VECT_H
+#pragma once
 
 #include "chipmunk_types.h"
 
@@ -226,5 +225,3 @@ cpMat2x2Transform(cpMat2x2 m, cpVect v)
 }
 
 ///@}
-
-#endif

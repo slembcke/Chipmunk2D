@@ -19,8 +19,7 @@
  * SOFTWARE.
  */
 
-#ifndef CHIPMUNK_TYPES_H
-#define CHIPMUNK_TYPES_H
+#pragma once
 
 #include <stdint.h>
 #include <float.h>
@@ -246,5 +245,3 @@ typedef struct cpMat2x2 {
 	// Row major [[a, b][c d]]
 	cpFloat a, b, c, d;
 } cpMat2x2;
-
-#endif

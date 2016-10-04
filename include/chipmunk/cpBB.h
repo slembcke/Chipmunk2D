@@ -19,8 +19,7 @@
  * SOFTWARE.
  */
 
-#ifndef CHIPMUNK_BB_H
-#define CHIPMUNK_BB_H
+#pragma once
 
 #include "chipmunk_types.h"
 #include "cpVect.h"
@@ -183,5 +182,3 @@ cpBBOffset(const cpBB bb, const cpVect v)
 }
 
 ///@}
-
-#endif

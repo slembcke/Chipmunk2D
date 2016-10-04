@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+#pragma once
+
 /// @defgroup cpArbiter cpArbiter
 /// The cpArbiter struct tracks pairs of colliding shapes.
 /// They are also used in conjuction with collision handler callbacks

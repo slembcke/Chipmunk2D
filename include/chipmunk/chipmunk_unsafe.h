@@ -36,8 +36,7 @@
 /// so the results will be unrealistic. You must explicity include the chipmunk_unsafe.h header to use them.
 /// @{
 
-#ifndef CHIPMUNK_UNSAFE_H
-#define CHIPMUNK_UNSAFE_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,6 +60,5 @@ CP_EXPORT void cpPolyShapeSetRadius(cpShape *shape, cpFloat radius);
 
 #ifdef __cplusplus
 }
-#endif
 #endif
 /// @}

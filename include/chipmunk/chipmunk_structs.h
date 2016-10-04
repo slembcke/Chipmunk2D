@@ -22,8 +22,7 @@
 // All of the struct definitions for Chipmunk should be considered part of the private API.
 // However, it is very valuable to know the struct sizes for preallocating memory.
 
-#ifndef CHIPMUNK_STRUCTS_H
-#define CHIPMUNK_STRUCTS_H
+#pragma once
 
 #include "chipmunk/chipmunk.h"
 
@@ -446,5 +445,3 @@ typedef struct cpPostStepCallback {
 	void *key;
 	void *data;
 } cpPostStepCallback;
-
-#endif
