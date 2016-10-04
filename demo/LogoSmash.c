@@ -26,7 +26,7 @@ static const int image_width = 188;
 static const int image_height = 35;
 static const int image_row_length = 24;
 
-static const unsigned char image_bitmap[] = {
+static const char image_bitmap[] = {
 	15,-16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,-64,15,63,-32,-2,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,31,-64,15,127,-125,-1,-128,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,127,-64,15,127,15,-1,-64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,-1,-64,15,-2,

@@ -161,7 +161,7 @@ ShatterShape(cpSpace *space, cpShape *shape, cpFloat cellSize, cpVect focus)
 	int width = (int)((bb.r - bb.l)/cellSize) + 1;
 	int height = (int)((bb.t - bb.b)/cellSize) + 1;
 //	printf("Splitting as %dx%d\n", width, height);
-	struct WorleyContex context = {rand(), cellSize, width, height, bb, focus};
+	struct WorleyContex context = {(uint32_t)rand(), cellSize, width, height, bb, focus};
 	
 	for(int i=0; i<context.width; i++){
 		for(int j=0; j<context.height; j++){

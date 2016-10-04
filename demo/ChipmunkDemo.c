@@ -77,7 +77,7 @@ static cpConstraint *mouse_joint = NULL;
 
 char const *ChipmunkDemoMessageString = NULL;
 
-#define GRABBABLE_MASK_BIT (1<<31)
+#define GRABBABLE_MASK_BIT (1u<<31)
 cpShapeFilter GRAB_FILTER = {CP_NO_GROUP, GRABBABLE_MASK_BIT, GRABBABLE_MASK_BIT};
 cpShapeFilter NOT_GRABBABLE_FILTER = {CP_NO_GROUP, ~GRABBABLE_MASK_BIT, ~GRABBABLE_MASK_BIT};
 
@@ -283,8 +283,8 @@ ChipmunkDemoPrintString(char const *fmt, ...)
 
 	va_list args;
 	va_start(args, fmt);
-	int remaining = sizeof(PrintStringBuffer) - (PrintStringCursor - PrintStringBuffer);
-	int would_write = vsnprintf(PrintStringCursor, remaining, fmt, args);
+	size_t remaining = sizeof(PrintStringBuffer) - (PrintStringCursor - PrintStringBuffer);
+	size_t would_write = vsnprintf(PrintStringCursor, remaining, fmt, args);
 	if (would_write > 0 && would_write < remaining) {
 		PrintStringCursor += would_write;
 	} else {

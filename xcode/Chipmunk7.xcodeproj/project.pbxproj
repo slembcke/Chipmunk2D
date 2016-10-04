@@ -29,8 +29,6 @@
 		D31402950E9DD07E00EF79DB /* Springies.c in Sources */ = {isa = PBXBuildFile; fileRef = D31402940E9DD07E00EF79DB /* Springies.c */; };
 		D317246613280FC900752CBE /* cpSweep1D.c in Sources */ = {isa = PBXBuildFile; fileRef = D317246513280FC900752CBE /* cpSweep1D.c */; };
 		D317246713280FC900752CBE /* cpSweep1D.c in Sources */ = {isa = PBXBuildFile; fileRef = D317246513280FC900752CBE /* cpSweep1D.c */; };
-		D3172C681A5DDF8C004D09F7 /* cpHastySpace.c in Sources */ = {isa = PBXBuildFile; fileRef = D3172C651A5DDF8C004D09F7 /* cpHastySpace.c */; };
-		D3172C691A5DDF8C004D09F7 /* cpHastySpace.c in Sources */ = {isa = PBXBuildFile; fileRef = D3172C651A5DDF8C004D09F7 /* cpHastySpace.c */; };
 		D3172C6A1A5DDF8D004D09F7 /* cpMarch.c in Sources */ = {isa = PBXBuildFile; fileRef = D3172C661A5DDF8C004D09F7 /* cpMarch.c */; };
 		D3172C6B1A5DDF8D004D09F7 /* cpMarch.c in Sources */ = {isa = PBXBuildFile; fileRef = D3172C661A5DDF8C004D09F7 /* cpMarch.c */; };
 		D3172C6C1A5DDF8D004D09F7 /* cpPolyline.c in Sources */ = {isa = PBXBuildFile; fileRef = D3172C671A5DDF8C004D09F7 /* cpPolyline.c */; };
@@ -190,7 +188,6 @@
 		FF80DCDF1CA9C68500C44647 /* cpGrooveJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */; };
 		FF80DCE01CA9C68500C44647 /* cpDampedSpring.c in Sources */ = {isa = PBXBuildFile; fileRef = D380115F0E984FA400A3D7FA /* cpDampedSpring.c */; };
 		FF80DCE11CA9C68500C44647 /* chipmunk.c in Sources */ = {isa = PBXBuildFile; fileRef = D3B718E00AB2BC8900B500C9 /* chipmunk.c */; };
-		FF80DCE21CA9C68500C44647 /* cpHastySpace.c in Sources */ = {isa = PBXBuildFile; fileRef = D3172C651A5DDF8C004D09F7 /* cpHastySpace.c */; };
 		FF80DCE31CA9C68500C44647 /* cpArray.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E5F2DD0AAA562B004E361B /* cpArray.c */; };
 		FF80DCE41CA9C68500C44647 /* cpHashSet.c in Sources */ = {isa = PBXBuildFile; fileRef = D30CE25D0B52535500427129 /* cpHashSet.c */; };
 		FF80DCE51CA9C68500C44647 /* cpPolyline.c in Sources */ = {isa = PBXBuildFile; fileRef = D3172C671A5DDF8C004D09F7 /* cpPolyline.c */; };
@@ -1220,7 +1217,6 @@
 				D3E4A9CC0E99683200EE08BA /* cpGrooveJoint.c in Sources */,
 				D38011620E984FA400A3D7FA /* cpDampedSpring.c in Sources */,
 				D34963CE0B56CBBF00CAD239 /* chipmunk.c in Sources */,
-				D3172C681A5DDF8C004D09F7 /* cpHastySpace.c in Sources */,
 				D34963D10B56CBBF00CAD239 /* cpArray.c in Sources */,
 				D34963D20B56CBBF00CAD239 /* cpHashSet.c in Sources */,
 				D3172C6C1A5DDF8D004D09F7 /* cpPolyline.c in Sources */,
@@ -1268,7 +1264,6 @@
 				D3C378F911063C57003EF1D9 /* cpGrooveJoint.c in Sources */,
 				D3C378FA11063C57003EF1D9 /* cpDampedSpring.c in Sources */,
 				D3C378FB11063C57003EF1D9 /* chipmunk.c in Sources */,
-				D3172C691A5DDF8C004D09F7 /* cpHastySpace.c in Sources */,
 				D3C378FE11063C57003EF1D9 /* cpArray.c in Sources */,
 				D3C378FF11063C57003EF1D9 /* cpHashSet.c in Sources */,
 				D3172C6D1A5DDF8D004D09F7 /* cpPolyline.c in Sources */,
@@ -1342,7 +1337,6 @@
 				FF80DCDF1CA9C68500C44647 /* cpGrooveJoint.c in Sources */,
 				FF80DCE01CA9C68500C44647 /* cpDampedSpring.c in Sources */,
 				FF80DCE11CA9C68500C44647 /* chipmunk.c in Sources */,
-				FF80DCE21CA9C68500C44647 /* cpHastySpace.c in Sources */,
 				FF80DCE31CA9C68500C44647 /* cpArray.c in Sources */,
 				FF80DCE41CA9C68500C44647 /* cpHashSet.c in Sources */,
 				FF80DCE51CA9C68500C44647 /* cpPolyline.c in Sources */,
@@ -1586,9 +1580,11 @@
 		D34963BF0B56CACA00CAD239 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				INSTALL_PATH = /usr/local/lib;
 				OTHER_CFLAGS = (
 					"-DDEBUG",
@@ -1604,8 +1600,10 @@
 		D34963C00B56CACA00CAD239 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				INSTALL_PATH = /usr/local/lib;
 				OTHER_CFLAGS = (
 					"-DCHIPMUNK_FFI",
@@ -1694,8 +1692,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
@@ -1711,8 +1711,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				COPY_PHASE_STRIP = YES;
 				GCC_AUTO_VECTORIZATION = YES;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
@@ -1829,10 +1831,12 @@
 		D3E5F04E0AA32FDF004E361B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				HEADER_SEARCH_PATHS = (
@@ -1872,10 +1876,12 @@
 		D3E5F04F0AA32FDF004E361B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_AUTO_VECTORIZATION = YES;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				HEADER_SEARCH_PATHS = (
@@ -1920,8 +1926,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
@@ -1938,8 +1946,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				COPY_PHASE_STRIP = YES;
 				GCC_AUTO_VECTORIZATION = YES;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				GCC_THUMB_SUPPORT = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
