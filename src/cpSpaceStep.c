@@ -37,7 +37,7 @@ cpSpaceGetPostStepCallback(cpSpace *space, void *key)
 
 static void PostStepDoNothing(cpSpace *space, void *obj, void *data){}
 
-cpBool
+bool
 cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data)
 {
 	cpAssertWarn(space->locked,
@@ -51,9 +51,9 @@ cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void 
 		callback->data = data;
 		
 		cpArrayPush(space->postStepCallbacks, callback);
-		return cpTrue;
+		return true;
 	} else {
-		return cpFalse;
+		return false;
 	}
 }
 
@@ -66,7 +66,7 @@ cpSpaceLock(cpSpace *space)
 }
 
 void
-cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
+cpSpaceUnlock(cpSpace *space, bool runPostStep)
 {
 	space->locked--;
 	cpAssertHard(space->locked >= 0, "Internal Error: Space lock underflow.");
@@ -82,7 +82,7 @@ cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
 		waking->num = 0;
 		
 		if(space->locked == 0 && runPostStep && !space->skipPostStep){
-			space->skipPostStep = cpTrue;
+			space->skipPostStep = true;
 			
 			cpArray *arr = space->postStepCallbacks;
 			for(int i=0; i<arr->num; i++){
@@ -99,7 +99,7 @@ cpSpaceUnlock(cpSpace *space, cpBool runPostStep)
 			}
 			
 			arr->num = 0;
-			space->skipPostStep = cpFalse;
+			space->skipPostStep = false;
 		}
 	}
 }
@@ -201,7 +201,7 @@ cpSpaceArbiterSetTrans(cpShape **shapes, cpSpace *space)
 	return cpArbiterInit((cpArbiter *)cpArrayPop(space->pooledArbiters), shapes[0], shapes[1]);
 }
 
-static inline cpBool
+static inline bool
 QueryRejectConstraint(cpBody *a, cpBody *b)
 {
 	CP_BODY_FOREACH_CONSTRAINT(a, constraint){
@@ -210,13 +210,13 @@ QueryRejectConstraint(cpBody *a, cpBody *b)
 				(constraint->a == a && constraint->b == b) ||
 				(constraint->a == b && constraint->b == a)
 			)
-		) return cpTrue;
+		) return true;
 	}
 	
-	return cpFalse;
+	return false;
 }
 
-static inline cpBool
+static inline bool
 QueryReject(cpShape *a, cpShape *b)
 {
 	return (
@@ -226,7 +226,7 @@ QueryReject(cpShape *a, cpShape *b)
 		|| a->body == b->body
 		// Don't collide shapes that are filtered.
 		|| cpShapeFilterReject(a->filter, b->filter)
-		// Don't collide bodies if they have a constraint with collideBodies == cpFalse.
+		// Don't collide bodies if they have a constraint with collideBodies == false.
 		|| QueryRejectConstraint(a->body, b->body)
 	);
 }
@@ -289,7 +289,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 }
 
 // Hashset filter func to throw away old arbiters.
-cpBool
+bool
 cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 {
 	cpTimestamp ticks = space->stamp - arb->stamp;
@@ -303,7 +303,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 		(cpBodyGetType(a) == CP_BODY_TYPE_STATIC || cpBodyIsSleeping(a)) &&
 		(cpBodyGetType(b) == CP_BODY_TYPE_STATIC || cpBodyIsSleeping(b))
 	){
-		return cpTrue;
+		return true;
 	}
 	
 	// Arbiter was used last frame, but not this one
@@ -318,10 +318,10 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
 		arb->count = 0;
 		
 		cpArrayPush(space->pooledArbiters, arb);
-		return cpFalse;
+		return false;
 	}
 	
-	return cpTrue;
+	return true;
 }
 
 //MARK: All Important cpSpaceStep() Function
@@ -370,7 +370,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		cpSpacePushFreshContactBuffer(space);
 		cpSpatialIndexEach(space->dynamicShapes, (cpSpatialIndexIteratorFunc)cpShapeUpdateFunc, NULL);
 		cpSpatialIndexReindexQuery(space->dynamicShapes, (cpSpatialIndexQueryFunc)cpSpaceCollideShapes, space);
-	} cpSpaceUnlock(space, cpFalse);
+	} cpSpaceUnlock(space, false);
 	
 	// Rebuild the contact graph (and detect sleeping components if sleeping is enabled)
 	cpSpaceProcessComponents(space, dt);
@@ -441,5 +441,5 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 			cpCollisionHandler *handler = arb->handler;
 			handler->postSolveFunc(arb, space, handler->userData);
 		}
-	} cpSpaceUnlock(space, cpTrue);
+	} cpSpaceUnlock(space, true);
 }

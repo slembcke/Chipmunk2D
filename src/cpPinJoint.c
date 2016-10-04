@@ -120,7 +120,7 @@ cpPinJointNew(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB)
 	return (cpConstraint *)cpPinJointInit(cpPinJointAlloc(), a, b, anchorA, anchorB);
 }
 
-cpBool
+bool
 cpConstraintIsPinJoint(const cpConstraint *constraint)
 {
 	return (constraint->klass == &klass);

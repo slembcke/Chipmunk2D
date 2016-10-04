@@ -32,7 +32,7 @@ update(cpSpace *space, double dt)
 #define HEIGHT 30.0f
 
 static void
-add_domino(cpSpace *space, cpVect pos, cpBool flipped)
+add_domino(cpSpace *space, cpVect pos, bool flipped)
 {
 	cpFloat mass = 1.0f;
 	cpFloat radius = 0.5f;
@@ -68,17 +68,17 @@ init(void)
 	for(int i=0; i<n; i++){
 		for(int j=0; j<(n - i); j++){
 			cpVect offset = cpv((j - (n - 1 - i)*0.5f)*1.5f*HEIGHT, (i + 0.5f)*(HEIGHT + 2*WIDTH) - WIDTH - 240);
-			add_domino(space, offset, cpFalse);
-			add_domino(space, cpvadd(offset, cpv(0, (HEIGHT + WIDTH)/2.0f)), cpTrue);
+			add_domino(space, offset, false);
+			add_domino(space, cpvadd(offset, cpv(0, (HEIGHT + WIDTH)/2.0f)), true);
 			
 			if(j == 0){
-				add_domino(space, cpvadd(offset, cpv(0.5f*(WIDTH - HEIGHT), HEIGHT + WIDTH)), cpFalse);
+				add_domino(space, cpvadd(offset, cpv(0.5f*(WIDTH - HEIGHT), HEIGHT + WIDTH)), false);
 			}
 			
 			if(j != n - i - 1){
-				add_domino(space, cpvadd(offset, cpv(HEIGHT*0.75f, (HEIGHT + 3*WIDTH)/2.0f)), cpTrue);
+				add_domino(space, cpvadd(offset, cpv(HEIGHT*0.75f, (HEIGHT + 3*WIDTH)/2.0f)), true);
 			} else {
-				add_domino(space, cpvadd(offset, cpv(0.5f*(HEIGHT - WIDTH), HEIGHT + WIDTH)), cpFalse);
+				add_domino(space, cpvadd(offset, cpv(0.5f*(HEIGHT - WIDTH), HEIGHT + WIDTH)), false);
 			}
 		}
 	}

@@ -23,7 +23,7 @@
 /// @{
 
 /// Check if a constraint is a slide joint.
-CP_EXPORT cpBool cpConstraintIsGrooveJoint(const cpConstraint *constraint);
+CP_EXPORT bool cpConstraintIsGrooveJoint(const cpConstraint *constraint);
 
 /// Allocate a groove joint.
 CP_EXPORT cpGrooveJoint* cpGrooveJointAlloc(void);

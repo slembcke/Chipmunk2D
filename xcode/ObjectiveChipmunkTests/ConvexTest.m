@@ -255,7 +255,7 @@ MakeLoopedPolyline(id self, int count, cpVect *verts)
 	XCTAssert(cpPolylineIsClosed(set->lines[0]), @"");
 	
 	cpPolyline *line = set->lines[0];
-	cpPolylineSetFree(set, cpFalse);
+	cpPolylineSetFree(set, false);
 	
 	return line;
 }

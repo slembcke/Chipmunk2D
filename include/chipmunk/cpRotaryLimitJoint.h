@@ -23,7 +23,7 @@
 /// @{
 
 /// Check if a constraint is a damped rotary springs.
-CP_EXPORT cpBool cpConstraintIsRotaryLimitJoint(const cpConstraint *constraint);
+CP_EXPORT bool cpConstraintIsRotaryLimitJoint(const cpConstraint *constraint);
 
 /// Allocate a damped rotary limit joint.
 CP_EXPORT cpRotaryLimitJoint* cpRotaryLimitJointAlloc(void);

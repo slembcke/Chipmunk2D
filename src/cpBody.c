@@ -127,7 +127,7 @@ cpBodyFree(cpBody *body)
 	#define	cpAssertSaneBody(body) cpBodySanityCheck(body)
 #endif
 
-cpBool
+bool
 cpBodyIsSleeping(const cpBody *body)
 {
 	return (body->sleeping.root != ((cpBody*)0));
@@ -616,7 +616,7 @@ cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
 	while(arb){
 		cpArbiter *next = cpArbiterNext(arb, body);
 		
-		cpBool swapped = arb->swapped; {
+		bool swapped = arb->swapped; {
 			arb->swapped = (body == arb->body_b);
 			func(body, arb, data);
 		} arb->swapped = swapped;

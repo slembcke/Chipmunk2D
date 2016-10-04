@@ -283,7 +283,7 @@ NodeNew(cpBBTree *tree, Node *a, Node *b)
 	return node;
 }
 
-static inline cpBool
+static inline bool
 NodeIsLeaf(Node *node)
 {
 	return (node->obj != NULL);
@@ -423,7 +423,7 @@ typedef struct MarkContext {
 } MarkContext;
 
 static void
-MarkLeafQuery(Node *subtree, Node *leaf, cpBool left, MarkContext *context)
+MarkLeafQuery(Node *subtree, Node *leaf, bool left, MarkContext *context)
 {
 	if(cpBBIntersects(leaf->bb, subtree->bb)){
 		if(NodeIsLeaf(subtree)){
@@ -446,13 +446,13 @@ MarkLeaf(Node *leaf, MarkContext *context)
 	cpBBTree *tree = context->tree;
 	if(leaf->STAMP == GetMasterTree(tree)->stamp){
 		Node *staticRoot = context->staticRoot;
-		if(staticRoot) MarkLeafQuery(staticRoot, leaf, cpFalse, context);
+		if(staticRoot) MarkLeafQuery(staticRoot, leaf, false, context);
 		
 		for(Node *node = leaf; node->parent; node = node->parent){
 			if(node == node->parent->A){
-				MarkLeafQuery(node->parent->B, leaf, cpTrue, context);
+				MarkLeafQuery(node->parent->B, leaf, true, context);
 			} else {
-				MarkLeafQuery(node->parent->A, leaf, cpFalse, context);
+				MarkLeafQuery(node->parent->A, leaf, false, context);
 			}
 		}
 	} else {
@@ -495,7 +495,7 @@ LeafNew(cpBBTree *tree, void *obj, cpBB bb)
 	return node;
 }
 
-static cpBool
+static bool
 LeafUpdate(Node *leaf, cpBBTree *tree)
 {
 	Node *root = tree->root;
@@ -510,9 +510,9 @@ LeafUpdate(Node *leaf, cpBBTree *tree)
 		PairsClear(leaf, tree);
 		leaf->STAMP = GetMasterTree(tree)->stamp;
 		
-		return cpTrue;
+		return true;
 	} else {
-		return cpFalse;
+		return false;
 	}
 }
 
@@ -527,7 +527,7 @@ LeafAddPairs(Node *leaf, cpBBTree *tree)
 		if(dynamicRoot){
 			cpBBTree *dynamicTree = GetTree(dynamicIndex);
 			MarkContext context = {dynamicTree, NULL, NULL, NULL};
-			MarkLeafQuery(dynamicRoot, leaf, cpTrue, &context);
+			MarkLeafQuery(dynamicRoot, leaf, true, &context);
 		}
 	} else {
 		Node *staticRoot = GetRootIfTree(tree->spatialIndex.staticIndex);
@@ -578,7 +578,7 @@ void
 cpBBTreeSetVelocityFunc(cpSpatialIndex *index, cpBBTreeVelocityFunc func)
 {
 	if(index->klass != Klass()){
-		cpAssertWarn(cpFalse, "Ignoring cpBBTreeSetVelocityFunc() call to non-tree spatial index.");
+		cpAssertWarn(false, "Ignoring cpBBTreeSetVelocityFunc() call to non-tree spatial index.");
 		return;
 	}
 	
@@ -625,7 +625,7 @@ cpBBTreeRemove(cpBBTree *tree, void *obj, cpHashValue hashid)
 	NodeRecycle(tree, leaf);
 }
 
-static cpBool
+static bool
 cpBBTreeContains(cpBBTree *tree, void *obj, cpHashValue hashid)
 {
 	return (cpHashSetFind(tree->leaves, hashid, obj) != NULL);
@@ -754,7 +754,7 @@ partitionNodes(cpBBTree *tree, Node **nodes, int count)
 	for(int i=1; i<count; i++) bb = cpBBMerge(bb, nodes[i]->bb);
 	
 	// Split it on it's longest axis
-	cpBool splitWidth = (bb.r - bb.l > bb.t - bb.b);
+	bool splitWidth = (bb.r - bb.l > bb.t - bb.b);
 	
 	// Sort the bounds and use the median as the splitting point
 	cpFloat *bounds = (cpFloat *)cpcalloc(count*2, sizeof(cpFloat));
@@ -828,7 +828,7 @@ void
 cpBBTreeOptimize(cpSpatialIndex *index)
 {
 	if(index->klass != &klass){
-		cpAssertWarn(cpFalse, "Ignoring cpBBTreeOptimize() call to non-tree spatial index.");
+		cpAssertWarn(false, "Ignoring cpBBTreeOptimize() call to non-tree spatial index.");
 		return;
 	}
 	
@@ -886,7 +886,7 @@ NodeRender(Node *node, int depth)
 void
 cpBBTreeRenderDebug(cpSpatialIndex *index){
 	if(index->klass != &klass){
-		cpAssertWarn(cpFalse, "Ignoring cpBBTreeRenderDebug() call to non-tree spatial index.");
+		cpAssertWarn(false, "Ignoring cpBBTreeRenderDebug() call to non-tree spatial index.");
 		return;
 	}
 	

@@ -34,18 +34,18 @@
 // TODO test first collision
 // TODO test post-step callbacks
 
-static cpBool
+static bool
 Begin(cpArbiter *arb, cpSpace *space, NSMutableString *string){
 	[string appendString:@"Begin-"];
 	
-	return cpTrue;
+	return true;
 }
 
-static cpBool
+static bool
 PreSolve(cpArbiter *arb, cpSpace *space, NSMutableString *string){
 	[string appendString:@"PreSolve-"];
 	
-	return cpTrue;
+	return true;
 }
 
 static void
@@ -252,7 +252,7 @@ testSleepingSensorCallbacksHelper(id self, int wakeRemoveType){
 	testSleepingSensorCallbacksHelper(self, 1);
 }
 
-static cpBool CallBlock(cpArbiter *arb, cpSpace *space, cpBool (^block)(cpArbiter *arb)){return block(arb);}
+static bool CallBlock(cpArbiter *arb, cpSpace *space, bool (^block)(cpArbiter *arb)){return block(arb);}
 
 -(void)testPostStepRemoval {
 	NSString *ballType = @"ballType";

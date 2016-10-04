@@ -115,7 +115,7 @@ update(cpSpace *space, double dt)
 {
 	cpSpaceStep(space, dt);
 	
-	static cpBool lastClickState = cpFalse;
+	static bool lastClickState = false;
 	static cpVect sliceStart = {0.0, 0.0};
 	
 	// Annoying state tracking code that you wouldn't need

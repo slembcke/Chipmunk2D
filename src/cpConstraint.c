@@ -50,7 +50,7 @@ cpConstraintInit(cpConstraint *constraint, const cpConstraintClass *klass, cpBod
 	constraint->errorBias = cpfpow(1.0f - 0.1f, 60.0f);
 	constraint->maxBias = (cpFloat)INFINITY;
 	
-	constraint->collideBodies = cpTrue;
+	constraint->collideBodies = true;
 	
 	constraint->preSolve = NULL;
 	constraint->postSolve = NULL;
@@ -116,14 +116,14 @@ cpConstraintSetMaxBias(cpConstraint *constraint, cpFloat maxBias)
 	constraint->maxBias = maxBias;
 }
 
-cpBool
+bool
 cpConstraintGetCollideBodies(const cpConstraint *constraint)
 {
 	return constraint->collideBodies;
 }
 
 void
-cpConstraintSetCollideBodies(cpConstraint *constraint, cpBool collideBodies)
+cpConstraintSetCollideBodies(cpConstraint *constraint, bool collideBodies)
 {
 	cpConstraintActivateBodies(constraint);
 	constraint->collideBodies = collideBodies;

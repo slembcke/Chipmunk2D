@@ -128,7 +128,7 @@ cpSlideJointNew(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB, cpFloat mi
 	return (cpConstraint *)cpSlideJointInit(cpSlideJointAlloc(), a, b, anchorA, anchorB, min, max);
 }
 
-cpBool
+bool
 cpConstraintIsSlideJoint(const cpConstraint *constraint)
 {
 	return (constraint->klass == &klass);

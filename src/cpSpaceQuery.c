@@ -54,7 +54,7 @@ cpSpacePointQuery(cpSpace *space, cpVect point, cpFloat maxDistance, cpShapeFilt
 	cpSpaceLock(space); {
 		cpSpatialIndexQuery(space->dynamicShapes, &context, bb, (cpSpatialIndexQueryFunc)NearestPointQuery, data);
 		cpSpatialIndexQuery(space->staticShapes, &context, bb, (cpSpatialIndexQueryFunc)NearestPointQuery, data);
-	} cpSpaceUnlock(space, cpTrue);
+	} cpSpaceUnlock(space, true);
 }
 
 static cpCollisionID
@@ -133,7 +133,7 @@ cpSpaceSegmentQuery(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cp
 	cpSpaceLock(space); {
     cpSpatialIndexSegmentQuery(space->staticShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryFunc)SegmentQuery, data);
     cpSpatialIndexSegmentQuery(space->dynamicShapes, &context, start, end, 1.0f, (cpSpatialIndexSegmentQueryFunc)SegmentQuery, data);
-	} cpSpaceUnlock(space, cpTrue);
+	} cpSpaceUnlock(space, true);
 }
 
 static cpFloat
@@ -204,7 +204,7 @@ cpSpaceBBQuery(cpSpace *space, cpBB bb, cpShapeFilter filter, cpSpaceBBQueryFunc
 	cpSpaceLock(space); {
     cpSpatialIndexQuery(space->dynamicShapes, &context, bb, (cpSpatialIndexQueryFunc)BBQuery, data);
     cpSpatialIndexQuery(space->staticShapes, &context, bb, (cpSpatialIndexQueryFunc)BBQuery, data);
-	} cpSpaceUnlock(space, cpTrue);
+	} cpSpaceUnlock(space, true);
 }
 
 //MARK: Shape Query Functions
@@ -212,7 +212,7 @@ cpSpaceBBQuery(cpSpace *space, cpBB bb, cpShapeFilter filter, cpSpaceBBQueryFunc
 struct ShapeQueryContext {
 	cpSpaceShapeQueryFunc func;
 	void *data;
-	cpBool anyCollision;
+	bool anyCollision;
 };
 
 // Callback from the spatial hash.
@@ -230,17 +230,17 @@ ShapeQuery(cpShape *a, cpShape *b, cpCollisionID id, struct ShapeQueryContext *c
 	return id;
 }
 
-cpBool
+bool
 cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data)
 {
 	cpBody *body = shape->body;
 	cpBB bb = (body ? cpShapeUpdate(shape, body->transform) : shape->bb);
-	struct ShapeQueryContext context = {func, data, cpFalse};
+	struct ShapeQueryContext context = {func, data, false};
 	
 	cpSpaceLock(space); {
     cpSpatialIndexQuery(space->dynamicShapes, shape, bb, (cpSpatialIndexQueryFunc)ShapeQuery, &context);
     cpSpatialIndexQuery(space->staticShapes, shape, bb, (cpSpatialIndexQueryFunc)ShapeQuery, &context);
-	} cpSpaceUnlock(space, cpTrue);
+	} cpSpaceUnlock(space, true);
 	
 	return context.anyCollision;
 }

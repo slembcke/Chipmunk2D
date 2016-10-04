@@ -43,7 +43,7 @@ struct cpSweep1D
 	TableCell *table;
 };
 
-static inline cpBool
+static inline bool
 BoundsOverlap(Bounds a, Bounds b)
 {
 	return (a.min <= b.max && b.min <= a.max);
@@ -122,10 +122,10 @@ cpSweep1DContains(cpSweep1D *sweep, void *obj, cpHashValue hashid)
 {
 	TableCell *table = sweep->table;
 	for(int i=0, count=sweep->num; i<count; i++){
-		if(table[i].obj == obj) return cpTrue;
+		if(table[i].obj == obj) return true;
 	}
 	
-	return cpFalse;
+	return false;
 }
 
 //MARK: Basic Operations

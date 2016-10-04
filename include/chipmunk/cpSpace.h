@@ -27,10 +27,10 @@
 /// Collision begin event function callback type.
 /// Returning false from a begin callback causes the collision to be ignored until
 /// the the separate callback is called when the objects stop colliding.
-typedef cpBool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
+typedef bool (*cpCollisionBeginFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
 /// Collision pre-solve event function callback type.
 /// Returning false from a pre-step callback causes the collision to be ignored until the next step.
-typedef cpBool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
+typedef bool (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
 /// Collision post-solve event function callback type.
 typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, cpDataPointer userData);
 /// Collision separate event function callback type.
@@ -138,7 +138,7 @@ CP_EXPORT cpBody* cpSpaceGetStaticBody(const cpSpace *space);
 CP_EXPORT cpFloat cpSpaceGetCurrentTimeStep(const cpSpace *space);
 
 /// returns true from inside a callback when objects cannot be added/removed.
-CP_EXPORT cpBool cpSpaceIsLocked(cpSpace *space);
+CP_EXPORT bool cpSpaceIsLocked(cpSpace *space);
 
 
 //MARK: Collision Handlers
@@ -170,11 +170,11 @@ CP_EXPORT void cpSpaceRemoveBody(cpSpace *space, cpBody *body);
 CP_EXPORT void cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint);
 
 /// Test if a collision shape has been added to the space.
-CP_EXPORT cpBool cpSpaceContainsShape(cpSpace *space, cpShape *shape);
+CP_EXPORT bool cpSpaceContainsShape(cpSpace *space, cpShape *shape);
 /// Test if a rigid body has been added to the space.
-CP_EXPORT cpBool cpSpaceContainsBody(cpSpace *space, cpBody *body);
+CP_EXPORT bool cpSpaceContainsBody(cpSpace *space, cpBody *body);
 /// Test if a constraint has been added to the space.
-CP_EXPORT cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint);
+CP_EXPORT bool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint);
 
 //MARK: Post-Step Callbacks
 
@@ -184,7 +184,7 @@ typedef void (*cpPostStepFunc)(cpSpace *space, void *key, void *data);
 /// You can only register one callback per unique value for @c key.
 /// Returns true only if @c key has never been scheduled before.
 /// It's possible to pass @c NULL for @c func if you only want to mark @c key as being used.
-CP_EXPORT cpBool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data);
+CP_EXPORT bool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data);
 
 
 //MARK: Queries
@@ -215,7 +215,7 @@ CP_EXPORT void cpSpaceBBQuery(cpSpace *space, cpBB bb, cpShapeFilter filter, cpS
 /// Shape query callback function type.
 typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points, void *data);
 /// Query a space for any shapes overlapping the given shape and call @c func for each shape found.
-CP_EXPORT cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
+CP_EXPORT bool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
 
 
 //MARK: Iteration

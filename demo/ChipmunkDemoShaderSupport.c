@@ -41,7 +41,7 @@ CheckGLErrors(void)
 	}
 }
 
-static cpBool
+static bool
 CheckError(GLint obj, GLenum status, PFNGLGETSHADERIVPROC getiv, PFNGLGETSHADERINFOLOGPROC getInfoLog)
 {
 	GLint success;
@@ -55,9 +55,9 @@ CheckError(GLint obj, GLenum status, PFNGLGETSHADERIVPROC getiv, PFNGLGETSHADERI
 		getInfoLog(obj, length, NULL, log);
 		
 		fprintf(stderr, "Shader compile error for 0x%04X: %s\n", status, log);
-		return cpFalse;
+		return false;
 	} else {
-		return cpTrue;
+		return true;
 	}
 }
 
@@ -90,11 +90,11 @@ LinkProgram(GLint vshader, GLint fshader)
 	return program;
 }
 
-cpBool
+bool
 ValidateProgram(GLint program)
 {
 	// TODO: Implement?
-	return cpTrue;
+	return true;
 }
 
 void

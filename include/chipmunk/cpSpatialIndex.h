@@ -119,7 +119,7 @@ typedef void (*cpSpatialIndexDestroyImpl)(cpSpatialIndex *index);
 typedef int (*cpSpatialIndexCountImpl)(cpSpatialIndex *index);
 typedef void (*cpSpatialIndexEachImpl)(cpSpatialIndex *index, cpSpatialIndexIteratorFunc func, void *data);
 
-typedef cpBool (*cpSpatialIndexContainsImpl)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+typedef bool (*cpSpatialIndexContainsImpl)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
 typedef void (*cpSpatialIndexInsertImpl)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
 typedef void (*cpSpatialIndexRemoveImpl)(cpSpatialIndex *index, void *obj, cpHashValue hashid);
 
@@ -173,7 +173,7 @@ static inline void cpSpatialIndexEach(cpSpatialIndex *index, cpSpatialIndexItera
 
 /// Returns true if the spatial index contains the given object.
 /// Most spatial indexes use hashed storage, so you must provide a hash value too.
-static inline cpBool cpSpatialIndexContains(cpSpatialIndex *index, void *obj, cpHashValue hashid)
+static inline bool cpSpatialIndexContains(cpSpatialIndex *index, void *obj, cpHashValue hashid)
 {
 	return index->klass->contains(index, obj, hashid);
 }

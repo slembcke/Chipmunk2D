@@ -119,7 +119,7 @@ cpDampedSpringNew(cpBody *a, cpBody *b, cpVect anchorA, cpVect anchorB, cpFloat 
 	return (cpConstraint *)cpDampedSpringInit(cpDampedSpringAlloc(), a, b, anchorA, anchorB, restLength, stiffness, damping);
 }
 
-cpBool
+bool
 cpConstraintIsDampedSpring(const cpConstraint *constraint)
 {
 	return (constraint->klass == &klass);

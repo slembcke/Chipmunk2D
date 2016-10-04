@@ -59,7 +59,7 @@ CP_EXPORT cpFloat cpArbiterTotalKE(const cpArbiter *arb);
 
 /// Mark a collision pair to be ignored until the two objects separate.
 /// Pre-solve and post-solve callbacks will not be called, but the separate callback will be called.
-CP_EXPORT cpBool cpArbiterIgnore(cpArbiter *arb);
+CP_EXPORT bool cpArbiterIgnore(cpArbiter *arb);
 
 /// Return the colliding shapes involved for this arbiter.
 /// The order of their cpSpace.collision_type values will match
@@ -103,9 +103,9 @@ CP_EXPORT cpContactPointSet cpArbiterGetContactPointSet(const cpArbiter *arb);
 CP_EXPORT void cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set);
 
 /// Returns true if this is the first step a pair of objects started colliding.
-CP_EXPORT cpBool cpArbiterIsFirstContact(const cpArbiter *arb);
+CP_EXPORT bool cpArbiterIsFirstContact(const cpArbiter *arb);
 /// Returns true if the separate callback is due to a shape being removed from the space.
-CP_EXPORT cpBool cpArbiterIsRemoval(const cpArbiter *arb);
+CP_EXPORT bool cpArbiterIsRemoval(const cpArbiter *arb);
 
 /// Get the number of contact points for this arbiter.
 CP_EXPORT int cpArbiterGetCount(const cpArbiter *arb);
@@ -120,17 +120,17 @@ CP_EXPORT cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i);
 
 /// If you want a custom callback to invoke the wildcard callback for the first collision type, you must call this function explicitly.
 /// You must decide how to handle the wildcard's return value since it may disagree with the other wildcard handler's return value or your own.
-CP_EXPORT cpBool cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space);
+CP_EXPORT bool cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space);
 /// If you want a custom callback to invoke the wildcard callback for the second collision type, you must call this function explicitly.
 /// You must decide how to handle the wildcard's return value since it may disagree with the other wildcard handler's return value or your own.
-CP_EXPORT cpBool cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space);
+CP_EXPORT bool cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space);
 
 /// If you want a custom callback to invoke the wildcard callback for the first collision type, you must call this function explicitly.
 /// You must decide how to handle the wildcard's return value since it may disagree with the other wildcard handler's return value or your own.
-CP_EXPORT cpBool cpArbiterCallWildcardPreSolveA(cpArbiter *arb, cpSpace *space);
+CP_EXPORT bool cpArbiterCallWildcardPreSolveA(cpArbiter *arb, cpSpace *space);
 /// If you want a custom callback to invoke the wildcard callback for the second collision type, you must call this function explicitly.
 /// You must decide how to handle the wildcard's return value since it may disagree with the other wildcard handler's return value or your own.
-CP_EXPORT cpBool cpArbiterCallWildcardPreSolveB(cpArbiter *arb, cpSpace *space);
+CP_EXPORT bool cpArbiterCallWildcardPreSolveB(cpArbiter *arb, cpSpace *space);
 
 /// If you want a custom callback to invoke the wildcard callback for the first collision type, you must call this function explicitly.
 CP_EXPORT void cpArbiterCallWildcardPostSolveA(cpArbiter *arb, cpSpace *space);

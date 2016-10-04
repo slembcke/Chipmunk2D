@@ -681,7 +681,7 @@ CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, struct cpColl
 static void
 CollisionError(const cpShape *circle, const cpShape *poly, struct cpCollisionInfo *info)
 {
-	cpAssertHard(cpFalse, "Internal Error: Shape types are not sorted.");
+	cpAssertHard(false, "Internal Error: Shape types are not sorted.");
 }
 
 

@@ -32,7 +32,7 @@ typedef struct OneWayPlatform {
 
 static OneWayPlatform platformInstance;
 
-static cpBool
+static bool
 PreSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 {
 	CP_ARBITER_GET_SHAPES(arb, a, b);
@@ -42,7 +42,7 @@ PreSolve(cpArbiter *arb, cpSpace *space, void *ignore)
 		return cpArbiterIgnore(arb);
 	}
 	
-	return cpTrue;
+	return true;
 }
 
 static void

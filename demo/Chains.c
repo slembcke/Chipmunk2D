@@ -115,7 +115,7 @@ init(void)
 			
 			cpConstraintSetMaxForce(constraint, breakingForce);
 			cpConstraintSetPostSolveFunc(constraint, BreakableJointPostSolve);
-			cpConstraintSetCollideBodies(constraint, cpFalse);
+			cpConstraintSetCollideBodies(constraint, false);
 			
 			prev = body;
 		}

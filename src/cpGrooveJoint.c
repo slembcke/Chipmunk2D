@@ -137,7 +137,7 @@ cpGrooveJointNew(cpBody *a, cpBody *b, cpVect groove_a, cpVect groove_b, cpVect 
 	return (cpConstraint *)cpGrooveJointInit(cpGrooveJointAlloc(), a, b, groove_a, groove_b, anchorB);
 }
 
-cpBool
+bool
 cpConstraintIsGrooveJoint(const cpConstraint *constraint)
 {
 	return (constraint->klass == &klass);

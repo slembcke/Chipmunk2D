@@ -123,7 +123,7 @@ cpRotaryLimitJointNew(cpBody *a, cpBody *b, cpFloat min, cpFloat max)
 	return (cpConstraint *)cpRotaryLimitJointInit(cpRotaryLimitJointAlloc(), a, b, min, max);
 }
 
-cpBool
+bool
 cpConstraintIsRotaryLimitJoint(const cpConstraint *constraint)
 {
 	return (constraint->klass == &klass);

@@ -128,7 +128,7 @@ cpRatchetJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratchet)
 	return (cpConstraint *)cpRatchetJointInit(cpRatchetJointAlloc(), a, b, phase, ratchet);
 }
 
-cpBool
+bool
 cpConstraintIsRatchetJoint(const cpConstraint *constraint)
 {
 	return (constraint->klass == &klass);

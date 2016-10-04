@@ -5,7 +5,7 @@
 // "Fast math" should be disabled here.
 
 // Check if c is to the left of segment (a, b).
-cpBool cpCheckPointGreater(const cpVect a, const cpVect b, const cpVect c);
+bool cpCheckPointGreater(const cpVect a, const cpVect b, const cpVect c);
 
 // Check if p is behind one of v0 or v1 on axis n.
-cpBool cpCheckAxis(cpVect v0, cpVect v1, cpVect p, cpVect n);
+bool cpCheckAxis(cpVect v0, cpVect v1, cpVect p, cpVect n);

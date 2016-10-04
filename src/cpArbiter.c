@@ -51,12 +51,12 @@ cpArbiterUnthread(cpArbiter *arb)
 	unthreadHelper(arb, arb->body_b);
 }
 
-cpBool cpArbiterIsFirstContact(const cpArbiter *arb)
+bool cpArbiterIsFirstContact(const cpArbiter *arb)
 {
 	return arb->state == CP_ARBITER_STATE_FIRST_COLLISION;
 }
 
-cpBool cpArbiterIsRemoval(const cpArbiter *arb)
+bool cpArbiterIsRemoval(const cpArbiter *arb)
 {
 	return arb->state == CP_ARBITER_STATE_INVALIDATED;
 }
@@ -102,7 +102,7 @@ cpArbiterGetContactPointSet(const cpArbiter *arb)
 	cpContactPointSet set;
 	set.count = cpArbiterGetCount(arb);
 	
-	cpBool swapped = arb->swapped;
+	bool swapped = arb->swapped;
 	cpVect n = arb->n;
 	set.normal = (swapped ? cpvneg(n) : n);
 	
@@ -125,7 +125,7 @@ cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
 	int count = set->count;
 	cpAssertHard(count == arb->count, "The number of contact points cannot be changed.");
 	
-	cpBool swapped = arb->swapped;
+	bool swapped = arb->swapped;
 	arb->n = (swapped ? cpvneg(set->normal) : set->normal);
 	
 	for(int i=0; i<count; i++){
@@ -172,11 +172,11 @@ cpArbiterTotalKE(const cpArbiter *arb)
 	return sum;
 }
 
-cpBool
+bool
 cpArbiterIgnore(cpArbiter *arb)
 {
 	arb->state = CP_ARBITER_STATE_IGNORE;
-	return cpFalse;
+	return false;
 }
 
 cpFloat
@@ -244,36 +244,36 @@ void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)
 	(*b) = shape_b->body;
 }
 
-cpBool
+bool
 cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerA;
 	return handler->beginFunc(arb, space, handler->userData);
 }
 
-cpBool
+bool
 cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerB;
 	arb->swapped = !arb->swapped;
-	cpBool retval = handler->beginFunc(arb, space, handler->userData);
+	bool retval = handler->beginFunc(arb, space, handler->userData);
 	arb->swapped = !arb->swapped;
 	return retval;
 }
 
-cpBool
+bool
 cpArbiterCallWildcardPreSolveA(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerA;
 	return handler->preSolveFunc(arb, space, handler->userData);
 }
 
-cpBool
+bool
 cpArbiterCallWildcardPreSolveB(cpArbiter *arb, cpSpace *space)
 {
 	cpCollisionHandler *handler = arb->handlerB;
 	arb->swapped = !arb->swapped;
-	cpBool retval = handler->preSolveFunc(arb, space, handler->userData);
+	bool retval = handler->preSolveFunc(arb, space, handler->userData);
 	arb->swapped = !arb->swapped;
 	return retval;
 }
@@ -314,7 +314,7 @@ cpArbiter*
 cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b)
 {
 	arb->handler = NULL;
-	arb->swapped = cpFalse;
+	arb->swapped = false;
 	
 	arb->handler = NULL;
 	arb->handlerA = NULL;
@@ -399,7 +399,7 @@ cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpSpace *space)
 	cpCollisionHandler *handler = arb->handler = cpSpaceLookupHandler(space, typeA, typeB, defaultHandler);
 	
 	// Check if the types match, but don't swap for a default handler which use the wildcard for type A.
-	cpBool swapped = arb->swapped = (typeA != handler->typeA && handler->typeA != CP_WILDCARD_COLLISION_TYPE);
+	bool swapped = arb->swapped = (typeA != handler->typeA && handler->typeA != CP_WILDCARD_COLLISION_TYPE);
 	
 	if(handler != defaultHandler || space->usesWildcards){
 		// The order of the main handler swaps the wildcard handlers too. Uffda.

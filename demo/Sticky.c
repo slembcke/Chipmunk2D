@@ -37,7 +37,7 @@ PostStepAddJoint(cpSpace *space, void *key, void *data)
 	cpSpaceAddConstraint(space, joint);
 }
 
-static cpBool
+static bool
 StickyPreSolve(cpArbiter *arb, cpSpace *space, void *data)
 {
 	// We want to fudge the collisions a bit to allow shapes to overlap more.

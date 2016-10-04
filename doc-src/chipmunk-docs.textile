@@ -146,7 +146,6 @@ To further ease integration with garbage collectors or other memory management c
 @chipmunk_types.h@ defines a number of basic types that Chipmunk uses. These can be changed at compile time to better suit your needs:
 * @cpFloat@: Floating point type. Defaults to @double@.
 * @cpVect@: 2D vector type. "cpVect documentation":#cpVect
-* @cpBool@: Like every good C library that wants good cross language compatibility, you end up defining your own boolean type. :-\ Defaults to @int@.
 * @cpDataPointer@: Pointer type defined for callbacks and the user definable data pointer on most Chipmunk structs. Defaults to @void*@.
 * @cpCollisionType@: Unique identifier for collision shape types. Defaults to @unsigned int@. Defined type must support the @==@ operator.
 * @cpGroup@: Unique identifier for collision groups. Defaults to @unsigned int@. A @CP_NO_GROUP@ value is defined that can be used when you don't want to specify a group. Defined type must support the equality @==@ operator.
@@ -191,7 +190,7 @@ p(expl). Convenience constructor for creating new @cpVect@ structs.
 
 <%= h 2, "Operations:", "Operations" %>
 
-* @cpBool cpveql(const cpVect v1, const cpVect v2)@ - Check if two vectors are equal. Chipmunk provides an overloaded @==@ operator when used in C++ programs. _(Be careful when comparing floating point numbers!)_
+* @bool cpveql(const cpVect v1, const cpVect v2)@ - Check if two vectors are equal. Chipmunk provides an overloaded @==@ operator when used in C++ programs. _(Be careful when comparing floating point numbers!)_
 * @cpVect cpvadd(const cpVect v1, const cpVect v2)@ - Add two vectors. Chipmunk provides an overloaded @+@ operator when used in C++ programs.
 * @cpVect cpvsub(const cpVect v1, const cpVect v2)@ - Subtract two vectors. Chipmunk provides an overloaded @-@ operator when used in C++ programs.
 * @cpVect cpvneg(const cpVect v)@ - Negate a vector. Chipmunk provides an overloaded unary negation operator @-@ when used in C++ programs.
@@ -213,7 +212,7 @@ p(expl). Convenience constructor for creating new @cpVect@ structs.
 * @cpVect cpvclamp(const cpVect v, const cpFloat len)@ - Clamp @v@ to length @len@.
 * @cpFloat cpvdist(const cpVect v1, const cpVect v2)@ - Returns the distance between @v1@ and @v2@.
 * @cpFloat cpvdistsq(const cpVect v1, const cpVect v2)@ - Returns the squared distance between @v1@ and @v2@. Faster than @cpvdist()@ when you only need to compare distances.
-* @cpBool cpvnear(const cpVect v1, const cpVect v2, const cpFloat dist)@ - Returns true if the distance between @v1@ and @v2@ is less than @dist@.
+* @bool cpvnear(const cpVect v1, const cpVect v2, const cpFloat dist)@ - Returns true if the distance between @v1@ and @v2@ is less than @dist@.
 * @cpVect cpvforangle(const cpFloat a)@ - Returns the unit length vector for the given angle (in radians).
 * @cpFloat cpvtoangle(const cpVect v)@ - Returns the angular direction @v@ is pointing in (in radians).
 
@@ -243,16 +242,16 @@ p(expl). Convenience constructor for making a @cpBB@ fitting a circle at positio
 
 <%= h 2, "Operations:", "Operations" %>
 
-* @cpBool cpBBIntersects(const cpBB a, const cpBB b)@ - Returns true if the bounding boxes intersect.
-* @cpBool cpBBContainsBB(const cpBB bb, const cpBB other)@ - Returns true if @bb@ completely contains @other@.
-* @cpBool cpBBContainsVect(const cpBB bb, const cpVect v)@ - Returns true if @bb@ contains @v@.
+* @bool cpBBIntersects(const cpBB a, const cpBB b)@ - Returns true if the bounding boxes intersect.
+* @bool cpBBContainsBB(const cpBB bb, const cpBB other)@ - Returns true if @bb@ completely contains @other@.
+* @bool cpBBContainsVect(const cpBB bb, const cpVect v)@ - Returns true if @bb@ contains @v@.
 * @cpBB cpBBMerge(const cpBB a, const cpBB b)@ - Return the minimal bounding box that contains both @a@ and @b@.
 * @cpBB cpBBExpand(const cpBB bb, const cpVect v)@ - Return the minimal bounding box that contains both @bb@ and @v@.
 * @cpVect cpBBCenter(const cpBB bb)@ - Return the center of @bb@.
 * @cpFloat cpBBArea(cpBB bb)@ - Return the area of @bb@.
 * @cpFloat cpBBMergedArea(cpBB a, cpBB b)@ - Merges @a@ and @b@ then returns the area of the merged bounding box.
 * @cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)@ - Returns the fraction along the segment query the cpBB is hit. Returns INFINITY if it doesn't hit.
-* @cpBool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)@ - Returns true if the segment defined by endpoints @a@ and @b@ intersect @bb@.
+* @bool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)@ - Returns true if the segment defined by endpoints @a@ and @b@ intersect @bb@.
 * @cpVect cpBBClampVect(const cpBB bb, const cpVect v)@ - Returns a copy of @v@ clamped to the bounding box.
 * @cpVect cpBBWrapVect(const cpBB bb, const cpVect v)@ - Returns a copy of @v@ wrapped to the bounding box.
 
@@ -426,7 +425,7 @@ People are sometimes confused by the difference between a force and an impulse. 
 
 Chipmunk supports a sleeping feature which improves performance by not simulating groups of objects that aren't moving. Read more about it in the "cpSpace section":#cpSpace-Sleeping.
 
-* @cpBool cpBodyIsSleeping(const cpBody *body)@ - Returns true if @body@ is sleeping.
+* @bool cpBodyIsSleeping(const cpBody *body)@ - Returns true if @body@ is sleeping.
 * @void cpBodyActivate(cpBody *body)@ - Reset the idle timer on a body. If it was sleeping, wake it and any other bodies it was touching.
 * @void cpBodySleep(cpBody *body)@ - Forces a body to fall asleep immediately even if it's in midair. Cannot be called from a callback.
 * @void cpBodyActivateStatic(cpBody *body, cpShape *filter)@ - Similar in function to @cpBodyActivate()@. Activates all bodies touching @body@. If @filter@ is not @NULL@, then only bodies touching through @filter@ will be awoken.
@@ -491,8 +490,8 @@ p(expl). The rigid body the shape is attached to. Can only be set when the shape
 
 p(expl). The bounding box of the shape. Only guaranteed to be valid after @cpShapeCacheBB()@ or @cpSpaceStep()@ is called. Moving a body that a shape is connected to does not update its bounding box. For shapes used for queries that aren't attached to bodies, you can also use @cpShapeUpdate()@.
 
-<pre><code>cpBool cpShapeGetSensor(const cpShape *shape)
-void cpShapeSetSensor(cpShape *shape, cpBool value)</code></pre>
+<pre><code>bool cpShapeGetSensor(const cpShape *shape)
+void cpShapeSetSensor(cpShape *shape, bool value)</code></pre>
 
 p(expl). A boolean value if this shape is a sensor or not. Sensors only call collision callbacks, and never generate real collisions.
 
@@ -754,9 +753,9 @@ void cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 void cpSpaceRemoveBody(cpSpace *space, cpBody *body)
 void cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 
-cpBool cpSpaceContainsShape(cpSpace *space, cpShape *shape)
-cpBool cpSpaceContainsBody(cpSpace *space, cpBody *body)
-cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)</code></pre>
+bool cpSpaceContainsShape(cpSpace *space, cpShape *shape)
+bool cpSpaceContainsBody(cpSpace *space, cpBody *body)
+bool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)</code></pre>
 
 p(expl). These functions add and remove shapes, bodies and constraints from @space@. The add/remove functions cannot be called from within a callback other than a @postStep()@ callback _(which is different than a postSolve() callback!)_. Attempting to add or remove objects from the space while @cpSpaceStep()@ is still executing will throw an assertion. See the "callbacks section":#Callbacks for more information. The add functions return the thing being added so that you can create and add something in one line. Be careful not to free bodies before removing shapes and constraints attached to them or you will cause crashes.. The contains functions allow you to check if an object has been added to the space or not.
 
@@ -873,10 +872,10 @@ p(expl). The maximum speed at which the constraint can apply error correction. D
 
 p(expl). Get the @cpSpace@ that @constraint@ has been added to.
 
-<pre><code>cpBool cpConstraintGetCollideBodies(const cpConstraint *constraint)
-void cpConstraintSetCollideBodies(cpConstraint *constraint, cpBool collideBodies)</code></pre>
+<pre><code>bool cpConstraintGetCollideBodies(const cpConstraint *constraint)
+void cpConstraintSetCollideBodies(cpConstraint *constraint, bool collideBodies)</code></pre>
 
-p(expl). Constraints can be used for filtering collisions too. When two bodies collide, Chipmunk ignores the collisions if this property is set to @cpFalse@ on any constraint that connects the two bodies. Defaults to @cpTrue@. This can be used to create a chain that self collides, but adjacent links in the chain do not collide.
+p(expl). Constraints can be used for filtering collisions too. When two bodies collide, Chipmunk ignores the collisions if this property is set to @false@ on any constraint that connects the two bodies. Defaults to @true@. This can be used to create a chain that self collides, but adjacent links in the chain do not collide.
 
 <pre><code>cpDataPointer cpConstraintGetUserData(const cpConstraint *constraint)
 void cpConstraintSetUserData(cpConstraint *constraint, cpDataPointer value)</code></pre>
@@ -1217,9 +1216,9 @@ Post step callbacks are registered as a function and a pointer that is used as a
 
 p(expl). Function type used for @postStep()@ callbacks. @space@ is the space the callback was registered on, @obj@ is the pointer value you supplied as the key, and @data@ is a user definable pointer you can use to pass in as a context value.
 
-<pre><code>cpBool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data);</code></pre>
+<pre><code>bool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data);</code></pre>
 
-p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @key@ and @data@ will be passed to your function. Only the first callback registered for any unique value of @key@ will be recorded. It returns @cpTrue@ if the callback is scheduled and @cpfalse@ when the @key@ has already been used. The behavior of adding a @postStep()@ callback from outside of a collision handler or query callback is undefined.
+p(expl). Add @func@ to be called before @cpSpaceStep()@ returns. @key@ and @data@ will be passed to your function. Only the first callback registered for any unique value of @key@ will be recorded. It returns @true@ if the callback is scheduled and @false@ when the @key@ has already been used. The behavior of adding a @postStep()@ callback from outside of a collision handler or query callback is undefined.
 
 *Note:* Post-step callbacks are not run in any particular order. If you need to sequence a number of events, you'll need to put them in a single callback.
 
@@ -1269,23 +1268,23 @@ cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i)</code></pre>
 
 p(expl). Get the number of contacts tracked by this arbiter or the specific collision point, collision normal or penetration depth of a collision point. For the forseeable future, the maximum number of contacts will be two.
 
-<pre><code>cpBool cpArbiterIsFirstContact(const cpArbiter *arb)</code></pre>
+<pre><code>bool cpArbiterIsFirstContact(const cpArbiter *arb)</code></pre>
 
 p(expl). Returns true if this is the first step the two shapes started touching. This can be useful for sound effects for instance. If its the first frame for a certain collision, check the energy of the collision in a @postStep()@ callbock and use that to determine the volume of a sound effect to play.
 
-<pre><code>cpBool cpArbiterIsRemoval(const cpArbiter *arb)</code></pre>
+<pre><code>bool cpArbiterIsRemoval(const cpArbiter *arb)</code></pre>
 
-p(expl). Returns @cpTrue@ during a @separate()@ callback if the callback was invoked due to an object removal.
+p(expl). Returns @true@ during a @separate()@ callback if the callback was invoked due to an object removal.
 
 <pre><code>void cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
 void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)</code></pre>
 
 p(expl). Get the shapes or bodies in the order that they were defined in the collision handler associated with this arbiter. If you defined the handler as @cpSpaceAddCollisionHandler(space, 1, 2, ...)@, you you will find that @a->collision_type == 1@ and @b->collision_type == 2@.
 
-<pre><code>cpBool cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space)
-cpBool cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space)
-cpBool cpArbiterCallWildcardPreSolveA(cpArbiter *arb, cpSpace *space)
-cpBool cpArbiterCallWildcardPreSolveB(cpArbiter *arb, cpSpace *space)
+<pre><code>bool cpArbiterCallWildcardBeginA(cpArbiter *arb, cpSpace *space)
+bool cpArbiterCallWildcardBeginB(cpArbiter *arb, cpSpace *space)
+bool cpArbiterCallWildcardPreSolveA(cpArbiter *arb, cpSpace *space)
+bool cpArbiterCallWildcardPreSolveB(cpArbiter *arb, cpSpace *space)
 void cpArbiterCallWildcardPostSolveA(cpArbiter *arb, cpSpace *space)
 void cpArbiterCallWildcardPostSolveB(cpArbiter *arb, cpSpace *space)
 void cpArbiterCallWildcardSeparateA(cpArbiter *arb, cpSpace *space)
@@ -1396,7 +1395,7 @@ Segment queries are like ray casting, but because not all spatial indexes allow 
 
 p(expl). Segment queries return more information than just a simple yes or no, they also return where a shape was hit and its surface normal at the hit point. @t@ is the percentage between the query start and end points. If you need the hit point in world space or the absolute distance from start, see the segment query helper functions farther down. If a segment query starts within a shape it will have @t = 0@ and @n = cpvzero@.
 
-<pre><code>cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info)</code></pre>
+<pre><code>bool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpFloat radius, cpSegmentQueryInfo *info)</code></pre>
 
 p(expl). Perform a segment query from @a@ to @b@ with the given @radius@ against a single shape @shape@. @info@ must be a valid pointer to a @cpSegmentQueryInfo@ structure which will be initialized with the raycast info.
 
@@ -1440,7 +1439,7 @@ You can either create a body/shape pair before querying, or you can create a sha
 
 <pre><code>typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points, void *data);
 
-cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);</code></pre>
+bool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);</code></pre>
 
 p(expl). Query @space@ to find all shapes overlapping @shape@. @func@ is called for each overlapping shape along with a pointer to a temporary cpContactPointSet and the @data@ argument passed to @cpSpaceBBQuery()@. Sensor shapes are included.
 

@@ -211,15 +211,15 @@ cpSpaceHashDestroy(cpSpaceHash *hash)
 
 //MARK: Helper Functions
 
-static inline cpBool
+static inline bool
 containsHandle(cpSpaceHashBin *bin, cpHandle *hand)
 {
 	while(bin){
-		if(bin->handle == hand) return cpTrue;
+		if(bin->handle == hand) return true;
 		bin = bin->next;
 	}
 	
-	return cpFalse;
+	return false;
 }
 
 // The hash function itself.
@@ -548,7 +548,7 @@ void
 cpSpaceHashResize(cpSpaceHash *hash, cpFloat celldim, int numcells)
 {
 	if(hash->spatialIndex.klass != Klass()){
-		cpAssertWarn(cpFalse, "Ignoring cpSpaceHashResize() call to non-cpSpaceHash spatial index.");
+		cpAssertWarn(false, "Ignoring cpSpaceHashResize() call to non-cpSpaceHash spatial index.");
 		return;
 	}
 	
@@ -602,7 +602,7 @@ void
 cpSpaceHashRenderDebug(cpSpatialIndex *index)
 {
 	if(index->klass != &klass){
-		cpAssertWarn(cpFalse, "Ignoring cpSpaceHashRenderDebug() call to non-spatial hash spatial index.");
+		cpAssertWarn(false, "Ignoring cpSpaceHashRenderDebug() call to non-spatial hash spatial index.");
 		return;
 	}
 	

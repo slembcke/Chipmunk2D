@@ -101,7 +101,7 @@ cpPolylineEnqueue(cpPolyline *line, cpVect v)
 }
 
 // Returns true if the polyline starts and ends with the same vertex.
-cpBool
+bool
 cpPolylineIsClosed(cpPolyline *line)
 {
 	return (line->count > 1 && cpveql(line->verts[0], line->verts[line->count-1]));
@@ -257,7 +257,7 @@ cpPolylineSetNew(void)
 }
 
 void
-cpPolylineSetDestroy(cpPolylineSet *set, cpBool freePolylines)
+cpPolylineSetDestroy(cpPolylineSet *set, bool freePolylines)
 {
 	if(freePolylines){
 		for(int i=0; i<set->count; i++){
@@ -270,7 +270,7 @@ cpPolylineSetDestroy(cpPolylineSet *set, cpBool freePolylines)
 
 
 void
-cpPolylineSetFree(cpPolylineSet *set, cpBool freePolylines)
+cpPolylineSetFree(cpPolylineSet *set, bool freePolylines)
 {
 	if(set){
 		cpPolylineSetDestroy(set, freePolylines);
@@ -518,7 +518,7 @@ FindSteiner(int count, cpVect *verts, struct Notch notch)
 //	return feature;
 //}
 
-//static cpBool
+//static bool
 //VertexUnobscured(int count, cpVect *verts, int index, int notch_i)
 //{
 //	cpVect v = verts[notch_i];
@@ -532,10 +532,10 @@ FindSteiner(int count, cpVect *verts, struct Notch notch)
 //		
 //		cpFloat thing_a = cpvcross(n, cpvsub(seg_a, v));
 //		cpFloat thing_b = cpvcross(n, cpvsub(seg_b, v));
-//		if(thing_a*thing_b <= 0.0) return cpTrue;
+//		if(thing_a*thing_b <= 0.0) return true;
 //	}
 //	
-//	return cpFalse;
+//	return false;
 //}
 //
 //static cpFloat

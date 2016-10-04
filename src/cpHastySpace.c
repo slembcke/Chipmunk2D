@@ -423,7 +423,7 @@ cpHastySpaceStep(cpSpace *space, cpFloat dt)
 		cpSpacePushFreshContactBuffer(space);
 		cpSpatialIndexEach(space->dynamicShapes, (cpSpatialIndexIteratorFunc)cpShapeUpdateFunc, NULL);
 		cpSpatialIndexReindexQuery(space->dynamicShapes, (cpSpatialIndexQueryFunc)cpSpaceCollideShapes, space);
-	} cpSpaceUnlock(space, cpFalse);
+	} cpSpaceUnlock(space, false);
 	
 	// Rebuild the contact graph (and detect sleeping components if sleeping is enabled)
 	cpSpaceProcessComponents(space, dt);
@@ -490,5 +490,5 @@ cpHastySpaceStep(cpSpace *space, cpFloat dt)
 			cpCollisionHandler *handler = arb->handler;
 			handler->postSolveFunc(arb, space, handler->userData);
 		}
-	} cpSpaceUnlock(space, cpTrue);
+	} cpSpaceUnlock(space, true);
 }

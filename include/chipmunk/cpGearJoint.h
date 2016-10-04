@@ -23,7 +23,7 @@
 /// @{
 
 /// Check if a constraint is a damped rotary springs.
-CP_EXPORT cpBool cpConstraintIsGearJoint(const cpConstraint *constraint);
+CP_EXPORT bool cpConstraintIsGearJoint(const cpConstraint *constraint);
 
 /// Allocate a gear joint.
 CP_EXPORT cpGearJoint* cpGearJointAlloc(void);

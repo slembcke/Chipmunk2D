@@ -13,7 +13,7 @@ typedef struct cpPolyline {
 CP_EXPORT void cpPolylineFree(cpPolyline *line);
 
 /// Returns true if the first vertex is equal to the last.
-CP_EXPORT cpBool cpPolylineIsClosed(cpPolyline *line);
+CP_EXPORT bool cpPolylineIsClosed(cpPolyline *line);
 
 /**
 	Returns a copy of a polyline simplified by using the Douglas-Peucker algorithm.
@@ -47,10 +47,10 @@ CP_EXPORT cpPolylineSet *cpPolylineSetInit(cpPolylineSet *set);
 CP_EXPORT cpPolylineSet *cpPolylineSetNew(void);
 
 /// Destroy a polyline set.
-CP_EXPORT void cpPolylineSetDestroy(cpPolylineSet *set, cpBool freePolylines);
+CP_EXPORT void cpPolylineSetDestroy(cpPolylineSet *set, bool freePolylines);
 
 /// Destroy and free a polyline set.
-CP_EXPORT void cpPolylineSetFree(cpPolylineSet *set, cpBool freePolylines);
+CP_EXPORT void cpPolylineSetFree(cpPolylineSet *set, bool freePolylines);
 
 /**
 	Add a line segment to a polyline set.

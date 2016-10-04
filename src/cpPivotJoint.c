@@ -115,7 +115,7 @@ cpPivotJointNew(cpBody *a, cpBody *b, cpVect pivot)
 	return cpPivotJointNew2(a, b, anchorA, anchorB);
 }
 
-cpBool
+bool
 cpConstraintIsPivotJoint(const cpConstraint *constraint)
 {
 	return (constraint->klass == &klass);

@@ -41,14 +41,14 @@ void cpArrayFree(cpArray *arr);
 void cpArrayPush(cpArray *arr, void *object);
 void *cpArrayPop(cpArray *arr);
 void cpArrayDeleteObj(cpArray *arr, void *obj);
-cpBool cpArrayContains(cpArray *arr, void *ptr);
+bool cpArrayContains(cpArray *arr, void *ptr);
 
 void cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*));
 
 
 //MARK: cpHashSet
 
-typedef cpBool (*cpHashSetEqlFunc)(void *ptr, void *elt);
+typedef bool (*cpHashSetEqlFunc)(void *ptr, void *elt);
 typedef void *(*cpHashSetTransFunc)(void *ptr, void *data);
 
 cpHashSet *cpHashSetNew(int size, cpHashSetEqlFunc eqlFunc);
@@ -64,7 +64,7 @@ void *cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr);
 typedef void (*cpHashSetIteratorFunc)(void *elt, void *data);
 void cpHashSetEach(cpHashSet *set, cpHashSetIteratorFunc func, void *data);
 
-typedef cpBool (*cpHashSetFilterFunc)(void *elt, void *data);
+typedef bool (*cpHashSetFilterFunc)(void *elt, void *data);
 void cpHashSetFilter(cpHashSet *set, cpHashSetFilterFunc func, void *data);
 
 
@@ -106,7 +106,7 @@ void cpArbiterApplyImpulse(cpArbiter *arb);
 
 cpShape *cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body, struct cpShapeMassInfo massInfo);
 
-static inline cpBool
+static inline bool
 cpShapeActive(cpShape *shape)
 {
 	// checks if the shape is added to a shape list.
@@ -141,7 +141,7 @@ CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r1, cpVect a, cpVect b
 	}
 }
 
-static inline cpBool
+static inline bool
 cpShapeFilterReject(cpShapeFilter a, cpShapeFilter b)
 {
 	// Reject the collision if:
@@ -288,12 +288,12 @@ void cpSpacePushContacts(cpSpace *space, int count);
 
 cpPostStepCallback *cpSpaceGetPostStepCallback(cpSpace *space, void *key);
 
-cpBool cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space);
+bool cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space);
 void cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter);
 
 void cpSpaceActivateBody(cpSpace *space, cpBody *body);
 void cpSpaceLock(cpSpace *space);
-void cpSpaceUnlock(cpSpace *space, cpBool runPostStep);
+void cpSpaceUnlock(cpSpace *space, bool runPostStep);
 
 static inline void
 cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb)

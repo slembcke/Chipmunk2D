@@ -55,8 +55,8 @@ extern int ChipmunkDemoTicks;
 extern double ChipmunkDemoTime;
 extern cpVect ChipmunkDemoKeyboard;
 extern cpVect ChipmunkDemoMouse;
-extern cpBool ChipmunkDemoRightClick;
-extern cpBool ChipmunkDemoRightDown;
+extern bool ChipmunkDemoRightClick;
+extern bool ChipmunkDemoRightDown;
 
 extern char const *ChipmunkDemoMessageString;
 void ChipmunkDemoPrintString(char const *fmt, ...);

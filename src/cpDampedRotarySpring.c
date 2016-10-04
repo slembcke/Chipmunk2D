@@ -111,7 +111,7 @@ cpDampedRotarySpringNew(cpBody *a, cpBody *b, cpFloat restAngle, cpFloat stiffne
 	return (cpConstraint *)cpDampedRotarySpringInit(cpDampedRotarySpringAlloc(), a, b, restAngle, stiffness, damping);
 }
 
-cpBool
+bool
 cpConstraintIsDampedRotarySpring(const cpConstraint *constraint)
 {
 	return (constraint->klass == &klass);

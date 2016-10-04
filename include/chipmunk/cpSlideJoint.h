@@ -23,7 +23,7 @@
 /// @{
 
 /// Check if a constraint is a slide joint.
-CP_EXPORT cpBool cpConstraintIsSlideJoint(const cpConstraint *constraint);
+CP_EXPORT bool cpConstraintIsSlideJoint(const cpConstraint *constraint);
 
 /// Allocate a slide joint.
 CP_EXPORT cpSlideJoint* cpSlideJointAlloc(void);

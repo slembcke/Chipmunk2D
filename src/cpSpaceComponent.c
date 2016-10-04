@@ -207,20 +207,20 @@ FloodFillComponent(cpBody *root, cpBody *body)
 	}
 }
 
-static inline cpBool
+static inline bool
 ComponentActive(cpBody *root, cpFloat threshold)
 {
 	CP_BODY_FOREACH_COMPONENT(root, body){
-		if(body->sleeping.idleTime < threshold) return cpTrue;
+		if(body->sleeping.idleTime < threshold) return true;
 	}
 	
-	return cpFalse;
+	return false;
 }
 
 void
 cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 {
-	cpBool sleep = (space->sleepTimeThreshold != INFINITY);
+	bool sleep = (space->sleepTimeThreshold != INFINITY);
 	cpArray *bodies = space->dynamicBodies;
 	
 #ifndef NDEBUG

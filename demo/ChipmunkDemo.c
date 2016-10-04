@@ -57,8 +57,8 @@ static ChipmunkDemo *demos;
 static int demo_count = 0;
 static int demo_index = 'a' - 'a';
 
-static cpBool paused = cpFalse;
-static cpBool step = cpFalse;
+static bool paused = false;
+static bool step = false;
 
 static cpSpace *space;
 
@@ -68,8 +68,8 @@ int ChipmunkDemoTicks = 0;
 double ChipmunkDemoTime;
 
 cpVect ChipmunkDemoMouse;
-cpBool ChipmunkDemoRightClick = cpFalse;
-cpBool ChipmunkDemoRightDown = cpFalse;
+bool ChipmunkDemoRightClick = false;
+bool ChipmunkDemoRightDown = false;
 cpVect ChipmunkDemoKeyboard = {};
 
 static cpBody *mouse_body = NULL;
@@ -315,8 +315,8 @@ Tick(double dt)
 		ChipmunkDemoTicks++;
 		ChipmunkDemoTime += dt;
 		
-		step = cpFalse;
-		ChipmunkDemoRightDown = cpFalse;
+		step = false;
+		ChipmunkDemoRightDown = false;
 		
 		ChipmunkDemoTextDrawString(cpv(-300, -200), ChipmunkDemoMessageString);
 	}
@@ -442,7 +442,7 @@ Keyboard(int key, int state)
   } else if(key == '`'){
 		paused = !paused;
   } else if(key == '1'){
-		step = cpTrue;
+		step = true;
 	} else if(key == '\\'){
 		glDisable(GL_LINE_SMOOTH);
 		glDisable(GL_POINT_SMOOTH);

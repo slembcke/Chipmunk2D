@@ -23,7 +23,7 @@
 /// @{
 
 /// Check if a constraint is a damped rotary springs.
-CP_EXPORT cpBool cpConstraintIsDampedRotarySpring(const cpConstraint *constraint);
+CP_EXPORT bool cpConstraintIsDampedRotarySpring(const cpConstraint *constraint);
 
 /// Function type used for damped rotary spring force callbacks.
 typedef cpFloat (*cpDampedRotarySpringTorqueFunc)(struct cpConstraint *spring, cpFloat relativeAngle);

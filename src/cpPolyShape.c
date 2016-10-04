@@ -73,7 +73,7 @@ cpPolyShapePointQuery(cpPolyShape *poly, cpVect p, cpPointQueryInfo *info){
 	cpFloat minDist = INFINITY;
 	cpVect closestPoint = cpvzero;
 	cpVect closestNormal = cpvzero;
-	cpBool outside = cpFalse;
+	bool outside = false;
 	
 	for(int i=0; i<count; i++){
 		cpVect v1 = planes[i].v0;

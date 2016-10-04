@@ -39,7 +39,7 @@ static inline cpVect cpv(const cpFloat x, const cpFloat y)
 }
 
 /// Check if two vectors are equal. (Be careful when comparing floating point numbers!)
-static inline cpBool cpveql(const cpVect v1, const cpVect v2)
+static inline bool cpveql(const cpVect v1, const cpVect v2)
 {
 	return (v1.x == v2.x && v1.y == v2.y);
 }
@@ -200,7 +200,7 @@ static inline cpFloat cpvdistsq(const cpVect v1, const cpVect v2)
 }
 
 /// Returns true if the distance between v1 and v2 is less than dist.
-static inline cpBool cpvnear(const cpVect v1, const cpVect v2, const cpFloat dist)
+static inline bool cpvnear(const cpVect v1, const cpVect v2, const cpFloat dist)
 {
 	return cpvdistsq(v1, v2) < dist*dist;
 }

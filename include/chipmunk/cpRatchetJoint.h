@@ -23,7 +23,7 @@
 /// @{
 
 /// Check if a constraint is a damped rotary springs.
-CP_EXPORT cpBool cpConstraintIsRatchetJoint(const cpConstraint *constraint);
+CP_EXPORT bool cpConstraintIsRatchetJoint(const cpConstraint *constraint);
 
 /// Allocate a ratchet joint.
 CP_EXPORT cpRatchetJoint* cpRatchetJointAlloc(void);

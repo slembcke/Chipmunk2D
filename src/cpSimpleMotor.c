@@ -101,7 +101,7 @@ cpSimpleMotorNew(cpBody *a, cpBody *b, cpFloat rate)
 	return (cpConstraint *)cpSimpleMotorInit(cpSimpleMotorAlloc(), a, b, rate);
 }
 
-cpBool
+bool
 cpConstraintIsSimpleMotor(const cpConstraint *constraint)
 {
 	return (constraint->klass == &klass);

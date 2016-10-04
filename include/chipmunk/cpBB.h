@@ -55,19 +55,19 @@ static inline cpBB cpBBNewForCircle(const cpVect p, const cpFloat r)
 }
 
 /// Returns true if @c a and @c b intersect.
-static inline cpBool cpBBIntersects(const cpBB a, const cpBB b)
+static inline bool cpBBIntersects(const cpBB a, const cpBB b)
 {
 	return (a.l <= b.r && b.l <= a.r && a.b <= b.t && b.b <= a.t);
 }
 
 /// Returns true if @c other lies completely within @c bb.
-static inline cpBool cpBBContainsBB(const cpBB bb, const cpBB other)
+static inline bool cpBBContainsBB(const cpBB bb, const cpBB other)
 {
 	return (bb.l <= other.l && bb.r >= other.r && bb.b <= other.b && bb.t >= other.t);
 }
 
 /// Returns true if @c bb contains @c v.
-static inline cpBool cpBBContainsVect(const cpBB bb, const cpVect v)
+static inline bool cpBBContainsVect(const cpBB bb, const cpVect v)
 {
 	return (bb.l <= v.x && bb.r >= v.x && bb.b <= v.y && bb.t >= v.y);
 }
@@ -143,7 +143,7 @@ static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
 }
 
 /// Return true if the bounding box intersects the line segment with ends @c a and @c b.
-static inline cpBool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)
+static inline bool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)
 {
 	return (cpBBSegmentQuery(bb, a, b) != INFINITY);
 }

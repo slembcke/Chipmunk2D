@@ -211,7 +211,7 @@ typedef void (^cpSpaceBBQueryBlock)(cpShape *shape);
 void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpShapeFilter filter, cpSpaceBBQueryBlock block);
 
 typedef void (^cpSpaceShapeQueryBlock)(cpShape *shape, cpContactPointSet *points);
-cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block);
+bool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block);
 
 #endif
 #endif
@@ -225,7 +225,9 @@ cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBloc
 static inline cpVect operator +(const cpVect v1, const cpVect v2){return cpvadd(v1, v2);}
 static inline cpVect operator -(const cpVect v1, const cpVect v2){return cpvsub(v1, v2);}
 static inline cpVect operator *(const cpVect v, const cpFloat s){return cpvmult(v, s);}
-static inline cpBool operator ==(const cpVect v1, const cpVect v2){return cpveql(v1, v2);}
+static inline cpVect operator *(const cpFloat s, const cpVect v){return cpvmult(v, s);}
+static inline cpVect operator /(const cpVect v, const cpFloat s){return cpvmult(v, 1/s);}
+static inline bool operator ==(const cpVect v1, const cpVect v2){return cpveql(v1, v2);}
 static inline cpVect operator -(const cpVect v){return cpvneg(v);}
 
 #endif

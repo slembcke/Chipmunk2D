@@ -26,7 +26,7 @@ void CheckGLErrors(void);
 
 GLint CompileShader(GLenum type, const char *source);
 GLint LinkProgram(GLint vshader, GLint fshader);
-cpBool ValidateProgram(GLint program);
+bool ValidateProgram(GLint program);
 
 #define GLSL(x) #x
 

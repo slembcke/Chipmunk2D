@@ -74,7 +74,7 @@ CP_EXPORT void cpBodySleep(cpBody *body);
 CP_EXPORT void cpBodySleepWithGroup(cpBody *body, cpBody *group);
 
 /// Returns true if the body is sleeping.
-CP_EXPORT cpBool cpBodyIsSleeping(const cpBody *body);
+CP_EXPORT bool cpBodyIsSleeping(const cpBody *body);
 
 /// Get the type of the body.
 CP_EXPORT cpBodyType cpBodyGetType(cpBody *body);

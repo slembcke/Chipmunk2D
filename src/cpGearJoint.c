@@ -107,7 +107,7 @@ cpGearJointNew(cpBody *a, cpBody *b, cpFloat phase, cpFloat ratio)
 	return (cpConstraint *)cpGearJointInit(cpGearJointAlloc(), a, b, phase, ratio);
 }
 
-cpBool
+bool
 cpConstraintIsGearJoint(const cpConstraint *constraint)
 {
 	return (constraint->klass == &klass);

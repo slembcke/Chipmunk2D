@@ -138,7 +138,7 @@ struct cpArbiter {
 	
 	// Regular, wildcard A and wildcard B collision handlers.
 	cpCollisionHandler *handler, *handlerA, *handlerB;
-	cpBool swapped;
+	bool swapped;
 	
 	cpTimestamp stamp;
 	enum cpArbiterState state;
@@ -182,7 +182,7 @@ struct cpShape {
 	struct cpShapeMassInfo massInfo;
 	cpBB bb;
 	
-	cpBool sensor;
+	bool sensor;
 	
 	cpFloat e;
 	cpFloat u;
@@ -259,7 +259,7 @@ struct cpConstraint {
 	cpFloat errorBias;
 	cpFloat maxBias;
 	
-	cpBool collideBodies;
+	bool collideBodies;
 	
 	cpConstraintPreSolveFunc preSolve;
 	cpConstraintPostSolveFunc postSolve;
@@ -430,11 +430,11 @@ struct cpSpace {
 	cpArray *allocatedBuffers;
 	unsigned int locked;
 	
-	cpBool usesWildcards;
+	bool usesWildcards;
 	cpHashSet *collisionHandlers;
 	cpCollisionHandler defaultHandler;
 	
-	cpBool skipPostStep;
+	bool skipPostStep;
 	cpArray *postStepCallbacks;
 	
 	cpBody *staticBody;

@@ -42,7 +42,7 @@ k_scalar_body(cpBody *body, cpVect point, cpVect n)
 	return 1.0f/cpBodyGetMass(body) + rcn*rcn/cpBodyGetMoment(body);
 }
 
-static cpBool
+static bool
 waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 {
 	CP_ARBITER_GET_SHAPES(arb, water, poly);
@@ -108,7 +108,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpFloat w_damping = cpMomentForPoly(FLUID_DRAG*FLUID_DENSITY*clippedArea, clippedCount, clipped, cpvneg(cog), 0.0f);
 	cpBodySetAngularVelocity(body, cpBodyGetAngularVelocity(body)*cpfexp(-w_damping*dt/cpBodyGetMoment(body)));
 	
-	return cpTrue;
+	return true;
 }
 
 static cpSpace *
@@ -169,7 +169,7 @@ init(void)
 		
 		// Add the sensor for the water.
 		shape = cpSpaceAddShape(space, cpBoxShapeNew2(staticBody, bb, 0.0));
-		cpShapeSetSensor(shape, cpTrue);
+		cpShapeSetSensor(shape, true);
 		cpShapeSetCollisionType(shape, 1);
 	}
 

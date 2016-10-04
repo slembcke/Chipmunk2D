@@ -63,7 +63,7 @@ AttachHook(cpSpace *space, cpBody *hook, cpBody *crate)
 }
 
 
-static cpBool
+static bool
 HookCrate(cpArbiter *arb, cpSpace *space, void *data)
 {
 	if(hookJoint == NULL){
@@ -78,7 +78,7 @@ HookCrate(cpArbiter *arb, cpSpace *space, void *data)
 		cpSpaceAddPostStepCallback(space, (cpPostStepFunc)AttachHook, hook, crate);
 	}
 	
-	return cpTrue; // return value is ignored for sensor callbacks anyway
+	return true; // return value is ignored for sensor callbacks anyway
 }
 
 
@@ -127,7 +127,7 @@ init(void)
 	
 	// Add a sensor shape for it. This will be used to figure out when the hook touches a box.
 	shape = cpSpaceAddShape(space, cpCircleShapeNew(hookBody, 10, cpvzero));
-	cpShapeSetSensor(shape, cpTrue);
+	cpShapeSetSensor(shape, true);
 	cpShapeSetCollisionType(shape, HOOK_SENSOR);
 	
 	// Add a slide joint to act as a winch motor

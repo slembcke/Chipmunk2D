@@ -23,7 +23,7 @@
 /// @{
 
 /// Check if a constraint is a slide joint.
-CP_EXPORT cpBool cpConstraintIsDampedSpring(const cpConstraint *constraint);
+CP_EXPORT bool cpConstraintIsDampedSpring(const cpConstraint *constraint);
 
 /// Function type used for damped spring force callbacks.
 typedef cpFloat (*cpDampedSpringForceFunc)(cpConstraint *spring, cpFloat dist);

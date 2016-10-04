@@ -39,8 +39,8 @@ static cpBody *playerBody = NULL;
 static cpShape *playerShape = NULL;
 
 static cpFloat remainingBoost = 0;
-static cpBool grounded = cpFalse;
-static cpBool lastJumpState = cpFalse;
+static bool grounded = false;
+static bool lastJumpState = false;
 
 static void
 SelectPlayerGroundNormal(cpBody *body, cpArbiter *arb, cpVect *groundNormal){
@@ -64,7 +64,7 @@ playerUpdateVelocity(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt)
 	if(groundNormal.y < 0.0f) remainingBoost = 0.0f;
 	
 	// Do a normal-ish update
-	cpBool boost = (jumpState && remainingBoost > 0.0f);
+	bool boost = (jumpState && remainingBoost > 0.0f);
 	cpVect g = (boost ? cpvzero : gravity);
 	cpBodyUpdateVelocity(body, g, damping, dt);
 	
