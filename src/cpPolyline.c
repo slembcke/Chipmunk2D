@@ -109,16 +109,16 @@ cpPolylineIsClosed(cpPolyline *line)
 
 // Check if a cpPolyline is longer than a certain length
 // Takes a range which can wrap around if the polyline is looped.
-static cpBool
+static bool
 cpPolylineIsShort(cpVect *points, int count, int start, int end, cpFloat min)
 {
   cpFloat length = 0.0f;
 	for(int i=start; i!=end; i=Next(i, count)){
 		length += cpvdist(points[i], points[Next(i, count)]);
-		if(length > min) return cpFalse;
+		if(length > min) return false;
 	}
   
-  return cpTrue;
+  return true;
 }
 
 //MARK: Polyline Simplification
