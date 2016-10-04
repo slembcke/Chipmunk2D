@@ -26,14 +26,13 @@
 #include "chipmunk/cpRobust.h"
 
 #if DEBUG && 0
-#include "ChipmunkDemo.h"
-#define DRAW_ALL 0
-#define DRAW_GJK (0 || DRAW_ALL)
-#define DRAW_EPA (0 || DRAW_ALL)
-#define DRAW_CLOSEST (0 || DRAW_ALL)
-#define DRAW_CLIP (0 || DRAW_ALL)
-
-#define PRINT_LOG 0
+	#include "ChipmunkDemo.h"
+	
+	#define DRAW_ALL 0
+	#define DRAW_GJK (0 || DRAW_ALL)
+	#define DRAW_EPA (0 || DRAW_ALL)
+	#define DRAW_CLOSEST (0 || DRAW_ALL)
+	#define DRAW_CLIP (0 || DRAW_ALL)
 #endif
 
 #define MAX_GJK_ITERATIONS 30
@@ -569,10 +568,6 @@ SegmentToSegment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, struct 
 	struct ClosestPoints points = GJK(&context, &info->id);
 	
 #if DRAW_CLOSEST
-#if PRINT_LOG
-//	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
-#endif
-	
 	ChipmunkDebugDrawDot(6.0, points.a, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawDot(6.0, points.b, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
@@ -604,10 +599,6 @@ PolyToPoly(const cpPolyShape *poly1, const cpPolyShape *poly2, struct cpCollisio
 	struct ClosestPoints points = GJK(&context, &info->id);
 	
 #if DRAW_CLOSEST
-#if PRINT_LOG
-//	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
-#endif
-	
 	ChipmunkDebugDrawDot(3.0, points.a, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawDot(3.0, points.b, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
@@ -627,10 +618,6 @@ SegmentToPoly(const cpSegmentShape *seg, const cpPolyShape *poly, struct cpColli
 	struct ClosestPoints points = GJK(&context, &info->id);
 	
 #if DRAW_CLOSEST
-#if PRINT_LOG
-//	ChipmunkDemoPrintString("Distance: %.2f\n", points.d);
-#endif
-	
 	ChipmunkDebugDrawDot(3.0, points.a, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawDot(3.0, points.b, RGBAColor(1, 1, 1, 1));
 	ChipmunkDebugDrawSegment(points.a, points.b, RGBAColor(1, 1, 1, 1));
@@ -704,17 +691,5 @@ cpCollide(const cpShape *a, const cpShape *b, cpCollisionID id, struct cpContact
 	}
 	
 	CollisionFuncs[info.a->klass->type + info.b->klass->type*CP_NUM_SHAPES](info.a, info.b, &info);
-	
-//	if(0){
-//		for(int i=0; i<info.count; i++){
-//			cpVect r1 = info.arr[i].r1;
-//			cpVect r2 = info.arr[i].r2;
-//			cpVect mid = cpvlerp(r1, r2, 0.5f);
-//			
-//			ChipmunkDebugDrawSegment(r1, mid, RGBAColor(1, 0, 0, 1));
-//			ChipmunkDebugDrawSegment(r2, mid, RGBAColor(0, 0, 1, 1));
-//		}
-//	}
-	
 	return info;
 }
