@@ -70,21 +70,21 @@ int cpArbiterGetCount(const cpArbiter *arb)
 cpVect
 cpArbiterGetNormal(const cpArbiter *arb)
 {
-	return cpvmult(arb->n, arb->swapped ? -1.0f : 1.0);
+	return (arb->swapped ? -arb->n : arb->n);
 }
 
 cpVect
 cpArbiterGetPointA(const cpArbiter *arb, int i)
 {
 	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
-	return cpvadd(arb->body_a->p, arb->contacts[i].r1);
+	return arb->body_a->p + arb->contacts[i].r1;
 }
 
 cpVect
 cpArbiterGetPointB(const cpArbiter *arb, int i)
 {
 	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
-	return cpvadd(arb->body_b->p, arb->contacts[i].r2);
+	return arb->body_b->p + arb->contacts[i].r2;
 }
 
 cpFloat
@@ -93,7 +93,7 @@ cpArbiterGetDepth(const cpArbiter *arb, int i)
 	cpAssertHard(0 <= i && i < cpArbiterGetCount(arb), "Index error: The specified contact index is invalid for this arbiter");
 	
 	struct cpContact *con = &arb->contacts[i];
-	return cpvdot(cpvadd(cpvsub(con->r2, con->r1), cpvsub(arb->body_b->p, arb->body_a->p)), arb->n);
+	return cpvdot((con->r2 - con->r1) + (arb->body_b->p - arb->body_a->p), arb->n);
 }
 
 cpContactPointSet
@@ -104,16 +104,16 @@ cpArbiterGetContactPointSet(const cpArbiter *arb)
 	
 	bool swapped = arb->swapped;
 	cpVect n = arb->n;
-	set.normal = (swapped ? cpvneg(n) : n);
+	set.normal = (swapped ? -n : n);
 	
 	for(int i=0; i<set.count; i++){
 		// Contact points are relative to body CoGs;
-		cpVect p1 = cpvadd(arb->body_a->p, arb->contacts[i].r1);
-		cpVect p2 = cpvadd(arb->body_b->p, arb->contacts[i].r2);
+		cpVect p1 = arb->body_a->p + arb->contacts[i].r1;
+		cpVect p2 = arb->body_b->p + arb->contacts[i].r2;
 		
 		set.points[i].pointA = (swapped ? p2 : p1);
 		set.points[i].pointB = (swapped ? p1 : p2);
-		set.points[i].distance = cpvdot(cpvsub(p2, p1), n);
+		set.points[i].distance = cpvdot(p2 - p1, n);
 	}
 	
 	return set;
@@ -126,15 +126,15 @@ cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
 	cpAssertHard(count == arb->count, "The number of contact points cannot be changed.");
 	
 	bool swapped = arb->swapped;
-	arb->n = (swapped ? cpvneg(set->normal) : set->normal);
+	arb->n = (swapped ? -set->normal : set->normal);
 	
 	for(int i=0; i<count; i++){
 		// Convert back to CoG relative offsets.
 		cpVect p1 = set->points[i].pointA;
 		cpVect p2 = set->points[i].pointB;
 		
-		arb->contacts[i].r1 = cpvsub(swapped ? p2 : p1, arb->body_a->p);
-		arb->contacts[i].r2 = cpvsub(swapped ? p1 : p2, arb->body_b->p);
+		arb->contacts[i].r1 = (swapped ? p2 : p1) - arb->body_a->p;
+		arb->contacts[i].r2 = (swapped ? p1 : p2) - arb->body_b->p;
 	}
 }
 
@@ -147,10 +147,10 @@ cpArbiterTotalImpulse(const cpArbiter *arb)
 	
 	for(int i=0, count=cpArbiterGetCount(arb); i<count; i++){
 		struct cpContact *con = &contacts[i];
-		sum = cpvadd(sum, cpvrotate(n, cpv(con->jnAcc, con->jtAcc)));
+		sum = sum + cpvrotate(n, cpv(con->jnAcc, con->jtAcc));
 	}
 		
-	return (arb->swapped ? sum : cpvneg(sum));
+	return (arb->swapped ? sum : -sum);
 	return cpvzero;
 }
 
@@ -206,13 +206,13 @@ cpArbiterSetFriction(cpArbiter *arb, cpFloat friction)
 cpVect
 cpArbiterGetSurfaceVelocity(cpArbiter *arb)
 {
-	return cpvmult(arb->surface_vr, arb->swapped ? -1.0f : 1.0);
+	return (arb->swapped ? -arb->surface_vr : arb->surface_vr);
 }
 
 void
 cpArbiterSetSurfaceVelocity(cpArbiter *arb, cpVect vr)
 {
-	arb->surface_vr = cpvmult(vr, arb->swapped ? -1.0f : 1.0);
+	arb->surface_vr = (arb->swapped ? -vr : vr);
 }
 
 cpDataPointer
@@ -366,8 +366,8 @@ cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpSpace *space)
 		
 		// r1 and r2 store absolute offsets at init time.
 		// Need to convert them to relative offsets.
-		con->r1 = cpvsub(con->r1, a->body->p);
-		con->r2 = cpvsub(con->r2, b->body->p);
+		con->r1 = con->r1 - a->body->p;
+		con->r2 = con->r2 - b->body->p;
 		
 		// Cached impulses are not zeroed at init time.
 		con->jnAcc = con->jtAcc = 0.0f;
@@ -391,8 +391,8 @@ cpArbiterUpdate(cpArbiter *arb, struct cpCollisionInfo *info, cpSpace *space)
 	arb->e = a->e * b->e;
 	arb->u = a->u * b->u;
 	
-	cpVect surface_vr = cpvsub(b->surfaceV, a->surfaceV);
-	arb->surface_vr = cpvsub(surface_vr, cpvmult(info->n, cpvdot(surface_vr, info->n)));
+	cpVect surface_vr = b->surfaceV - a->surfaceV;
+	arb->surface_vr = surface_vr - cpvdot(surface_vr, info->n)*info->n;
 	
 	cpCollisionType typeA = info->a->type, typeB = info->b->type;
 	cpCollisionHandler *defaultHandler = &space->defaultHandler;
@@ -417,7 +417,7 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat slop, cpFloat bias)
 	cpBody *a = arb->body_a;
 	cpBody *b = arb->body_b;
 	cpVect n = arb->n;
-	cpVect body_delta = cpvsub(b->p, a->p);
+	cpVect body_delta = b->p - a->p;
 	
 	for(int i=0; i<arb->count; i++){
 		struct cpContact *con = &arb->contacts[i];
@@ -427,7 +427,7 @@ cpArbiterPreStep(cpArbiter *arb, cpFloat dt, cpFloat slop, cpFloat bias)
 		con->tMass = 1.0f/k_scalar(a, b, con->r1, con->r2, cpvperp(n));
 				
 		// Calculate the target bias velocity.
-		cpFloat dist = cpvdot(cpvadd(cpvsub(con->r2, con->r1), body_delta), n);
+		cpFloat dist = cpvdot(body_delta + (con->r2 - con->r1), n);
 		con->bias = -bias*cpfmin(0.0f, dist + slop)/dt;
 		con->jBias = 0.0f;
 		
@@ -448,7 +448,7 @@ cpArbiterApplyCachedImpulse(cpArbiter *arb, cpFloat dt_coef)
 	for(int i=0; i<arb->count; i++){
 		struct cpContact *con = &arb->contacts[i];
 		cpVect j = cpvrotate(n, cpv(con->jnAcc, con->jtAcc));
-		apply_impulses(a, b, con->r1, con->r2, cpvmult(j, dt_coef));
+		apply_impulses(a, b, con->r1, con->r2, dt_coef*j);
 	}
 }
 
@@ -469,11 +469,11 @@ cpArbiterApplyImpulse(cpArbiter *arb)
 		cpVect r1 = con->r1;
 		cpVect r2 = con->r2;
 		
-		cpVect vb1 = cpvadd(a->v_bias, cpvmult(cpvperp(r1), a->w_bias));
-		cpVect vb2 = cpvadd(b->v_bias, cpvmult(cpvperp(r2), b->w_bias));
-		cpVect vr = cpvadd(relative_velocity(a, b, r1, r2), surface_vr);
+		cpVect vb1 = a->v_bias + a->w_bias*cpvperp(r1);
+		cpVect vb2 = b->v_bias + b->w_bias*cpvperp(r2);
+		cpVect vr = relative_velocity(a, b, r1, r2) + surface_vr;
 		
-		cpFloat vbn = cpvdot(cpvsub(vb2, vb1), n);
+		cpFloat vbn = cpvdot(vb2 - vb1, n);
 		cpFloat vrn = cpvdot(vr, n);
 		cpFloat vrt = cpvdot(vr, cpvperp(n));
 		
@@ -490,7 +490,7 @@ cpArbiterApplyImpulse(cpArbiter *arb)
 		cpFloat jtOld = con->jtAcc;
 		con->jtAcc = cpfclamp(jtOld + jt, -jtMax, jtMax);
 		
-		apply_bias_impulses(a, b, r1, r2, cpvmult(n, con->jBias - jbnOld));
+		apply_bias_impulses(a, b, r1, r2, (con->jBias - jbnOld)*n);
 		apply_impulses(a, b, r1, r2, cpvrotate(n, cpv(con->jnAcc - jnOld, con->jtAcc - jtOld)));
 	}
 }
