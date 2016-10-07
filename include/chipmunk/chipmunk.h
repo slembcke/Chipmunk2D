@@ -86,22 +86,6 @@ CP_EXPORT void cpMessage(const char *condition, const char *file, int line, int 
 #define CP_ASSUME_NONNULL_END
 #endif
 #endif
-    
-#ifndef CP_IMPLICIT_BRIDGING_ENABLED
-#if __has_feature(arc_cf_code_audited)
-#define CP_IMPLICIT_BRIDGING_ENABLED _Pragma("clang arc_cf_code_audited begin")
-#else
-#define CP_IMPLICIT_BRIDGING_ENABLED
-#endif
-#endif
-    
-#ifndef CP_IMPLICIT_BRIDGING_DISABLED
-#if __has_feature(arc_cf_code_audited)
-#define CP_IMPLICIT_BRIDGING_DISABLED _Pragma("clang arc_cf_code_audited end")
-#else
-#define CP_IMPLICIT_BRIDGING_DISABLED
-#endif
-#endif
 
 #include "chipmunk_types.h"
 	
@@ -166,6 +150,7 @@ typedef struct __attribute__((swift_private)) cpSpace cpSpace;
 #include "cpBody.h"
 #include "cpBodyRef.h"
 #include "cpShape.h"
+#include "cpShapeRef.h"
 #include "cpPolyShape.h"
 
 #include "cpConstraint.h"

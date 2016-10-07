@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6E7CF94D1DA7737300CC9684 /* cpBodyRef.h in Headers */ = {isa = PBXBuildFile; fileRef = 6E7CF94C1DA7737300CC9684 /* cpBodyRef.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6E7CF94F1DA7829800CC9684 /* cpShapeRef.h in Headers */ = {isa = PBXBuildFile; fileRef = 6E7CF94E1DA7829800CC9684 /* cpShapeRef.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6EBFCD4E1DA6C67900D4717D /* Chipmunk.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EBFCD441DA6C67900D4717D /* Chipmunk.framework */; };
 		6EBFCD531DA6C67900D4717D /* ChipmunkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EBFCD521DA6C67900D4717D /* ChipmunkTests.swift */; };
 		6EBFCD5B1DA6C88E00D4717D /* chipmunk.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0C40AA75CC3004E361B /* chipmunk.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -374,6 +375,7 @@
 
 /* Begin PBXFileReference section */
 		6E7CF94C1DA7737300CC9684 /* cpBodyRef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpBodyRef.h; path = ../include/chipmunk/cpBodyRef.h; sourceTree = "<group>"; };
+		6E7CF94E1DA7829800CC9684 /* cpShapeRef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpShapeRef.h; path = ../include/chipmunk/cpShapeRef.h; sourceTree = "<group>"; };
 		6EBFCD441DA6C67900D4717D /* Chipmunk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Chipmunk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6EBFCD481DA6C67900D4717D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6EBFCD4D1DA6C67900D4717D /* ChipmunkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChipmunkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -740,6 +742,7 @@
 				D3E5F0C10AA75CA9004E361B /* cpArbiter.h */,
 				D3E5F0C20AA75CA9004E361B /* cpArbiter.c */,
 				D37E22FC0AAA63B800BB4C50 /* cpShape.h */,
+				6E7CF94E1DA7829800CC9684 /* cpShapeRef.h */,
 				D37E22FD0AAA63B800BB4C50 /* cpShape.c */,
 				D3BC99AC0AB381AF0025A2C0 /* cpPolyShape.h */,
 				D3BC99AB0AB381AF0025A2C0 /* cpPolyShape.c */,
@@ -1004,6 +1007,7 @@
 				6EBFCD681DA6C88E00D4717D /* cpArbiter.h in Headers */,
 				6EBFCD691DA6C88E00D4717D /* cpShape.h in Headers */,
 				6EBFCD6A1DA6C88E00D4717D /* cpPolyShape.h in Headers */,
+				6E7CF94F1DA7829800CC9684 /* cpShapeRef.h in Headers */,
 				6EBFCD6B1DA6C88E00D4717D /* cpConstraint.h in Headers */,
 				6E7CF94D1DA7737300CC9684 /* cpBodyRef.h in Headers */,
 				6EBFCD6C1DA6C88E00D4717D /* cpPinJoint.h in Headers */,

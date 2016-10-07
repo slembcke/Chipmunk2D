@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import SwiftShims
 @testable import Chipmunk
 
 final class ChipmunkTests: XCTestCase {
@@ -39,7 +40,38 @@ final class ChipmunkTests: XCTestCase {
         
         let body = Chipmunk.Body(mass: 1.0, moment: 1.0)
         
-        defer { }
+        let group = Body(mass: 123, moment: 123)
         
+        defer {
+            
+            group.free()
+            
+            XCTAssert(_swift_stdlib_malloc_size(UnsafeRawPointer(group.pointer!)) == 0, "Memory was not freed: \(group)")
+        }
+        
+        // need to assign to space first
+        
+        
+        
+        /*
+        body.sleep()
+        
+        XCTAssert(body.isSleeping == true)
+        
+        body.sleep(with: group)
+        
+        XCTAssert(body.isSleeping == true)
+        
+        body.activate()
+        
+        XCTAssert(body.isSleeping == false)
+        
+        body.activateStatic(filter: Shape)
+        
+        XCTAssert(body.isSleeping == false)
+        */
+        body.bodyType = bodyType
+        
+        XCTAssert(body.bodyType == bodyType)
     }
 }
