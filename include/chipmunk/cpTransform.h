@@ -27,12 +27,18 @@
 #include "cpBB.h"
 
 /// Identity transform matrix.
+#ifdef CP_USE_CGTYPES
+__attribute__((swift_private))
+#else
+__attribute__((swift_name("AffineTransform.identity")))
+#endif
 static const cpTransform cpTransformIdentity = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f};
 
 /// Construct a new transform matrix.
 /// (a, b) is the x basis vector.
 /// (c, d) is the y basis vector.
 /// (tx, ty) is the translation.
+__attribute__((swift_private))
 static inline cpTransform
 cpTransformNew(cpFloat a, cpFloat b, cpFloat c, cpFloat d, cpFloat tx, cpFloat ty)
 {
@@ -41,6 +47,7 @@ cpTransformNew(cpFloat a, cpFloat b, cpFloat c, cpFloat d, cpFloat tx, cpFloat t
 }
 
 /// Construct a new transform matrix in transposed order.
+__attribute__((swift_private))
 static inline cpTransform
 cpTransformNewTranspose(cpFloat a, cpFloat c, cpFloat tx, cpFloat b, cpFloat d, cpFloat ty)
 {
@@ -49,6 +56,7 @@ cpTransformNewTranspose(cpFloat a, cpFloat c, cpFloat tx, cpFloat b, cpFloat d, 
 }
 
 /// Get the inverse of a transform matrix.
+__attribute__((swift_name("getter:AffineTransform.inverse(self:)")))
 static inline cpTransform
 cpTransformInverse(cpTransform t)
 {
@@ -60,6 +68,7 @@ cpTransformInverse(cpTransform t)
 }
 
 /// Multiply two transformation matrices.
+__attribute__((swift_name("AffineTransform.multiply(self:_:)")))
 static inline cpTransform
 cpTransformMult(cpTransform t1, cpTransform t2)
 {
@@ -70,6 +79,7 @@ cpTransformMult(cpTransform t1, cpTransform t2)
 }
 
 /// Transform an absolute point. (i.e. a vertex)
+__attribute__((swift_name("AffineTransform.transform(self:_:)")))
 static inline cpVect
 cpTransformPoint(cpTransform t, cpVect p)
 {
@@ -77,6 +87,7 @@ cpTransformPoint(cpTransform t, cpVect p)
 }
 
 /// Transform a vector (i.e. a normal)
+__attribute__((swift_name("AffineTransform.transform(self:_:)")))
 static inline cpVect
 cpTransformVect(cpTransform t, cpVect v)
 {
@@ -84,6 +95,7 @@ cpTransformVect(cpTransform t, cpVect v)
 }
 
 /// Transform a cpBB.
+__attribute__((swift_name("AffineTransform.transform(self:_:)")))
 static inline cpBB
 cpTransformbBB(cpTransform t, cpBB bb)
 {
@@ -98,6 +110,7 @@ cpTransformbBB(cpTransform t, cpBB bb)
 }
 
 /// Create a transation matrix.
+__attribute__((swift_name("AffineTransform.init(translate:)")))
 static inline cpTransform
 cpTransformTranslate(cpVect translate)
 {
@@ -108,6 +121,7 @@ cpTransformTranslate(cpVect translate)
 }
 
 /// Create a scale matrix.
+__attribute__((swift_name("AffineTransform.init(scaleX:scaleY:)")))
 static inline cpTransform
 cpTransformScale(cpFloat scaleX, cpFloat scaleY)
 {
@@ -118,6 +132,7 @@ cpTransformScale(cpFloat scaleX, cpFloat scaleY)
 }
 
 /// Create a rotation matrix.
+__attribute__((swift_name("AffineTransform.init(rotation:)")))
 static inline cpTransform
 cpTransformRotate(cpFloat radians)
 {
@@ -129,6 +144,7 @@ cpTransformRotate(cpFloat radians)
 }
 
 /// Create a rigid transformation matrix. (transation + rotation)
+__attribute__((swift_name("AffineTransform.init(translation:rotation:)")))
 static inline cpTransform
 cpTransformRigid(cpVect translate, cpFloat radians)
 {
@@ -140,6 +156,7 @@ cpTransformRigid(cpVect translate, cpFloat radians)
 }
 
 /// Fast inverse of a rigid transformation matrix.
+__attribute__((swift_name("getter:AffineTransform.rigidInverse(self:)")))
 static inline cpTransform
 cpTransformRigidInverse(cpTransform t)
 {
@@ -151,19 +168,21 @@ cpTransformRigidInverse(cpTransform t)
 
 //MARK: Miscellaneous (but useful) transformation matrices.
 // See source for documentation...
-
+__attribute__((swift_name("AffineTransform.wrap(outer:inner:)")))
 static inline cpTransform
 cpTransformWrap(cpTransform outer, cpTransform inner)
 {
   return cpTransformMult(cpTransformInverse(outer), cpTransformMult(inner, outer));
 }
 
+__attribute__((swift_name("AffineTransform.wrapInverse(outer:inner:)")))
 static inline cpTransform
 cpTransformWrapInverse(cpTransform outer, cpTransform inner)
 {
   return cpTransformMult(outer, cpTransformMult(inner, cpTransformInverse(outer)));
 }
 
+__attribute__((swift_name("AffineTransform.init(ortho:)")))
 static inline cpTransform
 cpTransformOrtho(cpBB bb)
 {
@@ -173,6 +192,7 @@ cpTransformOrtho(cpBB bb)
   );
 }
 
+__attribute__((swift_name("AffineTransform.init(boneScale0:boneScale1:)")))
 static inline cpTransform
 cpTransformBoneScale(cpVect v0, cpVect v1)
 {
@@ -183,6 +203,7 @@ cpTransformBoneScale(cpVect v0, cpVect v1)
   );
 }
 
+__attribute__((swift_name("AffineTransform.init(axis:pivot:scale:)")))
 static inline cpTransform
 cpTransformAxialScale(cpVect axis, cpVect pivot, cpFloat scale)
 {

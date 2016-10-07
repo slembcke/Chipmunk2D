@@ -21,4 +21,13 @@ final class ChipmunkTests: XCTestCase {
         
         XCTAssert(vector.negate == Vector(x: -10, y: -10))
     }
+    
+    func testAffineTransform() {
+        
+        var affineTransform = Chipmunk.AffineTransform.identity
+        
+        affineTransform = AffineTransform(translate: Vector.zero)
+        
+        affineTransform = AffineTransform.wrap(outer: affineTransform, inner: AffineTransform.identity)
+    }
 }
