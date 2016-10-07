@@ -37,7 +37,7 @@ if(APPLE)
 endif(APPLE)
 
 if(NOT MSVC)
-  list(APPEND chipmunk_demos_libraries m)
+  list(APPEND chipmunk_demos_libraries m pthread)
 endif(NOT MSVC)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
