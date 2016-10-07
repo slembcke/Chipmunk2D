@@ -111,9 +111,15 @@
 	#endif
 #endif
 
+#if __LP64__ || TARGET_OS_EMBEDDED || TARGET_OS_IPHONE || TARGET_OS_WIN32 || NS_BUILD_32_LIKE_64
+    typedef long CPInteger;
+    typedef unsigned long CPUInteger;
+#else
+    typedef int CPInteger;
+    typedef unsigned int CPUInteger;
+#endif
 
 #define CP_PI ((cpFloat)3.14159265358979323846264338327950288)
-
 
 /// Return the max of two cpFloats.
 static inline cpFloat cpfmax(cpFloat a, cpFloat b)
