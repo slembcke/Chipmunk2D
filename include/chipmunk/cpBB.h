@@ -30,11 +30,12 @@
 /// @{
 
 /// Chipmunk's axis-aligned 2D bounding box type. (left, bottom, right, top)
-typedef struct cpBB{
+typedef struct __attribute__((swift_name("BoundingBox"))) cpBB{
 	cpFloat l, b, r ,t;
 } cpBB;
 
 /// Convenience constructor for cpBB structs.
+__attribute__((swift_private))
 static inline cpBB cpBBNew(const cpFloat l, const cpFloat b, const cpFloat r, const cpFloat t)
 {
 	cpBB bb = {l, b, r, t};
@@ -42,6 +43,7 @@ static inline cpBB cpBBNew(const cpFloat l, const cpFloat b, const cpFloat r, co
 }
 
 /// Constructs a cpBB centered on a point with the given extents (half sizes).
+__attribute__((swift_name("BoundingBox.init(c:hw:hh:)")))
 static inline cpBB
 cpBBNewForExtents(const cpVect c, const cpFloat hw, const cpFloat hh)
 {
@@ -49,30 +51,35 @@ cpBBNewForExtents(const cpVect c, const cpFloat hw, const cpFloat hh)
 }
 
 /// Constructs a cpBB for a circle with the given position and radius.
+__attribute__((swift_name("BoundingBox.init(position:radius:)")))
 static inline cpBB cpBBNewForCircle(const cpVect p, const cpFloat r)
 {
 	return cpBBNewForExtents(p, r, r);
 }
 
 /// Returns true if @c a and @c b intersect.
+__attribute__((swift_name("BoundingBox.intersects(self:_:)")))
 static inline cpBool cpBBIntersects(const cpBB a, const cpBB b)
 {
 	return (a.l <= b.r && b.l <= a.r && a.b <= b.t && b.b <= a.t);
 }
 
 /// Returns true if @c other lies completely within @c bb.
+__attribute__((swift_name("BoundingBox.contains(self:_:)")))
 static inline cpBool cpBBContainsBB(const cpBB bb, const cpBB other)
 {
 	return (bb.l <= other.l && bb.r >= other.r && bb.b <= other.b && bb.t >= other.t);
 }
 
 /// Returns true if @c bb contains @c v.
+__attribute__((swift_name("BoundingBox.contains(self:_:)")))
 static inline cpBool cpBBContainsVect(const cpBB bb, const cpVect v)
 {
 	return (bb.l <= v.x && bb.r >= v.x && bb.b <= v.y && bb.t >= v.y);
 }
 
 /// Returns a bounding box that holds both bounding boxes.
+__attribute__((swift_name("BoundingBox.merge(self:_:)")))
 static inline cpBB cpBBMerge(const cpBB a, const cpBB b){
 	return cpBBNew(
 		cpfmin(a.l, b.l),
@@ -83,6 +90,7 @@ static inline cpBB cpBBMerge(const cpBB a, const cpBB b){
 }
 
 /// Returns a bounding box that holds both @c bb and @c v.
+__attribute__((swift_name("BoundingBox.expand(self:_:)")))
 static inline cpBB cpBBExpand(const cpBB bb, const cpVect v){
 	return cpBBNew(
 		cpfmin(bb.l, v.x),
@@ -93,6 +101,7 @@ static inline cpBB cpBBExpand(const cpBB bb, const cpVect v){
 }
 
 /// Returns the center of a bounding box.
+__attribute__((swift_name("getter:BoundingBox.center(self:)")))
 static inline cpVect
 cpBBCenter(cpBB bb)
 {
@@ -100,18 +109,21 @@ cpBBCenter(cpBB bb)
 }
 
 /// Returns the area of the bounding box.
+__attribute__((swift_name("getter:BoundingBox.area(self:)")))
 static inline cpFloat cpBBArea(cpBB bb)
 {
 	return (bb.r - bb.l)*(bb.t - bb.b);
 }
 
 /// Merges @c a and @c b and returns the area of the merged bounding box.
+__attribute__((swift_name("BoundingBox.mergedArea(self:_:)")))
 static inline cpFloat cpBBMergedArea(cpBB a, cpBB b)
 {
 	return (cpfmax(a.r, b.r) - cpfmin(a.l, b.l))*(cpfmax(a.t, b.t) - cpfmin(a.b, b.b));
 }
 
 /// Returns the fraction along the segment query the cpBB is hit. Returns INFINITY if it doesn't hit.
+__attribute__((swift_name("BoundingBox.segmentQuery(self:a:b:)")))
 static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
 {
 	cpVect delta = cpvsub(b, a);
@@ -143,12 +155,14 @@ static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
 }
 
 /// Return true if the bounding box intersects the line segment with ends @c a and @c b.
+__attribute__((swift_name("BoundingBox.intersects(self:a:b:)")))
 static inline cpBool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)
 {
 	return (cpBBSegmentQuery(bb, a, b) != INFINITY);
 }
 
 /// Clamp a vector to a bounding box.
+__attribute__((swift_name("BoundingBox.clamp(self:_:)")))
 static inline cpVect
 cpBBClampVect(const cpBB bb, const cpVect v)
 {
@@ -156,6 +170,7 @@ cpBBClampVect(const cpBB bb, const cpVect v)
 }
 
 /// Wrap a vector to a bounding box.
+__attribute__((swift_name("BoundingBox.wrap(self:_:)")))
 static inline cpVect
 cpBBWrapVect(const cpBB bb, const cpVect v)
 {
@@ -171,6 +186,7 @@ cpBBWrapVect(const cpBB bb, const cpVect v)
 }
 
 /// Returns a bounding box offseted by @c v.
+__attribute__((swift_name("BoundingBox.offset(self:by:)")))
 static inline cpBB
 cpBBOffset(const cpBB bb, const cpVect v)
 {

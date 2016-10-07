@@ -18,7 +18,7 @@
 		6EBFCD621DA6C88E00D4717D /* cpVect.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0270AA32F16004E361B /* cpVect.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6EBFCD631DA6C88E00D4717D /* cpTransform.h in Headers */ = {isa = PBXBuildFile; fileRef = D38825E517EB945E00663730 /* cpTransform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6EBFCD641DA6C88E00D4717D /* cpBB.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F2D90AAA5622004E361B /* cpBB.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6EBFCD651DA6C88E00D4717D /* cpRobust.h in Headers */ = {isa = PBXBuildFile; fileRef = D3F441EA1B3B17C900C881DD /* cpRobust.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6EBFCD651DA6C88E00D4717D /* cpRobust.h in Headers */ = {isa = PBXBuildFile; fileRef = D3F441EA1B3B17C900C881DD /* cpRobust.h */; };
 		6EBFCD661DA6C88E00D4717D /* cpBody.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0DD0AAA2273004E361B /* cpBody.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6EBFCD671DA6C88E00D4717D /* cpSpatialIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = D3AA477A12AF0F9B00E27AAB /* cpSpatialIndex.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6EBFCD681DA6C88E00D4717D /* cpArbiter.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0C10AA75CA9004E361B /* cpArbiter.h */; settings = {ATTRIBUTES = (Public, ); }; };
