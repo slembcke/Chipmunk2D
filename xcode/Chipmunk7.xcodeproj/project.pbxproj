@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6E7CF94D1DA7737300CC9684 /* cpBodyRef.h in Headers */ = {isa = PBXBuildFile; fileRef = 6E7CF94C1DA7737300CC9684 /* cpBodyRef.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6EBFCD4E1DA6C67900D4717D /* Chipmunk.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EBFCD441DA6C67900D4717D /* Chipmunk.framework */; };
 		6EBFCD531DA6C67900D4717D /* ChipmunkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EBFCD521DA6C67900D4717D /* ChipmunkTests.swift */; };
 		6EBFCD5B1DA6C88E00D4717D /* chipmunk.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0C40AA75CC3004E361B /* chipmunk.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -372,6 +373,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6E7CF94C1DA7737300CC9684 /* cpBodyRef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpBodyRef.h; path = ../include/chipmunk/cpBodyRef.h; sourceTree = "<group>"; };
 		6EBFCD441DA6C67900D4717D /* Chipmunk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Chipmunk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6EBFCD481DA6C67900D4717D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6EBFCD4D1DA6C67900D4717D /* ChipmunkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChipmunkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -930,6 +932,7 @@
 				D3B718E00AB2BC8900B500C9 /* chipmunk.c */,
 				D3E5F2F30AAA575E004E361B /* Basics */,
 				D3E5F0DD0AAA2273004E361B /* cpBody.h */,
+				6E7CF94C1DA7737300CC9684 /* cpBodyRef.h */,
 				D3E5F0DE0AAA2273004E361B /* cpBody.c */,
 				D37E24570AAAA48800BB4C50 /* Collision */,
 				D3800E0E0E9815FC00A3D7FA /* Constraints */,
@@ -1002,6 +1005,7 @@
 				6EBFCD691DA6C88E00D4717D /* cpShape.h in Headers */,
 				6EBFCD6A1DA6C88E00D4717D /* cpPolyShape.h in Headers */,
 				6EBFCD6B1DA6C88E00D4717D /* cpConstraint.h in Headers */,
+				6E7CF94D1DA7737300CC9684 /* cpBodyRef.h in Headers */,
 				6EBFCD6C1DA6C88E00D4717D /* cpPinJoint.h in Headers */,
 				6EBFCD6D1DA6C88E00D4717D /* cpSlideJoint.h in Headers */,
 				6EBFCD6E1DA6C88E00D4717D /* cpPivotJoint.h in Headers */,

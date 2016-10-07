@@ -38,5 +38,8 @@ final class ChipmunkTests: XCTestCase {
         XCTAssert(bodyType.rawValue == 0)
         
         let body = Chipmunk.Body(mass: 1.0, moment: 1.0)
+        
+        defer { }
+        
     }
 }

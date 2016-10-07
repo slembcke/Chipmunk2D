@@ -59,9 +59,49 @@ CP_EXPORT void cpMessage(const char *condition, const char *file, int line, int 
     
 #define CP_ENUM CF_ENUM
     
-#define CP_ASSUME_NONNULL_BEGIN _Pragma("clang assume_nonnull begin")
+#if !__has_feature(nullability)
+#ifndef _Nullable
+#define _Nullable
+#endif
+#ifndef _Nonnull
+#define _Nonnull
+#endif
+#ifndef _Null_unspecified
+#define _Null_unspecified
+#endif
+#endif
     
+#ifndef CP_ASSUME_NONNULL_BEGIN
+#if __has_feature(assume_nonnull)
+#define CP_ASSUME_NONNULL_BEGIN _Pragma("clang assume_nonnull begin")
+#else
+#define CP_ASSUME_NONNULL_BEGIN
+#endif
+#endif
+    
+#ifndef CP_ASSUME_NONNULL_END
+#if __has_feature(assume_nonnull)
 #define CP_ASSUME_NONNULL_END _Pragma("clang assume_nonnull end")
+#else
+#define CP_ASSUME_NONNULL_END
+#endif
+#endif
+    
+#ifndef CP_IMPLICIT_BRIDGING_ENABLED
+#if __has_feature(arc_cf_code_audited)
+#define CP_IMPLICIT_BRIDGING_ENABLED _Pragma("clang arc_cf_code_audited begin")
+#else
+#define CP_IMPLICIT_BRIDGING_ENABLED
+#endif
+#endif
+    
+#ifndef CP_IMPLICIT_BRIDGING_DISABLED
+#if __has_feature(arc_cf_code_audited)
+#define CP_IMPLICIT_BRIDGING_DISABLED _Pragma("clang arc_cf_code_audited end")
+#else
+#define CP_IMPLICIT_BRIDGING_DISABLED
+#endif
+#endif
 
 #include "chipmunk_types.h"
 	
@@ -88,33 +128,33 @@ CP_EXPORT void cpMessage(const char *condition, const char *file, int line, int 
 	#define cpfree free
 #endif
 
-typedef struct cpArray cpArray;
-typedef struct cpHashSet cpHashSet;
+typedef struct __attribute__((swift_private)) cpArray cpArray;
+typedef struct __attribute__((swift_private)) cpHashSet cpHashSet;
 
-typedef struct cpBody cpBody;
+typedef struct __attribute__((swift_private)) cpBody cpBody;
     
-typedef struct cpShape cpShape;
-typedef struct cpCircleShape cpCircleShape;
-typedef struct cpSegmentShape cpSegmentShape;
-typedef struct cpPolyShape cpPolyShape;
+typedef struct __attribute__((swift_private)) cpShape cpShape;
+typedef struct __attribute__((swift_private)) cpCircleShape cpCircleShape;
+typedef struct __attribute__((swift_private)) cpSegmentShape cpSegmentShape;
+typedef struct __attribute__((swift_private)) cpPolyShape cpPolyShape;
 
-typedef struct cpConstraint cpConstraint;
-typedef struct cpPinJoint cpPinJoint;
-typedef struct cpSlideJoint cpSlideJoint;
-typedef struct cpPivotJoint cpPivotJoint;
-typedef struct cpGrooveJoint cpGrooveJoint;
-typedef struct cpDampedSpring cpDampedSpring;
-typedef struct cpDampedRotarySpring cpDampedRotarySpring;
-typedef struct cpRotaryLimitJoint cpRotaryLimitJoint;
-typedef struct cpRatchetJoint cpRatchetJoint;
-typedef struct cpGearJoint cpGearJoint;
-typedef struct cpSimpleMotorJoint cpSimpleMotorJoint;
+typedef struct __attribute__((swift_private)) cpConstraint cpConstraint;
+typedef struct __attribute__((swift_private)) cpPinJoint cpPinJoint;
+typedef struct __attribute__((swift_private)) cpSlideJoint cpSlideJoint;
+typedef struct __attribute__((swift_private)) cpPivotJoint cpPivotJoint;
+typedef struct __attribute__((swift_private)) cpGrooveJoint cpGrooveJoint;
+typedef struct __attribute__((swift_private)) cpDampedSpring cpDampedSpring;
+typedef struct __attribute__((swift_private)) cpDampedRotarySpring cpDampedRotarySpring;
+typedef struct __attribute__((swift_private)) cpRotaryLimitJoint cpRotaryLimitJoint;
+typedef struct __attribute__((swift_private)) cpRatchetJoint cpRatchetJoint;
+typedef struct __attribute__((swift_private)) cpGearJoint cpGearJoint;
+typedef struct __attribute__((swift_private)) cpSimpleMotorJoint cpSimpleMotorJoint;
 
-typedef struct cpCollisionHandler cpCollisionHandler;
-typedef struct cpContactPointSet cpContactPointSet;
-typedef struct cpArbiter cpArbiter;
+typedef struct __attribute__((swift_private)) cpCollisionHandler cpCollisionHandler;
+typedef struct __attribute__((swift_private)) cpContactPointSet cpContactPointSet;
+typedef struct __attribute__((swift_private)) cpArbiter cpArbiter;
 
-typedef struct cpSpace cpSpace;
+typedef struct __attribute__((swift_private)) cpSpace cpSpace;
 
 #include "cpVect.h"
 #include "cpBB.h"
@@ -124,6 +164,7 @@ typedef struct cpSpace cpSpace;
 #include "cpArbiter.h"	
 
 #include "cpBody.h"
+#include "cpBodyRef.h"
 #include "cpShape.h"
 #include "cpPolyShape.h"
 
