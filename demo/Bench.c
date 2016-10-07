@@ -4,7 +4,7 @@
 
 #define ENABLE_HASTY 0
 #if ENABLE_HASTY
-	#import "chipmunk/cpHastySpace.h"
+	#include "chipmunk/cpHastySpace.h"
 	
 	static cpSpace *MakeHastySpace(){
 		cpSpace *space = cpHastySpaceNew();
