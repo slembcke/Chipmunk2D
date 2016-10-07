@@ -24,21 +24,28 @@
 /// it's mass, and position and velocity of it's center of gravity. They don't have an shape on their own.
 /// They are given a shape by creating collision shapes (cpShape) that point to the body.
 /// @{
+typedef CP_ENUM(CPInteger, cpBodyType) {
+    
+    /// A dynamic body is one that is affected by gravity, forces, and collisions.
+    /// This is the default body type.
+    cpBodyTypeDynamic,
+    
+    /// A kinematic body is an infinite mass, user controlled body that is not affected by gravity, forces or collisions.
+    /// Instead the body only moves based on it's velocity.
+    /// Dynamic bodies collide normally with kinematic bodies, though the kinematic body will be unaffected.
+    /// Collisions between two kinematic bodies, or a kinematic body and a static body produce collision callbacks, but no collision response.
+    cpBodyTypeKinematic,
+    
+    /// A static body is a body that never (or rarely) moves. If you move a static body, you must call one of the cpSpaceReindex*() functions.
+    /// Chipmunk uses this information to optimize the collision detection.
+    /// Static bodies do not produce collision callbacks when colliding with other static bodies.
+    cpBodyTypeStatic
+} __attribute__((swift_name("BodyType")));
 
-typedef enum cpBodyType {
-	/// A dynamic body is one that is affected by gravity, forces, and collisions.
-	/// This is the default body type.
-	CP_BODY_TYPE_DYNAMIC,
-	/// A kinematic body is an infinite mass, user controlled body that is not affected by gravity, forces or collisions.
-	/// Instead the body only moves based on it's velocity.
-	/// Dynamic bodies collide normally with kinematic bodies, though the kinematic body will be unaffected.
-	/// Collisions between two kinematic bodies, or a kinematic body and a static body produce collision callbacks, but no collision response.
-	CP_BODY_TYPE_KINEMATIC,
-	/// A static body is a body that never (or rarely) moves. If you move a static body, you must call one of the cpSpaceReindex*() functions.
-	/// Chipmunk uses this information to optimize the collision detection.
-	/// Static bodies do not produce collision callbacks when colliding with other static bodies.
-	CP_BODY_TYPE_STATIC,
-} cpBodyType;
+// legacy declarations
+#define CP_BODY_TYPE_DYNAMIC cpBodyTypeDynamic
+#define CP_BODY_TYPE_KINEMATIC cpBodyTypeKinematic
+#define CP_BODY_TYPE_STATIC cpBodyTypeStatic
 
 /// Rigid body velocity update function type.
 typedef void (*cpBodyVelocityFunc)(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);

@@ -30,4 +30,11 @@ final class ChipmunkTests: XCTestCase {
         
         affineTransform = AffineTransform.wrap(outer: affineTransform, inner: AffineTransform.identity)
     }
+    
+    func testBody() {
+        
+        let bodyType: Chipmunk.BodyType = .dynamic // properly import enum
+        
+        XCTAssert(bodyType.rawValue == 0)
+    }
 }
