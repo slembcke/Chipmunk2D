@@ -36,5 +36,7 @@ final class ChipmunkTests: XCTestCase {
         let bodyType: Chipmunk.BodyType = .dynamic // properly import enum
         
         XCTAssert(bodyType.rawValue == 0)
+        
+        let body = Chipmunk.Body(mass: 1.0, moment: 1.0)
     }
 }

@@ -58,6 +58,10 @@ CP_EXPORT void cpMessage(const char *condition, const char *file, int line, int 
 #define cpAssertHard(__condition__, ...) if(!(__condition__)){cpMessage(#__condition__, __FILE__, __LINE__, 1, 1, __VA_ARGS__); abort();}
     
 #define CP_ENUM CF_ENUM
+    
+#define CP_ASSUME_NONNULL_BEGIN _Pragma("clang assume_nonnull begin")
+    
+#define CP_ASSUME_NONNULL_END _Pragma("clang assume_nonnull end")
 
 #include "chipmunk_types.h"
 	
@@ -88,7 +92,7 @@ typedef struct cpArray cpArray;
 typedef struct cpHashSet cpHashSet;
 
 typedef struct cpBody cpBody;
-
+    
 typedef struct cpShape cpShape;
 typedef struct cpCircleShape cpCircleShape;
 typedef struct cpSegmentShape cpSegmentShape;

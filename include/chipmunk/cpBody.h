@@ -19,11 +19,14 @@
  * SOFTWARE.
  */
 
+CP_ASSUME_NONNULL_BEGIN
+
 /// @defgroup cpBody cpBody
 /// Chipmunk's rigid body type. Rigid bodies hold the physical properties of an object like
 /// it's mass, and position and velocity of it's center of gravity. They don't have an shape on their own.
 /// They are given a shape by creating collision shapes (cpShape) that point to the body.
 /// @{
+
 typedef CP_ENUM(CPInteger, cpBodyType) {
     
     /// A dynamic body is one that is affected by gravity, forces, and collisions.
@@ -47,17 +50,36 @@ typedef CP_ENUM(CPInteger, cpBodyType) {
 #define CP_BODY_TYPE_KINEMATIC cpBodyTypeKinematic
 #define CP_BODY_TYPE_STATIC cpBodyTypeStatic
 
+/// Chipmunk's rigid body type.
+///
+/// - Note: Reference type.
+typedef struct __attribute__((swift_name("Body"))) cpBodyRef {
+    cpBody * pointer;
+} cpBodyRef;
+
 /// Rigid body velocity update function type.
+__attribute__((swift_private))
 typedef void (*cpBodyVelocityFunc)(cpBody *body, cpVect gravity, cpFloat damping, cpFloat dt);
 /// Rigid body position update function type.
+__attribute__((swift_private))
 typedef void (*cpBodyPositionFunc)(cpBody *body, cpFloat dt);
 
 /// Allocate a cpBody.
+__attribute__((swift_private))
 CP_EXPORT cpBody* cpBodyAlloc(void);
 /// Initialize a cpBody.
+__attribute__((swift_private))
 CP_EXPORT cpBody* cpBodyInit(cpBody *body, cpFloat mass, cpFloat moment);
 /// Allocate and initialize a cpBody.
 CP_EXPORT cpBody* cpBodyNew(cpFloat mass, cpFloat moment);
+
+/// Allocate and initialize a cpBodyRef.
+ __attribute__((swift_name("Body.init(mass:moment:)")))
+static inline cpBodyRef cpBodyCreateWithMass(cpFloat mass, cpFloat moment)
+{
+    cpBodyRef ref = { cpBodyNew(mass, moment) };
+    return ref;
+}
 
 /// Allocate and initialize a cpBody, and set it as a kinematic body.
 CP_EXPORT cpBody* cpBodyNewKinematic(void);
@@ -78,7 +100,7 @@ CP_EXPORT void cpBodyActivateStatic(cpBody *body, cpShape *filter);
 /// Force a body to fall asleep immediately.
 CP_EXPORT void cpBodySleep(cpBody *body);
 /// Force a body to fall asleep immediately along with other bodies in a group.
-CP_EXPORT void cpBodySleepWithGroup(cpBody *body, cpBody *group);
+CP_EXPORT void cpBodySleepWithGroup(cpBody *body, cpBody  * _Nullable group);
 
 /// Returns true if the body is sleeping.
 CP_EXPORT cpBool cpBodyIsSleeping(const cpBody *body);
@@ -194,3 +216,5 @@ typedef void (*cpBodyArbiterIteratorFunc)(cpBody *body, cpArbiter *arbiter, void
 CP_EXPORT void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data);
 
 ///@}
+
+CP_ASSUME_NONNULL_END

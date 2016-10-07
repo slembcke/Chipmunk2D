@@ -12,7 +12,6 @@
 		6EBFCD5B1DA6C88E00D4717D /* chipmunk.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0C40AA75CC3004E361B /* chipmunk.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6EBFCD5C1DA6C88E00D4717D /* chipmunk_private.h in Headers */ = {isa = PBXBuildFile; fileRef = D3C2B4581282178B0080A718 /* chipmunk_private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6EBFCD5D1DA6C88E00D4717D /* chipmunk_types.h in Headers */ = {isa = PBXBuildFile; fileRef = D39F478A0FD4AB4E00B244CA /* chipmunk_types.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6EBFCD5E1DA6C88E00D4717D /* chipmunk_structs.h in Headers */ = {isa = PBXBuildFile; fileRef = D3F74B131BE154FA00E41DA0 /* chipmunk_structs.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6EBFCD601DA6C88E00D4717D /* chipmunk_ffi.h in Headers */ = {isa = PBXBuildFile; fileRef = D36C44DD10F53DEB003D48B5 /* chipmunk_ffi.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6EBFCD611DA6C88E00D4717D /* prime.h in Headers */ = {isa = PBXBuildFile; fileRef = D353B6480B059C5F0038D274 /* prime.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6EBFCD621DA6C88E00D4717D /* cpVect.h in Headers */ = {isa = PBXBuildFile; fileRef = D3E5F0270AA32F16004E361B /* cpVect.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -991,7 +990,6 @@
 				6EBFCD5B1DA6C88E00D4717D /* chipmunk.h in Headers */,
 				6EBFCD5C1DA6C88E00D4717D /* chipmunk_private.h in Headers */,
 				6EBFCD5D1DA6C88E00D4717D /* chipmunk_types.h in Headers */,
-				6EBFCD5E1DA6C88E00D4717D /* chipmunk_structs.h in Headers */,
 				6EBFCD601DA6C88E00D4717D /* chipmunk_ffi.h in Headers */,
 				6EBFCD611DA6C88E00D4717D /* prime.h in Headers */,
 				6EBFCD621DA6C88E00D4717D /* cpVect.h in Headers */,
