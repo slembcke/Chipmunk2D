@@ -48,6 +48,7 @@
 		D3185D200EC5610A00E6BFCB /* TheoJansen.c in Sources */ = {isa = PBXBuildFile; fileRef = D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */; };
 		D3238F8210C1B5ED00C4BDC2 /* Joints.c in Sources */ = {isa = PBXBuildFile; fileRef = D3238F8110C1B5ED00C4BDC2 /* Joints.c */; };
 		D32E825417D6D1300037966D /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D32E825317D6D1300037966D /* IOKit.framework */; };
+		D32F47751DAD86F5009A7484 /* Photon.c in Sources */ = {isa = PBXBuildFile; fileRef = D32F47721DAD86F5009A7484 /* Photon.c */; };
 		D333C5E518639A0500BBC4FF /* ChipmunkBody.m in Sources */ = {isa = PBXBuildFile; fileRef = D309B24617EFFF9E00AA52C8 /* ChipmunkBody.m */; };
 		D333C5E618639A0500BBC4FF /* ChipmunkShape.m in Sources */ = {isa = PBXBuildFile; fileRef = D309B24A17EFFF9E00AA52C8 /* ChipmunkShape.m */; };
 		D333C5E718639A0500BBC4FF /* ChipmunkConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = D309B24717EFFF9E00AA52C8 /* ChipmunkConstraint.m */; };
@@ -156,7 +157,6 @@
 		D3E4A9CC0E99683200EE08BA /* cpGrooveJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */; };
 		D3E5D84C1DAC583300EAE3EA /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5D84B1DAC583300EAE3EA /* libglfw3.a */; };
 		D3E5D8531DAC5B1C00EAE3EA /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5D8521DAC5B1C00EAE3EA /* QuartzCore.framework */; };
-		D3E5D8571DAC892E00EAE3EA /* Photon.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E5D8541DAC892E00EAE3EA /* Photon.c */; };
 		D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0540AA3303F004E361B /* OpenGL.framework */; };
 		D3F18B491A5DDC8B005BED54 /* ChipmunkAutoGeometry.m in Sources */ = {isa = PBXBuildFile; fileRef = D3F18B451A5DDC8B005BED54 /* ChipmunkAutoGeometry.m */; };
 		D3F18B4A1A5DDC8B005BED54 /* ChipmunkAutoGeometry.m in Sources */ = {isa = PBXBuildFile; fileRef = D3F18B451A5DDC8B005BED54 /* ChipmunkAutoGeometry.m */; };
@@ -339,6 +339,9 @@
 		D3185D1F0EC5610A00E6BFCB /* TheoJansen.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = TheoJansen.c; sourceTree = "<group>"; };
 		D3238F8110C1B5ED00C4BDC2 /* Joints.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Joints.c; sourceTree = "<group>"; };
 		D32E825317D6D1300037966D /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		D32F47721DAD86F5009A7484 /* Photon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Photon.c; sourceTree = "<group>"; };
+		D32F47731DAD86F5009A7484 /* Photon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Photon.h; sourceTree = "<group>"; };
+		D32F47741DAD86F5009A7484 /* PhotonMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotonMath.h; sourceTree = "<group>"; };
 		D333C5F018639A0500BBC4FF /* libObjectiveChipmunk-Mac.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libObjectiveChipmunk-Mac.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D34963BB0B56CAA300CAD239 /* libChipmunk-Mac.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libChipmunk-Mac.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D34E9E6412558081002C0FE5 /* cpSpaceQuery.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cpSpaceQuery.c; path = ../src/cpSpaceQuery.c; sourceTree = "<group>"; };
@@ -416,9 +419,6 @@
 		D3E5D8501DAC585400EAE3EA /* glfw3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glfw3.h; sourceTree = "<group>"; };
 		D3E5D8511DAC585400EAE3EA /* glfw3native.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glfw3native.h; sourceTree = "<group>"; };
 		D3E5D8521DAC5B1C00EAE3EA /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		D3E5D8541DAC892E00EAE3EA /* Photon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Photon.c; path = ../../Drift/native/Photon.c; sourceTree = "<group>"; };
-		D3E5D8551DAC892E00EAE3EA /* Photon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Photon.h; path = ../../Drift/native/Photon.h; sourceTree = "<group>"; };
-		D3E5D8561DAC892E00EAE3EA /* PhotonMath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PhotonMath.h; path = ../../Drift/native/PhotonMath.h; sourceTree = "<group>"; };
 		D3E5F0270AA32F16004E361B /* cpVect.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpVect.h; path = ../include/chipmunk/cpVect.h; sourceTree = "<group>"; };
 		D3E5F0490AA32FDE004E361B /* ChipmunkDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChipmunkDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3E5F04C0AA32FDE004E361B /* main-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "main-Info.plist"; sourceTree = "<group>"; };
@@ -723,12 +723,12 @@
 			children = (
 				D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */,
 				D3BC99C00AB381EE0025A2C0 /* ChipmunkDemo.c */,
-				D3E5D8551DAC892E00EAE3EA /* Photon.h */,
-				D3E5D8561DAC892E00EAE3EA /* PhotonMath.h */,
-				D3E5D8541DAC892E00EAE3EA /* Photon.c */,
 				D3FBA1B80E9B1F6300950BCC /* ChipmunkDebugDraw.h */,
 				D3FBA1A60E9B1E0400950BCC /* ChipmunkDebugDraw.c */,
 				D3E76CFE17C007E70068C3C3 /* VeraMoBd.ttf_sdf.h */,
+				D32F47731DAD86F5009A7484 /* Photon.h */,
+				D32F47741DAD86F5009A7484 /* PhotonMath.h */,
+				D32F47721DAD86F5009A7484 /* Photon.c */,
 				D3CCDF460AE35D920080442F /* LogoSmash.c */,
 				D3BAF9C40E9C4F250039DD5C /* PyramidStack.c */,
 				D3BAFA030E9C52810039DD5C /* Plink.c */,
@@ -1260,6 +1260,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D3BC99C10AB381EE0025A2C0 /* ChipmunkDemo.c in Sources */,
+				D32F47751DAD86F5009A7484 /* Photon.c in Sources */,
 				D37697200B50C53900BB33CC /* LogoSmash.c in Sources */,
 				D3FBA1A70E9B1E0400950BCC /* ChipmunkDebugDraw.c in Sources */,
 				D3BAF9C50E9C4F250039DD5C /* PyramidStack.c in Sources */,
@@ -1281,7 +1282,6 @@
 				D37282D413C76C1B00FFFA3F /* Buoyancy.c in Sources */,
 				D373FF1013D0D66E000EDB87 /* ContactGraph.c in Sources */,
 				D38996A6148B1E72006CFE0B /* Slice.c in Sources */,
-				D3E5D8571DAC892E00EAE3EA /* Photon.c in Sources */,
 				D3F2EE2F14F898E9005FD439 /* Unicycle.c in Sources */,
 				D3F6EEDF156D581300A158A8 /* Convex.c in Sources */,
 				D3DFB55D1613765700162F19 /* Sticky.c in Sources */,
