@@ -104,11 +104,9 @@ static const char *FontShader = PHOTON_GLSL(
 	
 	void main(void){
 		float sdf = texture(u_FontAtlas, PhotonFragUV1).r;
-		
-		//float fw = fwidth(sdf)*0.5;
-		float fw = length(vec2(dFdx(sdf), dFdy(sdf)))*0.5;
-		
+		float fw = 0.5*fwidth(sdf);
 		float mask = smoothstep(0.5 - fw, 0.5 + fw, sdf);
+		
 		PhotonFragOut = PhotonFragColor*mask;
 	}
 );
@@ -191,7 +189,21 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebu
 extern cpVect ChipmunkDemoMouse;
 
 void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
-{/*
+{
+	pvec4 c = {{fillColor.r, fillColor.g, fillColor.b, fillColor.a}};
+	
+	PhotonRenderBuffers buffers = PhotonRendererEnqueueTriangles(Renderer, count - 2, count, PrimitiveState);
+	
+	for(int i = 0; i < count; i++){
+		buffers.vertexes = PhotonVertexPush(buffers.vertexes, (pvec4){{verts[i].x, verts[i].y, 0, 1}}, PVEC2_0, PVEC2_0, c);
+	}
+	
+	for(int i = 0; i < count - 2; i++){
+		buffers.indexes = PhotonIndexesCopy(buffers.indexes, (PhotonIndex[]){0, i + 1, i + 2}, 0, 3, buffers.batchOffset);
+	}
+}
+
+/*
 	struct ExtrudeVerts {cpVect offset, n;};
 	size_t bytes = sizeof(struct ExtrudeVerts)*count;
 	struct ExtrudeVerts *extrude = (struct ExtrudeVerts *)alloca(bytes);
@@ -253,7 +265,7 @@ void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cp
 		Triangle t2 = {{inner0, v2f0, fillColor, outlineColor}, {outer0,      n1, fillColor, outlineColor}, {outer2, offset0, fillColor, outlineColor}}; *cursor++ = t2;
 		Triangle t3 = {{inner0, v2f0, fillColor, outlineColor}, {outer2, offset0, fillColor, outlineColor}, {outer3,      n0, fillColor, outlineColor}}; *cursor++ = t3;
 	}
-*/}
+*/
 
 void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 {
@@ -332,6 +344,7 @@ ChipmunkDebugDrawText(cpVect pos, char const *str)
 
 void ChipmunkDebugDrawBegin(int width, int height)
 {
+	// TODO Need to make a set of renderers.
 	while(!PhotonRendererWait(Renderer, 1)){
 		printf("Sync on renderer\n");
 	}
