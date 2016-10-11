@@ -122,7 +122,6 @@
 		D3AD63AF17CDB9F500B03A7F /* libGLEW.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D3AD63A617CDB9F500B03A7F /* libGLEW.a */; };
 		D3AD63B017CDB9F500B03A7F /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = D3AD63A717CDB9F500B03A7F /* LICENSE.txt */; };
 		D3AD63B117CDB9F500B03A7F /* COPYING.txt in Resources */ = {isa = PBXBuildFile; fileRef = D3AD63A917CDB9F500B03A7F /* COPYING.txt */; };
-		D3AD63B217CDB9F500B03A7F /* libglfw.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D3AD63AE17CDB9F500B03A7F /* libglfw.a */; };
 		D3BACF8310B5DF8900376394 /* OneWay.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BACF8210B5DF8900376394 /* OneWay.c */; };
 		D3BAD65810B8B52900376394 /* Player.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAD0C710B61AAD00376394 /* Player.c */; };
 		D3BAF9C50E9C4F250039DD5C /* PyramidStack.c in Sources */ = {isa = PBXBuildFile; fileRef = D3BAF9C40E9C4F250039DD5C /* PyramidStack.c */; };
@@ -157,6 +156,8 @@
 		D3E4A9C80E99683200EE08BA /* cpSlideJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA60E98260200A3D7FA /* cpSlideJoint.c */; };
 		D3E4A9CA0E99683200EE08BA /* cpPivotJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA40E98260200A3D7FA /* cpPivotJoint.c */; };
 		D3E4A9CC0E99683200EE08BA /* cpGrooveJoint.c in Sources */ = {isa = PBXBuildFile; fileRef = D3800EA00E98260200A3D7FA /* cpGrooveJoint.c */; };
+		D3E5D84C1DAC583300EAE3EA /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5D84B1DAC583300EAE3EA /* libglfw3.a */; };
+		D3E5D8531DAC5B1C00EAE3EA /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5D8521DAC5B1C00EAE3EA /* QuartzCore.framework */; };
 		D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3E5F0540AA3303F004E361B /* OpenGL.framework */; };
 		D3E76CFC17BFE2340068C3C3 /* ChipmunkDemoTextSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = D3E76CFB17BFDD930068C3C3 /* ChipmunkDemoTextSupport.c */; };
 		D3EEF8A117BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c in Sources */ = {isa = PBXBuildFile; fileRef = D3EEF8A017BAB5A7006B62EB /* ChipmunkDemoShaderSupport.c */; };
@@ -399,8 +400,6 @@
 		D3AD63A617CDB9F500B03A7F /* libGLEW.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libGLEW.a; sourceTree = "<group>"; };
 		D3AD63A717CDB9F500B03A7F /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		D3AD63A917CDB9F500B03A7F /* COPYING.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING.txt; sourceTree = "<group>"; };
-		D3AD63AC17CDB9F500B03A7F /* glfw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glfw.h; sourceTree = "<group>"; };
-		D3AD63AE17CDB9F500B03A7F /* libglfw.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libglfw.a; sourceTree = "<group>"; };
 		D3B718E00AB2BC8900B500C9 /* chipmunk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chipmunk.c; path = ../src/chipmunk.c; sourceTree = "<group>"; };
 		D3BACF8210B5DF8900376394 /* OneWay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = OneWay.c; sourceTree = "<group>"; };
 		D3BAD0C710B61AAD00376394 /* Player.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Player.c; sourceTree = "<group>"; };
@@ -419,6 +418,10 @@
 		D3CCEAE60E9B346100161D40 /* ChipmunkDemo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChipmunkDemo.h; sourceTree = "<group>"; };
 		D3DFB55C1613765700162F19 /* Sticky.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Sticky.c; sourceTree = "<group>"; };
 		D3E4867513175AE000A00840 /* Bench.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Bench.c; sourceTree = "<group>"; };
+		D3E5D84B1DAC583300EAE3EA /* libglfw3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libglfw3.a; sourceTree = "<group>"; };
+		D3E5D8501DAC585400EAE3EA /* glfw3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glfw3.h; sourceTree = "<group>"; };
+		D3E5D8511DAC585400EAE3EA /* glfw3native.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glfw3native.h; sourceTree = "<group>"; };
+		D3E5D8521DAC5B1C00EAE3EA /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		D3E5F0270AA32F16004E361B /* cpVect.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cpVect.h; path = ../include/chipmunk/cpVect.h; sourceTree = "<group>"; };
 		D3E5F0490AA32FDE004E361B /* ChipmunkDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChipmunkDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3E5F04C0AA32FDE004E361B /* main-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "main-Info.plist"; sourceTree = "<group>"; };
@@ -516,11 +519,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D3E5D8531DAC5B1C00EAE3EA /* QuartzCore.framework in Frameworks */,
 				D32E825417D6D1300037966D /* IOKit.framework in Frameworks */,
+				D3E5D84C1DAC583300EAE3EA /* libglfw3.a in Frameworks */,
 				D38687D30BAFC695008B7008 /* libChipmunk-Mac.a in Frameworks */,
 				D3E5F0560AA3303F004E361B /* OpenGL.framework in Frameworks */,
 				D3AD63AF17CDB9F500B03A7F /* libGLEW.a in Frameworks */,
-				D3AD63B217CDB9F500B03A7F /* libglfw.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -673,6 +677,7 @@
 		D39ECD8717ED70D900319DBA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D3E5D8521DAC5B1C00EAE3EA /* QuartzCore.framework */,
 				D3172C781A5DE0D2004D09F7 /* ImageIO.framework */,
 				D32E825317D6D1300037966D /* IOKit.framework */,
 				D3E5F0540AA3303F004E361B /* OpenGL.framework */,
@@ -743,23 +748,15 @@
 		D3AD63AA17CDB9F500B03A7F /* include */ = {
 			isa = PBXGroup;
 			children = (
-				D3AD63AB17CDB9F500B03A7F /* GL */,
+				D3E5D84F1DAC585400EAE3EA /* GLFW */,
 			);
 			path = include;
-			sourceTree = "<group>";
-		};
-		D3AD63AB17CDB9F500B03A7F /* GL */ = {
-			isa = PBXGroup;
-			children = (
-				D3AD63AC17CDB9F500B03A7F /* glfw.h */,
-			);
-			path = GL;
 			sourceTree = "<group>";
 		};
 		D3AD63AD17CDB9F500B03A7F /* lib */ = {
 			isa = PBXGroup;
 			children = (
-				D3AD63AE17CDB9F500B03A7F /* libglfw.a */,
+				D3E5D84B1DAC583300EAE3EA /* libglfw3.a */,
 			);
 			path = lib;
 			sourceTree = "<group>";
@@ -805,6 +802,15 @@
 			);
 			name = demo;
 			path = ../demo;
+			sourceTree = "<group>";
+		};
+		D3E5D84F1DAC585400EAE3EA /* GLFW */ = {
+			isa = PBXGroup;
+			children = (
+				D3E5D8501DAC585400EAE3EA /* glfw3.h */,
+				D3E5D8511DAC585400EAE3EA /* glfw3native.h */,
+			);
+			path = GLFW;
 			sourceTree = "<group>";
 		};
 		D3E5F0170AA32EAC004E361B = {
@@ -1848,6 +1854,7 @@
 					"\"$(SRCROOT)/libglfw/lib\"",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -1891,6 +1898,7 @@
 					"\"$(SRCROOT)/libglfw/lib\"",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				OTHER_CFLAGS = (
 					"-ffast-math",
 					"-DNDEBUG",
