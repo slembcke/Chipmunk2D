@@ -143,20 +143,21 @@ ChipmunkDebugDrawInit(void)
 }
 
 void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
-{/*
-	Triangle *triangles = PushTriangles(2);
-	
+{
 	cpFloat r = radius + 1.0f/ChipmunkDebugDrawPointLineScale;
-	Vertex a = {{(GLfloat)(pos.x - r), (GLfloat)(pos.y - r)}, {-1.0f, -1.0f}, fillColor, outlineColor};
-	Vertex b = {{(GLfloat)(pos.x - r), (GLfloat)(pos.y + r)}, {-1.0f,  1.0f}, fillColor, outlineColor};
-	Vertex c = {{(GLfloat)(pos.x + r), (GLfloat)(pos.y + r)}, { 1.0f,  1.0f}, fillColor, outlineColor};
-	Vertex d = {{(GLfloat)(pos.x + r), (GLfloat)(pos.y - r)}, { 1.0f, -1.0f}, fillColor, outlineColor};
+	pvec4 c = {{fillColor.r, fillColor.g, fillColor.b, fillColor.a}};
 	
-	Triangle t0 = {a, b, c}; triangles[0] = t0;
-	Triangle t1 = {a, c, d}; triangles[1] = t1;
+	// TODO outline color
+	
+	PhotonRenderBuffers buffers = PhotonRendererEnqueueTriangles(Renderer, 2, 4, PrimitiveState);
+	PhotonVertexPush(buffers.vertexes + 0, (pvec4){{(float)pos.x - r, (float)pos.y - r, 0, 1}}, (pvec2){-1, -1}, PVEC2_0, c);
+	PhotonVertexPush(buffers.vertexes + 1, (pvec4){{(float)pos.x - r, (float)pos.y + r, 0, 1}}, (pvec2){-1,  1}, PVEC2_0, c);
+	PhotonVertexPush(buffers.vertexes + 2, (pvec4){{(float)pos.x + r, (float)pos.y + r, 0, 1}}, (pvec2){ 1,  1}, PVEC2_0, c);
+	PhotonVertexPush(buffers.vertexes + 3, (pvec4){{(float)pos.x + r, (float)pos.y - r, 0, 1}}, (pvec2){ 1, -1}, PVEC2_0, c);
+	PhotonRenderBuffersCopyIndexes(&buffers, (PhotonIndex[]){0, 1, 2, 2, 3, 0}, 0, 6);
 	
 	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawPointLineScale*0.5f)), outlineColor);
-*/}
+}
 
 void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color)
 {
@@ -164,37 +165,28 @@ void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color)
 }
 
 void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
-{/*
-	Triangle *triangles = PushTriangles(6);
-	
-	cpVect n = cpvnormalize(cpvrperp(cpvsub(b, a)));
-	cpVect t = cpvrperp(n);
-	
-	cpFloat half = 1.0f/ChipmunkDebugDrawPointLineScale;
-	cpFloat r = radius + half;
+{
+	float half = 1.0f/ChipmunkDebugDrawPointLineScale;
+	float r = radius + half;
 	if(r <= half){
 		r = half;
 		fillColor = outlineColor;
 	}
 	
-	cpVect nw = (cpvmult(n, r));
-	cpVect tw = (cpvmult(t, r));
-	struct v2f v0 = v2f(cpvsub(b, cpvadd(nw, tw))); // { 1.0, -1.0}
-	struct v2f v1 = v2f(cpvadd(b, cpvsub(nw, tw))); // { 1.0,  1.0}
-	struct v2f v2 = v2f(cpvsub(b, nw)); // { 0.0, -1.0}
-	struct v2f v3 = v2f(cpvadd(b, nw)); // { 0.0,  1.0}
-	struct v2f v4 = v2f(cpvsub(a, nw)); // { 0.0, -1.0}
-	struct v2f v5 = v2f(cpvadd(a, nw)); // { 0.0,  1.0}
-	struct v2f v6 = v2f(cpvsub(a, cpvsub(nw, tw))); // {-1.0, -1.0}
-	struct v2f v7 = v2f(cpvadd(a, cpvadd(nw, tw))); // {-1.0,  1.0}
+	cpVect t = cpvmult(cpvnormalize(cpvsub(b, a)), r);
+	pvec4 c = {{fillColor.r, fillColor.g, fillColor.b, fillColor.a}};
 	
-	Triangle t0 = {{v0, { 1.0f, -1.0f}, fillColor, outlineColor}, {v1, { 1.0f,  1.0f}, fillColor, outlineColor}, {v2, { 0.0f, -1.0f}, fillColor, outlineColor}}; triangles[0] = t0;
-	Triangle t1 = {{v3, { 0.0f,  1.0f}, fillColor, outlineColor}, {v1, { 1.0f,  1.0f}, fillColor, outlineColor}, {v2, { 0.0f, -1.0f}, fillColor, outlineColor}}; triangles[1] = t1;
-	Triangle t2 = {{v3, { 0.0f,  1.0f}, fillColor, outlineColor}, {v4, { 0.0f, -1.0f}, fillColor, outlineColor}, {v2, { 0.0f, -1.0f}, fillColor, outlineColor}}; triangles[2] = t2;
-	Triangle t3 = {{v3, { 0.0f,  1.0f}, fillColor, outlineColor}, {v4, { 0.0f, -1.0f}, fillColor, outlineColor}, {v5, { 0.0f,  1.0f}, fillColor, outlineColor}}; triangles[3] = t3;
-	Triangle t4 = {{v6, {-1.0f, -1.0f}, fillColor, outlineColor}, {v4, { 0.0f, -1.0f}, fillColor, outlineColor}, {v5, { 0.0f,  1.0f}, fillColor, outlineColor}}; triangles[4] = t4;
-	Triangle t5 = {{v6, {-1.0f, -1.0f}, fillColor, outlineColor}, {v7, {-1.0f,  1.0f}, fillColor, outlineColor}, {v5, { 0.0f,  1.0f}, fillColor, outlineColor}}; triangles[5] = t5;
-*/}
+	PhotonRenderBuffers buffers = PhotonRendererEnqueueTriangles(Renderer, 6, 8, PrimitiveState);
+	PhotonVertexPush(buffers.vertexes + 0, (pvec4){{b.x - t.y + t.x, b.y + t.x + t.y, 0, 1}}, (pvec2){ 1, -1}, PVEC2_0, c);
+	PhotonVertexPush(buffers.vertexes + 1, (pvec4){{b.x + t.y + t.x, b.y - t.x + t.y, 0, 1}}, (pvec2){ 1,  1}, PVEC2_0, c);
+	PhotonVertexPush(buffers.vertexes + 2, (pvec4){{b.x - t.y      , b.y + t.x      , 0, 1}}, (pvec2){ 0, -1}, PVEC2_0, c);
+	PhotonVertexPush(buffers.vertexes + 3, (pvec4){{b.x + t.y      , b.y - t.x      , 0, 1}}, (pvec2){ 0,  1}, PVEC2_0, c);
+	PhotonVertexPush(buffers.vertexes + 4, (pvec4){{a.x - t.y      , a.y + t.x      , 0, 1}}, (pvec2){ 0, -1}, PVEC2_0, c);
+	PhotonVertexPush(buffers.vertexes + 5, (pvec4){{a.x + t.y      , a.y - t.x      , 0, 1}}, (pvec2){ 0,  1}, PVEC2_0, c);
+	PhotonVertexPush(buffers.vertexes + 6, (pvec4){{a.x - t.y - t.x, a.y + t.x - t.y, 0, 1}}, (pvec2){-1, -1}, PVEC2_0, c);
+	PhotonVertexPush(buffers.vertexes + 7, (pvec4){{a.x + t.y - t.x, a.y - t.x - t.y, 0, 1}}, (pvec2){-1,  1}, PVEC2_0, c);
+	PhotonRenderBuffersCopyIndexes(&buffers, (PhotonIndex[]){0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5, 6, 4, 5, 6, 7, 5}, 0, 18);
+}
 
 extern cpVect ChipmunkDemoMouse;
 
@@ -273,7 +265,6 @@ void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 	PhotonVertexPush(buffers.vertexes + 1, (pvec4){{(float)pos.x - r, (float)pos.y + r, 0, 1}}, (pvec2){-1.0f,  1.0f}, PVEC2_0, c);
 	PhotonVertexPush(buffers.vertexes + 2, (pvec4){{(float)pos.x + r, (float)pos.y + r, 0, 1}}, (pvec2){ 1.0f,  1.0f}, PVEC2_0, c);
 	PhotonVertexPush(buffers.vertexes + 3, (pvec4){{(float)pos.x + r, (float)pos.y - r, 0, 1}}, (pvec2){ 1.0f, -1.0f}, PVEC2_0, c);
-	
 	PhotonRenderBuffersCopyIndexes(&buffers, (PhotonIndex[]){0, 1, 2, 2, 3, 0}, 0, 6);
 }
 
