@@ -46,12 +46,10 @@
   #endif
 #endif
 
-#include "GL/glew.h"
 #include "GLFW/glfw3.h"
 
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDemo.h"
-#include "ChipmunkDemoTextSupport.h"
 
 static ChipmunkDemo *demos;
 static int demo_count = 0;
@@ -215,7 +213,7 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 static void
 DrawInstructions()
 {
-	ChipmunkDemoTextDrawString(cpv(-300, 220),
+	ChipmunkDebugDrawText(cpv(-300, 220),
 		"Controls:\n"
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
@@ -266,7 +264,7 @@ DrawInfo()
 		ChipmunkDemoTime, (ke < 1e-10f ? 0.0f : ke)
 	);
 	
-	ChipmunkDemoTextDrawString(cpv(0, 220), buffer);
+	ChipmunkDebugDrawText(cpv(0, 220), buffer);
 }
 
 static char PrintStringBuffer[1024*8];
@@ -300,12 +298,7 @@ Tick(double dt)
 	if(!paused || step){
 		PrintStringBuffer[0] = 0;
 		PrintStringCursor = PrintStringBuffer;
-		
-		// Completely reset the renderer only at the beginning of a tick.
-		// That way it can always display at least the last ticks' debug drawing.
-		ChipmunkDebugDrawClearRenderer();
-		ChipmunkDemoTextClearRenderer();
-		
+				
 		cpVect new_point = cpvlerp(mouse_body->p, ChipmunkDemoMouse, 0.25f);
 		mouse_body->v = cpvmult(cpvsub(new_point, mouse_body->p), 60.0f);
 		mouse_body->p = new_point;
@@ -318,7 +311,7 @@ Tick(double dt)
 		step = cpFalse;
 		ChipmunkDemoRightDown = cpFalse;
 		
-		ChipmunkDemoTextDrawString(cpv(-300, -200), ChipmunkDemoMessageString);
+//		ChipmunkDebugDrawText(cpv(-300, -200), ChipmunkDemoMessageString);
 	}
 }
 
@@ -339,42 +332,30 @@ Update(void)
 }
 
 static void
-Display(void)
+Display(GLFWwindow *window)
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
 	
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef((GLfloat)translate.x, (GLfloat)translate.y, 0.0f);
-	glScalef((GLfloat)scale, (GLfloat)scale, 1.0f);
+	ChipmunkDebugDrawBegin(width, height);
+//	glMatrixMode(GL_MODELVIEW);
+//	glLoadIdentity();
+//	glTranslatef((GLfloat)translate.x, (GLfloat)translate.y, 0.0f);
+//	glScalef((GLfloat)scale, (GLfloat)scale, 1.0f);
 	
 	Update();
 	
-	ChipmunkDebugDrawPushRenderer();
 	demos[demo_index].drawFunc(space);
 	
 //	// Highlight the shape under the mouse because it looks neat.
 //	cpShape *nearest = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0f, CP_ALL_LAYERS, CP_NO_GROUP, NULL);
 //	if(nearest) ChipmunkDebugDrawShape(nearest, RGBAColor(1.0f, 0.0f, 0.0f, 1.0f), LAColor(0.0f, 0.0f));
 	
-	// Draw the renderer contents and reset it back to the last tick's state.
-	ChipmunkDebugDrawFlushRenderer();
-	ChipmunkDebugDrawPopRenderer();
-	
-	ChipmunkDemoTextPushRenderer();
 	// Now render all the UI text.
 	DrawInstructions();
 	DrawInfo();
 	
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix(); {
-		// Draw the text at fixed positions,
-		// but save the drawing matrix for the mouse picking
-		glLoadIdentity();
-		
-		ChipmunkDemoTextFlushRenderer();
-		ChipmunkDemoTextPopRenderer();
-	} glPopMatrix();
+	ChipmunkDebugDrawFlush();
 }
 
 static void
@@ -390,9 +371,7 @@ Reshape(GLFWwindow *window, int wwidth, int wheight)
 	
 	ChipmunkDebugDrawPointLineScale = scale;
 	
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(-hw, hw, -hh, hh);
+	ChipmunkDebugDrawProjection = cpTransformOrtho(cpBBNew(-hw, -hh, hw, hh));
 }
 
 static char *
@@ -469,7 +448,7 @@ Keyboard(GLFWwindow *window, unsigned int key)
 
 static cpVect
 MouseToSpace(GLFWwindow *window, double x, double y)
-{
+{/*
 	GLdouble model[16];
 	glGetDoublev(GL_MODELVIEW_MATRIX, model);
 	
@@ -486,7 +465,7 @@ MouseToSpace(GLFWwindow *window, double x, double y)
 	gluUnProject(x, wh - y, 0.0f, model, proj, view, &mx, &my, &mz);
 	
 	return cpv(mx, my);
-}
+*/}
 
 static void
 Mouse(GLFWwindow *window, double x, double y)
@@ -543,18 +522,10 @@ SetupGL(void)
 	printf("GL_VERSION: %s\n", glGetString(GL_VERSION));
 	printf("GL_RENDERER: %s\n", glGetString(GL_RENDERER));
 	
-	glewExperimental = GL_TRUE;
-	cpAssertHard(glewInit() == GLEW_NO_ERROR, "There was an error initializing GLEW.");
-	cpAssertHard(GLEW_ARB_vertex_array_object, "Requires VAO support.");
+//	glClearColor(52.0f/255.0f, 62.0f/255.0f, 72.0f/255.0f, 1.0f);
+//	glClear(GL_COLOR_BUFFER_BIT);
 	
 	ChipmunkDebugDrawInit();
-	ChipmunkDemoTextInit();
-	
-	glClearColor(52.0f/255.0f, 62.0f/255.0f, 72.0f/255.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 static GLFWwindow *
@@ -562,6 +533,11 @@ SetupGLFW()
 {
 	cpAssertHard(glfwInit(), "Error initializing GLFW.");
 	glfwSwapInterval(1);
+	
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	
 	const int width = 800;
 	const int height = 600;
@@ -674,7 +650,6 @@ main(int argc, const char **argv)
 	}
 	
 	if(trial){
-		cpAssertHard(glfwInit(), "Error initializing GLFW.");
 //		sleep(1);
 		for(int i=0; i<demo_count; i++) TimeTrial(i, 1000);
 //		time_trial('d' - 'a', 10000);
@@ -687,7 +662,7 @@ main(int argc, const char **argv)
 		RunDemo(window, demo_index);
 		
 		while(!glfwWindowShouldClose(window)){
-			Display();
+			Display(window);
 			
 			glfwSwapBuffers(window);
 			glfwPollEvents();

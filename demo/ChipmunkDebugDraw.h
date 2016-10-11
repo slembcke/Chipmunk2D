@@ -34,6 +34,8 @@ void ChipmunkDebugDrawInit(void);
 extern float ChipmunkDebugDrawPointLineScale;
 extern float ChipmunkDebugDrawOutlineWidth;
 
+extern cpTransform ChipmunkDebugDrawProjection;
+
 void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor);
 void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color);
 void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor);
@@ -41,12 +43,7 @@ void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cp
 void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor);
 void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor outlineColor);
 
-// Call this at the end of the frame to draw the ChipmunkDebugDraw*() commands to the screen.
-void ChipmunkDebugDrawFlushRenderer(void);
-// Call this at the beginning of the frame to clear out any ChipmunkDebugDraw*() commands.
-void ChipmunkDebugDrawClearRenderer(void);
+void ChipmunkDebugDrawText(cpVect pos, char const *str);
 
-// Save the current contents of the renderer.
-void ChipmunkDebugDrawPushRenderer(void);
-// Reset the renderer back to it's last pushed state.
-void ChipmunkDebugDrawPopRenderer(void);
+void ChipmunkDebugDrawBegin(int width, int height);
+void ChipmunkDebugDrawFlush(void);
