@@ -69,7 +69,7 @@ static const char *PrimitiveVShader = PHOTON_GLSL(
 		gl_Position = u_MVP*PhotonAttributePosition;
 		PhotonFragUV1 = PhotonAttributeUV1;
 		PhotonFragUV2 = PhotonAttributeUV2;
-		PhotonFragColor = PhotonAttributeColor;
+		PhotonFragColor = PhotonAttributeColor*PhotonAttributeColor.a;
 	}
 );
 
@@ -265,13 +265,13 @@ extern cpVect ChipmunkDemoMouse;
 void
 ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor outline, cpSpaceDebugColor fill)
 {
-	pvec2 attribs = {-1, -1};
+	pvec2 attribs = {1, 1};
 	pvec4 color = MakeColor(fill);
 	
 	PhotonRenderBuffers buffers = PhotonRendererEnqueueTriangles(Renderer, count - 2, count, PrimitiveState);
 	
 	for(int i = 0; i < count; i++){
-		buffers.vertexes = PhotonVertexPush(buffers.vertexes, (pvec4){{verts[i].x, verts[i].y, 0, 1}}, attribs, (pvec2){1, 1}, color);
+		buffers.vertexes = PhotonVertexPush(buffers.vertexes, (pvec4){{verts[i].x, verts[i].y, 0, 1}}, PVEC2_0, attribs, color);
 	}
 	
 	for(int i = 0; i < count - 2; i++){
