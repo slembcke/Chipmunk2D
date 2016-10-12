@@ -122,7 +122,7 @@ ChipmunkDemoFreeSpaceChildren(cpSpace *space)
 
 static void
 DrawCircle(cpVect p, cpFloat a, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
-{ChipmunkDebugDrawCircle(p, a, r, outline, fill);}
+{ChipmunkDebugDrawCircle(p, a, r, fill);}
 
 static void
 DrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color, cpDataPointer data)
@@ -130,11 +130,11 @@ DrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color, cpDataPointer data)
 
 static void
 DrawFatSegment(cpVect a, cpVect b, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
-{ChipmunkDebugDrawFatSegment(a, b, r, outline, fill);}
+{ChipmunkDebugDrawFatSegment(a, b, r, fill);}
 
 static void
 DrawPolygon(int count, const cpVect *verts, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
-{ChipmunkDebugDrawPolygon(count, verts, r, outline, fill);}
+{ChipmunkDebugDrawPolygon(count, verts, r, fill);}
 
 static void
 DrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor color, cpDataPointer data)
@@ -144,14 +144,18 @@ static cpSpaceDebugColor
 ColorForShape(cpShape *shape, cpDataPointer data)
 {
 	if(cpShapeGetSensor(shape)){
-		return LAColor(1.0f, 0.1f);
+		cpSpaceDebugColor c = ChipmunkDebugPalette[15];
+		c.a = 0.1;
+		return c;
 	} else {
 		cpBody *body = cpShapeGetBody(shape);
 		
 		if(cpBodyIsSleeping(body)){
-			return LAColor(0.2f, 1.0f);
+			return ChipmunkDebugPalette[0];
 		} else if(body->sleeping.idleTime > shape->space->sleepTimeThreshold) {
-			return LAColor(0.66f, 1.0f);
+			return ChipmunkDebugPalette[1];
+		} else if(cpBodyGetType(body) == CP_BODY_TYPE_STATIC){
+			return ChipmunkDebugPalette[3];
 		} else {
 			uint32_t val = (uint32_t)shape->hashid;
 			
@@ -163,26 +167,8 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 			val = (val+0xfd7046c5) + (val<<3);
 			val = (val^0xb55a4f09) ^ (val>>16);
 			
-			GLfloat r = (GLfloat)((val>>0) & 0xFF);
-			GLfloat g = (GLfloat)((val>>8) & 0xFF);
-			GLfloat b = (GLfloat)((val>>16) & 0xFF);
-			
-			GLfloat max = (GLfloat)cpfmax(cpfmax(r, g), b);
-			GLfloat min = (GLfloat)cpfmin(cpfmin(r, g), b);
-			GLfloat intensity = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC ? 0.15f : 0.75f);
-			
-			// Saturate and scale the color
-			if(min == max){
-				return RGBAColor(intensity, 0.0f, 0.0f, 1.0f);
-			} else {
-				GLfloat coef = (GLfloat)intensity/(max - min);
-				return RGBAColor(
-					(r - min)*coef,
-					(g - min)*coef,
-					(b - min)*coef,
-					1.0f
-				);
-			}
+			static const int colors[] = {5, 8, 9, 12, 13};
+			return ChipmunkDebugPalette[colors[val%5]];
 		}
 	}
 }
@@ -202,8 +188,8 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 		
 		{200.0f/255.0f, 210.0f/255.0f, 230.0f/255.0f, 1.0f},
 		ColorForShape,
-		{0.0f, 0.75f, 0.0f, 1.0f},
-		{1.0f, 0.0f, 0.0f, 1.0f},
+		ChipmunkDebugPalette[11],
+		ChipmunkDebugPalette[6],
 		NULL,
 	};
 	
@@ -216,7 +202,8 @@ DrawInstructions()
 	ChipmunkDebugDrawText(cpv(-300, 220),
 		"Controls:\n"
 		"A - * Switch demos. (return restarts)\n"
-		"Use the mouse to grab objects.\n"
+		"Use the mouse to grab objects.\n",
+		ChipmunkDebugPalette[14]
 	);
 }
 
@@ -264,7 +251,7 @@ DrawInfo()
 		ChipmunkDemoTime, (ke < 1e-10f ? 0.0f : ke)
 	);
 	
-	ChipmunkDebugDrawText(cpv(0, 220), buffer);
+	ChipmunkDebugDrawText(cpv(0, 220), buffer, ChipmunkDebugPalette[14]);
 }
 
 static char PrintStringBuffer[1024*8];

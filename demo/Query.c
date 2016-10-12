@@ -61,7 +61,7 @@ update(cpSpace *space, double dt)
 	}
 	
 	// Draw a fat green line over the unoccluded part of the query
-	ChipmunkDebugDrawFatSegment(start, cpvlerp(start, end, segInfo.alpha), radius, RGBAColor(0,1,0,1), LAColor(0,0));
+	ChipmunkDebugDrawFatSegment(start, cpvlerp(start, end, segInfo.alpha), radius, RGBAColor(0,1,0,1));
 	
 	cpPointQueryInfo nearestInfo = {};
 	cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 100.0, CP_SHAPE_FILTER_ALL, &nearestInfo);

@@ -35,14 +35,16 @@ extern float ChipmunkDebugDrawScaleFactor;
 extern cpTransform ChipmunkDebugDrawProjection;
 extern cpTransform ChipmunkDebugDrawCamera;
 
-void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor);
-void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color);
-void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor);
-void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor);
-void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor);
-void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor outlineColor);
+extern const cpSpaceDebugColor *ChipmunkDebugPalette;
 
-void ChipmunkDebugDrawText(cpVect pos, char const *str);
+void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor fill);
+void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color);
+void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColor fill);
+void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor fill);
+void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fill);
+void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color);
+
+void ChipmunkDebugDrawText(cpVect pos, char const *str, cpSpaceDebugColor color);
 
 void ChipmunkDebugDrawBegin(int width, int height);
 void ChipmunkDebugDrawFlush(void);

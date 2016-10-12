@@ -38,6 +38,7 @@ cpTransform ChipmunkDebugDrawProjection = {1, 0, 0, 1, 0, 0};
 cpTransform ChipmunkDebugDrawCamera = {1, 0, 0, 1, 0, 0};
 
 static pvec4 Palette[16];
+const cpSpaceDebugColor *ChipmunkDebugPalette;
 
 static PhotonRenderer *Renderer = NULL;
 static PhotonRenderState *FontState = NULL;
@@ -94,7 +95,7 @@ static const char *PrimitiveFShader = PHOTON_GLSL(
 		float r2 = PhotonFragUV2[1];
 		
 		float l = length(PhotonFragUV1);
-		float fw = fwidth(l);
+		float fw = fwidth(l) + 1e-3;
 		
 		// Fill/outline color.
 		float outlineWidth = fw*u_OutlineWidth;
@@ -177,6 +178,8 @@ ChipmunkDebugDrawInit(void)
 		Palette[i] = pvec4Mult(palette[i], 1.0/255.0);
 	}
 	
+	ChipmunkDebugPalette = (cpSpaceDebugColor *)Palette;
+	
 	PhotonShader *primitiveShader = PhotonShaderNew(PrimitiveVShader, PrimitiveFShader);
 	PhotonUniforms *primitiveUniforms = PhotonUniformsNew(primitiveShader);
 	
@@ -222,11 +225,11 @@ ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fill)
 }
 
 void
-ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outline, cpSpaceDebugColor fill)
+ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor fill)
 {
 	cpFloat r = radius + 1.0f/ChipmunkDebugDrawScaleFactor;
 	DrawCircle((pvec2){pos.x, pos.y}, r - 1, r, MakeColor(fill));
-	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawScaleFactor*0.5f)), outline);
+	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawScaleFactor*0.5f)), ChipmunkDebugPalette[15]);
 }
 
 static void
@@ -254,7 +257,7 @@ ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color)
 }
 
 void
-ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColor outline, cpSpaceDebugColor fill)
+ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColor fill)
 {
 	float r = fmaxf(radius + 1/ChipmunkDebugDrawScaleFactor, 1);
 	DrawSegment(a, b, r - 1, r, MakeColor(fill));
@@ -263,7 +266,7 @@ ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColo
 extern cpVect ChipmunkDemoMouse;
 
 void
-ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor outline, cpSpaceDebugColor fill)
+ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor fill)
 {
 	pvec2 attribs = {1, 1};
 	pvec4 color = MakeColor(fill);
@@ -352,7 +355,7 @@ ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color)
 		cpv(bb.l, bb.t),
 		cpv(bb.l, bb.b),
 	};
-	ChipmunkDebugDrawPolygon(4, verts, 0.0f, color, LAColor(0, 0));
+	ChipmunkDebugDrawPolygon(4, verts, 0.0f, color);
 }
 
 
@@ -389,16 +392,17 @@ PushChar(int character, float x, float y, pvec4 color)
 }
 
 void
-ChipmunkDebugDrawText(cpVect pos, char const *str)
+ChipmunkDebugDrawText(cpVect pos, char const *str, cpSpaceDebugColor color)
 {
 	float x = pos.x, y = pos.y;
+	pvec4 c = MakeColor(color);
 	
 	for(size_t i=0, len=strlen(str); i<len; i++){
 		if(str[i] == '\n'){
 			y -= TextLineHeight;
 			x = pos.x;
 		} else {
-			x += PushChar(str[i], x, y, Palette[14]);
+			x += PushChar(str[i], x, y, c);
 		}
 	}
 }
