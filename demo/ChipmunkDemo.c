@@ -151,11 +151,11 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 		cpBody *body = cpShapeGetBody(shape);
 		
 		if(cpBodyIsSleeping(body)){
-			return ChipmunkDebugPalette[0];
-		} else if(body->sleeping.idleTime > shape->space->sleepTimeThreshold) {
-			return ChipmunkDebugPalette[1];
-		} else if(cpBodyGetType(body) == CP_BODY_TYPE_STATIC){
 			return ChipmunkDebugPalette[3];
+		} else if(body->sleeping.idleTime > shape->space->sleepTimeThreshold) {
+			return ChipmunkDebugPalette[7];
+		} else if(cpBodyGetType(body) == CP_BODY_TYPE_STATIC){
+			return ChipmunkDebugPalette[0];
 		} else {
 			uint32_t val = (uint32_t)shape->hashid;
 			
@@ -167,7 +167,7 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 			val = (val+0xfd7046c5) + (val<<3);
 			val = (val^0xb55a4f09) ^ (val>>16);
 			
-			static const int colors[] = {5, 8, 9, 12, 13};
+			static const int colors[] = {8, 9, 11, 12, 13};
 			return ChipmunkDebugPalette[colors[val%5]];
 		}
 	}
@@ -186,9 +186,9 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 		
 		(cpSpaceDebugDrawFlags)(CP_SPACE_DEBUG_DRAW_SHAPES | CP_SPACE_DEBUG_DRAW_CONSTRAINTS | CP_SPACE_DEBUG_DRAW_COLLISION_POINTS),
 		
-		{200.0f/255.0f, 210.0f/255.0f, 230.0f/255.0f, 1.0f},
+		ChipmunkDebugPalette[15],
 		ColorForShape,
-		ChipmunkDebugPalette[11],
+		ChipmunkDebugPalette[5],
 		ChipmunkDebugPalette[6],
 		NULL,
 	};

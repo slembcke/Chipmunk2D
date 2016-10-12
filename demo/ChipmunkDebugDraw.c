@@ -220,7 +220,7 @@ DrawCircle(pvec2 p, float r1, float r2, pvec4 color)
 void
 ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fill)
 {
-	float r = size*0.5f*ChipmunkDebugDrawScaleFactor;
+	float r = size*0.5f;
 	DrawCircle((pvec2){pos.x, pos.y}, r + 1, r, MakeColor(fill));
 }
 

@@ -92,8 +92,8 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 		cpVect a = cpTransformPoint(body_a->transform, joint->anchorA);
 		cpVect b = cpTransformPoint(body_b->transform, joint->anchorB);
 		
-		options->drawDot(2, a, color, data);
-		options->drawDot(2, b, color, data);
+		options->drawDot(5, a, color, data);
+		options->drawDot(5, b, color, data);
 		options->drawSegment(a, b, color, data);
 	} else if(cpConstraintIsSlideJoint(constraint)){
 		cpSlideJoint *joint = (cpSlideJoint *)constraint;
@@ -101,8 +101,8 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 		cpVect a = cpTransformPoint(body_a->transform, joint->anchorA);
 		cpVect b = cpTransformPoint(body_b->transform, joint->anchorB);
 		
-		options->drawDot(2, a, color, data);
-		options->drawDot(2, b, color, data);
+		options->drawDot(5, a, color, data);
+		options->drawDot(5, b, color, data);
 		options->drawSegment(a, b, color, data);
 	} else if(cpConstraintIsPivotJoint(constraint)){
 		cpPivotJoint *joint = (cpPivotJoint *)constraint;
@@ -110,8 +110,8 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 		cpVect a = cpTransformPoint(body_a->transform, joint->anchorA);
 		cpVect b = cpTransformPoint(body_b->transform, joint->anchorB);
 
-		options->drawDot(2, a, color, data);
-		options->drawDot(2, b, color, data);
+		options->drawDot(5, a, color, data);
+		options->drawDot(5, b, color, data);
 	} else if(cpConstraintIsGrooveJoint(constraint)){
 		cpGrooveJoint *joint = (cpGrooveJoint *)constraint;
 	
@@ -119,7 +119,7 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 		cpVect b = cpTransformPoint(body_a->transform, joint->grv_b);
 		cpVect c = cpTransformPoint(body_b->transform, joint->anchorB);
 		
-		options->drawDot(2, c, color, data);
+		options->drawDot(5, c, color, data);
 		options->drawSegment(a, b, color, data);
 	} else if(cpConstraintIsDampedSpring(constraint)){
 		cpDampedSpring *spring = (cpDampedSpring *)constraint;
@@ -129,8 +129,8 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 		cpVect a = cpTransformPoint(body_a->transform, spring->anchorA);
 		cpVect b = cpTransformPoint(body_b->transform, spring->anchorB);
 		
-		options->drawDot(2, a, color, data);
-		options->drawDot(2, b, color, data);
+		options->drawDot(5, a, color, data);
+		options->drawDot(5, b, color, data);
 
 		cpVect delta = cpvsub(b, a);
 		cpFloat cos = delta.x;
