@@ -369,7 +369,7 @@ Reshape(GLFWwindow *window, int wwidth, int wheight)
 	float hw = width*(0.5f/scale);
 	float hh = height*(0.5f/scale);
 	
-	ChipmunkDebugDrawPointLineScale = scale;
+	ChipmunkDebugDrawScaleFactor = scale;
 	
 	ChipmunkDebugDrawProjection = cpTransformOrtho(cpBBNew(-hw, -hh, hw, hh));
 }
