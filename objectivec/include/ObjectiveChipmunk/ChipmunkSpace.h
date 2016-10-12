@@ -229,7 +229,7 @@ typedef void (^ChipmunkPostStepBlock)(void);
 
 /// Find the closest shape to a point that is within @c maxDistance of @c point.
 /// The point is treated as having the given layers and group.
-- (ChipmunkPointQueryInfo *)pointQueryNearest:(cpVect)point maxDistance:(cpFloat)maxDistance filter:(cpShapeFilter)filter;
+- (ChipmunkShape *)pointQueryNearest:(cpVect)point maxDistance:(cpFloat)maxDistance filter:(cpShapeFilter)filter;
 
 /// Return a NSArray of ChipmunkSegmentQueryInfo objects for all the shapes that overlap the segment. The objects are unsorted.
 - (NSArray *)segmentQueryAllFrom:(cpVect)start to:(cpVect)end radius:(cpFloat)radius filter:(cpShapeFilter)filter;
