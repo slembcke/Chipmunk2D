@@ -4,10 +4,204 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <pthread.h>
+//TODO: Move all the thread stuff to another file
+
 //#include <sys/param.h >
 #ifndef _WIN32
 #include <sys/sysctl.h>
+#include <pthread.h>
+#else
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif NOMINMAX
+
+#include <process.h> // _beginthreadex
+#include <windows.h>
+
+#ifndef ETIMEDOUT
+#define ETIMEDOUT 1
+#endif
+
+// Simple pthread implementation for Windows
+// Made from scratch to avoid the LGPL licence from pthread-win32
+enum {
+	SIGNAL = 0,
+	BROADCAST = 1,
+	MAX_EVENTS = 2
+};
+
+typedef HANDLE pthread_t;
+typedef struct
+{
+	// Based on http://www.cs.wustl.edu/~schmidt/win32-cv-1.html since Windows has no condition variable until NT6
+	UINT waiters_count;
+	// Count of the number of waiters.
+
+	CRITICAL_SECTION waiters_count_lock;
+	// Serialize access to <waiters_count_>.
+
+	HANDLE events[MAX_EVENTS];
+} pthread_cond_t;
+typedef CRITICAL_SECTION pthread_mutex_t;
+
+struct pthread_condattr_t; // Dummy
+
+int pthread_cond_destroy(pthread_cond_t* cv)
+{
+	CloseHandle(cv->events[BROADCAST]);
+	CloseHandle(cv->events[SIGNAL]);
+
+	return 0;
+}
+
+int pthread_cond_init(pthread_cond_t* cv, const pthread_condattr_t*)
+{
+	// Initialize the count to 0.
+	cv->waiters_count = 0;
+
+	// Create an auto-reset event.
+	cv->events[SIGNAL] = CreateEvent(NULL,  // no security
+	                                 FALSE, // auto-reset event
+	                                 FALSE, // non-signaled initially
+	                                 NULL); // unnamed
+
+	// Create a manual-reset event.
+	cv->events[BROADCAST] = CreateEvent(NULL,  // no security
+	                                    TRUE,  // manual-reset
+	                                    FALSE, // non-signaled initially
+	                                    NULL); // unnamed
+
+	return 0;
+}
+
+int pthread_cond_broadcast(pthread_cond_t *cv)
+{
+	// Avoid race conditions.
+	EnterCriticalSection(&cv->waiters_count_lock);
+	int have_waiters = cv->waiters_count > 0;
+	LeaveCriticalSection(&cv->waiters_count_lock);
+
+	if (have_waiters)
+		SetEvent(cv->events[BROADCAST]);
+
+	return 0;
+}
+
+int pthread_cond_signal(pthread_cond_t* cv)
+{
+	// Avoid race conditions.
+	EnterCriticalSection(&cv->waiters_count_lock);
+	int have_waiters = cv->waiters_count > 0;
+	LeaveCriticalSection(&cv->waiters_count_lock);
+
+	if (have_waiters)
+		SetEvent(cv->events[SIGNAL]);
+
+	return 0;
+}
+
+int pthread_cond_wait(pthread_cond_t* cv, pthread_mutex_t* external_mutex)
+{
+	// Avoid race conditions.
+	EnterCriticalSection(&cv->waiters_count_lock);
+	cv->waiters_count++;
+	LeaveCriticalSection(&cv->waiters_count_lock);
+
+	// It's ok to release the <external_mutex> here since Win32
+	// manual-reset events maintain state when used with
+	// <SetEvent>.  This avoids the "lost wakeup" bug...
+	LeaveCriticalSection(external_mutex);
+
+	// Wait for either event to become signaled due to <pthread_cond_signal>
+	// being called or <pthread_cond_broadcast> being called.
+	int result = WaitForMultipleObjects(2, cv->events, FALSE, INFINITE);
+
+	EnterCriticalSection(&cv->waiters_count_lock);
+	cv->waiters_count--;
+	int last_waiter =
+		result == WAIT_OBJECT_0 + BROADCAST
+		&& cv->waiters_count == 0;
+	LeaveCriticalSection(&cv->waiters_count_lock);
+
+	// Some thread called <pthread_cond_broadcast>.
+	if (last_waiter)
+		// We're the last waiter to be notified or to stop waiting, so
+		// reset the manual event. 
+		ResetEvent(cv->events[BROADCAST]);
+
+	// Reacquire the <external_mutex>.
+	EnterCriticalSection(external_mutex);
+
+	return result == WAIT_TIMEOUT ? ETIMEDOUT : 0;
+}
+
+struct pthread_mutexattr_t; //< Dummy
+
+int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t*)
+{
+	InitializeCriticalSection(mutex);
+	return 0;
+}
+
+int pthread_mutex_destroy(pthread_mutex_t* mutex)
+{
+	DeleteCriticalSection(mutex);
+	return 0;
+}
+
+int pthread_mutex_lock(pthread_mutex_t* mutex)
+{
+	EnterCriticalSection(mutex);
+	return 0;
+}
+
+int pthread_mutex_unlock(pthread_mutex_t* mutex)
+{
+	LeaveCriticalSection(mutex);
+	return 0;
+}
+
+struct pthread_attr_t;
+
+struct pthread_internal_thread
+{
+	void *(*start_routine) (void *);
+	void* arg;
+};
+
+unsigned int __stdcall ThreadProc(void* userdata)
+{
+	pthread_internal_thread* ud = (pthread_internal_thread*) userdata;
+	ud->start_routine(ud->arg);
+
+	free(ud);
+
+	return 0;
+}
+
+int pthread_create(pthread_t* thread, const pthread_attr_t*, void *(*start_routine) (void *), void *arg)
+{
+	pthread_internal_thread* ud = (pthread_internal_thread*) malloc(sizeof(pthread_internal_thread));
+
+	*thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, &ThreadProc, ud, 0, nullptr));
+	if (!*thread)
+		return 1;
+
+	return 0;
+}
+
+int pthread_join(pthread_t thread, void **value_ptr)
+{
+	WaitForSingleObject(thread, INFINITE);
+	CloseHandle(thread);
+
+	return 0;
+}
+
 #endif
 
 #include "chipmunk/chipmunk_private.h"
@@ -335,7 +529,7 @@ cpHastySpaceSetThreads(cpSpace *space, unsigned long threads)
 			hasty->workers[i].space = hasty;
 			hasty->workers[i].thread_num = i + 1;
 			
-			pthread_create(&hasty->workers[i].thread, NULL, (void *)WorkerThreadLoop, &hasty->workers[i]);
+			pthread_create(&hasty->workers[i].thread, NULL, (void*(*)(void*))WorkerThreadLoop, &hasty->workers[i]);
 		}
 		
 		pthread_cond_wait(&hasty->cond_resume, &hasty->mutex);
