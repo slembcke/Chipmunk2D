@@ -56,7 +56,7 @@ cpMessage(const char *condition, const char *file, int line, int isError, int is
 #define STR(s) #s
 #define XSTR(s) STR(s)
 
-const char *cpVersionString = XSTR(CP_VERSION_MAJOR)"."XSTR(CP_VERSION_MINOR)"."XSTR(CP_VERSION_RELEASE);
+const char *cpVersionString = XSTR(CP_VERSION_MAJOR) "." XSTR(CP_VERSION_MINOR) "." XSTR(CP_VERSION_RELEASE);
 
 //MARK: Misc Functions
 
