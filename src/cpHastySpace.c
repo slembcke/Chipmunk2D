@@ -186,6 +186,8 @@ unsigned int __stdcall ThreadProc(void* userdata)
 int pthread_create(pthread_t* thread, const pthread_attr_t*, void *(*start_routine) (void *), void *arg)
 {
 	pthread_internal_thread* ud = (pthread_internal_thread*) malloc(sizeof(pthread_internal_thread));
+	ud->start_routine = start_routine;
+	ud->arg = arg;
 
 	*thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, &ThreadProc, ud, 0, nullptr));
 	if (!*thread)
