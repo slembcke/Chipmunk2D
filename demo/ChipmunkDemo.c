@@ -319,18 +319,41 @@ Update(void)
 }
 
 static void
+DrawShadows(cpShape *shape, void *unused)
+{
+	cpBody *body = cpShapeGetBody(shape);
+	if(cpBodyGetType(body) != CP_BODY_TYPE_DYNAMIC) return;
+	
+	switch(shape->klass->type){
+		case CP_CIRCLE_SHAPE:
+		case CP_SEGMENT_SHAPE:
+			break;
+		case CP_POLY_SHAPE: {
+			int count = cpPolyShapeGetCount(shape);
+			cpVect *verts = alloca(count*sizeof(cpVect));
+			
+			for(int i = 0; i < count; i++){
+				verts[count - i - 1] = cpPolyShapeGetVert(shape, i);
+			}
+			
+			ChipmunkDebugDrawShadow(body->transform, count, verts);
+			break;
+		}
+		default: break;
+	}
+}
+
+static void
 Display(GLFWwindow *window)
 {
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 	
 	ChipmunkDebugDrawBegin(width, height);
-//	glMatrixMode(GL_MODELVIEW);
-//	glLoadIdentity();
-//	glTranslatef((GLfloat)translate.x, (GLfloat)translate.y, 0.0f);
-//	glScalef((GLfloat)scale, (GLfloat)scale, 1.0f);
 	
 	Update();
+	cpSpaceEachShape(space, DrawShadows, NULL);
+	ChipmunkDebugDrawApplyShadows();
 	
 	demos[demo_index].drawFunc(space);
 	

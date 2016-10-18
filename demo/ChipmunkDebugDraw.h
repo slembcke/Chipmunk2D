@@ -46,5 +46,8 @@ void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color);
 
 void ChipmunkDebugDrawText(cpVect pos, char const *str, cpSpaceDebugColor color);
 
+void ChipmunkDebugDrawShadow(cpTransform transform, int count, cpVect *verts);
+void ChipmunkDebugDrawApplyShadows(void);
+
 void ChipmunkDebugDrawBegin(int width, int height);
 void ChipmunkDebugDrawFlush(void);
