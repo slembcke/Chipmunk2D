@@ -61,8 +61,7 @@ static const char *PrimitiveVShader = PHOTON_GLSL(
 	uniform PhotonGlobals {
 		mat4 u_P;
 		mat4 u_MVP;
-		
-		vec4 u_Palette[16];
+		vec4 u_OutlineColor;
 		float u_OutlineWidth;
 	};
 	
@@ -85,8 +84,7 @@ static const char *PrimitiveFShader = PHOTON_GLSL(
 	uniform PhotonGlobals {
 		mat4 u_P;
 		mat4 u_MVP;
-		
-		vec4 u_Palette[16];
+		vec4 u_OutlineColor;
 		float u_OutlineWidth;
 	};
 	
@@ -99,11 +97,10 @@ static const char *PrimitiveFShader = PHOTON_GLSL(
 		
 		// Fill/outline color.
 		float outlineWidth = fw*u_OutlineWidth;
-		vec4 outlineColor = u_Palette[15];
 		float outline = smoothstep(r1, r1 - fw, l);
 		
 		// Use pre-multiplied alpha.
-		vec4 color = mix(outlineColor, PhotonFragColor, outline);
+		vec4 color = mix(u_OutlineColor, PhotonFragColor, outline);
 		float mask = smoothstep(r2, r2 - fw, l);
 		PhotonFragOut = color*mask;
 	}
@@ -121,8 +118,8 @@ static const char *FontVShader = PHOTON_GLSL(
 	uniform PhotonGlobals {
 		mat4 u_P;
 		mat4 u_MVP;
-		
-		vec4 u_Palette[16];
+		vec4 u_OutlineColor;
+		float u_OutlineWidth;
 	};
 	
 	void main(void){
@@ -156,22 +153,22 @@ ChipmunkDebugDrawInit(void)
 	Renderer = PhotonRendererNew();
 	
 	const pvec4 palette[] = {
-		{{ 20,  12,  28, 255}},
-		{{ 68,  36,  52, 255}},
-		{{ 48,  52, 109, 255}},
-		{{ 78,  74,  78, 255}},
-		{{133,  76,  48, 255}},
-		{{ 52, 101,  36, 255}},
-		{{208,  70,  72, 255}},
-		{{117, 113,  97, 255}},
-		{{ 89, 125, 206, 255}},
-		{{210, 125,  44, 255}},
-		{{133, 149, 161, 255}},
-		{{109, 170,  44, 255}},
-		{{210, 170, 153, 255}},
-		{{109, 194, 202, 255}},
-		{{218, 212,  94, 255}},
-		{{222, 238, 214, 255}},
+		{{ 39,  40, 126, 255}}, //  0 DBlue
+		{{139,   7,  80, 255}}, //  1 Purple
+		{{  0, 139,  52, 255}}, //  2 DGreen
+		{{185,  73,  40, 255}}, //  3 Brown
+		{{ 69,  69,  69, 255}}, //  4 DGrey
+		{{195, 196, 200, 255}}, //  5 Grey
+		{{255, 242, 232, 255}}, //  6 White
+		{{255,   0,  52, 255}}, //  7 Red
+		{{255, 161,   0, 255}}, //  8 DYellow
+		{{255, 238,   0, 255}}, //  9 Yellow
+		{{  0, 241,  58, 255}}, // 10 Green
+		{{  0, 169, 255, 255}}, // 11 Blue
+		{{137, 114, 157, 255}}, // 12 Violet
+		{{255,  95, 163, 255}}, // 13 Pink
+		{{255, 203, 166, 255}}, // 14 Tan
+		{{  0,   0,   0, 255}}, // 15 Black
 	};
 	
 	for(int i = 0; i < 16; i++){
@@ -229,7 +226,7 @@ ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugC
 {
 	cpFloat r = radius + 1.0f/ChipmunkDebugDrawScaleFactor;
 	DrawCircle((pvec2){pos.x, pos.y}, r - 1, r, MakeColor(fill));
-	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawScaleFactor*0.5f)), ChipmunkDebugPalette[15]);
+	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawScaleFactor*0.5f)), ChipmunkDebugPalette[14]);
 }
 
 static void
@@ -423,7 +420,7 @@ ChipmunkDebugDrawBegin(int width, int height)
 	struct {
 		float u_P[16];
 		float u_MVP[16];
-		pvec4 u_Palette[16];
+		pvec4 u_OutlineColor;
 		float u_OutlineWidth;
 	} globals = {
 		{
@@ -438,15 +435,13 @@ ChipmunkDebugDrawBegin(int width, int height)
 			    0 ,     0 , 1, 0,
 			mvp.tx, mvp.ty, 0, 1,
 		},
-		{},
+		Palette[14],
 		ChipmunkDebugDrawScaleFactor,
 	};
 	
-	memcpy(&globals.u_Palette, Palette, sizeof(Palette));
-	
 	PhotonRendererSetGlobals(Renderer, &globals, sizeof(globals));
 	
-	PhotonRendererBindRenderTexture(Renderer, NULL, PhotonLoadActionClear, PhotonStoreActionDontCare, Palette[2]);
+	PhotonRendererBindRenderTexture(Renderer, NULL, PhotonLoadActionClear, PhotonStoreActionDontCare, Palette[0]);
 }
 
 void

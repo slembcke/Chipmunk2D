@@ -144,18 +144,18 @@ static cpSpaceDebugColor
 ColorForShape(cpShape *shape, cpDataPointer data)
 {
 	if(cpShapeGetSensor(shape)){
-		cpSpaceDebugColor c = ChipmunkDebugPalette[15];
+		cpSpaceDebugColor c = ChipmunkDebugPalette[6];
 		c.a = 0.1;
 		return c;
 	} else {
 		cpBody *body = cpShapeGetBody(shape);
 		
 		if(cpBodyIsSleeping(body)){
-			return ChipmunkDebugPalette[3];
+			return ChipmunkDebugPalette[4];
 		} else if(body->sleeping.idleTime > shape->space->sleepTimeThreshold) {
-			return ChipmunkDebugPalette[7];
+			return ChipmunkDebugPalette[5];
 		} else if(cpBodyGetType(body) == CP_BODY_TYPE_STATIC){
-			return ChipmunkDebugPalette[0];
+			return ChipmunkDebugPalette[4];
 		} else {
 			uint32_t val = (uint32_t)shape->hashid;
 			
@@ -167,8 +167,8 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 			val = (val+0xfd7046c5) + (val<<3);
 			val = (val^0xb55a4f09) ^ (val>>16);
 			
-			static const int colors[] = {8, 9, 11, 12, 13};
-			return ChipmunkDebugPalette[colors[val%5]];
+			static const int colors[] = {7, 8, 9, 10, 11, 13};
+			return ChipmunkDebugPalette[colors[val%6]];
 		}
 	}
 }
@@ -186,10 +186,10 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 		
 		(cpSpaceDebugDrawFlags)(CP_SPACE_DEBUG_DRAW_SHAPES | CP_SPACE_DEBUG_DRAW_CONSTRAINTS | CP_SPACE_DEBUG_DRAW_COLLISION_POINTS),
 		
-		ChipmunkDebugPalette[15],
-		ColorForShape,
-		ChipmunkDebugPalette[5],
 		ChipmunkDebugPalette[6],
+		ColorForShape,
+		ChipmunkDebugPalette[2],
+		ChipmunkDebugPalette[7],
 		NULL,
 	};
 	
@@ -203,7 +203,7 @@ DrawInstructions()
 		"Controls:\n"
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n",
-		ChipmunkDebugPalette[14]
+		ChipmunkDebugPalette[6]
 	);
 }
 
@@ -251,7 +251,7 @@ DrawInfo()
 		ChipmunkDemoTime, (ke < 1e-10f ? 0.0f : ke)
 	);
 	
-	ChipmunkDebugDrawText(cpv(0, 220), buffer, ChipmunkDebugPalette[14]);
+	ChipmunkDebugDrawText(cpv(0, 220), buffer, ChipmunkDebugPalette[6]);
 }
 
 static char PrintStringBuffer[1024*8];
