@@ -37,8 +37,8 @@ float ChipmunkDebugDrawScaleFactor = 1.0f;
 cpTransform ChipmunkDebugDrawProjection = {1, 0, 0, 1, 0, 0};
 cpTransform ChipmunkDebugDrawCamera = {1, 0, 0, 1, 0, 0};
 
-static pvec4 Palette[16];
-const cpSpaceDebugColor *ChipmunkDebugPalette;
+cpVect ChipmunkDebugDrawLightPosition;
+cpFloat ChipmunkDebugDrawLightRadius;
 
 static PhotonRenderer *Renderer = NULL;
 static PhotonRenderState *PrimitiveState = NULL;
@@ -289,31 +289,6 @@ ChipmunkDebugDrawInit(void)
 {
 	Renderer = PhotonRendererNew();
 	
-	const pvec4 palette[] = {
-		{{ 39,  40, 126, 255}}, //  0 DBlue
-		{{139,   7,  80, 255}}, //  1 Purple
-		{{  0, 139,  52, 255}}, //  2 DGreen
-		{{185,  73,  40, 255}}, //  3 Brown
-		{{ 69,  69,  69, 255}}, //  4 DGrey
-		{{195, 196, 200, 255}}, //  5 Grey
-		{{255, 242, 232, 255}}, //  6 White
-		{{255,   0,  52, 255}}, //  7 Red
-		{{255, 161,   0, 255}}, //  8 DYellow
-		{{255, 238,   0, 255}}, //  9 Yellow
-		{{  0, 241,  58, 255}}, // 10 Green
-		{{  0, 169, 255, 255}}, // 11 Blue
-		{{137, 114, 157, 255}}, // 12 Violet
-		{{255,  95, 163, 255}}, // 13 Pink
-		{{255, 203, 166, 255}}, // 14 Tan
-		{{  0,   0,   0, 255}}, // 15 Black
-	};
-	
-	for(int i = 0; i < 16; i++){
-		Palette[i] = pvec4Mult(palette[i], 1.0/255.0);
-	}
-	
-	ChipmunkDebugPalette = (cpSpaceDebugColor *)Palette;
-	
 	PhotonShader *directShader = PhotonShaderNew(DirectVShader, DirectFShader);
 	PhotonUniforms *directUniforms = PhotonUniformsNew(directShader);
 	
@@ -344,7 +319,7 @@ ChipmunkDebugDrawInit(void)
 		.colorSrcFactor = PhotonBlendFactorDstAlpha,
 		.colorDstFactor = PhotonBlendFactorOneMinusDstAlpha,
 		.alphaOp = PhotonBlendOpAdd,
-		.alphaSrcFactor = PhotonBlendFactorOne,
+		.alphaSrcFactor = PhotonBlendFactorZero,
 		.alphaDstFactor = PhotonBlendFactorZero,
 	};
 	
@@ -378,7 +353,7 @@ ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugC
 {
 	cpFloat r = radius + 1.0f/ChipmunkDebugDrawScaleFactor;
 	DrawCircle((pvec2){pos.x, pos.y}, r - 1, r, MakeColor(fill));
-	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawScaleFactor*0.5f)), ChipmunkDebugPalette[14]);
+	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawScaleFactor*0.5f)), ChipmunkDebugDrawOutlineColor);
 }
 
 static void
@@ -569,7 +544,7 @@ ShadowsBegin(cpTransform mvp)
 		.alphaDstFactor = PhotonBlendFactorOne,
 	};
 	
-	cpTransform l = cpTransformTranslate(cpv(-1000, 1000));
+	cpTransform l = cpTransformTranslate(ChipmunkDebugDrawLightPosition);
 	cpTransform lmvp = cpTransformMult(mvp, l);
 	
 	struct {
@@ -589,7 +564,7 @@ ShadowsBegin(cpTransform mvp)
 			0      ,      0 , 1, 0,
 			lmvp.tx, lmvp.ty, 0, 1,
 		},
-		30,
+		ChipmunkDebugDrawLightRadius,
 	};
 	
 	PhotonUniforms *shadowMaskUniforms = PhotonRendererTemporaryUniforms(Renderer, ShadowMaskShader);
@@ -627,8 +602,7 @@ ChipmunkDebugDrawShadow(cpTransform transform, int count, cpVect *verts)
 void
 ChipmunkDebugDrawApplyShadows(void)
 {
-	pvec4 c = Palette[1];
-	c.a = 0.5;
+	const pvec4 c = {{0x75p-8, 0x4Fp-8, 0x44p-8, 1}};
 	
 	PhotonRenderBuffers buffers = PhotonRendererEnqueueTriangles(Renderer, 2, 4, ShadowApplyState);
 	PhotonVertexPush(buffers.vertexes + 0, (pvec4){{-1, -1, 0, 1}}, PVEC2_0, PVEC2_0, c);
@@ -648,9 +622,7 @@ ChipmunkDebugDrawBegin(int width, int height)
 	
 	PhotonRendererPrepare(Renderer, (pvec2){width, height});
 	
-	pvec4 clear = Palette[0];
-	clear.a = 0;
-	
+	const pvec4 clear = {{0xECp-8, 0x73p-8, 0x57p-8, 0}};
 	PhotonRendererBindRenderTexture(Renderer, NULL, PhotonLoadActionClear, PhotonStoreActionDontCare, clear);
 	
 	cpTransform p = ChipmunkDebugDrawProjection;
@@ -674,7 +646,7 @@ ChipmunkDebugDrawBegin(int width, int height)
 			    0 ,     0 , 1, 0,
 			mvp.tx, mvp.ty, 0, 1,
 		},
-		Palette[14],
+		MakeColor(ChipmunkDebugDrawOutlineColor),
 		ChipmunkDebugDrawScaleFactor,
 	};
 	

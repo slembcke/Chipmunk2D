@@ -144,18 +144,18 @@ static cpSpaceDebugColor
 ColorForShape(cpShape *shape, cpDataPointer data)
 {
 	if(cpShapeGetSensor(shape)){
-		cpSpaceDebugColor c = ChipmunkDebugPalette[6];
+		cpSpaceDebugColor c = LAColor(1.0, 0.5);
 		c.a = 0.1;
 		return c;
 	} else {
 		cpBody *body = cpShapeGetBody(shape);
 		
 		if(cpBodyIsSleeping(body)){
-			return ChipmunkDebugPalette[4];
+			return LAColor(0.3, 1.0);
 		} else if(body->sleeping.idleTime > shape->space->sleepTimeThreshold) {
-			return ChipmunkDebugPalette[5];
+			return LAColor(0.4, 1.0);
 		} else if(cpBodyGetType(body) == CP_BODY_TYPE_STATIC){
-			return ChipmunkDebugPalette[4];
+			return LAColor(0.2, 1.0);
 		} else {
 			uint32_t val = (uint32_t)shape->hashid;
 			
@@ -167,8 +167,7 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 			val = (val+0xfd7046c5) + (val<<3);
 			val = (val^0xb55a4f09) ^ (val>>16);
 			
-			static const int colors[] = {7, 8, 9, 10, 11, 13};
-			return ChipmunkDebugPalette[colors[val%6]];
+			return RGBAColor(0xFDp-8, 0xD6p-8, 0x92p-8, 1);
 		}
 	}
 }
@@ -186,10 +185,10 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 		
 		(cpSpaceDebugDrawFlags)(CP_SPACE_DEBUG_DRAW_SHAPES | CP_SPACE_DEBUG_DRAW_CONSTRAINTS | CP_SPACE_DEBUG_DRAW_COLLISION_POINTS),
 		
-		ChipmunkDebugPalette[6],
+		ChipmunkDebugDrawOutlineColor,
 		ColorForShape,
-		ChipmunkDebugPalette[2],
-		ChipmunkDebugPalette[7],
+		RGBAColor(0, 1, 0, 1),
+		RGBAColor(1, 0, 0, 1),
 		NULL,
 	};
 	
@@ -203,7 +202,7 @@ DrawInstructions()
 		"Controls:\n"
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n",
-		ChipmunkDebugPalette[6]
+		ChipmunkDebugDrawTextColor
 	);
 }
 
@@ -251,7 +250,7 @@ DrawInfo()
 		ChipmunkDemoTime, (ke < 1e-10f ? 0.0f : ke)
 	);
 	
-	ChipmunkDebugDrawText(cpv(0, 220), buffer, ChipmunkDebugPalette[6]);
+	ChipmunkDebugDrawText(cpv(0, 220), buffer, ChipmunkDebugDrawTextColor);
 }
 
 static char PrintStringBuffer[1024*8];
@@ -325,7 +324,21 @@ DrawShadows(cpShape *shape, void *unused)
 	if(cpBodyGetType(body) != CP_BODY_TYPE_DYNAMIC) return;
 	
 	switch(shape->klass->type){
-		case CP_CIRCLE_SHAPE:
+		case CP_CIRCLE_SHAPE: {
+			cpFloat radius = cpCircleShapeGetRadius(shape);
+			cpTransform transform = cpTransformMult(body->transform, cpTransformScale(radius, radius));
+			
+			ChipmunkDebugDrawShadow(transform, 8, (cpVect[]){
+				{ 0.00,  1.00},
+				{ 0.71, -0.71},
+				{-1.00,  0.00},
+				{-0.71, -0.71},
+				{ 0.00, -1.00},
+				{-0.71,  0.71},
+				{ 1.00,  0.00},
+				{ 0.71,  0.71},
+			});
+		} break;
 		case CP_SEGMENT_SHAPE:
 			break;
 		case CP_POLY_SHAPE: {
@@ -337,8 +350,7 @@ DrawShadows(cpShape *shape, void *unused)
 			}
 			
 			ChipmunkDebugDrawShadow(body->transform, count, verts);
-			break;
-		}
+		} break;
 		default: break;
 	}
 }
@@ -405,13 +417,16 @@ RunDemo(GLFWwindow *window, int index)
 	Accumulator = 0.0;
 	LastTime = glfwGetTime();
 	
+	ChipmunkDebugDrawLightPosition = cpv(-1000, 1000);
+	ChipmunkDebugDrawLightRadius = 50.0;
+	
 	mouse_joint = NULL;
 	ChipmunkDemoMessageString = "";
 	max_arbiters = 0;
 	max_points = 0;
 	max_constraints = 0;
 	space = demos[demo_index].initFunc();
-
+	
 	glfwSetWindowTitle(window, DemoTitle(index));
 }
 

@@ -40,6 +40,9 @@ update(cpSpace *space, double dt)
 		cpBodySetVelocity(tankControlBody, cpvrotate(cpBodyGetRotation(tankBody), cpv(30.0f*direction, 0.0f)));
 	}
 	
+	ChipmunkDebugDrawLightPosition = cpBodyGetPosition(tankBody);
+	ChipmunkDebugDrawLightRadius = 15;
+	
 	cpSpaceStep(space, dt);
 }
 

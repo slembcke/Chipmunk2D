@@ -29,13 +29,17 @@ static inline cpSpaceDebugColor LAColor(float l, float a){
 	return color;
 }
 
+static const cpSpaceDebugColor ChipmunkDebugDrawOutlineColor = {0xFBp-8, 0xFFp-8, 0xB9p-8, 1};  
+static const cpSpaceDebugColor ChipmunkDebugDrawTextColor = {1, 1, 1, 1};  
+
 void ChipmunkDebugDrawInit(void);
 
 extern float ChipmunkDebugDrawScaleFactor;
 extern cpTransform ChipmunkDebugDrawProjection;
 extern cpTransform ChipmunkDebugDrawCamera;
 
-extern const cpSpaceDebugColor *ChipmunkDebugPalette;
+extern cpVect ChipmunkDebugDrawLightPosition;
+extern cpFloat ChipmunkDebugDrawLightRadius;
 
 void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor fill);
 void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color);

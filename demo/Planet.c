@@ -111,6 +111,9 @@ init(void)
 	cpShapeSetFriction(shape, 1.0f);
 	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 	
+	ChipmunkDebugDrawLightPosition = cpvzero;
+	ChipmunkDebugDrawLightRadius = cpCircleShapeGetRadius(shape);
+	
 	return space;
 }
 
