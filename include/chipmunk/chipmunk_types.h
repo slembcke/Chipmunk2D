@@ -145,8 +145,6 @@ static inline cpFloat cpfclamp01(cpFloat f)
 	return cpfmax(0.0f, cpfmin(f, 1.0f));
 }
 
-
-
 /// Linearly interpolate (or extrapolate) between @c f1 and @c f2 by @c t percent.
 static inline cpFloat cpflerp(cpFloat f1, cpFloat f2, cpFloat t)
 {
@@ -161,21 +159,21 @@ static inline cpFloat cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 
 /// Hash value type.
 #ifdef CP_HASH_VALUE_TYPE
-	typedef CP_HASH_VALUE_TYPE cpHashValue;
+	typedef CP_HASH_VALUE_TYPE cpHashValue __attribute__((swift_name("HashValue")));
 #else
-	typedef uintptr_t cpHashValue;
+	typedef uintptr_t cpHashValue __attribute__((swift_name("HashValue")));
 #endif
 
 /// Type used internally to cache colliding object info for cpCollideShapes().
 /// Should be at least 32 bits.
-typedef uint32_t cpCollisionID;
+typedef uint32_t cpCollisionID __attribute__((swift_name("CollisionID")));
 
 // Oh C, how we love to define our own boolean types to get compiler compatibility
 /// Chipmunk's boolean type.
 #ifdef CP_BOOL_TYPE
-	typedef CP_BOOL_TYPE cpBool;
+	typedef CP_BOOL_TYPE cpBool __attribute__((swift_name("Bool")));
 #else
-	typedef unsigned char cpBool;
+	typedef unsigned char cpBool __attribute__((swift_private));
 #endif
 
 #ifndef cpTrue
@@ -189,38 +187,38 @@ typedef uint32_t cpCollisionID;
 #endif
 
 #ifdef CP_DATA_POINTER_TYPE
-	typedef CP_DATA_POINTER_TYPE cpDataPointer;
+	typedef CP_DATA_POINTER_TYPE cpDataPointer __attribute__((swift_name("DataPointer")));
 #else
 /// Type used for user data pointers.
-	typedef void * cpDataPointer;
+	typedef void * cpDataPointer __attribute__((swift_name("DataPointer")));
 #endif
 
 #ifdef CP_COLLISION_TYPE_TYPE
-	typedef CP_COLLISION_TYPE_TYPE cpCollisionType;
+	typedef CP_COLLISION_TYPE_TYPE cpCollisionType __attribute__((swift_name("CollisionType")));
 #else
 /// Type used for cpSpace.collision_type.
-	typedef uintptr_t cpCollisionType;
+	typedef uintptr_t cpCollisionType __attribute__((swift_name("CollisionType")));
 #endif
 
 #ifdef CP_GROUP_TYPE
-	typedef CP_GROUP_TYPE cpGroup;
+	typedef CP_GROUP_TYPE cpGroup __attribute__((swift_name("Group")));
 #else
 /// Type used for cpShape.group.
-	typedef uintptr_t cpGroup;
+	typedef uintptr_t cpGroup __attribute__((swift_name("Group")));
 #endif
 
 #ifdef CP_BITMASK_TYPE
-	typedef CP_BITMASK_TYPE cpBitmask;
+	typedef CP_BITMASK_TYPE cpBitmask __attribute__((swift_name("Bitmask")));
 #else
 /// Type used for cpShapeFilter category and mask.
-	typedef unsigned int cpBitmask;
+	typedef unsigned int cpBitmask __attribute__((swift_name("Bitmask")));
 #endif
 
 #ifdef CP_TIMESTAMP_TYPE
-	typedef CP_TIMESTAMP_TYPE cpTimestamp;
+	typedef CP_TIMESTAMP_TYPE cpTimestamp __attribute__((swift_name("Timestamp")));
 #else
 /// Type used for various timestamps in Chipmunk.
-	typedef unsigned int cpTimestamp;
+	typedef unsigned int cpTimestamp __attribute__((swift_name("Timestamp")));
 #endif
 
 #ifndef CP_NO_GROUP
@@ -243,24 +241,24 @@ typedef uint32_t cpCollisionID;
 // CGPoints are structurally the same, and allow
 // easy interoperability with other Cocoa libraries
 #if CP_USE_CGTYPES
-	typedef CGPoint cpVect;
+	typedef CGPoint cpVect __attribute__((swift_name("Vector")));
 #else
 /// Chipmunk's 2D vector type.
 /// @addtogroup cpVect
-	typedef struct cpVect{cpFloat x,y;} cpVect;
+	typedef struct __attribute__((swift_name("Vector"))) cpVect{cpFloat x,y;} cpVect;
 #endif
 
 #if CP_USE_CGTYPES
-	typedef CGAffineTransform cpTransform;
+	typedef CGAffineTransform cpTransform __attribute__((swift_name("AffineTransform")));
 #else
 	/// Column major affine transform.
-	typedef struct cpTransform {
+	typedef struct __attribute__((swift_name("AffineTransform"))) cpTransform {
 		cpFloat a, b, c, d, tx, ty;
 	} cpTransform;
 #endif
 
 // NUKE
-typedef struct cpMat2x2 {
+typedef struct __attribute__((swift_name("Matrix2"))) cpMat2x2 {
 	// Row major [[a, b][c d]]
 	cpFloat a, b, c, d;
 } cpMat2x2;

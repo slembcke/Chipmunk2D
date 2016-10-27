@@ -29,9 +29,16 @@
 /// @{
 
 /// Constant for the zero vector.
-static const cpVect cpvzero = {0.0f,0.0f};
+static const __attribute__((swift_private)) cpVect cpvzero = {0.0f,0.0f};
+
+__attribute__((swift_name("getter:Vector.zero()")))
+static inline cpVect cpVectGetZero(void)
+{
+    return cpvzero;
+}
 
 /// Convenience constructor for cpVect structs.
+__attribute__((swift_private))
 static inline cpVect cpv(const cpFloat x, const cpFloat y)
 {
 	cpVect v = {x, y};

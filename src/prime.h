@@ -22,6 +22,7 @@
 // Used for resizing hash tables.
 // Values approximately double.
 // http://planetmath.org/encyclopedia/GoodHashTablePrimes.html
+__attribute__((swift_private))
 static int primes[] = {
 	5,
 	13,
@@ -55,6 +56,7 @@ static int primes[] = {
 	0,
 };
 
+__attribute__((swift_private))
 static inline int
 next_prime(int n)
 {
