@@ -15,7 +15,8 @@ final class ChipmunkTests: XCTestCase {
         
         let vector = Chipmunk.Vector(x: 10, y: 10)
         
-        XCTAssert(__cpvzero.x == 0 && __cpvzero.y == 0, "cpvzero should be imported as private")
+        let _ = Chipmunk.Vector.zero
         
+        NS
     }
 }

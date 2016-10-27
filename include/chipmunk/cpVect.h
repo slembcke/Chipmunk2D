@@ -29,13 +29,12 @@
 /// @{
 
 /// Constant for the zero vector.
-static const __attribute__((swift_private)) cpVect cpvzero = {0.0f,0.0f};
-
-__attribute__((swift_name("getter:Vector.zero()")))
-static inline cpVect cpVectGetZero(void)
-{
-    return cpvzero;
-}
+#ifdef CP_USE_CGTYPES
+__attribute__((swift_name("Vector.zero")))
+#else
+__attribute__((swift_private))
+#endif
+static const cpVect cpvzero = {0.0f,0.0f};
 
 /// Convenience constructor for cpVect structs.
 __attribute__((swift_private))
@@ -46,6 +45,12 @@ static inline cpVect cpv(const cpFloat x, const cpFloat y)
 }
 
 /// Check if two vectors are equal. (Be careful when comparing floating point numbers!)
+
+#ifdef CP_USE_CGTYPES
+__attribute__((swift_private))
+#else
+__attribute__((swift_name("Vector.isEqual(self:to:)")));
+#endif
 static inline cpBool cpveql(const cpVect v1, const cpVect v2)
 {
 	return (v1.x == v2.x && v1.y == v2.y);
