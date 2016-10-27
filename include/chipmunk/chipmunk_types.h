@@ -173,7 +173,7 @@ typedef uint32_t cpCollisionID __attribute__((swift_name("CollisionID")));
 #ifdef CP_BOOL_TYPE
 	typedef CP_BOOL_TYPE cpBool __attribute__((swift_name("Bool")));
 #else
-	typedef unsigned char cpBool __attribute__((swift_private));
+	typedef bool cpBool __attribute__((swift_name("Bool")));
 #endif
 
 #ifndef cpTrue

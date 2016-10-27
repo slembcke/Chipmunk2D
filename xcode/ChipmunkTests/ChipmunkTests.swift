@@ -15,8 +15,10 @@ final class ChipmunkTests: XCTestCase {
         
         let vector = Chipmunk.Vector(x: 10, y: 10)
         
-        let _ = Chipmunk.Vector.zero
+        XCTAssert(vector.isEqual(Chipmunk.Vector.zero) == false)
         
-        NS
+        XCTAssert(vector.add(Vector(x:5, y:5)) == Vector(x: 15, y: 15))
+        
+        XCTAssert(vector.negate == Vector(x: -10, y: -10))
     }
 }
