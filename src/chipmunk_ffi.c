@@ -1,104 +1,104 @@
-/* Copyright (c) 2013 Scott Lembcke and Howling Moon Software
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 
 #include "chipmunk/chipmunk.h"
 
-// Create non static inlined copies of Chipmunk functions, useful for working with dynamic FFIs
-// For many languages, it may be faster to reimplement these functions natively instead.
-// Note: This file should only be included by chipmunk.c.
-
-#ifdef _MSC_VER
- #if _MSC_VER >= 1600
-  #define MAKE_REF(name) CP_EXPORT decltype(name) *_##name = name
- #else
-  #define MAKE_REF(name)
- #endif
-#else
- #define MAKE_REF(name) __typeof__(name) *_##name = name
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-MAKE_REF(cpv); // makes a variable named _cpv that contains the function pointer for cpv()
-MAKE_REF(cpveql);
-MAKE_REF(cpvadd);
-MAKE_REF(cpvneg);
-MAKE_REF(cpvsub);
-MAKE_REF(cpvmult);
-MAKE_REF(cpvdot);
-MAKE_REF(cpvcross);
-MAKE_REF(cpvperp);
-MAKE_REF(cpvrperp);
-MAKE_REF(cpvproject);
-MAKE_REF(cpvforangle);
-MAKE_REF(cpvtoangle);
-MAKE_REF(cpvrotate);
-MAKE_REF(cpvunrotate);
-MAKE_REF(cpvlengthsq);
-MAKE_REF(cpvlength);
-MAKE_REF(cpvlerp);
-MAKE_REF(cpvnormalize);
-MAKE_REF(cpvclamp);
-MAKE_REF(cpvlerpconst);
-MAKE_REF(cpvdist);
-MAKE_REF(cpvdistsq);
-MAKE_REF(cpvnear);
-
-MAKE_REF(cpfmax);
-MAKE_REF(cpfmin);
-MAKE_REF(cpfabs);
-MAKE_REF(cpfclamp);
-MAKE_REF(cpflerp);
-MAKE_REF(cpflerpconst);
-
-MAKE_REF(cpBBNew);
-MAKE_REF(cpBBNewForExtents);
-MAKE_REF(cpBBNewForCircle);
-MAKE_REF(cpBBIntersects);
-MAKE_REF(cpBBContainsBB);
-MAKE_REF(cpBBContainsVect);
-MAKE_REF(cpBBMerge);
-MAKE_REF(cpBBExpand);
-MAKE_REF(cpBBCenter);
-MAKE_REF(cpBBArea);
-MAKE_REF(cpBBMergedArea);
-MAKE_REF(cpBBSegmentQuery);
-MAKE_REF(cpBBIntersectsSegment);
-MAKE_REF(cpBBClampVect);
-
-MAKE_REF(cpSpatialIndexDestroy);
-MAKE_REF(cpSpatialIndexCount);
-MAKE_REF(cpSpatialIndexEach);
-MAKE_REF(cpSpatialIndexContains);
-MAKE_REF(cpSpatialIndexInsert);
-MAKE_REF(cpSpatialIndexRemove);
-MAKE_REF(cpSpatialIndexReindex);
-MAKE_REF(cpSpatialIndexReindexObject);
-MAKE_REF(cpSpatialIndexSegmentQuery);
-MAKE_REF(cpSpatialIndexQuery);
-MAKE_REF(cpSpatialIndexReindexQuery);
-
-#ifdef __cplusplus
-}
-#endif
+cpVect cpClosetPointOnSegment(const cpVect p, const cpVect a, const cpVect b);
+struct cpArbiterThread * cpArbiterThreadForBody(cpArbiter *arb, cpBody *body);
+cpBool cpShapeActive(cpShape *shape);
+void CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r1, cpVect a, cpVect b, cpFloat r2, cpSegmentQueryInfo *info);
+cpBool cpShapeFilterReject(cpShapeFilter a, cpShapeFilter b);
+void cpConstraintActivateBodies(cpConstraint *constraint);
+cpVect relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2);
+cpFloat normal_relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n);
+void apply_impulse(cpBody *body, cpVect j, cpVect r);
+void apply_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j);
+void apply_bias_impulse(cpBody *body, cpVect j, cpVect r);
+void apply_bias_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j);
+cpFloat k_scalar_body(cpBody *body, cpVect r, cpVect n);
+cpFloat k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n);
+cpMat2x2 k_tensor(cpBody *a, cpBody *b, cpVect r1, cpVect r2);
+cpFloat bias_coef(cpFloat errorBias, cpFloat dt);
+void cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb);
+cpArray * cpSpaceArrayForBodyType(cpSpace *space, cpBodyType type);
+cpConstraint * cpConstraintNext(cpConstraint *node, cpBody *body);
+cpArbiter * cpArbiterNext(cpArbiter *node, cpBody *body);
+cpFloat cpfmax(cpFloat a, cpFloat b);
+cpFloat cpfmin(cpFloat a, cpFloat b);
+cpFloat cpfabs(cpFloat f);
+cpFloat cpfclamp(cpFloat f, cpFloat min, cpFloat max);
+cpFloat cpfclamp01(cpFloat f);
+cpFloat cpflerp(cpFloat f1, cpFloat f2, cpFloat t);
+cpFloat cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d);
+cpBB cpBBNew(const cpFloat l, const cpFloat b, const cpFloat r, const cpFloat t);
+cpBB cpBBNewForExtents(const cpVect c, const cpFloat hw, const cpFloat hh);
+cpBB cpBBNewForCircle(const cpVect p, const cpFloat r);
+cpBool cpBBIntersects(const cpBB a, const cpBB b);
+cpBool cpBBContainsBB(const cpBB bb, const cpBB other);
+cpBool cpBBContainsVect(const cpBB bb, const cpVect v);
+cpBB cpBBMerge(const cpBB a, const cpBB b);
+cpBB cpBBExpand(const cpBB bb, const cpVect v); 
+cpVect cpBBCenter(cpBB bb);
+cpFloat cpBBArea(cpBB bb);
+cpFloat cpBBMergedArea(cpBB a, cpBB b);
+cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b);
+cpBool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b);
+cpVect cpBBClampVect(const cpBB bb, const cpVect v);
+cpVect cpBBWrapVect(const cpBB bb, const cpVect v);
+cpBB cpBBOffset(const cpBB bb, const cpVect v);
+cpShapeFilter cpShapeFilterNew(cpGroup group, cpBitmask categories, cpBitmask mask);
+void cpSpatialIndexDestroy(cpSpatialIndex *index);
+int cpSpatialIndexCount(cpSpatialIndex *index);
+void cpSpatialIndexEach(cpSpatialIndex *index, cpSpatialIndexIteratorFunc func, void *data);
+cpBool cpSpatialIndexContains(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+void cpSpatialIndexInsert(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+void cpSpatialIndexRemove(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+void cpSpatialIndexReindex(cpSpatialIndex *index);
+void cpSpatialIndexReindexObject(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+void cpSpatialIndexQuery(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, void *data);
+void cpSpatialIndexSegmentQuery(cpSpatialIndex *index, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryFunc func, void *data);
+void cpSpatialIndexReindexQuery(cpSpatialIndex *index, cpSpatialIndexQueryFunc func, void *data);
+cpTransform cpTransformNew(cpFloat a, cpFloat b, cpFloat c, cpFloat d, cpFloat tx, cpFloat ty);
+cpTransform cpTransformNewTranspose(cpFloat a, cpFloat c, cpFloat tx, cpFloat b, cpFloat d, cpFloat ty);
+cpTransform cpTransformInverse(cpTransform t);
+cpTransform cpTransformMult(cpTransform t1, cpTransform t2);
+cpVect cpTransformPoint(cpTransform t, cpVect p);
+cpVect cpTransformVect(cpTransform t, cpVect v);
+cpBB cpTransformbBB(cpTransform t, cpBB bb);
+cpTransform cpTransformTranslate(cpVect translate);
+cpTransform cpTransformScale(cpFloat scaleX, cpFloat scaleY);
+cpTransform cpTransformRotate(cpFloat radians);
+cpTransform cpTransformRigid(cpVect translate, cpFloat radians);
+cpTransform cpTransformRigidInverse(cpTransform t);
+cpTransform cpTransformWrap(cpTransform outer, cpTransform inner);
+cpTransform cpTransformWrapInverse(cpTransform outer, cpTransform inner);
+cpTransform cpTransformOrtho(cpBB bb);
+cpTransform cpTransformBoneScale(cpVect v0, cpVect v1);
+cpTransform cpTransformAxialScale(cpVect axis, cpVect pivot, cpFloat scale);
+cpVect cpv(const cpFloat x, const cpFloat y);
+cpBool cpveql(const cpVect v1, const cpVect v2);
+cpVect cpvadd(const cpVect v1, const cpVect v2);
+cpVect cpvsub(const cpVect v1, const cpVect v2);
+cpVect cpvneg(const cpVect v);
+cpVect cpvmult(const cpVect v, const cpFloat s);
+cpFloat cpvdot(const cpVect v1, const cpVect v2);
+cpFloat cpvcross(const cpVect v1, const cpVect v2);
+cpVect cpvperp(const cpVect v);
+cpVect cpvrperp(const cpVect v);
+cpVect cpvproject(const cpVect v1, const cpVect v2);
+cpVect cpvforangle(const cpFloat a);
+cpFloat cpvtoangle(const cpVect v);
+cpVect cpvrotate(const cpVect v1, const cpVect v2);
+cpVect cpvunrotate(const cpVect v1, const cpVect v2);
+cpFloat cpvlengthsq(const cpVect v);
+cpFloat cpvlength(const cpVect v);
+cpVect cpvlerp(const cpVect v1, const cpVect v2, const cpFloat t);
+cpVect cpvnormalize(const cpVect v);
+cpVect cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t);
+cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a);
+cpVect cpvclamp(const cpVect v, const cpFloat len);
+cpVect cpvlerpconst(cpVect v1, cpVect v2, cpFloat d);
+cpFloat cpvdist(const cpVect v1, const cpVect v2);
+cpFloat cpvdistsq(const cpVect v1, const cpVect v2);
+cpBool cpvnear(const cpVect v1, const cpVect v2, const cpFloat dist);
+cpMat2x2 cpMat2x2New(cpFloat a, cpFloat b, cpFloat c, cpFloat d);
+cpVect cpMat2x2Transform(cpMat2x2 m, cpVect v);
 
