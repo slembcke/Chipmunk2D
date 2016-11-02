@@ -29,7 +29,7 @@
 /// @{
 
 /// Constant for the zero vector.
-const cpVect cpvzero = {0.0f,0.0f};
+static const cpVect cpvzero = {0.0f,0.0f};
 
 /// Convenience constructor for cpVect structs.
 inline cpVect cpv(const cpFloat x, const cpFloat y)

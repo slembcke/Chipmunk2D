@@ -11,9 +11,13 @@ message("Configuring Chipmunk2D version ${CHIPMUNK_VERSION}")
 
 
 if(BUILD_SHARED)
-  add_library(chipmunk SHARED
-    ${chipmunk_source_files}
-  )
+  if (FUNCTION_POINTERS)
+    message("Building shared library with function pointers.")
+    add_library(chipmunk SHARED ${chipmunk_source_files} "opt/chipmunk_fptrs.c")
+  else()
+    message("Building shared library without function pointers.")
+    add_library(chipmunk SHARED ${chipmunk_source_files})
+  endif()
   # Tell MSVC to compile the code as C++.
   if(MSVC)
     set_source_files_properties(${chipmunk_source_files} PROPERTIES LANGUAGE CXX)

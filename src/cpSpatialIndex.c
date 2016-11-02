@@ -67,3 +67,17 @@ cpSpatialIndexCollideStatic(cpSpatialIndex *dynamicIndex, cpSpatialIndex *static
 	}
 }
 
+// declarations of inline functions in "cpSpatialIndex.h"
+
+void cpSpatialIndexDestroy(cpSpatialIndex *index);
+int cpSpatialIndexCount(cpSpatialIndex *index);
+void cpSpatialIndexEach(cpSpatialIndex *index, cpSpatialIndexIteratorFunc func, void *data);
+cpBool cpSpatialIndexContains(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+void cpSpatialIndexInsert(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+void cpSpatialIndexRemove(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+void cpSpatialIndexReindex(cpSpatialIndex *index);
+void cpSpatialIndexReindexObject(cpSpatialIndex *index, void *obj, cpHashValue hashid);
+void cpSpatialIndexQuery(cpSpatialIndex *index, void *obj, cpBB bb, cpSpatialIndexQueryFunc func, void *data);
+void cpSpatialIndexSegmentQuery(cpSpatialIndex *index, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryFunc func, void *data);
+void cpSpatialIndexReindexQuery(cpSpatialIndex *index, cpSpatialIndexQueryFunc func, void *data);
+

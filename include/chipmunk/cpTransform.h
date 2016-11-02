@@ -27,7 +27,7 @@
 #include "cpBB.h"
 
 /// Identity transform matrix.
-const cpTransform cpTransformIdentity = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f};
+static const cpTransform cpTransformIdentity = {1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f};
 
 /// Construct a new transform matrix.
 /// (a, b) is the x basis vector.

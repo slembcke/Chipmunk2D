@@ -62,9 +62,9 @@ typedef struct cpShapeFilter {
 } cpShapeFilter;
 
 /// Collision filter value for a shape that will collide with anything except CP_SHAPE_FILTER_NONE.
-const cpShapeFilter CP_SHAPE_FILTER_ALL = {CP_NO_GROUP, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES};
+static const cpShapeFilter CP_SHAPE_FILTER_ALL = {CP_NO_GROUP, CP_ALL_CATEGORIES, CP_ALL_CATEGORIES};
 /// Collision filter value for a shape that does not collide with anything.
-const cpShapeFilter CP_SHAPE_FILTER_NONE = {CP_NO_GROUP, ~CP_ALL_CATEGORIES, ~CP_ALL_CATEGORIES};
+static const cpShapeFilter CP_SHAPE_FILTER_NONE = {CP_NO_GROUP, ~CP_ALL_CATEGORIES, ~CP_ALL_CATEGORIES};
 
 /// Create a new collision filter.
 inline cpShapeFilter
