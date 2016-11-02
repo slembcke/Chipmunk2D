@@ -129,7 +129,7 @@ CP_EXPORT void cpSpaceSetCollisionPersistence(cpSpace *space, cpTimestamp collis
 CP_EXPORT cpDataPointer cpSpaceGetUserData(const cpSpace *space);
 CP_EXPORT void cpSpaceSetUserData(cpSpace *space, cpDataPointer userData);
 
-/// The Space provided static body for a given cpSpace.
+/// The Space provided body for a given cpSpace.
 /// This is merely provided for convenience and you are not required to use it.
 CP_EXPORT cpBody* cpSpaceGetStaticBody(const cpSpace *space);
 
@@ -155,7 +155,7 @@ CP_EXPORT cpCollisionHandler *cpSpaceAddWildcardHandler(cpSpace *space, cpCollis
 //MARK: Add/Remove objects
 
 /// Add a collision shape to the simulation.
-/// If the shape is attached to a static body, it will be added as a static shape.
+/// If the shape is attached to a body, it will be added as a shape.
 CP_EXPORT cpShape* cpSpaceAddShape(cpSpace *space, cpShape *shape);
 /// Add a rigid body to the simulation.
 CP_EXPORT cpBody* cpSpaceAddBody(cpSpace *space, cpBody *body);
@@ -238,7 +238,7 @@ CP_EXPORT void cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFu
 
 //MARK: Indexing
 
-/// Update the collision detection info for the static shapes in the space.
+/// Update the collision detection info for the shapes in the space.
 CP_EXPORT void cpSpaceReindexStatic(cpSpace *space);
 /// Update the collision detection data for a specific shape in the space.
 CP_EXPORT void cpSpaceReindexShape(cpSpace *space, cpShape *shape);

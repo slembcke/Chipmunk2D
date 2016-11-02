@@ -88,7 +88,7 @@ cpSpatialIndex *cpSpatialIndexInit(cpSpatialIndex *index, cpSpatialIndexClass *k
 
 cpArbiter* cpArbiterInit(cpArbiter *arb, cpShape *a, cpShape *b);
 
-static inline struct cpArbiterThread *
+inline struct cpArbiterThread *
 cpArbiterThreadForBody(cpArbiter *arb, cpBody *body)
 {
 	return (arb->body_a == body ? &arb->thread_a : &arb->thread_b);
@@ -106,7 +106,7 @@ void cpArbiterApplyImpulse(cpArbiter *arb);
 
 cpShape *cpShapeInit(cpShape *shape, const cpShapeClass *klass, cpBody *body, struct cpShapeMassInfo massInfo);
 
-static inline cpBool
+inline cpBool
 cpShapeActive(cpShape *shape)
 {
 	// checks if the shape is added to a shape list.
@@ -117,7 +117,7 @@ cpShapeActive(cpShape *shape)
 // Note: This function returns contact points with r1/r2 in absolute coordinates, not body relative.
 struct cpCollisionInfo cpCollide(const cpShape *a, const cpShape *b, cpCollisionID id, struct cpContact *contacts);
 
-static inline void
+inline void
 CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r1, cpVect a, cpVect b, cpFloat r2, cpSegmentQueryInfo *info)
 {
 	cpVect da = cpvsub(a, center);
@@ -141,7 +141,7 @@ CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r1, cpVect a, cpVect b
 	}
 }
 
-static inline cpBool
+inline cpBool
 cpShapeFilterReject(cpShapeFilter a, cpShapeFilter b)
 {
 	// Reject the collision if:
@@ -162,14 +162,14 @@ void cpLoopIndexes(const cpVect *verts, int count, int *start, int *end);
 
 void cpConstraintInit(cpConstraint *constraint, const struct cpConstraintClass *klass, cpBody *a, cpBody *b);
 
-static inline void
+inline void
 cpConstraintActivateBodies(cpConstraint *constraint)
 {
 	cpBody *a = constraint->a; cpBodyActivate(a);
 	cpBody *b = constraint->b; cpBodyActivate(b);
 }
 
-static inline cpVect
+inline cpVect
 relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2){
 	cpVect v1_sum = cpvadd(a->v, cpvmult(cpvperp(r1), a->w));
 	cpVect v2_sum = cpvadd(b->v, cpvmult(cpvperp(r2), b->w));
@@ -177,46 +177,46 @@ relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2){
 	return cpvsub(v2_sum, v1_sum);
 }
 
-static inline cpFloat
+inline cpFloat
 normal_relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n){
 	return cpvdot(relative_velocity(a, b, r1, r2), n);
 }
 
-static inline void
+inline void
 apply_impulse(cpBody *body, cpVect j, cpVect r){
 	body->v = cpvadd(body->v, cpvmult(j, body->m_inv));
 	body->w += body->i_inv*cpvcross(r, j);
 }
 
-static inline void
+inline void
 apply_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
 {
 	apply_impulse(a, cpvneg(j), r1);
 	apply_impulse(b, j, r2);
 }
 
-static inline void
+inline void
 apply_bias_impulse(cpBody *body, cpVect j, cpVect r)
 {
 	body->v_bias = cpvadd(body->v_bias, cpvmult(j, body->m_inv));
 	body->w_bias += body->i_inv*cpvcross(r, j);
 }
 
-static inline void
+inline void
 apply_bias_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j)
 {
 	apply_bias_impulse(a, cpvneg(j), r1);
 	apply_bias_impulse(b, j, r2);
 }
 
-static inline cpFloat
+inline cpFloat
 k_scalar_body(cpBody *body, cpVect r, cpVect n)
 {
 	cpFloat rcn = cpvcross(r, n);
 	return body->m_inv + body->i_inv*rcn*rcn;
 }
 
-static inline cpFloat
+inline cpFloat
 k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n)
 {
 	cpFloat value = k_scalar_body(a, r1, n) + k_scalar_body(b, r2, n);
@@ -225,7 +225,7 @@ k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n)
 	return value;
 }
 
-static inline cpMat2x2
+inline cpMat2x2
 k_tensor(cpBody *a, cpBody *b, cpVect r1, cpVect r2)
 {
 	cpFloat m_sum = a->m_inv + b->m_inv;
@@ -261,7 +261,7 @@ k_tensor(cpBody *a, cpBody *b, cpVect r1, cpVect r2)
  	);
 }
 
-static inline cpFloat
+inline cpFloat
 bias_coef(cpFloat errorBias, cpFloat dt)
 {
 	return 1.0f - cpfpow(errorBias, dt);
@@ -295,7 +295,7 @@ void cpSpaceActivateBody(cpSpace *space, cpBody *body);
 void cpSpaceLock(cpSpace *space);
 void cpSpaceUnlock(cpSpace *space, cpBool runPostStep);
 
-static inline void
+inline void
 cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb)
 {
 	const cpShape *a = arb->a, *b = arb->b;
@@ -305,7 +305,7 @@ cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb)
 	cpArrayDeleteObj(space->arbiters, arb);
 }
 
-static inline cpArray *
+inline cpArray *
 cpSpaceArrayForBodyType(cpSpace *space, cpBodyType type)
 {
 	return (type == CP_BODY_TYPE_STATIC ? space->staticBodies : space->dynamicBodies);
@@ -317,7 +317,7 @@ cpCollisionID cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpS
 
 //MARK: Foreach loops
 
-static inline cpConstraint *
+inline cpConstraint *
 cpConstraintNext(cpConstraint *node, cpBody *body)
 {
 	return (node->a == body ? node->next_a : node->next_b);
@@ -326,7 +326,7 @@ cpConstraintNext(cpConstraint *node, cpBody *body)
 #define CP_BODY_FOREACH_CONSTRAINT(bdy, var)\
 	for(cpConstraint *var = bdy->constraintList; var; var = cpConstraintNext(var, bdy))
 
-static inline cpArbiter *
+inline cpArbiter *
 cpArbiterNext(cpArbiter *node, cpBody *body)
 {
 	return (node->body_a == body ? node->thread_a.next : node->thread_b.next);
