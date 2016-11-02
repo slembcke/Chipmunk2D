@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-#ifdef CHIPMUNK_FFI
+#include "chipmunk/chipmunk.h"
 
 // Create non static inlined copies of Chipmunk functions, useful for working with dynamic FFIs
 // For many languages, it may be faster to reimplement these functions natively instead.
@@ -102,4 +102,3 @@ MAKE_REF(cpSpatialIndexReindexQuery);
 }
 #endif
 
-#endif
