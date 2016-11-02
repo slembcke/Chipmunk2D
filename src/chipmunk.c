@@ -328,4 +328,3 @@ cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBloc
 #endif
 #endif
 
-#include "chipmunk/chipmunk_ffi.h"
