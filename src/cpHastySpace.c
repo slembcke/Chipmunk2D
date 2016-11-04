@@ -17,7 +17,7 @@
 
 #ifndef NOMINMAX
 #define NOMINMAX
-#endif NOMINMAX
+#endif
 
 #include <process.h> // _beginthreadex
 #include <windows.h>
@@ -48,7 +48,7 @@ typedef struct
 } pthread_cond_t;
 typedef CRITICAL_SECTION pthread_mutex_t;
 
-struct pthread_condattr_t; // Dummy
+typedef struct {} pthread_condattr_t; // Dummy;
 
 int pthread_cond_destroy(pthread_cond_t* cv)
 {
@@ -58,7 +58,7 @@ int pthread_cond_destroy(pthread_cond_t* cv)
 	return 0;
 }
 
-int pthread_cond_init(pthread_cond_t* cv, const pthread_condattr_t*)
+int pthread_cond_init(pthread_cond_t* cv, const pthread_condattr_t* attr)
 {
 	// Initialize the count to 0.
 	cv->waiters_count = 0;
@@ -139,9 +139,9 @@ int pthread_cond_wait(pthread_cond_t* cv, pthread_mutex_t* external_mutex)
 	return result == WAIT_TIMEOUT ? ETIMEDOUT : 0;
 }
 
-struct pthread_mutexattr_t; //< Dummy
+typedef struct {} pthread_mutexattr_t; //< Dummy
 
-int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t*)
+int pthread_mutex_init(pthread_mutex_t* mutex, const pthread_mutexattr_t* attr)
 {
 	InitializeCriticalSection(mutex);
 	return 0;
@@ -165,13 +165,13 @@ int pthread_mutex_unlock(pthread_mutex_t* mutex)
 	return 0;
 }
 
-struct pthread_attr_t;
+typedef struct {} pthread_attr_t;
 
-struct pthread_internal_thread
+typedef struct
 {
 	void *(*start_routine) (void *);
 	void* arg;
-};
+} pthread_internal_thread;
 
 unsigned int __stdcall ThreadProc(void* userdata)
 {
@@ -183,13 +183,13 @@ unsigned int __stdcall ThreadProc(void* userdata)
 	return 0;
 }
 
-int pthread_create(pthread_t* thread, const pthread_attr_t*, void *(*start_routine) (void *), void *arg)
+int pthread_create(pthread_t* thread, const pthread_attr_t* attr, void *(*start_routine) (void *), void *arg)
 {
 	pthread_internal_thread* ud = (pthread_internal_thread*) malloc(sizeof(pthread_internal_thread));
 	ud->start_routine = start_routine;
 	ud->arg = arg;
 
-	*thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, &ThreadProc, ud, 0, nullptr));
+	*thread = (HANDLE) (_beginthreadex(NULL, 0, &ThreadProc, ud, 0, NULL));
 	if (!*thread)
 		return 1;
 
