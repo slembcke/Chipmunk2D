@@ -1,3 +1,5 @@
+set(GLFW_INCLUDE_DIR "/usr/include/GLFW")
+
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0001 NEW) # don't use MAKE_BACKWARDS_COMPATIBILITY but policies instead
 # CMP0042 is an apple specific option

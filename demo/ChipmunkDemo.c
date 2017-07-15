@@ -47,7 +47,7 @@
 #endif
 
 #include "GL/glew.h"
-#include "GL/glfw.h"
+#include "glfw3.h"
 
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDemo.h"
@@ -83,6 +83,9 @@ cpShapeFilter NOT_GRABBABLE_FILTER = {CP_NO_GROUP, ~GRABBABLE_MASK_BIT, ~GRABBAB
 
 cpVect translate = {0, 0};
 cpFloat scale = 1.0;
+
+GLFWwindow* window;
+
 
 static void ShapeFreeWrap(cpSpace *space, cpShape *shape, void *unused){
 	cpSpaceRemoveShape(space, shape);
@@ -374,16 +377,17 @@ Display(void)
 		ChipmunkDemoTextPopRenderer();
 	} glPopMatrix();
 	
-	glfwSwapBuffers();
+	glfwSwapBuffers(window);
+	glfwPollEvents();
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 static void
-Reshape(int width, int height)
+Reshape(GLFWwindow* w, int width, int height)
 {
 	glViewport(0, 0, width, height);
 	
-	float scale = (float)cpfmin(width/640.0, height/480.0);
+	scale = (float)cpfmin(((float)width)/640.0, ((float)height)/480.0);
 	float hw = width*(0.5f/scale);
 	float hh = height*(0.5f/scale);
 	
@@ -423,15 +427,23 @@ RunDemo(int index)
 	max_constraints = 0;
 	space = demos[demo_index].initFunc();
 
-	glfwSetWindowTitle(DemoTitle(index));
+	glfwSetWindowTitle(window, DemoTitle(index));
 }
 
 static void
-Keyboard(int key, int state)
+Keyboard(GLFWwindow* w, int key, int scan, int state, int mods)
 {
+	switch(key){
+		case GLFW_KEY_UP   : ChipmunkDemoKeyboard.y += (state == GLFW_PRESS ?  1.0 : -1.0); break;
+		case GLFW_KEY_DOWN : ChipmunkDemoKeyboard.y += (state == GLFW_PRESS ? -1.0 :  1.0); break;
+		case GLFW_KEY_RIGHT: ChipmunkDemoKeyboard.x += (state == GLFW_PRESS ?  1.0 : -1.0); break;
+		case GLFW_KEY_LEFT : ChipmunkDemoKeyboard.x += (state == GLFW_PRESS ? -1.0 :  1.0); break;
+		default: break;
+	}
+	
 	if(state == GLFW_RELEASE) return;
 	
-	int index = key - 'a';
+	int index = key - 'A';
 	
 	if(0 <= index && index < demo_count){
 		demos[demo_index].destroyFunc(space);
@@ -453,7 +465,7 @@ Keyboard(int key, int state)
 	if(key == '5'){
 		translate.x = 0.0f;
 		translate.y = 0.0f;
-		scale = 1.0f;
+		scale = 1.0;
 	}else if(key == '4'){
 		translate.x += translate_increment;
 	}else if(key == '6'){
@@ -482,7 +494,7 @@ MouseToSpace(int x, int y)
 	glGetIntegerv(GL_VIEWPORT, view);
 	
 	int ww, wh;
-	glfwGetWindowSize(&ww, &wh);
+	glfwGetWindowSize(window,&ww, &wh);
 	
 	GLdouble mx, my, mz;
 	gluUnProject(x, wh - y, 0.0f, model, proj, view, &mx, &my, &mz);
@@ -491,13 +503,13 @@ MouseToSpace(int x, int y)
 }
 
 static void
-Mouse(int x, int y)
+Mouse(GLFWwindow* w, double x, double y)
 {
-	ChipmunkDemoMouse = MouseToSpace(x, y);
+	ChipmunkDemoMouse = MouseToSpace((int)x, (int)y);
 }
 
 static void
-Click(int button, int state)
+Click(GLFWwindow* w, int button, int state, int mods)
 {
 	if(button == GLFW_MOUSE_BUTTON_1){
 		if(state == GLFW_PRESS){
@@ -527,25 +539,12 @@ Click(int button, int state)
 	}
 }
 
-static void
-SpecialKeyboard(int key, int state)
-{
-	switch(key){
-		case GLFW_KEY_UP   : ChipmunkDemoKeyboard.y += (state == GLFW_PRESS ?  1.0 : -1.0); break;
-		case GLFW_KEY_DOWN : ChipmunkDemoKeyboard.y += (state == GLFW_PRESS ? -1.0 :  1.0); break;
-		case GLFW_KEY_RIGHT: ChipmunkDemoKeyboard.x += (state == GLFW_PRESS ?  1.0 : -1.0); break;
-		case GLFW_KEY_LEFT : ChipmunkDemoKeyboard.x += (state == GLFW_PRESS ? -1.0 :  1.0); break;
-		default: break;
-	}
-}
-
-static int
-WindowClose()
+static void 
+WindowClose(GLFWwindow* w)
 {
 	glfwTerminate();
 	exit(EXIT_SUCCESS);
-	
-	return GL_TRUE;
+
 }
 
 static void
@@ -574,22 +573,29 @@ SetupGL(void)
 static void
 SetupGLFW()
 {
+
 	cpAssertHard(glfwInit(), "Error initializing GLFW.");
-	
-	cpAssertHard(glfwOpenWindow(640, 480, 8, 8, 8, 8, 0, 0, GLFW_WINDOW), "Error opening GLFW window.");
-	glfwSetWindowTitle(DemoTitle(demo_index));
+
+	window = glfwCreateWindow(640, 480, DemoTitle(demo_index), NULL, NULL);
+	cpAssertHard(window,"Error creating GLFW window.");
+
+	glfwMakeContextCurrent(window);
+
+	//glfwSetWindowTitle(window,DemoTitle(demo_index));
 	glfwSwapInterval(1);
 	
 	SetupGL();
+		
+	glfwSetWindowSizeCallback(window, Reshape);
+	glfwSetWindowCloseCallback(window, WindowClose);
+
+	glfwSetKeyCallback(window, Keyboard);
 	
-	glfwSetWindowSizeCallback(Reshape);
-	glfwSetWindowCloseCallback(WindowClose);
-	
-	glfwSetCharCallback(Keyboard);
-	glfwSetKeyCallback(SpecialKeyboard);
-	
-	glfwSetMousePosCallback(Mouse);
-	glfwSetMouseButtonCallback(Click);
+	glfwSetCursorPosCallback(window, Mouse);
+	glfwSetMouseButtonCallback(window, Click);
+
+	// ensure scale is sane, (can't count on it happening initially)
+	Reshape(window, 640, 480);
 }
 
 static void
