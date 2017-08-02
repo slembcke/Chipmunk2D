@@ -55,6 +55,8 @@ int pthread_cond_destroy(pthread_cond_t* cv)
 	CloseHandle(cv->events[BROADCAST]);
 	CloseHandle(cv->events[SIGNAL]);
 
+	DeleteCriticalSection(&cv->waiters_count_lock);
+
 	return 0;
 }
 
@@ -74,6 +76,8 @@ int pthread_cond_init(pthread_cond_t* cv, const pthread_condattr_t* attr)
 	                                    TRUE,  // manual-reset
 	                                    FALSE, // non-signaled initially
 	                                    NULL); // unnamed
+
+	InitializeCriticalSection(&cv->waiters_count_lock);
 
 	return 0;
 }
