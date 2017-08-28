@@ -3,9 +3,10 @@ file(GLOB chipmunk_public_header "${chipmunk_SOURCE_DIR}/include/chipmunk/*.h")
 
 include_directories(${chipmunk_SOURCE_DIR}/include)
 
+# Chipmunk2D 7.0.2
 set(CHIPMUNK_VERSION_MAJOR 7)
 set(CHIPMUNK_VERSION_MINOR 0)
-set(CHIPMUNK_VERSION_PATCH 1)
+set(CHIPMUNK_VERSION_PATCH 2)
 set(CHIPMUNK_VERSION "${CHIPMUNK_VERSION_MAJOR}.${CHIPMUNK_VERSION_MINOR}.${CHIPMUNK_VERSION_PATCH}")
 message("Configuring Chipmunk2D version ${CHIPMUNK_VERSION}")
 
