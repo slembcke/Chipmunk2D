@@ -132,7 +132,7 @@
 /**
   Apply a force to a rigid body. An offset of cpvzero is equivalent to adding directly to the force property.
   @param force A force in expressed in absolute (word) coordinates.
-	@param offset An offset expressed in world coordinates. Note that it is still an offset, meaning that it's position is relative, but the rotation is not.
+	@param point An offset expressed in world coordinates. Note that it is still an offset, meaning that it's position is relative, but the rotation is not.
 */
 - (void)applyForce:(cpVect)force atLocalPoint:(cpVect)point;
 - (void)applyForce:(cpVect)force atWorldPoint:(cpVect)point;
@@ -140,7 +140,7 @@
 /**
   Apply an impulse to a rigid body.
   @param impulse An impulse in expressed in absolute (word) coordinates.
-	@param offset An offset expressed in world coordinates. Note that it is still an offset, meaning that it's position is relative, but the rotation is not.
+	@param point An offset expressed in world coordinates. Note that it is still an offset, meaning that it's position is relative, but the rotation is not.
 */
 - (void)applyImpulse:(cpVect)impulse atLocalPoint:(cpVect)point;
 - (void)applyImpulse:(cpVect)impulse atWorldPoint:(cpVect)point;
