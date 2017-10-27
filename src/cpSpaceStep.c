@@ -415,6 +415,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 		}
 		
 		// Run the impulse solver.
+		cpFloat dti = dt / space->iterations;
 		for(int i=0; i<space->iterations; i++){
 			for(int j=0; j<arbiters->num; j++){
 				cpArbiterApplyImpulse((cpArbiter *)arbiters->arr[j]);
@@ -422,7 +423,7 @@ cpSpaceStep(cpSpace *space, cpFloat dt)
 				
 			for(int j=0; j<constraints->num; j++){
 				cpConstraint *constraint = (cpConstraint *)constraints->arr[j];
-				constraint->klass->applyImpulse(constraint, dt);
+				constraint->klass->applyImpulse(constraint, dti);
 			}
 		}
 		
