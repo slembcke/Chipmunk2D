@@ -674,7 +674,7 @@ CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, struct cpColl
 	// If the closest points are nearer than the sum of the radii...
 	if(points.d <= circle->r + poly->r){
 		cpVect n = info->n = points.n;
-		cpCollisionInfoPushContact(info, cpvadd(points.a, cpvmult(n, circle->r)), cpvadd(points.b, cpvmult(n, poly->r)), 0);
+		cpCollisionInfoPushContact(info, cpvadd(points.a, cpvmult(n, circle->r)), cpvadd(points.b, cpvmult(n, -poly->r)), 0);
 	}
 }
 
