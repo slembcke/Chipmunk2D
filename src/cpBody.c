@@ -258,7 +258,7 @@ cpBodySetMass(cpBody *body, cpFloat mass)
 	
 	cpBodyActivate(body);
 	body->m = mass;
-	body->m_inv = 1.0f/mass;
+	body->m_inv = mass == 0.0f ? INFINITY : 1.0f/mass;
 	cpAssertSaneBody(body);
 }
 
@@ -275,7 +275,7 @@ cpBodySetMoment(cpBody *body, cpFloat moment)
 	
 	cpBodyActivate(body);
 	body->i = moment;
-	body->i_inv = 1.0f/moment;
+	body->i_inv = moment == 0.0f ? INFINITY : 1.0f/moment;
 	cpAssertSaneBody(body);
 }
 

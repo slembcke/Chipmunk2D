@@ -303,7 +303,8 @@ cpCircleShapePointQuery(cpCircleShape *circle, cpVect p, cpPointQueryInfo *info)
 	cpFloat r = circle->r;
 	
 	info->shape = (cpShape *)circle;
-	info->point = cpvadd(circle->tc, cpvmult(delta, r/d)); // TODO: div/0
+	cpFloat r_over_d = d > 0.0f ? r/d : r;
+	info->point = cpvadd(circle->tc, cpvmult(delta, r_over_d)); // TODO: div/0
 	info->distance = d - r;
 	
 	// Use up for the gradient if the distance is very small.
