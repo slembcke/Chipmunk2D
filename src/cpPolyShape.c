@@ -117,6 +117,7 @@ cpPolyShapeSegmentQuery(cpPolyShape *poly, cpVect a, cpVect b, cpFloat r2, cpSeg
 		if(d < 0.0f) continue;
 		
 		cpFloat bn = cpvdot(b, n);
+		if ( an - bn < 10e-6 && an - bn > -10e-6 ) continue; // divisor is near zero: don't NaN.
 		cpFloat t = d/(an - bn);
 		if(t < 0.0f || 1.0f < t) continue;
 		
