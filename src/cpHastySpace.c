@@ -8,7 +8,9 @@
 
 //#include <sys/param.h >
 #ifndef _WIN32
+#ifdef __APPLE__
 #include <sys/sysctl.h>
+#endif
 #include <pthread.h>
 #else
 #ifndef WIN32_LEAN_AND_MEAN
