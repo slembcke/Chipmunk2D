@@ -110,14 +110,14 @@ cpConstraintIsSimpleMotor(const cpConstraint *constraint)
 cpFloat
 cpSimpleMotorGetRate(const cpConstraint *constraint)
 {
-	cpAssertHard(cpConstraintIsSimpleMotor(constraint), "Constraint is not a pin joint.");
+	cpAssertHard(cpConstraintIsSimpleMotor(constraint), "Constraint is not a SimpleMotor.");
 	return ((cpSimpleMotor *)constraint)->rate;
 }
 
 void
 cpSimpleMotorSetRate(cpConstraint *constraint, cpFloat rate)
 {
-	cpAssertHard(cpConstraintIsSimpleMotor(constraint), "Constraint is not a pin joint.");
+	cpAssertHard(cpConstraintIsSimpleMotor(constraint), "Constraint is not a SimpleMotor.");
 	cpConstraintActivateBodies(constraint);
 	((cpSimpleMotor *)constraint)->rate = rate;
 }
