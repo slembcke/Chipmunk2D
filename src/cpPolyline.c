@@ -385,6 +385,13 @@ cpPolylineToConvexHull(cpPolyline *line, cpFloat tol)
 	return cpPolylineShrink(hull);
 }
 
+//MARK: Subscription Functions
+cpVect
+cpPolylineGetVertex(cpPolyline* line, int index)
+{
+    return line->verts[index];
+}
+
 //MARK: Approximate Concave Decompostition
 
 struct Notch {
