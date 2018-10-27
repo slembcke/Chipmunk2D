@@ -385,11 +385,18 @@ cpPolylineToConvexHull(cpPolyline *line, cpFloat tol)
 	return cpPolylineShrink(hull);
 }
 
-//MARK: Subscription Functions
+//MARK: Member Access Functions
+
 cpVect
 cpPolylineGetVertex(cpPolyline* line, int index)
 {
     return line->verts[index];
+}
+
+cpVect *
+cpPolylineGetVertices(cpPolyline* line)
+{
+    return &line->verts[0];
 }
 
 //MARK: Approximate Concave Decompostition
