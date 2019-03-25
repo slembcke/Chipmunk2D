@@ -50,6 +50,9 @@
 #include "ChipmunkDemo.h"
 // #include "ChipmunkDemoTextSupport.h"
 
+#define SOKOL_IMPL
+#include "sokol/sokol_time.h"
+
 static ChipmunkDemo *demos;
 static int demo_count = 0;
 static int demo_index = 'a' - 'a';
@@ -321,12 +324,10 @@ Tick(double dt)
 	}
 }
 
-double glfwGetTime(){return 0;}
-
 static void
 Update(void)
 {
-	double time = glfwGetTime();
+	double time = stm_sec(stm_now());
 	double dt = time - LastTime;
 	if(dt > 0.2) dt = 0.2;
 	
@@ -415,7 +416,7 @@ RunDemo(int index)
 	ChipmunkDemoTicks = 0;
 	ChipmunkDemoTime = 0.0;
 	Accumulator = 0.0;
-	LastTime = glfwGetTime();
+	LastTime = stm_sec(stm_now());
 	
 	mouse_joint = NULL;
 	ChipmunkDemoMessageString = "";
@@ -598,13 +599,13 @@ TimeTrial(int index, int count)
 {
 	space = demos[index].initFunc();
 	
-	double start_time = glfwGetTime();
+	double start_time = stm_sec(stm_now());
 	double dt = demos[index].timestep;
 	
 	for(int i=0; i<count; i++)
 		demos[index].updateFunc(space, dt);
 	
-	double end_time = glfwGetTime();
+	double end_time = stm_sec(stm_now());
 	
 	demos[index].destroyFunc(space);
 	
@@ -694,6 +695,7 @@ main(int argc, const char **argv)
 		mouse_body = cpBodyNewKinematic();
 		
 		RunDemo(demo_index);
+		stm_setup();
 		// SetupGLFW();
 		
 		// while(1) Display();
