@@ -50,3 +50,4 @@ msvc/vc13/demo/x64/
 msvc/vc14/demo/Win32/
 msvc/vc14/demo/x64/
 
+.vscode/

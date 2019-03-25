@@ -46,12 +46,9 @@
   #endif
 #endif
 
-#include "GL/glew.h"
-#include "GL/glfw.h"
-
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDemo.h"
-#include "ChipmunkDemoTextSupport.h"
+// #include "ChipmunkDemoTextSupport.h"
 
 static ChipmunkDemo *demos;
 static int demo_count = 0;
@@ -122,6 +119,7 @@ ChipmunkDemoFreeSpaceChildren(cpSpace *space)
 	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)PostBodyFree, space);
 }
 
+/*
 static void
 DrawCircle(cpVect p, cpFloat a, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
 {ChipmunkDebugDrawCircle(p, a, r, outline, fill);}
@@ -165,19 +163,19 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 			val = (val+0xfd7046c5) + (val<<3);
 			val = (val^0xb55a4f09) ^ (val>>16);
 			
-			GLfloat r = (GLfloat)((val>>0) & 0xFF);
-			GLfloat g = (GLfloat)((val>>8) & 0xFF);
-			GLfloat b = (GLfloat)((val>>16) & 0xFF);
+			float r = (float)((val>>0) & 0xFF);
+			float g = (float)((val>>8) & 0xFF);
+			float b = (float)((val>>16) & 0xFF);
 			
-			GLfloat max = (GLfloat)cpfmax(cpfmax(r, g), b);
-			GLfloat min = (GLfloat)cpfmin(cpfmin(r, g), b);
-			GLfloat intensity = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC ? 0.15f : 0.75f);
+			float max = (float)cpfmax(cpfmax(r, g), b);
+			float min = (float)cpfmin(cpfmin(r, g), b);
+			float intensity = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC ? 0.15f : 0.75f);
 			
 			// Saturate and scale the color
 			if(min == max){
 				return RGBAColor(intensity, 0.0f, 0.0f, 1.0f);
 			} else {
-				GLfloat coef = (GLfloat)intensity/(max - min);
+				float coef = (float)intensity/(max - min);
 				return RGBAColor(
 					(r - min)*coef,
 					(g - min)*coef,
@@ -188,11 +186,11 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 		}
 	}
 }
-
-
+*/
 void
 ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 {
+	/*
 	cpSpaceDebugDrawOptions drawOptions = {
 		DrawCircle,
 		DrawSegment,
@@ -210,6 +208,7 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 	};
 	
 	cpSpaceDebugDraw(space, &drawOptions);
+	*/
 }
 
 static void
@@ -266,7 +265,7 @@ DrawInfo()
 		ChipmunkDemoTime, (ke < 1e-10f ? 0.0f : ke)
 	);
 	
-	ChipmunkDemoTextDrawString(cpv(0, 220), buffer);
+	// ChipmunkDemoTextDrawString(cpv(0, 220), buffer);
 }
 
 static char PrintStringBuffer[1024*8];
@@ -303,8 +302,8 @@ Tick(double dt)
 		
 		// Completely reset the renderer only at the beginning of a tick.
 		// That way it can always display at least the last ticks' debug drawing.
-		ChipmunkDebugDrawClearRenderer();
-		ChipmunkDemoTextClearRenderer();
+		// ChipmunkDebugDrawClearRenderer();
+		// ChipmunkDemoTextClearRenderer();
 		
 		cpVect new_point = cpvlerp(mouse_body->p, ChipmunkDemoMouse, 0.25f);
 		mouse_body->v = cpvmult(cpvsub(new_point, mouse_body->p), 60.0f);
@@ -318,9 +317,11 @@ Tick(double dt)
 		step = cpFalse;
 		ChipmunkDemoRightDown = cpFalse;
 		
-		ChipmunkDemoTextDrawString(cpv(-300, -200), ChipmunkDemoMessageString);
+		// ChipmunkDemoTextDrawString(cpv(-300, -200), ChipmunkDemoMessageString);
 	}
 }
+
+double glfwGetTime(){return 0;}
 
 static void
 Update(void)
@@ -337,14 +338,14 @@ Update(void)
 	
 	LastTime = time;
 }
-
+/*
 static void
 Display(void)
 {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glTranslatef((GLfloat)translate.x, (GLfloat)translate.y, 0.0f);
-	glScalef((GLfloat)scale, (GLfloat)scale, 1.0f);
+	glTranslatef((float)translate.x, (float)translate.y, 0.0f);
+	glScalef((float)scale, (float)scale, 1.0f);
 	
 	Update();
 	
@@ -388,7 +389,7 @@ Reshape(int width, int height)
 	float hh = height*(0.5f/scale);
 	
 	ChipmunkDebugDrawPointLineScale = scale;
-	glLineWidth((GLfloat)scale);
+	glLineWidth((float)scale);
 	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -403,7 +404,7 @@ DemoTitle(int index)
 	
 	return title;
 }
-
+*/
 static void
 RunDemo(int index)
 {
@@ -423,9 +424,9 @@ RunDemo(int index)
 	max_constraints = 0;
 	space = demos[demo_index].initFunc();
 
-	glfwSetWindowTitle(DemoTitle(index));
+	// glfwSetWindowTitle(DemoTitle(index));
 }
-
+/*
 static void
 Keyboard(int key, int state)
 {
@@ -448,8 +449,8 @@ Keyboard(int key, int state)
 		glDisable(GL_POINT_SMOOTH);
 	}
 	
-	GLfloat translate_increment = 50.0f/(GLfloat)scale;
-	GLfloat scale_increment = 1.2f;
+	float translate_increment = 50.0f/(float)scale;
+	float scale_increment = 1.2f;
 	if(key == '5'){
 		translate.x = 0.0f;
 		translate.y = 0.0f;
@@ -591,7 +592,7 @@ SetupGLFW()
 	glfwSetMousePosCallback(Mouse);
 	glfwSetMouseButtonCallback(Click);
 }
-
+*/
 static void
 TimeTrial(int index, int count)
 {
@@ -684,7 +685,7 @@ main(int argc, const char **argv)
 	}
 	
 	if(trial){
-		cpAssertHard(glfwInit(), "Error initializing GLFW.");
+		// cpAssertHard(glfwInit(), "Error initializing GLFW.");
 //		sleep(1);
 		for(int i=0; i<demo_count; i++) TimeTrial(i, 1000);
 //		time_trial('d' - 'a', 10000);
@@ -693,11 +694,9 @@ main(int argc, const char **argv)
 		mouse_body = cpBodyNewKinematic();
 		
 		RunDemo(demo_index);
-		SetupGLFW();
+		// SetupGLFW();
 		
-		while(1){
-			Display();
-		}
+		// while(1) Display();
 	}
 
 	return 0;

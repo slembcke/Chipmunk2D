@@ -22,37 +22,38 @@
 #include <limits.h>
 #include <string.h>
 
-#include "GL/glew.h"
-#include "GL/glfw.h"
+// #include "GL/glew.h"
+// #include "GL/glfw.h"
 
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDebugDraw.h"
-#include "ChipmunkDemoShaderSupport.h"
+// #include "ChipmunkDemoShaderSupport.h"
 
 float ChipmunkDebugDrawPointLineScale = 1.0f;
 float ChipmunkDebugDrawOutlineWidth = 1.0f;
 
-static GLuint program;
+// static GLuint program;
 
-struct v2f {GLfloat x, y;};
+struct v2f {float x, y;};
 static struct v2f v2f0 = {0.0f, 0.0f};
 
 static inline struct v2f
 v2f(cpVect v)
 {
-	struct v2f v2 = {(GLfloat)v.x, (GLfloat)v.y};
+	struct v2f v2 = {(float)v.x, (float)v.y};
 	return v2;
 }
 
 typedef struct Vertex {struct v2f vertex, aa_coord; cpSpaceDebugColor fill_color, outline_color;} Vertex;
 typedef struct Triangle {Vertex a, b, c;} Triangle;
 
-static GLuint vao = 0;
-static GLuint vbo = 0;
+// static GLuint vao = 0;
+// static GLuint vbo = 0;
 
 void
 ChipmunkDebugDrawInit(void)
 {
+	/*
 	// Setup the AA shader.
 	GLint vshader = CompileShader(GL_VERTEX_SHADER, GLSL(
 		attribute vec2 vertex;
@@ -139,17 +140,19 @@ ChipmunkDebugDrawInit(void)
 #endif
 
 	CHECK_GL_ERRORS();
+	*/
 }
 
 #undef MAX // Defined on some systems
 #define MAX(__a__, __b__) (__a__ > __b__ ? __a__ : __b__)
 
-static GLsizei triangle_capacity = 0;
-static GLsizei triangle_count = 0;
+static size_t triangle_capacity = 0;
+static size_t triangle_count = 0;
 static Triangle *triangle_buffer = NULL;
 
-static Triangle *PushTriangles(GLsizei count)
+static Triangle *PushTriangles(size_t count)
 {
+	/*
 	if(triangle_count + count > triangle_capacity){
 		triangle_capacity += MAX(triangle_capacity, count);
 		triangle_buffer = (Triangle *)realloc(triangle_buffer, triangle_capacity*sizeof(Triangle));
@@ -158,6 +161,7 @@ static Triangle *PushTriangles(GLsizei count)
 	Triangle *buffer = triangle_buffer + triangle_count;
 	triangle_count += count;
 	return buffer;
+	*/
 }
 
 
@@ -166,10 +170,10 @@ void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceD
 	Triangle *triangles = PushTriangles(2);
 	
 	cpFloat r = radius + 1.0f/ChipmunkDebugDrawPointLineScale;
-	Vertex a = {{(GLfloat)(pos.x - r), (GLfloat)(pos.y - r)}, {-1.0f, -1.0f}, fillColor, outlineColor};
-	Vertex b = {{(GLfloat)(pos.x - r), (GLfloat)(pos.y + r)}, {-1.0f,  1.0f}, fillColor, outlineColor};
-	Vertex c = {{(GLfloat)(pos.x + r), (GLfloat)(pos.y + r)}, { 1.0f,  1.0f}, fillColor, outlineColor};
-	Vertex d = {{(GLfloat)(pos.x + r), (GLfloat)(pos.y - r)}, { 1.0f, -1.0f}, fillColor, outlineColor};
+	Vertex a = {{(float)(pos.x - r), (float)(pos.y - r)}, {-1.0f, -1.0f}, fillColor, outlineColor};
+	Vertex b = {{(float)(pos.x - r), (float)(pos.y + r)}, {-1.0f,  1.0f}, fillColor, outlineColor};
+	Vertex c = {{(float)(pos.x + r), (float)(pos.y + r)}, { 1.0f,  1.0f}, fillColor, outlineColor};
+	Vertex d = {{(float)(pos.x + r), (float)(pos.y - r)}, { 1.0f, -1.0f}, fillColor, outlineColor};
 	
 	Triangle t0 = {a, b, c}; triangles[0] = t0;
 	Triangle t1 = {a, c, d}; triangles[1] = t1;
@@ -310,6 +314,7 @@ void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color)
 void
 ChipmunkDebugDrawFlushRenderer(void)
 {
+	/*
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Triangle)*triangle_count, triangle_buffer, GL_STREAM_DRAW);
 	
@@ -324,6 +329,7 @@ ChipmunkDebugDrawFlushRenderer(void)
 	glDrawArrays(GL_TRIANGLES, 0, triangle_count*3);
 		
 	CHECK_GL_ERRORS();
+	*/
 }
 
 void
