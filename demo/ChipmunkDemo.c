@@ -30,7 +30,8 @@
 	beyond simple shape drawing and is very dependent on implementation details
 	about Chipmunk which may change with little to no warning.
 */
- 
+
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -51,7 +52,16 @@
 // #include "ChipmunkDemoTextSupport.h"
 
 #define SOKOL_IMPL
+#define SOKOL_GLCORE33
+#include "sokol/sokol_app.h"
 #include "sokol/sokol_time.h"
+#include "sokol/sokol_gfx.h"
+
+static sg_pass_action pass_action = {
+	.colors[0] = {.action = SG_ACTION_CLEAR, .val = {52.0f/255.0f, 62.0f/255.0f, 72.0f/255.0f, 1.0f}}
+};
+
+#undef Convex
 
 static ChipmunkDemo *demos;
 static int demo_count = 0;
@@ -540,59 +550,6 @@ SpecialKeyboard(int key, int state)
 		default: break;
 	}
 }
-
-static int
-WindowClose()
-{
-	glfwTerminate();
-	exit(EXIT_SUCCESS);
-	
-	return GL_TRUE;
-}
-
-static void
-SetupGL(void)
-{
-	glewExperimental = GL_TRUE;
-	cpAssertHard(glewInit() == GLEW_NO_ERROR, "There was an error initializing GLEW.");
-	cpAssertHard(GLEW_ARB_vertex_array_object, "Requires VAO support.");
-	
-	ChipmunkDebugDrawInit();
-	ChipmunkDemoTextInit();
-	
-	glClearColor(52.0f/255.0f, 62.0f/255.0f, 72.0f/255.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POINT_SMOOTH);
-
-	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-	glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
-	
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-}
-
-static void
-SetupGLFW()
-{
-	cpAssertHard(glfwInit(), "Error initializing GLFW.");
-	
-	cpAssertHard(glfwOpenWindow(640, 480, 8, 8, 8, 8, 0, 0, GLFW_WINDOW), "Error opening GLFW window.");
-	glfwSetWindowTitle(DemoTitle(demo_index));
-	glfwSwapInterval(1);
-	
-	SetupGL();
-	
-	glfwSetWindowSizeCallback(Reshape);
-	glfwSetWindowCloseCallback(WindowClose);
-	
-	glfwSetCharCallback(Keyboard);
-	glfwSetKeyCallback(SpecialKeyboard);
-	
-	glfwSetMousePosCallback(Mouse);
-	glfwSetMouseButtonCallback(Click);
-}
 */
 static void
 TimeTrial(int index, int count)
@@ -642,9 +599,14 @@ extern ChipmunkDemo GJK;
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
 
-int
-main(int argc, const char **argv)
+static int
+init_sokol(void)
 {
+	sg_setup(&(sg_desc){});
+	
+	ChipmunkDebugDrawInit();
+	// ChipmunkDemoTextInit();
+	
 	ChipmunkDemo demo_list[] = {
 		LogoSmash,//A
 		PyramidStack,//B
@@ -676,30 +638,42 @@ main(int argc, const char **argv)
 	demo_count = sizeof(demo_list)/sizeof(ChipmunkDemo);
 	int trial = 0;
 	
-	for(int i=0; i<argc; i++){
-		if(strcmp(argv[i], "-bench") == 0){
-			demos = bench_list;
-			demo_count = bench_count;
-		} else if(strcmp(argv[i], "-trial") == 0){
-			trial = 1;
-		}
-	}
+	// for(int i=0; i<argc; i++){
+	// 	if(strcmp(argv[i], "-bench") == 0){
+	// 		demos = bench_list;
+	// 		demo_count = bench_count;
+	// 	} else if(strcmp(argv[i], "-trial") == 0){
+	// 		trial = 1;
+	// 	}
+	// }
 	
 	if(trial){
-		// cpAssertHard(glfwInit(), "Error initializing GLFW.");
-//		sleep(1);
 		for(int i=0; i<demo_count; i++) TimeTrial(i, 1000);
-//		time_trial('d' - 'a', 10000);
 		exit(0);
 	} else {
 		mouse_body = cpBodyNewKinematic();
-		
 		RunDemo(demo_index);
-		stm_setup();
-		// SetupGLFW();
-		
-		// while(1) Display();
 	}
+}
 
-	return 0;
+void frame(void) {
+	sg_begin_default_pass(&pass_action, sapp_width(), sapp_height());
+	sg_end_pass();
+	sg_commit();
+}
+
+void cleanup_sokol(void) {
+	sg_shutdown();
+}
+
+sapp_desc sokol_main(int argc, char* argv[]) {
+	stm_setup();
+	return (sapp_desc){
+		.init_cb = init_sokol,
+		.frame_cb = frame,
+		.cleanup_cb = cleanup_sokol,
+		.width = 640,
+		.height = 480,
+		.window_title = "Chipmunk2D",
+	};
 }
