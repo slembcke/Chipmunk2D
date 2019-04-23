@@ -600,8 +600,6 @@ extern int bench_count;
 static void
 init_sokol(void)
 {
-	sg_setup(&(sg_desc){});
-	
 	ChipmunkDebugDrawInit();
 	// ChipmunkDemoTextInit();
 	
@@ -655,9 +653,7 @@ init_sokol(void)
 }
 
 void frame(void) {
-	sg_begin_default_pass(&pass_action, sapp_width(), sapp_height());
-	sg_end_pass();
-	sg_commit();
+	ChipmunkDebugDrawFlushRenderer();
 }
 
 void cleanup_sokol(void) {

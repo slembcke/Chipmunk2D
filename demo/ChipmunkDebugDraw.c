@@ -22,8 +22,7 @@
 #include <limits.h>
 #include <string.h>
 
-// #include "GL/glew.h"
-// #include "GL/glfw.h"
+#include "sokol/sokol_gfx.h"
 
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDebugDraw.h"
@@ -33,6 +32,12 @@ float ChipmunkDebugDrawPointLineScale = 1.0f;
 float ChipmunkDebugDrawOutlineWidth = 1.0f;
 
 // static GLuint program;
+
+#define GLSL33(x) "#version 330\n" #x
+
+static sg_pipeline pip;
+static sg_bindings bind;
+static sg_pass_action pass_action;
 
 struct v2f {float x, y;};
 static struct v2f v2f0 = {0.0f, 0.0f};
@@ -53,6 +58,97 @@ typedef struct Triangle {Vertex a, b, c;} Triangle;
 void
 ChipmunkDebugDrawInit(void)
 {
+	sg_desc desc = {};
+	sg_setup(&desc);
+	assert(sg_isvalid());
+	
+	
+	typedef struct {float x, y;} float2;
+	typedef struct {uint8_t r, g, b, a;} RGBA8;
+	typedef struct {float radius; float2 position; float2 uv; RGBA8 color;} Vertex;
+	
+	float radius = 0.5f;
+	float2 vertex = {0.0f, 0.0f};
+	RGBA8 color = {0xFF, 0x00, 0x00, 0xFF};
+	
+	Vertex vertices[] = {
+		{radius, vertex, {-1.0f,  1.0f}, color},
+		{radius, vertex, { 1.0f,  1.0f}, color},
+		{radius, vertex, { 1.0f, -1.0f}, color},
+		{radius, vertex, {-1.0f, -1.0f}, color},
+	};
+	
+	sg_buffer vbuf = sg_make_buffer(&(sg_buffer_desc){
+		.size = sizeof(vertices),
+		.content = vertices,
+	});
+
+	uint16_t indices[] = {0, 1, 2, 0, 2, 3};
+	
+	sg_buffer ibuf = sg_make_buffer(&(sg_buffer_desc){
+		.size = sizeof(indices),
+		.type = SG_BUFFERTYPE_INDEXBUFFER,
+		.content = indices,
+	});
+
+	bind = (sg_bindings){
+		.vertex_buffers[0] = vbuf,
+		.index_buffer = ibuf
+	};
+
+	sg_shader shd = sg_make_shader(&(sg_shader_desc){
+		.vs.source = GLSL33(
+			layout(location = 0) in float IN_radius;
+			layout(location = 1) in vec4 IN_position;
+			layout(location = 2) in vec2 IN_uv;
+			layout(location = 3) in vec4 IN_color;
+			
+			out struct {
+				vec2 uv;
+				vec4 color;
+			} FRAG;
+			
+			void main(){
+				gl_Position = IN_position;
+				gl_Position.xy += IN_radius*IN_uv;
+				FRAG.uv = IN_uv;
+				FRAG.color = IN_color;
+			}
+		),
+		.fs.source = GLSL33(
+			in struct {
+				vec2 uv;
+				vec4 color;
+			} FRAG;
+			
+			out vec4 OUT_color;
+			
+			void main(){
+				float len = length(FRAG.uv);
+				float mask = smoothstep(1, 1 - fwidth(len), len);
+				OUT_color = FRAG.color*mask;
+			}
+		),
+	});
+	
+	pip = sg_make_pipeline(&(sg_pipeline_desc){
+		.shader = shd,
+		.blend = {
+			.enabled = true,
+			.src_factor_rgb = SG_BLENDFACTOR_ONE,
+			.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA
+		},
+		.index_type = SG_INDEXTYPE_UINT16,
+		.layout = {
+			.attrs = {
+				[0] = {.offset = offsetof(Vertex, radius), .format = SG_VERTEXFORMAT_FLOAT},
+				[1] = {.offset = offsetof(Vertex, position), .format = SG_VERTEXFORMAT_FLOAT2},
+				[2] = {.offset = offsetof(Vertex, uv), .format = SG_VERTEXFORMAT_FLOAT2},
+				[3] = {.offset = offsetof(Vertex, color), .format = SG_VERTEXFORMAT_UBYTE4N},
+			}
+		}
+	});
+	
 	/*
 	// Setup the AA shader.
 	GLint vshader = CompileShader(GL_VERTEX_SHADER, GLSL(
@@ -314,6 +410,14 @@ void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color)
 void
 ChipmunkDebugDrawFlushRenderer(void)
 {
+	sg_begin_default_pass(&pass_action, sapp_width(), sapp_height());
+	
+	sg_apply_pipeline(pip);
+	sg_apply_bindings(&bind);
+	sg_draw(0, 6, 1);
+	
+	sg_end_pass();
+	sg_commit();
 	/*
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Triangle)*triangle_count, triangle_buffer, GL_STREAM_DRAW);
