@@ -23,6 +23,7 @@ install_manifest.txt
 *.dll
 *.so
 *.so.*
+*.dylib
 *.a
 *.exe
 chipmunk_demos

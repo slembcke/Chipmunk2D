@@ -51,11 +51,7 @@
 #include "ChipmunkDemo.h"
 // #include "ChipmunkDemoTextSupport.h"
 
-#define SOKOL_IMPL
-#define SOKOL_GLCORE33
-#include "sokol/sokol_app.h"
-#include "sokol/sokol_time.h"
-#include "sokol/sokol_gfx.h"
+#include "sokol/sokol.h"
 
 static sg_pass_action pass_action = {
 	.colors[0] = {.action = SG_ACTION_CLEAR, .val = {52.0f/255.0f, 62.0f/255.0f, 72.0f/255.0f, 1.0f}}
@@ -227,11 +223,13 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 static void
 DrawInstructions()
 {
+	/*
 	ChipmunkDemoTextDrawString(cpv(-300, 220),
 		"Controls:\n"
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
 	);
+	*/
 }
 
 static int max_arbiters = 0;
@@ -599,7 +597,7 @@ extern ChipmunkDemo GJK;
 extern ChipmunkDemo bench_list[];
 extern int bench_count;
 
-static int
+static void
 init_sokol(void)
 {
 	sg_setup(&(sg_desc){});

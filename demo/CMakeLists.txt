@@ -1,5 +1,5 @@
 cmake_policy(SET CMP0015 NEW) # Convert relative paths
-cmake_policy(SET CMP0072 NEW)
+# cmake_policy(SET CMP0072 NEW)
 
 find_package(OpenGL REQUIRED)
 
@@ -11,15 +11,21 @@ set(chipmunk_demos_include_dirs
 set(chipmunk_demos_libraries
 	chipmunk_static
 	${OPENGL_LIBRARIES}
-	dl
-	X11
+	# dl
+	# X11
 )
+
+file(GLOB chipmunk_demos_source_files "*.c")
 
 if(APPLE)
 	FIND_LIBRARY(APPKIT AppKit)
 	FIND_LIBRARY(IOKIT IOKit)
 	
 	list(APPEND chipmunk_demos_libraries ${APPKIT} ${IOKIT})
+	list(APPEND chipmunk_demos_source_files "sokol/sokol.m")
+	set_property(SOURCE "sokol/sokol.m" APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
+else()
+	list(APPEND chipmunk_demos_source_files "sokol/sokol.c")
 endif(APPLE)
 
 if(NOT MSVC)
@@ -29,8 +35,6 @@ endif(NOT MSVC)
 if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
 	list(APPEND chipmunk_demos_libraries BlocksRuntime)
 endif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-
-file(GLOB chipmunk_demos_source_files "*.c")
 
 include_directories(${chipmunk_demos_include_dirs})
 link_directories(${chipmunk_demos_library_dirs})
