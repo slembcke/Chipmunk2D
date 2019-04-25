@@ -653,7 +653,7 @@ init_sokol(void)
 }
 
 void frame(void) {
-	ChipmunkDebugDrawFlushRenderer();
+	ChipmunkDebugDrawFlushRenderer(sapp_width(), sapp_height());
 }
 
 void cleanup_sokol(void) {

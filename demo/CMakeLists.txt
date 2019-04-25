@@ -11,8 +11,6 @@ set(chipmunk_demos_include_dirs
 set(chipmunk_demos_libraries
 	chipmunk_static
 	${OPENGL_LIBRARIES}
-	# dl
-	# X11
 )
 
 file(GLOB chipmunk_demos_source_files "*.c")
@@ -27,6 +25,10 @@ if(APPLE)
 else()
 	list(APPEND chipmunk_demos_source_files "sokol/sokol.c")
 endif(APPLE)
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	list(APPEND chipmunk_demos_libraries dl X11)
+endif(LINUX)
 
 if(NOT MSVC)
 	list(APPEND chipmunk_demos_libraries m pthread)

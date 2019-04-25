@@ -20,6 +20,7 @@
  */
 
 #include <limits.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "sokol/sokol_gfx.h"
@@ -60,7 +61,7 @@ ChipmunkDebugDrawInit(void)
 {
 	sg_desc desc = {};
 	sg_setup(&desc);
-	assert(sg_isvalid());
+	cpAssertHard(sg_isvalid(), "Could not init Sokol GFX.");
 	
 	
 	typedef struct {float x, y;} float2;
@@ -408,9 +409,9 @@ void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color)
 }
 
 void
-ChipmunkDebugDrawFlushRenderer(void)
+ChipmunkDebugDrawFlushRenderer(int pass_width, int pass_height)
 {
-	sg_begin_default_pass(&pass_action, sapp_width(), sapp_height());
+	sg_begin_default_pass(&pass_action, pass_width, pass_height);
 	
 	sg_apply_pipeline(pip);
 	sg_apply_bindings(&bind);
