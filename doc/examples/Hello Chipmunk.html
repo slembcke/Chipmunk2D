@@ -31,7 +31,7 @@
 &nbsp;&nbsp;<em><span style="color:#236e25;">// The cpSpaceAdd*() functions return the thing that you are adding.<br />
 </span></em>&nbsp;&nbsp;<em><span style="color:#236e25;">// It's convenient to create and add an object in one line.<br />
 </span></em>&nbsp;&nbsp;cpBody *ballBody = <span style="color:#003668;">cpSpaceAddBody</span>(space, <span style="color:#003668;">cpBodyNew</span>(mass, moment));<br />
-&nbsp;&nbsp;<span style="color:#003668;">cpBodySetPos</span>(ballBody, <span style="color:#003668;">cpv</span>(<span style="color:#0000ff;">0</span>, <span style="color:#0000ff;">15</span>));<br />
+&nbsp;&nbsp;<span style="color:#003668;">cpBodySetPosition</span>(ballBody, <span style="color:#003668;">cpv</span>(<span style="color:#0000ff;">0</span>, <span style="color:#0000ff;">15</span>));<br />
 &nbsp;&nbsp;<br />
 &nbsp;&nbsp;<em><span style="color:#236e25;">// Now we create the collision shape for the ball.<br />
 </span></em>&nbsp;&nbsp;<em><span style="color:#236e25;">// You can create multiple collision shapes that point to the same body.<br />
