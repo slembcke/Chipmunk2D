@@ -1,3 +1,5 @@
+set(GLFW_INCLUDE_DIR "/usr/include/GLFW")
+
 cmake_minimum_required(VERSION 3.7)
 
 project(chipmunk)
