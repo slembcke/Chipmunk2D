@@ -1,5 +1,5 @@
 cmake_policy(SET CMP0015 NEW) # Convert relative paths
-# cmake_policy(SET CMP0072 NEW)
+cmake_policy(SET CMP0072 NEW)
 
 find_package(OpenGL REQUIRED)
 
@@ -28,7 +28,7 @@ endif(APPLE)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	list(APPEND chipmunk_demos_libraries dl X11)
-endif(LINUX)
+endif()
 
 if(NOT MSVC)
 	list(APPEND chipmunk_demos_libraries m pthread)

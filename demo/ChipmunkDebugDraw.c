@@ -27,12 +27,9 @@
 
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDebugDraw.h"
-// #include "ChipmunkDemoShaderSupport.h"
 
 float ChipmunkDebugDrawPointLineScale = 1.0f;
 float ChipmunkDebugDrawOutlineWidth = 1.0f;
-
-// static GLuint program;
 
 #define GLSL33(x) "#version 330\n" #x
 
@@ -40,22 +37,27 @@ static sg_pipeline pip;
 static sg_bindings bind;
 static sg_pass_action pass_action;
 
-struct v2f {float x, y;};
-static struct v2f v2f0 = {0.0f, 0.0f};
+typedef struct {float x, y;} float2;
+typedef struct {uint8_t r, g, b, a;} RGBA8;
+typedef struct {float radius; float2 position; float2 uv; RGBA8 color;} Vertex;
+typedef uint16_t Index;
 
-static inline struct v2f
-v2f(cpVect v)
-{
-	struct v2f v2 = {(float)v.x, (float)v.y};
-	return v2;
-}
+// Meh, just max out 16 bit index size.
+#define VERTEX_MAX (64*1024)
+#define INDEX_MAX (128*1024)
 
-typedef struct Vertex {struct v2f vertex, aa_coord; cpSpaceDebugColor fill_color, outline_color;} Vertex;
-typedef struct Triangle {Vertex a, b, c;} Triangle;
+static sg_buffer vertex_buffer, index_buffer;
+static size_t vertex_count = 4, index_count = 6;
 
-// static GLuint vao = 0;
-// static GLuint vbo = 0;
+static Vertex Vertexes[VERTEX_MAX] = {
+	{0.5, {0, 0}, {-1.0f,  1.0f}, {0xFF, 0x00, 0x00, 0xFF}},
+	{0.5, {0, 0}, { 1.0f,  1.0f}, {0xFF, 0x00, 0x00, 0xFF}},
+	{0.5, {0, 0}, { 1.0f, -1.0f}, {0xFF, 0x00, 0x00, 0xFF}},
+	{0.5, {0, 0}, {-1.0f, -1.0f}, {0xFF, 0x00, 0x00, 0xFF}},
+};
 
+static uint16_t Indexes[INDEX_MAX] = {0, 1, 2, 0, 2, 3};
+	
 void
 ChipmunkDebugDrawInit(void)
 {
@@ -63,38 +65,23 @@ ChipmunkDebugDrawInit(void)
 	sg_setup(&desc);
 	cpAssertHard(sg_isvalid(), "Could not init Sokol GFX.");
 	
-	
-	typedef struct {float x, y;} float2;
-	typedef struct {uint8_t r, g, b, a;} RGBA8;
-	typedef struct {float radius; float2 position; float2 uv; RGBA8 color;} Vertex;
-	
-	float radius = 0.5f;
-	float2 vertex = {0.0f, 0.0f};
-	RGBA8 color = {0xFF, 0x00, 0x00, 0xFF};
-	
-	Vertex vertices[] = {
-		{radius, vertex, {-1.0f,  1.0f}, color},
-		{radius, vertex, { 1.0f,  1.0f}, color},
-		{radius, vertex, { 1.0f, -1.0f}, color},
-		{radius, vertex, {-1.0f, -1.0f}, color},
-	};
-	
-	sg_buffer vbuf = sg_make_buffer(&(sg_buffer_desc){
-		.size = sizeof(vertices),
-		.content = vertices,
+	vertex_buffer = sg_make_buffer(&(sg_buffer_desc){
+		.label = "ChipmunkDebugDraw Vertex Buffer",
+		.size = VERTEX_MAX*sizeof(Vertex),
+		.type = SG_BUFFERTYPE_VERTEXBUFFER,
+		.usage = SG_USAGE_STREAM,
 	});
 
-	uint16_t indices[] = {0, 1, 2, 0, 2, 3};
-	
-	sg_buffer ibuf = sg_make_buffer(&(sg_buffer_desc){
-		.size = sizeof(indices),
+	index_buffer = sg_make_buffer(&(sg_buffer_desc){
+		.label = "ChipmunkDebugDraw Index Buffer",
+		.size = INDEX_MAX*sizeof(Index),
 		.type = SG_BUFFERTYPE_INDEXBUFFER,
-		.content = indices,
+		.usage = SG_USAGE_STREAM,
 	});
 
 	bind = (sg_bindings){
-		.vertex_buffers[0] = vbuf,
-		.index_buffer = ibuf
+		.vertex_buffers[0] = vertex_buffer,
+		.index_buffer = index_buffer,
 	};
 
 	sg_shader shd = sg_make_shader(&(sg_shader_desc){
@@ -196,7 +183,7 @@ ChipmunkDebugDrawInit(void)
 			float fw = length(fwidth(v_aa_coord));
 			
 			// Outline width threshold.
-			float ow = 1.0 - fw;//*u_outline_coef;
+			float ow = 1.0 - fw;// *u_outline_coef;
 			
 			// Fill/outline color.
 			float fo_step = aa_step(max(ow - fw, 0.0), ow, l);
@@ -208,48 +195,17 @@ ChipmunkDebugDrawInit(void)
 			//gl_FragColor = vec4(vec3(l), 1);
 		}
 	));
-	
-	program = LinkProgram(vshader, fshader);
-	CHECK_GL_ERRORS();
-	
-	// Setu VBO and VAO.
-#if __APPLE__
-	glGenVertexArraysAPPLE(1, &vao);
-	glBindVertexArrayAPPLE(vao);
-#else
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-#endif
-	
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	
-	SET_ATTRIBUTE(program, struct Vertex, vertex, GL_FLOAT);
-	SET_ATTRIBUTE(program, struct Vertex, aa_coord, GL_FLOAT);
-	SET_ATTRIBUTE(program, struct Vertex, fill_color, GL_FLOAT);
-	SET_ATTRIBUTE(program, struct Vertex, outline_color, GL_FLOAT);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-#if __APPLE__
-	glBindVertexArrayAPPLE(0);
-#else
-	glBindVertexArray(0);
-#endif
-
-	CHECK_GL_ERRORS();
 	*/
 }
-
 #undef MAX // Defined on some systems
 #define MAX(__a__, __b__) (__a__ > __b__ ? __a__ : __b__)
-
+/*
 static size_t triangle_capacity = 0;
 static size_t triangle_count = 0;
 static Triangle *triangle_buffer = NULL;
 
 static Triangle *PushTriangles(size_t count)
 {
-	/*
 	if(triangle_count + count > triangle_capacity){
 		triangle_capacity += MAX(triangle_capacity, count);
 		triangle_buffer = (Triangle *)realloc(triangle_buffer, triangle_capacity*sizeof(Triangle));
@@ -258,12 +214,12 @@ static Triangle *PushTriangles(size_t count)
 	Triangle *buffer = triangle_buffer + triangle_count;
 	triangle_count += count;
 	return buffer;
-	*/
 }
-
+*/
 
 void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
+	/*
 	Triangle *triangles = PushTriangles(2);
 	
 	cpFloat r = radius + 1.0f/ChipmunkDebugDrawPointLineScale;
@@ -276,6 +232,7 @@ void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceD
 	Triangle t1 = {a, c, d}; triangles[1] = t1;
 	
 	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawPointLineScale*0.5f)), outlineColor);
+	*/
 }
 
 void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color)
@@ -285,6 +242,7 @@ void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color)
 
 void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
+	/*
 	Triangle *triangles = PushTriangles(6);
 	
 	cpVect n = cpvnormalize(cpvrperp(cpvsub(b, a)));
@@ -314,12 +272,14 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebu
 	Triangle t3 = {{v3, { 0.0f,  1.0f}, fillColor, outlineColor}, {v4, { 0.0f, -1.0f}, fillColor, outlineColor}, {v5, { 0.0f,  1.0f}, fillColor, outlineColor}}; triangles[3] = t3;
 	Triangle t4 = {{v6, {-1.0f, -1.0f}, fillColor, outlineColor}, {v4, { 0.0f, -1.0f}, fillColor, outlineColor}, {v5, { 0.0f,  1.0f}, fillColor, outlineColor}}; triangles[4] = t4;
 	Triangle t5 = {{v6, {-1.0f, -1.0f}, fillColor, outlineColor}, {v7, {-1.0f,  1.0f}, fillColor, outlineColor}, {v5, { 0.0f,  1.0f}, fillColor, outlineColor}}; triangles[5] = t5;
+	*/
 }
 
 extern cpVect ChipmunkDemoMouse;
 
 void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
+	/*
 	struct ExtrudeVerts {cpVect offset, n;};
 	size_t bytes = sizeof(struct ExtrudeVerts)*count;
 	struct ExtrudeVerts *extrude = (struct ExtrudeVerts *)alloca(bytes);
@@ -381,10 +341,12 @@ void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cp
 		Triangle t2 = {{inner0, v2f0, fillColor, outlineColor}, {outer0,      n1, fillColor, outlineColor}, {outer2, offset0, fillColor, outlineColor}}; *cursor++ = t2;
 		Triangle t3 = {{inner0, v2f0, fillColor, outlineColor}, {outer2, offset0, fillColor, outlineColor}, {outer3,      n0, fillColor, outlineColor}}; *cursor++ = t3;
 	}
+	*/
 }
 
 void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 {
+	/*
 	Triangle *triangles = PushTriangles(2);
 	
 	float r = (float)(size*0.5f/ChipmunkDebugDrawPointLineScale);
@@ -395,6 +357,7 @@ void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 	
 	Triangle t0 = {a, b, c}; triangles[0] = t0;
 	Triangle t1 = {a, c, d}; triangles[1] = t1;
+	*/
 }
 
 void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color)
@@ -415,43 +378,30 @@ ChipmunkDebugDrawFlushRenderer(int pass_width, int pass_height)
 	
 	sg_apply_pipeline(pip);
 	sg_apply_bindings(&bind);
+	
+	sg_update_buffer(vertex_buffer, Vertexes, vertex_count*sizeof(Vertex));
+	sg_update_buffer(index_buffer, Indexes, index_count*sizeof(Index));
 	sg_draw(0, 6, 1);
 	
 	sg_end_pass();
 	sg_commit();
-	/*
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Triangle)*triangle_count, triangle_buffer, GL_STREAM_DRAW);
-	
-	glUseProgram(program);
-	glUniform1f(glGetUniformLocation(program, "u_outline_coef"), ChipmunkDebugDrawPointLineScale);
-	
-#if __APPLE__
-	glBindVertexArrayAPPLE(vao);
-#else
-	glBindVertexArray(vao);
-#endif
-	glDrawArrays(GL_TRIANGLES, 0, triangle_count*3);
-		
-	CHECK_GL_ERRORS();
-	*/
 }
 
 void
 ChipmunkDebugDrawClearRenderer(void)
 {
-	triangle_count = 0;
+	// triangle_count = 0;
 }
 
-static int pushed_triangle_count = 0;
+// static int pushed_triangle_count = 0;
 void
 ChipmunkDebugDrawPushRenderer(void)
 {
-	pushed_triangle_count = triangle_count;
+	// pushed_triangle_count = triangle_count;
 }
 
 void
 ChipmunkDebugDrawPopRenderer(void)
 {
-	triangle_count = pushed_triangle_count;
+	// triangle_count = pushed_triangle_count;
 }
