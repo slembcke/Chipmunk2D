@@ -28,6 +28,7 @@
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDebugDraw.h"
 
+cpTransform ChipmunkDebugDrawVPMatrix;
 float ChipmunkDebugDrawPointLineScale = 1.0f;
 float ChipmunkDebugDrawOutlineWidth = 1.0f;
 
@@ -51,17 +52,11 @@ typedef struct {
 #define VERTEX_MAX (64*1024)
 #define INDEX_MAX (128*1024)
 
-static sg_buffer vertex_buffer, index_buffer;
-static size_t vertex_count = 4, index_count = 6;
+static sg_buffer VertexBuffer, IndexBuffer;
+static size_t VertexCount, IndexCount;
 
-static Vertex Vertexes[VERTEX_MAX] = {
-	{0.5, {0, 0}, {-1.0f,  1.0f}, {0xFF, 0x00, 0x00, 0xFF}},
-	{0.5, {0, 0}, { 1.0f,  1.0f}, {0xFF, 0x00, 0x00, 0xFF}},
-	{0.5, {0, 0}, { 1.0f, -1.0f}, {0xFF, 0x00, 0x00, 0xFF}},
-	{0.5, {0, 0}, {-1.0f, -1.0f}, {0xFF, 0x00, 0x00, 0xFF}},
-};
-
-static uint16_t Indexes[INDEX_MAX] = {0, 1, 2, 0, 2, 3};
+static Vertex Vertexes[VERTEX_MAX];
+static uint16_t Indexes[INDEX_MAX];
 	
 void
 ChipmunkDebugDrawInit(void)
@@ -70,14 +65,14 @@ ChipmunkDebugDrawInit(void)
 	sg_setup(&desc);
 	cpAssertHard(sg_isvalid(), "Could not init Sokol GFX.");
 	
-	vertex_buffer = sg_make_buffer(&(sg_buffer_desc){
+	VertexBuffer = sg_make_buffer(&(sg_buffer_desc){
 		.label = "ChipmunkDebugDraw Vertex Buffer",
 		.size = VERTEX_MAX*sizeof(Vertex),
 		.type = SG_BUFFERTYPE_VERTEXBUFFER,
 		.usage = SG_USAGE_STREAM,
 	});
 	
-	index_buffer = sg_make_buffer(&(sg_buffer_desc){
+	IndexBuffer = sg_make_buffer(&(sg_buffer_desc){
 		.label = "ChipmunkDebugDraw Index Buffer",
 		.size = INDEX_MAX*sizeof(Index),
 		.type = SG_BUFFERTYPE_INDEXBUFFER,
@@ -85,8 +80,8 @@ ChipmunkDebugDrawInit(void)
 	});
 	
 	bindings = (sg_bindings){
-		.vertex_buffers[0] = vertex_buffer,
-		.index_buffer = index_buffer,
+		.vertex_buffers[0] = VertexBuffer,
+		.index_buffer = IndexBuffer,
 	};
 	
 	sg_shader shd = sg_make_shader(&(sg_shader_desc){
@@ -209,42 +204,43 @@ ChipmunkDebugDrawInit(void)
 	));
 	*/
 }
-#undef MAX // Defined on some systems
-#define MAX(__a__, __b__) (__a__ > __b__ ? __a__ : __b__)
-/*
-static size_t triangle_capacity = 0;
-static size_t triangle_count = 0;
-static Triangle *triangle_buffer = NULL;
 
-static Triangle *PushTriangles(size_t count)
-{
-	if(triangle_count + count > triangle_capacity){
-		triangle_capacity += MAX(triangle_capacity, count);
-		triangle_buffer = (Triangle *)realloc(triangle_buffer, triangle_capacity*sizeof(Triangle));
-	}
+static Vertex *push_vertexes(size_t vcount, const Index *index_src, size_t icount){
+	Vertex *vertex_dst = Vertexes + VertexCount;
+	size_t base = VertexCount;
+	VertexCount += vcount;
 	
-	Triangle *buffer = triangle_buffer + triangle_count;
-	triangle_count += count;
-	return buffer;
+	Index *index_dst = Indexes + IndexCount;
+	for(size_t i = 0; i < icount; i++) index_dst[i] = index_src[i] + base;
+	IndexCount += icount;
+	
+	return vertex_dst;
 }
-*/
+
+void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
+{
+	if(VertexCount + 4 > VERTEX_MAX || IndexCount + 6 > INDEX_MAX) return;
+	
+	float r = (float)(size*0.5f/ChipmunkDebugDrawPointLineScale);
+	Vertex *vertexes = push_vertexes(4, (Index[]){0, 1, 2, 0, 2, 3}, 6);
+	vertexes[0] = (Vertex){r, {pos.x, pos.y}, {-1, -1}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[1] = (Vertex){r, {pos.x, pos.y}, {-1,  1}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[2] = (Vertex){r, {pos.x, pos.y}, { 1,  1}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[3] = (Vertex){r, {pos.x, pos.y}, { 1, -1}, {0xFF, 0x00, 0x00, 0xFF}};
+}
 
 void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
-	/*
-	Triangle *triangles = PushTriangles(2);
+	if(VertexCount + 4 > VERTEX_MAX || IndexCount + 6 > INDEX_MAX) return;
 	
 	cpFloat r = radius + 1.0f/ChipmunkDebugDrawPointLineScale;
-	Vertex a = {{(float)(pos.x - r), (float)(pos.y - r)}, {-1.0f, -1.0f}, fillColor, outlineColor};
-	Vertex b = {{(float)(pos.x - r), (float)(pos.y + r)}, {-1.0f,  1.0f}, fillColor, outlineColor};
-	Vertex c = {{(float)(pos.x + r), (float)(pos.y + r)}, { 1.0f,  1.0f}, fillColor, outlineColor};
-	Vertex d = {{(float)(pos.x + r), (float)(pos.y - r)}, { 1.0f, -1.0f}, fillColor, outlineColor};
-	
-	Triangle t0 = {a, b, c}; triangles[0] = t0;
-	Triangle t1 = {a, c, d}; triangles[1] = t1;
+	Vertex *vertexes = push_vertexes(4, (Index[]){0, 1, 2, 0, 2, 3}, 6);
+	vertexes[0] = (Vertex){r, {pos.x, pos.y}, {-1, -1}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[1] = (Vertex){r, {pos.x, pos.y}, {-1,  1}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[2] = (Vertex){r, {pos.x, pos.y}, { 1,  1}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[3] = (Vertex){r, {pos.x, pos.y}, { 1, -1}, {0xFF, 0x00, 0x00, 0xFF}};
 	
 	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawPointLineScale*0.5f)), outlineColor);
-	*/
 }
 
 void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color)
@@ -356,22 +352,6 @@ void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cp
 	*/
 }
 
-void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
-{
-	/*
-	Triangle *triangles = PushTriangles(2);
-	
-	float r = (float)(size*0.5f/ChipmunkDebugDrawPointLineScale);
-	Vertex a = {{(float)pos.x - r, (float)pos.y - r}, {-1.0f, -1.0f}, fillColor, fillColor};
-	Vertex b = {{(float)pos.x - r, (float)pos.y + r}, {-1.0f,  1.0f}, fillColor, fillColor};
-	Vertex c = {{(float)pos.x + r, (float)pos.y + r}, { 1.0f,  1.0f}, fillColor, fillColor};
-	Vertex d = {{(float)pos.x + r, (float)pos.y - r}, { 1.0f, -1.0f}, fillColor, fillColor};
-	
-	Triangle t0 = {a, b, c}; triangles[0] = t0;
-	Triangle t1 = {a, c, d}; triangles[1] = t1;
-	*/
-}
-
 void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color)
 {
 	cpVect verts[] = {
@@ -386,27 +366,30 @@ void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color)
 void
 ChipmunkDebugDrawFlushRenderer(int pass_width, int pass_height)
 {
+	ChipmunkDebugDrawDot(64, cpv(0, 0), (cpSpaceDebugColor){1, 0, 0, 1});
+	ChipmunkDebugDrawCircle(cpv(100, 100), 3.141/4, 64, LAColor(1, 1), LAColor(1, 1));
+	ChipmunkDebugDrawFatSegment(cpv(-100, 0), cpv(0, -100), 16, LAColor(0, 0), LAColor(0, 0));
+	
+	cpTransform t = ChipmunkDebugDrawVPMatrix;
+	Uniforms uniforms = {
+		.U_vp_matrix = {t.a , t.b , 0, 0, t.c , t.d , 0, 0, 0, 0, 1, 0, t.tx, t.ty, 0, 1},
+	};
+	
 	sg_begin_default_pass(&pass_action, pass_width, pass_height);
+	
+	sg_update_buffer(VertexBuffer, Vertexes, VertexCount*sizeof(Vertex));
+	sg_update_buffer(IndexBuffer, Indexes, IndexCount*sizeof(Index));
 	
 	sg_apply_pipeline(pipeline);
 	sg_apply_bindings(&bindings);
-	
-	sg_update_buffer(vertex_buffer, Vertexes, vertex_count*sizeof(Vertex));
-	sg_update_buffer(index_buffer, Indexes, index_count*sizeof(Index));
-	
-	Uniforms uniforms = {
-		.U_vp_matrix = {
-			2, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1,
-		},
-	};
 	sg_apply_uniforms(SG_SHADERSTAGE_VS, 0, &uniforms, sizeof(Uniforms));
-	sg_draw(0, index_count, 1);
+	sg_draw(0, IndexCount, 1);
 	
 	sg_end_pass();
 	sg_commit();
+	
+	VertexCount = 0;
+	IndexCount = 0;
 }
 
 void

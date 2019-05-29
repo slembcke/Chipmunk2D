@@ -653,6 +653,14 @@ init_sokol(void)
 }
 
 void frame(void) {
+	cpVect size = {sapp_width(), sapp_height()};
+	
+	float scale = (float)cpfmin(size.x/640.0, size.y/480.0);
+	float hw = size.x*(0.5f/scale);
+	float hh = size.y*(0.5f/scale);
+	
+	ChipmunkDebugDrawPointLineScale = scale;
+	ChipmunkDebugDrawVPMatrix = cpTransformOrtho(cpBBNew(-hw, -hh, hw, hh));
 	ChipmunkDebugDrawFlushRenderer(sapp_width(), sapp_height());
 }
 
