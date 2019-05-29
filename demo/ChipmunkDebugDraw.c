@@ -33,14 +33,19 @@ float ChipmunkDebugDrawOutlineWidth = 1.0f;
 
 #define GLSL33(x) "#version 330\n" #x
 
-static sg_pipeline pip;
-static sg_bindings bind;
+static sg_pipeline pipeline;
+static sg_bindings bindings;
 static sg_pass_action pass_action;
 
 typedef struct {float x, y;} float2;
 typedef struct {uint8_t r, g, b, a;} RGBA8;
 typedef struct {float radius; float2 position; float2 uv; RGBA8 color;} Vertex;
 typedef uint16_t Index;
+
+typedef struct {
+		float U_vp_matrix[16];
+} Uniforms;
+
 
 // Meh, just max out 16 bit index size.
 #define VERTEX_MAX (64*1024)
@@ -71,25 +76,33 @@ ChipmunkDebugDrawInit(void)
 		.type = SG_BUFFERTYPE_VERTEXBUFFER,
 		.usage = SG_USAGE_STREAM,
 	});
-
+	
 	index_buffer = sg_make_buffer(&(sg_buffer_desc){
 		.label = "ChipmunkDebugDraw Index Buffer",
 		.size = INDEX_MAX*sizeof(Index),
 		.type = SG_BUFFERTYPE_INDEXBUFFER,
 		.usage = SG_USAGE_STREAM,
 	});
-
-	bind = (sg_bindings){
+	
+	bindings = (sg_bindings){
 		.vertex_buffers[0] = vertex_buffer,
 		.index_buffer = index_buffer,
 	};
-
+	
 	sg_shader shd = sg_make_shader(&(sg_shader_desc){
+		.vs.uniform_blocks[0] = {
+				.size = sizeof(Uniforms),
+				.uniforms = {
+						[0] = {.name = "U_vp_matrix", .type = SG_UNIFORMTYPE_MAT4},
+				}
+		},
 		.vs.source = GLSL33(
 			layout(location = 0) in float IN_radius;
-			layout(location = 1) in vec4 IN_position;
+			layout(location = 1) in vec2 IN_position;
 			layout(location = 2) in vec2 IN_uv;
 			layout(location = 3) in vec4 IN_color;
+			
+			uniform mat4 U_vp_matrix;
 			
 			out struct {
 				vec2 uv;
@@ -97,8 +110,7 @@ ChipmunkDebugDrawInit(void)
 			} FRAG;
 			
 			void main(){
-				gl_Position = IN_position;
-				gl_Position.xy += IN_radius*IN_uv;
+				gl_Position = U_vp_matrix*vec4(IN_position + IN_radius*IN_uv, 0, 1);
 				FRAG.uv = IN_uv;
 				FRAG.color = IN_color;
 			}
@@ -119,7 +131,7 @@ ChipmunkDebugDrawInit(void)
 		),
 	});
 	
-	pip = sg_make_pipeline(&(sg_pipeline_desc){
+	pipeline = sg_make_pipeline(&(sg_pipeline_desc){
 		.shader = shd,
 		.blend = {
 			.enabled = true,
@@ -376,12 +388,22 @@ ChipmunkDebugDrawFlushRenderer(int pass_width, int pass_height)
 {
 	sg_begin_default_pass(&pass_action, pass_width, pass_height);
 	
-	sg_apply_pipeline(pip);
-	sg_apply_bindings(&bind);
+	sg_apply_pipeline(pipeline);
+	sg_apply_bindings(&bindings);
 	
 	sg_update_buffer(vertex_buffer, Vertexes, vertex_count*sizeof(Vertex));
 	sg_update_buffer(index_buffer, Indexes, index_count*sizeof(Index));
-	sg_draw(0, 6, 1);
+	
+	Uniforms uniforms = {
+		.U_vp_matrix = {
+			2, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1,
+		},
+	};
+	sg_apply_uniforms(SG_SHADERSTAGE_VS, 0, &uniforms, sizeof(Uniforms));
+	sg_draw(0, index_count, 1);
 	
 	sg_end_pass();
 	sg_commit();
