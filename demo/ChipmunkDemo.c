@@ -59,7 +59,7 @@ static sg_pass_action pass_action = {
 
 #undef Convex
 
-static ChipmunkDemo *demos;
+static ChipmunkDemo demos[32];
 static int demo_count = 0;
 static int demo_index = 'a' - 'a';
 
@@ -87,8 +87,8 @@ char const *ChipmunkDemoMessageString = NULL;
 cpShapeFilter GRAB_FILTER = {CP_NO_GROUP, GRABBABLE_MASK_BIT, GRABBABLE_MASK_BIT};
 cpShapeFilter NOT_GRABBABLE_FILTER = {CP_NO_GROUP, ~GRABBABLE_MASK_BIT, ~GRABBABLE_MASK_BIT};
 
-cpVect translate = {0, 0};
-cpFloat scale = 1.0;
+cpVect view_translate = {0, 0};
+cpFloat view_scale = 1.0;
 
 static void ShapeFreeWrap(cpSpace *space, cpShape *shape, void *unused){
 	cpSpaceRemoveShape(space, shape);
@@ -347,14 +347,21 @@ Update(void)
 	
 	LastTime = time;
 }
-/*
+
 static void
 Display(void)
 {
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef((float)translate.x, (float)translate.y, 0.0f);
-	glScalef((float)scale, (float)scale, 1.0f);
+	cpVect size = {sapp_width(), sapp_height()};
+	
+	cpTransform view_matrix = cpTransformIdentity;
+	
+	float screen_scale = (float)cpfmin(size.x/640.0, size.y/480.0);
+	float hw = size.x*(0.5f/screen_scale);
+	float hh = size.y*(0.5f/screen_scale);
+	cpTransform projection_matrix = cpTransformOrtho(cpBBNew(-hw, -hh, hw, hh));
+	
+	ChipmunkDebugDrawPointLineScale = screen_scale;
+	ChipmunkDebugDrawVPMatrix = cpTransformMult(projection_matrix, view_matrix);
 	
 	Update();
 	
@@ -366,54 +373,19 @@ Display(void)
 //	if(nearest) ChipmunkDebugDrawShape(nearest, RGBAColor(1.0f, 0.0f, 0.0f, 1.0f), LAColor(0.0f, 0.0f));
 	
 	// Draw the renderer contents and reset it back to the last tick's state.
-	ChipmunkDebugDrawFlushRenderer();
+	ChipmunkDebugDrawFlushRenderer(sapp_width(), sapp_height());
 	ChipmunkDebugDrawPopRenderer();
 	
-	ChipmunkDemoTextPushRenderer();
-	// Now render all the UI text.
-	DrawInstructions();
-	DrawInfo();
+	// ChipmunkDemoTextPushRenderer();
+	// // Now render all the UI text.
+	// DrawInstructions();
+	// DrawInfo();
 	
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix(); {
-		// Draw the text at fixed positions,
-		// but save the drawing matrix for the mouse picking
-		glLoadIdentity();
-		
-		ChipmunkDemoTextFlushRenderer();
-		ChipmunkDemoTextPopRenderer();
-	} glPopMatrix();
-	
-	glfwSwapBuffers();
-	glClear(GL_COLOR_BUFFER_BIT);
+	ChipmunkDebugDrawVPMatrix = projection_matrix;
+	// ChipmunkDemoTextFlushRenderer();
+	// ChipmunkDemoTextPopRenderer();
 }
 
-static void
-Reshape(int width, int height)
-{
-	glViewport(0, 0, width, height);
-	
-	float scale = (float)cpfmin(width/640.0, height/480.0);
-	float hw = width*(0.5f/scale);
-	float hh = height*(0.5f/scale);
-	
-	ChipmunkDebugDrawPointLineScale = scale;
-	glLineWidth((float)scale);
-	
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(-hw, hw, -hh, hh);
-}
-
-static char *
-DemoTitle(int index)
-{
-	static char title[1024];
-	sprintf(title, "Demo(%c): %s", 'a' + index, demos[demo_index].name);
-	
-	return title;
-}
-*/
 static void
 RunDemo(int index)
 {
@@ -433,15 +405,15 @@ RunDemo(int index)
 	max_constraints = 0;
 	space = demos[demo_index].initFunc();
 
-	// glfwSetWindowTitle(DemoTitle(index));
+	// Not supported by Sokol yet.
+	// static char title[1024];
+	// sprintf(title, "Demo(%c): %s", 'a' + demo_index, demos[demo_index].name);
 }
-/*
+
 static void
-Keyboard(int key, int state)
+Keyboard(sapp_keycode key)
 {
-	if(state == GLFW_RELEASE) return;
-	
-	int index = key - 'a';
+	int index = key - 'A';
 	
 	if(0 <= index && index < demo_count){
 		demos[demo_index].destroyFunc(space);
@@ -453,32 +425,35 @@ Keyboard(int key, int state)
 		paused = !paused;
   } else if(key == '1'){
 		step = cpTrue;
-	} else if(key == '\\'){
-		glDisable(GL_LINE_SMOOTH);
-		glDisable(GL_POINT_SMOOTH);
 	}
 	
-	float translate_increment = 50.0f/(float)scale;
+	float translate_increment = 50.0f/(float)view_scale;
 	float scale_increment = 1.2f;
-	if(key == '5'){
-		translate.x = 0.0f;
-		translate.y = 0.0f;
-		scale = 1.0f;
-	}else if(key == '4'){
-		translate.x += translate_increment;
-	}else if(key == '6'){
-		translate.x -= translate_increment;
-	}else if(key == '2'){
-		translate.y += translate_increment;
-	}else if(key == '8'){
-		translate.y -= translate_increment;
-	}else if(key == '7'){
-		scale /= scale_increment;
-	}else if(key == '9'){
-		scale *= scale_increment;
+	if(key == SAPP_KEYCODE_5){
+		view_translate.x = 0.0f;
+		view_translate.y = 0.0f;
+		view_scale = 1.0f;
+	}else if(key == SAPP_KEYCODE_4){
+		view_translate.x += translate_increment;
+	}else if(key == SAPP_KEYCODE_6){
+		view_translate.x -= translate_increment;
+	}else if(key == SAPP_KEYCODE_2){
+		view_translate.y += translate_increment;
+	}else if(key == SAPP_KEYCODE_8){
+		view_translate.y -= translate_increment;
+	}else if(key == SAPP_KEYCODE_7){
+		view_scale /= scale_increment;
+	}else if(key == SAPP_KEYCODE_9){
+		view_scale *= scale_increment;
 	}
+	
+	// case GLFW_KEY_UP   : ChipmunkDemoKeyboard.y += (state == GLFW_PRESS ?  1.0 : -1.0); break;
+	// case GLFW_KEY_DOWN : ChipmunkDemoKeyboard.y += (state == GLFW_PRESS ? -1.0 :  1.0); break;
+	// case GLFW_KEY_RIGHT: ChipmunkDemoKeyboard.x += (state == GLFW_PRESS ?  1.0 : -1.0); break;
+	// case GLFW_KEY_LEFT : ChipmunkDemoKeyboard.x += (state == GLFW_PRESS ? -1.0 :  1.0); break;
 }
 
+/*
 static cpVect
 MouseToSpace(int x, int y)
 {
@@ -536,19 +511,20 @@ Click(int button, int state)
 		ChipmunkDemoRightDown = ChipmunkDemoRightClick = (state == GLFW_PRESS);
 	}
 }
+*/
 
 static void
-SpecialKeyboard(int key, int state)
+Event(sapp_event *event)
 {
-	switch(key){
-		case GLFW_KEY_UP   : ChipmunkDemoKeyboard.y += (state == GLFW_PRESS ?  1.0 : -1.0); break;
-		case GLFW_KEY_DOWN : ChipmunkDemoKeyboard.y += (state == GLFW_PRESS ? -1.0 :  1.0); break;
-		case GLFW_KEY_RIGHT: ChipmunkDemoKeyboard.x += (state == GLFW_PRESS ?  1.0 : -1.0); break;
-		case GLFW_KEY_LEFT : ChipmunkDemoKeyboard.x += (state == GLFW_PRESS ? -1.0 :  1.0); break;
+	switch(event->type){
+		case SAPP_EVENTTYPE_KEY_DOWN: {
+			Keyboard(event->key_code);
+		} break;
+		
 		default: break;
 	}
 }
-*/
+
 static void
 TimeTrial(int index, int count)
 {
@@ -598,40 +574,37 @@ extern ChipmunkDemo bench_list[];
 extern int bench_count;
 
 static void
-init_sokol(void)
+Init(void)
 {
 	ChipmunkDebugDrawInit();
 	// ChipmunkDemoTextInit();
 	
-	ChipmunkDemo demo_list[] = {
-		LogoSmash,//A
-		PyramidStack,//B
-		Plink,//C
-		BouncyHexagons,//D
-		Tumble,//E
-		PyramidTopple,//F
-		Planet,//G
-		Springies,//H
-		Pump,//I
-		TheoJansen,//J
-		Query,//K
-		OneWay,//L
-		Joints,//M
-		Tank,//N
-		Chains,//O
-		Crane,//P
-		ContactGraph,//Q
-		Buoyancy,//R
-		Player,//S
-		Slice,//T
-		Convex,//U
-		Unicycle,//V
-		Sticky,//W
-		Shatter,//X
-	};
+	demos[ 0] = LogoSmash; //A
+	demos[ 1] = PyramidStack; //B
+	demos[ 2] = Plink; //C
+	demos[ 3] = BouncyHexagons; //D
+	demos[ 4] = Tumble; //E
+	demos[ 5] = PyramidTopple; //F
+	demos[ 6] = Planet; //G
+	demos[ 7] = Springies; //H
+	demos[ 8] = Pump; //I
+	demos[ 9] = TheoJansen; //J
+	demos[10] = Query; //K
+	demos[11] = OneWay; //L
+	demos[12] = Joints; //M
+	demos[13] = Tank; //N
+	demos[14] = Chains; //O
+	demos[15] = Crane; //P
+	demos[16] = ContactGraph; //Q
+	demos[17] = Buoyancy; //R
+	demos[18] = Player; //S
+	demos[19] = Slice; //T
+	demos[20] = Convex; //U
+	demos[21] = Unicycle; //V
+	demos[22] = Sticky; //W
+	demos[23] = Shatter; //X
 	
-	demos = demo_list;
-	demo_count = sizeof(demo_list)/sizeof(ChipmunkDemo);
+	demo_count = 23;
 	int trial = 0;
 	
 	// for(int i=0; i<argc; i++){
@@ -652,28 +625,17 @@ init_sokol(void)
 	}
 }
 
-void frame(void) {
-	cpVect size = {sapp_width(), sapp_height()};
-	
-	float scale = (float)cpfmin(size.x/640.0, size.y/480.0);
-	float hw = size.x*(0.5f/scale);
-	float hh = size.y*(0.5f/scale);
-	
-	ChipmunkDebugDrawPointLineScale = scale;
-	ChipmunkDebugDrawVPMatrix = cpTransformOrtho(cpBBNew(-hw, -hh, hw, hh));
-	ChipmunkDebugDrawFlushRenderer(sapp_width(), sapp_height());
-}
-
-void cleanup_sokol(void) {
+void Cleanup(void) {
 	sg_shutdown();
 }
 
 sapp_desc sokol_main(int argc, char* argv[]) {
 	stm_setup();
 	return (sapp_desc){
-		.init_cb = init_sokol,
-		.frame_cb = frame,
-		.cleanup_cb = cleanup_sokol,
+		.init_cb = Init,
+		.frame_cb = Display,
+		.event_cb = Event,
+		.cleanup_cb = Cleanup,
 		.width = 640,
 		.height = 480,
 		.window_title = "Chipmunk2D",

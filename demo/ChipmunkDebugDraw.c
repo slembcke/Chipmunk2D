@@ -366,10 +366,6 @@ void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color)
 void
 ChipmunkDebugDrawFlushRenderer(int pass_width, int pass_height)
 {
-	ChipmunkDebugDrawDot(64, cpv(0, 0), (cpSpaceDebugColor){1, 0, 0, 1});
-	ChipmunkDebugDrawCircle(cpv(100, 100), 3.141/4, 64, LAColor(1, 1), LAColor(1, 1));
-	ChipmunkDebugDrawFatSegment(cpv(-100, 0), cpv(0, -100), 16, LAColor(0, 0), LAColor(0, 0));
-	
 	cpTransform t = ChipmunkDebugDrawVPMatrix;
 	Uniforms uniforms = {
 		.U_vp_matrix = {t.a , t.b , 0, 0, t.c , t.d , 0, 0, 0, 0, 1, 0, t.tx, t.ty, 0, 1},
