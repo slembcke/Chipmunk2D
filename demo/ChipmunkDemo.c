@@ -367,7 +367,7 @@ Display(void)
 {
 	cpVect size = {sapp_width(), sapp_height()};
 	
-	cpTransform view_matrix = cpTransformIdentity;
+	cpTransform view_matrix = cpTransformMult(cpTransformScale(view_scale, view_scale), cpTransformTranslate(view_translate));
 	
 	float screen_scale = (float)cpfmin(size.x/640.0, size.y/480.0);
 	float hw = size.x*(0.5f/screen_scale);
@@ -425,46 +425,52 @@ RunDemo(int index)
 }
 
 static void
-Keyboard(sapp_keycode key)
+Keyboard(sapp_event *event)
 {
-	int index = key - 'A';
-	
-	if(0 <= index && index < demo_count){
-		demos[demo_index].destroyFunc(space);
-		RunDemo(index);
-	} else if(key == ' '){
-		demos[demo_index].destroyFunc(space);
-		RunDemo(demo_index);
-  } else if(key == '`'){
-		paused = !paused;
-  } else if(key == '1'){
-		step = cpTrue;
-	}
+	int index = event->key_code - 'A';
 	
 	float translate_increment = 50.0f/(float)view_scale;
 	float scale_increment = 1.2f;
-	if(key == SAPP_KEYCODE_5){
-		view_translate.x = 0.0f;
-		view_translate.y = 0.0f;
-		view_scale = 1.0f;
-	}else if(key == SAPP_KEYCODE_4){
-		view_translate.x += translate_increment;
-	}else if(key == SAPP_KEYCODE_6){
-		view_translate.x -= translate_increment;
-	}else if(key == SAPP_KEYCODE_2){
-		view_translate.y += translate_increment;
-	}else if(key == SAPP_KEYCODE_8){
-		view_translate.y -= translate_increment;
-	}else if(key == SAPP_KEYCODE_7){
-		view_scale /= scale_increment;
-	}else if(key == SAPP_KEYCODE_9){
-		view_scale *= scale_increment;
-	}
 	
-	// case GLFW_KEY_UP   : ChipmunkDemoKeyboard.y += (state == GLFW_PRESS ?  1.0 : -1.0); break;
-	// case GLFW_KEY_DOWN : ChipmunkDemoKeyboard.y += (state == GLFW_PRESS ? -1.0 :  1.0); break;
-	// case GLFW_KEY_RIGHT: ChipmunkDemoKeyboard.x += (state == GLFW_PRESS ?  1.0 : -1.0); break;
-	// case GLFW_KEY_LEFT : ChipmunkDemoKeyboard.x += (state == GLFW_PRESS ? -1.0 :  1.0); break;
+	if(event->type == SAPP_EVENTTYPE_KEY_DOWN){
+		if(0 <= index && index < demo_count){
+			demos[demo_index].destroyFunc(space);
+			RunDemo(index);
+		} else switch(event->key_code){
+			case SAPP_KEYCODE_SPACE:{
+				demos[demo_index].destroyFunc(space);
+				RunDemo(demo_index);
+			} break;
+			case SAPP_KEYCODE_GRAVE_ACCENT : {
+				paused = !paused;
+			} break;
+			case SAPP_KEYCODE_1: {
+				step = cpTrue;
+			} break;
+			
+			case SAPP_KEYCODE_KP_4: view_translate.x += translate_increment; break;
+			case SAPP_KEYCODE_KP_6: view_translate.x -= translate_increment; break;
+			case SAPP_KEYCODE_KP_2: view_translate.y += translate_increment; break;
+			case SAPP_KEYCODE_KP_8: view_translate.y -= translate_increment; break;
+			case SAPP_KEYCODE_KP_7: view_scale /= scale_increment; break;
+			case SAPP_KEYCODE_KP_9: view_scale *= scale_increment; break;
+			case SAPP_KEYCODE_KP_5: {
+				view_translate.x = 0.0f;
+				view_translate.y = 0.0f;
+				view_scale = 1.0f;
+			} break;
+			
+			default: break;
+		}
+	}
+		
+	switch(event->key_code){
+		case SAPP_KEYCODE_UP    : ChipmunkDemoKeyboard.y += (event->type == SAPP_EVENTTYPE_KEY_DOWN ?  1.0 : -1.0); break;
+		case SAPP_KEYCODE_DOWN  : ChipmunkDemoKeyboard.y += (event->type == SAPP_EVENTTYPE_KEY_DOWN ? -1.0 :  1.0); break;
+		case SAPP_KEYCODE_LEFT  : ChipmunkDemoKeyboard.x += (event->type == SAPP_EVENTTYPE_KEY_DOWN ?  1.0 : -1.0); break;
+		case SAPP_KEYCODE_RIGHT : ChipmunkDemoKeyboard.x += (event->type == SAPP_EVENTTYPE_KEY_DOWN ? -1.0 :  1.0); break;
+		default: break;
+	}
 }
 
 /*
@@ -531,8 +537,9 @@ static void
 Event(sapp_event *event)
 {
 	switch(event->type){
+		case SAPP_EVENTTYPE_KEY_UP:
 		case SAPP_EVENTTYPE_KEY_DOWN: {
-			Keyboard(event->key_code);
+			Keyboard(event);
 		} break;
 		
 		default: break;
