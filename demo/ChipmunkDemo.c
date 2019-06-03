@@ -128,22 +128,38 @@ ChipmunkDemoFreeSpaceChildren(cpSpace *space)
 	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)PostBodyFree, space);
 }
 
-/*
 static void
 DrawCircle(cpVect p, cpFloat a, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
 {ChipmunkDebugDrawCircle(p, a, r, outline, fill);}
 
 static void
 DrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color, cpDataPointer data)
-{ChipmunkDebugDrawSegment(a, b, color);}
+// {ChipmunkDebugDrawSegment(a, b, color);}
+{
+	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.0), 0, 1, color, color);
+	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.2), 0, 1, color, color);
+	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.4), 0, 1, color, color);
+	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.6), 0, 1, color, color);
+	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.8), 0, 1, color, color);
+	ChipmunkDebugDrawCircle(cpvlerp(a, b, 1.0), 0, 1, color, color);
+}
 
 static void
 DrawFatSegment(cpVect a, cpVect b, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
-{ChipmunkDebugDrawFatSegment(a, b, r, outline, fill);}
+// {ChipmunkDebugDrawFatSegment(a, b, r, outline, fill);}
+{
+	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.0), 0, r, outline, fill);
+	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.2), 0, r, outline, fill);
+	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.4), 0, r, outline, fill);
+	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.6), 0, r, outline, fill);
+	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.8), 0, r, outline, fill);
+	ChipmunkDebugDrawCircle(cpvlerp(a, b, 1.0), 0, r, outline, fill);
+}
 
 static void
 DrawPolygon(int count, const cpVect *verts, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
-{ChipmunkDebugDrawPolygon(count, verts, r, outline, fill);}
+// {ChipmunkDebugDrawPolygon(count, verts, r, outline, fill);}
+{for(int i = 0; i < count; i++) ChipmunkDebugDrawCircle(verts[i], 0, r, outline, fill);}
 
 static void
 DrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor color, cpDataPointer data)
@@ -195,11 +211,10 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 		}
 	}
 }
-*/
+
 void
 ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 {
-	/*
 	cpSpaceDebugDrawOptions drawOptions = {
 		DrawCircle,
 		DrawSegment,
@@ -217,7 +232,6 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 	};
 	
 	cpSpaceDebugDraw(space, &drawOptions);
-	*/
 }
 
 static void
