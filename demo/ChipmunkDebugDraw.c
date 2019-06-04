@@ -34,9 +34,9 @@ float ChipmunkDebugDrawOutlineWidth = 1.0f;
 
 #define GLSL33(x) "#version 330\n" #x
 
-static sg_pipeline pipeline;
-static sg_bindings bindings;
 static sg_pass_action pass_action;
+static sg_bindings bindings;
+static sg_pipeline pipeline;
 
 typedef struct {float x, y;} float2;
 typedef struct {uint8_t r, g, b, a;} RGBA8;
@@ -66,6 +66,13 @@ ChipmunkDebugDrawInit(void)
 	sg_desc desc = {};
 	sg_setup(&desc);
 	cpAssertHard(sg_isvalid(), "Could not init Sokol GFX.");
+	
+	pass_action = (sg_pass_action){
+		.colors = {
+			// [0] = {.action = SG_ACTION_CLEAR, .val = {0x07/255.0, 0x36/255.0, 0x42/255.0, 0.0}},
+			[0] = {.action = SG_ACTION_CLEAR, .val = {0x00/255.0, 0x2B/255.0, 0x36/255.0, 0.0}},
+		},
+	};
 	
 	VertexBuffer = sg_make_buffer(&(sg_buffer_desc){
 		.label = "ChipmunkDebugDraw Vertex Buffer",
@@ -224,21 +231,23 @@ static Vertex *push_vertexes(size_t vcount, const Index *index_src, size_t icoun
 void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 {
 	float r = (float)(size*0.5f/ChipmunkDebugDrawPointLineScale);
+	RGBA8 fill = cp_to_rgba(fillColor);
 	Vertex *vertexes = push_vertexes(4, (Index[]){0, 1, 2, 0, 2, 3}, 6);
-	vertexes[0] = (Vertex){r, {pos.x, pos.y}, {-1, -1}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[1] = (Vertex){r, {pos.x, pos.y}, {-1,  1}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[2] = (Vertex){r, {pos.x, pos.y}, { 1,  1}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[3] = (Vertex){r, {pos.x, pos.y}, { 1, -1}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[0] = (Vertex){r, {pos.x, pos.y}, {-1, -1}, fill};
+	vertexes[1] = (Vertex){r, {pos.x, pos.y}, {-1,  1}, fill};
+	vertexes[2] = (Vertex){r, {pos.x, pos.y}, { 1,  1}, fill};
+	vertexes[3] = (Vertex){r, {pos.x, pos.y}, { 1, -1}, fill};
 }
 
 void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
-	cpFloat r = radius;// + 1.0f/ChipmunkDebugDrawPointLineScale;
+	cpFloat r = radius + 1.0f/ChipmunkDebugDrawPointLineScale;
+	RGBA8 fill = cp_to_rgba(fillColor), outline = cp_to_rgba(outlineColor);
 	Vertex *vertexes = push_vertexes(4, (Index[]){0, 1, 2, 0, 2, 3}, 6);
-	vertexes[0] = (Vertex){r, {pos.x, pos.y}, {-1, -1}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[1] = (Vertex){r, {pos.x, pos.y}, {-1,  1}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[2] = (Vertex){r, {pos.x, pos.y}, { 1,  1}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[3] = (Vertex){r, {pos.x, pos.y}, { 1, -1}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[0] = (Vertex){r, {pos.x, pos.y}, {-1, -1}, fill};
+	vertexes[1] = (Vertex){r, {pos.x, pos.y}, {-1,  1}, fill};
+	vertexes[2] = (Vertex){r, {pos.x, pos.y}, { 1,  1}, fill};
+	vertexes[3] = (Vertex){r, {pos.x, pos.y}, { 1, -1}, fill};
 	
 	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawPointLineScale*0.5f)), outlineColor);
 }
@@ -262,14 +271,16 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebu
 		fillColor = outlineColor;
 	}
 	
-	vertexes[0] = (Vertex){r, {a.x, a.y}, {-t.x + t.y, -t.x - t.y}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[1] = (Vertex){r, {a.x, a.y}, {-t.x - t.y, +t.x - t.y}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[2] = (Vertex){r, {a.x, a.y}, {-0.0 + t.y, -t.x + 0.0}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[3] = (Vertex){r, {a.x, a.y}, {-0.0 - t.y, +t.x + 0.0}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[4] = (Vertex){r, {b.x, b.y}, {+0.0 + t.y, -t.x - 0.0}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[5] = (Vertex){r, {b.x, b.y}, {+0.0 - t.y, +t.x - 0.0}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[6] = (Vertex){r, {b.x, b.y}, {+t.x + t.y, -t.x + t.y}, {0xFF, 0x00, 0x00, 0xFF}};
-	vertexes[7] = (Vertex){r, {b.x, b.y}, {+t.x - t.y, +t.x + t.y}, {0xFF, 0x00, 0x00, 0xFF}};
+	RGBA8 fill = cp_to_rgba(fillColor), outline = cp_to_rgba(outlineColor);
+	
+	vertexes[0] = (Vertex){r, {a.x, a.y}, {-t.x + t.y, -t.x - t.y}, fill};
+	vertexes[1] = (Vertex){r, {a.x, a.y}, {-t.x - t.y, +t.x - t.y}, fill};
+	vertexes[2] = (Vertex){r, {a.x, a.y}, {-0.0 + t.y, -t.x + 0.0}, fill};
+	vertexes[3] = (Vertex){r, {a.x, a.y}, {-0.0 - t.y, +t.x + 0.0}, fill};
+	vertexes[4] = (Vertex){r, {b.x, b.y}, {+0.0 + t.y, -t.x - 0.0}, fill};
+	vertexes[5] = (Vertex){r, {b.x, b.y}, {+0.0 - t.y, +t.x - 0.0}, fill};
+	vertexes[6] = (Vertex){r, {b.x, b.y}, {+t.x + t.y, -t.x + t.y}, fill};
+	vertexes[7] = (Vertex){r, {b.x, b.y}, {+t.x - t.y, +t.x + t.y}, fill};
 }
 
 extern cpVect ChipmunkDemoMouse;

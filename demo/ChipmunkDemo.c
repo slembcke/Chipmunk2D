@@ -156,7 +156,7 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 		if(cpBodyIsSleeping(body)){
 			return LAColor(0.2f, 1.0f);
 		} else if(body->sleeping.idleTime > shape->space->sleepTimeThreshold) {
-			return LAColor(0.66f, 1.0f);
+			return LAColor(0.4f, 1.0f);
 		} else {
 			uint32_t val = (uint32_t)shape->hashid;
 			
@@ -174,20 +174,18 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 			
 			float max = (float)cpfmax(cpfmax(r, g), b);
 			float min = (float)cpfmin(cpfmin(r, g), b);
-			float intensity = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC ? 0.15f : 0.75f);
+			float intensity = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC ? 0.15f : 0.65f);
 			
-			// Saturate and scale the color
-			if(min == max){
-				return RGBAColor(intensity, 0.0f, 0.0f, 1.0f);
-			} else {
-				float coef = (float)intensity/(max - min);
-				return RGBAColor(
-					(r - min)*coef,
-					(g - min)*coef,
-					(b - min)*coef,
-					1.0f
-				);
-			}
+			cpSpaceDebugColor full_sat = RGBAColor(r/max, g/max, b/max, 1.0f);
+			float gray = 0.3*full_sat.r + 0.6*full_sat.g + 0.1*full_sat.b;
+			
+			float sat = 0.65;
+			return RGBAColor(
+				intensity*cpflerp(gray, full_sat.r, sat),
+				intensity*cpflerp(gray, full_sat.g, sat),
+				intensity*cpflerp(gray, full_sat.b, sat),
+				1.0
+			);
 		}
 	}
 }
