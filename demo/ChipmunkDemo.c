@@ -347,17 +347,19 @@ Update(void)
 	
 	LastTime = time;
 }
-/*
-static void
-Display(void)
-{
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef((float)translate.x, (float)translate.y, 0.0f);
-	glScalef((float)scale, (float)scale, 1.0f);
+
+void frame(void) {
+	// ChipmunkDebugDrawDot(64, cpv(0, 0), (cpSpaceDebugColor){1, 0, 0, 1});
+	// ChipmunkDebugDrawCircle(cpv(100, 100), 3.141/4, 64, LAColor(0, 1), LAColor(1, 1));
+	ChipmunkDebugDrawFatSegment(cpv(-100, 0), cpv(0, -100), 16, LAColor(0, 1), LAColor(1, 1));
+	
+	// glMatrixMode(GL_MODELVIEW);
+	// glLoadIdentity();
+	// glTranslatef((float)translate.x, (float)translate.y, 0.0f);
+	// glScalef((float)scale, (float)scale, 1.0f);
 	
 	Update();
-	
+/*
 	ChipmunkDebugDrawPushRenderer();
 	demos[demo_index].drawFunc(space);
 	
@@ -383,11 +385,20 @@ Display(void)
 		ChipmunkDemoTextFlushRenderer();
 		ChipmunkDemoTextPopRenderer();
 	} glPopMatrix();
+*/
+	cpVect size = {sapp_width(), sapp_height()};
 	
-	glfwSwapBuffers();
-	glClear(GL_COLOR_BUFFER_BIT);
+	float scale = (float)cpfmin(size.x/640.0, size.y/480.0);
+	float hw = size.x*(0.5f/scale);
+	float hh = size.y*(0.5f/scale);
+	cpTransform projection_matrix = cpTransformOrtho(cpBBNew(-hw, -hh, hw, hh));
+	
+	ChipmunkDebugDrawPointLineScale = scale;
+	ChipmunkDebugDrawVPMatrix = projection_matrix;
+	ChipmunkDebugDrawFlushRenderer(sapp_width(), sapp_height());
 }
 
+/*
 static void
 Reshape(int width, int height)
 {
@@ -650,18 +661,6 @@ init_sokol(void)
 		mouse_body = cpBodyNewKinematic();
 		RunDemo(demo_index);
 	}
-}
-
-void frame(void) {
-	cpVect size = {sapp_width(), sapp_height()};
-	
-	float scale = (float)cpfmin(size.x/640.0, size.y/480.0);
-	float hw = size.x*(0.5f/scale);
-	float hh = size.y*(0.5f/scale);
-	
-	ChipmunkDebugDrawPointLineScale = scale;
-	ChipmunkDebugDrawVPMatrix = cpTransformOrtho(cpBBNew(-hw, -hh, hw, hh));
-	ChipmunkDebugDrawFlushRenderer(sapp_width(), sapp_height());
 }
 
 void cleanup_sokol(void) {

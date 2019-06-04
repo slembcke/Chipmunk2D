@@ -1,5 +1,5 @@
 cmake_policy(SET CMP0015 NEW) # Convert relative paths
-cmake_policy(SET CMP0072 NEW)
+# cmake_policy(SET CMP0072 NEW)
 
 find_package(OpenGL REQUIRED)
 
