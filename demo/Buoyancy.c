@@ -86,7 +86,7 @@ waterPreSolve(cpArbiter *arb, cpSpace *space, void *ptr)
 	cpFloat displacedMass = clippedArea*FLUID_DENSITY;
 	cpVect centroid = cpCentroidForPoly(clippedCount, clipped);
 	
-	ChipmunkDebugDrawPolygon(clippedCount, clipped, 0.0f, RGBAColor(0, 0, 1, 1), RGBAColor(0, 0, 1, 0.1f));
+	ChipmunkDebugDrawPolygon(clippedCount, clipped, 5.0f, RGBAColor(0, 0, 1, 1), RGBAColor(0, 0, 1, 0.1f));
 	ChipmunkDebugDrawDot(5, centroid, RGBAColor(0, 0, 1, 1));
 	
 	cpFloat dt = cpSpaceGetCurrentTimeStep(space);

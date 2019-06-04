@@ -251,18 +251,22 @@ ChipmunkDemoTextFlushRenderer(void)
 void
 ChipmunkDemoTextClearRenderer(void)
 {
-	// triangle_count = 0;
+	VertexCount = IndexCount = 0;
 }
 
-static int pushed_triangle_count = 0;
+
+static size_t PushedVertexCount, PushedIndexCount;
+
 void
 ChipmunkDemoTextPushRenderer(void)
 {
-	// pushed_triangle_count = triangle_count;
+	PushedVertexCount = VertexCount;
+	PushedIndexCount = IndexCount;
 }
 
 void
 ChipmunkDemoTextPopRenderer(void)
 {
-	// triangle_count = pushed_triangle_count;
+	VertexCount = PushedVertexCount;
+	IndexCount = PushedIndexCount;
 }

@@ -103,7 +103,9 @@ ChipmunkDebugDrawInit(void)
 				gl_Position = U_vp_matrix*vec4(IN_pos + IN_radius*IN_uv, 0, 1);
 				FRAG.uv = IN_uv;
 				FRAG.fill = IN_fill;
+				FRAG.fill.rgb *= IN_fill.a;
 				FRAG.outline = IN_outline;
+				FRAG.outline.a *= IN_outline.a;
 			}
 		),
 		.fs.source = GLSL33(
@@ -122,7 +124,7 @@ ChipmunkDebugDrawInit(void)
 				
 				float outline = 1 - fw;
 				float outline_mask = smoothstep(outline - fw, outline, len);
-				vec4 color = mix(FRAG.fill, FRAG.outline, outline_mask);
+				vec4 color = FRAG.fill + (FRAG.outline - FRAG.fill*FRAG.outline.a)*outline_mask;
 				OUT_color = color*mask;
 			}
 		),
@@ -295,26 +297,27 @@ ChipmunkDebugDrawFlushRenderer(void)
 	sg_apply_bindings(&bindings);
 	sg_apply_uniforms(SG_SHADERSTAGE_VS, 0, &uniforms, sizeof(Uniforms));
 	sg_draw(0, IndexCount, 1);
-	
-	VertexCount = 0;
-	IndexCount = 0;
 }
 
 void
 ChipmunkDebugDrawClearRenderer(void)
 {
-	// triangle_count = 0;
+	VertexCount = IndexCount = 0;
 }
 
-// static int pushed_triangle_count = 0;
+
+static size_t PushedVertexCount, PushedIndexCount;
+
 void
 ChipmunkDebugDrawPushRenderer(void)
 {
-	// pushed_triangle_count = triangle_count;
+	PushedVertexCount = VertexCount;
+	PushedIndexCount = IndexCount;
 }
 
 void
 ChipmunkDebugDrawPopRenderer(void)
 {
-	// triangle_count = pushed_triangle_count;
+	VertexCount = PushedVertexCount;
+	IndexCount = PushedIndexCount;
 }

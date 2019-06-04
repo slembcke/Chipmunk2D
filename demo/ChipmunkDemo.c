@@ -302,8 +302,8 @@ Tick(double dt)
 		
 		// Completely reset the renderer only at the beginning of a tick.
 		// That way it can always display at least the last ticks' debug drawing.
-		// ChipmunkDebugDrawClearRenderer();
-		// ChipmunkDemoTextClearRenderer();
+		ChipmunkDebugDrawClearRenderer();
+		ChipmunkDemoTextClearRenderer();
 		
 		cpVect new_point = cpvlerp(mouse_body->p, ChipmunkDemoMouse, 0.25f);
 		mouse_body->v = cpvmult(cpvsub(new_point, mouse_body->p), 60.0f);
@@ -353,7 +353,9 @@ Display(void)
 	
 	Update();
 	
+	// Save the drawing commands from the most recent tick.
 	ChipmunkDebugDrawPushRenderer();
+	ChipmunkDemoTextPushRenderer();
 	demos[demo_index].drawFunc(space);
 	
 //	// Highlight the shape under the mouse because it looks neat.
@@ -367,15 +369,15 @@ Display(void)
 	
 	// Draw the renderer contents and reset it back to the last tick's state.
 	ChipmunkDebugDrawFlushRenderer();
-	ChipmunkDebugDrawPopRenderer();
 	
-	// ChipmunkDemoTextPushRenderer();
 	// // Now render all the UI text.
 	DrawInstructions();
 	DrawInfo();
 	
 	ChipmunkDemoTextMatrix = projection_matrix;
 	ChipmunkDemoTextFlushRenderer();
+	
+	ChipmunkDebugDrawPopRenderer();
 	ChipmunkDemoTextPopRenderer();
 	
 	sg_end_pass();
