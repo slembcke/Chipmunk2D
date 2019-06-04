@@ -53,10 +53,6 @@
 
 #include "sokol/sokol.h"
 
-static sg_pass_action pass_action = {
-	.colors[0] = {.action = SG_ACTION_CLEAR, .val = {52.0f/255.0f, 62.0f/255.0f, 72.0f/255.0f, 1.0f}}
-};
-
 #undef Convex
 
 static ChipmunkDemo demos[32];
@@ -134,27 +130,11 @@ DrawCircle(cpVect p, cpFloat a, cpFloat r, cpSpaceDebugColor outline, cpSpaceDeb
 
 static void
 DrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color, cpDataPointer data)
-// {ChipmunkDebugDrawSegment(a, b, color);}
-{
-	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.0), 0, 1, color, color);
-	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.2), 0, 1, color, color);
-	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.4), 0, 1, color, color);
-	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.6), 0, 1, color, color);
-	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.8), 0, 1, color, color);
-	ChipmunkDebugDrawCircle(cpvlerp(a, b, 1.0), 0, 1, color, color);
-}
+{ChipmunkDebugDrawSegment(a, b, color);}
 
 static void
 DrawFatSegment(cpVect a, cpVect b, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
-// {ChipmunkDebugDrawFatSegment(a, b, r, outline, fill);}
-{
-	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.0), 0, r, outline, fill);
-	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.2), 0, r, outline, fill);
-	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.4), 0, r, outline, fill);
-	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.6), 0, r, outline, fill);
-	ChipmunkDebugDrawCircle(cpvlerp(a, b, 0.8), 0, r, outline, fill);
-	ChipmunkDebugDrawCircle(cpvlerp(a, b, 1.0), 0, r, outline, fill);
-}
+{ChipmunkDebugDrawFatSegment(a, b, r, outline, fill);}
 
 static void
 DrawPolygon(int count, const cpVect *verts, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
@@ -395,7 +375,7 @@ Display(void)
 	// DrawInstructions();
 	// DrawInfo();
 	
-	ChipmunkDebugDrawVPMatrix = projection_matrix;
+	// ChipmunkDebugDrawVPMatrix = projection_matrix;
 	// ChipmunkDemoTextFlushRenderer();
 	// ChipmunkDemoTextPopRenderer();
 }
@@ -463,58 +443,46 @@ Keyboard(sapp_event *event)
 			default: break;
 		}
 	}
-		
+	
+	// TODO key repeat.
 	switch(event->key_code){
 		case SAPP_KEYCODE_UP    : ChipmunkDemoKeyboard.y += (event->type == SAPP_EVENTTYPE_KEY_DOWN ?  1.0 : -1.0); break;
 		case SAPP_KEYCODE_DOWN  : ChipmunkDemoKeyboard.y += (event->type == SAPP_EVENTTYPE_KEY_DOWN ? -1.0 :  1.0); break;
-		case SAPP_KEYCODE_LEFT  : ChipmunkDemoKeyboard.x += (event->type == SAPP_EVENTTYPE_KEY_DOWN ?  1.0 : -1.0); break;
-		case SAPP_KEYCODE_RIGHT : ChipmunkDemoKeyboard.x += (event->type == SAPP_EVENTTYPE_KEY_DOWN ? -1.0 :  1.0); break;
+		case SAPP_KEYCODE_LEFT  : ChipmunkDemoKeyboard.x += (event->type == SAPP_EVENTTYPE_KEY_DOWN ? -1.0 : -1.0); break;
+		case SAPP_KEYCODE_RIGHT : ChipmunkDemoKeyboard.x += (event->type == SAPP_EVENTTYPE_KEY_DOWN ?  1.0 :  1.0); break;
 		default: break;
 	}
 }
 
-/*
 static cpVect
-MouseToSpace(int x, int y)
+MouseToSpace(sapp_event *event)
 {
-	GLdouble model[16];
-	glGetDoublev(GL_MODELVIEW_MATRIX, model);
+	// Calculate clip coord for mouse.
+	float scale = sapp_dpi_scale();
+	cpVect screen_size = cpv(sapp_width()/scale, sapp_height()/scale);
+	cpVect clip_coord = cpv(2*event->mouse_x/screen_size.x - 1, 1 - 2*event->mouse_y/screen_size.y);
 	
-	GLdouble proj[16];
-	glGetDoublev(GL_PROJECTION_MATRIX, proj);
- 	
-	GLint view[4];
-	glGetIntegerv(GL_VIEWPORT, view);
-	
-	int ww, wh;
-	glfwGetWindowSize(&ww, &wh);
-	
-	GLdouble mx, my, mz;
-	gluUnProject(x, wh - y, 0.0f, model, proj, view, &mx, &my, &mz);
-	
-	return cpv(mx, my);
+	// Use the VP matrix to transform to world space.
+	cpTransform vp_inverse = cpTransformInverse(ChipmunkDebugDrawVPMatrix);
+	return cpTransformPoint(vp_inverse, clip_coord);
 }
 
 static void
-Mouse(int x, int y)
+Click(sapp_event *event)
 {
-	ChipmunkDemoMouse = MouseToSpace(x, y);
-}
-
-static void
-Click(int button, int state)
-{
-	if(button == GLFW_MOUSE_BUTTON_1){
-		if(state == GLFW_PRESS){
+	cpVect mouse_pos = MouseToSpace(event);
+	
+	if(event->mouse_button == SAPP_MOUSEBUTTON_LEFT){
+		if(event->type == SAPP_EVENTTYPE_MOUSE_DOWN){
 			// give the mouse click a little radius to make it easier to click small shapes.
 			cpFloat radius = 5.0;
 			
 			cpPointQueryInfo info = {};
-			cpShape *shape = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, radius, GRAB_FILTER, &info);
+			cpShape *shape = cpSpacePointQueryNearest(space, mouse_pos, radius, GRAB_FILTER, &info);
 			
 			if(shape && cpBodyGetMass(cpShapeGetBody(shape)) < INFINITY){
 				// Use the closest point on the surface if the click is outside of the shape.
-				cpVect nearest = (info.distance > 0.0f ? info.point : ChipmunkDemoMouse);
+				cpVect nearest = (info.distance > 0.0f ? info.point : mouse_pos);
 				
 				cpBody *body = cpShapeGetBody(shape);
 				mouse_joint = cpPivotJointNew2(mouse_body, body, cpvzero, cpBodyWorldToLocal(body, nearest));
@@ -527,11 +495,10 @@ Click(int button, int state)
 			cpConstraintFree(mouse_joint);
 			mouse_joint = NULL;
 		}
-	} else if(button == GLFW_MOUSE_BUTTON_2){
-		ChipmunkDemoRightDown = ChipmunkDemoRightClick = (state == GLFW_PRESS);
+	} else if(event->mouse_button == SAPP_MOUSEBUTTON_RIGHT){
+		ChipmunkDemoRightDown = ChipmunkDemoRightClick = (event->type == SAPP_EVENTTYPE_MOUSE_DOWN);
 	}
 }
-*/
 
 static void
 Event(sapp_event *event)
@@ -540,6 +507,15 @@ Event(sapp_event *event)
 		case SAPP_EVENTTYPE_KEY_UP:
 		case SAPP_EVENTTYPE_KEY_DOWN: {
 			Keyboard(event);
+		} break;
+		
+		case SAPP_EVENTTYPE_MOUSE_MOVE: {
+			ChipmunkDemoMouse = MouseToSpace(event);
+		}; break;
+		
+		case SAPP_EVENTTYPE_MOUSE_UP:
+		case SAPP_EVENTTYPE_MOUSE_DOWN: {
+			Click(event);
 		} break;
 		
 		default: break;
