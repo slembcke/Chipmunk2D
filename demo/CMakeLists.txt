@@ -1,6 +1,6 @@
 cmake_policy(SET CMP0015 NEW) # Convert relative paths
-cmake_policy(SET CMP0072 NEW)
 
+set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 
 set(chipmunk_demos_include_dirs
