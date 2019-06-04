@@ -40,7 +40,7 @@ static sg_pipeline pipeline;
 
 typedef struct {float x, y;} float2;
 typedef struct {uint8_t r, g, b, a;} RGBA8;
-typedef struct {float radius; float2 position; float2 uv; RGBA8 color;} Vertex;
+typedef struct {float2 pos; float2 uv; float r; RGBA8 fill, outline;} Vertex;
 typedef uint16_t Index;
 
 static RGBA8 cp_to_rgba(cpSpaceDebugColor c){return (RGBA8){0xFF*c.r, 0xFF*c.g, 0xFF*c.b, 0xFF*c.a};}
@@ -100,28 +100,32 @@ ChipmunkDebugDrawInit(void)
 				}
 		},
 		.vs.source = GLSL33(
-			layout(location = 0) in float IN_radius;
-			layout(location = 1) in vec2 IN_position;
-			layout(location = 2) in vec2 IN_uv;
-			layout(location = 3) in vec4 IN_color;
+			layout(location = 0) in vec2 IN_pos;
+			layout(location = 1) in vec2 IN_uv;
+			layout(location = 2) in float IN_radius;
+			layout(location = 3) in vec4 IN_fill;
+			layout(location = 4) in vec4 IN_outline;
 			
 			uniform mat4 U_vp_matrix;
 			
 			out struct {
 				vec2 uv;
-				vec4 color;
+				vec4 fill;
+				vec4 outline;
 			} FRAG;
 			
 			void main(){
-				gl_Position = U_vp_matrix*vec4(IN_position + IN_radius*IN_uv, 0, 1);
+				gl_Position = U_vp_matrix*vec4(IN_pos + IN_radius*IN_uv, 0, 1);
 				FRAG.uv = IN_uv;
-				FRAG.color = IN_color;
+				FRAG.fill = IN_fill;
+				FRAG.outline = IN_outline;
 			}
 		),
 		.fs.source = GLSL33(
 			in struct {
 				vec2 uv;
-				vec4 color;
+				vec4 fill;
+				vec4 outline;
 			} FRAG;
 			
 			out vec4 OUT_color;
@@ -130,7 +134,11 @@ ChipmunkDebugDrawInit(void)
 				float len = length(FRAG.uv);
 				float fw = length(fwidth(FRAG.uv));
 				float mask = smoothstep(1, 1 - fw, len);
-				OUT_color = FRAG.color*mask;
+				
+				float outline = 1 - fw;
+				float outline_mask = smoothstep(outline - fw, outline, len);
+				vec4 color = mix(FRAG.fill, FRAG.outline, outline_mask);
+				OUT_color = color*mask;
 			}
 		),
 	});
@@ -145,10 +153,11 @@ ChipmunkDebugDrawInit(void)
 		.index_type = SG_INDEXTYPE_UINT16,
 		.layout = {
 			.attrs = {
-				[0] = {.offset = offsetof(Vertex, radius), .format = SG_VERTEXFORMAT_FLOAT},
-				[1] = {.offset = offsetof(Vertex, position), .format = SG_VERTEXFORMAT_FLOAT2},
-				[2] = {.offset = offsetof(Vertex, uv), .format = SG_VERTEXFORMAT_FLOAT2},
-				[3] = {.offset = offsetof(Vertex, color), .format = SG_VERTEXFORMAT_UBYTE4N},
+				[0] = {.offset = offsetof(Vertex, pos), .format = SG_VERTEXFORMAT_FLOAT2},
+				[1] = {.offset = offsetof(Vertex, uv), .format = SG_VERTEXFORMAT_FLOAT2},
+				[2] = {.offset = offsetof(Vertex, r), .format = SG_VERTEXFORMAT_FLOAT},
+				[3] = {.offset = offsetof(Vertex, fill), .format = SG_VERTEXFORMAT_UBYTE4N},
+				[4] = {.offset = offsetof(Vertex, outline), .format = SG_VERTEXFORMAT_UBYTE4N},
 			}
 		}
 	});
@@ -233,10 +242,10 @@ void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 	float r = (float)(size*0.5f/ChipmunkDebugDrawPointLineScale);
 	RGBA8 fill = cp_to_rgba(fillColor);
 	Vertex *vertexes = push_vertexes(4, (Index[]){0, 1, 2, 0, 2, 3}, 6);
-	vertexes[0] = (Vertex){r, {pos.x, pos.y}, {-1, -1}, fill};
-	vertexes[1] = (Vertex){r, {pos.x, pos.y}, {-1,  1}, fill};
-	vertexes[2] = (Vertex){r, {pos.x, pos.y}, { 1,  1}, fill};
-	vertexes[3] = (Vertex){r, {pos.x, pos.y}, { 1, -1}, fill};
+	vertexes[0] = (Vertex){{pos.x, pos.y}, {-1, -1}, r, fill, fill};
+	vertexes[1] = (Vertex){{pos.x, pos.y}, {-1,  1}, r, fill, fill};
+	vertexes[2] = (Vertex){{pos.x, pos.y}, { 1,  1}, r, fill, fill};
+	vertexes[3] = (Vertex){{pos.x, pos.y}, { 1, -1}, r, fill, fill};
 }
 
 void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
@@ -244,10 +253,10 @@ void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceD
 	cpFloat r = radius + 1.0f/ChipmunkDebugDrawPointLineScale;
 	RGBA8 fill = cp_to_rgba(fillColor), outline = cp_to_rgba(outlineColor);
 	Vertex *vertexes = push_vertexes(4, (Index[]){0, 1, 2, 0, 2, 3}, 6);
-	vertexes[0] = (Vertex){r, {pos.x, pos.y}, {-1, -1}, fill};
-	vertexes[1] = (Vertex){r, {pos.x, pos.y}, {-1,  1}, fill};
-	vertexes[2] = (Vertex){r, {pos.x, pos.y}, { 1,  1}, fill};
-	vertexes[3] = (Vertex){r, {pos.x, pos.y}, { 1, -1}, fill};
+	vertexes[0] = (Vertex){{pos.x, pos.y}, {-1, -1}, r, fill, outline};
+	vertexes[1] = (Vertex){{pos.x, pos.y}, {-1,  1}, r, fill, outline};
+	vertexes[2] = (Vertex){{pos.x, pos.y}, { 1,  1}, r, fill, outline};
+	vertexes[3] = (Vertex){{pos.x, pos.y}, { 1, -1}, r, fill, outline};
 	
 	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawPointLineScale*0.5f)), outlineColor);
 }
@@ -273,14 +282,14 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebu
 	
 	RGBA8 fill = cp_to_rgba(fillColor), outline = cp_to_rgba(outlineColor);
 	
-	vertexes[0] = (Vertex){r, {a.x, a.y}, {-t.x + t.y, -t.x - t.y}, fill};
-	vertexes[1] = (Vertex){r, {a.x, a.y}, {-t.x - t.y, +t.x - t.y}, fill};
-	vertexes[2] = (Vertex){r, {a.x, a.y}, {-0.0 + t.y, -t.x + 0.0}, fill};
-	vertexes[3] = (Vertex){r, {a.x, a.y}, {-0.0 - t.y, +t.x + 0.0}, fill};
-	vertexes[4] = (Vertex){r, {b.x, b.y}, {+0.0 + t.y, -t.x - 0.0}, fill};
-	vertexes[5] = (Vertex){r, {b.x, b.y}, {+0.0 - t.y, +t.x - 0.0}, fill};
-	vertexes[6] = (Vertex){r, {b.x, b.y}, {+t.x + t.y, -t.x + t.y}, fill};
-	vertexes[7] = (Vertex){r, {b.x, b.y}, {+t.x - t.y, +t.x + t.y}, fill};
+	vertexes[0] = (Vertex){{a.x, a.y}, {-t.x + t.y, -t.x - t.y}, r, fill, outline};
+	vertexes[1] = (Vertex){{a.x, a.y}, {-t.x - t.y, +t.x - t.y}, r, fill, outline};
+	vertexes[2] = (Vertex){{a.x, a.y}, {-0.0 + t.y, -t.x + 0.0}, r, fill, outline};
+	vertexes[3] = (Vertex){{a.x, a.y}, {-0.0 - t.y, +t.x + 0.0}, r, fill, outline};
+	vertexes[4] = (Vertex){{b.x, b.y}, {+0.0 + t.y, -t.x - 0.0}, r, fill, outline};
+	vertexes[5] = (Vertex){{b.x, b.y}, {+0.0 - t.y, +t.x - 0.0}, r, fill, outline};
+	vertexes[6] = (Vertex){{b.x, b.y}, {+t.x + t.y, -t.x + t.y}, r, fill, outline};
+	vertexes[7] = (Vertex){{b.x, b.y}, {+t.x - t.y, +t.x + t.y}, r, fill, outline};
 }
 
 extern cpVect ChipmunkDemoMouse;
