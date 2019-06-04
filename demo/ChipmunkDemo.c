@@ -409,22 +409,25 @@ RunDemo(int index)
 static void
 Keyboard(const sapp_event *event)
 {
-	int index = event->key_code - 'A';
-	
 	float translate_increment = 50.0f/(float)view_scale;
 	float scale_increment = 1.2f;
 	
-	if(event->type == SAPP_EVENTTYPE_KEY_DOWN){
+	if(event->type == SAPP_EVENTTYPE_CHAR && !event->key_repeat){
+		int index = event->char_code - 'a';
 		if(0 <= index && index < demo_count){
 			demos[demo_index].destroyFunc(space);
 			RunDemo(index);
-		} else switch(event->key_code){
+		}
+	} else if(event->type == SAPP_EVENTTYPE_KEY_DOWN){
+		switch(event->key_code){
 			case SAPP_KEYCODE_SPACE:{
-				demos[demo_index].destroyFunc(space);
-				RunDemo(demo_index);
+				if(!event->key_repeat){
+					demos[demo_index].destroyFunc(space);
+					RunDemo(demo_index);
+				}
 			} break;
 			case SAPP_KEYCODE_GRAVE_ACCENT : {
-				paused = !paused;
+				if(!event->key_repeat) paused = !paused;
 			} break;
 			case SAPP_KEYCODE_1: {
 				step = cpTrue;
@@ -446,13 +449,14 @@ Keyboard(const sapp_event *event)
 		}
 	}
 	
-	// TODO key repeat.
-	switch(event->key_code){
-		case SAPP_KEYCODE_UP    : ChipmunkDemoKeyboard.y += (event->type == SAPP_EVENTTYPE_KEY_DOWN ?  1.0 : -1.0); break;
-		case SAPP_KEYCODE_DOWN  : ChipmunkDemoKeyboard.y += (event->type == SAPP_EVENTTYPE_KEY_DOWN ? -1.0 :  1.0); break;
-		case SAPP_KEYCODE_LEFT  : ChipmunkDemoKeyboard.x += (event->type == SAPP_EVENTTYPE_KEY_DOWN ? -1.0 : -1.0); break;
-		case SAPP_KEYCODE_RIGHT : ChipmunkDemoKeyboard.x += (event->type == SAPP_EVENTTYPE_KEY_DOWN ?  1.0 :  1.0); break;
-		default: break;
+	if(!event->key_repeat){
+		switch(event->key_code){
+			case SAPP_KEYCODE_UP    : ChipmunkDemoKeyboard.y += (event->type == SAPP_EVENTTYPE_KEY_DOWN ?  1.0 : -1.0); break;
+			case SAPP_KEYCODE_DOWN  : ChipmunkDemoKeyboard.y += (event->type == SAPP_EVENTTYPE_KEY_DOWN ? -1.0 :  1.0); break;
+			case SAPP_KEYCODE_LEFT  : ChipmunkDemoKeyboard.x += (event->type == SAPP_EVENTTYPE_KEY_DOWN ? -1.0 :  1.0); break;
+			case SAPP_KEYCODE_RIGHT : ChipmunkDemoKeyboard.x += (event->type == SAPP_EVENTTYPE_KEY_DOWN ?  1.0 : -1.0); break;
+			default: break;
+		}
 	}
 }
 
@@ -505,6 +509,7 @@ static void
 Event(const sapp_event *event)
 {
 	switch(event->type){
+		case SAPP_EVENTTYPE_CHAR:
 		case SAPP_EVENTTYPE_KEY_UP:
 		case SAPP_EVENTTYPE_KEY_DOWN: {
 			Keyboard(event);
