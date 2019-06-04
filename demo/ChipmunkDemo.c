@@ -144,6 +144,18 @@ static void
 DrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor color, cpDataPointer data)
 {ChipmunkDebugDrawDot(size, pos, color);}
 
+
+static cpSpaceDebugColor Colors[] = {
+	{0xb5/255.0f, 0x89/255.0f, 0x00/255.0f, 1.0f},
+	{0xcb/255.0f, 0x4b/255.0f, 0x16/255.0f, 1.0f},
+	{0xdc/255.0f, 0x32/255.0f, 0x2f/255.0f, 1.0f},
+	{0xd3/255.0f, 0x36/255.0f, 0x82/255.0f, 1.0f},
+	{0x6c/255.0f, 0x71/255.0f, 0xc4/255.0f, 1.0f},
+	{0x26/255.0f, 0x8b/255.0f, 0xd2/255.0f, 1.0f},
+	{0x2a/255.0f, 0xa1/255.0f, 0x98/255.0f, 1.0f},
+	{0x85/255.0f, 0x99/255.0f, 0x00/255.0f, 1.0f},
+};
+
 static cpSpaceDebugColor
 ColorForShape(cpShape *shape, cpDataPointer data)
 {
@@ -153,9 +165,9 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 		cpBody *body = cpShapeGetBody(shape);
 		
 		if(cpBodyIsSleeping(body)){
-			return LAColor(0.2f, 1.0f);
+			return RGBAColor(0x58/255.0f, 0x6e/255.0f, 0x75/255.0f, 1.0f);
 		} else if(body->sleeping.idleTime > shape->space->sleepTimeThreshold) {
-			return LAColor(0.4f, 1.0f);
+			return RGBAColor(0x93/255.0f, 0xa1/255.0f, 0xa1/255.0f, 1.0f);
 		} else {
 			uint32_t val = (uint32_t)shape->hashid;
 			
@@ -166,24 +178,7 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 			val = (val+0xd3a2646c) ^ (val<<9);
 			val = (val+0xfd7046c5) + (val<<3);
 			val = (val^0xb55a4f09) ^ (val>>16);
-			
-			float r = (float)((val>>0) & 0xFF);
-			float g = (float)((val>>8) & 0xFF);
-			float b = (float)((val>>16) & 0xFF);
-			
-			float max = (float)cpfmax(cpfmax(r, g), b);
-			float intensity = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC ? 0.15f : 0.65f);
-			
-			cpSpaceDebugColor full_sat = RGBAColor(r/max, g/max, b/max, 1.0f);
-			float gray = 0.3*full_sat.r + 0.6*full_sat.g + 0.1*full_sat.b;
-			
-			float sat = 0.65;
-			return RGBAColor(
-				intensity*cpflerp(gray, full_sat.r, sat),
-				intensity*cpflerp(gray, full_sat.g, sat),
-				intensity*cpflerp(gray, full_sat.b, sat),
-				1.0
-			);
+			return Colors[val & 0x7];
 		}
 	}
 }
@@ -200,10 +195,10 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 		
 		(cpSpaceDebugDrawFlags)(CP_SPACE_DEBUG_DRAW_SHAPES | CP_SPACE_DEBUG_DRAW_CONSTRAINTS | CP_SPACE_DEBUG_DRAW_COLLISION_POINTS),
 		
-		{200.0f/255.0f, 210.0f/255.0f, 230.0f/255.0f, 1.0f},
+		{0xEE/255.0f, 0xE8/255.0f, 0xD5/255.0f, 1.0f}, // Outline color
 		ColorForShape,
-		{0.0f, 0.75f, 0.0f, 1.0f},
-		{1.0f, 0.0f, 0.0f, 1.0f},
+		{0.0f, 0.75f, 0.0f, 1.0f}, // Constraint color
+		{1.0f, 0.0f, 0.0f, 1.0f}, // Collision point color
 		NULL,
 	};
 	
@@ -213,10 +208,13 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 static void
 DrawInstructions()
 {
-	ChipmunkDemoTextDrawString(cpv(-300, 220), demos[demo_index].name);
+	static char title[1024];
+	sprintf(title, "Demo(%c): %s", 'A' + demo_index, demos[demo_index].name);
+	ChipmunkDemoTextDrawString(cpv(-300, 220), title);
+	
 	ChipmunkDemoTextDrawString(cpv(-300, 200),
 		"Controls:\n"
-		"A - * Switch demos. (return restarts)\n"
+		"A - Z Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
 	);
 }
@@ -363,7 +361,7 @@ Display(void)
 //	if(nearest) ChipmunkDebugDrawShape(nearest, RGBAColor(1.0f, 0.0f, 0.0f, 1.0f), LAColor(0.0f, 0.0f));
 	
 	sg_pass_action action = {
-		.colors[0] = {.action = SG_ACTION_CLEAR, .val = {0x00/255.0, 0x2B/255.0, 0x36/255.0, 0.0}},
+		.colors[0] = {.action = SG_ACTION_CLEAR, .val = {0x07/255.0f, 0x36/255.0f, 0x42/255.0f}},
 	};
 	sg_begin_default_pass(&action, screen_size.x, screen_size.y);
 	

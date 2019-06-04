@@ -134,7 +134,9 @@ ChipmunkDemoTextInit(void)
 				float sdf = texture(U_texture, FRAG.uv).r;
 				float fw = 0.5*fwidth(sdf);
 				float mask = smoothstep(0.5 - fw, 0.5 + fw, sdf);
-				OUT_color = FRAG.color*(FRAG.color.a*mask);
+				
+				OUT_color = FRAG.color*mask;
+				OUT_color.a = 0.25*smoothstep(0.0, 0.5, sdf);
 			}
 		),
 	});
@@ -198,7 +200,7 @@ PushChar(int character, float x, float y)
 	float xmax = xmin + gw*Scale;
 	float ymax = ymin + gh*Scale;
 	
-	RGBA8 color = {0xFF, 0xFF, 0xFF, 0xFF};
+	RGBA8 color = {0xFD, 0xF6, 0xE3, 0xFF};
 	Index indexes[] = {0, 1, 2, 0, 2, 3};
 	Vertex *vertexes = push_vertexes(4, indexes, 6);
 	vertexes[0] = (Vertex){{xmin, ymin}, {txmin, tymax}, color};
