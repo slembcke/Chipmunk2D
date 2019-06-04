@@ -69,7 +69,6 @@ ChipmunkDebugDrawInit(void)
 	
 	pass_action = (sg_pass_action){
 		.colors = {
-			// [0] = {.action = SG_ACTION_CLEAR, .val = {0x07/255.0, 0x36/255.0, 0x42/255.0, 0.0}},
 			[0] = {.action = SG_ACTION_CLEAR, .val = {0x00/255.0, 0x2B/255.0, 0x36/255.0, 0.0}},
 		},
 	};
@@ -129,7 +128,8 @@ ChipmunkDebugDrawInit(void)
 			
 			void main(){
 				float len = length(FRAG.uv);
-				float mask = smoothstep(1, 1 - fwidth(len), len);
+				float fw = length(fwidth(FRAG.uv));
+				float mask = smoothstep(1, 1 - fw, len);
 				OUT_color = FRAG.color*mask;
 			}
 		),
