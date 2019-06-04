@@ -120,7 +120,7 @@ ChipmunkDebugDrawInit(void)
 			void main(){
 				float len = length(FRAG.uv);
 				float fw = length(fwidth(FRAG.uv));
-				float mask = smoothstep(1, 1 - fw, len);
+				float mask = smoothstep(-1, fw - 1, -len);
 				
 				float outline = 1 - fw;
 				float outline_mask = smoothstep(outline - fw, outline, len);
