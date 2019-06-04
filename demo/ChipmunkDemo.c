@@ -172,7 +172,6 @@ ColorForShape(cpShape *shape, cpDataPointer data)
 			float b = (float)((val>>16) & 0xFF);
 			
 			float max = (float)cpfmax(cpfmax(r, g), b);
-			float min = (float)cpfmin(cpfmin(r, g), b);
 			float intensity = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC ? 0.15f : 0.65f);
 			
 			cpSpaceDebugColor full_sat = RGBAColor(r/max, g/max, b/max, 1.0f);
@@ -402,7 +401,7 @@ RunDemo(int index)
 }
 
 static void
-Keyboard(sapp_event *event)
+Keyboard(const sapp_event *event)
 {
 	int index = event->key_code - 'A';
 	
@@ -452,7 +451,7 @@ Keyboard(sapp_event *event)
 }
 
 static cpVect
-MouseToSpace(sapp_event *event)
+MouseToSpace(const sapp_event *event)
 {
 	// Calculate clip coord for mouse.
 	float scale = sapp_dpi_scale();
@@ -465,7 +464,7 @@ MouseToSpace(sapp_event *event)
 }
 
 static void
-Click(sapp_event *event)
+Click(const sapp_event *event)
 {
 	cpVect mouse_pos = MouseToSpace(event);
 	
@@ -498,7 +497,7 @@ Click(sapp_event *event)
 }
 
 static void
-Event(sapp_event *event)
+Event(const sapp_event *event)
 {
 	switch(event->type){
 		case SAPP_EVENTTYPE_KEY_UP:
