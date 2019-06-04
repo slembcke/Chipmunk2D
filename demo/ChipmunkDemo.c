@@ -582,6 +582,15 @@ Init(void)
 	ChipmunkDebugDrawInit();
 	ChipmunkDemoTextInit();
 	
+	mouse_body = cpBodyNewKinematic();
+	RunDemo(demo_index);
+}
+
+void Cleanup(void) {
+	sg_shutdown();
+}
+
+sapp_desc sokol_main(int argc, char* argv[]) {
 	demos[ 0] = LogoSmash; //A
 	demos[ 1] = PyramidStack; //B
 	demos[ 2] = Plink; //C
@@ -606,41 +615,31 @@ Init(void)
 	demos[21] = Unicycle; //V
 	demos[22] = Sticky; //W
 	demos[23] = Shatter; //X
+	demo_count = 24;
 	
-	demo_count = 23;
 	int trial = 0;
+	for(int i=0; i<argc; i++){
+		if(strcmp(argv[i], "-bench") == 0){
+			memcpy(demos, bench_list, bench_count*sizeof(ChipmunkDemo));
+			demo_count = bench_count;
+		} else if(strcmp(argv[i], "-trial") == 0){
+			trial = 1;
+		}
+	}
 	
-	// for(int i=0; i<argc; i++){
-	// 	if(strcmp(argv[i], "-bench") == 0){
-	// 		demos = bench_list;
-	// 		demo_count = bench_count;
-	// 	} else if(strcmp(argv[i], "-trial") == 0){
-	// 		trial = 1;
-	// 	}
-	// }
-	
+	stm_setup();
 	if(trial){
 		for(int i=0; i<demo_count; i++) TimeTrial(i, 1000);
 		exit(0);
 	} else {
-		mouse_body = cpBodyNewKinematic();
-		RunDemo(demo_index);
+		return (sapp_desc){
+			.init_cb = Init,
+			.frame_cb = Display,
+			.event_cb = Event,
+			.cleanup_cb = Cleanup,
+			.width = 1024,
+			.height = 768,
+			.window_title = "Chipmunk2D",
+		};
 	}
-}
-
-void Cleanup(void) {
-	sg_shutdown();
-}
-
-sapp_desc sokol_main(int argc, char* argv[]) {
-	stm_setup();
-	return (sapp_desc){
-		.init_cb = Init,
-		.frame_cb = Display,
-		.event_cb = Event,
-		.cleanup_cb = Cleanup,
-		.width = 640,
-		.height = 480,
-		.window_title = "Chipmunk2D",
-	};
 }

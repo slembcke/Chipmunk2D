@@ -42,13 +42,11 @@ void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor outlineColor);
 
 // Call this at the beginning of the frame to clear out any ChipmunkDebugDraw*() commands.
-/* void ChipmunkDebugDrawClearRenderer(void); */
+void ChipmunkDebugDrawClearRenderer(void);
 // Call this at the end of the frame to draw the ChipmunkDebugDraw*() commands to the screen.
 void ChipmunkDebugDrawFlushRenderer(void);
 
-/*
 // Save the current contents of the renderer.
 void ChipmunkDebugDrawPushRenderer(void);
 // Reset the renderer back to it's last pushed state.
 void ChipmunkDebugDrawPopRenderer(void);
-*/
