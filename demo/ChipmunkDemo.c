@@ -49,7 +49,7 @@
 
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDemo.h"
-// #include "ChipmunkDemoTextSupport.h"
+#include "ChipmunkDemoTextSupport.h"
 
 #include "sokol/sokol.h"
 
@@ -213,13 +213,11 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 static void
 DrawInstructions()
 {
-	/*
 	ChipmunkDemoTextDrawString(cpv(-300, 220),
 		"Controls:\n"
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
 	);
-	*/
 }
 
 static int max_arbiters = 0;
@@ -266,7 +264,7 @@ DrawInfo()
 		ChipmunkDemoTime, (ke < 1e-10f ? 0.0f : ke)
 	);
 	
-	// ChipmunkDemoTextDrawString(cpv(0, 220), buffer);
+	ChipmunkDemoTextDrawString(cpv(0, 220), buffer);
 }
 
 static char PrintStringBuffer[1024*8];
@@ -318,7 +316,7 @@ Tick(double dt)
 		step = cpFalse;
 		ChipmunkDemoRightDown = cpFalse;
 		
-		// ChipmunkDemoTextDrawString(cpv(-300, -200), ChipmunkDemoMessageString);
+		ChipmunkDemoTextDrawString(cpv(-300, -200), ChipmunkDemoMessageString);
 	}
 }
 
@@ -341,13 +339,12 @@ Update(void)
 static void
 Display(void)
 {
-	cpVect size = {sapp_width(), sapp_height()};
-	
+	cpVect screen_size = {sapp_width(), sapp_height()};
 	cpTransform view_matrix = cpTransformMult(cpTransformScale(view_scale, view_scale), cpTransformTranslate(view_translate));
 	
-	float screen_scale = (float)cpfmin(size.x/640.0, size.y/480.0);
-	float hw = size.x*(0.5f/screen_scale);
-	float hh = size.y*(0.5f/screen_scale);
+	float screen_scale = (float)cpfmin(screen_size.x/640.0, screen_size.y/480.0);
+	float hw = screen_size.x*(0.5f/screen_scale);
+	float hh = screen_size.y*(0.5f/screen_scale);
 	cpTransform projection_matrix = cpTransformOrtho(cpBBNew(-hw, -hh, hw, hh));
 	
 	ChipmunkDebugDrawPointLineScale = 1/view_scale;
@@ -362,18 +359,26 @@ Display(void)
 //	cpShape *nearest = cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 0.0f, CP_ALL_LAYERS, CP_NO_GROUP, NULL);
 //	if(nearest) ChipmunkDebugDrawShape(nearest, RGBAColor(1.0f, 0.0f, 0.0f, 1.0f), LAColor(0.0f, 0.0f));
 	
+	sg_pass_action action = {
+		.colors[0] = {.action = SG_ACTION_CLEAR, .val = {0x00/255.0, 0x2B/255.0, 0x36/255.0, 0.0}},
+	};
+	sg_begin_default_pass(&action, screen_size.x, screen_size.y);
+	
 	// Draw the renderer contents and reset it back to the last tick's state.
-	ChipmunkDebugDrawFlushRenderer(sapp_width(), sapp_height());
+	ChipmunkDebugDrawFlushRenderer();
 	ChipmunkDebugDrawPopRenderer();
 	
 	// ChipmunkDemoTextPushRenderer();
 	// // Now render all the UI text.
-	// DrawInstructions();
-	// DrawInfo();
+	DrawInstructions();
+	DrawInfo();
 	
-	// ChipmunkDebugDrawVPMatrix = projection_matrix;
-	// ChipmunkDemoTextFlushRenderer();
-	// ChipmunkDemoTextPopRenderer();
+	ChipmunkDemoTextMatrix = projection_matrix;
+	ChipmunkDemoTextFlushRenderer();
+	ChipmunkDemoTextPopRenderer();
+	
+	sg_end_pass();
+	sg_commit();
 }
 
 static void
@@ -569,8 +574,12 @@ extern int bench_count;
 static void
 Init(void)
 {
+	sg_desc desc = {};
+	sg_setup(&desc);
+	cpAssertHard(sg_isvalid(), "Could not init Sokol GFX.");
+	
 	ChipmunkDebugDrawInit();
-	// ChipmunkDemoTextInit();
+	ChipmunkDemoTextInit();
 	
 	demos[ 0] = LogoSmash; //A
 	demos[ 1] = PyramidStack; //B

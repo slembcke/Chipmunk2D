@@ -33,7 +33,6 @@ float ChipmunkDebugDrawPointLineScale = 1.0f;
 
 #define GLSL33(x) "#version 330\n" #x
 
-static sg_pass_action pass_action;
 static sg_bindings bindings;
 static sg_pipeline pipeline;
 
@@ -48,7 +47,6 @@ typedef struct {
 		float U_vp_matrix[16];
 } Uniforms;
 
-
 // Meh, just max out 16 bit index size.
 #define VERTEX_MAX (64*1024)
 #define INDEX_MAX (128*1024)
@@ -62,16 +60,6 @@ static uint16_t Indexes[INDEX_MAX];
 void
 ChipmunkDebugDrawInit(void)
 {
-	sg_desc desc = {};
-	sg_setup(&desc);
-	cpAssertHard(sg_isvalid(), "Could not init Sokol GFX.");
-	
-	pass_action = (sg_pass_action){
-		.colors = {
-			[0] = {.action = SG_ACTION_CLEAR, .val = {0x00/255.0, 0x2B/255.0, 0x36/255.0, 0.0}},
-		},
-	};
-	
 	VertexBuffer = sg_make_buffer(&(sg_buffer_desc){
 		.label = "ChipmunkDebugDraw Vertex Buffer",
 		.size = VERTEX_MAX*sizeof(Vertex),
@@ -93,10 +81,8 @@ ChipmunkDebugDrawInit(void)
 	
 	sg_shader shd = sg_make_shader(&(sg_shader_desc){
 		.vs.uniform_blocks[0] = {
-				.size = sizeof(Uniforms),
-				.uniforms = {
-						[0] = {.name = "U_vp_matrix", .type = SG_UNIFORMTYPE_MAT4},
-				}
+			.size = sizeof(Uniforms),
+			.uniforms[0] = {.name = "U_vp_matrix", .type = SG_UNIFORMTYPE_MAT4},
 		},
 		.vs.source = GLSL33(
 			layout(location = 0) in vec2 IN_pos;
@@ -295,14 +281,12 @@ void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color)
 }
 
 void
-ChipmunkDebugDrawFlushRenderer(int pass_width, int pass_height)
+ChipmunkDebugDrawFlushRenderer(void)
 {
 	cpTransform t = ChipmunkDebugDrawVPMatrix;
 	Uniforms uniforms = {
 		.U_vp_matrix = {t.a , t.b , 0, 0, t.c , t.d , 0, 0, 0, 0, 1, 0, t.tx, t.ty, 0, 1},
 	};
-	
-	sg_begin_default_pass(&pass_action, pass_width, pass_height);
 	
 	sg_update_buffer(VertexBuffer, Vertexes, VertexCount*sizeof(Vertex));
 	sg_update_buffer(IndexBuffer, Indexes, IndexCount*sizeof(Index));
@@ -311,9 +295,6 @@ ChipmunkDebugDrawFlushRenderer(int pass_width, int pass_height)
 	sg_apply_bindings(&bindings);
 	sg_apply_uniforms(SG_SHADERSTAGE_VS, 0, &uniforms, sizeof(Uniforms));
 	sg_draw(0, IndexCount, 1);
-	
-	sg_end_pass();
-	sg_commit();
 	
 	VertexCount = 0;
 	IndexCount = 0;
