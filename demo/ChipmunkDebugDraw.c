@@ -30,7 +30,6 @@
 
 cpTransform ChipmunkDebugDrawVPMatrix;
 float ChipmunkDebugDrawPointLineScale = 1.0f;
-float ChipmunkDebugDrawOutlineWidth = 1.0f;
 
 #define GLSL33(x) "#version 330\n" #x
 
@@ -179,7 +178,7 @@ static Vertex *push_vertexes(size_t vcount, const Index *index_src, size_t icoun
 
 void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 {
-	float r = (float)(size*0.5f/ChipmunkDebugDrawPointLineScale);
+	float r = (float)(size*0.5f*ChipmunkDebugDrawPointLineScale);
 	RGBA8 fill = cp_to_rgba(fillColor);
 	Vertex *vertexes = push_vertexes(4, (Index[]){0, 1, 2, 0, 2, 3}, 6);
 	vertexes[0] = (Vertex){{pos.x, pos.y}, {-1, -1}, r, fill, fill};
@@ -190,7 +189,7 @@ void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 
 void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
-	cpFloat r = radius + 1.0f/ChipmunkDebugDrawPointLineScale;
+	cpFloat r = radius + ChipmunkDebugDrawPointLineScale;
 	RGBA8 fill = cp_to_rgba(fillColor), outline = cp_to_rgba(outlineColor);
 	Vertex *vertexes = push_vertexes(4, (Index[]){0, 1, 2, 0, 2, 3}, 6);
 	vertexes[0] = (Vertex){{pos.x, pos.y}, {-1, -1}, r, fill, outline};
@@ -198,7 +197,7 @@ void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceD
 	vertexes[2] = (Vertex){{pos.x, pos.y}, { 1,  1}, r, fill, outline};
 	vertexes[3] = (Vertex){{pos.x, pos.y}, { 1, -1}, r, fill, outline};
 	
-	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), radius - ChipmunkDebugDrawPointLineScale*0.5f)), outlineColor);
+	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), 0.75f*radius)), outlineColor);
 }
 
 void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color)
@@ -213,13 +212,7 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebu
 	
 	cpVect t = cpvnormalize(cpvsub(b, a));
 	
-	cpFloat half = 1.0f/ChipmunkDebugDrawPointLineScale;
-	cpFloat r = radius + half;
-	if(r <= half){
-		r = half;
-		fillColor = outlineColor;
-	}
-	
+	cpFloat r = radius + ChipmunkDebugDrawPointLineScale;
 	RGBA8 fill = cp_to_rgba(fillColor), outline = cp_to_rgba(outlineColor);
 	
 	vertexes[0] = (Vertex){{a.x, a.y}, {-t.x + t.y, -t.x - t.y}, r, fill, outline};
@@ -232,73 +225,62 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebu
 	vertexes[7] = (Vertex){{b.x, b.y}, {+t.x - t.y, +t.x + t.y}, r, fill, outline};
 }
 
-extern cpVect ChipmunkDemoMouse;
+#define MAX_POLY_VERTEXES 64
+// Fill needs (count - 2) triangles.
+// Outline needs 4*count triangles.
+#define MAX_POLY_INDEXES (3*(5*MAX_POLY_VERTEXES - 2))
 
 void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
-	/*
-	struct ExtrudeVerts {cpVect offset, n;};
-	size_t bytes = sizeof(struct ExtrudeVerts)*count;
-	struct ExtrudeVerts *extrude = (struct ExtrudeVerts *)alloca(bytes);
-	memset(extrude, 0, bytes);
+	RGBA8 fill = cp_to_rgba(fillColor), outline = cp_to_rgba(outlineColor);
 	
+	Index indexes[MAX_POLY_INDEXES];
+	
+	// Polygon fill triangles.
+	for(int i = 0; i < count - 2; i++){
+		indexes[3*i + 0] = 0;
+		indexes[3*i + 1] = 4*(i + 1);
+		indexes[3*i + 2] = 4*(i + 2);
+	}
+	
+	// Polygon outline triangles.
+	Index *cursor = indexes + 3*(count - 2);
+	for(int i0 = 0; i0 < count; i0++){
+		int i1 = (i0 + 1)%count;
+		cursor[12*i0 +  0] = 4*i0 + 0;
+		cursor[12*i0 +  1] = 4*i0 + 1;
+		cursor[12*i0 +  2] = 4*i0 + 2;
+		cursor[12*i0 +  3] = 4*i0 + 0;
+		cursor[12*i0 +  4] = 4*i0 + 2;
+		cursor[12*i0 +  5] = 4*i0 + 3;
+		cursor[12*i0 +  6] = 4*i0 + 0;
+		cursor[12*i0 +  7] = 4*i0 + 3;
+		cursor[12*i0 +  8] = 4*i1 + 0;
+		cursor[12*i0 +  9] = 4*i0 + 3;
+		cursor[12*i0 + 10] = 4*i1 + 0;
+		cursor[12*i0 + 11] = 4*i1 + 1;
+	}
+	
+	cpFloat inset = -cpfmax(0.0f, 2.0f*ChipmunkDebugDrawPointLineScale - radius);
+	cpFloat outset = radius + ChipmunkDebugDrawPointLineScale;
+	cpFloat r = outset - inset;
+	
+	Vertex *vertexes = push_vertexes(4*count, indexes, 3*(5*count - 2));
 	for(int i=0; i<count; i++){
-		cpVect v0 = verts[(i-1+count)%count];
-		cpVect v1 = verts[i];
-		cpVect v2 = verts[(i+1)%count];
+		cpVect v0 = verts[i];
+		cpVect v_prev = verts[(i+(count - 1))%count];
+		cpVect v_next = verts[(i+(count + 1))%count];
 		
-		cpVect n1 = cpvnormalize(cpvrperp(cpvsub(v1, v0)));
-		cpVect n2 = cpvnormalize(cpvrperp(cpvsub(v2, v1)));
+		cpVect n1 = cpvnormalize(cpvrperp(cpvsub(v0, v_prev)));
+		cpVect n2 = cpvnormalize(cpvrperp(cpvsub(v_next, v0)));
+		cpVect of = cpvmult(cpvadd(n1, n2), 1.0/(cpvdot(n1, n2) + 1.0f));
+		cpVect v = cpvadd(v0, cpvmult(of, inset));
 		
-		cpVect offset = cpvmult(cpvadd(n1, n2), 1.0/(cpvdot(n1, n2) + 1.0f));
-		struct ExtrudeVerts v = {offset, n2}; extrude[i] = v;
+		vertexes[4*i + 0] = (Vertex){{v.x, v.y}, {0, 0}, 0, fill, outline};
+		vertexes[4*i + 1] = (Vertex){{v.x, v.y}, {n1.x, n1.y}, r, fill, outline};
+		vertexes[4*i + 2] = (Vertex){{v.x, v.y}, {of.x, of.y}, r, fill, outline};
+		vertexes[4*i + 3] = (Vertex){{v.x, v.y}, {n2.x, n2.y}, r, fill, outline};
 	}
-	
-//	Triangle *triangles = PushTriangles(6*count);
-	Triangle *triangles = PushTriangles(5*count - 2);
-	Triangle *cursor = triangles;
-	
-	cpFloat inset = -cpfmax(0.0f, 1.0f/ChipmunkDebugDrawPointLineScale - radius);
-	for(int i=0; i<count-2; i++){
-		struct v2f v0 = v2f(cpvadd(verts[  0], cpvmult(extrude[  0].offset, inset)));
-		struct v2f v1 = v2f(cpvadd(verts[i+1], cpvmult(extrude[i+1].offset, inset)));
-		struct v2f v2 = v2f(cpvadd(verts[i+2], cpvmult(extrude[i+2].offset, inset)));
-		
-		Triangle t = {{v0, v2f0, fillColor, fillColor}, {v1, v2f0, fillColor, fillColor}, {v2, v2f0, fillColor, fillColor}}; *cursor++ = t;
-	}
-	
-	cpFloat outset = 1.0f/ChipmunkDebugDrawPointLineScale + radius - inset;
-	for(int i=0, j=count-1; i<count; j=i, i++){
-		cpVect vA = verts[i];
-		cpVect vB = verts[j];
-		
-		cpVect nA = extrude[i].n;
-		cpVect nB = extrude[j].n;
-		
-		cpVect offsetA = extrude[i].offset;
-		cpVect offsetB = extrude[j].offset;
-		
-		cpVect innerA = cpvadd(vA, cpvmult(offsetA, inset));
-		cpVect innerB = cpvadd(vB, cpvmult(offsetB, inset));
-		
-		// Admittedly my variable naming sucks here...
-		struct v2f inner0 = v2f(innerA);
-		struct v2f inner1 = v2f(innerB);
-		struct v2f outer0 = v2f(cpvadd(innerA, cpvmult(nB, outset)));
-		struct v2f outer1 = v2f(cpvadd(innerB, cpvmult(nB, outset)));
-		struct v2f outer2 = v2f(cpvadd(innerA, cpvmult(offsetA, outset)));
-		struct v2f outer3 = v2f(cpvadd(innerA, cpvmult(nA, outset)));
-		
-		struct v2f n0 = v2f(nA);
-		struct v2f n1 = v2f(nB);
-		struct v2f offset0 = v2f(offsetA);
-		
-		Triangle t0 = {{inner0, v2f0, fillColor, outlineColor}, {inner1,    v2f0, fillColor, outlineColor}, {outer1,      n1, fillColor, outlineColor}}; *cursor++ = t0;
-		Triangle t1 = {{inner0, v2f0, fillColor, outlineColor}, {outer0,      n1, fillColor, outlineColor}, {outer1,      n1, fillColor, outlineColor}}; *cursor++ = t1;
-		Triangle t2 = {{inner0, v2f0, fillColor, outlineColor}, {outer0,      n1, fillColor, outlineColor}, {outer2, offset0, fillColor, outlineColor}}; *cursor++ = t2;
-		Triangle t3 = {{inner0, v2f0, fillColor, outlineColor}, {outer2, offset0, fillColor, outlineColor}, {outer3,      n0, fillColor, outlineColor}}; *cursor++ = t3;
-	}
-	*/
 }
 
 void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color)

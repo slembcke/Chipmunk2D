@@ -138,8 +138,7 @@ DrawFatSegment(cpVect a, cpVect b, cpFloat r, cpSpaceDebugColor outline, cpSpace
 
 static void
 DrawPolygon(int count, const cpVect *verts, cpFloat r, cpSpaceDebugColor outline, cpSpaceDebugColor fill, cpDataPointer data)
-// {ChipmunkDebugDrawPolygon(count, verts, r, outline, fill);}
-{for(int i = 0; i < count; i++) ChipmunkDebugDrawCircle(verts[i], 0, r, outline, fill);}
+{ChipmunkDebugDrawPolygon(count, verts, r, outline, fill);}
 
 static void
 DrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor color, cpDataPointer data)
@@ -352,7 +351,7 @@ Display(void)
 	float hh = size.y*(0.5f/screen_scale);
 	cpTransform projection_matrix = cpTransformOrtho(cpBBNew(-hw, -hh, hw, hh));
 	
-	ChipmunkDebugDrawPointLineScale = screen_scale;
+	ChipmunkDebugDrawPointLineScale = 1/view_scale;
 	ChipmunkDebugDrawVPMatrix = cpTransformMult(projection_matrix, view_matrix);
 	
 	Update();

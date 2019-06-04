@@ -33,7 +33,6 @@ void ChipmunkDebugDrawInit(void);
 
 extern cpTransform ChipmunkDebugDrawVPMatrix;
 extern float ChipmunkDebugDrawPointLineScale;
-extern float ChipmunkDebugDrawOutlineWidth;
 
 void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor);
 void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color);
