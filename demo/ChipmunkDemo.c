@@ -213,7 +213,8 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 static void
 DrawInstructions()
 {
-	ChipmunkDemoTextDrawString(cpv(-300, 220),
+	ChipmunkDemoTextDrawString(cpv(-300, 220), demos[demo_index].name);
+	ChipmunkDemoTextDrawString(cpv(-300, 200),
 		"Controls:\n"
 		"A - * Switch demos. (return restarts)\n"
 		"Use the mouse to grab objects.\n"
