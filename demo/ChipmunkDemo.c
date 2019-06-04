@@ -460,8 +460,7 @@ static cpVect
 MouseToSpace(const sapp_event *event)
 {
 	// Calculate clip coord for mouse.
-	float scale = sapp_dpi_scale();
-	cpVect screen_size = cpv(sapp_width()/scale, sapp_height()/scale);
+	cpVect screen_size = cpv(sapp_width(), sapp_height());
 	cpVect clip_coord = cpv(2*event->mouse_x/screen_size.x - 1, 1 - 2*event->mouse_y/screen_size.y);
 	
 	// Use the VP matrix to transform to world space.
@@ -639,6 +638,7 @@ sapp_desc sokol_main(int argc, char* argv[]) {
 			.cleanup_cb = Cleanup,
 			.width = 1024,
 			.height = 768,
+			.high_dpi = true,
 			.window_title = "Chipmunk2D",
 		};
 	}
