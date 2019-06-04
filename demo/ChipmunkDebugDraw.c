@@ -43,6 +43,8 @@ typedef struct {uint8_t r, g, b, a;} RGBA8;
 typedef struct {float radius; float2 position; float2 uv; RGBA8 color;} Vertex;
 typedef uint16_t Index;
 
+static RGBA8 cp_to_rgba(cpSpaceDebugColor c){return (RGBA8){0xFF*c.r, 0xFF*c.g, 0xFF*c.b, 0xFF*c.a};}
+
 typedef struct {
 		float U_vp_matrix[16];
 } Uniforms;
@@ -206,6 +208,8 @@ ChipmunkDebugDrawInit(void)
 }
 
 static Vertex *push_vertexes(size_t vcount, const Index *index_src, size_t icount){
+	cpAssertHard(VertexCount + vcount <= VERTEX_MAX || IndexCount + icount <= INDEX_MAX, "Geometry buffer full.");
+	
 	Vertex *vertex_dst = Vertexes + VertexCount;
 	size_t base = VertexCount;
 	VertexCount += vcount;
@@ -219,8 +223,6 @@ static Vertex *push_vertexes(size_t vcount, const Index *index_src, size_t icoun
 
 void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 {
-	if(VertexCount + 4 > VERTEX_MAX || IndexCount + 6 > INDEX_MAX) return;
-	
 	float r = (float)(size*0.5f/ChipmunkDebugDrawPointLineScale);
 	Vertex *vertexes = push_vertexes(4, (Index[]){0, 1, 2, 0, 2, 3}, 6);
 	vertexes[0] = (Vertex){r, {pos.x, pos.y}, {-1, -1}, {0xFF, 0x00, 0x00, 0xFF}};
@@ -231,9 +233,7 @@ void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 
 void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
-	if(VertexCount + 4 > VERTEX_MAX || IndexCount + 6 > INDEX_MAX) return;
-	
-	cpFloat r = radius + 1.0f/ChipmunkDebugDrawPointLineScale;
+	cpFloat r = radius;// + 1.0f/ChipmunkDebugDrawPointLineScale;
 	Vertex *vertexes = push_vertexes(4, (Index[]){0, 1, 2, 0, 2, 3}, 6);
 	vertexes[0] = (Vertex){r, {pos.x, pos.y}, {-1, -1}, {0xFF, 0x00, 0x00, 0xFF}};
 	vertexes[1] = (Vertex){r, {pos.x, pos.y}, {-1,  1}, {0xFF, 0x00, 0x00, 0xFF}};
@@ -250,11 +250,10 @@ void ChipmunkDebugDrawSegment(cpVect a, cpVect b, cpSpaceDebugColor color)
 
 void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
-	/*
-	Triangle *triangles = PushTriangles(6);
+	static const Index indexes[] = {0, 1, 2, 1, 2, 3, 2, 3, 4, 3, 4, 5, 4, 5, 6, 5, 6, 7};
+	Vertex *vertexes = push_vertexes(8, indexes, 18);
 	
-	cpVect n = cpvnormalize(cpvrperp(cpvsub(b, a)));
-	cpVect t = cpvrperp(n);
+	cpVect t = cpvnormalize(cpvsub(b, a));
 	
 	cpFloat half = 1.0f/ChipmunkDebugDrawPointLineScale;
 	cpFloat r = radius + half;
@@ -263,24 +262,14 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebu
 		fillColor = outlineColor;
 	}
 	
-	cpVect nw = (cpvmult(n, r));
-	cpVect tw = (cpvmult(t, r));
-	struct v2f v0 = v2f(cpvsub(b, cpvadd(nw, tw))); // { 1.0, -1.0}
-	struct v2f v1 = v2f(cpvadd(b, cpvsub(nw, tw))); // { 1.0,  1.0}
-	struct v2f v2 = v2f(cpvsub(b, nw)); // { 0.0, -1.0}
-	struct v2f v3 = v2f(cpvadd(b, nw)); // { 0.0,  1.0}
-	struct v2f v4 = v2f(cpvsub(a, nw)); // { 0.0, -1.0}
-	struct v2f v5 = v2f(cpvadd(a, nw)); // { 0.0,  1.0}
-	struct v2f v6 = v2f(cpvsub(a, cpvsub(nw, tw))); // {-1.0, -1.0}
-	struct v2f v7 = v2f(cpvadd(a, cpvadd(nw, tw))); // {-1.0,  1.0}
-	
-	Triangle t0 = {{v0, { 1.0f, -1.0f}, fillColor, outlineColor}, {v1, { 1.0f,  1.0f}, fillColor, outlineColor}, {v2, { 0.0f, -1.0f}, fillColor, outlineColor}}; triangles[0] = t0;
-	Triangle t1 = {{v3, { 0.0f,  1.0f}, fillColor, outlineColor}, {v1, { 1.0f,  1.0f}, fillColor, outlineColor}, {v2, { 0.0f, -1.0f}, fillColor, outlineColor}}; triangles[1] = t1;
-	Triangle t2 = {{v3, { 0.0f,  1.0f}, fillColor, outlineColor}, {v4, { 0.0f, -1.0f}, fillColor, outlineColor}, {v2, { 0.0f, -1.0f}, fillColor, outlineColor}}; triangles[2] = t2;
-	Triangle t3 = {{v3, { 0.0f,  1.0f}, fillColor, outlineColor}, {v4, { 0.0f, -1.0f}, fillColor, outlineColor}, {v5, { 0.0f,  1.0f}, fillColor, outlineColor}}; triangles[3] = t3;
-	Triangle t4 = {{v6, {-1.0f, -1.0f}, fillColor, outlineColor}, {v4, { 0.0f, -1.0f}, fillColor, outlineColor}, {v5, { 0.0f,  1.0f}, fillColor, outlineColor}}; triangles[4] = t4;
-	Triangle t5 = {{v6, {-1.0f, -1.0f}, fillColor, outlineColor}, {v7, {-1.0f,  1.0f}, fillColor, outlineColor}, {v5, { 0.0f,  1.0f}, fillColor, outlineColor}}; triangles[5] = t5;
-	*/
+	vertexes[0] = (Vertex){r, {a.x, a.y}, {-t.x + t.y, -t.x - t.y}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[1] = (Vertex){r, {a.x, a.y}, {-t.x - t.y, +t.x - t.y}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[2] = (Vertex){r, {a.x, a.y}, {-0.0 + t.y, -t.x + 0.0}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[3] = (Vertex){r, {a.x, a.y}, {-0.0 - t.y, +t.x + 0.0}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[4] = (Vertex){r, {b.x, b.y}, {+0.0 + t.y, -t.x - 0.0}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[5] = (Vertex){r, {b.x, b.y}, {+0.0 - t.y, +t.x - 0.0}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[6] = (Vertex){r, {b.x, b.y}, {+t.x + t.y, -t.x + t.y}, {0xFF, 0x00, 0x00, 0xFF}};
+	vertexes[7] = (Vertex){r, {b.x, b.y}, {+t.x - t.y, +t.x + t.y}, {0xFF, 0x00, 0x00, 0xFF}};
 }
 
 extern cpVect ChipmunkDemoMouse;
