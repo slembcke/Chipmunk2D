@@ -1,0 +1,9 @@
+I'm not much of a Windows dev, so the Visual Studio project is sometimes not up to date.
+If there is anything wrong, pull requests are highly appreciated!
+
+As of June 2015 I've dropped support for pre-2015 versions. In the past, everybody had their favorite version,
+and they all needed separate projects, but this was a huge pain to handle. I recently rewrote the demos to use
+Sokol, a even more lightweight replacement for GLFW so I didn't need to bundle GLFW binaries. I decided it was
+a good time to cutoff support for older versions.
+
+If you were still using one of the older projects feel free to update it and send me a pull request.
