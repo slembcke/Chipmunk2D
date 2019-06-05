@@ -149,8 +149,8 @@ cpHashSetCount(cpHashSet *set)
 	return set->entries;
 }
 
-void *
-cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, cpHashSetTransFunc trans, void *data)
+const void *
+cpHashSetInsert(cpHashSet *set, cpHashValue hash, const void *ptr, cpHashSetTransFunc trans, void *data)
 {
 	cpHashValue idx = hash%set->size;
 	
@@ -175,8 +175,8 @@ cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, cpHashSetTransFunc 
 	return bin->elt;
 }
 
-void *
-cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
+const void *
+cpHashSetRemove(cpHashSet *set, cpHashValue hash, const void *ptr)
 {
 	cpHashValue idx = hash%set->size;
 	
@@ -195,7 +195,7 @@ cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 		(*prev_ptr) = bin->next;
 		set->entries--;
 		
-		void *elt = bin->elt;
+		const void *elt = bin->elt;
 		recycleBin(set, bin);
 		
 		return elt;
@@ -204,8 +204,8 @@ cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr)
 	return NULL;
 }
 
-void *
-cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr)
+const void *
+cpHashSetFind(cpHashSet *set, cpHashValue hash, const void *ptr)
 {	
 	cpHashValue idx = hash%set->size;
 	cpHashSetBin *bin = set->table[idx];

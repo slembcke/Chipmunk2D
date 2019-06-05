@@ -32,7 +32,7 @@ update(cpSpace *space, double dt)
 #define FLUID_DENSITY 0.00014
 #define FLUID_DRAG 2.0
 
-char messageBuffer[1024] = {};
+char messageBuffer[1024];
 
 // Modified from chipmunk_private.h
 static inline cpFloat

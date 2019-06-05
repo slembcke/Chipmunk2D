@@ -41,7 +41,7 @@ typedef struct {uint8_t r, g, b, a;} RGBA8;
 typedef struct {float2 pos; float2 uv; float r; RGBA8 fill, outline;} Vertex;
 typedef uint16_t Index;
 
-static RGBA8 cp_to_rgba(cpSpaceDebugColor c){return (RGBA8){0xFF*c.r, 0xFF*c.g, 0xFF*c.b, 0xFF*c.a};}
+static RGBA8 cp_to_rgba(cpSpaceDebugColor c){return (RGBA8){(uint8_t)(0xFF*c.r), (uint8_t)(0xFF*c.g), (uint8_t)(0xFF*c.b), (uint8_t)(0xFF*c.a)};}
 
 typedef struct {
 		float U_vp_matrix[16];
@@ -158,7 +158,7 @@ static Vertex *push_vertexes(size_t vcount, const Index *index_src, size_t icoun
 	VertexCount += vcount;
 	
 	Index *index_dst = Indexes + IndexCount;
-	for(size_t i = 0; i < icount; i++) index_dst[i] = index_src[i] + base;
+	for(size_t i = 0; i < icount; i++) index_dst[i] = index_src[i] + (Index)base;
 	IndexCount += icount;
 	
 	return vertex_dst;
@@ -169,21 +169,21 @@ void ChipmunkDebugDrawDot(cpFloat size, cpVect pos, cpSpaceDebugColor fillColor)
 	float r = (float)(size*0.5f*ChipmunkDebugDrawPointLineScale);
 	RGBA8 fill = cp_to_rgba(fillColor);
 	Vertex *vertexes = push_vertexes(4, (Index[]){0, 1, 2, 0, 2, 3}, 6);
-	vertexes[0] = (Vertex){{pos.x, pos.y}, {-1, -1}, r, fill, fill};
-	vertexes[1] = (Vertex){{pos.x, pos.y}, {-1,  1}, r, fill, fill};
-	vertexes[2] = (Vertex){{pos.x, pos.y}, { 1,  1}, r, fill, fill};
-	vertexes[3] = (Vertex){{pos.x, pos.y}, { 1, -1}, r, fill, fill};
+	vertexes[0] = (Vertex){{(float)pos.x, (float)pos.y}, {-1, -1}, r, fill, fill};
+	vertexes[1] = (Vertex){{(float)pos.x, (float)pos.y}, {-1,  1}, r, fill, fill};
+	vertexes[2] = (Vertex){{(float)pos.x, (float)pos.y}, { 1,  1}, r, fill, fill};
+	vertexes[3] = (Vertex){{(float)pos.x, (float)pos.y}, { 1, -1}, r, fill, fill};
 }
 
 void ChipmunkDebugDrawCircle(cpVect pos, cpFloat angle, cpFloat radius, cpSpaceDebugColor outlineColor, cpSpaceDebugColor fillColor)
 {
-	cpFloat r = radius + ChipmunkDebugDrawPointLineScale;
+	float r = (float)radius + ChipmunkDebugDrawPointLineScale;
 	RGBA8 fill = cp_to_rgba(fillColor), outline = cp_to_rgba(outlineColor);
 	Vertex *vertexes = push_vertexes(4, (Index[]){0, 1, 2, 0, 2, 3}, 6);
-	vertexes[0] = (Vertex){{pos.x, pos.y}, {-1, -1}, r, fill, outline};
-	vertexes[1] = (Vertex){{pos.x, pos.y}, {-1,  1}, r, fill, outline};
-	vertexes[2] = (Vertex){{pos.x, pos.y}, { 1,  1}, r, fill, outline};
-	vertexes[3] = (Vertex){{pos.x, pos.y}, { 1, -1}, r, fill, outline};
+	vertexes[0] = (Vertex){{(float)pos.x, (float)pos.y}, {-1, -1}, r, fill, outline};
+	vertexes[1] = (Vertex){{(float)pos.x, (float)pos.y}, {-1,  1}, r, fill, outline};
+	vertexes[2] = (Vertex){{(float)pos.x, (float)pos.y}, { 1,  1}, r, fill, outline};
+	vertexes[3] = (Vertex){{(float)pos.x, (float)pos.y}, { 1, -1}, r, fill, outline};
 	
 	ChipmunkDebugDrawSegment(pos, cpvadd(pos, cpvmult(cpvforangle(angle), 0.75f*radius)), outlineColor);
 }
@@ -200,17 +200,17 @@ void ChipmunkDebugDrawFatSegment(cpVect a, cpVect b, cpFloat radius, cpSpaceDebu
 	
 	cpVect t = cpvnormalize(cpvsub(b, a));
 	
-	cpFloat r = radius + ChipmunkDebugDrawPointLineScale;
+	float r = (float)radius + ChipmunkDebugDrawPointLineScale;
 	RGBA8 fill = cp_to_rgba(fillColor), outline = cp_to_rgba(outlineColor);
 	
-	vertexes[0] = (Vertex){{a.x, a.y}, {-t.x + t.y, -t.x - t.y}, r, fill, outline};
-	vertexes[1] = (Vertex){{a.x, a.y}, {-t.x - t.y, +t.x - t.y}, r, fill, outline};
-	vertexes[2] = (Vertex){{a.x, a.y}, {-0.0 + t.y, -t.x + 0.0}, r, fill, outline};
-	vertexes[3] = (Vertex){{a.x, a.y}, {-0.0 - t.y, +t.x + 0.0}, r, fill, outline};
-	vertexes[4] = (Vertex){{b.x, b.y}, {+0.0 + t.y, -t.x - 0.0}, r, fill, outline};
-	vertexes[5] = (Vertex){{b.x, b.y}, {+0.0 - t.y, +t.x - 0.0}, r, fill, outline};
-	vertexes[6] = (Vertex){{b.x, b.y}, {+t.x + t.y, -t.x + t.y}, r, fill, outline};
-	vertexes[7] = (Vertex){{b.x, b.y}, {+t.x - t.y, +t.x + t.y}, r, fill, outline};
+	vertexes[0] = (Vertex){{(float)a.x, (float)a.y}, {(float)(-t.x + t.y), (float)(-t.x - t.y)}, r, fill, outline};
+	vertexes[1] = (Vertex){{(float)a.x, (float)a.y}, {(float)(-t.x - t.y), (float)(+t.x - t.y)}, r, fill, outline};
+	vertexes[2] = (Vertex){{(float)a.x, (float)a.y}, {(float)(-0.0 + t.y), (float)(-t.x + 0.0)}, r, fill, outline};
+	vertexes[3] = (Vertex){{(float)a.x, (float)a.y}, {(float)(-0.0 - t.y), (float)(+t.x + 0.0)}, r, fill, outline};
+	vertexes[4] = (Vertex){{(float)b.x, (float)b.y}, {(float)(+0.0 + t.y), (float)(-t.x - 0.0)}, r, fill, outline};
+	vertexes[5] = (Vertex){{(float)b.x, (float)b.y}, {(float)(+0.0 - t.y), (float)(+t.x - 0.0)}, r, fill, outline};
+	vertexes[6] = (Vertex){{(float)b.x, (float)b.y}, {(float)(+t.x + t.y), (float)(-t.x + t.y)}, r, fill, outline};
+	vertexes[7] = (Vertex){{(float)b.x, (float)b.y}, {(float)(+t.x - t.y), (float)(+t.x + t.y)}, r, fill, outline};
 }
 
 #define MAX_POLY_VERTEXES 64
@@ -249,9 +249,9 @@ void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cp
 		cursor[12*i0 + 11] = 4*i1 + 1;
 	}
 	
-	cpFloat inset = -cpfmax(0.0f, 2.0f*ChipmunkDebugDrawPointLineScale - radius);
-	cpFloat outset = radius + ChipmunkDebugDrawPointLineScale;
-	cpFloat r = outset - inset;
+	float inset = (float)-cpfmax(0, 2*ChipmunkDebugDrawPointLineScale - radius);
+	float outset = (float)radius + ChipmunkDebugDrawPointLineScale;
+	float r = outset - inset;
 	
 	Vertex *vertexes = push_vertexes(4*count, indexes, 3*(5*count - 2));
 	for(int i=0; i<count; i++){
@@ -264,10 +264,10 @@ void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cp
 		cpVect of = cpvmult(cpvadd(n1, n2), 1.0/(cpvdot(n1, n2) + 1.0f));
 		cpVect v = cpvadd(v0, cpvmult(of, inset));
 		
-		vertexes[4*i + 0] = (Vertex){{v.x, v.y}, {0, 0}, 0, fill, outline};
-		vertexes[4*i + 1] = (Vertex){{v.x, v.y}, {n1.x, n1.y}, r, fill, outline};
-		vertexes[4*i + 2] = (Vertex){{v.x, v.y}, {of.x, of.y}, r, fill, outline};
-		vertexes[4*i + 3] = (Vertex){{v.x, v.y}, {n2.x, n2.y}, r, fill, outline};
+		vertexes[4*i + 0] = (Vertex){{(float)v.x, (float)v.y}, {0.0f, 0.0f}, 0.0f, fill, outline};
+		vertexes[4*i + 1] = (Vertex){{(float)v.x, (float)v.y}, {(float)n1.x, (float)n1.y}, r, fill, outline};
+		vertexes[4*i + 2] = (Vertex){{(float)v.x, (float)v.y}, {(float)of.x, (float)of.y}, r, fill, outline};
+		vertexes[4*i + 3] = (Vertex){{(float)v.x, (float)v.y}, {(float)n2.x, (float)n2.y}, r, fill, outline};
 	}
 }
 
@@ -287,7 +287,7 @@ ChipmunkDebugDrawFlushRenderer(void)
 {
 	cpTransform t = ChipmunkDebugDrawVPMatrix;
 	Uniforms uniforms = {
-		.U_vp_matrix = {t.a , t.b , 0, 0, t.c , t.d , 0, 0, 0, 0, 1, 0, t.tx, t.ty, 0, 1},
+		.U_vp_matrix = {(float)t.a , (float)t.b , 0.0f, 0.0f, (float)t.c , (float)t.d , 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, (float)t.tx, (float)t.ty, 0.0f, 1.0f},
 	};
 	
 	sg_update_buffer(VertexBuffer, Vertexes, VertexCount*sizeof(Vertex));

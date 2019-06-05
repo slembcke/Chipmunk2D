@@ -37,16 +37,6 @@
 #include <limits.h>
 #include <stdarg.h>
 
-#ifdef _MSC_VER
-  // Needed for VS 2015 compatability
-  // http://stackoverflow.com/questions/30412951/unresolved-external-symbol-imp-fprintf-and-imp-iob-func-sdl2
-  #if _MSC_VER >= 1700
-	#ifndef __iob_func
-	  extern "C" { FILE __iob_func[3] = { *stdin,*stdout,*stderr }; }
-	#endif
-  #endif
-#endif
-
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDemo.h"
 #include "ChipmunkDemoTextSupport.h"
@@ -56,23 +46,23 @@
 #undef Convex
 
 static ChipmunkDemo demos[32];
-static int demo_count = 0;
-static int demo_index = 'a' - 'a';
+static int demo_count;
+static int demo_index;
 
 static cpBool paused = cpFalse;
 static cpBool step = cpFalse;
 
 static cpSpace *space;
 
-static double Accumulator = 0.0;
-static double LastTime = 0.0;
-int ChipmunkDemoTicks = 0;
+static double Accumulator;
+static double LastTime;
+int ChipmunkDemoTicks;
 double ChipmunkDemoTime;
 
 cpVect ChipmunkDemoMouse;
-cpBool ChipmunkDemoRightClick = cpFalse;
-cpBool ChipmunkDemoRightDown = cpFalse;
-cpVect ChipmunkDemoKeyboard = {};
+cpBool ChipmunkDemoRightClick;
+cpBool ChipmunkDemoRightDown;
+cpVect ChipmunkDemoKeyboard;
 
 static cpBody *mouse_body = NULL;
 static cpConstraint *mouse_joint = NULL;
@@ -342,11 +332,11 @@ Display(void)
 	cpTransform view_matrix = cpTransformMult(cpTransformScale(view_scale, view_scale), cpTransformTranslate(view_translate));
 	
 	float screen_scale = (float)cpfmin(screen_size.x/640.0, screen_size.y/480.0);
-	float hw = screen_size.x*(0.5f/screen_scale);
-	float hh = screen_size.y*(0.5f/screen_scale);
+	float hw = (float)screen_size.x*(0.5f/screen_scale);
+	float hh = (float)screen_size.y*(0.5f/screen_scale);
 	cpTransform projection_matrix = cpTransformOrtho(cpBBNew(-hw, -hh, hw, hh));
 	
-	ChipmunkDebugDrawPointLineScale = 1/view_scale;
+	ChipmunkDebugDrawPointLineScale = 1.0f/(float)view_scale;
 	ChipmunkDebugDrawVPMatrix = cpTransformMult(projection_matrix, view_matrix);
 	
 	Update();
@@ -363,7 +353,7 @@ Display(void)
 	sg_pass_action action = {
 		.colors[0] = {.action = SG_ACTION_CLEAR, .val = {0x07/255.0f, 0x36/255.0f, 0x42/255.0f}},
 	};
-	sg_begin_default_pass(&action, screen_size.x, screen_size.y);
+	sg_begin_default_pass(&action, (int)screen_size.x, (int)screen_size.y);
 	
 	// Draw the renderer contents and reset it back to the last tick's state.
 	ChipmunkDebugDrawFlushRenderer();
@@ -482,7 +472,7 @@ Click(const sapp_event *event)
 			// give the mouse click a little radius to make it easier to click small shapes.
 			cpFloat radius = 5.0;
 			
-			cpPointQueryInfo info = {};
+			cpPointQueryInfo info = {0};
 			cpShape *shape = cpSpacePointQueryNearest(space, mouse_pos, radius, GRAB_FILTER, &info);
 			
 			if(shape && cpBodyGetMass(cpShapeGetBody(shape)) < INFINITY){
@@ -579,7 +569,7 @@ extern int bench_count;
 static void
 Init(void)
 {
-	sg_desc desc = {};
+	sg_desc desc = {0};
 	sg_setup(&desc);
 	cpAssertHard(sg_isvalid(), "Could not init Sokol GFX.");
 	

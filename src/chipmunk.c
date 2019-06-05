@@ -89,7 +89,7 @@ cpAreaForSegment(cpVect a, cpVect b, cpFloat r)
 }
 
 cpFloat
-cpMomentForPoly(cpFloat m, const int count, const cpVect *verts, cpVect offset, cpFloat r)
+cpMomentForPoly(cpFloat m, int count, const cpVect *verts, cpVect offset, cpFloat r)
 {
 	// TODO account for radius.
 	if(count == 2) return cpMomentForSegment(m, verts[0], verts[1], 0.0f);

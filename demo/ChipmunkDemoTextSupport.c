@@ -173,7 +173,7 @@ static Vertex *push_vertexes(size_t vcount, const Index *index_src, size_t icoun
 	VertexCount += vcount;
 	
 	Index *index_dst = Indexes + IndexCount;
-	for(size_t i = 0; i < icount; i++) index_dst[i] = index_src[i] + base;
+	for(size_t i = 0; i < icount; i++) index_dst[i] = index_src[i] + (Index)base;
 	IndexCount += icount;
 	
 	return vertex_dst;
@@ -235,7 +235,7 @@ ChipmunkDemoTextFlushRenderer(void)
 {
 	cpTransform t = ChipmunkDemoTextMatrix;
 	Uniforms uniforms = {
-		.U_vp_matrix = {t.a , t.b , 0, 0, t.c , t.d , 0, 0, 0, 0, 1, 0, t.tx, t.ty, 0, 1},
+		.U_vp_matrix = {(float)t.a , (float)t.b , 0.0f, 0.0f, (float)t.c , (float)t.d , 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, (float)t.tx, (float)t.ty, 0.0f, 1.0f},
 	};
 	
 	sg_update_buffer(VertexBuffer, Vertexes, VertexCount*sizeof(Vertex));

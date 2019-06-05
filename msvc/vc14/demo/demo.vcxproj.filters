@@ -89,10 +89,10 @@
     <ClCompile Include="..\..\..\Demo\Shatter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Demo\ChipmunkDemoShaderSupport.c">
+    <ClCompile Include="..\..\..\Demo\ChipmunkDemoTextSupport.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Demo\ChipmunkDemoTextSupport.c">
+    <ClCompile Include="..\..\..\demo\sokol\sokol.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -101,6 +101,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Demo\ChipmunkDebugDraw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\demo\sokol\sokol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\demo\sokol\sokol_app.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\demo\sokol\sokol_gfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\demo\sokol\sokol_time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
