@@ -1,3 +1,7 @@
+What's new in 7.0.3:
+* MISC: Replacing GLFW with Sokol in the demo application. No need to push GLFW binaries and has a nice x-platform renderer to build on.
+* MISC: Fixed some 'const' warnings for MSCV.
+
 What's new in 7.0.2:
 * MISC: Merging pull requests. Build fixes and the like.
 
