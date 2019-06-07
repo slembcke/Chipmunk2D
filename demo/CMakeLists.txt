@@ -1,50 +1,42 @@
 cmake_policy(SET CMP0015 NEW) # Convert relative paths
 
+set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 
-if(APPLE)
-	set(GLEW_INCLUDE_DIR ../xcode/libGLEW/include)
-	set(GLFW_INCLUDE_DIR ../xcode/libglfw/include)
-	set(chipmunk_demos_library_dirs ../xcode/libglfw/lib ../xcode/libGLEW/lib)
-	set(GLEW_LIBRARIES GLEW)
-	set(GLFW_LIBRARIES glfw)
-else(APPLE)
-	FIND_PATH(GLFW_INCLUDE_DIR GL/glfw.h /usr/include/GL)
-	FIND_PATH(GLEW_INCLUDE_DIR GL/glew.h /usr/include/GL)
-	FIND_LIBRARY(GLFW_LIBRARIES glfw /usr/lib)
-	FIND_LIBRARY(GLEW_LIBRARIES GLEW /usr/lib)
-endif(APPLE)
-
 set(chipmunk_demos_include_dirs
-  ${chipmunk_SOURCE_DIR}/include
-  ${GLFW_INCLUDE_DIR}
-  ${GLEW_INCLUDE_DIR}
-  ${OPENGL_INCLUDE_DIR}
+	${chipmunk_SOURCE_DIR}/include
+	${OPENGL_INCLUDE_DIR}
 )
 
 set(chipmunk_demos_libraries
-  chipmunk_static
-  ${GLFW_LIBRARIES}
-  ${GLEW_LIBRARIES}
-  ${OPENGL_LIBRARIES}
+	chipmunk_static
+	${OPENGL_LIBRARIES}
 )
+
+file(GLOB chipmunk_demos_source_files "*.c")
 
 if(APPLE)
 	FIND_LIBRARY(APPKIT AppKit)
 	FIND_LIBRARY(IOKIT IOKit)
 	
 	list(APPEND chipmunk_demos_libraries ${APPKIT} ${IOKIT})
+	list(APPEND chipmunk_demos_source_files "sokol/sokol.m")
+	set_property(SOURCE "sokol/sokol.m" APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
+else()
+	list(APPEND chipmunk_demos_source_files "sokol/sokol.c")
 endif(APPLE)
 
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	list(APPEND chipmunk_demos_libraries dl X11)
+endif()
+
 if(NOT MSVC)
-  list(APPEND chipmunk_demos_libraries m pthread)
+	list(APPEND chipmunk_demos_libraries m pthread)
 endif(NOT MSVC)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-  list(APPEND chipmunk_demos_libraries BlocksRuntime)
+	list(APPEND chipmunk_demos_libraries BlocksRuntime)
 endif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-
-file(GLOB chipmunk_demos_source_files "*.c")
 
 include_directories(${chipmunk_demos_include_dirs})
 link_directories(${chipmunk_demos_library_dirs})
@@ -53,10 +45,10 @@ target_link_libraries(chipmunk_demos ${chipmunk_demos_libraries})
 
 # Tell MSVC to compile the code as C++.
 if(MSVC)
-  set_source_files_properties(${chipmunk_demos_source_files} PROPERTIES LANGUAGE CXX)
-  set_target_properties(chipmunk_demos PROPERTIES LINKER_LANGUAGE CXX)
+	set_source_files_properties(${chipmunk_demos_source_files} PROPERTIES LANGUAGE CXX)
+	set_target_properties(chipmunk_demos PROPERTIES LINKER_LANGUAGE CXX)
 endif(MSVC)
 
 if(INSTALL_DEMOS)
-  install(TARGETS chipmunk_demos RUNTIME DESTINATION bin)
+	install(TARGETS chipmunk_demos RUNTIME DESTINATION bin)
 endif(INSTALL_DEMOS)

@@ -20,12 +20,15 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 
+*.o
+*.obj
 *.dll
 *.so
 *.so.*
 *.dylib
 *.a
 *.exe
+*.lib
 chipmunk_demos
 
 # Visual studio
@@ -50,6 +53,8 @@ msvc/vc13/demo/Win32/
 msvc/vc13/demo/x64/
 msvc/vc14/demo/Win32/
 msvc/vc14/demo/x64/
+*.log
+*.tlog
+*.db
 
 .vscode
-

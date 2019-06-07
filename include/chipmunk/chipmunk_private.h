@@ -48,8 +48,8 @@ void cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*));
 
 //MARK: cpHashSet
 
-typedef cpBool (*cpHashSetEqlFunc)(void *ptr, void *elt);
-typedef void *(*cpHashSetTransFunc)(void *ptr, void *data);
+typedef cpBool (*cpHashSetEqlFunc)(const void *ptr, const void *elt);
+typedef void *(*cpHashSetTransFunc)(const void *ptr, void *data);
 
 cpHashSet *cpHashSetNew(int size, cpHashSetEqlFunc eqlFunc);
 void cpHashSetSetDefaultValue(cpHashSet *set, void *default_value);
@@ -57,9 +57,9 @@ void cpHashSetSetDefaultValue(cpHashSet *set, void *default_value);
 void cpHashSetFree(cpHashSet *set);
 
 int cpHashSetCount(cpHashSet *set);
-void *cpHashSetInsert(cpHashSet *set, cpHashValue hash, void *ptr, cpHashSetTransFunc trans, void *data);
-void *cpHashSetRemove(cpHashSet *set, cpHashValue hash, void *ptr);
-void *cpHashSetFind(cpHashSet *set, cpHashValue hash, void *ptr);
+const void *cpHashSetInsert(cpHashSet *set, cpHashValue hash, const void *ptr, cpHashSetTransFunc trans, void *data);
+const void *cpHashSetRemove(cpHashSet *set, cpHashValue hash, const void *ptr);
+const void *cpHashSetFind(cpHashSet *set, cpHashValue hash, const void *ptr);
 
 typedef void (*cpHashSetIteratorFunc)(void *elt, void *data);
 void cpHashSetEach(cpHashSet *set, cpHashSetIteratorFunc func, void *data);

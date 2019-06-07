@@ -21,8 +21,9 @@
 
 #include "chipmunk/chipmunk.h"
 
+extern cpTransform ChipmunkDemoTextMatrix;
+
 void ChipmunkDemoTextInit(void);
-//#define ChipmunkDemoTextDrawString(...)
 void ChipmunkDemoTextDrawString(cpVect pos, char const *str);
 void ChipmunkDemoTextFlushRenderer(void);
 void ChipmunkDemoTextClearRenderer(void);

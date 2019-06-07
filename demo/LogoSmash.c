@@ -79,7 +79,7 @@ update(cpSpace *space, double dt)
 static void
 DrawDot(cpBody *body, void *unused)
 {
-	ChipmunkDebugDrawDot(3.0, cpBodyGetPosition(body), RGBAColor(200.0f/255.0f, 210.0f/255.0f, 230.0f/255.0f, 1.0f));
+	ChipmunkDebugDrawDot(3.5/ChipmunkDebugDrawPointLineScale, cpBodyGetPosition(body), RGBAColor(0xee/255.0f, 0xe8/255.0f, 0xd5/255.0f, 1.0f));
 }
 
 static void

@@ -40,7 +40,7 @@ update(cpSpace *space, double dt)
 	
 	ChipmunkDemoPrintString("Query: Dist(%f) Point(%5.2f, %5.2f), ", cpvdist(start, end), end.x, end.y);
 	
-	cpSegmentQueryInfo segInfo = {};
+	cpSegmentQueryInfo segInfo = {0};
 	if(cpSpaceSegmentQueryFirst(space, start, end, radius, CP_SHAPE_FILTER_ALL, &segInfo)){
 		cpVect point = segInfo.point;
 		cpVect n = segInfo.normal;
@@ -63,7 +63,7 @@ update(cpSpace *space, double dt)
 	// Draw a fat green line over the unoccluded part of the query
 	ChipmunkDebugDrawFatSegment(start, cpvlerp(start, end, segInfo.alpha), radius, RGBAColor(0,1,0,1), LAColor(0,0));
 	
-	cpPointQueryInfo nearestInfo = {};
+	cpPointQueryInfo nearestInfo = {0};
 	cpSpacePointQueryNearest(space, ChipmunkDemoMouse, 100.0, CP_SHAPE_FILTER_ALL, &nearestInfo);
 	if(nearestInfo.shape){
 		// Draw a grey line to the closest shape.
@@ -100,18 +100,17 @@ init(void)
 	
 	{ // add a pentagon
 		cpFloat mass = 1.0f;
-		const int NUM_VERTS = 5;
 		
-		cpVect verts[NUM_VERTS];
-		for(int i=0; i<NUM_VERTS; i++){
-			cpFloat angle = -2.0f*CP_PI*i/((cpFloat) NUM_VERTS);
+		cpVect verts[5];
+		for(int i=0; i<5; i++){
+			cpFloat angle = -2.0f*CP_PI*i/((cpFloat) 5);
 			verts[i] = cpv(30*cos(angle), 30*sin(angle));
 		}
 		
-		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, NUM_VERTS, verts, cpvzero, 0.0f)));
+		cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, cpMomentForPoly(mass, 5, verts, cpvzero, 0.0f)));
 		cpBodySetPosition(body, cpv(50.0f, 30.0f));
 		
-		cpSpaceAddShape(space, cpPolyShapeNew(body, NUM_VERTS, verts, cpTransformIdentity, 10.0f));
+		cpSpaceAddShape(space, cpPolyShapeNew(body, 5, verts, cpTransformIdentity, 10.0f));
 	}
 	
 	{ // add a circle
