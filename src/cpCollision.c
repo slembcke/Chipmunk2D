@@ -200,7 +200,8 @@ static inline cpFloat
 ClosestT(const cpVect a, const cpVect b)
 {
 	cpVect delta = cpvsub(b, a);
-	return -cpfclamp(cpvdot(delta, cpvadd(a, b))/cpvlengthsq(delta), -1.0f, 1.0f);
+	cpFloat d2 = cpvlengthsq(delta);
+	return d2 ? -cpfclamp(cpvdot(delta, cpvadd(a, b))/d2, -1.0f, 1.0f) : 0.0f;
 }
 
 // Basically the same as cpvlerp(), except t = [-1, 1]
