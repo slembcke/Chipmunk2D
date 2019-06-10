@@ -417,12 +417,13 @@ cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type)
 cpShape *
 cpSpaceAddShape(cpSpace *space, cpShape *shape)
 {
-	cpBody *body = shape->body;
-	
 	cpAssertHard(shape->space != space, "You have already added this shape to this space. You must not add it a second time.");
 	cpAssertHard(!shape->space, "You have already added this shape to another space. You cannot add it to a second.");
-//	cpAssertHard(body->space == space, "The shape's body must be added to the space before the shape.");
+	cpAssertHard(shape->body, "The shape's body is not defined.");
+	cpAssertHard(shape->body->space == space, "The shape's body must be added to the space before the shape.");
 	cpAssertSpaceUnlocked(space);
+	
+	cpBody *body = shape->body;
 	
 	cpBool isStatic = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC);
 	if(!isStatic) cpBodyActivate(body);
