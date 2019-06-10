@@ -231,9 +231,11 @@ void
 cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
 {
 	if(arb->swapped){
-		(*a) = (cpShape *)arb->b, (*b) = (cpShape *)arb->a;
+		(*a) = (cpShape *)arb->b;
+		(*b) = (cpShape *)arb->a;
 	} else {
-		(*a) = (cpShape *)arb->a, (*b) = (cpShape *)arb->b;
+		(*a) = (cpShape *)arb->a;
+		(*b) = (cpShape *)arb->b;
 	}
 }
 

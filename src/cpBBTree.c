@@ -24,7 +24,7 @@
 
 #include "chipmunk/chipmunk_private.h"
 
-static inline cpSpatialIndexClass *Klass();
+static inline cpSpatialIndexClass *Klass(void);
 
 typedef struct Node Node;
 typedef struct Pair Pair;

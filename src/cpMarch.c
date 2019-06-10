@@ -44,8 +44,8 @@ cpMarchCells(
 			cpFloat x0 = cpflerp(bb.l, bb.r, (i+0)*x_denom);
 			cpFloat x1 = cpflerp(bb.l, bb.r, (i+1)*x_denom);
 			
-			a = b, b = buffer[i + 1];
-			c = d, d = sample(cpv(x1, y1), sample_data);
+			a = b; b = buffer[i + 1];
+			c = d; d = sample(cpv(x1, y1), sample_data);
 			buffer[i + 1] = d;
 			
 			cell(t, a, b, c, d, x0, x1, y0, y1, segment, segment_data);
