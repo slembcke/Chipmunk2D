@@ -49,13 +49,13 @@ typedef struct {
 
 // Meh, just max out 16 bit index size.
 #define VERTEX_MAX (64*1024)
-#define INDEX_MAX (128*1024)
+#define INDEX_MAX (4*VERTEX_MAX)
 
 static sg_buffer VertexBuffer, IndexBuffer;
 static size_t VertexCount, IndexCount;
 
 static Vertex Vertexes[VERTEX_MAX];
-static uint16_t Indexes[INDEX_MAX];
+static Index Indexes[INDEX_MAX];
 	
 void
 ChipmunkDebugDrawInit(void)
@@ -151,7 +151,7 @@ ChipmunkDebugDrawInit(void)
 }
 
 static Vertex *push_vertexes(size_t vcount, const Index *index_src, size_t icount){
-	cpAssertHard(VertexCount + vcount <= VERTEX_MAX || IndexCount + icount <= INDEX_MAX, "Geometry buffer full.");
+	cpAssertHard(VertexCount + vcount <= VERTEX_MAX && IndexCount + icount <= INDEX_MAX, "Geometry buffer full.");
 	
 	Vertex *vertex_dst = Vertexes + VertexCount;
 	size_t base = VertexCount;
