@@ -313,7 +313,7 @@ void cpBodySetType(cpBody *body, cpBodyType)</code></pre>
 
 p(expl). Set the type of a body (dynamic, kinematic, static). See the section on "BodyTypes":#BodyTypes for more information. When changing an body to a dynamic body, the mass and moment of inertia are recalculated from the shapes added to the body. Custom calculated moments of inertia are not preseved when changing types. This function cannot be called directly in a collision callback. See "Post-Step Callbacks":#PostStep for more information.
 
-<pre><code>cpSpace cpBodyGetSpace(const cpBody *body)</code></pre>
+<pre><code>cpSpace *cpBodyGetSpace(const cpBody *body)</code></pre>
 
 p(expl). The @cpSpace@ this body is currently added to, or @NULL@ if it is not currently added to a space.
 
@@ -615,9 +615,9 @@ The polygon shape will be created with a @radius@, increasing the size of the sh
 <pre><code>cpPolyShape* cpPolyShapeInitRaw(cpPolyShape *poly, cpBody *body, int count, const cpVect *verts, cpFloat radius)
 cpShape* cpPolyShapeNewRaw(cpBody *body, int count, const cpVect *verts, cpFloat radius)</code></pre>
 
-Alternate constructors for poly shapes. This version does not apply a transform nor does it create a convex hull. Verticies _must_ be provided with a counter-clockwise winding.
+Alternate constructors for poly shapes. This version does not apply a transform nor does it create a convex hull. Vertices _must_ be provided with a counter-clockwise winding.
 
-<pre><code>int cpPolyShapeGetNumVerts(cpShape *shape)
+<pre><code>int cpPolyShapeGetCount(cpShape *shape)
 cpVect cpPolyShapeGetVert(cpShape *shape, int index)
 cpFloat cpPolyShapeGetRadius()</code></pre>
 
