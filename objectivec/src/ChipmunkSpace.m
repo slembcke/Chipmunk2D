@@ -46,6 +46,11 @@
 	return self;
 }
 
+-(void)dealloc {
+	self.chipmunkObjects = nil;
+	[super dealloc];
+}
+
 -(NSUInteger)count
 {
 	return [_chipmunkObjects count];
