@@ -11,23 +11,6 @@ def log(string)
 	open(BUILD_LOG_PATH, 'a'){|f| f.puts string}
 end
 
-def latest_sdk()
-	sdks = `xcodebuild -showsdks`.split("\n")
-	
-	versions = sdks.map do|elt|
-		# Match only lines with "iphoneos" in them.
-		m = elt.match(/iphoneos(\d\.\d)/)
-		(m ? m.captures[0] : "0.0")
-	end
-	
-	return versions.max
-end
-
-# Or you can pick a specific version string (ex: "5.1")
-IOS_SDK_VERSION = latest_sdk()
-
-log("Building using iOS SDK #{IOS_SDK_VERSION}")
-
 PROJECT = "Chipmunk7.xcodeproj"
 VERBOSE = (not ARGV.include?("--quiet"))
 
@@ -46,9 +29,8 @@ end
 
 def build(target, configuration, simulator)
 	sdk_os = (simulator ? "iphonesimulator" : "iphoneos")
-	sdk = "#{sdk_os}#{IOS_SDK_VERSION}"
 	
-	command = "xcodebuild -project #{PROJECT} -sdk #{sdk} -configuration #{configuration} -target #{target}"
+	command = "xcodebuild -project #{PROJECT} -sdk #{sdk_os} -configuration #{configuration} -target #{target}"
 	system command
 	
 	return "build/#{configuration}-#{sdk_os}/lib#{target}.a"
