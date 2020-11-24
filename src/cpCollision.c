@@ -95,6 +95,7 @@ typedef struct SupportPoint (*SupportPointFunc)(const cpShape *shape, const cpVe
 static inline struct SupportPoint
 CircleSupportPoint(const cpCircleShape *circle, const cpVect n)
 {
+	(void)n;
 	return SupportPointNew(circle->tc, 0);
 }
 
@@ -681,6 +682,7 @@ CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, struct cpColl
 static void
 CollisionError(const cpShape *circle, const cpShape *poly, struct cpCollisionInfo *info)
 {
+	(void)circle, (void)poly, (void)info;
 	cpAssertHard(cpFalse, "Internal Error: Shape types are not sorted.");
 }
 

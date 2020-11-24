@@ -561,6 +561,8 @@ FindSteiner(int count, cpVect *verts, struct Notch notch)
 static struct Notch
 DeepestNotch(int count, cpVect *verts, int hullCount, cpVect *hullVerts, int first, cpFloat tol)
 {
+	(void)tol;
+
 	struct Notch notch = {};
 	int j = Next(first, count);
 	

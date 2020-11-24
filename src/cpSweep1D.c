@@ -52,6 +52,7 @@ BoundsOverlap(Bounds a, Bounds b)
 static inline Bounds
 BBToBounds(cpSweep1D *sweep, cpBB bb)
 {
+	(void)sweep;
 	Bounds bounds = {bb.l, bb.r};
 	return bounds;
 }
@@ -120,6 +121,8 @@ cpSweep1DEach(cpSweep1D *sweep, cpSpatialIndexIteratorFunc func, void *data)
 static int
 cpSweep1DContains(cpSweep1D *sweep, void *obj, cpHashValue hashid)
 {
+	(void)hashid;
+
 	TableCell *table = sweep->table;
 	for(int i=0, count=sweep->num; i<count; i++){
 		if(table[i].obj == obj) return cpTrue;
@@ -133,6 +136,8 @@ cpSweep1DContains(cpSweep1D *sweep, void *obj, cpHashValue hashid)
 static void
 cpSweep1DInsert(cpSweep1D *sweep, void *obj, cpHashValue hashid)
 {
+	(void)hashid;
+
 	if(sweep->num == sweep->max) ResizeTable(sweep, sweep->max*2);
 	
 	sweep->table[sweep->num] = MakeTableCell(sweep, obj);
@@ -142,6 +147,8 @@ cpSweep1DInsert(cpSweep1D *sweep, void *obj, cpHashValue hashid)
 static void
 cpSweep1DRemove(cpSweep1D *sweep, void *obj, cpHashValue hashid)
 {
+	(void)hashid;
+
 	TableCell *table = sweep->table;
 	for(int i=0, count=sweep->num; i<count; i++){
 		if(table[i].obj == obj){
@@ -160,12 +167,14 @@ cpSweep1DRemove(cpSweep1D *sweep, void *obj, cpHashValue hashid)
 static void
 cpSweep1DReindexObject(cpSweep1D *sweep, void *obj, cpHashValue hashid)
 {
+	(void)sweep, (void)obj, (void)hashid;
 	// Nothing to do here
 }
 
 static void
 cpSweep1DReindex(cpSweep1D *sweep)
 {
+	(void)sweep;
 	// Nothing to do here
 	// Could perform a sort, but queries are not accelerated anyway.
 }
@@ -190,6 +199,8 @@ cpSweep1DQuery(cpSweep1D *sweep, void *obj, cpBB bb, cpSpatialIndexQueryFunc fun
 static void
 cpSweep1DSegmentQuery(cpSweep1D *sweep, void *obj, cpVect a, cpVect b, cpFloat t_exit, cpSpatialIndexSegmentQueryFunc func, void *data)
 {
+	(void)t_exit;
+
 	cpBB bb = cpBBExpand(cpBBNew(a.x, a.y, a.x, a.y), b);
 	Bounds bounds = BBToBounds(sweep, bb);
 	

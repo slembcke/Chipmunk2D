@@ -35,7 +35,11 @@ cpSpaceGetPostStepCallback(cpSpace *space, void *key)
 	return NULL;
 }
 
-static void PostStepDoNothing(cpSpace *space, void *obj, void *data){}
+static void
+PostStepDoNothing(cpSpace *space, void *obj, void *data)
+{
+	(void)space, (void)obj, (void)data;
+}
 
 cpBool
 cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data)
@@ -329,6 +333,7 @@ cpSpaceArbiterSetFilter(cpArbiter *arb, cpSpace *space)
  void
 cpShapeUpdateFunc(cpShape *shape, void *unused)
 {
+	(void)unused;
 	cpShapeCacheBB(shape);
 }
 

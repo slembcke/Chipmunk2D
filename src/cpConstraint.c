@@ -23,7 +23,7 @@
 
 // TODO: Comment me!
 
-void cpConstraintDestroy(cpConstraint *constraint){}
+void cpConstraintDestroy(cpConstraint *constraint){(void)constraint;}
 
 void
 cpConstraintFree(cpConstraint *constraint)

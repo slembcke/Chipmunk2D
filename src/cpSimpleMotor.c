@@ -24,6 +24,8 @@
 static void
 preStep(cpSimpleMotor *joint, cpFloat dt)
 {
+	(void)dt;
+
 	cpBody *a = joint->constraint.a;
 	cpBody *b = joint->constraint.b;
 	

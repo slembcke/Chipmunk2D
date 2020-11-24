@@ -471,6 +471,8 @@ RunWorkers(cpHastySpace *hasty, cpHastySpaceWorkFunction func)
 static void
 Solver(cpSpace *space, unsigned long worker, unsigned long worker_count)
 {
+	(void)worker;
+
 	cpArray *constraints = space->constraints;
 	cpArray *arbiters = space->arbiters;
 	
