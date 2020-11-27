@@ -23,7 +23,7 @@ CP_EXPORT cpPolyline *cpPolylineSimplifyCurves(cpPolyline *line, cpFloat tol);
 
 /**
 	Returns a copy of a polyline simplified by discarding "flat" vertexes.
-	This works well on straigt edged or angular shapes, not as well on smooth shapes.
+	This works well on straight edged or angular shapes, not as well on smooth shapes.
 */
 CP_EXPORT cpPolyline *cpPolylineSimplifyVertexes(cpPolyline *line, cpFloat tol);
 
