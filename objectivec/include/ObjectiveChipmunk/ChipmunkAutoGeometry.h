@@ -47,7 +47,7 @@
 
 /**
 	Returns a copy of a polyline simplified by discarding "flat" vertexes.
-	This works well on straigt edged or angular shapes, not as well on smooth shapes.
+	This works well on straight edged or angular shapes, not as well on smooth shapes.
 */
 -(ChipmunkPolyline *)simplifyVertexes:(cpFloat)tolerance;
 
