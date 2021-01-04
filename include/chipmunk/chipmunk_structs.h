@@ -428,7 +428,7 @@ struct cpSpace {
 	cpArray *pooledArbiters;
 	
 	cpArray *allocatedBuffers;
-	unsigned int locked;
+	int locked;
 	
 	cpBool usesWildcards;
 	cpHashSet *collisionHandlers;
