@@ -15,6 +15,11 @@ if(BUILD_SHARED)
   add_library(chipmunk SHARED
     ${chipmunk_source_files}
   )
+  # Tell MSVC to compile the code as C++.
+  if(MSVC)
+    set_source_files_properties(${chipmunk_source_files} PROPERTIES LANGUAGE CXX)
+    set_target_properties(chipmunk_static PROPERTIES LINKER_LANGUAGE CXX)
+  endif(MSVC)
   # set the lib's version number
   # But avoid on Android because symlinks to version numbered .so's don't work with Android's Java-side loadLibrary.
   if(NOT ANDROID)
