@@ -123,8 +123,6 @@ cpSpaceDebugDrawConstraint(cpConstraint *constraint, cpSpaceDebugDrawOptions *op
 		options->drawSegment(a, b, color, data);
 	} else if(cpConstraintIsDampedSpring(constraint)){
 		cpDampedSpring *spring = (cpDampedSpring *)constraint;
-		cpDataPointer data = options->data;
-		cpSpaceDebugColor color = options->constraintColor;
 		
 		cpVect a = cpTransformPoint(body_a->transform, spring->anchorA);
 		cpVect b = cpTransformPoint(body_b->transform, spring->anchorB);
