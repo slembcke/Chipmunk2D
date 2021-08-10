@@ -43,12 +43,6 @@ link_directories(${chipmunk_demos_library_dirs})
 add_executable(chipmunk_demos ${chipmunk_demos_source_files})
 target_link_libraries(chipmunk_demos ${chipmunk_demos_libraries})
 
-# Tell MSVC to compile the code as C++.
-if(MSVC)
-	set_source_files_properties(${chipmunk_demos_source_files} PROPERTIES LANGUAGE CXX)
-	set_target_properties(chipmunk_demos PROPERTIES LINKER_LANGUAGE CXX)
-endif(MSVC)
-
 if(INSTALL_DEMOS)
 	install(TARGETS chipmunk_demos RUNTIME DESTINATION bin)
 endif(INSTALL_DEMOS)
