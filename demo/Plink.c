@@ -72,7 +72,7 @@ init(void)
 	cpShape *shape;
 	
 	// Vertexes for a triangle shape.
-	cpVect tris[] = {
+	cpVect tris[4] = {
 		cpv(-15,-15),
 		cpv(  0, 10),
 		cpv( 15,-15),

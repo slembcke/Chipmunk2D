@@ -109,7 +109,7 @@ init(void)
 	cpShapeSetFriction(shape, 0.5f);
 	cpShapeSetFilter(shape, NOT_GRABBABLE_FILTER);
 
-	cpVect verts[] = {
+	cpVect verts[4] = {
 		cpv(-30,-80),
 		cpv(-30, 80),
 		cpv( 30, 64),

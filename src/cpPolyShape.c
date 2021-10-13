@@ -234,7 +234,7 @@ cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height, c
 cpPolyShape *
 cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box, cpFloat radius)
 {
-	cpVect verts[] = {
+	cpVect verts[4] = {
 		cpv(box.r, box.b),
 		cpv(box.r, box.t),
 		cpv(box.l, box.t),
