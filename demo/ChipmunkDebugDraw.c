@@ -273,7 +273,7 @@ void ChipmunkDebugDrawPolygon(int count, const cpVect *verts, cpFloat radius, cp
 
 void ChipmunkDebugDrawBB(cpBB bb, cpSpaceDebugColor color)
 {
-	cpVect verts[] = {
+	cpVect verts[4] = {
 		cpv(bb.r, bb.b),
 		cpv(bb.r, bb.t),
 		cpv(bb.l, bb.t),
