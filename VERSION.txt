@@ -210,7 +210,7 @@ Keep in mind that this is a x.0.0 release and that it's likely there are still s
 What's new in 5.3.5
 * FIX: Fixed spelling of cpArbiterGetDepth(). Was cpArbiteGetDepth() before. Apparently nobody ever used this function.
 * FIX: Added defines for M_PI and M_E. Apparently these values were never part of the C standard math library. Who knew!?
-* FIX: Added a guard to cpBodyActivate() so that it's a noop for rouge bodies.
+* FIX: Added a guard to cpBodyActivate() so that it's a noop for rogue bodies.
 * FIX: Shape queries now work with (and against) sensor shapes.
 * FIX: Fixed an issue where removing a collision handler while a separate() callback was waiting to fire the next step would cause crashes.
 * FIX: Fixed an issue where the default callback would not be called for sensor shapes.

@@ -95,10 +95,10 @@ add_box(cpSpace *space)
 static cpSpace *
 init(void)
 {
-	// Create a rouge body to control the planet manually.
 	cpSpace *space = cpSpaceNew();
 	cpSpaceSetIterations(space, 20);
 	
+	// Create a kinematic body to control the planet manually.
 	planetBody = cpSpaceAddBody(space, cpBodyNewKinematic());
 	cpBodySetAngularVelocity(planetBody, 0.2f);
 	
