@@ -31,7 +31,13 @@
 cpTransform ChipmunkDebugDrawVPMatrix;
 float ChipmunkDebugDrawPointLineScale = 1.0f;
 
-#define GLSL33(x) "#version 330\n" #x
+#ifdef SOKOL_GLCORE33
+#define GLSL(x) "#version 330\n" #x
+#endif
+#ifdef SOKOL_GLES3
+#define GLSL(x) "#version 300 es\n" #x
+#endif
+
 
 static sg_bindings bindings;
 static sg_pipeline pipeline;
@@ -84,7 +90,7 @@ ChipmunkDebugDrawInit(void)
 			.size = sizeof(Uniforms),
 			.uniforms[0] = {.name = "U_vp_matrix", .type = SG_UNIFORMTYPE_MAT4},
 		},
-		.vs.source = GLSL33(
+		.vs.source = GLSL(
 			layout(location = 0) in vec2 IN_pos;
 			layout(location = 1) in vec2 IN_uv;
 			layout(location = 2) in float IN_radius;
@@ -100,7 +106,7 @@ ChipmunkDebugDrawInit(void)
 			} FRAG;
 			
 			void main(){
-				gl_Position = U_vp_matrix*vec4(IN_pos + IN_radius*IN_uv, 0, 1);
+				gl_Position = U_vp_matrix*vec4(IN_pos + IN_radius*IN_uv, 0.0, 1.0);
 				FRAG.uv = IN_uv;
 				FRAG.fill = IN_fill;
 				FRAG.fill.rgb *= IN_fill.a;
@@ -108,7 +114,8 @@ ChipmunkDebugDrawInit(void)
 				FRAG.outline.a *= IN_outline.a;
 			}
 		),
-		.fs.source = GLSL33(
+		.fs.source = GLSL(
+			precision mediump float;
 			in struct {
 				vec2 uv;
 				vec4 fill;
@@ -120,9 +127,9 @@ ChipmunkDebugDrawInit(void)
 			void main(){
 				float len = length(FRAG.uv);
 				float fw = length(fwidth(FRAG.uv));
-				float mask = smoothstep(-1, fw - 1, -len);
+				float mask = smoothstep(-1.0, fw - 1.0, -len);
 				
-				float outline = 1 - fw;
+				float outline = 1.0 - fw;
 				float outline_mask = smoothstep(outline - fw, outline, len);
 				vec4 color = FRAG.fill + (FRAG.outline - FRAG.fill*FRAG.outline.a)*outline_mask;
 				OUT_color = color*mask;
