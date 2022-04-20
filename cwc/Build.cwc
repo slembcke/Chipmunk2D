@@ -11,10 +11,10 @@
 -{vOS_Flag}
 >
 ;Generate Dynamic Lib
-;-o obj/{sOut}/lib/ -#To Lib/{sOut}/box2d.{_sDynamic}
+-o obj/{sOut}/lib/ -#To Lib/{sOut}/Chipmunk.{_sDynamic}
 >
 ;Generate Static Lib
-;-o obj/{sOut}/lib/ -#To Lib/{sOut}/box2d.a
+-o obj/{sOut}/lib/ -#To Lib/{sOut}/libChipmunk.a
 >
 ;Build an Example
 -c ../Demo/ -o obj/{sOut}/
