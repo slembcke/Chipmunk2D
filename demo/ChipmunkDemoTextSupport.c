@@ -39,7 +39,12 @@ static int glyph_indexes[256];
 
 cpTransform ChipmunkDemoTextMatrix;
 
-#define GLSL33(x) "#version 330\n" #x
+#ifdef SOKOL_GLCORE33
+#define GLSL(x) "#version 330\n" #x
+#endif
+#ifdef SOKOL_GLES3
+#define GLSL(x) "#version 300 es\n" #x
+#endif
 
 static sg_bindings bindings;
 static sg_pipeline pipeline;
@@ -102,7 +107,7 @@ ChipmunkDemoTextInit(void)
 			.size = sizeof(Uniforms),
 			.uniforms[0] = {.name = "U_vp_matrix", .type = SG_UNIFORMTYPE_MAT4},
 		},
-		.vs.source = GLSL33(
+		.vs.source = GLSL(
 			layout(location = 0) in vec2 IN_pos;
 			layout(location = 1) in vec2 IN_uv;
 			layout(location = 2) in vec4 IN_color;
@@ -115,13 +120,14 @@ ChipmunkDemoTextInit(void)
 			} FRAG;
 			
 			void main(){
-				gl_Position = U_vp_matrix*vec4(IN_pos, 0, 1);
+				gl_Position = U_vp_matrix*vec4(IN_pos, 0.0, 1.0);
 				FRAG.uv = IN_uv;
 				FRAG.color = IN_color;
 			}
 		),
 		.fs.images[0] = {.name = "U_texture", .type = SG_IMAGETYPE_2D},
-		.fs.source = GLSL33(
+		.fs.source = GLSL(
+			precision mediump float;
 			in struct {
 				vec2 uv;
 				vec4 color;
