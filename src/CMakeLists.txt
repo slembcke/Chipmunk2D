@@ -57,3 +57,6 @@ if(BUILD_SHARED OR INSTALL_STATIC)
   install(FILES ${chipmunk_public_header} DESTINATION include/chipmunk)
   install(FILES ${chipmunk_constraint_header} DESTINATION include/chipmunk/constraints)
 endif(BUILD_SHARED OR INSTALL_STATIC)
+
+configure_file(chipmunk.pc.in chipmunk.pc @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/chipmunk.pc DESTINATION lib/pkgconfig)
