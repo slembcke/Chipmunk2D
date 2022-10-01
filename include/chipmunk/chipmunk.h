@@ -38,8 +38,8 @@
 #ifdef _WIN32
 	#ifdef CHIPMUNK_SHARED
 		#ifdef CHIPMUNK_BUILD
-	#define CP_EXPORT __declspec(dllexport)
-#else
+			#define CP_EXPORT __declspec(dllexport)
+		#else
 			#define CP_EXPORT __declspec(dllimport)
 		#endif
 	#else
@@ -119,7 +119,10 @@ typedef struct cpArbiter cpArbiter;
 typedef struct cpSpace cpSpace;
 
 #include "cpVect.h"
+#include "cpRobust.h"
+#include "cpHastySpace.h"
 #include "cpBB.h"
+#include "cpMarch.h"
 #include "cpTransform.h"
 #include "cpSpatialIndex.h"
 
