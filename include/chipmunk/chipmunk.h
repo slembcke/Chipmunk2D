@@ -36,7 +36,15 @@
 #endif
 
 #ifdef _WIN32
+	#ifdef CHIPMUNK_SHARED
+		#ifdef CHIPMUNK_BUILD
 	#define CP_EXPORT __declspec(dllexport)
+#else
+			#define CP_EXPORT __declspec(dllimport)
+		#endif
+	#else
+		#define CP_EXPORT
+	#endif
 #else
 	#define CP_EXPORT
 #endif
