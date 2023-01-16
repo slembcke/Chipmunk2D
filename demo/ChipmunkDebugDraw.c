@@ -23,7 +23,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "sokol/sokol_gfx.h"
+#include "sokol/sokol.h"
 
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDebugDraw.h"
