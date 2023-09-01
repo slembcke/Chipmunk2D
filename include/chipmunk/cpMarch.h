@@ -1,6 +1,10 @@
 // Copyright 2013 Howling Moon Software. All rights reserved.
 // See http://chipmunk2d.net/legal.php for more information.
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// Function type used as a callback from the marching squares algorithm to sample an image function.
 /// It passes you the point to sample and your context pointer, and you return the density.
 typedef cpFloat (*cpMarchSampleFunc)(cpVect point, void *data);
@@ -26,3 +30,7 @@ CP_EXPORT void cpMarchHard(
   cpMarchSegmentFunc segment, void *segment_data,
   cpMarchSampleFunc sample, void *sample_data
 );
+
+#ifdef __cplusplus
+}
+#endif
