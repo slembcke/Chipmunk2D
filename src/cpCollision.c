@@ -558,7 +558,7 @@ CircleToSegment(const cpCircleShape *circle, const cpSegmentShape *segment, stru
 		cpVect n = info->n = (dist ? cpvmult(delta, 1.0f/dist) : segment->tn);
 		
 		// Reject endcap collisions if tangents are provided.
-		cpVect rot = cpBodyGetRotation(segment->shape.body);
+		cpVect rot = segment->shape.body ? cpBodyGetRotation(segment->shape.body) : cpv(1.0f, 0.0f);
 		if(
 			(closest_t != 0.0f || cpvdot(n, cpvrotate(segment->a_tangent, rot)) >= 0.0) &&
 			(closest_t != 1.0f || cpvdot(n, cpvrotate(segment->b_tangent, rot)) >= 0.0)
@@ -586,8 +586,8 @@ SegmentToSegment(const cpSegmentShape *seg1, const cpSegmentShape *seg2, struct 
 #endif
 	
 	cpVect n = points.n;
-	cpVect rot1 = cpBodyGetRotation(seg1->shape.body);
-	cpVect rot2 = cpBodyGetRotation(seg2->shape.body);
+	cpVect rot1 = seg1->shape.body ? cpBodyGetRotation(seg1->shape.body) : cpv(1.0f, 0.0f);
+	cpVect rot2 = seg2->shape.body ? cpBodyGetRotation(seg2->shape.body) : cpv(1.0f, 0.0f);
 	
 	// If the closest points are nearer than the sum of the radii...
 	if(
@@ -644,7 +644,7 @@ SegmentToPoly(const cpSegmentShape *seg, const cpPolyShape *poly, struct cpColli
 #endif
 	
 	cpVect n = points.n;
-	cpVect rot = cpBodyGetRotation(seg->shape.body);
+	cpVect rot = seg->shape.body ? cpBodyGetRotation(seg->shape.body) : cpv(1.0f, 0.0f);
 	
 	if(
 		// If the closest points are nearer than the sum of the radii...
