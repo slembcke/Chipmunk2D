@@ -64,7 +64,11 @@
 #if CP_USE_DOUBLES
 /// Chipmunk's floating point type.
 /// Can be reconfigured at compile time.
-	typedef double cpFloat;
+	#if CP_USE_CGTYPES
+		typedef CGFloat cpFloat;
+	#else
+		typedef double cpFloat;
+	#endif
 	#define cpfsqrt sqrt
 	#define cpfsin sin
 	#define cpfcos cos
@@ -77,7 +81,11 @@
 	#define cpfceil ceil
 	#define CPFLOAT_MIN DBL_MIN
 #else
-	typedef float cpFloat;
+	#if CP_USE_CGTYPES
+		typedef CGFloat cpFloat;
+	#else
+		typedef float cpFloat;
+	#endif
 	#define cpfsqrt sqrtf
 	#define cpfsin sinf
 	#define cpfcos cosf
