@@ -32,11 +32,11 @@ typedef enum cpBodyType {
 	/// A kinematic body is an infinite mass, user controlled body that is not affected by gravity, forces or collisions.
 	/// Instead the body only moves based on it's velocity.
 	/// Dynamic bodies collide normally with kinematic bodies, though the kinematic body will be unaffected.
-	/// Collisions between two kinematic bodies, or a kinematic body and a static body produce collision callbacks, but no collision response.
+	/// Collisions between two kinematic bodies, or a kinematic body and a body produce collision callbacks, but no collision response.
 	CP_BODY_TYPE_KINEMATIC,
-	/// A static body is a body that never (or rarely) moves. If you move a static body, you must call one of the cpSpaceReindex*() functions.
+	/// A body is a body that never (or rarely) moves. If you move a body, you must call one of the cpSpaceReindex*() functions.
 	/// Chipmunk uses this information to optimize the collision detection.
-	/// Static bodies do not produce collision callbacks when colliding with other static bodies.
+	/// Static bodies do not produce collision callbacks when colliding with other bodies.
 	CP_BODY_TYPE_STATIC,
 } cpBodyType;
 
@@ -54,7 +54,7 @@ CP_EXPORT cpBody* cpBodyNew(cpFloat mass, cpFloat moment);
 
 /// Allocate and initialize a cpBody, and set it as a kinematic body.
 CP_EXPORT cpBody* cpBodyNewKinematic(void);
-/// Allocate and initialize a cpBody, and set it as a static body.
+/// Allocate and initialize a cpBody, and set it as a body.
 CP_EXPORT cpBody* cpBodyNewStatic(void);
 
 /// Destroy a cpBody.
@@ -65,7 +65,7 @@ CP_EXPORT void cpBodyFree(cpBody *body);
 // Defined in cpSpace.c
 /// Wake up a sleeping or idle body.
 CP_EXPORT void cpBodyActivate(cpBody *body);
-/// Wake up any sleeping or idle bodies touching a static body.
+/// Wake up any sleeping or idle bodies touching a body.
 CP_EXPORT void cpBodyActivateStatic(cpBody *body, cpShape *filter);
 
 /// Force a body to fall asleep immediately.

@@ -35,45 +35,45 @@ typedef struct cpBB{
 } cpBB;
 
 /// Convenience constructor for cpBB structs.
-static inline cpBB cpBBNew(const cpFloat l, const cpFloat b, const cpFloat r, const cpFloat t)
+inline cpBB cpBBNew(const cpFloat l, const cpFloat b, const cpFloat r, const cpFloat t)
 {
 	cpBB bb = {l, b, r, t};
 	return bb;
 }
 
 /// Constructs a cpBB centered on a point with the given extents (half sizes).
-static inline cpBB
+inline cpBB
 cpBBNewForExtents(const cpVect c, const cpFloat hw, const cpFloat hh)
 {
 	return cpBBNew(c.x - hw, c.y - hh, c.x + hw, c.y + hh);
 }
 
 /// Constructs a cpBB for a circle with the given position and radius.
-static inline cpBB cpBBNewForCircle(const cpVect p, const cpFloat r)
+inline cpBB cpBBNewForCircle(const cpVect p, const cpFloat r)
 {
 	return cpBBNewForExtents(p, r, r);
 }
 
 /// Returns true if @c a and @c b intersect.
-static inline cpBool cpBBIntersects(const cpBB a, const cpBB b)
+inline cpBool cpBBIntersects(const cpBB a, const cpBB b)
 {
 	return (a.l <= b.r && b.l <= a.r && a.b <= b.t && b.b <= a.t);
 }
 
 /// Returns true if @c other lies completely within @c bb.
-static inline cpBool cpBBContainsBB(const cpBB bb, const cpBB other)
+inline cpBool cpBBContainsBB(const cpBB bb, const cpBB other)
 {
 	return (bb.l <= other.l && bb.r >= other.r && bb.b <= other.b && bb.t >= other.t);
 }
 
 /// Returns true if @c bb contains @c v.
-static inline cpBool cpBBContainsVect(const cpBB bb, const cpVect v)
+inline cpBool cpBBContainsVect(const cpBB bb, const cpVect v)
 {
 	return (bb.l <= v.x && bb.r >= v.x && bb.b <= v.y && bb.t >= v.y);
 }
 
 /// Returns a bounding box that holds both bounding boxes.
-static inline cpBB cpBBMerge(const cpBB a, const cpBB b){
+inline cpBB cpBBMerge(const cpBB a, const cpBB b){
 	return cpBBNew(
 		cpfmin(a.l, b.l),
 		cpfmin(a.b, b.b),
@@ -83,7 +83,7 @@ static inline cpBB cpBBMerge(const cpBB a, const cpBB b){
 }
 
 /// Returns a bounding box that holds both @c bb and @c v.
-static inline cpBB cpBBExpand(const cpBB bb, const cpVect v){
+inline cpBB cpBBExpand(const cpBB bb, const cpVect v){
 	return cpBBNew(
 		cpfmin(bb.l, v.x),
 		cpfmin(bb.b, v.y),
@@ -93,26 +93,26 @@ static inline cpBB cpBBExpand(const cpBB bb, const cpVect v){
 }
 
 /// Returns the center of a bounding box.
-static inline cpVect
+inline cpVect
 cpBBCenter(cpBB bb)
 {
 	return cpvlerp(cpv(bb.l, bb.b), cpv(bb.r, bb.t), 0.5f);
 }
 
 /// Returns the area of the bounding box.
-static inline cpFloat cpBBArea(cpBB bb)
+inline cpFloat cpBBArea(cpBB bb)
 {
 	return (bb.r - bb.l)*(bb.t - bb.b);
 }
 
 /// Merges @c a and @c b and returns the area of the merged bounding box.
-static inline cpFloat cpBBMergedArea(cpBB a, cpBB b)
+inline cpFloat cpBBMergedArea(cpBB a, cpBB b)
 {
 	return (cpfmax(a.r, b.r) - cpfmin(a.l, b.l))*(cpfmax(a.t, b.t) - cpfmin(a.b, b.b));
 }
 
 /// Returns the fraction along the segment query the cpBB is hit. Returns INFINITY if it doesn't hit.
-static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
+inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
 {
 	cpVect delta = cpvsub(b, a);
 	cpFloat tmin = -INFINITY, tmax = INFINITY;
@@ -143,20 +143,20 @@ static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
 }
 
 /// Return true if the bounding box intersects the line segment with ends @c a and @c b.
-static inline cpBool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)
+inline cpBool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)
 {
 	return (cpBBSegmentQuery(bb, a, b) != INFINITY);
 }
 
 /// Clamp a vector to a bounding box.
-static inline cpVect
+inline cpVect
 cpBBClampVect(const cpBB bb, const cpVect v)
 {
 	return cpv(cpfclamp(v.x, bb.l, bb.r), cpfclamp(v.y, bb.b, bb.t));
 }
 
 /// Wrap a vector to a bounding box.
-static inline cpVect
+inline cpVect
 cpBBWrapVect(const cpBB bb, const cpVect v)
 {
 	cpFloat dx = cpfabs(bb.r - bb.l);
@@ -171,7 +171,7 @@ cpBBWrapVect(const cpBB bb, const cpVect v)
 }
 
 /// Returns a bounding box offseted by @c v.
-static inline cpBB
+inline cpBB
 cpBBOffset(const cpBB bb, const cpVect v)
 {
 	return cpBBNew(

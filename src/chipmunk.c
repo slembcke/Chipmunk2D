@@ -325,7 +325,50 @@ cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBloc
 	return cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)ShapeQueryIteratorFunc, block);
 }
 
+// declarations of inline functions in chipmunk_types.h
+
+cpFloat cpfmax(cpFloat a, cpFloat b);
+cpFloat cpfmin(cpFloat a, cpFloat b);
+cpFloat cpfabs(cpFloat f);
+cpFloat cpfclamp(cpFloat f, cpFloat min, cpFloat max);
+cpFloat cpfclamp01(cpFloat f);
+cpFloat cpflerp(cpFloat f1, cpFloat f2, cpFloat t);
+cpFloat cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d);
+
+// declarations of inline functions in chipmunk_private.h
+
+void CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r1, cpVect a, cpVect b, cpFloat r2, cpSegmentQueryInfo *info);
+
+cpArbiter * cpArbiterNext(cpArbiter *node, cpBody *body);
+
+cpVect cpClosetPointOnSegment(const cpVect p, const cpVect a, const cpVect b);
+struct cpArbiterThread * cpArbiterThreadForBody(cpArbiter *arb, cpBody *body);
+cpBool cpShapeActive(cpShape *shape);
+void CircleSegmentQuery(cpShape *shape, cpVect center, cpFloat r1, cpVect a, cpVect b, cpFloat r2, cpSegmentQueryInfo *info);
+cpBool cpShapeFilterReject(cpShapeFilter a, cpShapeFilter b);
+void cpConstraintActivateBodies(cpConstraint *constraint);
+
+void cpSpaceUncacheArbiter(cpSpace *space, cpArbiter *arb);
+cpArray * cpSpaceArrayForBodyType(cpSpace *space, cpBodyType type);
+cpConstraint * cpConstraintNext(cpConstraint *node, cpBody *body);
+cpArbiter * cpArbiterNext(cpArbiter *node, cpBody *body);
+cpShapeFilter cpShapeFilterNew(cpGroup group, cpBitmask categories, cpBitmask mask);
+
+void cpConstraintActivateBodies(cpConstraint *constraint);
+cpVect relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2);
+cpFloat normal_relative_velocity(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n);
+void apply_impulse(cpBody *body, cpVect j, cpVect r);
+void apply_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j);
+void apply_bias_impulse(cpBody *body, cpVect j, cpVect r);
+void apply_bias_impulses(cpBody *a , cpBody *b, cpVect r1, cpVect r2, cpVect j);
+cpFloat k_scalar_body(cpBody *body, cpVect r, cpVect n);
+cpFloat k_scalar(cpBody *a, cpBody *b, cpVect r1, cpVect r2, cpVect n);
+cpMat2x2 k_tensor(cpBody *a, cpBody *b, cpVect r1, cpVect r2);
+cpFloat bias_coef(cpFloat errorBias, cpFloat dt);
+
+cpMat2x2 cpMat2x2New(cpFloat a, cpFloat b, cpFloat c, cpFloat d);
+cpVect cpMat2x2Transform(cpMat2x2 m, cpVect v);
+
 #endif
 #endif
 
-#include "chipmunk/chipmunk_ffi.h"

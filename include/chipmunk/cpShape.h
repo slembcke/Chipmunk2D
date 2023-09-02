@@ -67,7 +67,7 @@ static const cpShapeFilter CP_SHAPE_FILTER_ALL = {CP_NO_GROUP, CP_ALL_CATEGORIES
 static const cpShapeFilter CP_SHAPE_FILTER_NONE = {CP_NO_GROUP, ~CP_ALL_CATEGORIES, ~CP_ALL_CATEGORIES};
 
 /// Create a new collision filter.
-static inline cpShapeFilter
+inline cpShapeFilter
 cpShapeFilterNew(cpGroup group, cpBitmask categories, cpBitmask mask)
 {
 	cpShapeFilter filter = {group, categories, mask};
