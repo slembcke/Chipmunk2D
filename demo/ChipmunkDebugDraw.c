@@ -23,7 +23,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "sokol/sokol_gfx.h"
+#include "sokol/sokol.h"
 
 #include "chipmunk/chipmunk_private.h"
 #include "ChipmunkDebugDraw.h"
@@ -126,7 +126,7 @@ ChipmunkDebugDrawInit(void)
 			
 			void main(){
 				float len = length(FRAG.uv);
-				float fw = length(fwidth(FRAG.uv));
+				float fw = length(vec2(dFdx(len), dFdy(len)));
 				float mask = smoothstep(-1.0, fw - 1.0, -len);
 				
 				float outline = 1.0 - fw;

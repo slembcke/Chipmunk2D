@@ -1,6 +1,10 @@
 // Copyright 2013 Howling Moon Software. All rights reserved.
 // See http://chipmunk2d.net/legal.php for more information.
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Polylines are just arrays of vertexes.
 // They are looped if the first vertex is equal to the last.
 // cpPolyline structs are intended to be passed by value and destroyed when you are done with them.
@@ -68,3 +72,7 @@ CP_EXPORT void cpPolylineSetCollectSegment(cpVect v0, cpVect v1, cpPolylineSet *
 CP_EXPORT cpPolylineSet *cpPolylineConvexDecomposition(cpPolyline *line, cpFloat tol);
 
 #define cpPolylineConvexDecomposition_BETA cpPolylineConvexDecomposition
+
+#ifdef __cplusplus
+}
+#endif

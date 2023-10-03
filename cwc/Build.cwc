@@ -8,7 +8,6 @@
 ;Build Engine
 -c ../src/ !../src/cpHastySpace.c -o obj/{sOut}/lib/Chipmunk/
 -{vIncl}
--{vOS_Flag}
 >
 ;Generate Dynamic Lib
 -o obj/{sOut}/lib/ -#To Lib/{sOut}/Chipmunk.{_sDynamic}
