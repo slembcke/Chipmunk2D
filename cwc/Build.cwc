@@ -1,0 +1,27 @@
+-{vFlag}=""
+>
+-{sOut}={_sPlatform}_{_sConfig_Type}_{_sOpt}
+>
+-{vIncl}=
+-I ../include/ 
+>
+;Build Engine
+-c ../src/ !../src/cpHastySpace.c -o obj/{sOut}/lib/Chipmunk/
+-{vIncl}
+>
+;Generate Dynamic Lib
+-o obj/{sOut}/lib/ -#To Lib/{sOut}/Chipmunk.{_sDynamic}
+>
+;Generate Static Lib
+-o obj/{sOut}/lib/ -#To Lib/{sOut}/libChipmunk.a
+>
+;Build an Example
+-c ../Demo/ -o obj/{sOut}/
+-{vIncl}
+-{vOS_Flag}
+>
+;Generate executable
+-o obj/{sOut}/ -#To _out/{sOut}/App.*
+{vOS_FlagLink}
+>
+-#Run

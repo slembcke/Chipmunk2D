@@ -1,0 +1,11 @@
+;Register Cwc before using a .cwmake
+>
+-{_sOpt}="OS"
+>
+-{vOS_FlagLink}=-s USE_WEBGL2=1 |
+-{vOS_Flag}=-DSOKOL_GLES3 -fdeclspec -DNDEBUG
+> 
+-{_sDynamic}="so"
+>
+-#Run Build.cwc -{_wToolchain}= "VLianceTool/WebRT"
+-{vPreloadRc}="--preload-file Rc/@Rc/"

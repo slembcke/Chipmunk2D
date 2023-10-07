@@ -1,0 +1,10 @@
+;Register Cwc before using a .cwmake
+>
+-{_sOpt}="O2"
+>
+-{vOS_FlagLink}=-lgdi32 |
+-{vOS_Flag}=-DSOKOL_GLCORE33
+> 
+-{_sDynamic}="dll"
+>
+-#Run Build.cwc -{_wToolchain}= VLianceTool/LibRT
