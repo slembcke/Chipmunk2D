@@ -239,12 +239,14 @@ typedef void (*cpConstraintPreStepImpl)(cpConstraint *constraint, cpFloat dt);
 typedef void (*cpConstraintApplyCachedImpulseImpl)(cpConstraint *constraint, cpFloat dt_coef);
 typedef void (*cpConstraintApplyImpulseImpl)(cpConstraint *constraint, cpFloat dt);
 typedef cpFloat (*cpConstraintGetImpulseImpl)(cpConstraint *constraint);
+typedef void (*cpConstraintResetAccImpl)(cpConstraint *constraint);
 
 typedef struct cpConstraintClass {
 	cpConstraintPreStepImpl preStep;
 	cpConstraintApplyCachedImpulseImpl applyCachedImpulse;
 	cpConstraintApplyImpulseImpl applyImpulse;
 	cpConstraintGetImpulseImpl getImpulse;
+	cpConstraintResetAccImpl resetAcc;
 } cpConstraintClass;
 
 struct cpConstraint {
