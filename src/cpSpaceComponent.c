@@ -304,6 +304,14 @@ cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 			body->sleeping.next = NULL;
 		}
 	}
+
+	// Clear an arbiter list pointer
+	for(int i=0, count=arbiters->num; i<count; i++){
+		cpArbiter *arb = (cpArbiter*)arbiters->arr[i];
+		cpBody *a = arb->body_a, *b = arb->body_b;
+		a->arbiterList=NULL;
+		b->arbiterList=NULL;
+	}
 }
 
 void
