@@ -189,6 +189,7 @@ ChipmunkDemoDefaultDrawImpl(cpSpace *space)
 		ColorForShape,
 		{0.0f, 0.75f, 0.0f, 1.0f}, // Constraint color
 		{1.0f, 0.0f, 0.0f, 1.0f}, // Collision point color
+		cpTransformIdentity,
 		NULL,
 	};
 	
