@@ -231,10 +231,7 @@ int pthread_join(pthread_t thread, void **value_ptr)
 	#error Compiler not supported.
 #endif
 
-#if CP_USE_DOUBLES
-	#if !__arm64
-		#error Cannot use CP_USE_DOUBLES on 32 bit ARM.
-	#endif
+#if CP_USE_DOUBLES && __arm64
 	
 	typedef float64_t cpFloat_t;
 	typedef float64x2_t cpFloatx2_t;
