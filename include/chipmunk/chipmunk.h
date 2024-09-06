@@ -36,7 +36,11 @@
 #endif
 
 #ifdef _WIN32
-	#define CP_EXPORT __declspec(dllexport)
+        #ifdef chipmunk_EXPORTS
+            #define CP_EXPORT __declspec(dllexport)
+        #else
+            #define CP_EXPORT __declspec(dllimport)
+        #endif
 #else
 	#define CP_EXPORT
 #endif
