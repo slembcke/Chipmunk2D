@@ -1,0 +1,21 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Chipmunk2D
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Scott
+    family-names: Lembcke
+repository-code: 'https://github.com/slembcke/Chipmunk2D'
+url: 'https://chipmunk-physics.net/'
+abstract: >-
+  Chipmunk2D is a simple, lightweight, fast and portable 2D
+  rigid body physics library written in C.
+keywords:
+  - 2d physics simulation
+  - rigidbody physics
+license: MIT
