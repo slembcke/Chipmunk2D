@@ -46,6 +46,14 @@ UNIXes: A forum user was kind enough to make a set of CMake files for Chipmunk. 
 
 Windows: Visual Studio projects are included in the msvc/ directory. While I try to make sure the MSVC 10 project is up to date, I don't have MSVC 9 to keep that project updated regularly. It may not work. I'd appreciate a hand fixing it if that's the case.
 
+Building chipmunk2d with vcpkg: The chipmunk2d port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please create an issue or pull request on the vcpkg repository. The url of vcpkg is: https://github.com/Microsoft/vcpkg . You can download and install chipmunk2d using the vcpkg dependency manager:
+
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.sh
+        ./vcpkg integrate install
+        ./vcpkg install chipmunk2d
+
 
 h2. GET UP TO DATE:
 
