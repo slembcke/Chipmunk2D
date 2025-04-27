@@ -1,4 +1,4 @@
-#include "chipmunk/cpRobust.h"
+#include "chipmunk/chipmunk_private.h"
 
 
 cpBool

@@ -19,6 +19,8 @@ if(BUILD_SHARED)
   if(MSVC)
     set_source_files_properties(${chipmunk_source_files} PROPERTIES LANGUAGE CXX)
     set_target_properties(chipmunk PROPERTIES LINKER_LANGUAGE CXX)
+    target_compile_definitions(chipmunk PRIVATE CHIPMUNK_BUILD
+                                    PUBLIC CHIPMUNK_SHARED)
   endif(MSVC)
   # set the lib's version number
   # But avoid on Android because symlinks to version numbered .so's don't work with Android's Java-side loadLibrary.
