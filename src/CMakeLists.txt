@@ -53,7 +53,7 @@ if(BUILD_STATIC)
 endif(BUILD_STATIC)
 
 if(BUILD_SHARED OR INSTALL_STATIC)
-  # FIXME: change to PUBLIC_HEADER to allow building frameworks
-  install(FILES ${chipmunk_public_header} DESTINATION include/chipmunk)
-  install(FILES ${chipmunk_constraint_header} DESTINATION include/chipmunk/constraints)
+  # FIXME: change to target_sources(FILE_SET)
+  install(FILES ${chipmunk_public_header} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/chipmunk)
+  install(FILES ${chipmunk_constraint_header} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/chipmunk/constraints)
 endif(BUILD_SHARED OR INSTALL_STATIC)

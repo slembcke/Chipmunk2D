@@ -42,5 +42,5 @@ add_executable(chipmunk_demos ${chipmunk_demos_source_files})
 target_link_libraries(chipmunk_demos ${chipmunk_demos_libraries})
 
 if(INSTALL_DEMOS)
-	install(TARGETS chipmunk_demos RUNTIME DESTINATION bin)
+	install(TARGETS chipmunk_demos)
 endif(INSTALL_DEMOS)
