@@ -31,15 +31,15 @@ I hope you enjoy using Chipmunk2D!
 ** Can be used to easily implement breakable or animated joints. (Examples included)
 * Maintains a contact graph of all colliding objects.
 * Lightweight C99 implementation with no external dependencies outside of the Std. C library.
-* "Many language bindings available":http://chipmunk2d.net/bindingsAndPorts.php.
-* Simple, read the "documentation":http://chipmunk2d.net/documentation.php and see!
+* [Many language bindings available](http://chipmunk2d.net/bindingsAndPorts.php).
+* Simple, read the [documentation](http://chipmunk2d.net/documentation.php) and see!
 * Unrestrictive MIT license
 
 ## CONTRACTING:
 
 Howling Moon Software (my company) is available for contracting if you want to make the physics in your game really stand out.
 Given our unique experience with the library, we can help you use Chipmunk to its fullest potential.
-Feel free to contact us through our webpage: http://howlingmoonsoftware.com/
+Feel free to contact us through [our webpage](http://howlingmoonsoftware.com/)
 
 ## BUILDING:
 
@@ -56,7 +56,7 @@ Windows: Visual Studio projects are included in the msvc/ directory. While I try
 
 If you got the source from a point release download, you might want to consider getting the latest source from GitHub. Bugs are fixed and new features are added regularly. Big changes are done in branches and tested before merging them in it's rare for the point release downloads to be better or more bug free than the latest code.
 
-Head on over to "GitHub":https://github.com/slembcke/Chipmunk2D and experience the future TODAY! (Okay, so maybe it's not that exciting.)
+Head on over to [Codeberg](https://github.com/slembcke/Chipmunk2D) and experience the future TODAY! (Okay, so maybe it's not that exciting.)
 
 
 ## GETTING STARTED:
