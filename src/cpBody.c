@@ -20,6 +20,7 @@
  */
 
 #include <float.h>
+#include <math.h>
 #include <stdarg.h>
 
 #include "chipmunk/chipmunk_private.h"
@@ -104,7 +105,7 @@ cpBodyFree(cpBody *body)
 	#define	cpAssertSaneBody(body)
 #else
 	static void cpv_assert_nan(cpVect v, const char *message){cpAssertHard(v.x == v.x && v.y == v.y, message);}
-	static void cpv_assert_infinite(cpVect v, const char *message){cpAssertHard(cpfabs(v.x) != INFINITY && cpfabs(v.y) != INFINITY, message);}
+	static void cpv_assert_infinite(cpVect v, const char *message){cpAssertHard(!isinf(cpfabs(v.x)) && !isinf(cpfabs(v.y)), message);}
 	static void cpv_assert_sane(cpVect v, const char *message){cpv_assert_nan(v, message); cpv_assert_infinite(v, message);}
 	
 	static void
@@ -119,9 +120,9 @@ cpBodyFree(cpBody *body)
 		cpv_assert_sane(body->v, "Body's velocity is invalid.");
 		cpv_assert_sane(body->f, "Body's force is invalid.");
 
-		cpAssertHard(body->a == body->a && cpfabs(body->a) != INFINITY, "Body's angle is invalid.");
-		cpAssertHard(body->w == body->w && cpfabs(body->w) != INFINITY, "Body's angular velocity is invalid.");
-		cpAssertHard(body->t == body->t && cpfabs(body->t) != INFINITY, "Body's torque is invalid.");
+		cpAssertHard(body->a == body->a && !isinf(cpfabs(body->a)), "Body's angle is invalid.");
+		cpAssertHard(body->w == body->w && !isinf(cpfabs(body->w)), "Body's angular velocity is invalid.");
+		cpAssertHard(body->t == body->t && !isinf(cpfabs(body->t)), "Body's torque is invalid.");
 	}
 	
 	#define	cpAssertSaneBody(body) cpBodySanityCheck(body)
@@ -136,9 +137,9 @@ cpBodyIsSleeping(const cpBody *body)
 cpBodyType
 cpBodyGetType(cpBody *body)
 {
-	if(body->sleeping.idleTime == INFINITY){
+	if(isinf(body->sleeping.idleTime)){
 		return CP_BODY_TYPE_STATIC;
-	} else if(body->m == INFINITY){
+	} else if(isinf(body->m)){
 		return CP_BODY_TYPE_KINEMATIC;
 	} else {
 		return CP_BODY_TYPE_DYNAMIC;
@@ -254,7 +255,7 @@ void
 cpBodySetMass(cpBody *body, cpFloat mass)
 {
 	cpAssertHard(cpBodyGetType(body) == CP_BODY_TYPE_DYNAMIC, "You cannot set the mass of kinematic or static bodies.");
-	cpAssertHard(0.0f <= mass && mass < INFINITY, "Mass must be positive and finite.");
+	cpAssertHard(0.0f <= mass && isfinite(mass), "Mass must be positive and finite.");
 	
 	cpBodyActivate(body);
 	body->m = mass;

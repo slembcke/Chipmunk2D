@@ -20,6 +20,7 @@
  */
  
 #include <string.h>
+#include <math.h>
 
 #include "chipmunk/chipmunk_private.h"
 
@@ -220,7 +221,7 @@ ComponentActive(cpBody *root, cpFloat threshold)
 void
 cpSpaceProcessComponents(cpSpace *space, cpFloat dt)
 {
-	cpBool sleep = (space->sleepTimeThreshold != INFINITY);
+	cpBool sleep = isfinite(space->sleepTimeThreshold);
 	cpArray *bodies = space->dynamicBodies;
 	
 #ifndef NDEBUG
