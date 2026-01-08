@@ -1,3 +1,21 @@
+# This Project has Moved!
+
+You can find the new project page on [Codeberg](https://codeberg.org/slembcke/Chipmunk2D).
+
+At least for now, I will be supporting the project on both sites, but eventually I plan to eventually drop GitHub entirely.
+
+To migrate an existing checkout, you can use the following command, or make a new checkout of the project from the new location.
+
+```
+git remote set-url origin https://codeberg.org/slembcke/Chipmunk2D
+git fetch origin master
+git reset origin/master
+```
+
+You may additionally need to run `git checkout .` to cleanup the deleted files. *This will also discard your local changes if you have made any.*
+
+To read more about why this project moved, you can read about it in [PROJECT_HAS_MOVED.md](PROJECT_HAS_MOVED.md).
+
 ![Chipmunk Logo](http://files.slembcke.net/chipmunk/logo/logo1_med.png)
 
 ## NEW IN CHIPMUNK 7
