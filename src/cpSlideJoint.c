@@ -89,9 +89,15 @@ applyImpulse(cpSlideJoint *joint, cpFloat dt)
 }
 
 static cpFloat
-getImpulse(cpConstraint *joint)
+getImpulse(cpSlideJoint *joint)
 {
-	return cpfabs(((cpSlideJoint *)joint)->jnAcc);
+	return cpfabs(joint->jnAcc);
+}
+
+static void
+resetAcc(cpSlideJoint *joint)
+{
+	joint->jnAcc = 0.0f;
 }
 
 static const cpConstraintClass klass = {

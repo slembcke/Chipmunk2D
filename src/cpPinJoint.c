@@ -80,13 +80,19 @@ getImpulse(cpPinJoint *joint)
 	return cpfabs(joint->jnAcc);
 }
 
+static void
+resetAcc(cpPinJoint *joint)
+{
+	joint->jnAcc = 0.0f;
+}
+
 static const cpConstraintClass klass = {
 	(cpConstraintPreStepImpl)preStep,
 	(cpConstraintApplyCachedImpulseImpl)applyCachedImpulse,
 	(cpConstraintApplyImpulseImpl)applyImpulse,
 	(cpConstraintGetImpulseImpl)getImpulse,
+	(cpConstraintResetAccImpl)resetAcc,
 };
-
 
 cpPinJoint *
 cpPinJointAlloc(void)
