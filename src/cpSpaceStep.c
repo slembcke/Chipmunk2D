@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+#include <math.h>
+
 #include "chipmunk/chipmunk_private.h"
 
 //MARK: Post Step Callback Functions
@@ -269,7 +271,7 @@ cpSpaceCollideShapes(cpShape *a, cpShape *b, cpCollisionID id, cpSpace *space)
 		!(a->sensor || b->sensor) &&
 		// Don't process collisions between two infinite mass bodies.
 		// This includes collisions between two kinematic bodies, or a kinematic body and a static body.
-		!(a->body->m == INFINITY && b->body->m == INFINITY)
+		!(isinf(a->body->m) && isinf(b->body->m))
 	){
 		cpArrayPush(space->arbiters, arb);
 	} else {

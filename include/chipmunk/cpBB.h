@@ -145,7 +145,8 @@ static inline cpFloat cpBBSegmentQuery(cpBB bb, cpVect a, cpVect b)
 /// Return true if the bounding box intersects the line segment with ends @c a and @c b.
 static inline cpBool cpBBIntersectsSegment(cpBB bb, cpVect a, cpVect b)
 {
-	return (cpBBSegmentQuery(bb, a, b) != INFINITY);
+	cpFloat result = cpBBSegmentQuery(bb, a, b);
+	return isfinite(result);
 }
 
 /// Clamp a vector to a bounding box.

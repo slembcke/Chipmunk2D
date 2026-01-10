@@ -329,7 +329,16 @@ cpConstraintNext(cpConstraint *node, cpBody *body)
 static inline cpArbiter *
 cpArbiterNext(cpArbiter *node, cpBody *body)
 {
-	return (node->body_a == body ? node->thread_a.next : node->thread_b.next);
+	// Check both body_a and body_b to handle cases where they may have been swapped
+	// after the arbiter was threaded into the body's list
+	if(node->body_a == body){
+		return node->thread_a.next;
+	} else if(node->body_b == body){
+		return node->thread_b.next;
+	} else {
+		// This should never happen in normal operation, but return NULL to prevent infinite loops
+		return NULL;
+	}
 }
 
 #define CP_BODY_FOREACH_ARBITER(bdy, var)\
