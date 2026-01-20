@@ -34,6 +34,11 @@ CP_EXPORT cpPolyline *cpPolylineSimplifyVertexes(cpPolyline *line, cpFloat tol);
 /// Get the convex hull of a polyline as a looped polyline.
 CP_EXPORT cpPolyline *cpPolylineToConvexHull(cpPolyline *line, cpFloat tol);
 
+/// Get vertex of polyline at given index.
+CP_EXPORT cpVect cpPolylineGetVertex(cpPolyline* line, int index);
+
+/// Get pointer to vertices of polyline.
+CP_EXPORT cpVect *cpPolylineGetVertices(cpPolyline* line);
 
 /// Polyline sets are collections of polylines, generally built by cpMarchSoft() or cpMarchHard().
 typedef struct cpPolylineSet {

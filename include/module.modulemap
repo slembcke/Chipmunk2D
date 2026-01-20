@@ -1,0 +1,5 @@
+module CChipmunk2D {
+    umbrella header "CChipmunk2D.h"
+    link "CChipmunk2D"
+    export *
+}
