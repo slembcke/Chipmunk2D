@@ -53,4 +53,7 @@ CP_EXPORT cpVect cpPolyShapeGetVert(const cpShape *shape, int index);
 /// Get the radius of a polygon shape.
 CP_EXPORT cpFloat cpPolyShapeGetRadius(const cpShape *shape);
 
+/// Query if shape is a polygon shape.
+CP_EXPORT cpBool cpShapeIsPoly(const cpShape *shape);
+
 /// @}

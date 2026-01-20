@@ -174,6 +174,9 @@ CP_EXPORT cpVect cpCircleShapeGetOffset(const cpShape *shape);
 /// Get the radius of a circle shape.
 CP_EXPORT cpFloat cpCircleShapeGetRadius(const cpShape *shape);
 
+/// Query if shape is a polygon shape.
+CP_EXPORT cpBool cpShapeIsCircle(const cpShape *shape);
+
 /// @}
 /// @defgroup cpSegmentShape cpSegmentShape
 
@@ -195,5 +198,8 @@ CP_EXPORT cpVect cpSegmentShapeGetB(const cpShape *shape);
 CP_EXPORT cpVect cpSegmentShapeGetNormal(const cpShape *shape);
 /// Get the first endpoint of a segment shape.
 CP_EXPORT cpFloat cpSegmentShapeGetRadius(const cpShape *shape);
+
+/// Query if shape is a segment shape.
+CP_EXPORT cpBool cpShapeIsSegment(const cpShape *shape);
 
 /// @}
