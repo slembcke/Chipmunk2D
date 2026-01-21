@@ -224,7 +224,7 @@ ShapeQuery(cpShape *a, cpShape *b, cpCollisionID id, struct ShapeQueryContext *c
 	cpContactPointSet set = cpShapesCollide(a, b);
 	if(set.count){
 		if(context->func) context->func(b, &set, context->data);
-		context->anyCollision = !(a->sensor || b->sensor);
+		context->anyCollision |= !(a->sensor || b->sensor);
 	}
 	
 	return id;
