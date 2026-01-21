@@ -544,7 +544,7 @@ cpBBTreeAlloc(void)
 	return (cpBBTree *)cpcalloc(1, sizeof(cpBBTree));
 }
 
-static int
+static cpBool
 leafSetEql(void *obj, Node *node)
 {
 	return (obj == node->obj);
