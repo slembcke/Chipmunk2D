@@ -21,7 +21,7 @@
 
 // Used for resizing hash tables.
 // Values approximately double.
-// http://planetmath.org/encyclopedia/GoodHashTablePrimes.html
+// https://planetmath.org/goodhashtableprimes
 static int primes[] = {
 	5,
 	13,
