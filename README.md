@@ -74,7 +74,7 @@ Windows: Visual Studio projects are included in the msvc/ directory. While I try
 
 If you got the source from a point release download, you might want to consider getting the latest source from GitHub. Bugs are fixed and new features are added regularly. Big changes are done in branches and tested before merging them in it's rare for the point release downloads to be better or more bug free than the latest code.
 
-Head on over to [Codeberg](https://github.com/slembcke/Chipmunk2D) and experience the future TODAY! (Okay, so maybe it's not that exciting.)
+Head on over to [Codeberg](https://codeberg.org/slembcke/Chipmunk2D) and experience the future TODAY! (Okay, so maybe it's not that exciting.)
 
 
 ## GETTING STARTED:
