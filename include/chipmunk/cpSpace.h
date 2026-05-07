@@ -38,7 +38,8 @@ typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, cpDataPo
 
 /// Struct that holds function callback pointers to configure custom collision handling.
 /// Collision handlers have a pair of types; when a collision occurs between two shapes that have these types, the collision handler functions are triggered.
-struct cpCollisionHandler {
+struct cpCollisionHandler
+{
 	/// Collision type identifier of the first shape that this handler recognizes.
 	/// In the collision handler callback, the shape with this type will be the first argument. Read only.
 	const cpCollisionType typeA;
@@ -61,21 +62,19 @@ struct cpCollisionHandler {
 
 // TODO: Make timestep a parameter?
 
-
 //MARK: Memory and Initialization
 
 /// Allocate a cpSpace.
-CP_EXPORT cpSpace* cpSpaceAlloc(void);
+CP_EXPORT cpSpace *cpSpaceAlloc(void);
 /// Initialize a cpSpace.
-CP_EXPORT cpSpace* cpSpaceInit(cpSpace *space);
+CP_EXPORT cpSpace *cpSpaceInit(cpSpace *space);
 /// Allocate and initialize a cpSpace.
-CP_EXPORT cpSpace* cpSpaceNew(void);
+CP_EXPORT cpSpace *cpSpaceNew(void);
 
 /// Destroy a cpSpace.
 CP_EXPORT void cpSpaceDestroy(cpSpace *space);
 /// Destroy and free a cpSpace.
 CP_EXPORT void cpSpaceFree(cpSpace *space);
-
 
 //MARK: Properties
 
@@ -131,7 +130,7 @@ CP_EXPORT void cpSpaceSetUserData(cpSpace *space, cpDataPointer userData);
 
 /// The Space provided static body for a given cpSpace.
 /// This is merely provided for convenience and you are not required to use it.
-CP_EXPORT cpBody* cpSpaceGetStaticBody(const cpSpace *space);
+CP_EXPORT cpBody *cpSpaceGetStaticBody(const cpSpace *space);
 
 /// Returns the current (or most recent) time step used with the given space.
 /// Useful from callbacks if your time step is not a compile-time global.
@@ -139,7 +138,6 @@ CP_EXPORT cpFloat cpSpaceGetCurrentTimeStep(const cpSpace *space);
 
 /// returns true from inside a callback when objects cannot be added/removed.
 CP_EXPORT cpBool cpSpaceIsLocked(cpSpace *space);
-
 
 //MARK: Collision Handlers
 
@@ -151,16 +149,15 @@ CP_EXPORT cpCollisionHandler *cpSpaceAddCollisionHandler(cpSpace *space, cpColli
 /// Create or return the existing wildcard collision handler for the specified type.
 CP_EXPORT cpCollisionHandler *cpSpaceAddWildcardHandler(cpSpace *space, cpCollisionType type);
 
-
 //MARK: Add/Remove objects
 
 /// Add a collision shape to the simulation.
 /// If the shape is attached to a static body, it will be added as a static shape.
-CP_EXPORT cpShape* cpSpaceAddShape(cpSpace *space, cpShape *shape);
+CP_EXPORT cpShape *cpSpaceAddShape(cpSpace *space, cpShape *shape);
 /// Add a rigid body to the simulation.
-CP_EXPORT cpBody* cpSpaceAddBody(cpSpace *space, cpBody *body);
+CP_EXPORT cpBody *cpSpaceAddBody(cpSpace *space, cpBody *body);
 /// Add a constraint to the simulation.
-CP_EXPORT cpConstraint* cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint);
+CP_EXPORT cpConstraint *cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint);
 
 /// Remove a collision shape from the simulation.
 CP_EXPORT void cpSpaceRemoveShape(cpSpace *space, cpShape *shape);
@@ -185,7 +182,6 @@ typedef void (*cpPostStepFunc)(cpSpace *space, void *key, void *data);
 /// Returns true only if @c key has never been scheduled before.
 /// It's possible to pass @c NULL for @c func if you only want to mark @c key as being used.
 CP_EXPORT cpBool cpSpaceAddPostStepCallback(cpSpace *space, cpPostStepFunc func, void *key, void *data);
-
 
 //MARK: Queries
 
@@ -217,7 +213,6 @@ typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points,
 /// Query a space for any shapes overlapping the given shape and call @c func for each shape found.
 CP_EXPORT cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
 
-
 //MARK: Iteration
 
 /// Space/body iterator callback function type.
@@ -235,7 +230,6 @@ typedef void (*cpSpaceConstraintIteratorFunc)(cpConstraint *constraint, void *da
 /// Call @c func for each shape in the space.
 CP_EXPORT void cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, void *data);
 
-
 //MARK: Indexing
 
 /// Update the collision detection info for the static shapes in the space.
@@ -248,19 +242,18 @@ CP_EXPORT void cpSpaceReindexShapesForBody(cpSpace *space, cpBody *body);
 /// Switch the space to use a spatial has as it's spatial index.
 CP_EXPORT void cpSpaceUseSpatialHash(cpSpace *space, cpFloat dim, int count);
 
-
 //MARK: Time Stepping
 
 /// Step the space forward in time by @c dt.
 CP_EXPORT void cpSpaceStep(cpSpace *space, cpFloat dt);
-
 
 //MARK: Debug API
 
 #ifndef CP_SPACE_DISABLE_DEBUG_API
 
 /// Color type to use with the space debug drawing API.
-typedef struct cpSpaceDebugColor {
+typedef struct cpSpaceDebugColor
+{
 	float r, g, b, a;
 } cpSpaceDebugColor;
 
@@ -277,14 +270,16 @@ typedef void (*cpSpaceDebugDrawDotImpl)(cpFloat size, cpVect pos, cpSpaceDebugCo
 /// Callback type for a function that returns a color for a given shape. This gives you an opportunity to color shapes based on how they are used in your engine.
 typedef cpSpaceDebugColor (*cpSpaceDebugDrawColorForShapeImpl)(cpShape *shape, cpDataPointer data);
 
-typedef enum cpSpaceDebugDrawFlags {
-	CP_SPACE_DEBUG_DRAW_SHAPES = 1<<0,
-	CP_SPACE_DEBUG_DRAW_CONSTRAINTS = 1<<1,
-	CP_SPACE_DEBUG_DRAW_COLLISION_POINTS = 1<<2,
+typedef enum cpSpaceDebugDrawFlags
+{
+	CP_SPACE_DEBUG_DRAW_SHAPES = 1 << 0,
+	CP_SPACE_DEBUG_DRAW_CONSTRAINTS = 1 << 1,
+	CP_SPACE_DEBUG_DRAW_COLLISION_POINTS = 1 << 2,
 } cpSpaceDebugDrawFlags;
 
 /// Struct used with cpSpaceDebugDraw() containing drawing callbacks and other drawing settings.
-typedef struct cpSpaceDebugDrawOptions {
+typedef struct cpSpaceDebugDrawOptions
+{
 	/// Function that will be invoked to draw circles.
 	cpSpaceDebugDrawCircleImpl drawCircle;
 	/// Function that will be invoked to draw line segments.
@@ -295,7 +290,7 @@ typedef struct cpSpaceDebugDrawOptions {
 	cpSpaceDebugDrawPolygonImpl drawPolygon;
 	/// Function that will be invoked to draw dots.
 	cpSpaceDebugDrawDotImpl drawDot;
-	
+
 	/// Flags that request which things to draw (collision shapes, constraints, contact points).
 	cpSpaceDebugDrawFlags flags;
 	/// Outline color passed to the drawing function.
@@ -306,7 +301,9 @@ typedef struct cpSpaceDebugDrawOptions {
 	cpSpaceDebugColor constraintColor;
 	/// Color passed to drawing functions for collision points.
 	cpSpaceDebugColor collisionPointColor;
-	
+	/// Transform used to transform the things to draw.
+	cpTransform transform;
+
 	/// User defined context pointer passed to all of the callback functions as the 'data' argument.
 	cpDataPointer data;
 } cpSpaceDebugDrawOptions;
