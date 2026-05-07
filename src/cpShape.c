@@ -151,7 +151,7 @@ cpShapeGetFriction(const cpShape *shape)
 void
 cpShapeSetFriction(cpShape *shape, cpFloat friction)
 {
-	cpAssertHard(friction >= 0.0f, "Friction must be postive.");
+	cpAssertHard(friction >= 0.0f, "Friction must be positive.");
 	cpBodyActivate(shape->body);
 	shape->u = friction;
 }
