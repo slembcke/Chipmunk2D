@@ -1,5 +1,3 @@
-cmake_policy(SET CMP0015 NEW) # Convert relative paths
-
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 
@@ -44,5 +42,5 @@ add_executable(chipmunk_demos ${chipmunk_demos_source_files})
 target_link_libraries(chipmunk_demos ${chipmunk_demos_libraries})
 
 if(INSTALL_DEMOS)
-	install(TARGETS chipmunk_demos RUNTIME DESTINATION bin)
+	install(TARGETS chipmunk_demos)
 endif(INSTALL_DEMOS)

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.7...4.0)
 
 project(chipmunk)
 
@@ -14,11 +14,23 @@ if(NOT CMAKE_BUILD_TYPE)
       FORCE)
 endif()
 
+include(GNUInstallDirs)
 # to manually select install locations of libraries and executables
 #   -D LIB_INSTALL_DIR mylib
 #   -D BIN_INSTALL_DIR newbin
-set(LIB_INSTALL_DIR lib CACHE STRING "Install location of libraries")
-set(BIN_INSTALL_DIR bin CACHE STRING "Install location of executables")
+if(DEFINED LIB_INSTALL_DIR)
+  message(WARNING
+      "LIB_INSTALL_DIR is deprecated, use the standard CMAKE_INSTALL_LIBDIR instead."
+  )
+else()
+  set(LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
+endif()
+if(DEFINED BIN_INSTALL_DIR)
+  message(WARNING
+      "LIB_INSTALL_DIR is deprecated, use the standard CMAKE_INSTALL_LIBDIR instead."
+  )
+  set(LIB_INSTALL_DIR "${CMAKE_INSTALL_BINDIR}")
+endif()
 
 # other options for the build, you can i.e. activate the shared library by passing
 #   -D BUILD_SHARED=ON
