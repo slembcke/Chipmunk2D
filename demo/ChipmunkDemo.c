@@ -240,7 +240,7 @@ DrawInfo()
 	cpFloat ke = 0.0f;
 	for(int i=0; i<bodies->num; i++){
 		cpBody *body = (cpBody *)bodies->arr[i];
-		if(body->m == INFINITY || body->i == INFINITY) continue;
+		if(isinf(body->m) || isinf(body->i)) continue;
 		
 		ke += body->m*cpvdot(body->v, body->v) + body->i*body->w*body->w;
 	}
@@ -475,7 +475,7 @@ Click(const sapp_event *event)
 			cpPointQueryInfo info = {0};
 			cpShape *shape = cpSpacePointQueryNearest(space, mouse_pos, radius, GRAB_FILTER, &info);
 			
-			if(shape && cpBodyGetMass(cpShapeGetBody(shape)) < INFINITY){
+			if(shape && isfinite(cpBodyGetMass(cpShapeGetBody(shape)))){
 				// Use the closest point on the surface if the click is outside of the shape.
 				cpVect nearest = (info.distance > 0.0f ? info.point : mouse_pos);
 				
