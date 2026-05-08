@@ -65,7 +65,7 @@ applyImpulse(cpDampedRotarySpring *spring, cpFloat dt)
 	
 	//apply_impulses(a, b, spring->r1, spring->r2, cpvmult(spring->n, v_damp*spring->nMass));
 	cpFloat j_damp = w_damp*spring->iSum;
-	spring->jAcc += j_damp;
+	spring->jAcc -= j_damp;
 	
 	a->w += j_damp*a->i_inv;
 	b->w -= j_damp*b->i_inv;
