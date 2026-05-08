@@ -117,7 +117,7 @@ cpSweep1DEach(cpSweep1D *sweep, cpSpatialIndexIteratorFunc func, void *data)
 	for(int i=0, count=sweep->num; i<count; i++) func(table[i].obj, data);
 }
 
-static int
+static cpBool 
 cpSweep1DContains(cpSweep1D *sweep, void *obj, cpHashValue hashid)
 {
 	TableCell *table = sweep->table;

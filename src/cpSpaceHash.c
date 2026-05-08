@@ -69,7 +69,7 @@ cpHandleRelease(cpHandle *hand, cpArray *pooledHandles)
 	if(hand->retain == 0) cpArrayPush(pooledHandles, hand);
 }
 
-static int handleSetEql(void *obj, cpHandle *hand){return (obj == hand->obj);}
+static cpBool handleSetEql(void *obj, cpHandle *hand){return (obj == hand->obj);}
 
 static void *
 handleSetTrans(void *obj, cpSpaceHash *hash)
@@ -564,7 +564,7 @@ cpSpaceHashCount(cpSpaceHash *hash)
 	return cpHashSetCount(hash->handleSet);
 }
 
-static int
+static cpBool
 cpSpaceHashContains(cpSpaceHash *hash, void *obj, cpHashValue hashid)
 {
 	return cpHashSetFind(hash->handleSet, hashid, obj) != NULL;
