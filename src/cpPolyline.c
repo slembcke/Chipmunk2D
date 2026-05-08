@@ -244,7 +244,7 @@ cpPolylineSetInit(cpPolylineSet *set)
 {
 	set->count = 0;
 	set->capacity = 8;
-	set->lines = (cpPolyline**) cpcalloc(set->capacity, sizeof(cpPolyline));
+	set->lines = (cpPolyline**) cpcalloc(set->capacity, sizeof(cpPolyline*));
 	
   return set;
 }
@@ -313,7 +313,7 @@ cpPolylineSetPush(cpPolylineSet *set, cpPolyline *line)
   set->count++;
   if(set->count > set->capacity){
     set->capacity *= 2;
-    set->lines = (cpPolyline**) cprealloc(set->lines, set->capacity*sizeof(cpPolyline));
+    set->lines = (cpPolyline**) cprealloc(set->lines, set->capacity*sizeof(cpPolyline*));
   }
   
 	set->lines[set->count - 1] = line;
