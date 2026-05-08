@@ -222,7 +222,7 @@ int pthread_join(pthread_t thread, void **value_ptr)
 
 //MARK: ARM NEON Solver
 
-#if __ARM_NEON__
+#if defined(__ARM_NEON__) || defined(_M_ARM64) || defined(_M_ARM64EC) 
 #include <arm_neon.h>
 
 // Tested and known to work fine with Clang 3.0 and GCC 4.2
@@ -232,7 +232,7 @@ int pthread_join(pthread_t thread, void **value_ptr)
 #endif
 
 #if CP_USE_DOUBLES
-	#if !__arm64
+	#if !defined(__arm64) && !defined(_M_ARM64) && !defined(_M_ARM64EC)
 		#error Cannot use CP_USE_DOUBLES on 32 bit ARM.
 	#endif
 	
@@ -252,8 +252,13 @@ int pthread_join(pthread_t thread, void **value_ptr)
 	#define vset_lane vsetq_lane_f64
 	#define vmin vminq_f64
 	#define vmax vmaxq_f64
-	#define vrev(__a) __builtin_shufflevector(__a, __a, 1, 0)
-#else
+	#if defined(_M_ARM64) || defined(_M_ARM64EC)
+		// MSVC doesn't support __builtin_shufflevector.
+		#define vrev(__a) vextq_f64(__a, __a, 1)
+	#else
+		#define vrev(__a) __builtin_shufflevector(__a, __a, 1, 0)
+	#endif
+	#else
 	typedef float32_t cpFloat_t;
 	typedef float32x2_t cpFloatx2_t;
 	#define vld vld1_f32
@@ -284,9 +289,16 @@ vmake(cpFloat_t x, cpFloat_t y)
 //	v = vset_lane(y, v, 1);
 //	
 //	return v;
-	
+#if defined(_M_ARM64) || defined(_M_ARM64EC)
+	// MSVC doesn't support compound literals for NEON types
+	cpFloatx2_t v = vdupq_n_f64(0.0);
+	v = vset_lane(x, v, 0);
+	v = vset_lane(y, v, 1);
+	return v;
+#else
 	// This might not be super compatible, but all the NEON headers use it...
-	return (cpFloatx2_t){x, y};
+	return (cpFloatx2_t) { x, y };
+#endif
 }
 
 static void
@@ -480,7 +492,7 @@ Solver(cpSpace *space, unsigned long worker, unsigned long worker_count)
 	for(unsigned long i=0; i<iterations; i++){
 		for(int j=0; j<arbiters->num; j++){
 			cpArbiter *arb = (cpArbiter *)arbiters->arr[j];
-			#ifdef __ARM_NEON__
+			#if defined(__ARM_NEON__) || defined(_M_ARM64) || defined(_M_ARM64EC)
 				cpArbiterApplyImpulse_NEON(arb);
 			#else
 				cpArbiterApplyImpulse(arb);
