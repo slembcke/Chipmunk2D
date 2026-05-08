@@ -322,3 +322,9 @@ cpPolyShapeSetRadius(cpShape *shape, cpFloat radius)
 //	shape->massInfo = cpPolyShapeMassInfo(shape->massInfo.m, poly->count, poly->verts, poly->r);
 //	if(mass > 0.0f) cpBodyAccumulateMassFromShapes(shape->body);
 }
+
+cpBool
+cpShapeIsPoly(const cpShape *shape)
+{
+	return shape->klass == &polyClass;
+}
